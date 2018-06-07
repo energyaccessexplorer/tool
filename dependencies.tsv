@@ -1,0 +1,12 @@
+require.js	http://requirejs.org/docs/release/2.3.5/minified/require.js
+d3.js	https://d3js.org/d3.v5.min.js
+topojson.js	https://unpkg.com/topojson/dist/topojson
+geotiff.js	https://github.com/geotiffjs/geotiff.js/releases/download/v1.0.0-beta.1/geotiff.bundle.min.js
+plotty.js	https://raw.githubusercontent.com/santilland/plotty/master/dist/plotty.min.js
+mapbox-gl.js	https://api.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.js
+mapbox-gl.css	https://api.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css
+world-50m.json	https://unpkg.com/world-atlas/world/50m.json
+world-110m.json	https://unpkg.com/world-atlas/world/110m.json
+countries.json	https://raw.githubusercontent.com/mledoze/countries/master/dist/countries.json
+TZA-adm0.json	https://raw.githubusercontent.com/energy-data/nzt-electrification/master/assets/TZA-adm0.json
+fonts/arimo.woff2	https://fonts.gstatic.com/s/arimo/v11/P5sMzZCDf9_T_10ZxCE.woff2

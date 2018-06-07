@@ -1,0 +1,124 @@
+#controls {
+  color: #f1f1f1;
+  flex: 0;
+  display: flex;
+  text-align: right;
+
+  z-index: 0;
+
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.controls {
+  position: relative;
+  padding: 1em 0 1em 1em;
+}
+
+.controls .label {
+  color: white;
+  font-size: 0.8em;
+}
+
+.controls .loading {
+  position: absolute;
+  background-color: rgba(0,0,0,0.3);
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  text-align: center;
+}
+
+.controls circle {
+  stroke: white;
+  stroke-width: 1px;
+}
+
+.controls .svg-checkbox {
+  margin-bottom: -4px;
+}
+
+.control-group {
+  clear: both;
+  white-space: nowrap;
+}
+
+.controls-category {
+  flex: 1 50%;
+  vertical-align: top;
+  padding: 20px 40px 0 0;
+}
+
+.controls-category-title {
+  font-size: 1.6em;
+  white-space: nowrap;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-family: MyriadPro-Cond;
+  cursor: pointer;
+}
+
+.controls-category-title:before {
+  content: "\00a0\00a0";
+}
+
+.controls-category-title .triangle {
+  display: inline-block;
+  opacity: 0.7;
+  transform: scale(1.4);
+}
+
+.controls-subcategory {
+  margin-top: 1em;
+}
+
+.controls-subcategory-title {
+  font-size: 1.3em;
+  white-space: nowrap;
+  text-transform: capitalize;
+  border-bottom: dashed 1px;
+  box-sizing: border-box;
+  padding: 10px 0;
+  cursor: pointer;
+}
+
+.controls-subcategory-title:before {
+  content: "\00a0\00a0";
+}
+
+.controls-dataset-header {
+  margin-bottom: 10px;
+}
+
+.controls-dataset-description {
+  text-align: right;
+  white-space: nowrap;
+  color: white;
+}
+
+.controls-dataset-description:before {
+  content: "\00a0\00a0";
+}
+
+.controls-dataset-unit {
+  color: white;
+}
+
+.collapse {
+  cursor: pointer;
+}
+
+#supply {
+  background-color: #e4a82e;
+  color: #1c4478;
+  fill: #1c4478;
+}
+
+#demand {
+  background-color: #1c4478;
+  color: #e4a82e;
+  fill: #e4a82e;
+}

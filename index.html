@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    <link href="./stylesheets/main.css" rel="stylesheet" />
+    <link href="./stylesheets/controls.css" rel="stylesheet" />
+    <link href="./stylesheets/maparea.css" rel="stylesheet" />
+
+    <link href="./lib/mapbox-gl.css" rel="stylesheet" />
+    <script src="./lib/mapbox-gl.js"></script>
+
+    <script src="./config.json" type="text/javascript"></script>
+
+    <title>Energy Access</title>
+  </head>
+
+  <body>
+    <div style="position: relative;
+                padding-right: 1em;
+                background-color: #333333;">
+      <div style="height: 3em;
+                  line-height: 3.1em;
+                  width: 100%;
+                  text-align: right;
+                  text-transform: uppercase;
+                  font-family: Georgia, serif;
+                  font-size: 1em;
+                  color: #f1f1f1;">
+        World Resources Institute
+      </div>
+    </div>
+
+    <nav>
+      <input id="toggle"
+             class="no-desktop"
+             type="checkbox">
+
+      <a href="#"
+         class="no-desktop">
+        <label for="toggle">
+          <svg style="width:24px;height:24px" viewBox="0 0 24 14">
+            <path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" />
+          </svg>&nbsp;
+        </label>
+      </a>
+
+      <a id="energy-access-link"
+         href="/"
+         class="toggleable">
+        <img src="/images/ea-logo.svg"
+             style="height: 2.5em;
+                    margin-bottom: 0.5em;
+                    margin-right: 0.7em;
+                    vertical-align: middle;">Energy Access Explorer
+      </a>
+    </nav>
+
+    <div id="playground">
+      <div id="controls"></div>
+
+      <div class="center">
+        <div id="maparea">
+        <div id="mapbox-container"></div>
+        <canvas id="plot"></canvas>
+        <svg id="map"></svg>
+        </div>
+      </div>
+    </div>
+
+    <div id="app-loading" class="loading">
+      <div class="spinner"></div>
+
+      <p style="font-size: small">
+        fetching things...
+      </p>
+    </div>
+  </body>
+
+  <script data-main="./src/init"
+          src="./lib/require.js"></script>
+</html>

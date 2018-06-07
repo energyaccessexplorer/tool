@@ -1,0 +1,202 @@
+@font-face {
+  font-family: 'Arimo';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Arimo Regular'), local('Arimo-Regular'), url(../lib/fonts/arimo.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: Georgia;
+  font-style: normal;
+  src: local('Georgia'), url(../fonts/Georgia.ttf);
+}
+
+@font-face {
+  font-family: MyriadPro-Cond;
+  font-style: normal;
+  font-weight: 400;
+  src: local('MyriadPro Cond'), local('Myriad Pro'), local('MyriadPro'), local('MyriadPro-Cond'), url(../fonts/MyriadPro-Cond.otf);
+}
+
+@font-face {
+  font-family: MyriadPro-Cond;
+  font-style: normal;
+  font-weight: bold;
+  src: local('MyriadPro Cond'), local('Myriad Pro'), local('MyriadPro'), local('MyriadPro-Cond'), url(../fonts/MyriadPro-BoldCond.otf);
+}
+
+* {
+  /* box-sizing: border-box; */
+}
+
+svg {
+  box-sizing: content-box;
+}
+
+body {
+  height: calc(100% - 7em);
+  padding: 0;
+  margin: 0;
+  /* overflow: hidden; */
+  font-family: Arimo, sans-serif;
+  background-color: #f8f8f8;
+}
+
+nav {
+  display: flex;
+  background-color: #FCFCFC;
+  font-family: MyriadPro-Cond;
+  clear: both;
+  height: 3.5em;
+  line-height: 4em;
+  padding: 0 5em;
+  box-shadow: 0px 1px 5px rgba(0,0,0,0.3);
+}
+
+nav a {
+  display: block;
+
+  text-transform: uppercase;
+  text-align: center;
+  text-decoration: none;
+
+  margin: 0;
+  flex: 1;
+
+  font-weight: bold;
+  font-size: 1.1em;
+
+  color: #a8a8a8;
+  fill: black;
+}
+
+nav a:hover {
+  opacity: 0.7;
+}
+
+nav a#energy-access-link {
+  flex: 0;
+  width: auto;
+  color: #1c4478;
+  text-transform: none;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.loading {
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0,0,0, 0.6);
+  color: #f1f1f1;
+  text-align: center;
+  font-size: 24px;
+
+  padding-top: 1em;
+}
+
+.spinner {
+  display: inline-block;
+  border: 1px solid #333;
+  border-radius: 50%;
+  border-top: 1px solid #f1f1f1;
+  animation: spin 2s linear infinite;
+  width: 48px;
+  height: 48px;
+  margin: auto auto;
+}
+
+#playground {
+  display: flex;
+  flex-direction: row;
+
+  width: auto;     /* will be changed by JS */
+  height: auto;    /* will be changed by JS */
+
+  padding: 0;
+  margin: auto;
+}
+
+#app-loading {
+  z-index: 64;
+}
+
+#app-loading .spinner {
+  margin: 8em auto 3em;
+  border: 2px solid #333;
+  border-top: 2px solid #f1f1f1;
+  width: 120px;
+  height: 120px;
+}
+
+.small {
+  font-size: 0.7em;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+#maparea {
+  width: 100%;
+}
+
+.monospace {
+  font-family: monospace;
+}
+
+/* desktop specifics */
+@media (min-width: 72em) {
+  .no-desktop {
+    display: none;
+  }
+}
+
+/* mobile specifics */
+@media (max-width: 72em) {
+  .no-mobile {
+    display: none !important;
+  }
+
+  main {
+    width: 100% !important;
+  }
+
+  nav {
+    padding: 0 1em;
+  }
+
+  nav div {
+    text-align: center;
+    margin: 0;
+    flex: 1;
+  }
+
+  nav #toggle {
+    display: none;
+    width: 0;
+  }
+
+  nav label[for="toggle"] {
+    position: absolute;
+    right: 0;
+
+    font-weight: bold;
+    font-size: 1.9em;
+
+    color: black;
+    cursor: pointer;
+  }
+
+  nav #toggle:not(:checked) ~ .toggleable {
+    position: absolute;
+    top: -1000px !important;
+    display: none;
+    clear: both;
+  }
+}

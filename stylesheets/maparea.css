@@ -1,0 +1,85 @@
+#maparea {
+  flex: 1;
+  position: relative;
+  width: auto;     /* will be changed by JS */
+  height: auto;    /* will be changed by JS */
+  padding: 0;
+  margin: auto;
+}
+
+.center {
+  margin: auto;
+}
+
+canvas#plot, svg#map, #mapbox-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 100%;
+
+  margin: 0;
+  padding: 0;
+}
+
+canvas#plot {
+  margin: auto;
+  filter: blur(1px);
+}
+
+svg#map {
+  opacity: 1.0;
+  /* pointer-events: none; */
+}
+
+#mapbox-container {
+  z-index: 0;
+}
+
+#coord-tooltip {
+  position: absolute;
+  display: none;
+  pointer-events: none;
+
+  background: #fff;
+  color: #666;
+
+  padding: 5px;
+  border: solid #ccc 1px;
+
+  font-family: sans-serif;
+  font-size: x-small;
+  font-family: monospace;
+}
+
+#land {
+  fill: none; /* green */
+}
+
+.mines {
+  fill: darkgray;
+  fill-opacity: 1;
+}
+
+.powerplants {
+  fill: pink;
+  fill-opacity: 1;
+}
+
+.hydro {
+  fill: cyan;
+  fill-opacity: 1;
+}
+
+.facilities {
+  fill: yellow;
+  fill-opacity: 1;
+}
+
+.transmission-lines-polygon {
+  fill: black;
+  fill-opacity: 0.3;
+  stroke: black;
+  stroke-width: 0.5;
+}

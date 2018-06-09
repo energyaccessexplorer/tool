@@ -46,6 +46,8 @@ require([
 
   ea_lazy_load_datasets(ea_datasets.slice(1).filter((d) => d.preload));
 
+  ea_canvas = document.querySelector('canvas#plot');
+
   ea_maparea_setup();
 
   ea_init();

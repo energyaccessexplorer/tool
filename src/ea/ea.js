@@ -1,7 +1,7 @@
-const canvas = document.getElementById("plot");
-
 function ea_plot(ds) {
   if (!ds) return;
+
+  var canvas = ea_canvas;
 
   const plot = new plotty.plot({
     canvas,
@@ -44,7 +44,7 @@ function ea_analysis() {
 
   var filtered = ea_datasets.filter(d => (d.active && d.raster));
 
-  canvas.style['opacity'] = (filtered.length === 0) ? 0 : 1;
+  ea_canvas.style['opacity'] = (filtered.length === 0) ? 0 : 1;
 
   var scales = filtered.map(d => {
     return (d.scalefn().clamp) ?

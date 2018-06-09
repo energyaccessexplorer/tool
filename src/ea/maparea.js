@@ -26,9 +26,9 @@ function ea_maparea_setup() {
   coord_tooltip.id = "coord-tooltip";
   document.body.appendChild(coord_tooltip);
 
-  var rect = canvas.getBoundingClientRect();
+  const rect = ea_canvas.getBoundingClientRect();
 
-  canvas.addEventListener('mousemove', (e) => {
+  ea_canvas.addEventListener('mousemove', (e) => {
     var p = [
       (e.clientX - rect.left) * (ea_settings.image_width / ea_settings.width),
       (e.clientY - rect.top) * (ea_settings.image_height / ea_settings.height)

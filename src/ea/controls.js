@@ -159,6 +159,8 @@ function ea_controls(ds) {
           if (typeof ds.hide === 'function') ds.hide();
         }
 
+        ea_layers_update_list();
+
         ea_plot(ea_analysis());
       }
     )

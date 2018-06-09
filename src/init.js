@@ -5,10 +5,12 @@ requirejs.config({
     'topojson': "../lib/topojson",
     'geotiff': "../lib/geotiff",
     'plotty': "../lib/plotty",
+    'sortable':   "../lib/htmlsortable",
     'ea': "./ea/ea",
     'datasets': "./ea/datasets",
     'controls': "./ea/controls",
     'ui': "./ea/ui",
+    'layers': "./ea/layers",
     'client': "./ea/client",
     'svg': "./ea/svg",
     'maparea': "./ea/maparea",
@@ -27,14 +29,18 @@ require([
   'controls',
   'utils',
   'ui',
+  'layers',
   'maparea',
   'globe',
   'mapbox',
+  'sortable',
 ], (d3, topojson, geotiff, plotty) => {
   window.d3 = d3;
   window.topojson = topojson;
   window.GeoTIFF = geotiff;
   window.plotty = plotty;
+
+  ea_layers_init();
 
   ea_controls_tree();
 

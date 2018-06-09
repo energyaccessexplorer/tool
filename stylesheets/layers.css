@@ -1,0 +1,54 @@
+#layers {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  list-style-type: none;
+  min-width: 22em;
+}
+
+.layers-element {
+  display: flex;
+  background-color: white;
+  margin: 2px;
+  padding: 5px;
+  color: #1C4478;
+  white-space: nowrap;
+}
+
+.layers-element-handle {
+  min-width: 1em;
+
+  background-image: url(/images/layer-handle.svg);
+  background-size: 100% auto;
+  background-position: top center;
+  background-repeat: no-repeat;
+
+  cursor: grab;
+  cursor: -webkit-grab;
+
+  color: #95A8C1;
+}
+
+.layers-element-content {
+  flex: 1;
+  display: block;
+  padding: 0.5em;
+}
+
+.layers-element-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.layers-element-title {
+  margin-right: 1em;
+
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.layers-element-descriptor {
+
+}

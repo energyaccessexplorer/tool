@@ -2,28 +2,28 @@ function ea_maparea_setup() {
   const b = ea_settings.bounds;
   const p = document.querySelector('#playground');
 
-  if (!p)
-    ea_settings.width = 500;
-  else
-    ea_settings.width = (p.clientWidth - p.querySelector('#playground #controls').clientWidth) * (4/5);
+  const w = (b[1][0] - b[0][0]);
+  const h = (b[1][1] - b[0][1]);
 
-  p.querySelector('canvas#plot').style.width = ea_settings.width;
+  ea_settings.center = [w/2, h/2];
 
-  ea_settings.center = [(b[1][0] - b[0][0]) / 2, (b[1][1] - b[0][1]) / 2];
+  if (w < h) {
+    ea_settings.width = (p.clientWidth - p.querySelector('#controls').clientWidth) * (4/5);
+    ea_settings.height = (h/w) * ea_settings.width;
+  }
 
-  ea_settings.height = (b[1][1] - b[0][1]) / (b[1][0] - b[0][0]) * ea_settings.width;
-  ea_settings.image_height = Math.round(ea_settings.image_width * ea_settings.height) / ea_settings.width;
+  else {
+    ea_settings.height = p.clientHeight * (4/5);
+    ea_settings.width = (w/h) * ea_settings.height;
+  }
 
-  var svg = d3.select('svg#map')
-      .attr('width', ea_settings.width)
-      .attr('height', ea_settings.height);
+  const svg = d3.select('svg#map')
+        .attr('width', ea_settings.width)
+        .attr('height', ea_settings.height);
 
-  var maparea = document.querySelector('#maparea')
-  maparea.style.width = ea_settings.width + "px";
-  maparea.style.height = ea_settings.height + "px";
-
-
-
+  const maparea = document.querySelector('#maparea')
+  maparea.style['width'] = ea_settings.width + "px";
+  maparea.style['height'] = ea_settings.height + "px";
 
   d3.queue()
     .defer(d3.json, './lib/TZA-adm0.json')

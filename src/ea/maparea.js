@@ -22,24 +22,8 @@ function ea_maparea_setup() {
   maparea.style.width = ea_settings.width + "px";
   maparea.style.height = ea_settings.height + "px";
 
-  coord_tooltip = document.createElement('div');
-  coord_tooltip.id = "coord-tooltip";
-  document.body.appendChild(coord_tooltip);
 
-  const rect = ea_canvas.getBoundingClientRect();
 
-  ea_canvas.addEventListener('mousemove', (e) => {
-    var p = [
-      (e.clientX - rect.left) * (ea_settings.image_width / ea_settings.width),
-      (e.clientY - rect.top) * (ea_settings.image_height / ea_settings.height)
-    ];
-
-    coord_tooltip.innerHTML = `${ p[0].toFixed(4) }, ${ p[1].toFixed(4) }`;
-    coord_tooltip.style = `
-left: ${ (e.clientX + 7) }px;
-top: ${ (e.clientY + 15) }px;
-display: block;`
-  });
 
   d3.queue()
     .defer(d3.json, './lib/TZA-adm0.json')

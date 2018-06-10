@@ -20,13 +20,13 @@ function globe_load_features(g, features, cls, callback) {
   return topo;
 };
 
-function globe_mousemove(g) {
+function globe_mousemove(g, t) {
   var e = d3.event
       p = g.projection.invert([e.offsetX, e.offsetY]);
 
   // p = [e.offsetX, e.offsetY];
 
-  coord_tooltip
+  t
     .html(`${ p[0].toFixed(4) }, ${ p[1].toFixed(4) }`)
     .style('left', `${ (d3.event.pageX + 7) }px`)
     .style('top', `${ (d3.event.pageY + 15) }px`)
@@ -83,11 +83,17 @@ function globe_create(svg, topofile) {
   // {
   // }
 
+
+  const coord_tooltip = d3.select('body').append('div');
+  coord_tooltip.attr('id', "coord-tooltip");
+
+  document.body.appendChild(coord_tooltip.node());
+
   // MOUSE OVER
   //
-  // svg
-  //   .on('mousemove', () => globe_mousemove(_globe))
-  //   .on('mouseout', () => coord_tooltip.style('display', "none"));
+  svg
+    .on('mousemove', () => globe_mousemove(_globe, coord_tooltip))
+    .on('mouseout', () => coord_tooltip.style('display', "none"));
 
   return _globe;
 };

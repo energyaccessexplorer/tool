@@ -26,8 +26,12 @@ function ea_map_setup() {
   maparea.style['height'] = ea_settings.height + "px";
 
   d3.queue()
-    .defer(d3.json, './lib/TZA-adm0.json')
+    .defer(d3.json, ea_settings.topofile)
     .await((error, topo) => {
+      if (error) {
+        ea_ui_flash('error', error.target.statusText, error.target.responseURL);
+        console.log(error);
+      }
 
       ea_map = ea_map_svg(svg, topo);
 

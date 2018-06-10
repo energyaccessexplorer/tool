@@ -2,8 +2,35 @@
   position: absolute;
   bottom: 5px;
   right: 5px;
+  width: 350px;
+  display: none;
+}
+
+#layers-list {
+  margin: 0;
+  padding: 0;
   list-style-type: none;
-  min-width: 22em;
+}
+
+.layers-header {
+  background-color: white;
+  margin: 2px;
+  color: #1C4478;
+  cursor: pointer;
+  padding: 0.5em;
+  line-height: 1.8em;
+
+  font-size: 1.6em;
+  white-space: nowrap;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-family: MyriadPro-Cond;
+}
+
+.layers-header .collapse.triangle {
+  float: right;
+  fill: #1C4478;
+  transform: scale(1.4);
 }
 
 .layers-element {
@@ -47,6 +74,45 @@
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+
+.layers-element-controls {
+  float: right;
+
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.layers-element-controls div {
+  display: inline-block;
+
+  width: 1em;
+  height: 1em;
+
+  background-size: 100%;
+  background-position: center center;
+  background-repeat: no-repeat;
+
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
+  cursor: pointer;
+}
+
+.layers-element-controls div.layer-type:before {
+  content: 'T';
+}
+
+.layers-element-controls div.layer-visibility:before {
+  content: 'V';
+}
+
+.layers-element-controls div.layer-info:before {
+  content: 'I';
 }
 
 .layers-element-descriptor {

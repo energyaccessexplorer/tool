@@ -7,7 +7,11 @@ function ea_ui_collapse_triangle(d) {
     break;
 
   case 's':
-    t = 'translate(-8,-6)rotate(45)';
+    t = 'rotate(45)translate(-8,0)';
+    break;
+
+  case 'n':
+    t = 'rotate(-135)translate(0,-6)';
     break;
 
   case 'w':
@@ -23,7 +27,7 @@ function ea_ui_collapse_triangle(d) {
     break;
 
   default:
-    throw `ea_collapse_triangle: e, ne, s, se, w. Got ${dir}.`;
+    throw `ea_collapse_triangle: e, ne, s, se, w. Got ${d}.`;
   }
 
   return `

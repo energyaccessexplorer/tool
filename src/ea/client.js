@@ -1,6 +1,7 @@
 function ea_client_errors(response) {
   if (!response.ok) {
     console.log(response);
+    ea_ui_flash('error', `${response.status}: ${response.statusText}`, response.url);
     throw Error(response.statusText);
   }
 

@@ -64,3 +64,71 @@ function ea_ui_dataset_loading(ds, bool) {
 
   return s;
 }
+
+function ea_ui_flash_setup() {
+  var flash = document.createElement('aside');
+  flash.id = 'flash';
+
+  document.body.prepend(flash)
+
+  if (flash)
+    flash.style = `
+color: white;
+font-family: monospace;
+position: fixed;
+top: 2px;
+left: 2px;
+z-index: 9999;
+display: none;
+min-height: 50px;
+padding: 10px 20px;
+border: 1px solid white;
+`;
+
+  return (_type, title, message, timeout_override) => {
+    var content = '';
+
+    var bc = 'transparent';
+    var timeout = null;
+
+    if (title && message) {
+      content += `<strong>${title}</strong><br>`;
+      content += `<pre>${message}</pre>`;
+    }
+
+    if (title && !message)
+      content = `<div style="line-height: 29px;">${title}</div>`;
+
+    flash.innerHTML = content;
+
+    switch (_type) {
+    case "error":
+      bc = '#E3655A';
+      timeout = 0;
+      break;
+
+    case "info":
+      bc = '#AEB3FF';
+      timeout = 2000;
+      break;
+
+    case "success":
+      bc = '#A5E49E';
+      timeout = 1000;
+      break;
+
+    default:
+      bc = 'gray';
+      timeout = 5000;
+    };
+
+    timeout = (typeof timeout_override !== 'undefined' ? timeout_override : timeout);
+
+    flash.style['display'] = 'block';
+    flash.style['background-color'] = bc;
+
+    if (timeout) setTimeout(() => flash.style['display'] = 'none', timeout);
+
+    flash.addEventListener('click', () => flash.style['display'] = 'none');
+  };
+}

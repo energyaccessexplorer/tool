@@ -38,6 +38,8 @@ require([
   window.GeoTIFF = geotiff;
   window.plotty = plotty;
 
+  ea_ui_flash = ea_ui_flash_setup();
+
   ea_canvas = document.querySelector('canvas#plot');
 
   ea_layers_init();

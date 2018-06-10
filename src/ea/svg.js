@@ -76,7 +76,7 @@ function ea_svg_checkbox(callback) {
     .attr('font-weight', "bold")
     .text("OFF");
 
-  function change(s) {
+  function change(s,init) {
     c1.attr('cx', (s ? svgmax : svgmin));
 
     gutter
@@ -86,12 +86,12 @@ function ea_svg_checkbox(callback) {
       .attr('x', (s ? (svgmin - 2) : svgmax - (radius * 2) - 4))
       .text((s ? "ON" : "OFF"))
 
-    if (typeof callback === 'function') callback(s);
+    if (typeof callback === 'function' && !init) callback(s);
   }
 
   svg.on('click', () => change(status = !status))
 
-  change(status);
+  change(status, true);
 
   return svg.node();
 }

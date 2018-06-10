@@ -28,16 +28,12 @@ function ea_map_setup() {
   d3.queue()
     .defer(d3.json, './lib/TZA-adm0.json')
     .await((error, topo) => {
-      ea_globe = ea_map_svg(svg, topo);
 
-      ea_map_load_features(
-        ea_globe,
-        ea_globe.topo.features,
-        'land',
-        'adm0'
-      );
+      ea_map = ea_map_svg(svg, topo);
 
-      ea_svg_land_mask(ea_globe);
+      ea_map_load_features(ea_map, ea_map.topo.features, 'land', 'adm0');
+
+      ea_svg_land_mask(ea_map);
       mapbox_setup();
     });
 };
@@ -107,13 +103,13 @@ function ea_map_svg(svg, topofile) {
   return _map;
 };
 
-function ea_map_load_features(g, features, cls, callback) {
-  var container = g.svg.select(`#${cls}`)
+function ea_map_load_features(m, features, cls, callback) {
+  var container = m.svg.select(`#${cls}`)
 
   if (container.empty())
-    container = g.svg.append('g').attr('id', cls);
+    container = m.svg.append('g').attr('id', cls);
 
-  g.svg.select('#mask').raise();
+  m.svg.select('#mask').raise();
 
   container.selectAll(`path.${ cls }`).remove();
 
@@ -121,13 +117,19 @@ function ea_map_load_features(g, features, cls, callback) {
     .data(features).enter()
     .append('path')
     .attr('class', cls)
-    .attr('d', g.geopath)
+    .attr('d', m.geopath)
     .on('dblclick', callback)
     .on('mouseover', (d) => console.log(d.id))
   ;
 
   return topo;
 };
+
+function ea_map_unload(g, id) {
+  if (typeof g === 'undefined' || g === null) return;
+
+  g.svg.select(`#${id}`).remove();
+}
 
 function ea_map_mousemove(g, t) {
   var e = d3.event

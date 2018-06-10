@@ -15,9 +15,9 @@ function ea_layers_update_map(list) {
   list
     .filter(x => ea_datasets.find(d => d.id === x && d.features))
     .reverse()
-    .forEach(i => ea_globe.svg.select(`#${i}`).raise());
+    .forEach(i => ea_map.svg.select(`#${i}`).raise());
 
-  ea_globe.svg.select(`#mask`).raise();
+  ea_map.svg.select(`#mask`).raise();
 
   ea_plot(ea_datasets.find(x => x.id === raster_id));
 }

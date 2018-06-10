@@ -134,7 +134,7 @@ var ea_datasets = [
           this.features = [r[0]['payload']];
 
           ea_map_load_features(
-            ea_globe,
+            ea_map,
             this.features,
             'transmission-lines-polygon',
             null
@@ -143,10 +143,7 @@ var ea_datasets = [
       );
     },
 
-    hide: function() {
-      if (typeof ea_globe !== 'undefined')
-        ea_globe.svg.select(`#${this.id}`).remove()
-    },
+    hide: function() { ea_map_unload(ea_map, this.id) },
 
     datatype: "boolean",
     active: false,
@@ -166,7 +163,7 @@ var ea_datasets = [
           this.features = r[0]['jsonb_build_object'].features;
 
           ea_map_load_features(
-            ea_globe,
+            ea_map,
             this.features,
             'facilities',
             null
@@ -175,10 +172,7 @@ var ea_datasets = [
       );
     },
 
-    hide: function() {
-      if (typeof ea_globe !== 'undefined')
-        ea_globe.svg.select(`#${this.id}`).remove()
-    },
+    hide: function() { ea_map_unload(ea_map, this.id) },
 
     datatype: "boolean",
     active: false,
@@ -198,7 +192,7 @@ var ea_datasets = [
           this.features = r[0]['jsonb_build_object'].features;
 
           ea_map_load_features(
-            ea_globe,
+            ea_map,
             this.features,
             'mines',
             null
@@ -207,10 +201,7 @@ var ea_datasets = [
       );
     },
 
-    hide: function() {
-      if (typeof ea_globe !== 'undefined')
-        ea_globe.svg.select(`#${this.id}`).remove()
-    },
+    hide: function() { ea_map_unload(ea_map, this.id) },
 
     datatype: "boolean",
     active: false,
@@ -230,7 +221,7 @@ var ea_datasets = [
           this.features = r[0]['jsonb_build_object'].features
 
           ea_map_load_features(
-            ea_globe,
+            ea_map,
             this.features,
             'powerplants',
             null
@@ -239,10 +230,7 @@ var ea_datasets = [
       );
     },
 
-    hide: function() {
-      if (typeof ea_globe !== 'undefined')
-        ea_globe.svg.select(`#${this.id}`).remove()
-    },
+    hide: function() { ea_map_unload(ea_map, this.id) },
 
     datatype: "boolean",
     active: false,
@@ -262,7 +250,7 @@ var ea_datasets = [
           this.features = r[0]['jsonb_build_object'].features
 
           ea_map_load_features(
-            ea_globe,
+            ea_map,
             this.features,
             'hydro',
             'powerplants',
@@ -272,10 +260,7 @@ var ea_datasets = [
       );
     },
 
-    hide: function() {
-      if (typeof ea_globe !== 'undefined')
-        ea_globe.svg.select(`#${this.id}`).remove()
-    },
+    hide: function() { ea_map_unload(ea_map, this.id) },
 
     datatype: "boolean",
     active: false,

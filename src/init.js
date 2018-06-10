@@ -42,6 +42,8 @@ require([
 
   ea_canvas = document.querySelector('canvas#plot');
 
+  ea_map = null;
+
   ea_layers_init();
 
   ea_controls_tree();

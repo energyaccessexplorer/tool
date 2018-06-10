@@ -13,7 +13,7 @@ requirejs.config({
     'layers': "./ea/layers",
     'client': "./ea/client",
     'svg': "./ea/svg",
-    'maparea': "./ea/maparea",
+    'map': "./ea/map",
   }
 });
 
@@ -27,11 +27,9 @@ require([
   'client',
   'svg',
   'controls',
-  'utils',
   'ui',
   'layers',
-  'maparea',
-  'globe',
+  'map',
   'mapbox',
   'sortable',
 ], (d3, topojson, geotiff, plotty) => {
@@ -40,15 +38,13 @@ require([
   window.GeoTIFF = geotiff;
   window.plotty = plotty;
 
+  ea_canvas = document.querySelector('canvas#plot');
+
   ea_layers_init();
 
   ea_controls_tree();
 
-  ea_lazy_load_datasets(ea_datasets.slice(1).filter((d) => d.preload));
-
-  ea_canvas = document.querySelector('canvas#plot');
-
-  ea_maparea_setup();
+  ea_map_setup();
 
   ea_init();
 });

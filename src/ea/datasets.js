@@ -2,10 +2,9 @@ var ea_datasets = [
   {
     id: "dummy",
     description: "Dummy dataset",
-    preload: false,
 
     url: "./data/empty_tiff.tif",
-    parse: function(response) { return ea_dataset_tiff_url(this) },
+    parse: function(response) { return ea_datasets_tiff_url(this) },
 
     band: 0,
   },
@@ -16,16 +15,16 @@ var ea_datasets = [
     preload: false,
 
     // url: "./data/ghi.tif",
-    // parse: async function() { return ea_dataset_tiff_url(this) },
+    // parse: async function() { return ea_datasets_tiff_url(this) },
 
     endpoint: `${ea_database}/ghi_tiff_materialized`,
     parse: async function(cb) {
       if (!this.raster || !this.image)
-      await ea_endpoint(
+      await ea_client(
         this,
         'GET',
         null,
-        (r) => ea_dataset_tiff_stream(this, r)
+        (r) => ea_datasets_tiff_stream(this, r)
       );
     },
 
@@ -43,16 +42,16 @@ var ea_datasets = [
     preload: false,
 
     // url: "./data/poverty.tif",
-    // parse: () => (!this.raster || !this.image) ? ea_dataset_tiff_url(this) : null,
+    // parse: () => (!this.raster || !this.image) ? ea_datasets_tiff_url(this) : null,
 
     endpoint: `${ea_database}/poverty_tiff`,
     parse: async function(cb) {
       if (!this.raster || !this.image)
-      await ea_endpoint(
+      await ea_client(
         this,
         'GET',
         null,
-        (r) => ea_dataset_tiff_stream(this, r)
+        (r) => ea_datasets_tiff_stream(this, r)
       );
     },
 
@@ -70,16 +69,16 @@ var ea_datasets = [
     preload: false,
 
     // url: "./data/schools_distance.tif",
-    // parse: () => (!this.raster || !this.image) ? ea_dataset_tiff_url(this) : null,
+    // parse: () => (!this.raster || !this.image) ? ea_datasets_tiff_url(this) : null,
 
     endpoint: `${ea_database}/schools_tiff_resampled_materialized`,
     parse: async function(cb) {
       if (!this.raster || !this.image)
-      await ea_endpoint(
+      await ea_client(
         this,
         'GET',
         null,
-        (r) => ea_dataset_tiff_stream(this, r)
+        (r) => ea_datasets_tiff_stream(this, r)
       );
     },
 
@@ -100,11 +99,11 @@ var ea_datasets = [
 
     endpoint: `${ea_database}/rpc/transmission_lines_buffered_tiff`,
     parse: async function(v) {
-      await ea_endpoint(
+      await ea_client(
         this,
         'POST',
         { km: (v || this.init) },
-        (r) => ea_dataset_tiff_stream(this, r)
+        (r) => ea_datasets_tiff_stream(this, r)
       );
     },
 
@@ -127,14 +126,14 @@ var ea_datasets = [
 
     endpoint: `${ea_database}/rpc/merged_transmission_lines_geojson`,
     parse: async function(v) {
-      await ea_endpoint(
+      await ea_client(
         this,
         'POST',
         { km: (v || this.init) },
         (r) => {
           this.features = [r[0]['payload']];
 
-          globe_load_features(
+          ea_map_load_features(
             ea_globe,
             this.features,
             'transmission-lines-polygon',
@@ -159,14 +158,14 @@ var ea_datasets = [
 
     endpoint: `${ea_database}/envelope_facilities`,
     parse: async function(v) {
-      await ea_endpoint(
+      await ea_client(
         this,
         'GET',
         null,
         (r) => {
           this.features = r[0]['jsonb_build_object'].features;
 
-          globe_load_features(
+          ea_map_load_features(
             ea_globe,
             this.features,
             'facilities',
@@ -191,14 +190,14 @@ var ea_datasets = [
 
     endpoint: `${ea_database}/envelope_mines`,
     parse: async function(v) {
-      await ea_endpoint(
+      await ea_client(
         this,
         'GET',
         null,
         (r) => {
           this.features = r[0]['jsonb_build_object'].features;
 
-          globe_load_features(
+          ea_map_load_features(
             ea_globe,
             this.features,
             'mines',
@@ -223,14 +222,14 @@ var ea_datasets = [
 
     endpoint: `${ea_database}/envelope_powerplants`,
     parse: async function(v) {
-      await ea_endpoint(
+      await ea_client(
         this,
         'GET',
         null,
         (r) => {
           this.features = r[0]['jsonb_build_object'].features
 
-          globe_load_features(
+          ea_map_load_features(
             ea_globe,
             this.features,
             'powerplants',
@@ -255,14 +254,14 @@ var ea_datasets = [
 
     endpoint: `${ea_database}/envelope_hydro`,
     parse: async function(v) {
-      await ea_endpoint(
+      await ea_client(
         this,
         'GET',
         null,
         (r) => {
           this.features = r[0]['jsonb_build_object'].features
 
-          globe_load_features(
+          ea_map_load_features(
             ea_globe,
             this.features,
             'hydro',
@@ -334,3 +333,52 @@ const ea_datasets_category_tree = [{
     ]
   }]
 }];
+
+async function ea_datasets_load(ds,v) {
+  ea_ui_dataset_loading(ds, true);
+
+  await ds.parse(v);
+
+	ea_ui_dataset_loading(ds, false);
+}
+
+async function ea_datasets_tiff(ds, method, payload) {
+  if (!ds.raster || !ds.image) {
+    const tiff = await method(payload);
+    const image = await tiff.getImage();
+    const rasters = await image.readRasters();
+
+    ds.tiff = tiff;
+    ds.image = image;
+    ds.raster = rasters[ds.band];
+
+    ds.width = image.getWidth();
+    ds.height = image.getHeight();
+
+    ds.nodata = parseFloat(ds.tiff.fileDirectories[0][0].GDAL_NODATA);
+  }
+
+  return ds;
+}
+
+async function ea_datasets_tiff_stream(ds, data) {
+  if (!ds.raster || !ds.image) {
+    var hex = data[0]['tiff'].slice(2);
+    var byteBuf = new Uint8Array(new ArrayBuffer(hex.length/2));
+
+    for (var i = 0; i < hex.length; i += 2)
+      byteBuf[i/2] = parseInt(hex.slice(i, i+2), 16);
+
+    await ea_datasets_tiff(ds, GeoTIFF.fromBlob, (new Blob([byteBuf], {type: "image/tiff"})));
+  }
+
+  return ds;
+}
+
+async function ea_datasets_tiff_url(ds) {
+  if (!ds.raster || !ds.image) {
+  await ea_datasets_tiff(ds, GeoTIFF.fromUrl, ds.url);
+  }
+
+  return ds;
+}

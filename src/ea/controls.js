@@ -1,53 +1,19 @@
-function ea_collapse_triangle(dir) {
-  let t;
-
-  switch (dir) {
-  case 'e':
-    t = 'rotate(-45)translate(-2,-4)';
-    break;
-
-  case 's':
-    t = 'translate(-8,-6)rotate(45)';
-    break;
-
-  case 'w':
-    t = 'rotate(135)translate(-2,0)';
-    break;
-
-  case 'ne':
-    t = 'rotate(-90)';
-    break;
-
-  case 'se':
-    t = '';
-    break;
-
-  default:
-    throw `ea_collapse_triangle: e, ne, s, se, w. Got ${dir}.`;
-  }
-
-  return `
-<svg width="12px" height="12px" viewBox="0 0 12 12" transform="${t}">
-  <polyline points="12,0 12,12 0,12 "/>
-</svg>`
-}
-
-function ea_collapse_subcategory(conel, subel) {
+function ea_controls_collapse_subcategory(conel, subel) {
   const d = conel.style['display'];
   const c = subel.querySelector('.collapse');
 
   if (d === "none") {
     conel.style['display'] = 'block';
-    c.innerHTML = ea_collapse_triangle('se');
+    c.innerHTML = ea_ui_collapse_triangle('se');
   }
 
   else {
     conel.style['display'] = 'none';
-    c.innerHTML = ea_collapse_triangle('ne');
+    c.innerHTML = ea_ui_collapse_triangle('ne');
   }
 }
 
-function ea_collapse_category(catel) {
+function ea_controls_collapse_category(catel) {
   const subcatel = catel.querySelector('.controls-subcategories');
   const cti = catel.querySelector('.controls-category-title');
   const ctr = catel.querySelector('.collapse.triangle')
@@ -55,7 +21,7 @@ function ea_collapse_category(catel) {
   const d = subcatel.style['display'];
 
   if (d === "none") {
-    ctr.innerHTML = ea_collapse_triangle('w');
+    ctr.innerHTML = ea_ui_collapse_triangle('w');
 
     // use empty strings so that the CSS can decide
     //
@@ -65,7 +31,7 @@ function ea_collapse_category(catel) {
   }
 
   else {
-    ctr.innerHTML = ea_collapse_triangle('s');
+    ctr.innerHTML = ea_ui_collapse_triangle('s');
 
     subcatel.style['display'] = 'none';
     cti.style['transform'] = "rotate(-90deg) translate(-2em)";
@@ -81,7 +47,7 @@ function ea_controls_tree() {
     const ahtml = `
       <div id=${a.name} class="controls-category">
         <div class="controls-category-title">
-          <span class="collapse triangle">${ea_collapse_triangle('w')}</span> ${a.name}
+          <span class="collapse triangle">${ea_ui_collapse_triangle('w')}</span> ${a.name}
         </div>
         <div class="controls-subcategories"></div>
       </div>
@@ -92,14 +58,14 @@ function ea_controls_tree() {
     const catel = ctel.querySelector(`#${a.name}`);
     const cti = catel.querySelector('.controls-category-title');
 
-    cti.addEventListener('mouseup', e => ea_collapse_category(catel));
+    cti.addEventListener('mouseup', e => ea_controls_collapse_category(catel));
 
     a.subcategories.forEach(b => {
       const bhtml = `
         <div id=${b.name} class="controls-subcategory">
           <div class="controls-subcategory-title">
             ${b.name}
-            <span class="collapse">${ea_collapse_triangle('se')}</span>
+            <span class="collapse">${ea_ui_collapse_triangle('se')}</span>
           </div>
           <div class="controls-container"></div>
         </div>
@@ -112,7 +78,7 @@ function ea_controls_tree() {
       const conel = subel.querySelector('.controls-container');
 
       subel.querySelector('.controls-subcategory-title')
-        .addEventListener('mouseup', e => ea_collapse_subcategory(conel, subel));
+        .addEventListener('mouseup', e => ea_controls_collapse_subcategory(conel, subel));
 
       b.datasets.forEach(b => {
         const ds = ea_datasets.find(x => x.id === b);
@@ -154,7 +120,7 @@ function ea_controls(ds) {
     ea_controls_activate(
       ds,
       async function(v) {
-        if (v) await ea_dataset_load(ds);
+        if (v) await ea_datasets_load(ds);
         else {
           if (typeof ds.hide === 'function') ds.hide();
         }
@@ -192,7 +158,6 @@ function ea_controls(ds) {
   case "hydro":
   case "facilities":
   case "powerplants":
-    controls.appendChild(ea_controls_empty(ds));
     break;
 
   default:
@@ -311,7 +276,7 @@ margin-bottom: 10px;
 
         if (!ds.active) return;
 
-        await ea_dataset_load(ds,x);
+        await ea_datasets_load(ds,x);
         ea_plot(ea_analysis());
       },
       ("weight" === false)
@@ -321,29 +286,4 @@ margin-bottom: 10px;
   container.appendChild(l);
 
   return container;
-}
-
-function ea_dataset_loading(ds, bool) {
-  const el = document.querySelector(`#controls-${ds.id}`);
-  let s;
-
-  if (bool) {
-    s = ea_spinner();
-    el.append(s);
-  }
-
-  else if (bool === false) {
-    s = el.querySelector('.loading');
-    s.remove();
-  }
-
-  else {
-    throw "Wrong Argument ${bool} for ea_dataset_loading";
-  }
-
-  return s;
-}
-
-function ea_controls_empty(ds) {
-  return document.createElement('div');
 }

@@ -126,9 +126,7 @@ var ea_datasets = [
 
     endpoint: `${ea_database}/rpc/merged_transmission_lines_geojson`,
     parse: async function(v) {
-      await ea_client(
-        this,
-        'POST',
+      await ea_client(this, 'POST',
         { km: (v || this.init) },
         (r) => {
           this.features = [r[0]['payload']];
@@ -154,23 +152,8 @@ var ea_datasets = [
     preload: false,
 
     endpoint: `${ea_database}/envelope_facilities`,
-    parse: async function(v) {
-      await ea_client(
-        this,
-        'GET',
-        null,
-        (r) => {
-          this.features = r[0]['jsonb_build_object'].features;
 
-          ea_map_load_features(
-            ea_map,
-            this.features,
-            'facilities',
-            null
-          );
-        }
-      );
-    },
+    parse: async function() { await ea_datasets_features(this) },
 
     hide: function() { ea_map_unload(ea_map, this.id) },
 
@@ -183,23 +166,8 @@ var ea_datasets = [
     preload: false,
 
     endpoint: `${ea_database}/envelope_mines`,
-    parse: async function(v) {
-      await ea_client(
-        this,
-        'GET',
-        null,
-        (r) => {
-          this.features = r[0]['jsonb_build_object'].features;
 
-          ea_map_load_features(
-            ea_map,
-            this.features,
-            'mines',
-            null
-          );
-        }
-      );
-    },
+    parse: async function() { await ea_datasets_features(this) },
 
     hide: function() { ea_map_unload(ea_map, this.id) },
 
@@ -212,23 +180,8 @@ var ea_datasets = [
     preload: false,
 
     endpoint: `${ea_database}/envelope_powerplants`,
-    parse: async function(v) {
-      await ea_client(
-        this,
-        'GET',
-        null,
-        (r) => {
-          this.features = r[0]['jsonb_build_object'].features
 
-          ea_map_load_features(
-            ea_map,
-            this.features,
-            'powerplants',
-            null
-          );
-        }
-      );
-    },
+    parse: async function() { await ea_datasets_features(this) },
 
     hide: function() { ea_map_unload(ea_map, this.id) },
 
@@ -241,24 +194,8 @@ var ea_datasets = [
     preload: false,
 
     endpoint: `${ea_database}/envelope_hydro`,
-    parse: async function(v) {
-      await ea_client(
-        this,
-        'GET',
-        null,
-        (r) => {
-          this.features = r[0]['jsonb_build_object'].features
 
-          ea_map_load_features(
-            ea_map,
-            this.features,
-            'hydro',
-            'powerplants',
-            null
-          );
-        }
-      );
-    },
+    parse: async function() { await ea_datasets_features(this) },
 
     hide: function() { ea_map_unload(ea_map, this.id) },
 
@@ -325,6 +262,21 @@ async function ea_datasets_load(ds,v) {
   await ds.parse(v);
 
 	ea_ui_dataset_loading(ds, false);
+}
+
+async function ea_datasets_features(ds) {
+  await ea_client(ds, 'GET', null,
+    (r) => {
+      ds.features = r[0]['jsonb_build_object'].features;
+
+      ea_map_load_features(
+        ea_map,
+        ds.features,
+        ds.id,
+        null
+      );
+    }
+  );
 }
 
 async function ea_datasets_tiff(ds, method, payload) {

@@ -112,13 +112,13 @@
 }
 
 #supply {
-  background-color: #e4a82e;
-  color: #1c4478;
-  fill: #1c4478;
+  background-color: var(--the-yellow);
+  color: var(--the-blue);
+  fill: var(--the-blue);
 }
 
 #demand {
-  background-color: #1c4478;
-  color: #e4a82e;
-  fill: #e4a82e;
+  background-color: var(--the-blue);
+  color: var(--the-yellow);
+  fill: var(--the-yellow);
 }

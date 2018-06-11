@@ -45,7 +45,7 @@
 .layers-element-handle {
   min-width: 1em;
 
-  background-image: url(/images/layer-handle.svg);
+  background-image: url(../images/layer-handle.svg);
   background-size: 100% auto;
   background-position: top center;
   background-repeat: no-repeat;

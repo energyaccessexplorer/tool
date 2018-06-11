@@ -186,13 +186,15 @@ function ea_controls_range(ds) {
 
   const l = document.createElement('div');
   l.className = "label";
-  l.innerHTML = `<span class="left" bind="v1"></span> <span bind="v2" class="right"></span>`;  l.style = `
+  l.innerHTML = `
+<span class="left" bind="v1"></span> <span bind="v2" class="right"></span>`;
+
+  l.style = `
 float: right;
 display: flex;
 justify-content: space-between;
 width: 150px;
-margin-bottom: 10px;
-`;
+margin-bottom: 10px;`;
 
   const v1 = l.querySelector('[bind=v1]');
   const v2 = l.querySelector('[bind=v2]');
@@ -204,6 +206,8 @@ margin-bottom: 10px;
       () => ea_plot(ea_analysis()),
     )
   );
+
+  container.appendChild(document.createElement('br'));
 
   container.appendChild(l);
 
@@ -242,6 +246,8 @@ margin-bottom: 10px;
     )
   );
 
+  container.appendChild(document.createElement('br'));
+
   container.appendChild(l);
 
   return container;
@@ -258,8 +264,7 @@ float: right;
 display: flex;
 justify-content: space-between;
 width: 150px;
-margin-bottom: 10px;
-`;
+margin-bottom: 10px;`;
 
   l.innerHTML = `<span></span><span bind="vw"></span>`;
 
@@ -282,6 +287,8 @@ margin-bottom: 10px;
       ("weight" === false)
     )
   );
+
+  container.appendChild(document.createElement('br'));
 
   container.appendChild(l);
 

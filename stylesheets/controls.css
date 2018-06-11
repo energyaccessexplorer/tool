@@ -48,8 +48,13 @@
 
 .controls-category {
   flex: 1 50%;
-  vertical-align: top;
+
+  min-width: -moz-fit-content;
+  min-width: fit-content;
   padding: 20px 40px 0 0;
+
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 .controls-category-title {

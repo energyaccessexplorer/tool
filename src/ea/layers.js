@@ -91,7 +91,7 @@ function ea_layers_update_list() {
   if (coll.length) {
     parent.style['display'] = "block";
 
-    parent.querySelector('.layers-header').addEventListener('mouseup', function() {
+    parent.querySelector('#layers-header').addEventListener('mouseup', function() {
       d = !d;
 
       el.style['display'] = (d ? "" : "none");
@@ -109,16 +109,8 @@ function ea_layers_update_list() {
 }
 
 function ea_layers_init() {
-  const el = document.querySelector('#layers');
-
-  el.insertAdjacentHTML(
-    'afterBegin',
-    `
-<div class="layers-header">
-Underlying Datasets
-<div class="collapse triangle">${ea_ui_collapse_triangle('s')}</div>
-</div>
-`);
+  document.querySelector('#layers-header .collapse.triangle')
+    .innerHTML = ea_ui_collapse_triangle('s');
 
   sortable('#layers-list', {
     items: 'li.layers-element',
@@ -130,6 +122,4 @@ Underlying Datasets
       'sortupdate',
       (e) => ea_layers_update_map(e.detail.destination.items.map(i => i.getAttribute('bind')))
     )
-
-  return el;
 }

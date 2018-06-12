@@ -12,7 +12,8 @@
   list-style-type: none;
 }
 
-.layers-header {
+#layers-header {
+  display: flex;
   background-color: white;
   margin: 2px;
   color: #1C4478;
@@ -27,8 +28,13 @@
   font-family: MyriadPro-Cond;
 }
 
-.layers-header .collapse.triangle {
-  float: right;
+#layers-header .title {
+  flex: 1;
+  fill: #1C4478;
+}
+
+#layers-header .collapse.triangle {
+  flex: 0;
   fill: #1C4478;
   transform: scale(1.4);
 }

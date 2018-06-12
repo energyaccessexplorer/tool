@@ -1,3 +1,10 @@
+function elem(str) {
+  var d = document.createElement('div');
+  d.innerHTML = str;
+
+  return d.firstElementChild;
+}
+
 function ea_ui_collapse_triangle(d) {
   let t;
 
@@ -37,15 +44,7 @@ function ea_ui_collapse_triangle(d) {
 }
 
 function ea_ui_spinner() {
-  var d = document.createElement('div');
-  d.classList.add('loading');
-
-  var s = document.createElement('div');
-  s.classList.add('spinner');
-
-  d.appendChild(s);
-
-  return d;
+  return elem(`<div class="loading"><div class="spinner"></div></div>`);
 }
 
 function ea_ui_app_loading(bool) {
@@ -70,24 +69,21 @@ function ea_ui_dataset_loading(ds, bool) {
 }
 
 function ea_ui_flash_setup() {
-  var flash = document.createElement('aside');
-  flash.id = 'flash';
+  const flash = elem(`
+<aside id="flash"
+       style="color: white;
+              font-family: monospace;
+              position: fixed;
+              top: 2px;
+              left: 2px;
+              z-index: 9999;
+              display: none;
+              min-height: 50px;
+              padding: 10px 20px;
+              border: 1px solid white;">
+</aside>`);
 
   document.body.prepend(flash)
-
-  if (flash)
-    flash.style = `
-color: white;
-font-family: monospace;
-position: fixed;
-top: 2px;
-left: 2px;
-z-index: 9999;
-display: none;
-min-height: 50px;
-padding: 10px 20px;
-border: 1px solid white;
-`;
 
   return (_type, title, message, timeout_override) => {
     var content = '';

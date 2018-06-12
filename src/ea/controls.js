@@ -44,16 +44,13 @@ function ea_controls_tree() {
   ctel.style['height'] = `calc(${window.innerHeight}px - 6.5em)`;
 
   ea_datasets_category_tree.forEach(a => {
-    const ahtml = `
-      <div id=${a.name} class="controls-category">
-        <div class="controls-category-title">
-          <span class="collapse triangle">${ea_ui_collapse_triangle('w')}</span> ${a.name}
-        </div>
-        <div class="controls-subcategories"></div>
-      </div>
-    `;
-
-    ctel.insertAdjacentHTML('beforeend', ahtml);
+    ctel.appendChild(elem(`
+<div id=${a.name} class="controls-category">
+  <div class="controls-category-title">
+    <span class="collapse triangle">${ea_ui_collapse_triangle('w')}</span> ${a.name}
+  </div>
+  <div class="controls-subcategories"></div>
+</div>`));
 
     const catel = ctel.querySelector(`#${a.name}`);
     const cti = catel.querySelector('.controls-category-title');
@@ -61,18 +58,15 @@ function ea_controls_tree() {
     cti.addEventListener('mouseup', e => ea_controls_collapse_category(catel));
 
     a.subcategories.forEach(b => {
-      const bhtml = `
-        <div id=${b.name} class="controls-subcategory">
-          <div class="controls-subcategory-title">
-            ${b.name}
-            <span class="collapse">${ea_ui_collapse_triangle('se')}</span>
-          </div>
-          <div class="controls-container"></div>
-        </div>
-      `;
-
       catel.querySelector('.controls-subcategories')
-        .insertAdjacentHTML('beforeend', bhtml);
+        .appendChild(elem(`
+<div id=${b.name} class="controls-subcategory">
+  <div class="controls-subcategory-title">
+    ${b.name}
+    <span class="collapse">${ea_ui_collapse_triangle('se')}</span>
+  </div>
+  <div class="controls-container"></div>
+</div>`));
 
       const subel = catel.querySelector(`#${b.name}`);
       const conel = subel.querySelector('.controls-container');
@@ -91,25 +85,17 @@ function ea_controls_tree() {
 }
 
 function ea_controls_elem(ds) {
-  const controls = document.createElement('div');
-  controls.id = `controls-${ds.id}`;
-  controls.classList.add('controls');
+  const controls = elem(`
+<div id="controls-${ds.id}" class="controls">
+  <div class="controls-dataset-header">
+    <span class="controls-dataset-description">${ds.description}&nbsp;</span>
+  </div>
+</div>`);
 
-  const conhead = document.createElement('div');
-  conhead.className = "controls-dataset-header";
-
-  conhead.insertAdjacentHTML(
-    'beforeend',
-    `<span class="controls-dataset-description">${ds.description}&nbsp;</span>`
-  );
-
-  if (ds.unit)
-    conhead.insertAdjacentHTML(
-      'beforeend',
-      `<span class="controls-dataset-unit small">(${ds.unit})</span>&nbsp;&nbsp;`
-    );
-
-  controls.appendChild(conhead);
+  if (ds.unit) {
+    controls.querySelector('.controls-dataset-header')
+      .appendChild(elem(`<span class="controls-dataset-unit small">(${ds.unit})</span>&nbsp;&nbsp;`));
+  }
 
   return controls;
 }
@@ -178,23 +164,22 @@ function ea_controls_range(ds) {
     ds.scalefn = () => d3.scaleLinear().domain(domain).range([0,1]).clamp(true);
   }
 
-  const container = document.createElement('div');
-  container.className = "control-group";
+  const container = elem(`<div class="controls-group"></div>`);
 
   const range_norm = d3.scaleLinear().domain([0,1]).range(ds.domain);
   const domain = ds.domain.slice(0);
 
-  const l = document.createElement('div');
-  l.className = "label";
-  l.innerHTML = `
-<span class="left" bind="v1"></span> <span bind="v2" class="right"></span>`;
-
-  l.style = `
-float: right;
-display: flex;
-justify-content: space-between;
-width: 150px;
-margin-bottom: 10px;`;
+  const l = elem(`
+<div class="label"
+     style="float: right;
+            display: flex;
+            justify-content: space-between;
+            width: 150px;
+            margin-bottom: 10px;">
+  <span class="left" bind="v1"></span>
+  &nbsp;
+  <span bind="v2" class="right"></span>
+</div>`);
 
   const v1 = l.querySelector('[bind=v1]');
   const v2 = l.querySelector('[bind=v2]');
@@ -207,7 +192,7 @@ margin-bottom: 10px;`;
     )
   );
 
-  container.appendChild(document.createElement('br'));
+  container.appendChild(elem('<br>'));
 
   container.appendChild(l);
 
@@ -217,21 +202,20 @@ margin-bottom: 10px;`;
 function ea_controls_weight(ds) {
   var weights = Array.apply(null, Array(5)).map((_, i) => i + 1)
 
-  const container = document.createElement('div');
-  container.className = "control-group";
-  container.innerHTML = `<span class="label">weight</span>&nbsp;&nbsp;&nbsp;`;
+  const container = elem(`
+<div class="control-group">
+  <span class="label">weight</span>&nbsp;&nbsp;&nbsp;
+</div>`);
 
-  const l = document.createElement('div');
-  l.className = "label";
-  l.style = `
-float: right;
-display: flex;
-justify-content: space-between;
-width: 150px;
-margin-bottom: 10px;
-`;
-
-  l.innerHTML = `<span>${weights[0]}</span><span>${weights[weights.length - 1]}</span>`
+  const l = elem(`
+<div class="label"
+     style="float: right;
+            display: flex;
+            justify-content: space-between;
+            width: 150px;
+            margin-bottom: 10px;"
+  <span>${weights[0]}</span><span>${weights[weights.length - 1]}</span>
+<div>`);
 
   container.appendChild(
     ea_svg_range_steps(
@@ -246,7 +230,7 @@ margin-bottom: 10px;
     )
   );
 
-  container.appendChild(document.createElement('br'));
+  container.appendChild(elem('<br>'));
 
   container.appendChild(l);
 
@@ -254,19 +238,17 @@ margin-bottom: 10px;
 }
 
 function ea_controls_steps(ds) {
-  const container = document.createElement('div');
-  container.className = "control-group";
+  const container = elem(`<div class="control-group"></div>`);
 
-  const l = document.createElement('span');
-  l.className = "label";
-  l.style = `
-float: right;
-display: flex;
-justify-content: space-between;
-width: 150px;
-margin-bottom: 10px;`;
-
-  l.innerHTML = `<span></span><span bind="vw"></span>`;
+  const l = elem(`
+<span class="label"
+      style="float: right;
+             display: flex;
+             justify-content: space-between;
+             width: 150px;
+             margin-bottom: 10px;">
+  <span></span><span bind="vw"></span>
+</span>`);
 
   const w = l.querySelector('[bind=vw]');
 
@@ -288,7 +270,7 @@ margin-bottom: 10px;`;
     )
   );
 
-  container.appendChild(document.createElement('br'));
+  container.appendChild(elem('<br>'));
 
   container.appendChild(l);
 

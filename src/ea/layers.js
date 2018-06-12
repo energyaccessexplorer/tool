@@ -23,33 +23,30 @@ function ea_layers_update_map(list) {
 }
 
 function ea_layer_elem(ds) {
-  const d = document.createElement('li');
-  d.setAttribute('bind', ds.id);
-  d.className = "layers-element";
+  const d = elem(`
+<li bind="${ds.id}"
+    class="layers-element">
+  <div class="layers-element-handle"></div>
 
-  d.innerHTML = `
-<div class="layers-element-handle"></div>
+  <div class="layers-element-content">
+    <div class="layers-element-header">
+      <div class="layers-element-title">${ds.description}</div>
 
-<div class="layers-element-content">
-  <div class="layers-element-header">
-    <div class="layers-element-title">${ds.description}</div>
-
-    <div class="layers-element-controls">
-      <div class="layer-type"></div>
-      <div class="layer-visibility"></div>
-      <div class="layer-info"></div>
+      <div class="layers-element-controls">
+        <div class="layer-type"></div>
+        <div class="layer-visibility"></div>
+        <div class="layer-info"></div>
+      </div>
     </div>
+
+    <div class="layers-element-descriptor"></div>
   </div>
+</li>`);
 
-  <div class="layers-element-descriptor"></div>
-</div>
-`;
-
-  if (ds.unit)
-    d.querySelector('.layers-element-title').insertAdjacentHTML(
-      'beforeend',
-      `&nbsp;<span class="small">(${ds.unit})</span>`
-    );
+  if (ds.unit) {
+    d.querySelector('.layers-element-title')
+      .appendChild(elem(`<span class="small">&nbsp;&nbsp;(${ds.unit})</span>`));
+  }
 
   d.querySelector('.layer-type').addEventListener('mouseup', (e) => {
     ea_ui_flash(null, "this does something, right?");

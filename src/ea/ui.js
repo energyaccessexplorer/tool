@@ -49,7 +49,7 @@ function ea_ui_spinner() {
 }
 
 function ea_ui_app_loading(bool) {
-  document.querySelector('#app-loading').style.display = (bool) ? 'block' : 'none';
+  document.querySelector('#app-loading').style['display'] = bool ? 'block' : 'none';
 }
 
 function ea_ui_dataset_loading(ds, bool) {

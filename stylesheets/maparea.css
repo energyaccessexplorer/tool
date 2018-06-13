@@ -5,6 +5,7 @@
   height: auto;    /* will be changed by JS */
   padding: 0;
   margin: auto;
+  background-color: #333;
 }
 
 .center {

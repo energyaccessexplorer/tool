@@ -88,13 +88,13 @@ function ea_controls_elem(ds) {
   const controls = elem(`
 <div id="controls-${ds.id}" class="controls">
   <div class="controls-dataset-header">
-    <span class="controls-dataset-description">${ds.description}&nbsp;</span>
+    <span class="controls-dataset-description">${ds.description}</span>
   </div>
 </div>`);
 
   if (ds.unit) {
     controls.querySelector('.controls-dataset-header')
-      .appendChild(elem(`<span class="controls-dataset-unit small">(${ds.unit})</span>&nbsp;&nbsp;`));
+      .appendChild(elem(`<span class="controls-dataset-unit small">(${ds.unit})</span>`));
   }
 
   return controls;
@@ -170,15 +170,9 @@ function ea_controls_range(ds) {
   const domain = ds.domain.slice(0);
 
   const l = elem(`
-<div class="label"
-     style="float: right;
-            display: flex;
-            justify-content: space-between;
-            width: 150px;
-            margin-bottom: 10px;">
-  <span class="left" bind="v1"></span>
-  &nbsp;
-  <span bind="v2" class="right"></span>
+<div class="label">
+  <span bind="v1"></span>
+  <span bind="v2"></span>
 </div>`);
 
   const v1 = l.querySelector('[bind=v1]');
@@ -204,18 +198,14 @@ function ea_controls_weight(ds) {
 
   const container = elem(`
 <div class="control-group">
-  <span class="label">weight</span>&nbsp;&nbsp;&nbsp;
+  <span class="weight-label">weight</span>
 </div>`);
 
   const l = elem(`
-<div class="label"
-     style="float: right;
-            display: flex;
-            justify-content: space-between;
-            width: 150px;
-            margin-bottom: 10px;"
-  <span>${weights[0]}</span><span>${weights[weights.length - 1]}</span>
-<div>`);
+<div class="label">
+  <span>${weights[0]}</span>
+  <span>${weights[weights.length - 1]}</span>
+</div>`);
 
   container.appendChild(
     ea_svg_range_steps(
@@ -241,14 +231,10 @@ function ea_controls_steps(ds) {
   const container = elem(`<div class="control-group"></div>`);
 
   const l = elem(`
-<span class="label"
-      style="float: right;
-             display: flex;
-             justify-content: space-between;
-             width: 150px;
-             margin-bottom: 10px;">
-  <span></span><span bind="vw"></span>
-</span>`);
+<div class="label">
+  <span></span>
+  <span bind="vw"></span>
+</div>`);
 
   const w = l.querySelector('[bind=vw]');
 

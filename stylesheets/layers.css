@@ -39,13 +39,21 @@
   transform: scale(1.4);
 }
 
+.layers-element,
+.layers-element-place-holder {
+  margin: 2px;
+}
+
 .layers-element {
   display: flex;
   background-color: white;
-  margin: 2px;
   padding: 5px;
   color: #1C4478;
   white-space: nowrap;
+}
+
+.layers-element-place-holder {
+  background-color: rgba(0,0,0,0.3);
 }
 
 .layers-element-handle {

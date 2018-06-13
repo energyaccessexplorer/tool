@@ -112,7 +112,7 @@ function ea_layers_init() {
   sortable('#layers-list', {
     items: 'li.layers-element',
     forcePlaceholderSize: true,
-    placeholder: '<li style="background-color: rgba(0,0,0,0.3);"></li>',
+    placeholder: '<li class="layers-element-place-holder"></li>',
     handle: '.layers-element-handle',
   })[0]
     .addEventListener(

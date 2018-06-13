@@ -17,7 +17,23 @@
   padding: 1em 0 1em 1em;
 }
 
+.controls .label,
+.controls .weight-label {
+  color: white;
+  font-size: 0.8em;
+}
+
+.controls .weight-label {
+  margin-right: 0.7em;
+  vertical-align: top;
+}
+
 .controls .label {
+  float: right;
+  display: flex;
+  justify-content: space-between;
+  width: 150px;
+  margin-bottom: 10px;
   color: white;
   font-size: 0.8em;
 }
@@ -110,6 +126,7 @@
 
 .controls-dataset-unit {
   color: white;
+  margin-right: 1em;
 }
 
 .collapse {

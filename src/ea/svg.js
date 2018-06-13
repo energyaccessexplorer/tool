@@ -1,10 +1,12 @@
 function ea_svg_land_mask(g) {
-  var el = document.querySelector("#map");
+  var el = d3.select("#svg-mask")
+      .attr("width", ea_settings.width)
+      .attr("height", ea_settings.height);
 
-  var mask = g.svg
-    .append("defs")
-    .append("mask")
-    .attr("id", "country-mask");
+  var mask = el
+      .append("defs")
+      .append("mask")
+      .attr("id", "country-mask");
 
   mask.append("rect")
     .attr("x", 0)
@@ -12,15 +14,12 @@ function ea_svg_land_mask(g) {
     .attr("width", ea_settings.width)
     .attr("height", ea_settings.height)
     .style("fill", "white")
-    .style("opacity", "1")
-  ;
+    .style("opacity", "1");
 
-  var paths = document.querySelectorAll('#land path');
-  var masknode = mask.node();
+  document.querySelectorAll('#land path')
+    .forEach((p) => mask.node().appendChild(p.cloneNode()));
 
-  paths.forEach((p) => masknode.appendChild(p.cloneNode()));
-
-  g.svg
+  el
     .append("g")
     .attr("id", "mask")
     .attr("transform", "translate(0,0)")
@@ -30,7 +29,8 @@ function ea_svg_land_mask(g) {
     .attr("width", ea_settings.width)
     .attr("height", ea_settings.height)
     .attr("mask", "url(#country-mask)")
-    .style("fill", "#f8f8f8");
+    .style("fill", "#f8f8f8")
+    .style("stroke", 'none');
 }
 
 function ea_svg_checkbox(callback) {

@@ -12,7 +12,7 @@
   margin: auto;
 }
 
-canvas#plot, svg#map, #mapbox-container {
+canvas#plot, svg#map, #mapbox-container, #svg-mask {
   position: absolute;
   top: 0;
   left: 0;

@@ -92,7 +92,6 @@ function ea_map_svg(svg, topofile) {
   // {
   // }
 
-
   const coord_tooltip = d3.select('body').append('div');
   coord_tooltip.attr('id', "coord-tooltip");
 
@@ -112,8 +111,6 @@ function ea_map_load_features(m, features, cls, callback) {
 
   if (container.empty())
     container = m.svg.append('g').attr('id', cls);
-
-  m.svg.select('#mask').raise();
 
   container.selectAll(`path.${ cls }`).remove();
 

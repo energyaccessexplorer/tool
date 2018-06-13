@@ -63,6 +63,20 @@ var ea_datasets = [
     active: false,
   },
   {
+    id: "schools",
+    description: "Schools",
+    preload: false,
+
+    endpoint: `${ea_database}/envelope_schools`,
+
+    parse: async function() { await ea_datasets_features(this) },
+
+    hide: function() { ea_map_unload(ea_map, this.id) },
+
+    datatype: "boolean",
+    active: false,
+  },
+  {
     id: "schools-distance",
     description: "Distance to schools",
     unit: "km",
@@ -71,7 +85,7 @@ var ea_datasets = [
     // url: "./data/schools_distance.tif",
     // parse: () => (!this.raster || !this.image) ? ea_datasets_tiff_url(this) : null,
 
-    endpoint: `${ea_database}/schools_tiff_resampled_materialized`,
+    endpoint: `${ea_database}/schools_distance_tiff_resampled_materialized`,
     parse: async function(cb) {
       if (!this.raster || !this.image)
       await ea_client(
@@ -232,6 +246,7 @@ const ea_datasets_category_tree = [{
   }, {
     "name": "productive-uses",
     "datasets": [
+      "schools",
       "schools-distance",
       "facilities",
       "mines",

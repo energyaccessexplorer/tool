@@ -139,6 +139,7 @@ function ea_controls(ds) {
     controls.appendChild(ea_controls_weight(ds));
     break;
 
+  case "schools":
   case "crops":
   case "mines":
   case "hydro":

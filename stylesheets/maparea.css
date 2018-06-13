@@ -57,6 +57,11 @@ svg#map {
   fill: none; /* green */
 }
 
+.schools {
+  fill: orange;
+  fill-opacity: 1;
+}
+
 .mines {
   fill: darkgray;
   fill-opacity: 1;

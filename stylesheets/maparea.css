@@ -12,7 +12,10 @@
   margin: auto;
 }
 
-canvas#plot, svg#map, #mapbox-container, #svg-mask {
+div#mapbox-container,
+canvas#plot,
+svg#svg-map,
+svg#svg-mask {
   position: absolute;
   top: 0;
   left: 0;
@@ -29,9 +32,13 @@ canvas#plot {
   filter: blur(1px);
 }
 
-svg#map {
+svg#svg-map {
   opacity: 1.0;
   /* pointer-events: none; */
+}
+
+svg#svg-mask {
+  pointer-events: none;
 }
 
 #mapbox-container {

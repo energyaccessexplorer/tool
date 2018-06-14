@@ -17,7 +17,7 @@ function ea_map_setup() {
     ea_settings.width = (w/h) * ea_settings.height;
   }
 
-  const svg = d3.select('svg#map')
+  const svg = d3.select('#svg-map')
         .attr('width', ea_settings.width)
         .attr('height', ea_settings.height);
 
@@ -47,7 +47,8 @@ function ea_map_svg(svg, topofile) {
 
   var projection, geopath, scale;
 
-  var land = svg.append('g').attr('id', "land");
+  const map = svg.select('#map');
+  const land = map.append('g').attr('id', "land");
 
   topo = topojson.feature(topofile, topofile.objects.adm0);
 
@@ -83,6 +84,7 @@ function ea_map_svg(svg, topofile) {
     projection: projection,
     geopath: geopath,
     svg: svg,
+    map: map,
     land: land,
     scale: scale,
   };
@@ -107,10 +109,10 @@ function ea_map_svg(svg, topofile) {
 };
 
 function ea_map_load_features(m, features, cls, callback) {
-  var container = m.svg.select(`#${cls}`)
+  var container = m.map.select(`#${cls}`)
 
   if (container.empty())
-    container = m.svg.append('g').attr('id', cls);
+    container = m.map.append('g').attr('id', cls);
 
   container.selectAll(`path.${ cls }`).remove();
 
@@ -129,7 +131,7 @@ function ea_map_load_features(m, features, cls, callback) {
 function ea_map_unload(g, id) {
   if (typeof g === 'undefined' || g === null) return;
 
-  g.svg.select(`#${id}`).remove();
+  g.map.select(`#${id}`).remove();
 }
 
 function ea_map_mousemove(g, t) {

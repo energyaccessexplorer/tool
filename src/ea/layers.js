@@ -18,7 +18,7 @@ function ea_layers_update_map(list) {
   list
     .filter(x => ea_datasets.find(d => d.id === x && d.features))
     .reverse()
-    .forEach(i => ea_map.svg.select(`#${i}`).raise());
+    .forEach(i => ea_map.map.select(`#${i}`).raise());
 
   if (list.indexOf(raster_id) === 0) order = order.reverse();
 
@@ -66,7 +66,7 @@ function ea_layer_elem(ds) {
     }
 
     else if (ds.features) {
-      ea_map.svg.select(`#${ds.id}`).style('opacity', (visible ? 1 : 0))
+      ea_map.map.select(`#${ds.id}`).style('opacity', (visible ? 1 : 0))
     }
   });
 

@@ -77,42 +77,57 @@ function ea_layer_elem(ds) {
   return d;
 }
 
+function ea_layers_toggle_list(bool) {
+  const layers = document.querySelector('#layers');
+  const list = layers.querySelector('#layers-list');
+  const t = layers.querySelector('.collapse.triangle');
+
+  list.style['display'] = (bool ? "" : "none");
+  t.innerHTML = ea_ui_collapse_triangle(bool ? 's' : 'n');
+}
+
 function ea_layers_update_list() {
   sortable('#layers-list', 'disable');
 
-  const parent = document.querySelector('#layers');
-  const el = parent.querySelector('#layers-list');
+  const layers = document.querySelector('#layers');
+  const list = layers.querySelector('#layers-list');
 
   const coll = ea_layers_collection();
-  const t = parent.querySelector('.collapse.triangle');
 
-  el.innerHTML = "";
-
-  let d = true;
+  list.innerHTML = "";
 
   if (coll.length) {
-    parent.style['display'] = "block";
-
-    parent.querySelector('#layers-header').addEventListener('mouseup', function() {
-      d = !d;
-
-      el.style['display'] = (d ? "" : "none");
-
-      t.innerHTML = ea_ui_collapse_triangle(d ? 's' : 'n');
-    });
-
-    coll.forEach(ds => el.appendChild(ea_layer_elem(ds)));
-
+    coll.forEach(ds => list.appendChild(ea_layer_elem(ds)));
     sortable('#layers-list', 'enable');
-  } else {
-    d = false;
-    parent.style['display'] = "none";
   }
+
+  layers.style['display'] = (coll.length) ? "block" : "none";
 }
 
 function ea_layers_init() {
-  document.querySelector('#layers-header .collapse.triangle')
+  const layers = document.querySelector('#layers');
+  const header = layers.querySelector('#layers-header');
+  const list = layers.querySelector('#layers-list');
+
+  header.querySelector('.collapse.triangle')
     .innerHTML = ea_ui_collapse_triangle('s');
+
+  let d;
+  ea_layers_toggle_list(d = false);
+
+  header.addEventListener('mouseup', function() {
+    d = !d;
+
+    ea_layers_toggle_list(d);
+
+    if (d) {
+      ea_layers_update_map([].map.call(
+        document.querySelectorAll('li.layers-element'),
+        i => i.getAttribute('bind')));
+    } else {
+      ea_canvas_plot(ea_analysis());
+    }
+  });
 
   sortable('#layers-list', {
     items: 'li.layers-element',

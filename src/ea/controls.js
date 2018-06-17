@@ -111,9 +111,8 @@ function ea_controls(ds) {
           if (typeof ds.hide === 'function') ds.hide();
         }
 
+        ea_controls_update();
         ea_layers_update_list();
-
-        ea_canvas_plot(ea_analysis());
       }
     )
   );
@@ -159,6 +158,11 @@ function ea_controls_activate(ds, callback) {
   return ea_svg_checkbox((s) => callback((ds.active = s)));
 }
 
+function ea_controls_update() {
+  ea_layers_toggle_list(false);
+  ea_canvas_plot(ea_analysis());
+}
+
 function ea_controls_range(ds) {
   function update_range_value(x,i,el) {
     el.innerText = domain[i] = range_norm(x).toFixed(2);
@@ -183,7 +187,7 @@ function ea_controls_range(ds) {
     ea_svg_interval(
       x => update_range_value(x, 0, v1),
       x => update_range_value(x, 1, v2),
-      () => ea_canvas_plot(ea_analysis()),
+      ea_controls_update
     )
   );
 
@@ -215,7 +219,7 @@ function ea_controls_weight(ds) {
       null,
       x => {
         ds.weight = x;
-        ea_canvas_plot(ea_analysis());
+        ea_controls_update();
       },
       ("weight" === "weight")
     )
@@ -251,7 +255,7 @@ function ea_controls_steps(ds) {
         if (!ds.active) return;
 
         await ea_datasets_load(ds,x);
-        ea_canvas_plot(ea_analysis());
+        ea_controls_update();
       },
       ("weight" === false)
     )

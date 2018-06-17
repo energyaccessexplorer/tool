@@ -10,7 +10,7 @@ function ea_canvas_setup(dummy) {
 }
 
 function ea_canvas_draw(et, tmp) {
-  if (typeof fullimagedata === 'undefined' || fullimagedata === null) return;
+  if (typeof ea_plot_imagedata === 'undefined' || ea_plot_imagedata === null) return;
 
   var w = ea_canvas.width;
   var h = ea_canvas.height;
@@ -18,7 +18,7 @@ function ea_canvas_draw(et, tmp) {
   const f = (w/ea_settings.width);
 
   tmp.getContext('2d')
-    .putImageData(fullimagedata, 0, 0);
+    .putImageData(ea_plot_imagedata, 0, 0);
 
   ea_plot.ctx.clearRect(0, 0, w, h);
 
@@ -42,11 +42,19 @@ function ea_canvas_plot(ds) {
     colorScale: "bluered"
   });
 
+  ea_plot = plot;
+
   plot.render();
 
-  fullimagedata = plot.ctx.getImageData(0, 0, ds.width, ds.height);
+  ea_plot_imagedata = plot.ctx.getImageData(0, 0, ds.width, ds.height);
 
-  ea_plot = plot;
+  let tmp_canvas = document.createElement("canvas");
+  tmp_canvas.setAttribute("width", ea_canvas.width);
+  tmp_canvas.setAttribute("height", ea_canvas.height);
+
+  ea_canvas_draw(d3.zoomTransform(ea_map.svg.node()), tmp_canvas);
+
+  tmp_canvas.remove();
 
   return plot;
 }

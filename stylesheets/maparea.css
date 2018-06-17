@@ -30,11 +30,11 @@ svg#svg-mask {
 canvas#plot {
   margin: auto;
   filter: blur(1px);
+  pointer-events: none;
 }
 
 svg#svg-map {
   opacity: 1.0;
-  /* pointer-events: none; */
 }
 
 svg#svg-mask {

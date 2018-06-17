@@ -3,6 +3,9 @@ include default.mk
 start:
 	@ static-server -noauth -port ${WEB_PORT}
 
+stop:
+	-@lsof -t -i :${WEB_PORT} | xargs kill
+
 deploy:
 	@rsync -OPrv \
 		--checksum \

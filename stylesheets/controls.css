@@ -48,11 +48,6 @@
   text-align: center;
 }
 
-.controls circle {
-  stroke: white;
-  stroke-width: 1px;
-}
-
 .controls .svg-checkbox {
   margin-bottom: -4px;
 }

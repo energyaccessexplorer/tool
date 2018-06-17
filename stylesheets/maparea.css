@@ -10,6 +10,7 @@
 
 .center {
   margin: auto;
+  overflow: hidden;
 }
 
 div#mapbox-container,
@@ -29,7 +30,7 @@ svg#svg-mask {
 
 canvas#plot {
   margin: auto;
-  filter: blur(1px);
+  filter: blur(5px);
   pointer-events: none;
 }
 
@@ -60,10 +61,6 @@ svg#svg-mask {
   font-family: monospace;
 }
 
-#land {
-  fill: none; /* green */
-}
-
 .schools {
   fill: orange;
   fill-opacity: 1;
@@ -92,6 +89,7 @@ svg#svg-mask {
 .transmission-lines-polygon {
   fill: black;
   fill-opacity: 0.3;
+
   stroke: black;
   stroke-width: 0.5;
 }

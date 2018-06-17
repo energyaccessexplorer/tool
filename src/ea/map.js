@@ -54,7 +54,8 @@ function ea_map_svg(svg, topofile) {
   var projection, geopath, scale;
 
   const map = svg.select('#map');
-  const land = map.append('g').attr('id', "land");
+  const land = map.append('g').attr('id', "land")
+        .attr('fill', "none");
 
   topo = topojson.feature(topofile, topofile.objects.adm0);
 

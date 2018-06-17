@@ -1,8 +1,8 @@
 async function ea_init() {
   (async () => {
-    var l = ea_datasets
-        .slice(1)
-        .filter((d) => d.preload)
+    const l = ea_datasets
+          .slice(1)
+          .filter((d) => d.preload);
 
     for (var d of l) await ea_datasets_load(d);
   })();
@@ -34,7 +34,7 @@ function ea_analysis() {
     width: tmp.width,
     height: tmp.height,
     raster: new Float32Array(tmp.raster.length),
-    nodata: -1
+    nodata: -1,
   };
 
   var filtered = ea_datasets.filter(d => (d.active && d.raster));
@@ -45,7 +45,7 @@ function ea_analysis() {
     return (d.scalefn().clamp) ?
       d.scalefn().clamp(ds.clamp) :
       d.scalefn();
-  })
+  });
 
   var full_weight = filtered.reduce((a,c,k) => ((c.datatype === "boolean") ? a : c.weight + a), 0);
 
@@ -76,4 +76,18 @@ function ea_analysis() {
   console.log(performance.now() - n1);
 
   return ds;
+}
+
+function ea_fake_download(blob) {
+  var a = document.createElement('a');
+  document.body.appendChild(a);
+
+  a.style = "display:none;";
+
+  var url = URL.createObjectURL(blob);
+  a.href = url;
+  a.download = "ea_download";
+  a.click();
+
+  window.URL.revokeObjectURL(url);
 }

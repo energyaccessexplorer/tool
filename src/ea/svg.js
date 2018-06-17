@@ -16,7 +16,7 @@ function ea_svg_land_mask(g) {
     .style("fill", "white")
     .style("opacity", "1");
 
-  document.querySelectorAll('#land path')
+  ea_map.land.selectAll('path').nodes()
     .forEach((p) => mask.node().appendChild(p.cloneNode()));
 
   el
@@ -68,7 +68,9 @@ function ea_svg_checkbox(callback) {
   c1
     .attr('r', radius - 0.5)
     .attr('cy', svgheight/2)
-    .attr('cx', svgmin);
+    .attr('cx', svgmin)
+    .attr('stroke', 'white')
+    .attr('stroke-width', 1);
 
   text
     .attr('y', svgheight - (radius/2) - 1)
@@ -89,7 +91,7 @@ function ea_svg_checkbox(callback) {
     if (typeof callback === 'function' && !init) callback(s);
   }
 
-  svg.on('click', () => change(status = !status))
+  svg.on('click', () => change(status = !status));
 
   change(status, true);
 
@@ -142,6 +144,8 @@ function ea_svg_range_steps(steps, init, drag_callback, end_callback, is_weight)
   c1
     .attr('r', radius)
     .attr('cy', svgheight/2)
+    .attr('stroke', 'white')
+    .attr('stroke-width', 1)
     .style('cursor', 'grab');
 
   let x_position;
@@ -237,12 +241,16 @@ function ea_svg_interval(callback1, callback2, end_callback) {
     .attr('r', radius)
     .attr('cy', svgheight/2)
     .attr('fill', 'blue')
+    .attr('stroke', 'white')
+    .attr('stroke-width', 1)
     .style('cursor', 'grab');
 
   c2
     .attr('r', radius)
     .attr('cy', svgheight/2)
     .attr('fill', 'red')
+    .attr('stroke', 'white')
+    .attr('stroke-width', 1)
     .style('cursor', 'grab');
 
   function drag_callback(c, cx, rx, w, callback) {

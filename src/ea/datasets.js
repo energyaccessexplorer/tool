@@ -295,7 +295,8 @@ async function ea_datasets_features(ds) {
 }
 
 async function ea_datasets_tiff(ds, method, payload) {
-  if (!ds.raster || !ds.image) {
+  if (ds.raster) ;
+  else {
     const tiff = await method(payload);
     const image = await tiff.getImage();
     const rasters = await image.readRasters();
@@ -314,23 +315,26 @@ async function ea_datasets_tiff(ds, method, payload) {
 }
 
 async function ea_datasets_tiff_stream(ds, data) {
-  if (!ds.raster || !ds.image) {
+  if (ds.raster) ;
+  else {
     var hex = data[0]['tiff'].slice(2);
     var byteBuf = new Uint8Array(new ArrayBuffer(hex.length/2));
 
     for (var i = 0; i < hex.length; i += 2)
       byteBuf[i/2] = parseInt(hex.slice(i, i+2), 16);
 
-    await ea_datasets_tiff(ds, GeoTIFF.fromBlob, (new Blob([byteBuf], {type: "image/tiff"})));
+    const blob = new Blob([byteBuf], {type: "image/tiff"});
+    await ea_datasets_tiff(ds, GeoTIFF.fromBlob, blob);
+
+    // ea_fake_download(blob);
   }
 
   return ds;
 }
 
 async function ea_datasets_tiff_url(ds) {
-  if (!ds.raster || !ds.image) {
-  await ea_datasets_tiff(ds, GeoTIFF.fromUrl, ds.url);
-  }
+  if (ds.raster) ;
+  else await ea_datasets_tiff(ds, GeoTIFF.fromUrl, ds.url);
 
   return ds;
 }

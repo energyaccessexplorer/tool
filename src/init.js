@@ -13,6 +13,7 @@ requirejs.config({
     'layers': "./ea/layers",
     'client': "./ea/client",
     'svg': "./ea/svg",
+    'canvas': "./ea/canvas",
     'map': "./ea/map",
   }
 });
@@ -26,6 +27,7 @@ require([
   'ea',
   'client',
   'svg',
+  'canvas',
   'controls',
   'ui',
   'layers',
@@ -39,8 +41,6 @@ require([
   window.plotty = plotty;
 
   ea_ui_flash = ea_ui_flash_setup();
-
-  ea_canvas = document.querySelector('canvas#plot');
 
   ea_map = null;
 

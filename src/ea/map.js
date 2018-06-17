@@ -28,6 +28,8 @@ function ea_map_setup() {
   const coord_tooltip = document.querySelector('body')
         .appendChild(elem(`<div id="coord-tooltip"></div>`));
 
+  ea_canvas = document.querySelector('canvas#plot');
+
   d3.queue()
     .defer(d3.json, ea_settings.topofile)
     .await((error, topo) => {
@@ -96,6 +98,7 @@ function ea_map_svg(svg, topofile) {
   //
   {
     let mask;
+    let tmp_canvas;
     let zt = d3.zoomIdentity;
     const tooltip = d3.select('#coord-tooltip');
 
@@ -114,6 +117,14 @@ function ea_map_svg(svg, topofile) {
 
     let zoomstart = () => {
       if (!mask || mask.empty()) mask = d3.select('#mask');
+
+      tmp_canvas = document.createElement("canvas");
+      tmp_canvas.setAttribute("width", ea_canvas.width);
+      tmp_canvas.setAttribute("height", ea_canvas.height);
+    };
+
+    let zoomend = () => {
+      tmp_canvas.remove();
     };
 
     let zooming = () => {
@@ -121,7 +132,10 @@ function ea_map_svg(svg, topofile) {
       const nw = projection.invert(et.invert([0,0]));
       const se = projection.invert(et.invert([width, height]));
 
-      mapbox.fitBounds([[nw[0], se[1]], [se[0], nw[1]]], { animate: false });
+      if (typeof mapbox !== 'undefined' && mapbox !== null)
+        mapbox.fitBounds([[nw[0], se[1]], [se[0], nw[1]]], { animate: false });
+
+      ea_canvas_draw(et, tmp_canvas);
 
       map.attr("transform", et);
       mask.attr("transform", et);
@@ -131,12 +145,13 @@ function ea_map_svg(svg, topofile) {
         .translateExtent([[0, 0], [width, height]])
         .scaleExtent([1, 200])
         .on("start", zoomstart)
-        .on("zoom", zooming);
+        .on("zoom", zooming)
+        .on("end", zoomend);
 
     svg.call(zoom)
       .on('mousemove', mousemove)
       .on('mouseenter', mouseenter)
-      .on('mouseleave', mouseleave)
+      .on('mouseleave', mouseleave);
   }
 
   return _map;

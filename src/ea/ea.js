@@ -7,29 +7,10 @@ async function ea_init() {
     for (var d of l) await ea_datasets_load(d);
   })();
 
-  await ea_datasets.find(d => d.id === "dummy").parse();
-
+  const dummy = ea_datasets.find(d => d.id === "dummy");
+  await dummy.parse();
+  ea_canvas_setup(dummy);
   ea_ui_app_loading(false);
-}
-
-function ea_plot(ds) {
-  if (!ds) return;
-
-  var canvas = ea_canvas;
-
-  const plot = new plotty.plot({
-    canvas,
-    data: ds.raster,
-    width: ds.width,
-    height: ds.height,
-    domain: ds.domain,
-    noDataValue: ds.nodata,
-    colorScale: "bluered"
-  });
-
-  plot.render();
-
-  return plot;
 }
 
 /*

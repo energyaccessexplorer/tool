@@ -113,7 +113,7 @@ function ea_controls(ds) {
 
         ea_layers_update_list();
 
-        ea_plot(ea_analysis());
+        ea_canvas_plot(ea_analysis());
       }
     )
   );
@@ -183,7 +183,7 @@ function ea_controls_range(ds) {
     ea_svg_interval(
       x => update_range_value(x, 0, v1),
       x => update_range_value(x, 1, v2),
-      () => ea_plot(ea_analysis()),
+      () => ea_canvas_plot(ea_analysis()),
     )
   );
 
@@ -215,7 +215,7 @@ function ea_controls_weight(ds) {
       null,
       x => {
         ds.weight = x;
-        ea_plot(ea_analysis());
+        ea_canvas_plot(ea_analysis());
       },
       ("weight" === "weight")
     )
@@ -251,7 +251,7 @@ function ea_controls_steps(ds) {
         if (!ds.active) return;
 
         await ea_datasets_load(ds,x);
-        ea_plot(ea_analysis());
+        ea_canvas_plot(ea_analysis());
       },
       ("weight" === false)
     )

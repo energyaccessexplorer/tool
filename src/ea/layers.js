@@ -24,7 +24,7 @@ function ea_layers_update_map(list) {
 
   maparea.insertBefore(...order);
 
-  ea_plot(ea_datasets.find(x => x.id === raster_id));
+  ea_canvas_plot(ea_datasets.find(x => x.id === raster_id));
 }
 
 function ea_layer_elem(ds) {

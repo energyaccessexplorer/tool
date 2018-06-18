@@ -39,7 +39,7 @@ function ea_canvas_plot(ds) {
     height: ds.height,
     domain: ds.domain,
     noDataValue: ds.nodata,
-    colorScale: "bluered"
+    colorScale: ds.color_scale,
   });
 
   ea_plot = plot;

@@ -40,6 +40,28 @@ require([
   window.GeoTIFF = geotiff;
   window.plotty = plotty;
 
+  plotty.addColorScale(
+    "hot-reverse",
+    plotty.colorscales['hot'].colors.reverse(),
+    plotty.colorscales['hot'].positions
+  );
+
+  plotty.addColorScale(
+    "yignbu-reverse",
+    plotty.colorscales['yignbu'].colors.reverse(),
+    plotty.colorscales['yignbu'].positions
+  );
+
+  ea_datasets.forEach((d) => {
+    if (!d.color_scale) return;
+
+    d.color_scale_fn = function() {
+      return d3.scaleLinear()
+        .domain(plotty.colorscales[d.color_scale].positions)
+        .range(plotty.colorscales[d.color_scale].colors);
+    }
+  })
+
   ea_ui_flash = ea_ui_flash_setup();
 
   ea_map = null;

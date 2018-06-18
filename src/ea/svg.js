@@ -174,7 +174,7 @@ function ea_svg_range_steps(steps, init, drag_callback, end_callback, is_weight)
   return svg.node();
 }
 
-function ea_svg_interval(callback1, callback2, end_callback) {
+function ea_svg_interval(color_scale, callback1, callback2, end_callback) {
   const radius = 6,
         svgwidth = 150,
         svgheight = (radius * 2) + 2,
@@ -198,15 +198,17 @@ function ea_svg_interval(callback1, callback2, end_callback) {
         .attr("y2", "0%")
         .attr("spreadMethod", "pad");
 
-  gradient.append("stop")
-    .attr("offset", "0%")
-    .attr("stop-color", "blue")
-    .attr("stop-opacity", 1);
+  const cr = color_scale().range();
+  const crl = cr.length;
 
-  gradient.append("stop")
-    .attr("offset", "100%")
-    .attr("stop-color", "red")
-    .attr("stop-opacity", 1);
+  for (var i = 0; i < crl; i++) {
+    var v = (1 / (crl-i)) * 100;
+
+    gradient.append("stop")
+      .attr("offset", v + "%")
+      .attr("stop-color", cr[i])
+      .attr("stop-opacity", 1);
+  }
 
   const g = svg.append('g');
 
@@ -240,7 +242,7 @@ function ea_svg_interval(callback1, callback2, end_callback) {
   c1
     .attr('r', radius)
     .attr('cy', svgheight/2)
-    .attr('fill', 'blue')
+    .attr('fill', cr[0])
     .attr('stroke', 'white')
     .attr('stroke-width', 1)
     .style('cursor', 'grab');
@@ -248,7 +250,7 @@ function ea_svg_interval(callback1, callback2, end_callback) {
   c2
     .attr('r', radius)
     .attr('cy', svgheight/2)
-    .attr('fill', 'red')
+    .attr('fill', cr[crl-1])
     .attr('stroke', 'white')
     .attr('stroke-width', 1)
     .style('cursor', 'grab');

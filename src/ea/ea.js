@@ -35,6 +35,7 @@ function ea_analysis() {
     height: tmp.height,
     raster: new Float32Array(tmp.raster.length),
     nodata: -1,
+    color_scale: "bluered",
   };
 
   var filtered = ea_datasets.filter(d => (d.active && d.raster));

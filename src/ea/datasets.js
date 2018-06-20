@@ -269,19 +269,27 @@ async function ea_datasets_features(ds) {
 
 async function ea_datasets_points() {
   const ds = this;
-  await ea_client(ds, 'GET', null,
-    (r) => {
-      ds.features = r[0]['jsonb_build_object'].features;
 
-      ea_map_load_points(
-        ea_map,
-        ds.features,
-        ds.id,
-        ds.symbol,
-        null
-      );
-    }
-  );
+  const load_em = () => {
+    ea_map_load_points(
+      ea_map,
+      ds.features,
+      ds.id,
+      ds.symbol,
+      null
+    )
+  }
+
+  if (ds.features) load_em();
+  else
+    await ea_client(
+      ds, 'GET', null,
+      (r) => {
+        ds.features = r[0]['jsonb_build_object'].features;
+        load_em();
+      }
+    );
+
   return ds;
 }
 

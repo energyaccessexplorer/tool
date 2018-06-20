@@ -212,6 +212,94 @@ var ea_datasets = [
     band: 0,
     active: false,
   },
+  {
+    id: "livestock",
+    description: "Livestock",
+    unit: "%",
+    preload: true,
+
+    url: "./data/districts.tif",
+    parse: ea_datasets_districts_tiff,
+
+    // endpoint: `${ea_database}/districts_tiff_materialized`,
+    // parse: ea_datasets_tiff_stream,
+
+    scale: 'livestock',
+    clamp: false,
+    domain: [0, 100],
+    range: [0, 1],
+    color_scale: 'greys',
+    weight: 5,
+
+    band: 0,
+    active: false,
+  },
+  {
+    id: "mobile",
+    description: "Mobile phone ownership",
+    unit: "%",
+    preload: true,
+
+    url: "./data/districts.tif",
+    parse: ea_datasets_tiff_url,
+
+    // endpoint: `${ea_database}/districts_tiff_materialized`,
+    // parse: ea_datasets_tiff_stream,
+
+    scale: 'mobile',
+    clamp: false,
+    domain: [0, 100],
+    range: [0, 1],
+    color_scale: 'greys',
+    weight: 5,
+
+    band: 0,
+    active: false,
+  },
+  {
+    id: "ironrooftop",
+    description: "Iron Rooftop",
+    unit: "%",
+    preload: true,
+
+    url: "./data/districts.tif",
+    parse: ea_datasets_tiff_url,
+
+    // endpoint: `${ea_database}/districts_tiff_materialized`,
+    // parse: ea_datasets_tiff_stream,
+
+    scale: 'ironrooftop',
+    clamp: false,
+    domain: [0, 100],
+    range: [0, 1],
+    color_scale: 'greys',
+    weight: 5,
+
+    band: 0,
+    active: false,
+  },
+  {
+    id: "radio",
+    description: "Radio Ownership",
+    unit: "%",
+    preload: true,
+
+    url: "./data/districts.tif",
+    parse: ea_datasets_tiff_url,
+
+    // endpoint: `${ea_database}/districts_tiff_materialized`,
+    // parse: ea_datasets_tiff_stream,
+
+    scale: 'radio',
+    clamp: false,
+    domain: [0, 100],
+    range: [0, 1],
+    color_scale: 'greys',
+    weight: 5,
+
+    band: 0,
+    active: false,
+  },
 ];
 
 const ea_datasets_category_tree = [{
@@ -221,6 +309,10 @@ const ea_datasets_category_tree = [{
     "datasets": [
       "population",
       "poverty",
+      "livestock",
+      "mobile",
+      "ironrooftop",
+      "radio",
     ]
   }, {
     "name": "productive-uses",
@@ -258,6 +350,12 @@ function ea_datasets_scale_fn(ds) {
         .range([0,1])
 
   switch (ds.scale) {
+  case 'radio':
+  case 'mobile':
+  case 'livestock':
+  case 'ironrooftop':
+    s = (x) => (x === 255) ? -1 : lin(ea_districts[x][ds.scale]);
+    break;
 
   case 'identity':
     s = d3.scaleIdentity()
@@ -401,4 +499,33 @@ async function ea_datasets_tiff_url() {
   else await ea_datasets_tiff(ds, GeoTIFF.fromUrl, ds.url);
 
   return ds;
+}
+
+async function ea_datasets_districts_tiff() {
+  await ea_datasets_tiff_url.call(this);
+
+  ea_datasets.forEach(d => {
+    if (['radio', 'mobile', 'livestock', 'ironrooftop'].indexOf(d.id) > -1)
+      d.raster = this.raster;
+  })
+}
+
+function ea_datasets_districts() {
+  d3.request('./data/districts-data.csv')
+    .mimeType("text/csv")
+    .response((xhr) => {
+      ea_districts = d3.csvParse(xhr.responseText, (d) => {
+        return {
+          oid: +d.OBJECTID,
+          district: d.District,
+          region: d.Region,
+          livestock: +d.Livestock,
+          radio: +d.Radio,
+          mobile: +d.Mobile,
+          ironrooftop: +d.IronRooftop,
+        }
+      });
+
+      ea_districts.unshift(null);
+    }).get();
 }

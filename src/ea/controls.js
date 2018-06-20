@@ -128,6 +128,10 @@ function ea_controls(ds) {
   case "ghi":
   case "poverty":
   case "population":
+  case "livestock":
+  case 'mobile':
+  case 'ironrooftop':
+  case 'radio':
     controls.appendChild(ea_controls_range(ds));
     controls.appendChild(ea_controls_weight(ds));
     break;

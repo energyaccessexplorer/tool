@@ -60,7 +60,9 @@ require([
         .domain(plotty.colorscales[d.color_scale].positions)
         .range(plotty.colorscales[d.color_scale].colors);
     }
-  })
+  });
+
+  ea_datasets_districts();
 
   ea_ui_flash = ea_ui_flash_setup();
 

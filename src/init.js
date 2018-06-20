@@ -23,7 +23,6 @@ require([
   'topojson',
   'geotiff',
   'plotty',
-  'datasets',
   'ea',
   'client',
   'svg',
@@ -32,6 +31,7 @@ require([
   'ui',
   'layers',
   'map',
+  'datasets',
   'mapbox',
   'sortable',
 ], (d3, topojson, geotiff, plotty) => {

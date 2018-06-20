@@ -56,7 +56,7 @@ var ea_datasets = [
     endpoint: `${ea_database}/envelope_schools`,
     parse: ea_datasets_points,
 
-    hide: function() { ea_map_unload(ea_map, this.id) },
+    hide: ea_map_unload,
     symbol: "square",
 
     datatype: "boolean",
@@ -128,7 +128,7 @@ var ea_datasets = [
       );
     },
 
-    hide: function() { ea_map_unload(ea_map, this.id) },
+    hide: ea_map_unload,
 
     datatype: "boolean",
     active: false,
@@ -141,7 +141,7 @@ var ea_datasets = [
     endpoint: `${ea_database}/envelope_facilities`,
     parse: ea_datasets_points,
 
-    hide: function() { ea_map_unload(ea_map, this.id) },
+    hide: ea_map_unload,
     symbol: "cross",
 
     datatype: "boolean",
@@ -155,7 +155,7 @@ var ea_datasets = [
     endpoint: `${ea_database}/envelope_mines`,
     parse: ea_datasets_points,
 
-    hide: function() { ea_map_unload(ea_map, this.id) },
+    hide: ea_map_unload,
     symbol: "wye",
 
     datatype: "boolean",
@@ -169,7 +169,7 @@ var ea_datasets = [
     endpoint: `${ea_database}/envelope_powerplants`,
     parse: ea_datasets_points,
 
-    hide: function() { ea_map_unload(ea_map, this.id) },
+    hide: ea_map_unload,
     symbol: "star",
 
     datatype: "boolean",
@@ -183,7 +183,7 @@ var ea_datasets = [
     endpoint: `${ea_database}/envelope_hydro`,
     parse: ea_datasets_points,
 
-    hide: function() { ea_map_unload(ea_map, this.id) },
+    hide: ea_map_unload,
     symbol: "circle",
 
     active: false,

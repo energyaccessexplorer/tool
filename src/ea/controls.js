@@ -115,7 +115,7 @@ function ea_controls(ds) {
       async function(v) {
         if (v) await ea_datasets_load(ds);
         else {
-          if (typeof ds.hide === 'function') ds.hide();
+          if (typeof ds.hide === 'function') ds.hide(ea_map, ds.id);
         }
 
         ea_controls_update();

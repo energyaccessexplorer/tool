@@ -84,6 +84,9 @@ function ea_layers_toggle_list(bool) {
 
   list.style['display'] = (bool ? "" : "none");
   t.innerHTML = ea_ui_collapse_triangle(bool ? 's' : 'n');
+
+  ea_controls_collapse_category(document.querySelector('#supply'), !bool);
+  ea_controls_collapse_category(document.querySelector('#demand'), !bool);
 }
 
 function ea_layers_update_list() {

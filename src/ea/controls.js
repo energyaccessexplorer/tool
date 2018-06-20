@@ -13,16 +13,21 @@ function ea_controls_collapse_subcategory(conel, subel) {
   }
 }
 
-function ea_controls_collapse_category(catel) {
-  if (!catel) return;
+function ea_controls_collapse_category(catel, show) {
+  if (!catel) {
+    console.warn(`ea_controls_collapse_category: catel is ${catel}. Return.`);
+    return;
+  }
 
   const subcatel = catel.querySelector('.controls-subcategories');
   const cti = catel.querySelector('.controls-category-title');
   const ctr = catel.querySelector('.collapse.triangle')
 
-  const d = subcatel.style['display'];
+  var d = (subcatel.style['display'] === "none");
 
-  if (d === "none") {
+  if (typeof show !== 'undefined') d = show;
+
+  if (d) {
     ctr.innerHTML = ea_ui_collapse_triangle('w');
 
     // use empty strings so that the CSS can decide

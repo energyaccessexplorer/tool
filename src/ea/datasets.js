@@ -97,12 +97,12 @@ var ea_datasets = [
     endpoint: `${ea_database}/rpc/transmission_lines_buffered_tiff`,
     parse: ea_datasets_tiff_rpc_stream,
 
+    scale: 'identity',
     clamp: false,
     domain: [0,1],
     range: [0,-1],
     weight: Infinity,
 
-    scale: 'identity',
     band: 0,
     datatype: "boolean",
 
@@ -253,19 +253,25 @@ const ea_datasets_category_tree = [{
 function ea_datasets_scale_fn(ds) {
   var s = null;
 
+  const lin = d3.scaleLinear()
+        .domain(ds.tmp_domain || ds.domain)
+        .range([0,1])
+
   switch (ds.scale) {
 
   case 'identity':
-    s = d3.scaleIdentity();
+    s = d3.scaleIdentity()
+      .domain(ds.tmp_domain || ds.domain)
+      .range(ds.range);
     break;
 
   case 'linear':
   default:
-    s = d3.scaleLinear().clamp(ds.clamp);
+    s = lin.clamp(ds.clamp)
     break;
   }
 
-  return s.domain(ds.tmp_domain || ds.domain).range(ds.range);
+  return s;
 }
 
 async function ea_datasets_load(ds,v) {

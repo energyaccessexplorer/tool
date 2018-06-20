@@ -29,7 +29,7 @@ svg#svg-mask {
 
 canvas#plot {
   margin: auto;
-  filter: blur(5px);
+  /* filter: blur(5px); */
   pointer-events: none;
 }
 

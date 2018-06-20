@@ -20,6 +20,8 @@ async function ea_init() {
  */
 
 function ea_analysis() {
+  var t0 = performance.now();
+
   // we use a dataset as a template just for code-clarity.
   //
   var tmp = ea_datasets.find(d => d.id === 'dummy');
@@ -45,9 +47,8 @@ function ea_analysis() {
 
   var scales = filtered.map(d => ea_datasets_scale_fn(d));
 
-  var full_weight = filtered.reduce((a,c,k) => ((c.datatype === "boolean") ? a : c.weight + a), 0);
-
-  var n1 = performance.now();
+  var full_weight = filtered.reduce(
+    (a,c,k) => ((c.datatype === "boolean") ? a : c.weight + a), 0);
 
   for (var i = 0; i < ds.raster.length; i++) {
     var t = filtered.reduce((a, c, k, l) => {
@@ -71,7 +72,7 @@ function ea_analysis() {
     ds.raster[i] = (t === -1) ? t : t / full_weight;
   }
 
-  console.log(performance.now() - n1);
+  console.log("Finished ea_analysis in:", performance.now() - t0);
 
   return ds;
 }

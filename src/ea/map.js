@@ -176,6 +176,55 @@ function ea_map_load_features(m, features, cls, callback) {
   return topo;
 }
 
+function ea_map_load_points(m, features, cls, sym, callback) {
+  var container = m.map.select(`#${cls}`)
+
+  if (container.empty())
+    container = m.map.append('g').attr('id', cls);
+
+  container.selectAll(`path.${ cls }`).remove();
+
+  var s = null;
+
+  switch (sym) {
+    case 'triangle':
+    s = d3.symbolTriangle;
+    break;
+
+    case 'wye':
+    s = d3.symbolWye;
+    break;
+
+    case 'star':
+    s = d3.symbolStar;
+    break;
+
+    case 'square':
+    s = d3.symbolSquare;
+    break;
+
+    case 'cross':
+    s = d3.symbolCross;
+    break;
+
+    case 'circle':
+    default:
+    s = d3.symbolCircle;
+    break;
+  }
+
+  var symbol = d3.symbol().size(20).type((d) => s)
+
+  container.selectAll(`path.${ cls }`)
+    .data(features).enter()
+    .append('path')
+    .attr('d', symbol)
+    .attr('transform', (d) => `translate(${m.projection(d.geometry.coordinates)})`)
+    .attr('class', cls);
+
+  return topo;
+}
+
 function ea_map_unload(g, id) {
   if (typeof g === 'undefined' || g === null) return;
 

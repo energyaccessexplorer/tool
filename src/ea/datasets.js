@@ -71,9 +71,10 @@ var ea_datasets = [
 
     endpoint: `${ea_database}/envelope_schools`,
 
-    parse: async function() { await ea_datasets_features(this) },
+    parse: async function() { await ea_datasets_points(this) },
 
     hide: function() { ea_map_unload(ea_map, this.id) },
+    symbol: "square",
 
     datatype: "boolean",
     active: false,
@@ -170,9 +171,10 @@ var ea_datasets = [
 
     endpoint: `${ea_database}/envelope_facilities`,
 
-    parse: async function() { await ea_datasets_features(this) },
+    parse: async function() { await ea_datasets_points(this) },
 
     hide: function() { ea_map_unload(ea_map, this.id) },
+    symbol: "cross",
 
     datatype: "boolean",
     active: false,
@@ -184,9 +186,10 @@ var ea_datasets = [
 
     endpoint: `${ea_database}/envelope_mines`,
 
-    parse: async function() { await ea_datasets_features(this) },
+    parse: async function() { await ea_datasets_points(this) },
 
     hide: function() { ea_map_unload(ea_map, this.id) },
+    symbol: "wye",
 
     datatype: "boolean",
     active: false,
@@ -198,9 +201,10 @@ var ea_datasets = [
 
     endpoint: `${ea_database}/envelope_powerplants`,
 
-    parse: async function() { await ea_datasets_features(this) },
+    parse: async function() { await ea_datasets_points(this) },
 
     hide: function() { ea_map_unload(ea_map, this.id) },
+    symbol: "star",
 
     datatype: "boolean",
     active: false,
@@ -212,9 +216,10 @@ var ea_datasets = [
 
     endpoint: `${ea_database}/envelope_hydro`,
 
-    parse: async function() { await ea_datasets_features(this) },
+    parse: async function() { await ea_datasets_points(this) },
 
     hide: function() { ea_map_unload(ea_map, this.id) },
+    symbol: "circle",
 
     datatype: "boolean",
     active: false,
@@ -292,6 +297,22 @@ async function ea_datasets_features(ds) {
         ea_map,
         ds.features,
         ds.id,
+        null
+      );
+    }
+  );
+}
+
+async function ea_datasets_points(ds) {
+  await ea_client(ds, 'GET', null,
+    (r) => {
+      ds.features = r[0]['jsonb_build_object'].features;
+
+      ea_map_load_points(
+        ea_map,
+        ds.features,
+        ds.id,
+        ds.symbol,
         null
       );
     }

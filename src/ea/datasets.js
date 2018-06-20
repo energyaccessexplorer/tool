@@ -3,7 +3,7 @@ var ea_datasets = [
     id: "dummy",
     description: "Dummy dataset",
 
-    url: "./data/empty_tiff.tif",
+    url: "./data/empty_8bui.tif",
     parse: ea_datasets_tiff_url,
 
     band: 0,
@@ -14,11 +14,11 @@ var ea_datasets = [
     unit: "kWh/m<sup>2</sup>",
     preload: false,
 
-    // url: "./data/ghi.tif",
-    // parse: ea_datasets_tiff_url,
+    url: "./data/ghi.tif",
+    parse: ea_datasets_tiff_url,
 
-    endpoint: `${ea_database}/ghi_tiff_materialized`,
-    parse: ea_datasets_tiff_stream,
+    // endpoint: `${ea_database}/ghi_tiff_materialized`,
+    // parse: ea_datasets_tiff_stream,
 
     clamp: false,
     domain: [500, 2800],
@@ -34,14 +34,14 @@ var ea_datasets = [
     unit: "< 2USD/day",
     preload: false,
 
-    // url: "./data/poverty.tif",
-    // parse: ea_datasets_tiff_url,
+    url: "./data/poverty.tif",
+    parse: ea_datasets_tiff_url,
 
-    endpoint: `${ea_database}/poverty_tiff`,
-    parse: ea_datasets_tiff_stream,
+    // endpoint: `${ea_database}/poverty_tiff`,
+    // parse: ea_datasets_tiff_stream,
 
     clamp: false,
-    domain: [0.5, 1],
+    domain: [0, 1],
     color_scale: 'yignbu-reverse',
     scalefn: function() { return d3.scaleLinear().domain(this.domain).range([0,1]) },
     band: 0,
@@ -54,7 +54,6 @@ var ea_datasets = [
     preload: false,
 
     endpoint: `${ea_database}/envelope_schools`,
-
     parse: ea_datasets_points,
 
     hide: function() { ea_map_unload(ea_map, this.id) },
@@ -69,14 +68,14 @@ var ea_datasets = [
     unit: "km",
     preload: false,
 
-    // url: "./data/schools_distance.tif",
-    // parse: ea_datasets_tiff_url,
+    url: "./data/schools_distance.tif",
+    parse: ea_datasets_tiff_url,
 
-    endpoint: `${ea_database}/schools_distance_tiff_resampled_materialized`,
-    parse: ea_datasets_tiff_stream,
+    // endpoint: `${ea_database}/schools_distance_tiff_resampled_materialized`,
+    // parse: ea_datasets_tiff_stream,
 
     clamp: true,
-    domain: [120000, 0],
+    domain: [120, 0],
     color_scale: 'greys',
     scalefn: function() { return d3.scaleLinear().domain(this.domain.reverse()).range([0, 120]) },
     band: 0,
@@ -140,7 +139,6 @@ var ea_datasets = [
     preload: false,
 
     endpoint: `${ea_database}/envelope_facilities`,
-
     parse: ea_datasets_points,
 
     hide: function() { ea_map_unload(ea_map, this.id) },
@@ -155,7 +153,6 @@ var ea_datasets = [
     preload: false,
 
     endpoint: `${ea_database}/envelope_mines`,
-
     parse: ea_datasets_points,
 
     hide: function() { ea_map_unload(ea_map, this.id) },
@@ -170,7 +167,6 @@ var ea_datasets = [
     preload: false,
 
     endpoint: `${ea_database}/envelope_powerplants`,
-
     parse: ea_datasets_points,
 
     hide: function() { ea_map_unload(ea_map, this.id) },
@@ -190,7 +186,6 @@ var ea_datasets = [
     hide: function() { ea_map_unload(ea_map, this.id) },
     symbol: "circle",
 
-    datatype: "boolean",
     active: false,
   },
   {

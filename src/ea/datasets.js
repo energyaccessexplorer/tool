@@ -22,10 +22,11 @@ var ea_datasets = [
 
     clamp: false,
     domain: [500, 2800],
+    range: [0,1],
     color_scale: 'hot-reverse',
-    scalefn: function() { return d3.scaleLinear().domain(this.domain).range([0,1]) },
-    band: 0,
     weight: 2,
+
+    band: 0,
     active: false,
   },
   {
@@ -42,10 +43,11 @@ var ea_datasets = [
 
     clamp: false,
     domain: [0, 1],
+    range: [0, 1],
     color_scale: 'yignbu-reverse',
-    scalefn: function() { return d3.scaleLinear().domain(this.domain).range([0,1]) },
-    band: 0,
     weight: 5,
+
+    band: 0,
     active: false,
   },
   {
@@ -76,10 +78,11 @@ var ea_datasets = [
 
     clamp: true,
     domain: [120, 0],
+    range: [0, 1],
     color_scale: 'greys',
-    scalefn: function() { return d3.scaleLinear().domain(this.domain.reverse()).range([0, 120]) },
-    band: 0,
     weight: 3,
+
+    band: 0,
     active: false,
   },
   {
@@ -96,11 +99,13 @@ var ea_datasets = [
 
     clamp: false,
     domain: [0,1],
-
-    scalefn: () => (x) => -x,
-    band: 0,
+    range: [0,-1],
     weight: Infinity,
+
+    scale: 'identity',
+    band: 0,
     datatype: "boolean",
+
     active: false,
   },
   {
@@ -200,10 +205,11 @@ var ea_datasets = [
 
     clamp: false,
     domain: [0, 1000],
+    range: [0, 1],
     color_scale: 'viridis',
-    scalefn: function() { return d3.scaleLinear().domain(this.domain).range([0,1]) },
-    band: 0,
     weight: 5,
+
+    band: 0,
     active: false,
   },
 ];
@@ -243,6 +249,24 @@ const ea_datasets_category_tree = [{
     ]
   }]
 }];
+
+function ea_datasets_scale_fn(ds) {
+  var s = null;
+
+  switch (ds.scale) {
+
+  case 'identity':
+    s = d3.scaleIdentity();
+    break;
+
+  case 'linear':
+  default:
+    s = d3.scaleLinear().clamp(ds.clamp);
+    break;
+  }
+
+  return s.domain(ds.tmp_domain || ds.domain).range(ds.range);
+}
 
 async function ea_datasets_load(ds,v) {
   ea_ui_dataset_loading(ds, true);

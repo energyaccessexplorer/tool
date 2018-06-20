@@ -43,11 +43,7 @@ function ea_analysis() {
 
   ea_canvas.style['opacity'] = (filtered.length === 0) ? 0 : 1;
 
-  var scales = filtered.map(d => {
-    return (d.scalefn().clamp) ?
-      d.scalefn().clamp(ds.clamp) :
-      d.scalefn();
-  });
+  var scales = filtered.map(d => ea_datasets_scale_fn(d));
 
   var full_weight = filtered.reduce((a,c,k) => ((c.datatype === "boolean") ? a : c.weight + a), 0);
 

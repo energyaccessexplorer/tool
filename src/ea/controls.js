@@ -173,7 +173,7 @@ function ea_controls_update() {
 function ea_controls_range(ds) {
   function update_range_value(x,i,el) {
     el.innerText = domain[i] = range_norm(x).toFixed(2);
-    ds.scalefn = () => d3.scaleLinear().domain(domain).range([0,1]).clamp(true);
+    ds.tmp_domain = domain;
   }
 
   const container = elem(`<div class="controls-group"></div>`);

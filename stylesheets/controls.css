@@ -1,7 +1,7 @@
 #controls {
-  color: #f1f1f1;
-  flex: 0;
   display: flex;
+
+  color: #f1f1f1;
   text-align: right;
 
   z-index: 0;

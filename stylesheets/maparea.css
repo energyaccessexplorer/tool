@@ -1,5 +1,4 @@
 #maparea {
-  flex: 1;
   position: relative;
   width: auto;     /* will be changed by JS */
   height: auto;    /* will be changed by JS */

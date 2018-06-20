@@ -46,7 +46,7 @@ function ea_map_setup() {
 
       mapbox_setup();
     });
-};
+}
 
 function ea_map_svg(svg, topofile) {
   var width, height;
@@ -156,7 +156,7 @@ function ea_map_svg(svg, topofile) {
   }
 
   return _map;
-};
+}
 
 function ea_map_load_features(m, features, cls, callback) {
   var container = m.map.select(`#${cls}`)
@@ -174,7 +174,7 @@ function ea_map_load_features(m, features, cls, callback) {
     .on('dblclick', callback);
 
   return topo;
-};
+}
 
 function ea_map_unload(g, id) {
   if (typeof g === 'undefined' || g === null) return;

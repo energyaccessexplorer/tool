@@ -14,6 +14,8 @@ function ea_controls_collapse_subcategory(conel, subel) {
 }
 
 function ea_controls_collapse_category(catel) {
+  if (!catel) return;
+
   const subcatel = catel.querySelector('.controls-subcategories');
   const cti = catel.querySelector('.controls-category-title');
   const ctr = catel.querySelector('.collapse.triangle')
@@ -41,7 +43,7 @@ function ea_controls_collapse_category(catel) {
 
 function ea_controls_tree() {
   const ctel = document.querySelector('#controls')
-  ctel.style['height'] = `calc(${window.innerHeight}px - 6.5em)`;
+  ctel.style['height'] = `calc(${window.innerHeight}px - 3.5em)`;
 
   ea_datasets_category_tree.forEach(a => {
     ctel.appendChild(elem(`

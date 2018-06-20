@@ -258,11 +258,9 @@ function ea_controls_steps(ds) {
       x => w.innerText = `${x}km`,
       async x => {
         ds.image = ds.raster = null;
-        ds.init = x;
-
         if (!ds.active) return;
 
-        await ea_datasets_load(ds,x);
+        await ea_datasets_load(ds, (ds.init = x));
         ea_controls_update();
       },
       ("weight" === false)

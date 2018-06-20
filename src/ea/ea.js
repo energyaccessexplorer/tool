@@ -4,7 +4,8 @@ async function ea_init() {
           .slice(1)
           .filter((d) => d.preload);
 
-    for (var d of l) await ea_datasets_load(d);
+    if (l.length)
+      for (var d of l) await ea_datasets_load(d);
   })();
 
   const dummy = ea_datasets.find(d => d.id === "dummy");

@@ -59,36 +59,3 @@ svg#svg-mask {
   font-size: x-small;
   font-family: monospace;
 }
-
-.schools {
-  fill: orange;
-  fill-opacity: 1;
-}
-
-.mines {
-  fill: darkgray;
-  fill-opacity: 1;
-}
-
-.powerplants {
-  fill: pink;
-  fill-opacity: 1;
-}
-
-.hydro {
-  fill: cyan;
-  fill-opacity: 1;
-}
-
-.facilities {
-  fill: yellow;
-  fill-opacity: 1;
-}
-
-.transmission-lines-polygon {
-  fill: black;
-  fill-opacity: 0.3;
-
-  stroke: black;
-  stroke-width: 0.5;
-}

@@ -1,4 +1,3 @@
-data*
-config.json
-fonts
-lib
+/data*
+/config.json
+/lib

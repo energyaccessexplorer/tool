@@ -38,12 +38,14 @@ function ea_analysis() {
     height: tmp.height,
     raster: new Float32Array(tmp.raster.length),
     nodata: -1,
-    color_scale: "bluered",
+    color_scale: "jet",
   };
 
   var filtered = ea_datasets.filter(d => (d.active && d.raster));
 
   ea_canvas.style['opacity'] = (filtered.length === 0) ? 0 : 1;
+
+  if (!filtered.length) return tmp;
 
   var scales = filtered.map(d => ea_datasets_scale_fn(d));
 

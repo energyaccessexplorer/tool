@@ -344,10 +344,13 @@ const ea_datasets_category_tree = [{
 
 function ea_datasets_scale_fn(ds) {
   var s = null;
+  var r = ds.range || [0,1];
+  var d = ds.domain || [0,1];
+  var t = ds.tmp_domain;
 
   const lin = d3.scaleLinear()
-        .domain(ds.tmp_domain || ds.domain)
-        .range([0,1])
+        .domain(t || d)
+        .range(r)
 
   switch (ds.scale) {
   case 'radio':
@@ -359,8 +362,8 @@ function ea_datasets_scale_fn(ds) {
 
   case 'identity':
     s = d3.scaleIdentity()
-      .domain(ds.tmp_domain || ds.domain)
-      .range(ds.range);
+      .domain(t || d)
+      .range(r);
     break;
 
   case 'linear':
@@ -380,8 +383,8 @@ async function ea_datasets_load(ds,v) {
 	ea_ui_dataset_loading(ds, false);
 }
 
-async function ea_datasets_features(ds) {
-  await ea_client(ds, 'GET', null,
+function ea_datasets_features(ds) {
+  ea_client(ds, 'GET', null,
     (r) => {
       ds.features = r[0]['jsonb_build_object'].features;
 
@@ -441,7 +444,7 @@ async function ea_datasets_tiff(ds, method, payload) {
   return ds;
 }
 
-async function ea_datasets_hexblob(hex) {
+function ea_datasets_hexblob(hex) {
   var byteBuf = new Uint8Array(new ArrayBuffer(hex.length/2));
 
   for (var i = 0; i < hex.length; i += 2)

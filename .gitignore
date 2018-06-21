@@ -1,3 +1,5 @@
 /data*
 /config.json
 /lib
+/src/scratch.js
+/default.mk

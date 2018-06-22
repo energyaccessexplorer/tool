@@ -1,6 +1,6 @@
 async function ea_init() {
   (async () => {
-    const l = ea_datasets
+    const l = ea_datasets_collection
           .slice(1)
           .filter((d) => d.preload);
 
@@ -8,7 +8,7 @@ async function ea_init() {
       for (var d of l) await ea_datasets_load(d);
   })();
 
-  const dummy = ea_datasets.find(d => d.id === "dummy");
+  const dummy = ea_datasets_collection.find(d => d.id === "dummy");
   await dummy.parse();
   ea_canvas_setup(dummy);
   ea_ui_app_loading(false);
@@ -24,7 +24,7 @@ function ea_analysis() {
 
   // we use a dataset as a template just for code-clarity.
   //
-  var tmp = ea_datasets.find(d => d.id === 'dummy');
+  var tmp = ea_datasets_collection.find(d => d.id === 'dummy');
 
   if (!tmp.raster) {
     console.warn("No raster template. Return.");
@@ -41,7 +41,7 @@ function ea_analysis() {
     color_scale: "jet",
   };
 
-  var filtered = ea_datasets.filter(d => (d.active && d.raster));
+  var filtered = ea_datasets_collection.filter(d => (d.active && d.raster));
 
   ea_canvas.style['opacity'] = (filtered.length === 0) ? 0 : 1;
 

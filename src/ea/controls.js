@@ -82,7 +82,7 @@ function ea_controls_tree() {
         .addEventListener('mouseup', e => ea_controls_collapse_subcategory(conel, subel));
 
       b.datasets.forEach(b => {
-        const ds = ea_datasets.find(x => x.id === b);
+        const ds = ea_datasets_collection.find(x => x.id === b);
 
         if (ds) conel.appendChild(ea_controls(ds));
         else console.warn(`'${b}' dataset not found`);
@@ -128,6 +128,9 @@ function ea_controls(ds) {
   case "ghi":
   case "poverty":
   case "population":
+  case "transmission-lines-distance":
+  case "minigrids-distance":
+  case "mines-distance":
   case "livestock":
   case 'mobile':
   case 'ironrooftop':
@@ -150,6 +153,7 @@ function ea_controls(ds) {
     break;
 
   case "schools":
+  case "minigrids":
   case "crops":
   case "mines":
   case "hydro":

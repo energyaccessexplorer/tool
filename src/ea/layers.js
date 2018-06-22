@@ -3,9 +3,9 @@ function ea_layers_collection() {
 
   var list = [].map.call(curr, x => x.getAttribute('bind'));
 
-  return ea_datasets
+  return ea_datasets_collection
     .filter(d => d.active)
-    .sort((a,b) => (list.indexOf(a.id) < list.indexOf(b.id)) ? -1 : 1)
+    .sort((a,b) => (list.indexOf(a.id) < list.indexOf(b.id)) ? -1 : 1);
 }
 
 function ea_layers_update_map(list) {
@@ -13,10 +13,10 @@ function ea_layers_update_map(list) {
   const maparea = document.querySelector('#maparea');
 
   const raster_id = list
-        .find(d => ea_datasets.find(x => x.id === d && x.active && x.raster));
+        .find(d => ea_datasets_collection.find(x => x.id === d && x.active && x.raster));
 
   list
-    .filter(x => ea_datasets.find(d => d.id === x && d.features))
+    .filter(x => ea_datasets_collection.find(d => d.id === x && d.features))
     .reverse()
     .forEach(i => ea_map.map.select(`#${i}`).raise());
 
@@ -24,7 +24,7 @@ function ea_layers_update_map(list) {
 
   maparea.insertBefore(...order);
 
-  ea_canvas_plot(ea_datasets.find(x => x.id === raster_id));
+  ea_canvas_plot(ea_datasets_collection.find(x => x.id === raster_id));
 }
 
 function ea_layer_elem(ds) {

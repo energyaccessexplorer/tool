@@ -52,7 +52,7 @@ require([
     plotty.colorscales['yignbu'].positions
   );
 
-  ea_datasets.forEach((d) => {
+  ea_datasets_collection.forEach((d) => {
     if (!d.color_scale) return;
 
     d.color_scale_fn = function() {

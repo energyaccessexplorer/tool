@@ -7,6 +7,8 @@ stop:
 	-@lsof -t -i :${WEB_PORT} | xargs kill
 
 deploy:
+	sed -i 's%const ea_database = "${DB_SERV_DEV}";%const ea_database = "${DB_SERV_PROD}";%' config.js
+
 	@rsync -OPrv \
 		--checksum \
 		--delete-before \
@@ -14,5 +16,6 @@ deploy:
 		--exclude=.git \
 		--exclude=default.mk \
 		--exclude=makefile \
-		--exclude=config.json \
 		./ ${SRV_USER}@${SRV_SERVER}:${SRV_DEST}
+
+	sed -i 's%const ea_database = "${DB_SERV_PROD}";%const ea_database = "${DB_SERV_DEV}";%' config.js

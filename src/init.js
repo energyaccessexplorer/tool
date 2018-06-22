@@ -15,6 +15,7 @@ requirejs.config({
     'svg': "./ea/svg",
     'canvas': "./ea/canvas",
     'map': "./ea/map",
+    'config': "../config",
   }
 });
 
@@ -34,6 +35,7 @@ require([
   'datasets',
   'mapbox',
   'sortable',
+  'config',
 ], (d3, topojson, geotiff, plotty) => {
   window.d3 = d3;
   window.topojson = topojson;

@@ -40,7 +40,7 @@ function ea_map_setup() {
 
       ea_map = ea_map_svg(svg, topo);
 
-      ea_map_load_features(ea_map, ea_map.topo.features, 'land', 'adm0');
+      ea_map_load_features(ea_map, ea_map.topo.features, 'land', 0);
 
       ea_svg_land_mask(ea_map);
 
@@ -71,7 +71,6 @@ function ea_map_svg(svg, topofile) {
 
   geopath = d3.geoPath()
     .projection(projection)
-    .pointRadius(1.3);
 
   var b = geopath.bounds(topo);
   const angle_width = (b[1][0] - b[0][0]);
@@ -125,6 +124,28 @@ function ea_map_svg(svg, topofile) {
     };
 
     let zoomend = () => {
+      const k = d3.event.transform.k;
+
+      ea_datasets_collection
+        .filter(x => x.active && x.features)
+        .forEach(ds => {
+          if (ds.type === 'points')
+            ea_map_load_points(
+              _map,
+              ds.features,
+              ds.id,
+              ds.symbol,
+              k
+            );
+          else if (ds.type === 'polygon')
+            ea_map_load_features(
+              _map,
+              ds.features,
+              ds.id,
+              k
+            );
+        });
+
       tmp_canvas.remove();
     };
 
@@ -158,7 +179,7 @@ function ea_map_svg(svg, topofile) {
   return _map;
 }
 
-function ea_map_load_features(m, features, cls, callback) {
+function ea_map_load_features(m, features, cls, scale) {
   var container = m.map.select(`#${cls}`)
 
   if (container.empty())
@@ -171,12 +192,14 @@ function ea_map_load_features(m, features, cls, callback) {
     .append('path')
     .attr('class', cls)
     .attr('d', m.geopath)
-    .on('dblclick', callback);
+    .attr('stroke-width', scale ? (0.5/scale) : 0);
 
   return topo;
 }
 
-function ea_map_load_points(m, features, cls, sym, callback) {
+function ea_map_load_points(m, features, cls, sym, scale) {
+  if (!scale) scale = 1;
+
   var container = m.map.select(`#${cls}`)
 
   if (container.empty())
@@ -213,13 +236,16 @@ function ea_map_load_points(m, features, cls, sym, callback) {
     break;
   }
 
-  var symbol = d3.symbol().size(20).type((d) => s)
+  var symbol = d3.symbol()
+      .size(25 / (scale**2))
+      .type((d) => s)
 
   container.selectAll(`path.${ cls }`)
     .data(features).enter()
     .append('path')
     .attr('d', symbol)
     .attr('transform', (d) => `translate(${m.projection(d.geometry.coordinates)})`)
+    .attr('stroke-width', (0.5/scale))
     .attr('class', cls);
 
   return topo;

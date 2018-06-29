@@ -1,32 +1,41 @@
 .schools {
   fill: orange;
   fill-opacity: 1;
+  stroke: black;
 }
 
 .mines {
   fill: darkgray;
   fill-opacity: 1;
+  stroke: black;
+}
+
+.minigrids {
+  fill: yellow;
+  fill-opacity: 1;
+  stroke: black;
 }
 
 .powerplants {
-  fill: pink;
+  fill: hotpink;
   fill-opacity: 1;
+  stroke: black;
 }
 
 .hydro {
   fill: cyan;
   fill-opacity: 1;
+  stroke: black;
 }
 
 .facilities {
-  fill: yellow;
+  fill: red;
   fill-opacity: 1;
+  stroke: white;
 }
 
 .transmission-lines {
   fill: black;
   fill-opacity: 0.3;
-
   stroke: black;
-  stroke-width: 0.5;
 }

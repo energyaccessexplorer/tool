@@ -59,7 +59,7 @@ function ea_datasets_features(ds) {
         ea_map,
         ds.features,
         ds.id,
-        null
+        1
       );
     }
   );
@@ -74,7 +74,7 @@ async function ea_datasets_points() {
       ds.features,
       ds.id,
       ds.symbol,
-      null
+      1
     )
   }
 

@@ -128,9 +128,14 @@ function ea_controls(ds) {
   case "ghi":
   case "poverty":
   case "population":
+  case 'windspeed':
+  case "facilities-distance":
   case "transmission-lines-distance":
   case "minigrids-distance":
   case "mines-distance":
+  case "hydro-distance":
+  case "schools-distance":
+  case "powerplants-distance":
   case "livestock":
   case 'mobile':
   case 'ironrooftop':
@@ -145,11 +150,6 @@ function ea_controls(ds) {
 
   case "transmission-lines-polygon":
     controls.appendChild(ea_controls_steps(ds));
-    break;
-
-  case "schools-distance":
-    controls.appendChild(ea_controls_range(ds));
-    controls.appendChild(ea_controls_weight(ds));
     break;
 
   case "schools":

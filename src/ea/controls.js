@@ -112,15 +112,7 @@ function ea_controls(ds) {
   controls.querySelector('.controls-dataset-header').appendChild(
     ea_controls_activate(
       ds,
-      async function(v) {
-        if (v) await ea_datasets_load(ds);
-        else {
-          if (typeof ds.hide === 'function') ds.hide(ea_map, ds.id);
-        }
-
-        ea_controls_update();
-        ea_layers_update_list();
-      }
+      (v) => ea_datasets_activate(ds, v)
     )
   );
 
@@ -170,7 +162,7 @@ function ea_controls(ds) {
 }
 
 function ea_controls_activate(ds, callback) {
-  return ea_svg_checkbox((s) => callback((ds.active = s)));
+  return ea_svg_checkbox(ds.active, (s) => callback((ds.active = s)));
 }
 
 function ea_controls_update() {

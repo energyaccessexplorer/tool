@@ -2,10 +2,15 @@ async function ea_init() {
   (async () => {
     const l = ea_datasets_collection
           .slice(1)
-          .filter((d) => d.preload);
+          .filter((d) => d.preload || d.active);
 
     if (l.length)
-      for (var d of l) await ea_datasets_load(d);
+      for (var ds of l) {
+        if (ds.preload)
+          await ea_datasets_load(ds);
+        if (ds.active)
+          await ea_datasets_activate(ds, true);
+      }
   })();
 
   const dummy = ea_datasets_collection.find(d => d.id === "dummy");

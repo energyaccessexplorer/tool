@@ -33,7 +33,7 @@ function ea_svg_land_mask(g) {
     .style("stroke", 'none');
 }
 
-function ea_svg_checkbox(callback) {
+function ea_svg_checkbox(init, callback) {
   const radius = 5,
         svgwidth = 34,
         svgheight = (radius + 1) * 2,
@@ -49,7 +49,7 @@ function ea_svg_checkbox(callback) {
   const text = g.append('text');
   const c1 = g.append('circle');
 
-  let status = false;
+  let status = init || false;
 
   svg
     .attr('width', svgwidth + 2)

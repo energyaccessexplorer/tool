@@ -39,6 +39,17 @@ async function ea_datasets_load(ds,v) {
 	ea_ui_dataset_loading(ds, false);
 }
 
+async function ea_datasets_activate(ds, v) {
+  if (v)
+    await ea_datasets_load(ds);
+  else {
+    if (typeof ds.hide === 'function') ds.hide(ea_map, ds.id);
+  }
+
+  ea_controls_update();
+  ea_layers_update_list();
+}
+
 function ea_datasets_features(ds) {
   ea_client(ds, 'GET', null,
     (r) => {

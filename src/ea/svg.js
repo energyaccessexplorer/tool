@@ -199,16 +199,14 @@ function ea_svg_interval(color_scale, callback1, callback2, end_callback) {
         .attr("spreadMethod", "pad");
 
   const cr = color_scale().range();
-  const crl = cr.length;
+  const cd = color_scale().domain();
 
-  for (var i = 0; i < crl; i++) {
-    var v = (1 / (crl-i)) * 100;
-
+  cr.forEach((v,i) => {
     gradient.append("stop")
-      .attr("offset", v + "%")
-      .attr("stop-color", cr[i])
+      .attr("offset", `${cd[i] * 100}%`)
+      .attr("stop-color", v)
       .attr("stop-opacity", 1);
-  }
+  });
 
   const g = svg.append('g');
 
@@ -250,7 +248,7 @@ function ea_svg_interval(color_scale, callback1, callback2, end_callback) {
   c2
     .attr('r', radius)
     .attr('cy', svgheight/2)
-    .attr('fill', cr[crl-1])
+    .attr('fill', cr[cr.length-1])
     .attr('stroke', 'white')
     .attr('stroke-width', 1)
     .style('cursor', 'grab');

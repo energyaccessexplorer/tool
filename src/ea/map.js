@@ -70,7 +70,7 @@ function ea_map_svg(svg, topofile) {
     .translate([0,0]);
 
   geopath = d3.geoPath()
-    .projection(projection)
+    .projection(projection);
 
   var b = geopath.bounds(topo);
   const angle_width = (b[1][0] - b[0][0]);

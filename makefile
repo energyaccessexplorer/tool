@@ -7,7 +7,10 @@ stop:
 	-@lsof -t -i :${WEB_PORT} | xargs kill
 
 deploy:
-	sed -i 's%const ea_database = "${DB_SERV_DEV}";%const ea_database = "${DB_SERV_PROD}";%' config.js
+	sed -i \
+		-e 's%const ea_database = "${DB_SERV_DEV}";%const ea_database = "${DB_SERV_PROD}";%' \
+		-e 's%mapboxstyle: null%mapboxstyle: "dark"%' \
+		config.js
 
 	@rsync -OPrv \
 		--checksum \
@@ -18,4 +21,7 @@ deploy:
 		--exclude=makefile \
 		./ ${SRV_USER}@${SRV_SERVER}:${SRV_DEST}
 
-	sed -i 's%const ea_database = "${DB_SERV_PROD}";%const ea_database = "${DB_SERV_DEV}";%' config.js
+	sed -i \
+		-e 's%const ea_database = "${DB_SERV_PROD}";%const ea_database = "${DB_SERV_DEV}";%' \
+		-e 's%mapboxstyle: "dark"%mapboxstyle: null%' \
+		config.js

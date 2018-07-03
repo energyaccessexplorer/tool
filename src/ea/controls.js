@@ -132,6 +132,7 @@ function ea_controls(ds) {
   case 'mobile':
   case 'ironrooftop':
   case 'radio':
+  case 'nighttime-lights':
     controls.appendChild(ea_controls_range(ds));
     controls.appendChild(ea_controls_weight(ds));
     break;

@@ -82,7 +82,9 @@ function ea_layers_toggle_list(bool) {
   const list = layers.querySelector('#layers-list');
   const t = layers.querySelector('.collapse.triangle');
 
-  list.style['display'] = (bool ? "" : "none");
+  const eai = document.querySelector('#eai');
+  eai.style['display']  = (!bool ? "" : "none");
+  list.style['display'] = ( bool ? "" : "none");
   t.innerHTML = ea_ui_collapse_triangle(bool ? 's' : 'n');
 
   ea_controls_collapse_category(document.querySelector('#supply'), !bool);

@@ -1,8 +1,31 @@
-#layers {
+#floating-thing {
   position: absolute;
   bottom: 5px;
   right: 5px;
   width: 350px;
+}
+
+#eai {
+  background-color: #1C4478;
+  margin: 2px;
+  color: white;
+  padding: 0.5em;
+  line-height: 1.8em;
+
+  font-size: 1.6em;
+  white-space: nowrap;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-family: condensed;
+}
+
+.thing {
+  font-size: 0.6em;
+  text-align: center;
+  line-height: 1.5em;
+}
+
+#layers {
   display: none;
 }
 

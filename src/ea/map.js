@@ -124,6 +124,7 @@ function ea_map_svg(svg, topofile, name, options) {
 
     let zoomstart = () => {
       if (!mask || mask.empty()) mask = d3.select('#mask');
+      if (typeof ea_canvas === 'undefined') return;
 
       tmp_canvas = document.createElement("canvas");
       tmp_canvas.setAttribute("width", ea_canvas.width);
@@ -153,7 +154,7 @@ function ea_map_svg(svg, topofile, name, options) {
             });
         });
 
-      tmp_canvas.remove();
+      if (tmp_canvas) tmp_canvas.remove();
     };
 
     let zooming = () => {
@@ -164,7 +165,7 @@ function ea_map_svg(svg, topofile, name, options) {
       if (typeof mapbox !== 'undefined' && mapbox !== null)
         mapbox.fitBounds([[nw[0], se[1]], [se[0], nw[1]]], { animate: false });
 
-      ea_canvas_draw(et, tmp_canvas);
+      if (typeof ea_canvas_draw !== "undefined") ea_canvas_draw(et, tmp_canvas);
 
       map.attr("transform", et);
       mask.attr("transform", et);

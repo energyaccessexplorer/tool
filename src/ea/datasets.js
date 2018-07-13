@@ -181,7 +181,7 @@ async function ea_datasets_districts_tiff() {
 }
 
 function ea_datasets_districts() {
-  d3.request('./data/districts-data.csv')
+  d3.request(ea_path_root + '/data/districts-data.csv')
     .mimeType("text/csv")
     .response((xhr) => {
       ea_districts = d3.csvParse(xhr.responseText, (d) => {

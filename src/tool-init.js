@@ -1,5 +1,7 @@
+const ea_path_root = "/maps-and-data/"
+
 requirejs.config({
-  'baseUrl': './src',
+  'baseUrl': ea_path_root + '/src',
   'paths': {
     'd3': "../lib/d3",
     'topojson': "../lib/topojson",

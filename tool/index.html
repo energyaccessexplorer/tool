@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    <link rel="icon" type="image/png" href="/images/ea-logo-64.png" />
+
+    <link href="/stylesheets/style.css" rel="stylesheet" />
+    <link href="/stylesheets/nav.css" rel="stylesheet" />
+    <link href="/maps-and-data/stylesheets/controls.css" rel="stylesheet" />
+    <link href="/maps-and-data/stylesheets/maparea.css" rel="stylesheet" />
+    <link href="/maps-and-data/stylesheets/layers.css" rel="stylesheet" />
+    <link href="/maps-and-data/stylesheets/datasets.css" rel="stylesheet" />
+
+    <link href="/maps-and-data/lib/mapbox-gl.css" rel="stylesheet" />
+    <script src="/maps-and-data/lib/mapbox-gl.js"></script>
+
+    <title>Energy Access</title>
+  </head>
+
+  <body>
+    <nav>
+      <input id="toggle"
+             class="no-desktop"
+             type="checkbox">
+
+      <a href="#"
+         class="no-desktop">
+        <label for="toggle">
+          <svg style="width:24px;height:24px" viewBox="0 0 24 14">
+            <path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" />
+          </svg>&nbsp;
+        </label>
+      </a>
+
+      <a id="energy-access-link"
+         href="/"
+         class="toggleable">
+        <img src="/images/ea-logo.svg"
+             style="height: 2.5em;
+                    margin-bottom: 0.5em;
+                    margin-right: 0.7em;
+                    vertical-align: middle;">Energy Access Explorer
+      </a>
+    </nav>
+
+    <div id="playground">
+      <div id="controls"></div>
+
+      <div class="center">
+        <div id="maparea">
+          <div id="mapbox-container"></div>
+          <canvas id="plot"></canvas>
+          <svg id="svg-map"><g id="map"></g></svg>
+          <svg id="svg-mask"></svg>
+        </div>
+      </div>
+
+      <div id="floating-thing">
+        <div id="eai">
+          Energy Access Index<br>
+          <svg width="315" height="16"><defs><linearGradient id="gradient-eai" x1="0%" y1="0%" x2="100%" y2="0%" spreadMethod="pad"><stop offset="0%" stop-color="#000083" stop-opacity="1"></stop><stop offset="12.5%" stop-color="#003CAA" stop-opacity="1"></stop><stop offset="37.5%" stop-color="#05FFFF" stop-opacity="1"></stop><stop offset="62.5%" stop-color="#FFFF00" stop-opacity="1"></stop><stop offset="87.5%" stop-color="#FA0000" stop-opacity="1"></stop><stop offset="100%" stop-color="#800000" stop-opacity="1"></stop></linearGradient></defs><g><rect fill="url(#gradient-eai)" stroke="none" x="7" y="1" height="12" width="100%"></rect></g></svg>
+          <div style="display: flex; justify-content: space-between; padding-right: 0.5em; padding-left: 0.5em;">
+            <div class="thing">Low</div>
+            <div class="thing">Medium</div>
+            <div class="thing">High</div>
+          </div>
+        </div>
+
+        <div id="layers">
+          <div id="layers-header">
+            <div class="title">Underlying Datasets</div>
+            <div class="collapse triangle"></div>
+          </div>
+
+          <ul id="layers-list"></ul>
+        </div>
+      </div>
+    </div>
+
+    <div id="app-loading" class="loading">
+      <div class="spinner"></div>
+
+      <p style="font-size: small">
+        fetching things...
+      </p>
+    </div>
+  </body>
+
+  <script data-main="/maps-and-data/src/tool-init"
+          src="/maps-and-data/lib/require.js"></script>
+</html>

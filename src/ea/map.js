@@ -40,7 +40,12 @@ function ea_map_setup() {
 
       ea_map = ea_map_svg(svg, topo);
 
-      ea_map_load_features(ea_map, ea_map.topo.features, 'land', 0);
+      ea_map_load_features({
+        map: ea_map,
+        features: ea_map.topo.features,
+        cls: 'land',
+        scale: 0,
+      });
 
       ea_svg_land_mask(ea_map);
 
@@ -138,12 +143,12 @@ function ea_map_svg(svg, topofile) {
               k
             );
           else if (ds.type === 'polygon')
-            ea_map_load_features(
-              _map,
-              ds.features,
-              ds.id,
-              k
-            );
+            ea_map_load_features({
+              map: _map,
+              features: ds.features,
+              cls: ds.id,
+              scale: k,
+            });
         });
 
       tmp_canvas.remove();
@@ -179,20 +184,38 @@ function ea_map_svg(svg, topofile) {
   return _map;
 }
 
-function ea_map_load_features(m, features, cls, scale) {
-  var container = m.map.select(`#${cls}`)
+function ea_map_load_features(o) {
+  if (!o.map)
+    throw "Argument Error: o.map is missing";
+
+  if (!o.map.map)
+    throw "Argument Error: o.map.map is missing";
+
+  if (!o.map.geopath)
+    throw "Argument Error: o.map.geopath is missing";
+
+  if (!o.features)
+    throw "Argument Error: o.features is missing";
+
+  if (o.features.some(f => f.type !== "Feature")) {
+    console.log(o.features);
+    throw "Argument Error: o.features is not an array of Features";
+  }
+
+  var container = o.map.map.select(`#${o.cls}`)
+  var paths;
 
   if (container.empty())
-    container = m.map.append('g').attr('id', cls);
+    container = o.map.map.append('g').attr('id', o.cls);
 
-  container.selectAll(`path.${ cls }`).remove();
+  container.selectAll(`path.${ o.cls }`).remove();
 
-  container.selectAll(`path.${ cls }`)
-    .data(features).enter()
+  paths = container.selectAll(`path.${ o.cls }`)
+    .data(o.features).enter()
     .append('path')
-    .attr('class', cls)
-    .attr('d', m.geopath)
-    .attr('stroke-width', scale ? (0.5/scale) : 0);
+    .attr('class', (o.cls || ''))
+    .attr('d', o.map.geopath)
+    .attr('stroke-width', o.scale ? (0.5/o.scale) : 0);
 
   return topo;
 }

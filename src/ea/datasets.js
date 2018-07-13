@@ -55,12 +55,12 @@ function ea_datasets_features(ds) {
     (r) => {
       ds.features = r[0]['jsonb_build_object'].features;
 
-      ea_map_load_features(
-        ea_map,
-        ds.features,
-        ds.id,
-        1
-      );
+      ea_map_load_features({
+        map: ea_map,
+        features: ds.features,
+        cls: ds.id,
+        scale: 1,
+      });
     }
   );
 }

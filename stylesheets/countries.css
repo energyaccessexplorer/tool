@@ -1,0 +1,55 @@
+body {
+  overflow: hidden;
+}
+
+#country-search {
+  display: flex;
+  position: absolute;
+  top: 6em;
+
+  /* margin: auto;   */
+  z-index: 32;
+
+  flex-direction: row wrap;
+  /* height: 2em; */
+}
+
+#country-search-input {
+  font-size: 3em;
+  font-family: monospace;
+  padding: 0.5em;
+  width: 20em;
+  height: 1em;
+  text-align: center;
+}
+
+#country-search-flag {
+  display: block;
+}
+
+#country-search-flag img {
+  margin-left: 5px;
+  height: 82px;
+}
+
+#country-overview {
+  display: block;
+  position: absolute;
+  top: 12em;
+  left: 0;
+  z-index: 32;
+  background-color: white;
+  padding: 1em;
+}
+
+svg .selectable {
+  fill: #3A75C4;
+}
+
+h1, h2, h3, h4, h5 {
+  text-align: center;
+}
+
+h5 {
+  margin: 0.5em;
+}

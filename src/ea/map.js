@@ -216,10 +216,11 @@ function ea_map_load_features(o) {
     .data(o.features).enter()
     .append('path')
     .attr('class', (o.cls || ''))
+    .attr('id', d => d.gid || d.id || null)
     .attr('d', o.map.geopath)
     .attr('stroke-width', o.scale ? (0.5/o.scale) : 0);
 
-  return topo;
+  return container;
 }
 
 function ea_map_load_points(m, features, cls, sym, scale) {

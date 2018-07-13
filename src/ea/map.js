@@ -221,6 +221,15 @@ function ea_map_load_features(o) {
     .attr('d', o.map.geopath)
     .attr('stroke-width', o.scale ? (0.5/o.scale) : 0);
 
+  if (typeof o.classed === 'function')
+    paths.classed("selectable", (d) => o.classed(d.gid || d.id || null));
+
+  if (typeof o.mouseover === 'function')
+    paths.on('mouseover', (d) => o.mouseover(d.gid || d.id || ''));
+
+  if (typeof o.mousedown === 'function')
+    paths.on('mousedown', (d) => o.mousedown(d.gid || d.id || ''));
+
   return container;
 }
 

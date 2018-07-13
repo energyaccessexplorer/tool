@@ -38,7 +38,7 @@ function ea_map_setup() {
         console.log(error);
       }
 
-      ea_map = ea_map_svg(svg, topo);
+      ea_map = ea_map_svg(svg, topo, 'adm0');
 
       ea_map_load_features({
         map: ea_map,
@@ -53,16 +53,18 @@ function ea_map_setup() {
     });
 }
 
-function ea_map_svg(svg, topofile) {
+function ea_map_svg(svg, topofile, name, options) {
   var width, height;
 
   var projection, geopath, scale;
+
+  var opts = options || {};
 
   const map = svg.select('#map');
   const land = map.append('g').attr('id', "land")
         .attr('fill', "none");
 
-  topo = topojson.feature(topofile, topofile.objects.adm0);
+  topo = topojson.feature(topofile, topofile.objects[name]);
 
   width = svg.attr('width');
   height = svg.attr('height');
@@ -85,9 +87,9 @@ function ea_map_svg(svg, topofile) {
   translate = [width/2 , height/2];
 
   projection
-    .scale(scale)
-    .center(ea_settings.center)
-    .translate(translate)
+    .scale(opts.scale || scale)
+    .center(opts.center || ea_settings.center)
+    .translate(opts.translate || translate)
 
   var _map = {
     topo: topo,

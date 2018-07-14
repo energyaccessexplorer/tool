@@ -6,7 +6,7 @@ mapbox_setup = () => {
     return;
   }
 
-  mapboxgl.accessToken = earth_config.mapbox_token;
+  mapboxgl.accessToken = ea_settings.mapbox_token;
 
   mapbox = new mapboxgl.Map({
     container: 'mapbox-container',

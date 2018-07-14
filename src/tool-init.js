@@ -1,4 +1,5 @@
 const ea_path_root = "/maps-and-data/"
+const ea_ccn3 = location.get_query_param('ccn3');
 
 requirejs.config({
   'baseUrl': ea_path_root + '/src',
@@ -74,9 +75,13 @@ require([
 
   ea_layers_init();
 
-  ea_controls_tree();
+  ea_client(`${ea_path_root}data/${ea_ccn3}/category-tree.json`, 'GET', null, (r) => {
+    window.ea_datasets_category_tree = r;
 
-  ea_map_setup();
+    ea_controls_tree();
 
-  ea_init();
+    ea_map_setup();
+
+    ea_init();
+  })
 });

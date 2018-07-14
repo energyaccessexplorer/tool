@@ -166,7 +166,7 @@ async function ea_datasets_tiff_url() {
   const ds = this;
 
   if (ds.raster) ;
-  else await ea_datasets_tiff(ds, GeoTIFF.fromUrl, ds.url);
+  else await ea_datasets_tiff(ds, GeoTIFF.fromUrl, `${ea_path_root}data/${ea_ccn3}/${ds.url}`);
 
   return ds;
 }
@@ -181,7 +181,7 @@ async function ea_datasets_districts_tiff() {
 }
 
 function ea_datasets_districts() {
-  d3.request(ea_path_root + '/data/districts-data.csv')
+  d3.request(`${ea_path_root}/data/${ea_ccn3}/districts-data.csv`)
     .mimeType("text/csv")
     .response((xhr) => {
       ea_districts = d3.csvParse(xhr.responseText, (d) => {

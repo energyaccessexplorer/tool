@@ -11,3 +11,4 @@ world-110m.json	https://unpkg.com/world-atlas/world/110m.json
 countries.json	https://raw.githubusercontent.com/mledoze/countries/master/dist/countries.json
 TZA-adm0.json	https://raw.githubusercontent.com/energy-data/nzt-electrification/master/assets/TZA-adm0.json
 fonts/arimo.woff2	https://fonts.gstatic.com/s/arimo/v11/P5sMzZCDf9_T_10ZxCE.woff2
+location.js	https://gitlab.com/fabbe/web-toolbelt/raw/d366571bb0cca6c6a811718c6504576e7ebecd76/location.js

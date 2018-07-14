@@ -32,8 +32,6 @@ require([
   window.d3 = d3;
   window.topojson = topojson;
 
-  ea_datasets_districts();
-
   ea_ui_flash = ea_ui_flash_setup();
 
   ea_map = null;

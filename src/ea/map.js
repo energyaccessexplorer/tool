@@ -31,7 +31,7 @@ function ea_map_setup() {
   ea_canvas = document.querySelector('canvas#plot');
 
   d3.queue()
-    .defer(d3.json, ea_settings.topofile)
+    .defer(d3.json, `${ea_path_root}lib/${ea_ccn3}-adm0.json`)
     .await((error, topo) => {
       if (error) {
         ea_ui_flash('error', error.target.statusText, error.target.responseURL);

@@ -81,7 +81,7 @@ async function ea_datasets_points() {
   if (ds.features) load_em();
   else
     await ea_client(
-      `${ea_database}/${ds.endpoint}`, 'GET', null,
+      `${ea_settings.database}/${ds.endpoint}`, 'GET', null,
       (r) => {
         ds.features = r[0]['jsonb_build_object'].features;
         load_em();
@@ -130,7 +130,7 @@ async function ea_datasets_tiff_stream() {
   else {
     var data = null;
 
-    await ea_client(`${ea_database}/${ds.endpoint}`, 'GET', null, (r) => data = r);
+    await ea_client(`${ea_settings.database}/${ds.endpoint}`, 'GET', null, (r) => data = r);
 
     await ea_datasets_tiff(
       ds,
@@ -151,7 +151,7 @@ async function ea_datasets_tiff_rpc_stream(v) {
     const payload = { };
     payload[ds.unit] = v || ds.init;
 
-    await ea_client(`${ea_database}/${ds.endpoint}`, 'POST', payload, (r) => data = r);
+    await ea_client(`${ea_settings.database}/${ds.endpoint}`, 'POST', payload, (r) => data = r);
 
     await ea_datasets_tiff(
       ds,

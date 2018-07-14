@@ -8,7 +8,7 @@ stop:
 
 deploy:
 	sed -i \
-		-e 's%const ea_database = "${DB_SERV_DEV}";%const ea_database = "${DB_SERV_PROD}";%' \
+		-e 's%database: "${DB_SERV_DEV}",%database: "${DB_SERV_PROD}",%' \
 		-e 's%mapboxstyle: null%mapboxstyle: "dark"%' \
 		config.js
 
@@ -22,6 +22,6 @@ deploy:
 		./ ${SRV_USER}@${SRV_SERVER}:${SRV_DEST}
 
 	sed -i \
-		-e 's%const ea_database = "${DB_SERV_PROD}";%const ea_database = "${DB_SERV_DEV}";%' \
+		-e 's%database: "${DB_SERV_PROD}",%database: "${DB_SERV_DEV}",%' \
 		-e 's%mapboxstyle: "dark"%mapboxstyle: null%' \
 		config.js

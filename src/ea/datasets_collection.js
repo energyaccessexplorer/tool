@@ -16,7 +16,6 @@ const ea_datasets_collection = [
     unit: "kWh/m<sup>2</sup>",
 
     url: "ghi.tif",
-    parse: ea_datasets_tiff_url,
 
     clamp: false,
     domain: [500, 2800],
@@ -29,7 +28,6 @@ const ea_datasets_collection = [
     unit: "?",
 
     url: "windspeed.tif",
-    parse: ea_datasets_tiff_url,
 
     clamp: true,
     domain: [0, 10],
@@ -42,7 +40,6 @@ const ea_datasets_collection = [
     unit: "< 2USD/day",
 
     url: "poverty.tif",
-    parse: ea_datasets_tiff_url,
 
     clamp: false,
 
@@ -68,7 +65,6 @@ const ea_datasets_collection = [
     unit: "km",
 
     url: "minigrid-distance.tif",
-    parse: ea_datasets_tiff_url,
 
     clamp: false,
     domain: [0, 250],
@@ -93,7 +89,6 @@ const ea_datasets_collection = [
     unit: "km",
 
     url: "mines-distance.tif",
-    parse: ea_datasets_tiff_url,
 
     clamp: false,
     domain: [0, 250],
@@ -118,7 +113,6 @@ const ea_datasets_collection = [
     unit: "km",
 
     url: "schools-distance.tif",
-    parse: ea_datasets_tiff_url,
 
     clamp: false,
     domain: [120, 0],
@@ -160,7 +154,6 @@ const ea_datasets_collection = [
     unit: "km",
 
     url: "transmission-lines-distance.tif",
-    parse: ea_datasets_tiff_url,
 
     clamp: false,
     domain: [0, 250],
@@ -205,7 +198,6 @@ const ea_datasets_collection = [
     unit: "km",
 
     url: "facilities-distance.tif",
-    parse: ea_datasets_tiff_url,
 
     clamp: false,
     domain: [0, 250],
@@ -230,7 +222,6 @@ const ea_datasets_collection = [
     unit: "km",
 
     url: "powerplants-distance.tif",
-    parse: ea_datasets_tiff_url,
 
     clamp: false,
     domain: [0, 250],
@@ -255,7 +246,6 @@ const ea_datasets_collection = [
     unit: "km",
 
     url: "hydro-distance.tif",
-    parse: ea_datasets_tiff_url,
 
     clamp: false,
     domain: [0, 250],
@@ -269,7 +259,6 @@ const ea_datasets_collection = [
     unit: "people/1km<sup>2</sup>",
 
     url: "population.tif",
-    parse: ea_datasets_tiff_url,
 
     clamp: true,
     domain: [10, 6000],
@@ -298,7 +287,6 @@ const ea_datasets_collection = [
     unit: "%",
 
     url: "districts.tif",
-    parse: ea_datasets_tiff_url,
 
     scale: 'mobile',
     clamp: false,
@@ -313,7 +301,6 @@ const ea_datasets_collection = [
     unit: "%",
 
     url: "districts.tif",
-    parse: ea_datasets_tiff_url,
 
     scale: 'ironrooftop',
     clamp: false,
@@ -328,7 +315,6 @@ const ea_datasets_collection = [
     unit: "?",
 
     url: "nighttime-lights.tif",
-    parse: ea_datasets_tiff_url,
 
     clamp: true,
     domain: [0, 255],

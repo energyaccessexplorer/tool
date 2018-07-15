@@ -34,6 +34,9 @@ function ea_datasets_scale_fn(ds) {
 async function ea_datasets_load(ds,v) {
   ea_ui_dataset_loading(ds, true);
 
+  if (ds.url && ds.url.match(/\.tif$/))
+    ds.parse = ea_datasets_tiff_url;
+
   await ds.parse.call(ds,v);
 
 	ea_ui_dataset_loading(ds, false);

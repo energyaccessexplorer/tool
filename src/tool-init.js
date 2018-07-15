@@ -78,7 +78,7 @@ require([
   ea_client(`${ea_path_root}data/${ea_ccn3}/specifics.json`, 'GET', null, (r) => {
     window.ea_datasets_category_tree = r['category-tree'];
 
-    ea_controls_tree();
+    ea_controls_tree(r['category-tree'], ea_datasets_collection);
 
     ea_map_setup(r['bounds']);
 

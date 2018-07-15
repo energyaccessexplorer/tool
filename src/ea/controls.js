@@ -46,11 +46,11 @@ function ea_controls_collapse_category(catel, show) {
   }
 }
 
-function ea_controls_tree() {
+function ea_controls_tree(tree, collection) {
   const ctel = document.querySelector('#controls')
   ctel.style['height'] = `calc(${window.innerHeight}px - 3.5em)`;
 
-  ea_datasets_category_tree.forEach(a => {
+  tree.forEach(a => {
     ctel.appendChild(elem(`
 <div id=${a.name} class="controls-category">
   <div class="controls-category-title">
@@ -82,7 +82,7 @@ function ea_controls_tree() {
         .addEventListener('mouseup', e => ea_controls_collapse_subcategory(conel, subel));
 
       b.datasets.forEach(b => {
-        const ds = ea_datasets_collection.find(x => x.id === b);
+        const ds = collection.find(x => x.id === b);
 
         if (ds) conel.appendChild(ea_controls(ds));
         else console.warn(`'${b}' dataset not found`);

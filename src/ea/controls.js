@@ -23,7 +23,7 @@ function ea_controls_collapse_category(catel, show) {
   const cti = catel.querySelector('.controls-category-title');
   const ctr = catel.querySelector('.collapse.triangle')
 
-  var d = (subcatel.style['display'] === "none");
+  let d = (subcatel.style['display'] === "none");
 
   if (typeof show !== 'undefined') d = show;
 
@@ -208,7 +208,7 @@ function ea_controls_range(ds) {
 }
 
 function ea_controls_weight(ds) {
-  var weights = Array.apply(null, Array(5)).map((_, i) => i + 1)
+  const weights = Array.apply(null, Array(5)).map((_, i) => i + 1);
 
   const container = elem(`
 <div class="control-group">

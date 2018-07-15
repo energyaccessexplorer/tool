@@ -28,7 +28,7 @@ function ea_countries_setup() {
     .defer(d3.json, ea_path_root + '/lib/countries.json')
     .defer(d3.csv,  ea_path_root + '/data/countries-overview.csv')
     .await((error, geo, countries, countries_overviews) => {
-      var topo = topojson.feature(geo, geo.objects.countries);
+      const topo = topojson.feature(geo, geo.objects.countries);
 
       if (error) {
         ea_ui_flash('error', error.target.statusText, error.target.responseURL);
@@ -64,12 +64,12 @@ function ea_countries_setup() {
 }
 
 function ea_countries_overview(c, collection) {
-  var r = collection.find(i => i.country === c.name.common)
+  const r = collection.find(i => i.country === c.name.common);
 
-  var co = document.querySelector('#country-overview');
+  const co = document.querySelector('#country-overview');
   co.innerHTML = `<h2>${c.name.common}</h2>`;
 
-  var demo, pop, area, urban_rural, pol, gdp, pies, ease, dev;
+  let demo, pop, area, urban_rural, pol, gdp, pies, ease, dev;
 
   if (r) {
     demo = elem('<h4>Demographics</h4>');

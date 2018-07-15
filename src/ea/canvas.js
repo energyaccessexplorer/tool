@@ -1,9 +1,8 @@
 function ea_canvas_setup(dummy) {
-  var w = dummy.image.getWidth();
-  var h = dummy.image.getHeight();
+  const i = dummy.image;
 
-  ea_canvas.setAttribute("width", w);
-  ea_canvas.setAttribute("height", h);
+  ea_canvas.setAttribute("width", i.getWidth());
+  ea_canvas.setAttribute("height", i.getHeight());
 
   // STRANGE: force the canvas to 2d...
   ea_canvas.getContext('2d');
@@ -12,8 +11,8 @@ function ea_canvas_setup(dummy) {
 function ea_canvas_draw(et, tmp) {
   if (typeof ea_plot_imagedata === 'undefined' || ea_plot_imagedata === null) return;
 
-  var w = ea_canvas.width;
-  var h = ea_canvas.height;
+  const w = ea_canvas.width;
+  const h = ea_canvas.height;
 
   const f = (w/ea_map.width);
 

@@ -1,5 +1,5 @@
 function elem(str) {
-  var d = document.createElement('div');
+  const d = document.createElement('div');
   d.innerHTML = str;
 
   return d.firstElementChild;
@@ -86,10 +86,9 @@ function ea_ui_flash_setup() {
   document.body.prepend(flash)
 
   return (_type, title, message, timeout_override) => {
-    var content = '';
-
-    var bc = 'transparent';
-    var timeout = null;
+    let content = '';
+    let bc = 'transparent';
+    let timeout = null;
 
     if (title && message) {
       content += `<strong>${title}</strong><br>`;

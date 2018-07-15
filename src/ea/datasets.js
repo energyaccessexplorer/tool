@@ -1,8 +1,8 @@
 function ea_datasets_scale_fn(ds) {
-  var s = null;
-  var r = ds.range || [0,1];
-  var d = ds.domain || [0,1];
-  var t = ds.tmp_domain;
+  let s = null;
+  const r = ds.range || [0,1];
+  const d = ds.domain || [0,1];
+  const t = ds.tmp_domain;
 
   const lin = d3.scaleLinear()
         .domain(t || d)
@@ -112,7 +112,7 @@ async function ea_datasets_tiff(ds, method, payload) {
 }
 
 function ea_datasets_hexblob(hex) {
-  var byteBuf = new Uint8Array(new ArrayBuffer(hex.length/2));
+  const byteBuf = new Uint8Array(new ArrayBuffer(hex.length/2));
 
   for (var i = 0; i < hex.length; i += 2)
     byteBuf[i/2] = parseInt(hex.slice(i, i+2), 16);
@@ -128,7 +128,7 @@ async function ea_datasets_tiff_stream() {
 
   if (ds.raster) ;
   else {
-    var data = null;
+    let data = null;
 
     await ea_client(`${ea_settings.database}/${ds.endpoint}`, 'GET', null, (r) => data = r);
 
@@ -146,7 +146,7 @@ async function ea_datasets_tiff_rpc_stream(v) {
 
   if (ds.raster) ;
   else {
-    var data = null;
+    let data = null;
 
     const payload = { };
     payload[ds.unit] = v || ds.init;

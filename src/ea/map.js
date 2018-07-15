@@ -59,11 +59,11 @@ function ea_map_setup(bounds) {
 }
 
 function ea_map_svg(svg, topofile, name, options) {
-  var width, height;
+  let width, height;
 
-  var projection, geopath, scale;
+  let projection, geopath, scale;
 
-  var opts = options || {};
+  let opts = options || {};
 
   const map = svg.select('#map');
   const land = map.append('g').attr('id', "land")
@@ -84,7 +84,7 @@ function ea_map_svg(svg, topofile, name, options) {
   geopath = d3.geoPath()
     .projection(projection);
 
-  var b = geopath.bounds(topo);
+  const b = geopath.bounds(topo);
   const angle_width = (b[1][0] - b[0][0]);
   const angle_height = (b[1][1] - b[0][1]);
 
@@ -96,7 +96,7 @@ function ea_map_svg(svg, topofile, name, options) {
     .center(opts.center || [0,0])
     .translate(opts.translate || translate)
 
-  var _map = {
+  const _map = {
     topo: topo,
     projection: projection,
     geopath: geopath,
@@ -212,8 +212,8 @@ function ea_map_load_features(o) {
     throw "Argument Error: o.features is not an array of Features";
   }
 
-  var container = o.map.map.select(`#${o.cls}`)
-  var paths;
+  const container = o.map.map.select(`#${o.cls}`);
+  let paths;
 
   if (container.empty())
     container = o.map.map.append('g').attr('id', o.cls);
@@ -243,45 +243,45 @@ function ea_map_load_features(o) {
 function ea_map_load_points(m, features, cls, sym, scale) {
   if (!scale) scale = 1;
 
-  var container = m.map.select(`#${cls}`)
+  let container = m.map.select(`#${cls}`);
 
   if (container.empty())
     container = m.map.append('g').attr('id', cls);
 
   container.selectAll(`path.${ cls }`).remove();
 
-  var s = null;
+  let s = null;
 
   switch (sym) {
-    case 'triangle':
+  case 'triangle':
     s = d3.symbolTriangle;
     break;
 
-    case 'wye':
+  case 'wye':
     s = d3.symbolWye;
     break;
 
-    case 'star':
+  case 'star':
     s = d3.symbolStar;
     break;
 
-    case 'square':
+  case 'square':
     s = d3.symbolSquare;
     break;
 
-    case 'cross':
+  case 'cross':
     s = d3.symbolCross;
     break;
 
-    case 'circle':
-    default:
+  case 'circle':
+  default:
     s = d3.symbolCircle;
     break;
   }
 
-  var symbol = d3.symbol()
-      .size(25 / (scale**2))
-      .type((d) => s)
+  const symbol = d3.symbol()
+        .size(25 / (scale**2))
+        .type((d) => s);
 
   container.selectAll(`path.${ cls }`)
     .data(features).enter()

@@ -57,7 +57,9 @@ require([
     plotty.colorscales['yignbu'].positions
   );
 
-  ea_datasets_collection.forEach((d) => {
+  const c = ea_datasets_collection;
+
+  c.forEach((d) => {
     if (!d.color_scale) return;
 
     d.color_scale_fn = function() {
@@ -78,7 +80,7 @@ require([
   ea_client(`${ea_path_root}data/${ea_ccn3}/specifics.json`, 'GET', null, (r) => {
     window.ea_datasets_category_tree = r['category-tree'];
 
-    ea_controls_tree(r['category-tree'], ea_datasets_collection);
+    ea_controls_tree(r['category-tree'], c);
 
     ea_map_setup(r['bounds']);
 

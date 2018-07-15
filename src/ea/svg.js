@@ -5,11 +5,11 @@ function ea_svg_land_mask(g, o) {
   if (!o.height)
     throw "Argument Error: ea_svg_land_mask not given o.height argument."
 
-  var el = d3.select("#svg-mask")
-      .attr("width", o.width)
-      .attr("height", o.height);
+  const el = d3.select("#svg-mask")
+        .attr("width", o.width)
+        .attr("height", o.height);
 
-  var mask = el
+const mask = el
       .append("defs")
       .append("mask")
       .attr("id", "country-mask");
@@ -303,20 +303,20 @@ function ea_svg_interval(color_scale, callback1, callback2, end_callback) {
 }
 
 function ea_svg_pie(container, data, outer, inner, colors, inner_text, create = true) {
-  var width =  outer * 2,
-      height = outer * 2;
+  const width =  outer * 2,
+        height = outer * 2;
 
-  var pie = d3.pie()
-      .value((d) => d[0])
-      .sort(null);
+  const pie = d3.pie()
+        .value((d) => d[0])
+        .sort(null);
 
-  var arc = d3.arc()
-      .innerRadius(((inner === null || inner === undefined || inner === false) ? outer - (outer/4) : inner))
-      .outerRadius(outer - (outer/15));
+  const arc = d3.arc()
+        .innerRadius(((inner === null || inner === undefined || inner === false) ? outer - (outer/4) : inner))
+        .outerRadius(outer - (outer/15));
 
-  var container = d3.select(container);
+  const container = d3.select(container);
 
-  var svg = null;
+  let svg = null;
 
   if (create) {
     svg = container.append("svg")
@@ -327,7 +327,7 @@ function ea_svg_pie(container, data, outer, inner, colors, inner_text, create = 
   else
     svg = container.select('svg');
 
-  var g = null;
+  let g = null;
 
   if (! create) {
     g = svg.append("g")
@@ -339,22 +339,22 @@ function ea_svg_pie(container, data, outer, inner, colors, inner_text, create = 
       .attr("transform", `translate(${ outer }, ${ outer })`);
   }
 
-  var path = g
-      .datum(data)
-      .selectAll("path")
-      .data(pie).enter()
-      .append("path")
-      .attr("fill", (d,i) => colors[i])
-      .attr("d", arc)
-      .each(function(d) { this._current = d });
+  const path = g
+        .datum(data)
+        .selectAll("path")
+        .data(pie).enter()
+        .append("path")
+        .attr("fill", (d,i) => colors[i])
+        .attr("d", arc)
+        .each(function(d) { this._current = d });
 
-  var text = svg.append("text")
-      .attr("dy", ".35em")
-      .attr("font-size", `${ outer / 47 }em`)
-      .attr("class", "monospace pie-center")
+  const text = svg.append("text")
+        .attr("dy", ".35em")
+        .attr("font-size", `${ outer / 47 }em`)
+        .attr("class", "monospace pie-center");
 
   function change(v) {
-    var t = "";
+    let t = "";
 
     pie.value(d => t = d[v]);
     path = path.data(pie);
@@ -374,10 +374,10 @@ function ea_svg_pie(container, data, outer, inner, colors, inner_text, create = 
       text.text("");
 
     try {
-      var box = text.node().getBBox();
+      const box = text.node().getBBox();
 
-      var x = (outer - (box['width']  / 2));
-      var y = (outer + (box['height'] / 10));
+      const x = (outer - (box['width']  / 2));
+      const y = (outer + (box['height'] / 10));
 
       text
         .attr('transform', `translate(${ x }, ${ y })`);
@@ -389,7 +389,7 @@ function ea_svg_pie(container, data, outer, inner, colors, inner_text, create = 
   }
 
   function tween(a) {
-    var i = d3.interpolate(this._current, a);
+    const i = d3.interpolate(this._current, a);
     this._current = i(0);
     return (t) => arc(i(t));
   };

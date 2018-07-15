@@ -15,7 +15,7 @@ function ea_canvas_draw(et, tmp) {
   var w = ea_canvas.width;
   var h = ea_canvas.height;
 
-  const f = (w/ea_settings.width);
+  const f = (w/ea_map.width);
 
   tmp.getContext('2d')
     .putImageData(ea_plot_imagedata, 0, 0);

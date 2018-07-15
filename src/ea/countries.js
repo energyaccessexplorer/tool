@@ -1,19 +1,20 @@
 function ea_countries_setup() {
   let b = [[-180, -85], [180, 85]];
+  let width, height;
 
   const p = document.querySelector('#playground');
   p.style['height'] = `calc(${window.innerHeight}px - 3.5em)`;
 
-  ea_settings.width = window.innerWidth;
-  ea_settings.height = p.clientHeight;
+  width = window.innerWidth;
+  height = p.clientHeight;
 
   const svg = d3.select('#svg-map')
-        .attr('width', ea_settings.width)
-        .attr('height', ea_settings.height);
+        .attr('width', width)
+        .attr('height', height);
 
   const maparea = document.querySelector('#maparea');
-  maparea.style['width'] = ea_settings.width + "px";
-  maparea.style['height'] = ea_settings.height + "px";
+  maparea.style['width'] = width + "px";
+  maparea.style['height'] = height + "px";
 
   const coord_tooltip = document.querySelector('body')
         .appendChild(elem(`<div id="coord-tooltip"></div>`));

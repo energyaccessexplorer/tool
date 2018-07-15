@@ -7,23 +7,25 @@ function ea_map_setup(bounds) {
 
   const center = [b[0][0] + (Math.abs(w/2)), b[0][1] + (Math.abs(h/2))];
 
+  let width, height;
+
   if (w < h) {
-    ea_settings.width = (p.clientWidth - p.querySelector('#controls').clientWidth) * (4/5);
-    ea_settings.height = (h/w) * ea_settings.width;
+    width = (p.clientWidth - p.querySelector('#controls').clientWidth) * (4/5);
+    height = (h/w) * width;
   }
 
   else {
-    ea_settings.height = p.clientHeight * (4/5);
-    ea_settings.width = (w/h) * ea_settings.height;
+    height = p.clientHeight * (4/5);
+    width = (w/h) * height;
   }
 
   const svg = d3.select('#svg-map')
-        .attr('width', ea_settings.width)
-        .attr('height', ea_settings.height);
+        .attr('width', width)
+        .attr('height', height);
 
   const maparea = document.querySelector('#maparea')
-  maparea.style['width'] = ea_settings.width + "px";
-  maparea.style['height'] = ea_settings.height + "px";
+  maparea.style['width'] = width + "px";
+  maparea.style['height'] = height + "px";
 
   const coord_tooltip = document.querySelector('body')
         .appendChild(elem(`<div id="coord-tooltip"></div>`));
@@ -50,7 +52,7 @@ function ea_map_setup(bounds) {
         scale: 0,
       });
 
-      ea_svg_land_mask(ea_map);
+      ea_svg_land_mask(ea_map, { width: width, height: height });
 
       mapbox_setup(b);
     });
@@ -69,8 +71,8 @@ function ea_map_svg(svg, topofile, name, options) {
 
   topo = topojson.feature(topofile, topofile.objects[name]);
 
-  width = svg.attr('width');
-  height = svg.attr('height');
+  width = +svg.attr('width');
+  height = +svg.attr('height');
 
   projection = d3.geoMercator();
 
@@ -102,6 +104,8 @@ function ea_map_svg(svg, topofile, name, options) {
     map: map,
     land: land,
     scale: scale,
+    width: width,
+    height: height,
   };
 
   // ZOOM AND MOUSE EVENTS

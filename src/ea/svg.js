@@ -1,7 +1,13 @@
-function ea_svg_land_mask(g) {
+function ea_svg_land_mask(g, o) {
+  if (!o.width)
+    throw "Argument Error: ea_svg_land_mask not given o.width argument."
+
+  if (!o.height)
+    throw "Argument Error: ea_svg_land_mask not given o.height argument."
+
   var el = d3.select("#svg-mask")
-      .attr("width", ea_settings.width)
-      .attr("height", ea_settings.height);
+      .attr("width", o.width)
+      .attr("height", o.height);
 
   var mask = el
       .append("defs")
@@ -11,8 +17,8 @@ function ea_svg_land_mask(g) {
   mask.append("rect")
     .attr("x", 0)
     .attr("y", 0)
-    .attr("width", ea_settings.width)
-    .attr("height", ea_settings.height)
+    .attr("width", o.width)
+    .attr("height", o.height)
     .style("fill", "white")
     .style("opacity", "1");
 
@@ -26,8 +32,8 @@ function ea_svg_land_mask(g) {
     .append("rect")
     .attr("x", 0)
     .attr("y", 0)
-    .attr("width", ea_settings.width)
-    .attr("height", ea_settings.height)
+    .attr("width", o.width)
+    .attr("height", o.height)
     .attr("mask", "url(#country-mask)")
     .style("fill", "#f8f8f8")
     .style("stroke", 'none');

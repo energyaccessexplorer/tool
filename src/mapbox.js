@@ -1,6 +1,6 @@
 mapbox = null;
 
-mapbox_setup = () => {
+mapbox_setup = (bounds) => {
   if (!ea_settings.mapboxstyle) {
     console.info("mapbox_setup: Mapbox disabled. Return.")
     return;
@@ -14,5 +14,5 @@ mapbox_setup = () => {
     interactive: false,
   });
 
-  mapbox.fitBounds(ea_settings.bounds, { animate: false });
+  mapbox.fitBounds(bounds, { animate: false });
 };

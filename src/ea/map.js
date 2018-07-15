@@ -1,11 +1,11 @@
-function ea_map_setup() {
-  const b = ea_settings.bounds;
+function ea_map_setup(bounds) {
+  const b = bounds;
   const p = document.querySelector('#playground');
 
   const w = (b[1][0] - b[0][0]);
   const h = (b[1][1] - b[0][1]);
 
-  ea_settings.center = [b[0][0] + (Math.abs(w/2)), b[0][1] + (Math.abs(h/2))];
+  const center = [b[0][0] + (Math.abs(w/2)), b[0][1] + (Math.abs(h/2))];
 
   if (w < h) {
     ea_settings.width = (p.clientWidth - p.querySelector('#controls').clientWidth) * (4/5);
@@ -38,7 +38,10 @@ function ea_map_setup() {
         console.log(error);
       }
 
-      ea_map = ea_map_svg(svg, topo, 'adm0');
+      ea_map = ea_map_svg(
+        svg, topo, 'adm0',
+        { center: center }
+      );
 
       ea_map_load_features({
         map: ea_map,
@@ -49,7 +52,7 @@ function ea_map_setup() {
 
       ea_svg_land_mask(ea_map);
 
-      mapbox_setup();
+      mapbox_setup(b);
     });
 }
 
@@ -88,7 +91,7 @@ function ea_map_svg(svg, topofile, name, options) {
 
   projection
     .scale(opts.scale || scale)
-    .center(opts.center || ea_settings.center)
+    .center(opts.center || [0,0])
     .translate(opts.translate || translate)
 
   var _map = {

@@ -7,9 +7,6 @@ function ea_countries_setup() {
   ea_settings.width = window.innerWidth;
   ea_settings.height = p.clientHeight;
 
-  ea_settings.bounds = b;
-  ea_settings.center = [0,0];
-
   const svg = d3.select('#svg-map')
         .attr('width', ea_settings.width)
         .attr('height', ea_settings.height);
@@ -61,7 +58,7 @@ function ea_countries_setup() {
 
       ea_ui_app_loading(false);
 
-      // mapbox_setup();
+      // mapbox_setup(b);
     });
 }
 

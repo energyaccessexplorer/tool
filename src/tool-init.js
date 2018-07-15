@@ -75,12 +75,12 @@ require([
 
   ea_layers_init();
 
-  ea_client(`${ea_path_root}data/${ea_ccn3}/category-tree.json`, 'GET', null, (r) => {
-    window.ea_datasets_category_tree = r;
+  ea_client(`${ea_path_root}data/${ea_ccn3}/specifics.json`, 'GET', null, (r) => {
+    window.ea_datasets_category_tree = r['category-tree'];
 
     ea_controls_tree();
 
-    ea_map_setup();
+    ea_map_setup(r['bounds']);
 
     ea_init();
   })

@@ -18,6 +18,7 @@ requirejs.config({
     'svg': "./ea/svg",
     'canvas': "./ea/canvas",
     'map': "./ea/map",
+    'datasets_collection': "./ea/datasets_collection",
     'config': "../config",
   }
 });
@@ -38,6 +39,7 @@ require([
   'datasets',
   'mapbox',
   'sortable',
+  'datasets_collection',
   'config',
 ], (d3, topojson, geotiff, plotty) => {
   window.d3 = d3;
@@ -57,9 +59,9 @@ require([
     plotty.colorscales['yignbu'].positions
   );
 
-  const c = ea_datasets_collection;
+  const collection = ea_datasets_collection;
 
-  c.forEach((d) => {
+  collection.forEach((d) => {
     if (!d.color_scale) return;
 
     d.color_scale_fn = function() {
@@ -77,13 +79,7 @@ require([
 
   ea_layers_init();
 
-  ea_client(`${ea_path_root}data/${ea_ccn3}/specifics.json`, 'GET', null, (r) => {
-    window.ea_datasets_category_tree = r['category-tree'];
-
-    ea_controls_tree(r['category-tree'], c);
-
-    ea_map_setup(r['bounds']);
-
-    ea_init();
+  ea_client(`${ea_path_root}data/${ea_ccn3}/specifics.json`, 'GET', null, async (r) => {
+    ea_init(r['category-tree'], collection, r['bounds']);
   })
 });

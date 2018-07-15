@@ -82,10 +82,10 @@ function ea_controls_tree(tree, collection) {
         .addEventListener('mouseup', e => ea_controls_collapse_subcategory(conel, subel));
 
       b.datasets.forEach(b => {
-        const ds = collection.find(x => x.id === b);
+        const ds = collection.find(x => x.id === b.id);
 
         if (ds) conel.appendChild(ea_controls(ds));
-        else console.warn(`'${b}' dataset not found`);
+        else console.warn(`'${b.id}' dataset not found`);
       });
     });
   });
@@ -111,8 +111,8 @@ function ea_controls(ds) {
   const controls = ea_controls_elem(ds);
   controls.querySelector('.controls-dataset-header').appendChild(
     ea_controls_activate(
-      ds,
-      (v) => ea_datasets_activate(ds, v)
+      ds.active,
+      (v) => ea_datasets_activate(ds,v)
     )
   );
 
@@ -162,8 +162,8 @@ function ea_controls(ds) {
   return controls;
 }
 
-function ea_controls_activate(ds, callback) {
-  return ea_svg_checkbox(ds.active, (s) => callback((ds.active = s)));
+function ea_controls_activate(active, callback) {
+  return ea_svg_checkbox(active, callback);
 }
 
 function ea_controls_update() {

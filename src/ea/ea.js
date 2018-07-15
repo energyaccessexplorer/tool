@@ -1,23 +1,34 @@
-async function ea_init() {
-  const c = ea_datasets_collection;
+async function ea_init(tree, collection, bounds) {
+  const preload_list = [];
+  const active_list = [];
+
+  tree.forEach(a => a.subcategories.forEach(b => b.datasets.filter(c => {
+    const ds = collection.find(d => d.id === c.id);
+
+    ds.band = c.band || 0;
+    ds.active = (c.active === true) || false;
+    ds.weight = c.weight || 2;
+
+    c.preload ? preload_list.push(c.id) : null;
+    c.active  ? active_list.push(c.id) : null;
+  })));
+
+  ea_controls_tree(tree, collection);
 
   (async () => {
-    const l = c
-          .slice(1)
-          .filter((d) => d.preload || d.active);
+    for (var id of active_list)
+      await ea_datasets_activate(collection.find(d => d.id === id), true);
 
-    if (l.length)
-      for (let ds of l) {
-        if (ds.preload)
-          await ea_datasets_load(ds);
-        if (ds.active)
-          await ea_datasets_activate(ds, true);
-      }
+    for (var id of preload_list)
+      await ea_datasets_load(collection.find(d => d.id === id));
   })();
 
-  const dummy = c.find(d => d.id === "dummy");
+  ea_map_setup(bounds);
+
+  const dummy = collection.find(d => d.id === "dummy");
   await dummy.parse();
   ea_canvas_setup(dummy);
+
   ea_ui_app_loading(false);
 }
 

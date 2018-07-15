@@ -40,11 +40,10 @@ async function ea_datasets_load(ds,v) {
 }
 
 async function ea_datasets_activate(ds, v) {
-  if (v)
+  if (ds.active = v)
     await ea_datasets_load(ds);
-  else {
+  else
     if (typeof ds.hide === 'function') ds.hide(ea_map, ds.id);
-  }
 
   ea_controls_update();
   ea_layers_update_list();

@@ -141,6 +141,8 @@ function ea_map_svg(svg, topofile, name, options) {
     let zoomend = () => {
       const k = d3.event.transform.k;
 
+      if (typeof ea_datasets_collection === 'undefined') return;
+
       ea_datasets_collection
         .filter(x => x.active && x.features)
         .forEach(ds => {

@@ -302,7 +302,7 @@ function ea_svg_interval(color_scale, callback1, callback2, end_callback) {
   return svg.node();
 }
 
-function ea_svg_pie(container, data, outer, inner, colors, inner_text, create = true) {
+function ea_svg_pie(container_id, data, outer, inner, colors, inner_text, create = true) {
   const width =  outer * 2,
         height = outer * 2;
 
@@ -314,7 +314,7 @@ function ea_svg_pie(container, data, outer, inner, colors, inner_text, create = 
         .innerRadius(((inner === null || inner === undefined || inner === false) ? outer - (outer/4) : inner))
         .outerRadius(outer - (outer/15));
 
-  const container = d3.select(container);
+  const container = d3.select(container_id);
 
   let svg = null;
 
@@ -339,14 +339,14 @@ function ea_svg_pie(container, data, outer, inner, colors, inner_text, create = 
       .attr("transform", `translate(${ outer }, ${ outer })`);
   }
 
-  const path = g
-        .datum(data)
-        .selectAll("path")
-        .data(pie).enter()
-        .append("path")
-        .attr("fill", (d,i) => colors[i])
-        .attr("d", arc)
-        .each(function(d) { this._current = d });
+  let path = g
+      .datum(data)
+      .selectAll("path")
+      .data(pie).enter()
+      .append("path")
+      .attr("fill", (d,i) => colors[i])
+      .attr("d", arc)
+      .each(function(d) { this._current = d });
 
   const text = svg.append("text")
         .attr("dy", ".35em")

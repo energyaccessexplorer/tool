@@ -118,15 +118,15 @@ function ea_layers_init() {
   header.querySelector('.collapse.triangle')
     .innerHTML = ea_ui_collapse_triangle('s');
 
-  let d;
-  ea_layers_toggle_list(d = false);
+  let t;
+  ea_layers_toggle_list(t = false);
 
   header.addEventListener('mouseup', function() {
-    d = !d;
+    t = !t;
 
-    ea_layers_toggle_list(d);
+    ea_layers_toggle_list(t);
 
-    if (d) {
+    if (t) {
       ea_layers_update_map([].map.call(
         document.querySelectorAll('li.layers-element'),
         i => i.getAttribute('bind')));

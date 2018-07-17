@@ -109,10 +109,11 @@ function ea_controls_elem(ds) {
 
 function ea_controls(ds) {
   const controls = ea_controls_elem(ds);
+
   controls.querySelector('.controls-dataset-header').appendChild(
-    ea_controls_activate(
+    ea_controls_active(
       ds.active,
-      (v) => ea_datasets_activate(ds,v)
+      (v) => ea_datasets_active(ds,v)
     )
   );
 
@@ -162,7 +163,7 @@ function ea_controls(ds) {
   return controls;
 }
 
-function ea_controls_activate(active, callback) {
+function ea_controls_active(active, callback) {
   return ea_svg_checkbox(active, callback);
 }
 

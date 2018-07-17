@@ -42,7 +42,7 @@ async function ea_datasets_load(ds,v) {
 	ea_ui_dataset_loading(ds, false);
 }
 
-async function ea_datasets_activate(ds, v) {
+async function ea_datasets_active(ds, v) {
   if (ds.active = v)
     await ea_datasets_load(ds);
   else

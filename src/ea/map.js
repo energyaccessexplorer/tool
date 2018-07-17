@@ -214,7 +214,7 @@ function ea_map_load_features(o) {
     throw "Argument Error: o.features is not an array of Features";
   }
 
-  const container = o.map.map.select(`#${o.cls}`);
+  let container = o.map.map.select(`#${o.cls}`);
   let paths;
 
   if (container.empty())

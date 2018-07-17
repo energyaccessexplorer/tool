@@ -17,7 +17,7 @@ async function ea_init(tree, collection, bounds) {
 
   (async () => {
     for (var id of active_list)
-      await ea_datasets_activate(collection.find(d => d.id === id), true);
+      await ea_datasets_active(collection.find(d => d.id === id), true);
 
     for (var id of preload_list)
       await ea_datasets_load(collection.find(d => d.id === id));
@@ -38,12 +38,12 @@ async function ea_init(tree, collection, bounds) {
  */
 
 function ea_analysis() {
-  const c = ea_datasets_collection;
+  const collection = ea_datasets_collection;
   const t0 = performance.now();
 
   // we use a dataset as a template just for code-clarity.
   //
-  const tmp = c.find(d => d.id === 'dummy');
+  const tmp = collection.find(d => d.id === 'dummy');
 
   if (!tmp.raster) {
     console.warn("No raster template. Return.");
@@ -60,7 +60,8 @@ function ea_analysis() {
     color_scale: "jet",
   };
 
-  const filtered = c.filter(d => (d.active && d.raster));
+  const filtered = collection
+        .filter(d => d.active && d.raster);
 
   ea_canvas.style['opacity'] = (filtered.length === 0) ? 0 : 1;
 
@@ -68,8 +69,8 @@ function ea_analysis() {
 
   const scales = filtered.map(d => ea_datasets_scale_fn(d));
 
-  const full_weight = filtered.reduce(
-    (a,c,k) => ((c.datatype === "boolean") ? a : c.weight + a), 0);
+  const full_weight = filtered
+        .reduce((a,c,k) => ((c.datatype === "boolean") ? a : c.weight + a), 0);
 
   for (var i = 0; i < ds.raster.length; i++) {
     const t = filtered.reduce((a, c, k, l) => {
@@ -98,16 +99,7 @@ function ea_analysis() {
   return ds;
 }
 
-function ea_fake_download(blob) {
-  const a = document.createElement('a');
-  document.body.appendChild(a);
 
-  a.style = "display:none;";
 
-  const url = URL.createObjectURL(blob);
-  a.href = url;
-  a.download = "ea_download";
-  a.click();
 
-  window.URL.revokeObjectURL(url);
 }

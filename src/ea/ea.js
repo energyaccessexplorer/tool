@@ -5,7 +5,7 @@ async function ea_init(tree, collection, bounds) {
   tree.forEach(a => a.subcategories.forEach(b => b.datasets.filter(c => {
     const ds = collection.find(d => d.id === c.id);
 
-    ds.band = c.band || 0;
+    ds.views.raster.band = ds.views.raster.band || 0;
     ds.active = (c.active === true) || false;
     ds.weight = c.weight || 2;
 

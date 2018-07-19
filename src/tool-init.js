@@ -62,12 +62,12 @@ require([
   const collection = ea_datasets_collection;
 
   collection.forEach((d) => {
-    if (!d.color_scale) return;
+    if (!d.views.raster.color_scale) return;
 
     d.color_scale_fn = function() {
       return d3.scaleLinear()
-        .domain(plotty.colorscales[d.color_scale].positions)
-        .range(plotty.colorscales[d.color_scale].colors);
+        .domain(plotty.colorscales[d.views.raster.color_scale].positions)
+        .range(plotty.colorscales[d.views.raster.color_scale].colors);
     }
   });
 

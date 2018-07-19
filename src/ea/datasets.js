@@ -3,17 +3,18 @@ function ea_datasets_scale_fn(ds) {
   const r = ds.range || [0,1];
   const d = ds.domain || [0,1];
   const t = ds.tmp_domain;
+  const v = ds.views.raster.scale;
 
   const lin = d3.scaleLinear()
         .domain(t || d)
         .range(r)
 
-  switch (ds.scale) {
+  switch (v) {
   case 'radio':
   case 'mobile':
   case 'livestock':
   case 'ironrooftop':
-    s = (x) => (x === 255) ? -1 : lin(ea_districts[x][ds.scale]);
+    s = (x) => (x === 255) ? -1 : lin(ea_districts[x][v]);
     break;
 
   case 'identity':
@@ -31,13 +32,20 @@ function ea_datasets_scale_fn(ds) {
   return s;
 }
 
-async function ea_datasets_load(ds,v) {
+async function ea_datasets_load(ds, t) {
   ea_ui_dataset_loading(ds, true);
 
-  if (ds.url && ds.url.match(/\.tif$/))
-    ds.parse = ea_datasets_tiff_url;
+  if (ds.views.raster.url && ds.views.raster.url.match(/\.tif$/))
+    ds.views.raster.parse = ea_datasets_tiff_url;
 
-  await ds.parse.call(ds,v);
+  if (ds.views.polygons && ds.views.polygons.symbol)
+    ds.views.polygons.parse = ea_datasets_points;
+
+  if (ds.views.raster)
+    await ds.views.raster.parse.call(ds,t);
+
+  if (ds.views.polygons)
+    await ds.views.polygons.parse.call(ds,t);
 
 	ea_ui_dataset_loading(ds, false);
 }
@@ -75,7 +83,7 @@ async function ea_datasets_points() {
       ea_map,
       ds.features,
       ds.id,
-      ds.symbol,
+      ds.views.polygons.symbol,
       1
     )
   }
@@ -83,7 +91,7 @@ async function ea_datasets_points() {
   if (ds.features) load_em();
   else
     await ea_client(
-      `${ea_settings.database}/${ds.endpoint}`, 'GET', null,
+      `${ea_settings.database}/${ds.views.polygons.endpoint}`, 'GET', null,
       (r) => {
         ds.features = r[0]['jsonb_build_object'].features;
         load_em();
@@ -102,7 +110,7 @@ async function ea_datasets_tiff(ds, method, payload) {
 
     ds.tiff = tiff;
     ds.image = image;
-    ds.raster = rasters[ds.band];
+    ds.raster = rasters[ds.views.raster.band];
 
     ds.width = image.getWidth();
     ds.height = image.getHeight();
@@ -168,7 +176,7 @@ async function ea_datasets_tiff_url() {
   const ds = this;
 
   if (ds.raster) ;
-  else await ea_datasets_tiff(ds, GeoTIFF.fromUrl, `${ea_path_root}data/${ea_ccn3}/${ds.url}`);
+  else await ea_datasets_tiff(ds, GeoTIFF.fromUrl, `${ea_path_root}data/${ea_ccn3}/${ds.views.raster.url}`);
 
   return ds;
 }

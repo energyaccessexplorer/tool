@@ -122,13 +122,6 @@ function ea_controls(ds) {
   case "poverty":
   case "population":
   case 'windspeed':
-  case "facilities-distance":
-  case "transmission-lines-distance":
-  case "minigrids-distance":
-  case "mines-distance":
-  case "hydro-distance":
-  case "schools-distance":
-  case "powerplants-distance":
   case "livestock":
   case 'mobile':
   case 'ironrooftop':
@@ -153,6 +146,8 @@ function ea_controls(ds) {
   case "hydro":
   case "facilities":
   case "powerplants":
+    controls.appendChild(ea_controls_range(ds));
+    controls.appendChild(ea_controls_weight(ds));
     break;
 
   default:
@@ -179,9 +174,10 @@ function ea_controls_range(ds) {
   }
 
   const container = elem(`<div class="controls-group"></div>`);
+  const d = ds.views.raster.domain
 
-  const range_norm = d3.scaleLinear().domain([0,1]).range(ds.domain);
-  const domain = ds.domain.slice(0);
+  const range_norm = d3.scaleLinear().domain([0,1]).range(d);
+  const domain = d.slice(0);
 
   const l = elem(`
 <div class="label">

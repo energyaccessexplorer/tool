@@ -151,7 +151,7 @@ function ea_map_svg(svg, topofile, name, options) {
               _map,
               ds.features,
               ds.id,
-              ds.symbol,
+              ds.views.polygons.symbol,
               k
             );
           else if (ds.type === 'polygon')

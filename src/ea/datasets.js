@@ -46,7 +46,7 @@ async function ea_datasets_active(ds, v) {
   if (ds.active = v)
     await ea_datasets_load(ds);
   else
-    if (typeof ds.hide === 'function') ds.hide(ea_map, ds.id);
+    if (typeof ds.views.polygons) ea_map_unload(ea_map, ds.id);
 
   ea_controls_update();
   ea_layers_update_list();

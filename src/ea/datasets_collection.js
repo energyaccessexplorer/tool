@@ -55,7 +55,6 @@ const ea_datasets_collection = [
     endpoint: 'envelope_minigrids',
     parse: ea_datasets_points,
 
-    hide: ea_map_unload,
     symbol: "square",
   },
   {
@@ -79,7 +78,6 @@ const ea_datasets_collection = [
     endpoint: 'envelope_mines',
     parse: ea_datasets_points,
 
-    hide: ea_map_unload,
     symbol: "wye",
   },
   {
@@ -103,7 +101,6 @@ const ea_datasets_collection = [
     endpoint: 'envelope_schools',
     parse: ea_datasets_points,
 
-    hide: ea_map_unload,
     symbol: "square",
   },
   {
@@ -145,7 +142,6 @@ const ea_datasets_collection = [
       );
     },
 
-    hide: ea_map_unload,
   },
   {
     id: "transmission-lines-distance",
@@ -188,7 +184,6 @@ const ea_datasets_collection = [
     endpoint: 'envelope_facilities',
     parse: ea_datasets_points,
 
-    hide: ea_map_unload,
     symbol: "cross",
   },
   {
@@ -212,7 +207,6 @@ const ea_datasets_collection = [
     endpoint: 'envelope_powerplants',
     parse: ea_datasets_points,
 
-    hide: ea_map_unload,
     symbol: "star",
   },
   {
@@ -236,7 +230,6 @@ const ea_datasets_collection = [
     endpoint: 'envelope_hydro',
     parse: ea_datasets_points,
 
-    hide: ea_map_unload,
     symbol: "circle",
   },
   {

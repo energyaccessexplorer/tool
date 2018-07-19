@@ -1,15 +1,5 @@
 const ea_datasets_collection = [
   {
-    id: "dummy",
-    type: "raster",
-    description: "Dummy dataset",
-
-    url: "empty_8bui.tif",
-    parse: ea_datasets_tiff_url,
-
-    band: 0
-  },
-  {
     id: "ghi",
     type: "raster",
     description: "Solar Potential",

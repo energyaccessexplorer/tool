@@ -25,9 +25,22 @@ async function ea_init(tree, collection, bounds) {
 
   ea_map_setup(bounds);
 
-  const dummy = collection.find(d => d.id === "dummy");
-  await dummy.parse();
-  ea_canvas_setup(dummy);
+  ea_dummy = {
+    id: "dummy",
+    description: "Dummy dataset",
+
+    views: {
+      raster: {
+        url: "empty_8bui.tif",
+        parse: ea_datasets_tiff_url,
+        band: 0
+      }
+    },
+  };
+
+  await ea_dummy.views.raster.parse.call(ea_dummy);
+
+  ea_canvas_setup(ea_dummy);
 
   ea_ui_app_loading(false);
 }
@@ -43,7 +56,7 @@ function ea_analysis() {
 
   // we use a dataset as a template just for code-clarity.
   //
-  const tmp = collection.find(d => d.id === 'dummy');
+  const tmp = ea_dummy;
 
   if (!tmp.raster) {
     console.warn("No raster template. Return.");

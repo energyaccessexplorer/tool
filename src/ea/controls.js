@@ -174,7 +174,7 @@ function ea_controls_range(ds) {
   }
 
   const container = elem(`<div class="controls-group"></div>`);
-  const d = ds.views.raster.domain
+  const d = ds.views.heatmaps.domain
 
   const range_norm = d3.scaleLinear().domain([0,1]).range(d);
   const domain = d.slice(0);

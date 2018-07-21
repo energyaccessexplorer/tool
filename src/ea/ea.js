@@ -5,7 +5,7 @@ async function ea_init(tree, collection, bounds) {
   tree.forEach(a => a.subcategories.forEach(b => b.datasets.filter(c => {
     const ds = collection.find(d => d.id === c.id);
 
-    ds.views.raster.band = ds.views.raster.band || 0;
+    ds.views.heatmaps.band = ds.views.heatmaps.band || 0;
     ds.active = (c.active === true) || false;
     ds.weight = c.weight || 2;
 
@@ -30,7 +30,7 @@ async function ea_init(tree, collection, bounds) {
     description: "Dummy dataset",
 
     views: {
-      raster: {
+      heatmaps: {
         url: "empty_8bui.tif",
         parse: ea_datasets_tiff_url,
         band: 0
@@ -38,7 +38,7 @@ async function ea_init(tree, collection, bounds) {
     },
   };
 
-  await ea_dummy.views.raster.parse.call(ea_dummy);
+  await ea_dummy.views.heatmaps.parse.call(ea_dummy);
 
   ea_canvas_setup(ea_dummy);
 

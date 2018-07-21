@@ -6,7 +6,7 @@ const ea_datasets_collection = [
     unit: "kWh/m<sup>2</sup>",
 
     views: {
-      raster: {
+      heatmaps: {
         url: "ghi.tif",
         clamp: false,
         domain: [500, 2800],
@@ -21,7 +21,7 @@ const ea_datasets_collection = [
     unit: "?",
 
     views: {
-      raster: {
+      heatmaps: {
         url: "windspeed.tif",
 
         clamp: true,
@@ -37,7 +37,7 @@ const ea_datasets_collection = [
     unit: "< 2USD/day",
 
     views: {
-      raster: {
+      heatmaps: {
         url: "poverty.tif",
         clamp: false,
         domain: [0, 1],
@@ -56,7 +56,7 @@ const ea_datasets_collection = [
         endpoint: 'envelope_minigrids',
         symbol: "square",
       },
-      raster: {
+      heatmaps: {
         url: "minigrid-distance.tif",
         clamp: false,
         domain: [0, 250],
@@ -76,7 +76,7 @@ const ea_datasets_collection = [
         symbol: "wye",
       },
 
-      raster: {
+      heatmaps: {
         url: "mines-distance.tif",
         clamp: false,
         domain: [0, 250],
@@ -96,7 +96,7 @@ const ea_datasets_collection = [
         symbol: "square",
       },
 
-      raster: {
+      heatmaps: {
         url: "schools-distance.tif",
         clamp: false,
         domain: [120, 0],
@@ -110,7 +110,7 @@ const ea_datasets_collection = [
     type: "polygon",
     description: "Transmission Lines",
 
-    init: 20,
+    init: 1,
     steps: [1, 10, 20, 30, 50, 100],
 
     views: {
@@ -135,7 +135,7 @@ const ea_datasets_collection = [
           );
         },
       },
-      raster: {
+      heatmaps: {
         url: "transmission-lines-distance.tif",
         clamp: false,
         domain: [0, 250],
@@ -154,7 +154,7 @@ const ea_datasets_collection = [
         endpoint: 'envelope_facilities',
         symbol: "cross",
       },
-      raster: {
+      heatmaps: {
         url: "facilities-distance.tif",
         clamp: false,
         domain: [0, 250],
@@ -173,7 +173,7 @@ const ea_datasets_collection = [
         endpoint: 'envelope_powerplants',
         symbol: "star",
       },
-      raster: {
+      heatmaps: {
         url: "powerplants-distance.tif",
         clamp: false,
         domain: [0, 250],
@@ -192,7 +192,7 @@ const ea_datasets_collection = [
         endpoint: 'envelope_hydro',
         symbol: "circle",
       },
-      raster: {
+      heatmaps: {
         url: "hydro-distance.tif",
         clamp: false,
         domain: [0, 250],
@@ -208,7 +208,7 @@ const ea_datasets_collection = [
     unit: "people/1km<sup>2</sup>",
 
     views: {
-      raster: {
+      heatmaps: {
         url: "population.tif",
         clamp: true,
         domain: [10, 6000],
@@ -224,7 +224,7 @@ const ea_datasets_collection = [
     unit: "%",
 
     views: {
-      raster: {
+      heatmaps: {
         url: "districts.tif",
         parse: ea_datasets_districts_tiff,
          scale: 'livestock',
@@ -242,7 +242,7 @@ const ea_datasets_collection = [
     unit: "%",
 
     views: {
-      raster: {
+      heatmaps: {
         url: "districts.tif",
         scale: 'mobile',
         clamp: false,
@@ -259,7 +259,7 @@ const ea_datasets_collection = [
     unit: "%",
 
     views: {
-      raster: {
+      heatmaps: {
         url: "districts.tif",
         scale: 'ironrooftop',
         clamp: false,
@@ -276,7 +276,7 @@ const ea_datasets_collection = [
     unit: "?",
 
     views: {
-      raster: {
+      heatmaps: {
         url: "nighttime-lights.tif",
         clamp: true,
         domain: [0, 255],

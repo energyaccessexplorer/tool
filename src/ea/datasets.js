@@ -3,7 +3,7 @@ function ea_datasets_scale_fn(ds) {
   const r = ds.range || [0,1];
   const d = ds.domain || [0,1];
   const t = ds.tmp_domain;
-  const v = ds.views.raster.scale;
+  const v = ds.views.heatmaps.scale;
 
   const lin = d3.scaleLinear()
         .domain(t || d)
@@ -35,17 +35,16 @@ function ea_datasets_scale_fn(ds) {
 async function ea_datasets_load(ds, t) {
   ea_ui_dataset_loading(ds, true);
 
-  if (ds.views.raster.url && ds.views.raster.url.match(/\.tif$/))
-    ds.views.raster.parse = ea_datasets_tiff_url;
+  if (ds.views.heatmaps.url && ds.views.heatmaps.url.match(/\.tif$/))
+    ds.views.heatmaps.parse = ea_datasets_tiff_url;
 
   if (ds.views.polygons && ds.views.polygons.symbol)
     ds.views.polygons.parse = ea_datasets_points;
 
-  if (ds.views.raster)
-    await ds.views.raster.parse.call(ds,t);
 
   if (ds.views.polygons)
     await ds.views.polygons.parse.call(ds,t);
+  await ds.views.heatmaps.parse.call(ds);
 
 	ea_ui_dataset_loading(ds, false);
 }
@@ -110,7 +109,7 @@ async function ea_datasets_tiff(ds, method, payload) {
 
     ds.tiff = tiff;
     ds.image = image;
-    ds.raster = rasters[ds.views.raster.band];
+    ds.raster = rasters[ds.views.heatmaps.band];
 
     ds.width = image.getWidth();
     ds.height = image.getHeight();
@@ -176,7 +175,7 @@ async function ea_datasets_tiff_url() {
   const ds = this;
 
   if (ds.raster) ;
-  else await ea_datasets_tiff(ds, GeoTIFF.fromUrl, `${ea_path_root}data/${ea_ccn3}/${ds.views.raster.url}`);
+  else await ea_datasets_tiff(ds, GeoTIFF.fromUrl, `${ea_path_root}data/${ea_ccn3}/${ds.views.heatmaps.url}`);
 
   return ds;
 }

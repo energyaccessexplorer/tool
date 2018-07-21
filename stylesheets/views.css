@@ -1,0 +1,24 @@
+body {
+  overflow: hidden;
+}
+
+#views {
+  position: absolute;
+  display: flex;
+
+  top: 3.5;
+  left: 50%
+}
+
+#views .view {
+  font-family: condensed;
+  font-size: 1.7em;
+  font-weight: bold;
+  text-transform: uppercase;
+  flex: 1;
+  display: block;
+  white-space: nowrap;
+  padding: 1em;
+  color: var(--the-blue);
+  cursor: pointer;
+}

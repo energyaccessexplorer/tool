@@ -162,11 +162,6 @@ function ea_controls_active(active, callback) {
   return ea_svg_checkbox(active, callback);
 }
 
-function ea_controls_update() {
-  ea_layers_toggle_list(false);
-  ea_canvas_plot(ea_analysis());
-}
-
 function ea_controls_range(ds) {
   function update_range_value(x,i,el) {
     el.innerText = domain[i] = range_norm(x).toFixed(2);
@@ -193,7 +188,10 @@ function ea_controls_range(ds) {
       ds.color_scale_fn,
       x => update_range_value(x, 0, v1),
       x => update_range_value(x, 1, v2),
-      ea_controls_update
+      _ => ea_overlord({
+        type: "dataset",
+        target: ds,
+      })
     )
   );
 
@@ -225,7 +223,11 @@ function ea_controls_weight(ds) {
       null,
       x => {
         ds.weight = x;
-        ea_controls_update();
+
+        ea_overlord({
+          type: "dataset",
+          target: ds,
+        });
       },
       ("weight" === "weight")
     )
@@ -259,7 +261,11 @@ function ea_controls_steps(ds) {
         if (!ds.active) return;
 
         await ea_datasets_load(ds, (ds.init = x));
-        ea_controls_update();
+
+        ea_overlord({
+          type: "dataset",
+          target: ds,
+        });
       },
       ("weight" === false)
     )

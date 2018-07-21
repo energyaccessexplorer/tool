@@ -33,6 +33,8 @@ function ea_datasets_scale_fn(ds) {
 }
 
 async function ea_datasets_load(ds, t) {
+  if (!ds.id) throw `Argument Error: ${ds} does not look like a dataset`;
+
   ea_ui_dataset_loading(ds, true);
 
   if (ds.views.heatmaps.url && ds.views.heatmaps.url.match(/\.tif$/))
@@ -41,22 +43,26 @@ async function ea_datasets_load(ds, t) {
   if (ds.views.polygons && ds.views.polygons.symbol)
     ds.views.polygons.parse = ea_datasets_points;
 
-
-  if (ds.views.polygons)
-    await ds.views.polygons.parse.call(ds,t);
   await ds.views.heatmaps.parse.call(ds);
 
 	ea_ui_dataset_loading(ds, false);
 }
 
 async function ea_datasets_active(ds, v) {
+  if (!ds || !ds.id) {
+    console.warn(ds);
+    throw `Argument Error: '${ds}' does not look like a dataset`;
+  }
+
   if (ds.active = v)
     await ea_datasets_load(ds);
   else
-    if (typeof ds.views.polygons) ea_map_unload(ea_map, ds.id);
+    if (typeof ds.views.polygons !== 'undefined') ;
 
-  ea_controls_update();
-  ea_layers_update_list();
+  ea_overlord({
+    type: "dataset",
+    target: ds,
+  });
 }
 
 function ea_datasets_features(ds) {
@@ -127,7 +133,7 @@ function ea_datasets_hexblob(hex) {
     byteBuf[i/2] = parseInt(hex.slice(i, i+2), 16);
 
   const blob = new Blob([byteBuf], {type: "image/tiff"});
-  // ea_fake_download(blob);
+  // fake_download(blob);
 
   return blob;
 }

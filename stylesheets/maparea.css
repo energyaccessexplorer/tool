@@ -58,4 +58,5 @@ svg#svg-mask {
 
   font-size: x-small;
   font-family: monospace;
+  white-space: nowrap;
 }

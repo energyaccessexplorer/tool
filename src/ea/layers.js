@@ -1,4 +1,4 @@
-function ea_layers_collection() {
+function ea_layers_dataset_collection() {
   const curr = document.querySelector('#layers-list').children;
 
   const list = [].map.call(curr, x => x.getAttribute('bind'));
@@ -8,13 +8,13 @@ function ea_layers_collection() {
     .sort((a,b) => (list.indexOf(a.id) < list.indexOf(b.id)) ? -1 : 1);
 }
 
-function ea_layers_update_map(list) {
+function ea_layers_update_datasets(list) {
   let order = [ea_canvas, ea_map.svg.node()];
   const maparea = document.querySelector('#maparea');
   const c = ea_datasets_collection;
 
   const raster_id = list
-        .find(d => c.find(x => x.id === d && x.active && x.raster));
+        .find(d => c.find(x => x.id === d && x.active && typeof x.views.polygons === 'undefined'));
 
   list
     .filter(x => c.find(d => d.id === x && d.features))
@@ -24,11 +24,9 @@ function ea_layers_update_map(list) {
   if (list.indexOf(raster_id) === 0) order = order.reverse();
 
   maparea.insertBefore(...order);
-
-  ea_canvas_plot(c.find(x => x.id === raster_id));
 }
 
-function ea_layer_elem(ds) {
+function ea_layers_dataset_elem(ds) {
   const d = elem(`
 <li bind="${ds.id}"
     class="layers-element">
@@ -78,62 +76,73 @@ function ea_layer_elem(ds) {
   return d;
 }
 
-function ea_layers_toggle_list(bool) {
-  const layers = document.querySelector('#layers');
-  const list = layers.querySelector('#layers-list');
-  const t = layers.querySelector('.collapse.triangle');
+function ea_layers_heatmap_elem(t, v) {
+  const d = elem(`
+<li bind="${t}"
+    class="layers-element eai">
+  <div class="layers-element-handle"></div>
 
-  const eai = document.querySelector('#eai');
-  eai.style['display']  = (!bool ? "" : "none");
-  list.style['display'] = ( bool ? "" : "none");
-  t.innerHTML = ea_ui_collapse_triangle(bool ? 's' : 'n');
+  <div class="layers-element-content">
+    <div class="layers-element-header">
+      <div class="layers-element-title">${v}</div>
 
-  ea_controls_collapse_category(document.querySelector('#supply'), !bool);
-  ea_controls_collapse_category(document.querySelector('#demand'), !bool);
+      <div class="layers-element-controls">
+        <div class="layer-type"></div>
+        <div class="layer-visibility"></div>
+        <div class="layer-info"></div>
+      </div>
+    </div>
+
+    <div class="layers-element-descriptor">
+      <svg width="280" height="16"><defs><linearGradient id="gradient-eai" x1="0%" y1="0%" x2="100%" y2="0%" spreadMethod="pad"><stop offset="0%" stop-color="#000083" stop-opacity="1"></stop><stop offset="12.5%" stop-color="#003CAA" stop-opacity="1"></stop><stop offset="37.5%" stop-color="#05FFFF" stop-opacity="1"></stop><stop offset="62.5%" stop-color="#FFFF00" stop-opacity="1"></stop><stop offset="87.5%" stop-color="#FA0000" stop-opacity="1"></stop><stop offset="100%" stop-color="#800000" stop-opacity="1"></stop></linearGradient></defs><g><rect fill="url(#gradient-eai)" stroke="none" x="7" y="1" height="12" width="100%"></rect></g></svg>
+
+      <div style="display: flex; justify-content: space-between; padding-right: 0.5em; padding-left: 0.5em;">
+        <div class="thing">Low</div>
+        <div class="thing">Medium</div>
+        <div class="thing">High</div>
+      </div>
+    </div>
+  </div>
+</li>`);
+
+  return d;
 }
 
-function ea_layers_update_list() {
+function ea_layers_heatmaps(list) {
   sortable('#layers-list', 'disable');
 
   const layers = document.querySelector('#layers');
-  const list = layers.querySelector('#layers-list');
+  const layers_list = layers.querySelector('#layers-list');
 
-  const lc = ea_layers_collection();
+  let lhc = {
+    "total": 'Energy Access Index',
+    "demand": 'Demand Index',
+    "supply": 'Supply Index',
+  };
 
-  list.innerHTML = "";
+  layers_list.innerHTML = "";
 
-  if (lc.length) {
-    lc.forEach(ds => list.appendChild(ea_layer_elem(ds)));
-    sortable('#layers-list', 'enable');
-  }
+  list.forEach((t,i) => layers_list.appendChild(ea_layers_heatmap_elem(t, lhc[t], i)));
+  sortable('#layers-list', 'enable');
+}
 
-  layers.style['display'] = (lc.length) ? "block" : "none";
+function ea_layers_datasets(list) {
+  sortable('#layers-list', 'disable');
+
+  const layers = document.querySelector('#layers');
+  const layers_list = layers.querySelector('#layers-list');
+
+  const ldc = list.map(i => ea_datasets_collection.find(d => d.id == i));
+
+  layers_list.innerHTML = "";
+
+  ldc.forEach(ds => layers_list.appendChild(ea_layers_dataset_elem(ds)));
+  sortable('#layers-list', 'enable');
 }
 
 function ea_layers_init() {
   const layers = document.querySelector('#layers');
-  const header = layers.querySelector('#layers-header');
   const list = layers.querySelector('#layers-list');
-
-  header.querySelector('.collapse.triangle')
-    .innerHTML = ea_ui_collapse_triangle('s');
-
-  let t;
-  ea_layers_toggle_list(t = false);
-
-  header.addEventListener('mouseup', function() {
-    t = !t;
-
-    ea_layers_toggle_list(t);
-
-    if (t) {
-      ea_layers_update_map([].map.call(
-        document.querySelectorAll('li.layers-element'),
-        i => i.getAttribute('bind')));
-    } else {
-      ea_canvas_plot(ea_analysis());
-    }
-  });
 
   sortable('#layers-list', {
     items: 'li.layers-element',
@@ -143,6 +152,10 @@ function ea_layers_init() {
   })[0]
     .addEventListener(
       'sortupdate',
-      (e) => ea_layers_update_map(e.detail.destination.items.map(i => i.getAttribute('bind')))
-    )
+      (e) => {
+        ea_overlord({
+          type: "sort",
+          layers: e.detail.destination.items.map(i => i.getAttribute('bind')),
+        })
+      });
 }

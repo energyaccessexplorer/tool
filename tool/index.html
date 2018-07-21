@@ -14,6 +14,7 @@
     <link href="/maps-and-data/stylesheets/maparea.css" rel="stylesheet" />
     <link href="/maps-and-data/stylesheets/layers.css" rel="stylesheet" />
     <link href="/maps-and-data/stylesheets/datasets.css" rel="stylesheet" />
+    <link href="/maps-and-data/stylesheets/views.css" rel="stylesheet" />
 
     <link href="/maps-and-data/lib/mapbox-gl.css" rel="stylesheet" />
     <script src="/maps-and-data/lib/mapbox-gl.js"></script>
@@ -48,6 +49,8 @@
     </nav>
 
     <div id="playground">
+      <div id="views"></div>
+
       <div id="controls"></div>
 
       <div class="center">
@@ -59,25 +62,8 @@
         </div>
       </div>
 
-      <div id="floating-thing">
-        <div id="eai">
-          Energy Access Index<br>
-          <svg width="315" height="16"><defs><linearGradient id="gradient-eai" x1="0%" y1="0%" x2="100%" y2="0%" spreadMethod="pad"><stop offset="0%" stop-color="#000083" stop-opacity="1"></stop><stop offset="12.5%" stop-color="#003CAA" stop-opacity="1"></stop><stop offset="37.5%" stop-color="#05FFFF" stop-opacity="1"></stop><stop offset="62.5%" stop-color="#FFFF00" stop-opacity="1"></stop><stop offset="87.5%" stop-color="#FA0000" stop-opacity="1"></stop><stop offset="100%" stop-color="#800000" stop-opacity="1"></stop></linearGradient></defs><g><rect fill="url(#gradient-eai)" stroke="none" x="7" y="1" height="12" width="100%"></rect></g></svg>
-          <div style="display: flex; justify-content: space-between; padding-right: 0.5em; padding-left: 0.5em;">
-            <div class="thing">Low</div>
-            <div class="thing">Medium</div>
-            <div class="thing">High</div>
-          </div>
-        </div>
-
-        <div id="layers">
-          <div id="layers-header">
-            <div class="title">Underlying Datasets</div>
-            <div class="collapse triangle"></div>
-          </div>
-
-          <ul id="layers-list"></ul>
-        </div>
+      <div id="layers">
+        <ul id="layers-list"></ul>
       </div>
     </div>
 

@@ -1,7 +1,7 @@
 function ea_datasets_scale_fn(ds) {
   let s = null;
-  const r = ds.range || [0,1];
-  const d = ds.domain || [0,1];
+  const r = ds.views.heatmaps.range || [0,1];
+  const d = ds.views.heatmaps.domain || [0,1];
   const t = ds.tmp_domain;
   const v = ds.views.heatmaps.scale;
 
@@ -25,7 +25,7 @@ function ea_datasets_scale_fn(ds) {
 
   case 'linear':
   default:
-    s = lin.clamp(ds.clamp)
+    s = lin.clamp(ds.views.heatmaps.clamp)
     break;
   }
 

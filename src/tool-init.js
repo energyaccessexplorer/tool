@@ -80,14 +80,20 @@ require([
 
   plotty.addColorScale(
     "hot-reverse",
-    plotty.colorscales['hot'].colors.reverse(),
+    plotty.colorscales['hot'].colors.slice(0).reverse(),
     plotty.colorscales['hot'].positions
   );
 
   plotty.addColorScale(
     "yignbu-reverse",
-    plotty.colorscales['yignbu'].colors.reverse(),
+    plotty.colorscales['yignbu'].colors.slice(0).reverse(),
     plotty.colorscales['yignbu'].positions
+  );
+
+  plotty.addColorScale(
+    "jet-reverse",
+    plotty.colorscales['jet'].colors.slice(0).reverse(),
+    plotty.colorscales['jet'].positions
   );
 
   const collection = ea_datasets_collection;
@@ -98,7 +104,8 @@ require([
     d.color_scale_fn = function() {
       return d3.scaleLinear()
         .domain(plotty.colorscales[d.views.heatmaps.color_scale].positions)
-        .range(plotty.colorscales[d.views.heatmaps.color_scale].colors);
+        .range(plotty.colorscales[d.views.heatmaps.color_scale].colors)
+        .clamp(d.views.heatmaps.clamp || false);
     }
   });
 

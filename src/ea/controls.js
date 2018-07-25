@@ -164,7 +164,7 @@ function ea_controls_active(active, callback) {
 
 function ea_controls_range(ds) {
   function update_range_value(x,i,el) {
-    el.innerText = domain[i] = range_norm(x).toFixed(2);
+    el.innerText = domain[i] = range_norm(x).toFixed(0);
     ds.tmp_domain = domain;
   }
 

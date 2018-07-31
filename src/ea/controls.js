@@ -247,7 +247,7 @@ function ea_controls_range(ds, label) {
   const v2 = l.querySelector('[bind=v2]');
 
   container.appendChild(
-    ea_svg_interval(
+    ea_svg_interval_thingradient(
       ds.color_scale_fn,
       x => update_range_value(x, 0, v1),
       x => update_range_value(x, 1, v2),

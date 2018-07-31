@@ -459,6 +459,158 @@ function ea_svg_color_gradient(color_scale) {
   return svg.node();
 };
 
+function ea_svg_interval_thingradient(color_scale, callback1, callback2, end_callback) {
+  const radius = 6,
+        svgwidth = 150,
+        svgheight = (radius * 2) + 2,
+        linewidth = radius * 2,
+        svgmin = radius + 1,
+        svgmax = svgwidth - radius - 1;
+
+  const now = Date.now();
+
+  const norm = d3.scaleLinear().domain([svgmin, svgmax]).range([0,1]);
+
+  const svg = d3.select(document.createElementNS(d3.namespaces.svg, "svg"))
+        .attr('class', 'svg-interval');
+
+  const gradient = svg.append("defs")
+        .append("linearGradient")
+        .attr("id", `gradient-${now}`)
+        .attr("x1", "0%")
+        .attr("y1", "0%")
+        .attr("x2", "100%")
+        .attr("y2", "0%")
+        .attr("spreadMethod", "pad");
+
+  const cr = color_scale().range();
+  const cd = color_scale().domain();
+
+  const clamp = color_scale().clamp();
+
+  cr.forEach((v,i) => {
+    gradient.append("stop")
+      .attr("offset", `${cd[i] * 100}%`)
+      .attr("stop-color", v)
+      .attr("stop-opacity", 1);
+  });
+
+  const g = svg.append('g');
+
+  const gutter = g.append('rect');
+  const marked = g.append('rect');
+
+  const umarked1 = g.append('rect');
+  const umarked2 = g.append('rect');
+
+  const c1 = g.append('circle');
+  const c2 = g.append('circle');
+
+  svg
+    .attr('width', svgwidth + 2)
+    .attr('height', svgheight + 2);
+
+  marked
+    .attr('fill', `url(#gradient-${now})`)
+    .attr('stroke', 'none')
+    .attr('x', 1)
+    .attr('y', (svgheight / 2) - 2)
+    .attr('height', 4);
+
+  gutter
+    .attr('stroke', 'black')
+    .attr('stroke-width', 0.1)
+    .attr('fill', 'transparent')
+    .attr('x', 1)
+    .attr('y', (svgheight / 2) - 1)
+    .attr('rx', 0)
+    .attr('ry', 0)
+    .attr('width', svgwidth - 2)
+    .attr('height', 1);
+
+  c1
+    .attr('r', radius)
+    .attr('cy', svgheight/2)
+    .attr('fill', cr[0])
+    .attr('stroke', 'white')
+    .attr('stroke-width', 1)
+    .style('cursor', 'grab');
+
+  c2
+    .attr('r', radius)
+    .attr('cy', svgheight/2)
+    .attr('fill', cr[cr.length-1])
+    .attr('stroke', 'white')
+    .attr('stroke-width', 1)
+    .style('cursor', 'grab');
+
+  umarked1
+    .attr('fill', cr[0])
+    .attr('stroke', 'none')
+    .attr('y', (svgheight / 2) - 2)
+    .attr('height', 4);
+
+  umarked2
+    .attr('fill', cr[cr.length - 1])
+    .attr('stroke', 'none')
+    .attr('y', (svgheight / 2) - 2)
+    .attr('height', 4);
+
+  function drag_callback(c, cx, rx, w, callback) {
+    c.attr('cx', cx);
+
+    marked
+      .attr('x', rx)
+      .attr('width', w);
+
+    if (c === c1) {
+      umarked1
+        .attr('width', (clamp ? rx : 0));
+    }
+
+    else if (c === c2) {
+      umarked2
+        .attr('x', cx)
+        .attr('width', (clamp ? svgwidth - cx : 0));
+    }
+
+    if (typeof callback === 'function') callback(norm(cx).toFixed(2));
+  }
+
+  c1.call(
+    d3.drag()
+      .on('drag', () => {
+        const c2x = c2.attr('cx');
+        const cx = Math.min(c2x, Math.max(d3.event.x, svgmin));
+
+        drag_callback(c1, cx, cx, c2x - cx, callback1);
+      })
+      .on('start', () => c1.raise())
+      .on('end', () => {
+        if (typeof end_callback === 'function') end_callback();
+      })
+  );
+
+  c2.call(
+    d3.drag()
+      .on('drag', () => {
+        const c1x = c1.attr('cx');
+        const cx = Math.max(c1x, Math.min(d3.event.x, svgmax));
+
+        drag_callback(c2, cx, c1x, cx - c1x, callback2);
+      })
+      .on('start', () => c2.raise())
+      .on('end', () => {
+        if (typeof end_callback === 'function') end_callback();
+      })
+  );
+
+  drag_callback(c1, svgmin, svgmin, svgmax - svgmin, callback1);
+  drag_callback(c2, svgmax, svgmin, svgmax - svgmin, callback2);
+
+  return svg.node();
+};
+
 function ea_svg_symbol(sym, cls, size) {
   const container = d3.select(document.createElementNS(d3.namespaces.svg, "svg"))
         .attr("width", size)

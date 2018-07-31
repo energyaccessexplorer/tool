@@ -99,7 +99,9 @@ require([
   const collection = ea_datasets_collection;
 
   collection.forEach((d) => {
-    if (!d.views.heatmaps.color_scale) return;
+    if (typeof d.views.heatmaps === 'undefined') return;
+
+    d.views.heatmaps.color_scale = 'jet';
 
     d.color_scale_fn = function() {
       return d3.scaleLinear()

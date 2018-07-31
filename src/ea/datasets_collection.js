@@ -1,3 +1,5 @@
+const ea_default_color_scheme = 'jet';
+
 const ea_datasets_collection = [
   {
     id: "ghi",
@@ -8,9 +10,8 @@ const ea_datasets_collection = [
     views: {
       heatmaps: {
         url: "ghi.tif",
-        clamp: false,
+        clamp: true,
         domain: [500, 2800],
-        color_scale: 'hot-reverse',
       }
     }
   },
@@ -26,7 +27,6 @@ const ea_datasets_collection = [
 
         clamp: true,
         domain: [0, 10],
-        color_scale: 'hot-reverse',
       }
     }
   },
@@ -40,8 +40,8 @@ const ea_datasets_collection = [
       heatmaps: {
         url: "poverty.tif",
         clamp: false,
-        domain: [0, 1],
-        color_scale: 'yignbu-reverse',
+        domain: [0, 1], //TODO: 0 - 100
+        range: [1, 0],
         weight: 5,
       }
     }
@@ -61,7 +61,6 @@ const ea_datasets_collection = [
         clamp: false,
         domain: [0, 250],
         range: [1, 0],
-        color_scale: 'hot-reverse',
       }
     },
   },
@@ -81,7 +80,6 @@ const ea_datasets_collection = [
         clamp: false,
         domain: [0, 250],
         range: [1, 0],
-        color_scale: 'hot-reverse',
       }
     },
   },
@@ -100,7 +98,7 @@ const ea_datasets_collection = [
         url: "schools-distance.tif",
         clamp: false,
         domain: [120, 0],
-        color_scale: 'jet',
+        range: [0, 1],
         weight: 3,
       }
     },
@@ -140,7 +138,6 @@ const ea_datasets_collection = [
         clamp: false,
         domain: [0, 250],
         range: [1, 0],
-        color_scale: 'hot-reverse',
       }
     },
   },
@@ -158,8 +155,7 @@ const ea_datasets_collection = [
         url: "facilities-distance.tif",
         clamp: false,
         domain: [0, 250],
-        range: [1, 0],
-        color_scale: 'hot-reverse',
+        range: [0, 1],
       }
     },
   },
@@ -175,10 +171,9 @@ const ea_datasets_collection = [
       },
       heatmaps: {
         url: "powerplants-distance.tif",
-        clamp: false,
+        clamp: true,
         domain: [0, 250],
         range: [1, 0],
-        color_scale: 'hot-reverse',
       }
     },
   },
@@ -194,10 +189,9 @@ const ea_datasets_collection = [
       },
       heatmaps: {
         url: "hydro-distance.tif",
-        clamp: false,
+        clamp: true,
         domain: [0, 250],
         range: [1, 0],
-        color_scale: 'hot-reverse',
       }
     },
   },
@@ -212,7 +206,6 @@ const ea_datasets_collection = [
         url: "population.tif",
         clamp: true,
         domain: [10, 6000],
-        color_scale: 'jet',
         weight: 5,
       }
     }
@@ -247,7 +240,6 @@ const ea_datasets_collection = [
         scale: 'mobile',
         clamp: false,
         domain: [0, 100],
-        color_scale: 'greys',
         weight: 5,
       }
     }
@@ -264,7 +256,6 @@ const ea_datasets_collection = [
         scale: 'ironrooftop',
         clamp: false,
         domain: [0, 100],
-        color_scale: 'greys',
         weight: 5,
       }
     }
@@ -280,7 +271,6 @@ const ea_datasets_collection = [
         url: "nighttime-lights.tif",
         clamp: true,
         domain: [0, 255],
-        color_scale: 'hot-reverse',
         weight: 5,
       }
     }

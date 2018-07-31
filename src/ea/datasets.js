@@ -4,17 +4,15 @@ function ea_datasets_scale_fn(ds) {
   const d = ds.views.heatmaps.domain || [0,1];
   const t = ds.tmp_domain;
   const v = ds.views.heatmaps.scale;
+  const o = ds.views.heatmaps.scale_option;
 
   const lin = d3.scaleLinear()
         .domain(t || d)
         .range(r)
 
   switch (v) {
-  case 'radio':
-  case 'mobile':
-  case 'livestock':
-  case 'ironrooftop':
-    s = (x) => (x === 255) ? -1 : lin(ea_districts[x][v]);
+  case 'key':
+    s = (x) => (x === 255) ? -1 : lin(ea_districts[x][o]);
     break;
 
   case 'identity':
@@ -184,15 +182,6 @@ async function ea_datasets_tiff_url() {
   else await ea_datasets_tiff(ds, GeoTIFF.fromUrl, `${ea_path_root}data/${ea_ccn3}/${ds.views.heatmaps.url}`);
 
   return ds;
-}
-
-async function ea_datasets_districts_tiff() {
-  await ea_datasets_tiff_url.call(this);
-
-  ea_datasets_collection.forEach(d => {
-    if (['radio', 'mobile', 'livestock', 'ironrooftop'].indexOf(d.id) > -1)
-      d.raster = this.raster;
-  })
 }
 
 function ea_datasets_districts() {

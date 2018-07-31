@@ -143,10 +143,6 @@ function ea_controls(ds) {
   case "poverty":
   case "population":
   case 'windspeed':
-  case "livestock":
-  case 'mobile':
-  case 'ironrooftop':
-  case 'radio':
   case 'nighttime-lights':
     controls.appendChild(ea_controls_range(ds, 'range'));
     controls.appendChild(ea_controls_weight(ds));
@@ -171,12 +167,38 @@ function ea_controls(ds) {
     controls.appendChild(ea_controls_weight(ds));
     break;
 
+  case 'income':
+    controls.appendChild(ea_controls_options(ds));
+    controls.appendChild(ea_controls_range(ds, 'range'));
+    controls.appendChild(ea_controls_weight(ds));
+    break;
+
   default:
     throw `EA Controls: Unknown data id ${ds.id}`;
     break;
   }
 
   return _controls;
+};
+
+function ea_controls_options(ds) {
+  const container = elem(`<div class="control-option"></div>`);
+  const select = elem('<select></select>');
+
+  select.appendChild(elem(`<option selected disabled>Select one...</option>`));
+
+  for (let v of ds.options)
+    select.appendChild(elem(`<option value=${v}>${v}</option>`));
+
+  select.addEventListener('change', function() {
+    ds.views.heatmaps.scale_option = this.value;
+    ea_datasets_active(ds, true);
+  });
+
+  container.appendChild(select);
+  container.appendChild(elem('<div>&nbsp;</div>')); // TODO: remove this.
+
+  return container;
 };
 
 function ea_controls_blur_control_groups(bool) {

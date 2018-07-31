@@ -211,54 +211,19 @@ const ea_datasets_collection = [
     }
   },
   {
-    id: "livestock",
+    id: "income",
+    description: "Income Indicator",
     type: "raster",
-    description: "Livestock",
-    unit: "%",
-
     views: {
       heatmaps: {
         url: "districts.tif",
-        parse: ea_datasets_districts_tiff,
-         scale: 'livestock',
-        clamp: false,
-        domain: [0, 100],
-        color_scale: 'greys',
-        weight: 5,
-      }
-    }
-  },
-  {
-    id: "mobile",
-    type: "raster",
-    description: "Mobile phone ownership",
-    unit: "%",
-
-    views: {
-      heatmaps: {
-        url: "districts.tif",
-        scale: 'mobile',
+        scale: 'key',
         clamp: false,
         domain: [0, 100],
         weight: 5,
       }
-    }
-  },
-  {
-    id: "ironrooftop",
-    type: "raster",
-    description: "Iron Rooftop",
-    unit: "%",
-
-    views: {
-      heatmaps: {
-        url: "districts.tif",
-        scale: 'ironrooftop',
-        clamp: false,
-        domain: [0, 100],
-        weight: 5,
-      }
-    }
+    },
+    options: ['radio', 'livestock', 'mobile', 'ironrooftop'],
   },
   {
     id: "nighttime-lights",

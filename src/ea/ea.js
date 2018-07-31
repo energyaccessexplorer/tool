@@ -1,5 +1,13 @@
 async function ea_init(tree, collection, bounds) {
-  let datasets_layers = location.get_query_param('datasets-layers').split(',');
+  let datasets_layers_param = location.get_query_param('datasets-layers');
+  let datasets_layers;
+
+  if (!datasets_layers_param) {
+    ea_overlord({ type: "init" });
+    datasets_layers = [];
+  }
+
+  else datasets_layers = datasets_layers_param.split(',');
 
   tree.forEach(a => a.subcategories.forEach(b => b.datasets.filter(c => {
     const ds = collection.find(d => d.id === c.id);
@@ -117,24 +125,31 @@ function ea_active_heatmaps(category = 'total') {
 async function ea_overlord(msg) {
   if (!msg) throw "Argument Error: Overlord: I have nothing to do!";
 
-  let mode = location.get_query_param('mode');
-  let heatmaps_layers = location.get_query_param('heatmaps-layers').split(',');
-  let datasets_layers = location.get_query_param('datasets-layers').split(',');
+  let heatmaps_layers;
+  let datasets_layers;
 
-  if (!heatmaps_layers || heatmaps_layers[0] === "") {
+  let mode = location.get_query_param('mode');
+  let heatmaps_layers_param = location.get_query_param('heatmaps-layers');
+  let datasets_layers_param = location.get_query_param('datasets-layers');
+
+  if (!heatmaps_layers_param) {
     heatmaps_layers = ["total", "supply", "demand"];
     history.replaceState(
       null, null,
       location.set_query_param('heatmaps-layers', heatmaps_layers.toString())
     );
+  } else {
+    heatmaps_layers = heatmaps_layers_param.split(',');
   }
 
-  if (!datasets_layers || datasets_layers[0] === "") {
+  if (!datasets_layers_param) {
     datasets_layers = [];
     history.replaceState(
       null, null,
       location.set_query_param('datasets-layers', datasets_layers.toString())
     );
+  } else {
+    datasets_layers = datasets_layers_param.split(',');
   }
 
   if (!mode) {
@@ -143,6 +158,11 @@ async function ea_overlord(msg) {
   }
 
   switch (msg.type) {
+  case "init": {
+    console.log("Overlord: init");
+    break;
+  }
+
   case "mode": {
     var t = msg.target;
 

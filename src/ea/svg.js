@@ -193,7 +193,7 @@ function ea_svg_interval(color_scale, callback1, callback2, end_callback) {
         svgmin = radius + 1,
         svgmax = svgwidth - radius - 1;
 
-  const now = Date.now();
+  const random = Math.random();
 
   const norm = d3.scaleLinear().domain([svgmin, svgmax]).range([0,1]);
 
@@ -202,7 +202,7 @@ function ea_svg_interval(color_scale, callback1, callback2, end_callback) {
 
   const gradient = svg.append("defs")
         .append("linearGradient")
-        .attr("id", `gradient-${now}`)
+        .attr("id", `gradient-${random}`)
         .attr("x1", "0%")
         .attr("y1", "0%")
         .attr("x2", "100%")
@@ -242,7 +242,7 @@ function ea_svg_interval(color_scale, callback1, callback2, end_callback) {
     .attr('height', svgheight - 2);
 
   marked
-    .attr('fill', `url(#gradient-${now})`)
+    .attr('fill', `url(#gradient-${random})`)
     .attr('stroke', 'none')
     .attr('x', 1)
     .attr('y', 1)
@@ -467,7 +467,7 @@ function ea_svg_interval_thingradient(color_scale, callback1, callback2, end_cal
         svgmin = radius + 1,
         svgmax = svgwidth - radius - 1;
 
-  const now = Date.now();
+  const random = Math.random();
 
   const norm = d3.scaleLinear().domain([svgmin, svgmax]).range([0,1]);
 
@@ -476,7 +476,7 @@ function ea_svg_interval_thingradient(color_scale, callback1, callback2, end_cal
 
   const gradient = svg.append("defs")
         .append("linearGradient")
-        .attr("id", `gradient-${now}`)
+        .attr("id", `gradient-${random}`)
         .attr("x1", "0%")
         .attr("y1", "0%")
         .attr("x2", "100%")
@@ -511,7 +511,7 @@ function ea_svg_interval_thingradient(color_scale, callback1, callback2, end_cal
     .attr('height', svgheight + 2);
 
   marked
-    .attr('fill', `url(#gradient-${now})`)
+    .attr('fill', `url(#gradient-${random})`)
     .attr('stroke', 'none')
     .attr('x', 1)
     .attr('y', (svgheight / 2) - 2)

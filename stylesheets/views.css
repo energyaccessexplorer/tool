@@ -1,24 +1,13 @@
-body {
-  overflow: hidden;
-}
-
-#views {
-  position: absolute;
-  display: flex;
-
-  top: 3.5;
-  left: 50%
-}
-
 #views .view {
+  text-align: center;
   font-family: condensed;
-  font-size: 1.7em;
+  font-size: 2em;
   font-weight: bold;
   text-transform: uppercase;
   flex: 1;
   display: block;
   white-space: nowrap;
-  padding: 1em;
+  padding: 0.7em;
   color: var(--the-blue);
   cursor: pointer;
 }

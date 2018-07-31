@@ -10,12 +10,18 @@ function ea_map_setup(bounds) {
   let width, height;
 
   if (w < h) {
-    width = (p.clientWidth - p.querySelector('#controls').clientWidth) * (4/5);
+    width = p.clientWidth -
+      (p.querySelector('#controls').clientWidth +
+       p.querySelector('#layers').clientWidth);
+
     height = (h/w) * width;
   }
 
   else {
-    height = p.clientHeight * (4/5);
+    height = document.querySelector('body').clientHeight -
+      (document.querySelector('nav').clientHeight +
+       document.querySelector('#views').clientHeight);
+
     width = (w/h) * height;
   }
 
@@ -31,6 +37,7 @@ function ea_map_setup(bounds) {
         .appendChild(elem(`<div id="coord-tooltip"></div>`));
 
   ea_canvas = document.querySelector('canvas#plot');
+  ea_canvas.style['width'] = width + "px";
 
   d3.queue()
     .defer(d3.json, `${ea_path_root}lib/${ea_ccn3}-adm0.json`)

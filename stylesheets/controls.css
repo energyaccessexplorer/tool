@@ -1,11 +1,4 @@
 #controls {
-  display: flex;
-
-  color: #f1f1f1;
-  text-align: right;
-
-  z-index: 0;
-
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -14,28 +7,20 @@
 
 .controls {
   position: relative;
-  padding: 1em 0 1em 1em;
-}
-
-.controls .label,
-.controls .weight-label {
-  color: white;
-  font-size: 0.8em;
-}
-
-.controls .weight-label {
-  margin-right: 0.7em;
-  vertical-align: top;
+  background-color: #f1f1f1;
+  border-bottom: solid 1px #d9d9d9;
 }
 
 .controls .label {
-  float: right;
   display: flex;
   justify-content: space-between;
   width: 150px;
-  margin-bottom: 10px;
-  color: white;
   font-size: 0.8em;
+}
+
+.controls .weight-label {
+  font-size: 0.7em;
+  margin-bottom: 0.7em;
 }
 
 .controls .loading {
@@ -50,77 +35,97 @@
 
 .controls .svg-checkbox {
   margin-bottom: -4px;
+  fill: var(--the-blue);
+  transform: scale(0.8);
 }
 
+.control-option,
 .control-group {
   clear: both;
   white-space: nowrap;
+  margin-left: 1.5em;
 }
 
 .controls-category {
   flex: 1 50%;
-
-  min-width: -moz-fit-content;
-  min-width: fit-content;
-  padding: 20px 40px 0 0;
 
   overflow-y: scroll;
   overflow-x: hidden;
 }
 
 .controls-category-title {
-  font-size: 1.6em;
+  font-size: 2em;
   white-space: nowrap;
   text-transform: uppercase;
+  text-align: center;
   font-weight: bold;
   font-family: condensed;
+  padding: 0.5em 0;
+  padding-bottom: 0;
+  color: var(--the-blue);
+  fill: var(--the-blue);
   cursor: pointer;
-}
-
-.controls-category-title:before {
-  content: "\00a0\00a0";
 }
 
 .controls-category-title .triangle {
   display: inline-block;
-  opacity: 0.7;
   transform: scale(1.4);
 }
 
-.controls-subcategory {
-  margin-top: 1em;
+.controls-category-title .triangle svg {
+  vertical-align: middle;
+}
+
+.controls-subcategory-title .triangle {
+  display: inline-block;
+  transform: scale(1.15);
+  margin-left: 5px;
 }
 
 .controls-subcategory-title {
   font-size: 1.3em;
+  font-family: condensed;
   white-space: nowrap;
-  text-transform: capitalize;
-  border-bottom: dashed 1px;
+  text-transform: uppercase;
   box-sizing: border-box;
-  padding: 10px 0;
+  padding: 1em 2em;
+  border-bottom: solid 1px #d9d9d9;
   cursor: pointer;
-}
-
-.controls-subcategory-title:before {
-  content: "\00a0\00a0";
 }
 
 .controls-dataset-header {
   margin-bottom: 10px;
+  cursor: pointer;
+  padding-top: 1em;
+  padding-bottom: 1em;
+}
+
+.controls-dataset-content {
+  background-color: white;
+  box-sizing: border-box;
+  padding-top: 1em;
+  padding-bottom: 1em;
+}
+
+.controls-dataset-header,
+.controls-dataset-content {
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+}
+
+.controls-dataset-description,
+.controls-dataset-header svg,
+.controls-dataset-unit {
+  vertical-align: middle;
 }
 
 .controls-dataset-description {
   text-align: right;
   white-space: nowrap;
-  color: white;
-}
-
-.controls-dataset-description:before {
-  content: "\00a0\00a0";
+  margin: auto 0.5em;
 }
 
 .controls-dataset-unit {
-  color: white;
   margin-right: 1em;
 }
 
@@ -128,14 +133,22 @@
   cursor: pointer;
 }
 
-#supply {
-  background-color: var(--the-yellow);
-  color: var(--the-blue);
-  fill: var(--the-blue);
+#controls-preset {
+  border: none;
+  width: 100%;
+
+  font-size: 2em;
+  padding: 0.7em;
+  background-color: white;
+  font-family: condensed;
+  font-weight: bold;
+  text-transform: uppercase;
+
+  appearance: none !important;
+  -moz-appearance: none !important;
+  -webkit-appearance: none !important;
 }
 
-#demand {
-  background-color: var(--the-blue);
-  color: var(--the-yellow);
-  fill: var(--the-yellow);
+#supply, #demand {
+  flex: 1 50%;
 }

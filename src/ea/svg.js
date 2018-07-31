@@ -232,7 +232,7 @@ function ea_svg_interval(color_scale, callback1, callback2, end_callback) {
     .attr('height', svgheight + 2);
 
   gutter
-    .attr('stroke', 'white')
+    .attr('stroke', 'none')
     .attr('fill', 'none')
     .attr('x', 1)
     .attr('y', 1)

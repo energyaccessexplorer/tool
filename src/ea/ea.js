@@ -156,6 +156,8 @@ async function ea_overlord(msg) {
           (typeof x.views.polygons !== 'undefined') ? ea_map_unload(ea_map, x.id) : null;
       });
 
+      ea_controls_blur_control_groups(false);
+
       ea_canvas_plot(ea_analysis(ea_active_heatmaps(heatmaps_layers[0])));
     }
 
@@ -170,6 +172,8 @@ async function ea_overlord(msg) {
             x.views.polygons.parse.call(x);
         }
       });
+
+      ea_controls_blur_control_groups(true);
 
       ea_canvas_plot(ea_dummy); // TODO: this is wrong.
     }
@@ -228,6 +232,8 @@ async function ea_overlord(msg) {
   case "sort": {
     if (mode === "heatmaps") {
       ea_canvas_plot(ea_analysis(ea_active_heatmaps(msg.layers[0])));
+
+      ea_controls_mingle(msg.layers);
 
       history.replaceState(
         null, null,

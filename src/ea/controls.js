@@ -41,14 +41,18 @@ function ea_controls_collapse_category(catel, show) {
     ctr.innerHTML = ea_ui_collapse_triangle('s');
 
     subcatel.style['display'] = 'none';
-    cti.style['transform'] = "rotate(-90deg) translate(-2em)";
     catel.style['padding-right'] = "0";
   }
 };
 
 function ea_controls_tree(tree, collection) {
   const ctel = document.querySelector('#controls')
-  ctel.style['height'] = `calc(${window.innerHeight}px - 3.5em)`;
+  const height = window.innerHeight - (
+    document.querySelector('nav').clientHeight +
+    document.querySelector('#controls-preset').clientHeight
+  );
+
+  ctel.style['height'] = `${height}px`;
 
   tree.forEach(a => {
     ctel.appendChild(elem(`
@@ -70,7 +74,7 @@ function ea_controls_tree(tree, collection) {
 <div id=${b.name} class="controls-subcategory">
   <div class="controls-subcategory-title">
     ${b.name}
-    <span class="collapse">${ea_ui_collapse_triangle('se')}</span>
+    <span class="collapse triangle">${ea_ui_collapse_triangle('se')}</span>
   </div>
   <div class="controls-container"></div>
 </div>`));
@@ -94,13 +98,34 @@ function ea_controls_tree(tree, collection) {
 function ea_controls_elem(ds) {
   const controls = elem(`
 <div id="controls-${ds.id}" class="controls">
-  <div class="controls-dataset-header">
-    <span class="controls-dataset-description">${ds.description}</span>
-  </div>
+  <div class="controls-dataset-header"></div>
+  <div class="controls-dataset-content"></div>
 </div>`);
 
+  const header = controls.querySelector('.controls-dataset-header');
+
+  let button;
+
+  header.appendChild(
+    button = ea_controls_active(
+      ds,
+      (v) => ea_datasets_active(ds,v)
+    )
+  );
+
+  header.addEventListener('mouseup', function(e) {
+    if (e.target !== button) {
+      let event = document.createEvent('HTMLEvents');
+      event.initEvent('click', true, true);
+
+      button.dispatchEvent(event);
+    }
+  });
+
+  header.appendChild(elem(`<span class="controls-dataset-description">${ds.description}</span>`));
+
   if (ds.unit) {
-    controls.querySelector('.controls-dataset-header')
+    header
       .appendChild(elem(`<span class="controls-dataset-unit small">(${ds.unit})</span>`));
   }
 
@@ -108,14 +133,10 @@ function ea_controls_elem(ds) {
 };
 
 function ea_controls(ds) {
-  const controls = ea_controls_elem(ds);
+  const _controls = ea_controls_elem(ds);
+  const controls = _controls.querySelector('.controls-dataset-content');
 
-  controls.querySelector('.controls-dataset-header').appendChild(
-    ea_controls_active(
-      ds.active,
-      (v) => ea_datasets_active(ds,v)
-    )
-  );
+  controls.style['display'] = ds.active ? '' : 'none';
 
   switch (ds.id) {
   case "ghi":
@@ -127,7 +148,7 @@ function ea_controls(ds) {
   case 'ironrooftop':
   case 'radio':
   case 'nighttime-lights':
-    controls.appendChild(ea_controls_range(ds));
+    controls.appendChild(ea_controls_range(ds, 'range'));
     controls.appendChild(ea_controls_weight(ds));
     break;
 
@@ -146,7 +167,7 @@ function ea_controls(ds) {
   case "hydro":
   case "facilities":
   case "powerplants":
-    controls.appendChild(ea_controls_range(ds));
+    controls.appendChild(ea_controls_range(ds, 'proximity'));
     controls.appendChild(ea_controls_weight(ds));
     break;
 
@@ -155,20 +176,47 @@ function ea_controls(ds) {
     break;
   }
 
-  return controls;
+  return _controls;
 };
 
-function ea_controls_active(active, callback) {
-  return ea_svg_checkbox(active, callback);
-}
+function ea_controls_blur_control_groups(bool) {
+  const contel = document.querySelectorAll('.controls-dataset-content');
 
-function ea_controls_range(ds) {
+  contel.forEach((c,i) => {
+    if (c) {
+      c.style['opacity'] = bool ? 0.1 : 1;
+      c.style['pointer-events'] = bool ? 'none' : '';
+    }
+  });
+};
+
+function ea_controls_active(ds, callback) {
+  return ea_svg_checkbox(ds.active, (s) => {
+    const contel = document.querySelector(`.controls#controls-${ds.id}`);
+    if (!contel) return;
+
+    const cs = contel.querySelectorAll('.controls-dataset-content');
+
+    cs.forEach((c,i) => {
+      if (s) c.style['display'] = '';
+      else c.style['display'] = 'none';
+    });
+
+    callback(s);
+  });
+};
+
+function ea_controls_range(ds, label) {
   function update_range_value(x,i,el) {
     el.innerText = domain[i] = range_norm(x).toFixed(0);
     ds.tmp_domain = domain;
-  }
+  };
 
-  const container = elem(`<div class="controls-group"></div>`);
+  const container = elem(`
+<div class="control-group">
+  <div class="weight-label">${label}:</div>
+</div>`);
+
   const d = ds.views.heatmaps.domain
 
   const range_norm = d3.scaleLinear().domain([0,1]).range(d);
@@ -207,7 +255,7 @@ function ea_controls_weight(ds) {
 
   const container = elem(`
 <div class="control-group">
-  <span class="weight-label">weight</span>
+  <div class="weight-label">weight:</div>
 </div>`);
 
   const l = elem(`
@@ -276,4 +324,17 @@ function ea_controls_steps(ds) {
   container.appendChild(l);
 
   return container;
+};
+
+function ea_controls_mingle(list) {
+  let ll = list.slice(0);
+  ll.remove('total');
+
+  for (let i = 0; i < list.length; i++) {
+    let l = list[i];
+    let x = document.querySelector(`#${l}`);
+
+    if (x)
+      ea_controls_collapse_category(x, (ll.indexOf(l) === 0 || (list[0] === 'total')));
+  }
 };

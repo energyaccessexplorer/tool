@@ -1,35 +1,8 @@
 #maparea {
-  position: relative;
-  width: auto;     /* will be changed by JS */
-  height: auto;    /* will be changed by JS */
-  padding: 0;
-  margin: auto;
   background-color: #333;
 }
 
-.center {
-  margin: auto;
-  overflow: hidden;
-}
-
-div#mapbox-container,
-canvas#plot,
-svg#svg-map,
-svg#svg-mask {
-  position: absolute;
-  top: 0;
-  left: 0;
-
-  width: 100%;
-  height: 100%;
-
-  margin: 0;
-  padding: 0;
-}
-
 canvas#plot {
-  margin: auto;
-  /* filter: blur(5px); */
   pointer-events: none;
 }
 
@@ -39,10 +12,6 @@ svg#svg-map {
 
 svg#svg-mask {
   pointer-events: none;
-}
-
-#mapbox-container {
-  z-index: 0;
 }
 
 #coord-tooltip {

@@ -1,27 +1,11 @@
-.eai {
-  background-color: #1C4478;
-  margin: 2px;
-  color: white;
-  padding: 0.5em;
-  line-height: 1.8em;
-
-  white-space: nowrap;
-  text-transform: uppercase;
-  font-weight: bold;
-  font-family: condensed;
-}
-
-.thing {
-  font-size: 0.6em;
+#layers-title {
   text-align: center;
-  line-height: 1.5em;
-}
-
-#layers {
-  position: absolute;
-  bottom: 5px;
-  right: 5px;
-  width: 350px;
+  font-family: condensed;
+  font-size: 2em;
+  font-weight: bold;
+  text-transform: uppercase;
+  padding: 0.7em;
+  color: var(--the-blue);
 }
 
 #layers-list {
@@ -149,4 +133,17 @@
 
 .layers-element-descriptor {
 
+}
+
+.eai {
+  background-color: #1C4478;
+  margin: 2px;
+  color: white;
+  padding: 0.5em;
+  line-height: 1.8em;
+
+  white-space: nowrap;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-family: condensed;
 }

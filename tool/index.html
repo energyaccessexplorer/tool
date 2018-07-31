@@ -10,6 +10,8 @@
 
     <link href="/stylesheets/style.css" rel="stylesheet" />
     <link href="/stylesheets/nav.css" rel="stylesheet" />
+    <link href="/maps-and-data/stylesheets/layout.css" rel="stylesheet" />
+    <link href="/maps-and-data/stylesheets/playground.css" rel="stylesheet" />
     <link href="/maps-and-data/stylesheets/controls.css" rel="stylesheet" />
     <link href="/maps-and-data/stylesheets/maparea.css" rel="stylesheet" />
     <link href="/maps-and-data/stylesheets/layers.css" rel="stylesheet" />
@@ -49,11 +51,19 @@
     </nav>
 
     <div id="playground">
-      <div id="views"></div>
+      <div id="controls-wrapper">
+        <select id="controls-preset">
+          <option>Off-grid developer</option>
+          <option>Rural Electrification Agency</option>
+          <option>Development Finance Institution</option>
+        </select>
 
-      <div id="controls"></div>
+        <div id="controls"></div>
+      </div>
 
-      <div class="center">
+      <div id="visual">
+        <div id="views"></div>
+
         <div id="maparea">
           <div id="mapbox-container"></div>
           <canvas id="plot"></canvas>
@@ -63,6 +73,8 @@
       </div>
 
       <div id="layers">
+        <div id="layers-title">Layers</div>
+
         <ul id="layers-list"></ul>
       </div>
     </div>

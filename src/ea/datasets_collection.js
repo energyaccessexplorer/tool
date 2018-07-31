@@ -205,7 +205,7 @@ const ea_datasets_collection = [
       heatmaps: {
         url: "population.tif",
         clamp: true,
-        domain: [10, 6000],
+        domain: [0, 5000],
         weight: 5,
       }
     }

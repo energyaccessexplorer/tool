@@ -150,6 +150,7 @@ function ea_map_svg(svg, topofile, name, options) {
 
       if (typeof ea_datasets_collection === 'undefined') return;
 
+      if (location.get_query_param('mode') === 'datasets')
       ea_datasets_collection
         .filter(x => x.active && x.features)
         .forEach(ds => {

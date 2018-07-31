@@ -148,14 +148,6 @@ function ea_controls(ds) {
     controls.appendChild(ea_controls_weight(ds));
     break;
 
-  case "transmission-lines":
-    controls.appendChild(ea_controls_steps(ds));
-    break;
-
-  case "transmission-lines-polygon":
-    controls.appendChild(ea_controls_steps(ds));
-    break;
-
   case "schools":
   case "minigrids":
   case "crops":
@@ -163,6 +155,7 @@ function ea_controls(ds) {
   case "hydro":
   case "facilities":
   case "powerplants":
+  case "transmission-lines":
     controls.appendChild(ea_controls_range(ds, 'proximity'));
     controls.appendChild(ea_controls_weight(ds));
     break;

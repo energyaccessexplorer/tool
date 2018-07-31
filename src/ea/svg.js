@@ -40,8 +40,8 @@ function ea_svg_land_mask(g, o) {
 };
 
 function ea_svg_checkbox(init, callback) {
-  const radius = 5,
-        svgwidth = 34,
+  const radius = 7,
+        svgwidth = 42,
         svgheight = (radius + 1) * 2,
         linewidth = (radius + 1) * 2,
         svgmin = radius + 1,
@@ -63,7 +63,7 @@ function ea_svg_checkbox(init, callback) {
     .style('cursor', 'pointer');
 
   gutter
-    .attr('stroke', 'white')
+    .attr('stroke', 'none')
     .attr('x', 1)
     .attr('y', 1)
     .attr('rx', radius)
@@ -76,30 +76,35 @@ function ea_svg_checkbox(init, callback) {
     .attr('cy', svgheight/2)
     .attr('cx', svgmin)
     .attr('stroke', 'white')
-    .attr('stroke-width', 1);
+    .attr('stroke-width', 0.5);
 
   text
-    .attr('y', svgheight - (radius/2) - 1)
-    .attr('font-size', (radius * 2) - 2.5)
+    .attr('y', svgheight - (radius/2) - 0.5)
+    .attr('font-size', (radius * 2) - 3.5)
     .attr('font-weight', "bold")
     .text("OFF");
 
-  function change(s,init) {
+  function change(s,i) {
     c1.attr('cx', (s ? svgmax : svgmin));
 
     gutter
-      .style('fill', (s ? 'white' : 'none'))
+      .style('fill', (s ? '#1c4478' : 'white'))
+
+    c1
+      .style('fill', (s ? 'white' : '#1c4478'))
+      .style('stroke', (s ? '#1c4478' : 'white'))
 
     text
       .attr('x', (s ? (svgmin - 2) : svgmax - (radius * 2) - 4))
+      .style('fill', (s ? 'white' : '#1c4478'))
       .text((s ? "ON" : "OFF"))
 
-    if (typeof callback === 'function' && !init) callback(s);
+    if (typeof callback === 'function' && !i) callback(s);
   }
 
   svg.on('click', () => change(status = !status));
 
-  change(status, true);
+  change(status, init);
 
   return svg.node();
 };

@@ -11,7 +11,7 @@ function ea_controls_collapse_subcategory(conel, subel) {
     conel.style['display'] = 'none';
     c.innerHTML = ea_ui_collapse_triangle('ne');
   }
-}
+};
 
 function ea_controls_collapse_category(catel, show) {
   if (!catel) {
@@ -44,7 +44,7 @@ function ea_controls_collapse_category(catel, show) {
     cti.style['transform'] = "rotate(-90deg) translate(-2em)";
     catel.style['padding-right'] = "0";
   }
-}
+};
 
 function ea_controls_tree(tree, collection) {
   const ctel = document.querySelector('#controls')
@@ -89,7 +89,7 @@ function ea_controls_tree(tree, collection) {
       });
     });
   });
-}
+};
 
 function ea_controls_elem(ds) {
   const controls = elem(`
@@ -105,7 +105,7 @@ function ea_controls_elem(ds) {
   }
 
   return controls;
-}
+};
 
 function ea_controls(ds) {
   const controls = ea_controls_elem(ds);
@@ -156,7 +156,7 @@ function ea_controls(ds) {
   }
 
   return controls;
-}
+};
 
 function ea_controls_active(active, callback) {
   return ea_svg_checkbox(active, callback);
@@ -200,7 +200,7 @@ function ea_controls_range(ds) {
   container.appendChild(l);
 
   return container;
-}
+};
 
 function ea_controls_weight(ds) {
   const weights = Array.apply(null, Array(5)).map((_, i) => i + 1);
@@ -238,7 +238,7 @@ function ea_controls_weight(ds) {
   container.appendChild(l);
 
   return container;
-}
+};
 
 function ea_controls_steps(ds) {
   const container = elem(`<div class="control-group"></div>`);
@@ -276,4 +276,4 @@ function ea_controls_steps(ds) {
   container.appendChild(l);
 
   return container;
-}
+};

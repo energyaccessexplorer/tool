@@ -42,7 +42,7 @@ async function ea_init(tree, collection, bounds) {
   })();
 
   ea_ui_app_loading(false);
-}
+};
 
 /*
  * An analysis is really a new dataset "ds" consisting of a selection of
@@ -105,14 +105,14 @@ function ea_analysis(collection) {
   console.log("Finished ea_analysis in:", performance.now() - t0);
 
   return ds;
-}
+};
 
 function ea_active_heatmaps(category = 'total') {
   var cat = d => category === 'total' ? true : d.category === category;
 
   return ea_datasets_collection
     .filter(d => d.active && cat(d)); // && d.raster
-}
+};
 
 async function ea_overlord(msg) {
   if (!msg) throw "Argument Error: Overlord: I have nothing to do!";
@@ -175,7 +175,7 @@ async function ea_overlord(msg) {
     }
 
     else {
-      throw `Argument Error: Overlord: Could set find the mode ${mode}`;
+      throw `Argument Error: Overlord: Could not set/find the mode '${mode}'.`;
     }
 
     history.replaceState(null, null, location.set_query_param('mode', t));
@@ -209,7 +209,7 @@ async function ea_overlord(msg) {
     }
 
     else {
-      throw `Argument Error: Overlord: Could set the mode ${mode}`;
+      throw `Argument Error: Overlord: Could not set the mode ${mode}`;
     }
 
     history.replaceState(
@@ -254,4 +254,4 @@ async function ea_overlord(msg) {
   default:
     throw `Overlord: I don't know message type '${msg.type}'`
   }
-}
+};

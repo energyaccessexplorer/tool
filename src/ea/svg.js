@@ -9,7 +9,7 @@ function ea_svg_land_mask(g, o) {
         .attr("width", o.width)
         .attr("height", o.height);
 
-const mask = el
+  const mask = el
       .append("defs")
       .append("mask")
       .attr("id", "country-mask");
@@ -37,7 +37,7 @@ const mask = el
     .attr("mask", "url(#country-mask)")
     .style("fill", "#f8f8f8")
     .style("stroke", 'none');
-}
+};
 
 function ea_svg_checkbox(init, callback) {
   const radius = 5,
@@ -102,7 +102,7 @@ function ea_svg_checkbox(init, callback) {
   change(status, true);
 
   return svg.node();
-}
+};
 
 function ea_svg_range_steps(steps, init, drag_callback, end_callback, is_weight) {
   const radius = (is_weight ? 5 : 6),
@@ -178,7 +178,7 @@ function ea_svg_range_steps(steps, init, drag_callback, end_callback, is_weight)
   dragged(denorm(init));
 
   return svg.node();
-}
+};
 
 function ea_svg_interval(color_scale, callback1, callback2, end_callback) {
   const radius = 6,
@@ -300,7 +300,7 @@ function ea_svg_interval(color_scale, callback1, callback2, end_callback) {
   drag_callback(c2, svgmax, svgmin, svgmax - svgmin, callback2);
 
   return svg.node();
-}
+};
 
 function ea_svg_pie(container_id, data, outer, inner, colors, inner_text, create = true) {
   const width =  outer * 2,

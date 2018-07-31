@@ -405,3 +405,51 @@ function ea_svg_pie(container_id, data, outer, inner, colors, inner_text, create
     path: path
   };
 };
+
+function ea_svg_symbol(sym, cls, size) {
+  const container = d3.select(document.createElementNS(d3.namespaces.svg, "svg"))
+        .attr("width", size)
+        .attr("height", size);
+
+  let s = null;
+
+  switch (sym) {
+  case 'triangle':
+    s = d3.symbolTriangle;
+    break;
+
+  case 'wye':
+    s = d3.symbolWye;
+    break;
+
+  case 'star':
+    s = d3.symbolStar;
+    break;
+
+  case 'square':
+    s = d3.symbolSquare;
+    break;
+
+  case 'cross':
+    s = d3.symbolCross;
+    break;
+
+  case 'circle':
+  default:
+    s = d3.symbolCircle;
+    break;
+  }
+
+  const symbol = d3.symbol()
+        .size((size**2) / 4)
+        .type((d) => s);
+
+  container
+    .append('path')
+    .attr('class', cls)
+    .attr('d', symbol)
+    .attr('transform', `translate(${size/2}, ${size/2})`)
+    .attr('stroke-width', 1);
+
+  return container.node();
+};

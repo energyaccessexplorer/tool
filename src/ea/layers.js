@@ -73,6 +73,9 @@ function ea_layers_dataset_elem(ds) {
     ea_ui_flash('info', "Info:", ds.description);
   });
 
+  if (ds.views.polygons && ds.views.polygons.symbol)
+    d.querySelector('.layers-element-descriptor').appendChild(ea_svg_symbol(ds.views.polygons.symbol, ds.id, 36));
+
   return d;
 }
 

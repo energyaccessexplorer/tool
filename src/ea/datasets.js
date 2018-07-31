@@ -43,6 +43,8 @@ async function ea_datasets_load(ds, t) {
 
   await ds.views.heatmaps.parse.call(ds);
 
+  ds.color_scale_svg = ea_svg_color_gradient(ds.color_scale_fn);
+
 	ea_ui_dataset_loading(ds, false);
 }
 

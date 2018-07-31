@@ -406,6 +406,59 @@ function ea_svg_pie(container_id, data, outer, inner, colors, inner_text, create
   };
 };
 
+function ea_svg_color_gradient(color_scale) {
+  const radius = 6,
+        svgwidth = 280,
+        svgheight = (radius * 2) + 2,
+        linewidth = radius * 2,
+        svgmin = radius + 1,
+        svgmax = svgwidth - radius - 1;
+
+  const random = Math.random();
+
+  const norm = d3.scaleLinear().domain([svgmin, svgmax]).range([0,1]);
+
+  const svg = d3.select(document.createElementNS(d3.namespaces.svg, "svg"))
+        .attr('class', 'svg-interval');
+
+  const gradient = svg.append("defs")
+        .append("linearGradient")
+        .attr("id", `gradient-${random}`)
+        .attr("x1", "0%")
+        .attr("y1", "0%")
+        .attr("x2", "100%")
+        .attr("y2", "0%")
+        .attr("spreadMethod", "pad");
+
+  const cr = color_scale().range();
+  const cd = color_scale().domain();
+
+  cr.forEach((v,i) => {
+    gradient.append("stop")
+      .attr("offset", `${cd[i] * 100}%`)
+      .attr("stop-color", v)
+      .attr("stop-opacity", 1);
+  });
+
+  const g = svg.append('g');
+
+  const marked = g.append('rect');
+
+  svg
+    .attr('width', svgwidth + 2)
+    .attr('height', svgheight + 2);
+
+  marked
+    .attr('fill', `url(#gradient-${random})`)
+    .attr('stroke', 'none')
+    .attr('x', 1)
+    .attr('y', 1)
+    .attr('width', svgwidth - 2)
+    .attr('height', svgheight - 2);
+
+  return svg.node();
+};
+
 function ea_svg_symbol(sym, cls, size) {
   const container = d3.select(document.createElementNS(d3.namespaces.svg, "svg"))
         .attr("width", size)

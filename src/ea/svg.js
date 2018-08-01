@@ -639,6 +639,10 @@ function ea_svg_symbol(sym, cls, size) {
     s = d3.symbolCross;
     break;
 
+  case 'diamond':
+    s = d3.symbolDiamond;
+    break;
+
   case 'circle':
   default:
     s = d3.symbolCircle;

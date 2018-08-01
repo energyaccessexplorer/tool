@@ -72,7 +72,7 @@ const ea_datasets_collection = [
     views: {
       polygons: {
         endpoint: 'envelope_mines',
-        symbol: "wye",
+        symbol: "diamond",
       },
 
       heatmaps: {
@@ -114,6 +114,7 @@ const ea_datasets_collection = [
     views: {
       polygons: {
         endpoint: 'rpc/merged_transmission_lines_geojson',
+        symbol: "wye",
         parse: async function(v) {
           let ds = ea_datasets_collection.find(d => d.id === 'transmission-lines');
 

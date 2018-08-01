@@ -5,7 +5,7 @@
 }
 
 .mines {
-  fill: darkgray;
+  fill: lightgray;
   fill-opacity: 1;
   stroke: black;
 }
@@ -36,6 +36,6 @@
 
 .transmission-lines {
   fill: black;
-  fill-opacity: 0.3;
+  fill-opacity: 0.7;
   stroke: black;
 }

@@ -38,7 +38,7 @@ async function ea_datasets_load(ds, t) {
   if (ds.views.heatmaps.url && ds.views.heatmaps.url.match(/\.tif$/))
     ds.views.heatmaps.parse = ea_datasets_tiff_url;
 
-  if (ds.views.polygons && ds.views.polygons.symbol)
+  if (ds.views.polygons && ds.views.polygons.symbol && !ds.views.polygons.parse)
     ds.views.polygons.parse = ea_datasets_points;
 
   await ds.views.heatmaps.parse.call(ds);

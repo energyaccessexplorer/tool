@@ -114,7 +114,7 @@ function ea_controls_elem(ds) {
   );
 
   header.addEventListener('mouseup', function(e) {
-    if (e.target !== button) {
+    if (e.target.closest('svg') !== button) {
       let event = document.createEvent('HTMLEvents');
       event.initEvent('click', true, true);
 

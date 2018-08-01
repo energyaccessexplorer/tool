@@ -10,7 +10,7 @@ const ea_datasets_collection = [
     views: {
       heatmaps: {
         url: "ghi.tif",
-        clamp: true,
+        clamp: false,
         domain: [500, 2800],
       }
     }
@@ -19,13 +19,13 @@ const ea_datasets_collection = [
     id: "windspeed",
     type: "raster",
     description: "Windspeed",
-    unit: "?",
+    unit: "m/s",
 
     views: {
       heatmaps: {
         url: "windspeed.tif",
 
-        clamp: true,
+        clamp: false,
         domain: [0, 10],
       }
     }
@@ -34,14 +34,15 @@ const ea_datasets_collection = [
     id: "poverty",
     type: "raster",
     description: "Poverty",
-    unit: "< 2USD/day",
+    unit: "> 2USD/day",
 
     views: {
       heatmaps: {
         url: "poverty.tif",
         clamp: false,
-        domain: [0, 1], //TODO: 0 - 100
-        range: [1, 0],
+        domain: [1, 0],
+        precision: 2,
+        factor: 100,
         weight: 5,
       }
     }
@@ -59,7 +60,7 @@ const ea_datasets_collection = [
       heatmaps: {
         url: "minigrid-distance.tif",
         clamp: false,
-        domain: [0, 250],
+        domain: [250, 0],
         range: [1, 0],
       }
     },
@@ -78,8 +79,7 @@ const ea_datasets_collection = [
       heatmaps: {
         url: "mines-distance.tif",
         clamp: false,
-        domain: [0, 250],
-        range: [1, 0],
+        domain: [250, 0],
       }
     },
   },
@@ -98,7 +98,6 @@ const ea_datasets_collection = [
         url: "schools-distance.tif",
         clamp: false,
         domain: [120, 0],
-        range: [0, 1],
         weight: 3,
       }
     },
@@ -137,7 +136,7 @@ const ea_datasets_collection = [
       heatmaps: {
         url: "transmission-lines-distance.tif",
         clamp: false,
-        domain: [0, 250],
+        domain: [250, 0],
         range: [1, 0],
       }
     },
@@ -145,7 +144,7 @@ const ea_datasets_collection = [
   {
     id: "facilities",
     type: "points",
-    description: "Facilities",
+    description: "Health Facilities",
 
     views: {
       polygons: {
@@ -155,8 +154,7 @@ const ea_datasets_collection = [
       heatmaps: {
         url: "facilities-distance.tif",
         clamp: false,
-        domain: [0, 250],
-        range: [0, 1],
+        domain: [120, 0],
       }
     },
   },
@@ -172,8 +170,8 @@ const ea_datasets_collection = [
       },
       heatmaps: {
         url: "powerplants-distance.tif",
-        clamp: true,
-        domain: [0, 250],
+        clamp: false,
+        domain: [250, 0],
         range: [1, 0],
       }
     },
@@ -181,7 +179,7 @@ const ea_datasets_collection = [
   {
     id: "hydro",
     type: "points",
-    description: "Hydro",
+    description: "Hydro (mini and small)",
 
     views: {
       polygons: {
@@ -190,9 +188,8 @@ const ea_datasets_collection = [
       },
       heatmaps: {
         url: "hydro-distance.tif",
-        clamp: true,
+        clamp: false,
         domain: [0, 250],
-        range: [1, 0],
       }
     },
   },
@@ -205,7 +202,7 @@ const ea_datasets_collection = [
     views: {
       heatmaps: {
         url: "population.tif",
-        clamp: true,
+        clamp: false,
         domain: [0, 5000],
         weight: 5,
       }
@@ -230,12 +227,12 @@ const ea_datasets_collection = [
     id: "nighttime-lights",
     type: "raster",
     description: "Nighttime Lights",
-    unit: "?",
+    unit: "radiance",
 
     views: {
       heatmaps: {
         url: "nighttime-lights.tif",
-        clamp: true,
+        clamp: false,
         domain: [0, 255],
         weight: 5,
       }

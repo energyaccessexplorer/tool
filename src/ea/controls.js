@@ -156,7 +156,7 @@ function ea_controls(ds) {
   case "facilities":
   case "powerplants":
   case "transmission-lines":
-    controls.appendChild(ea_controls_range(ds, 'proximity'));
+    controls.appendChild(ea_controls_range(ds, 'proximity in km'));
     controls.appendChild(ea_controls_weight(ds));
     break;
 
@@ -223,7 +223,8 @@ function ea_controls_active(ds, callback) {
 
 function ea_controls_range(ds, label) {
   function update_range_value(x,i,el) {
-    el.innerText = domain[i] = range_norm(x).toFixed(0);
+    domain[i] = range_norm(x).toFixed(ds.views.heatmaps.precision || 0);
+    el.innerText = Math.round(domain[i] * (ds.views.heatmaps.factor || 1));
     ds.tmp_domain = domain;
   };
 

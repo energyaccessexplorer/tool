@@ -144,13 +144,23 @@ function ea_svg_range_steps(steps, init, drag_callback, end_callback, is_weight)
 
   gutter
     .attr('stroke', (is_weight ? 'none' : 'white'))
-    .attr('fill', (is_weight ? 'white' : 'transparent'))
+    .attr('fill', (is_weight ? 'lightgray' : 'transparent'))
     .attr('x', 1)
     .attr('y', (is_weight ? svgheight/2 : 1))
     .attr('rx', (is_weight ? 0 : radius))
     .attr('ry', (is_weight ? 0 : radius))
     .attr('width', svgwidth - 2)
     .attr('height', (is_weight ? 1 : svgheight - 2));
+
+  steps.forEach(s => {
+    g.append('rect')
+      .attr('x', denorm(s))
+      .attr('y', radius - 2)
+      .attr('fill', 'lightgray')
+      .attr('stroke', 'none')
+      .attr('width', 1)
+      .attr('height', radius + 2);
+  });
 
   c1
     .attr('r', radius)

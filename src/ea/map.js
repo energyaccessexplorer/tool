@@ -260,38 +260,9 @@ function ea_map_load_points(m, features, cls, sym, scale) {
 
   container.selectAll(`path.${ cls }`).remove();
 
-  let s = null;
-
-  switch (sym) {
-  case 'triangle':
-    s = d3.symbolTriangle;
-    break;
-
-  case 'wye':
-    s = d3.symbolWye;
-    break;
-
-  case 'star':
-    s = d3.symbolStar;
-    break;
-
-  case 'square':
-    s = d3.symbolSquare;
-    break;
-
-  case 'cross':
-    s = d3.symbolCross;
-    break;
-
-  case 'circle':
-  default:
-    s = d3.symbolCircle;
-    break;
-  }
-
   const symbol = d3.symbol()
         .size(25 / (scale**2))
-        .type((d) => s);
+        .type((d) => ea_svg_symbol_pick(sym));
 
   container.selectAll(`path.${ cls }`)
     .data(features).enter()

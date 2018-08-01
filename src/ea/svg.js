@@ -616,9 +616,24 @@ function ea_svg_symbol(sym, cls, size) {
         .attr("width", size)
         .attr("height", size);
 
+  const symbol = d3.symbol()
+        .size((size**2) / 4)
+        .type((d) => ea_svg_symbol_pick(sym));
+
+  container
+    .append('path')
+    .attr('class', cls)
+    .attr('d', symbol)
+    .attr('transform', `translate(${size/2}, ${size/2})`)
+    .attr('stroke-width', 1);
+
+  return container.node();
+};
+
+function ea_svg_symbol_pick(str) {
   let s = null;
 
-  switch (sym) {
+  switch (str) {
   case 'triangle':
     s = d3.symbolTriangle;
     break;
@@ -649,16 +664,5 @@ function ea_svg_symbol(sym, cls, size) {
     break;
   }
 
-  const symbol = d3.symbol()
-        .size((size**2) / 4)
-        .type((d) => s);
-
-  container
-    .append('path')
-    .attr('class', cls)
-    .attr('d', symbol)
-    .attr('transform', `translate(${size/2}, ${size/2})`)
-    .attr('stroke-width', 1);
-
-  return container.node();
+  return s;
 };

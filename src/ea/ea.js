@@ -21,6 +21,8 @@ async function ea_init(tree, collection, bounds) {
   })));
 
   collection.forEach(d => {
+    if (d.type === 'mutant')
+      d.views = collection.find(x => x.id === d.hosts[0]).views;
 
     d.weight = d.weight || 2;
     d.active = (datasets_layers.indexOf(d.id) > -1);

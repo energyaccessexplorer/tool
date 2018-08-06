@@ -99,6 +99,44 @@ function ea_controls_tree(tree, collection) {
   });
 };
 
+function ea_controls_mutant_options(ds) {
+  const container = elem(`<div class="control-option"></div>`);
+  const select = elem('<select></select>');
+
+  ds.hosts.forEach(o => {
+    const host = ea_datasets_collection.find(x => x.id === o);
+    select.appendChild(elem(`<option value=${o}>${host.description}</option>`));
+  });
+
+  select.value = ds.hosts[0];
+
+  select.addEventListener('change', async function() {
+    const host = ea_datasets_collection.find(x => x.id === this.value);
+
+    ds.raster = undefined;
+    ds.views = undefined;
+    ds.height = undefined;
+    ds.width = undefined;
+    ds.image = undefined;
+    ds.tiff = undefined;
+
+    ds.views = host.views;
+
+    await host.views.heatmaps.parse.call(host);
+    ds.color_scale_svg = ea_svg_color_gradient(ds.color_scale_fn);
+
+    ds.raster = host.raster;
+    ds.image = host.image;
+
+    ea_datasets_active(ds, true);
+  });
+
+  container.appendChild(select);
+  container.appendChild(elem('<div>&nbsp;</div>')); // TODO: remove this.
+
+  return container;
+};
+
 function ea_controls_elem(ds) {
   const controls = elem(`
 <div id="controls-${ds.id}" class="controls">
@@ -154,7 +192,6 @@ function ea_controls(ds) {
 
   case "schools":
   case "minigrids":
-  case "crops":
   case "mines":
   case "hydro":
   case "facilities":
@@ -167,6 +204,12 @@ function ea_controls(ds) {
   case 'districts':
     controls.appendChild(ea_controls_options(ds));
     controls.appendChild(ea_controls_range(ds, 'range'));
+    break;
+
+  case 'crops':
+    controls.appendChild(ea_controls_mutant_options(ds));
+    controls.appendChild(ea_controls_range(ds, 'range'));
+    controls.appendChild(ea_controls_weight(ds));
     break;
 
   default:

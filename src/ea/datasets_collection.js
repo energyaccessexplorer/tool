@@ -237,4 +237,43 @@ const ea_datasets_collection = [
       }
     }
   },
+  {
+    id: "crops",
+    type: "mutant",
+    description: "Crops",
+    unit: "?",
+    hosts: ["crops-rainfed", "crops-irrigated"],
+
+    views: null
+  },
+  {
+    id: "crops-rainfed",
+    type: "raster",
+    description: "Crops Rainfed",
+    unit: "?",
+
+    views: {
+      heatmaps: {
+        url: "crops-rainfed.tif",
+        clamp: false,
+        domain: [0, 400],
+        weight: 5,
+      }
+    }
+  },
+  {
+    id: "crops-irrigated",
+    type: "raster",
+    description: "Crops Irrigated",
+    unit: "?",
+
+    views: {
+      heatmaps: {
+        url: "crops-irrigated.tif",
+        clamp: false,
+        domain: [0, 400],
+        weight: 5,
+      }
+    }
+  },
 ];

@@ -24,7 +24,6 @@ const ea_datasets_collection = [
     views: {
       heatmaps: {
         url: "windspeed.tif",
-
         clamp: false,
         domain: [0, 10],
       }
@@ -61,7 +60,6 @@ const ea_datasets_collection = [
         url: "minigrid-distance.tif",
         clamp: false,
         domain: [250, 0],
-        range: [1, 0],
       }
     },
   },
@@ -137,7 +135,6 @@ const ea_datasets_collection = [
         url: "transmission-lines-distance.tif",
         clamp: false,
         domain: [250, 0],
-        range: [1, 0],
       }
     },
   },
@@ -172,7 +169,6 @@ const ea_datasets_collection = [
         url: "powerplants-distance.tif",
         clamp: false,
         domain: [250, 0],
-        range: [1, 0],
       }
     },
   },

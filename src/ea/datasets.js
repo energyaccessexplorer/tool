@@ -1,7 +1,7 @@
 function ea_datasets_scale_fn(ds) {
   let s = null;
-  const r = ds.views.heatmaps.range || [0,1];
   const d = ds.views.heatmaps.domain || [0,1];
+  const r = (ds.views.heatmaps.range_invert === true ? [1,0] : [0,1]);
   const t = ds.tmp_domain;
   const v = ds.views.heatmaps.scale;
   const o = ds.views.heatmaps.scale_option;

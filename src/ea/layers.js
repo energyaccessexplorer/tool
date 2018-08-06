@@ -159,6 +159,7 @@ function ea_layers_init() {
         ea_overlord({
           type: "sort",
           layers: e.detail.destination.items.map(i => i.getAttribute('bind')),
+          caller: "ea_layers_init",
         })
       });
 }

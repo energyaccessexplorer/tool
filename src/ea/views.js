@@ -13,6 +13,7 @@ function ea_views_init() {
       ea_overlord({
         type: "mode",
         target: t,
+        caller: "ea_views_init",
       });
     });
 

@@ -3,7 +3,7 @@ async function ea_init(tree, collection, bounds) {
   let datasets_layers;
 
   if (!datasets_layers_param) {
-    ea_overlord({ type: "init" });
+    ea_overlord({ type: "init", caller: "ea_init", });
     datasets_layers = [];
   }
 
@@ -46,7 +46,11 @@ async function ea_init(tree, collection, bounds) {
       if (typeof ds !== 'undefined') await ea_datasets_load(ds);
     }
 
-    ea_overlord({ type: "mode", target: location.get_query_param('mode') });
+    ea_overlord({
+      type: "mode",
+      target: location.get_query_param('mode'),
+      caller: "ea_init_again",
+    });
   })();
 
   ea_ui_app_loading(false);
@@ -124,6 +128,7 @@ function ea_active_heatmaps(category = 'total') {
 
 async function ea_overlord(msg) {
   if (!msg) throw "Argument Error: Overlord: I have nothing to do!";
+  if (typeof msg.caller === 'undefined' || !msg.caller) throw "Argument Error: Overlord: Who is the caller?";
 
   let heatmaps_layers;
   let datasets_layers;

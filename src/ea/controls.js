@@ -255,6 +255,7 @@ function ea_controls_range(ds, label) {
       _ => ea_overlord({
         type: "dataset",
         target: ds,
+        caller: "ea_controls_range",
       })
     )
   );
@@ -291,6 +292,7 @@ function ea_controls_weight(ds) {
         ea_overlord({
           type: "dataset",
           target: ds,
+          caller: "ea_controls_weight",
         });
       },
       ("weight" === "weight")
@@ -329,6 +331,7 @@ function ea_controls_steps(ds) {
         ea_overlord({
           type: "dataset",
           target: ds,
+          caller: "ea_controls_steps",
         });
       },
       ("weight" === false)

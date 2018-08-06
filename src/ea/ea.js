@@ -80,7 +80,7 @@ function ea_analysis(collection) {
     height: tmp.height,
     raster: new Float32Array(tmp.raster.length),
     nodata: -1,
-    color_scale: "jet",
+    color_scale: ea_default_color_scheme,
   };
 
   ea_canvas.style['opacity'] = (collection.length === 0) ? 0 : 1;

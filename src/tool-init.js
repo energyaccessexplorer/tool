@@ -1,5 +1,6 @@
 const ea_path_root = "/maps-and-data/"
 const ea_ccn3 = location.get_query_param('ccn3');
+const ea_default_color_scheme = "electric";
 
 Array.prototype.unique = function() {
   var key, l, o, ref, value;
@@ -101,7 +102,8 @@ require([
   collection.forEach((d) => {
     if (typeof d.views.heatmaps === 'undefined') return;
 
-    d.views.heatmaps.color_scale = 'jet';
+    if (typeof d.views.heatmaps.color_scale === 'undefined')
+      d.views.heatmaps.color_scale = ea_default_color_scheme;
 
     d.color_scale_fn = function() {
       return d3.scaleLinear()

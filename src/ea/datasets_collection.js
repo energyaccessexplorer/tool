@@ -1,5 +1,3 @@
-const ea_default_color_scheme = 'jet';
-
 const ea_datasets_collection = [
   {
     id: "ghi",

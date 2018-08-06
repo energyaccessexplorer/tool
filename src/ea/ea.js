@@ -17,12 +17,33 @@ async function ea_init(tree, collection, bounds) {
       return false;
     }
 
-    ds.views.heatmaps.band = ds.views.heatmaps.band || 0;
-    ds.active = (datasets_layers.indexOf(d.id) > -1);
-    ds.weight = d.weight || 2;
-
     ds.category = cat.name;
   })));
+
+  collection.forEach(d => {
+
+    d.weight = d.weight || 2;
+    d.active = (datasets_layers.indexOf(d.id) > -1);
+
+    if (typeof d.views.heatmaps.color_scale === 'undefined')
+      d.views.heatmaps.color_scale = ea_default_color_scheme;
+
+    if (d.views.heatmaps.url && d.views.heatmaps.url.match(/\.tif$/))
+      d.views.heatmaps.parse = ea_datasets_tiff_url;
+
+    if (d.views && d.views.heatmaps)
+      d.views.heatmaps.band = d.views.heatmaps.band || 0;
+
+    if (d.views.polygons && d.views.polygons.symbol && !d.views.polygons.parse)
+      d.views.polygons.parse = ea_datasets_points;
+
+    d.color_scale_fn = function() {
+      return d3.scaleLinear()
+        .domain(plotty.colorscales[d.views.heatmaps.color_scale].positions)
+        .range(plotty.colorscales[d.views.heatmaps.color_scale].colors)
+        .clamp(d.views.heatmaps.clamp || false);
+    }
+  });
 
   ea_controls_tree(tree, collection);
 

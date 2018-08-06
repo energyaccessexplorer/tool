@@ -97,22 +97,6 @@ require([
     plotty.colorscales['jet'].positions
   );
 
-  const collection = ea_datasets_collection;
-
-  collection.forEach((d) => {
-    if (typeof d.views.heatmaps === 'undefined') return;
-
-    if (typeof d.views.heatmaps.color_scale === 'undefined')
-      d.views.heatmaps.color_scale = ea_default_color_scheme;
-
-    d.color_scale_fn = function() {
-      return d3.scaleLinear()
-        .domain(plotty.colorscales[d.views.heatmaps.color_scale].positions)
-        .range(plotty.colorscales[d.views.heatmaps.color_scale].colors)
-        .clamp(d.views.heatmaps.clamp || false);
-    }
-  });
-
   ea_datasets_districts();
 
   ea_ui_flash = ea_ui_flash_setup();
@@ -124,6 +108,6 @@ require([
   ea_layers_init();
 
   ea_client(`${ea_path_root}data/${ea_ccn3}/specifics.json`, 'GET', null, async (r) => {
-    ea_init(r['category-tree'], collection, r['bounds']);
+    ea_init(r['category-tree'], ea_datasets_collection, r['bounds']);
   })
 });

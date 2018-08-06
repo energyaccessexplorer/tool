@@ -35,12 +35,6 @@ async function ea_datasets_load(ds, t) {
 
   ea_ui_dataset_loading(ds, true);
 
-  if (ds.views.heatmaps.url && ds.views.heatmaps.url.match(/\.tif$/))
-    ds.views.heatmaps.parse = ea_datasets_tiff_url;
-
-  if (ds.views.polygons && ds.views.polygons.symbol && !ds.views.polygons.parse)
-    ds.views.polygons.parse = ea_datasets_points;
-
   await ds.views.heatmaps.parse.call(ds);
 
   ds.color_scale_svg = ea_svg_color_gradient(ds.color_scale_fn);

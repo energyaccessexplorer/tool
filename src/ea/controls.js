@@ -352,13 +352,13 @@ function ea_controls_steps(ds) {
 
 function ea_controls_mingle(list) {
   let ll = list.slice(0);
-  ll.remove('total');
+  ll.remove('eai');
 
   for (let i = 0; i < list.length; i++) {
     let l = list[i];
     let x = document.querySelector(`#${l}`);
 
     if (x)
-      ea_controls_collapse_category(x, (ll.indexOf(l) === 0 || (list[0] === 'total')));
+      ea_controls_collapse_category(x, (ll.indexOf(l) === 0 || (list[0] === 'eai')));
   }
 };

@@ -118,7 +118,7 @@ function ea_layers_heatmaps(list) {
   const layers_list = layers.querySelector('#layers-list');
 
   let lhc = {
-    "total": 'Energy Access Index',
+    "eai": 'Energy Access Index',
     "demand": 'Demand Index',
     "supply": 'Supply Index',
   };

@@ -119,8 +119,8 @@ function ea_analysis(collection) {
   return ds;
 };
 
-function ea_active_heatmaps(category = 'total') {
-  var cat = d => category === 'total' ? true : d.category === category;
+function ea_active_heatmaps(category = 'eai') {
+  var cat = d => category === 'eai' ? true : d.category === category;
 
   return ea_datasets_collection
     .filter(d => d.active && cat(d)); // && d.raster
@@ -138,7 +138,7 @@ async function ea_overlord(msg) {
   let datasets_layers_param = location.get_query_param('datasets-layers');
 
   if (!heatmaps_layers_param) {
-    heatmaps_layers = ["total", "supply", "demand"];
+    heatmaps_layers = ["eai", "supply", "demand"];
     history.replaceState(
       null, null,
       location.set_query_param('heatmaps-layers', heatmaps_layers.toString())

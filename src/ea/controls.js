@@ -160,10 +160,9 @@ function ea_controls(ds) {
     controls.appendChild(ea_controls_weight(ds));
     break;
 
-  case 'income':
+  case 'districts':
     controls.appendChild(ea_controls_options(ds));
     controls.appendChild(ea_controls_range(ds, 'range'));
-    controls.appendChild(ea_controls_weight(ds));
     break;
 
   default:

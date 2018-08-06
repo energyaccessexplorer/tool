@@ -203,8 +203,8 @@ const ea_datasets_collection = [
     }
   },
   {
-    id: "income",
-    description: "Income Indicator",
+    id: "districts",
+    description: "District Indicator",
     type: "raster",
     views: {
       heatmaps: {
@@ -215,7 +215,12 @@ const ea_datasets_collection = [
         weight: 5,
       }
     },
-    options: ['radio', 'livestock', 'mobile', 'ironrooftop'],
+    options: {
+      'mobile': "Mobile ownership",
+      'radio': "Radio ownership",
+      'livestock': "Livestock ownership",
+      'ironrooftop': "Iron Sheet Roofing"
+    },
   },
   {
     id: "nighttime-lights",

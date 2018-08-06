@@ -1,10 +1,10 @@
-function ea_datasets_scale_fn(ds) {
+function ea_datasets_scale_fn(ds, type) {
   let s = null;
   const d = ds.views.heatmaps.domain || [0,1];
-  const r = (ds.views.heatmaps.range_invert === true ? [1,0] : [0,1]);
   const t = ds.tmp_domain;
   const v = ds.views.heatmaps.scale;
   const o = ds.views.heatmaps.scale_option;
+  const r = ((typeof ds.invert !== 'undefined' && ds.invert.indexOf(type) > -1) ? [1,0] : [0,1]);
 
   const lin = d3.scaleLinear()
         .domain(t || d)

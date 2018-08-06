@@ -17,6 +17,7 @@ async function ea_init(tree, collection, bounds) {
       return false;
     }
 
+    ds.invert = d.invert;
     ds.category = cat.name;
   })));
 
@@ -89,8 +90,10 @@ async function ea_init(tree, collection, bounds) {
  * weighed datasets.
  */
 
-function ea_analysis(collection) {
+function ea_analysis(type) {
   const t0 = performance.now();
+
+  const collection = ea_active_heatmaps(type);
 
   // we use a dataset as a template just for code-clarity.
   //
@@ -115,7 +118,7 @@ function ea_analysis(collection) {
 
   if (!collection.length) return tmp;
 
-  const scales = collection.map(d => ea_datasets_scale_fn(d));
+  const scales = collection.map(d => ea_datasets_scale_fn(d, type));
 
   const full_weight = collection
         .reduce((a,c,k) => ((c.datatype === "boolean") ? a : c.weight + a), 0);
@@ -147,11 +150,17 @@ function ea_analysis(collection) {
   return ds;
 };
 
-function ea_active_heatmaps(category = 'eai') {
-  var cat = d => category === 'eai' ? true : d.category === category;
+function ea_active_heatmaps(type) {
+  let cat;
+
+  if (['supply', 'demand'].indexOf(type) > -1)
+    cat = d => d.category === type;
+
+  else if (['eai', 'ani'].indexOf(type) > -1)
+    cat = d => true;
 
   return ea_datasets_collection
-    .filter(d => d.active && cat(d)); // && d.raster
+    .filter(d => d.active && cat(d));
 };
 
 async function ea_overlord(msg) {
@@ -166,7 +175,7 @@ async function ea_overlord(msg) {
   let datasets_layers_param = location.get_query_param('datasets-layers');
 
   if (!heatmaps_layers_param) {
-    heatmaps_layers = ["eai", "supply", "demand"];
+    heatmaps_layers = ["eai", "ani", "supply", "demand"];
     history.replaceState(
       null, null,
       location.set_query_param('heatmaps-layers', heatmaps_layers.toString())
@@ -211,7 +220,7 @@ async function ea_overlord(msg) {
 
       ea_controls_blur_control_groups(false);
 
-      ea_canvas_plot(ea_analysis(ea_active_heatmaps(heatmaps_layers[0])));
+      ea_canvas_plot(ea_analysis(heatmaps_layers[0]));
     }
 
     else if (t === "datasets") {
@@ -255,7 +264,7 @@ async function ea_overlord(msg) {
       if (typeof ds.views.heatmaps !== "undefined")
         (ds.active) ? await ds.views.heatmaps.parse.call(ds) : null
 
-      ea_canvas_plot(ea_analysis(ea_active_heatmaps(heatmaps_layers[0])));
+      ea_canvas_plot(ea_analysis(heatmaps_layers[0]));
     }
 
     else if (mode === "datasets") {
@@ -284,7 +293,7 @@ async function ea_overlord(msg) {
 
   case "sort": {
     if (mode === "heatmaps") {
-      ea_canvas_plot(ea_analysis(ea_active_heatmaps(msg.layers[0])));
+      ea_canvas_plot(ea_analysis(msg.layers[0]));
 
       ea_controls_mingle(msg.layers);
 

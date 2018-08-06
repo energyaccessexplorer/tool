@@ -119,6 +119,7 @@ function ea_layers_heatmaps(list) {
 
   let lhc = {
     "eai": 'Energy Access Index',
+    "ani": 'Assistance Need Index',
     "demand": 'Demand Index',
     "supply": 'Supply Index',
   };

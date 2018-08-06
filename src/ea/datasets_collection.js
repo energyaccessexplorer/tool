@@ -37,7 +37,7 @@ const ea_datasets_collection = [
       heatmaps: {
         url: "poverty.tif",
         clamp: false,
-        domain: [1, 0],
+        domain: [0, 1],
         precision: 2,
         factor: 100,
         weight: 5,
@@ -57,7 +57,7 @@ const ea_datasets_collection = [
       heatmaps: {
         url: "minigrid-distance.tif",
         clamp: false,
-        domain: [250, 0],
+        domain: [0, 250],
       }
     },
   },
@@ -75,7 +75,7 @@ const ea_datasets_collection = [
       heatmaps: {
         url: "mines-distance.tif",
         clamp: false,
-        domain: [250, 0],
+        domain: [0, 250],
       }
     },
   },
@@ -93,7 +93,7 @@ const ea_datasets_collection = [
       heatmaps: {
         url: "schools-distance.tif",
         clamp: false,
-        domain: [120, 0],
+        domain: [0, 120],
         weight: 3,
       }
     },
@@ -149,7 +149,7 @@ const ea_datasets_collection = [
       heatmaps: {
         url: "facilities-distance.tif",
         clamp: false,
-        domain: [120, 0],
+        domain: [0, 120],
       }
     },
   },
@@ -166,7 +166,7 @@ const ea_datasets_collection = [
       heatmaps: {
         url: "powerplants-distance.tif",
         clamp: false,
-        domain: [250, 0],
+        domain: [0, 250],
       }
     },
   },

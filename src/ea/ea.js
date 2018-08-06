@@ -9,14 +9,19 @@ async function ea_init(tree, collection, bounds) {
 
   else datasets_layers = datasets_layers_param.split(',');
 
-  tree.forEach(a => a.subcategories.forEach(b => b.datasets.filter(c => {
-    const ds = collection.find(d => d.id === c.id);
+  tree.forEach(cat => cat.subcategories.forEach(sub => sub.datasets.filter(d => {
+    const ds = collection.find(x => x.id === d.id);
+
+    if (!ds) {
+      console.warn(`Dataset '${d.id}' not found:`, ds);
+      return false;
+    }
 
     ds.views.heatmaps.band = ds.views.heatmaps.band || 0;
-    ds.active = (datasets_layers.indexOf(c.id) > -1);
-    ds.weight = c.weight || 2;
+    ds.active = (datasets_layers.indexOf(d.id) > -1);
+    ds.weight = d.weight || 2;
 
-    ds.category = a.name;
+    ds.category = cat.name;
   })));
 
   ea_controls_tree(tree, collection);

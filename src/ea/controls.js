@@ -88,8 +88,12 @@ function ea_controls_tree(tree, collection) {
       b.datasets.forEach(b => {
         const ds = collection.find(x => x.id === b.id);
 
-        if (ds) conel.appendChild(ea_controls(ds));
-        else console.warn(`'${b.id}' dataset not found`);
+        if (ds) {
+          conel.appendChild(ea_controls(ds));
+        }
+        else {
+          console.warn(`'${b.id}' dataset not found.`);
+        }
       });
     });
   });

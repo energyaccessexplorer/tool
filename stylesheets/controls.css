@@ -94,7 +94,6 @@
 }
 
 .controls-dataset-header {
-  margin-bottom: 10px;
   cursor: pointer;
   padding-top: 1em;
   padding-bottom: 1em;
@@ -114,7 +113,6 @@
 }
 
 .controls-dataset-description,
-.controls-dataset-header svg,
 .controls-dataset-unit {
   vertical-align: middle;
 }
@@ -143,6 +141,9 @@
   font-family: condensed;
   font-weight: bold;
   text-transform: uppercase;
+
+  text-align-last: center;
+  text-align: center;
 
   appearance: none !important;
   -moz-appearance: none !important;

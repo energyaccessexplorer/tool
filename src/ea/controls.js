@@ -178,10 +178,15 @@ function ea_controls_options(ds) {
   const container = elem(`<div class="control-option"></div>`);
   const select = elem('<select></select>');
 
-  select.appendChild(elem(`<option selected disabled>Select one...</option>`));
+  // select.appendChild(elem(`<option selected disabled>Select one...</option>`));
 
-  for (let v of ds.options)
-    select.appendChild(elem(`<option value=${v}>${v}</option>`));
+  const options = Object.keys(ds.options);
+
+  options.forEach((v,i) => {
+    select.appendChild(elem(`<option value=${v}>${ds.options[v]}</option>`));
+  });
+
+  ds.views.heatmaps.scale_option = select.value = options[0]
 
   select.addEventListener('change', function() {
     ds.views.heatmaps.scale_option = this.value;

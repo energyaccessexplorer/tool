@@ -295,7 +295,7 @@ async function ea_overlord(msg) {
     if (mode === "heatmaps") {
       ea_canvas_plot(ea_analysis(msg.layers[0]));
 
-      ea_controls_mingle(msg.layers);
+      // ea_controls_mingle(msg.layers);
 
       history.replaceState(
         null, null,

@@ -58,7 +58,7 @@ async function ea_init(tree, collection, bounds) {
 
     views: {
       heatmaps: {
-        url: "empty_8bui.tif",
+        url: "districts.tif",
         parse: ea_datasets_tiff_url,
         band: 0
       }

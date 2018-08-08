@@ -23,7 +23,8 @@ const ea_datasets_collection = [
       heatmaps: {
         url: "windspeed.tif",
         clamp: false,
-        domain: [0, 10],
+        factor: 1/100,
+        domain: [100, 1700],
       }
     }
   },

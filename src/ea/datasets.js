@@ -12,7 +12,7 @@ function ea_datasets_scale_fn(ds, type) {
 
   switch (v) {
   case 'key':
-    s = (x) => (x === 255) ? -1 : lin(ea_districts[x][o]);
+    s = (x) => (!x || x === ds.nodata) ? -1 : lin(ea_districts[x][o]);
     break;
 
   case 'identity':

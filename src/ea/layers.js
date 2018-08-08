@@ -80,6 +80,13 @@ function ea_layers_dataset_elem(ds) {
 }
 
 function ea_layers_heatmap_elem(t, v) {
+  const svg = ea_svg_color_gradient(_ => {
+    return d3.scaleLinear()
+      .domain(plotty.colorscales[ea_default_color_scheme].positions)
+      .range(plotty.colorscales[ea_default_color_scheme].colors)
+      .clamp(false)
+  });
+
   const d = elem(`
 <li bind="${t}"
     class="layers-element eai">
@@ -97,8 +104,6 @@ function ea_layers_heatmap_elem(t, v) {
     </div>
 
     <div class="layers-element-descriptor">
-      <svg width="280" height="16"><defs><linearGradient id="gradient-eai" x1="0%" y1="0%" x2="100%" y2="0%" spreadMethod="pad"><stop offset="0%" stop-color="#000083" stop-opacity="1"></stop><stop offset="12.5%" stop-color="#003CAA" stop-opacity="1"></stop><stop offset="37.5%" stop-color="#05FFFF" stop-opacity="1"></stop><stop offset="62.5%" stop-color="#FFFF00" stop-opacity="1"></stop><stop offset="87.5%" stop-color="#FA0000" stop-opacity="1"></stop><stop offset="100%" stop-color="#800000" stop-opacity="1"></stop></linearGradient></defs><g><rect fill="url(#gradient-eai)" stroke="none" x="7" y="1" height="12" width="100%"></rect></g></svg>
-
       <div style="display: flex; justify-content: space-between; padding-right: 0.5em; padding-left: 0.5em;">
         <div class="thing">Low</div>
         <div class="thing">Medium</div>
@@ -107,6 +112,8 @@ function ea_layers_heatmap_elem(t, v) {
     </div>
   </div>
 </li>`);
+
+  d.querySelector('.layers-element-descriptor').prepend(svg);
 
   return d;
 }

@@ -34,6 +34,7 @@ function ea_map_setup(bounds, dimensions) {
       ea_svg_land_mask(ea_map, { width: width, height: height });
 
       mapbox_setup(bounds);
+      ea_map.init();
     });
 }
 
@@ -81,6 +82,7 @@ function ea_map_svg(svg, topofile, name, options) {
     geopath: geopath,
     svg: svg,
     map: map,
+    init: null,
     land: land,
     scale: scale,
     width: width,
@@ -90,6 +92,7 @@ function ea_map_svg(svg, topofile, name, options) {
   // ZOOM AND MOUSE EVENTS
   //
   {
+    const comfy = 4/5;
     let mask;
     let tmp_canvas;
     let zt = d3.zoomIdentity;
@@ -118,7 +121,12 @@ function ea_map_svg(svg, topofile, name, options) {
     };
 
     let zoomend = () => {
-      const k = d3.event.transform.k;
+      let k;
+
+      if (d3.event)
+        k = d3.event.transform.k;
+      else
+        k = comfy;
 
       if (typeof ea_datasets_collection === 'undefined') return;
 
@@ -147,7 +155,13 @@ function ea_map_svg(svg, topofile, name, options) {
     };
 
     let zooming = () => {
-      const et = zt = d3.event.transform;
+      let et;
+
+      if (d3.event)
+        et = zt = d3.event.transform;
+      else
+        et = zt = d3.zoomIdentity.translate(width/10, height/10).scale(comfy);
+
       const nw = projection.invert(et.invert([0,0]));
       const se = projection.invert(et.invert([width, height]));
 
@@ -162,7 +176,7 @@ function ea_map_svg(svg, topofile, name, options) {
 
     let zoom = d3.zoom()
         .translateExtent([[0, 0], [width, height]])
-        .scaleExtent([1, 200])
+        .scaleExtent([comfy, 200])
         .on("start", zoomstart)
         .on("zoom", zooming)
         .on("end", zoomend);
@@ -171,6 +185,21 @@ function ea_map_svg(svg, topofile, name, options) {
       .on('mousemove', mousemove)
       .on('mouseenter', mouseenter)
       .on('mouseleave', mouseleave);
+
+    zoom.scaleBy(svg, comfy);
+    zoom.translateTo(svg, _map.width/10, _map.height/10);
+
+    _map.init = () => {
+      var d = d3.dispatch("init");
+
+      d.on("init", _ => {
+        zoomstart();
+        zooming();
+        zoomend();
+      });
+
+      d.call("init");
+    }
   }
 
   return _map;

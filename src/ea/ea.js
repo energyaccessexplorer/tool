@@ -68,6 +68,8 @@ async function ea_init(tree, collection, bounds) {
 
   await ea_dummy.views.heatmaps.parse.call(ea_dummy);
 
+  ea_dummy.raster = new Uint16Array(ea_dummy.width * ea_dummy.height).fill(ea_dummy.nodata);
+
   ea_canvas_setup(ea_dummy);
 
   (async () => {
@@ -237,6 +239,8 @@ async function ea_overlord(msg) {
       });
 
       ea_controls_blur_control_groups(true);
+
+      ea_canvas_plot(ea_dummy); // TODO: should rasters be shown as layers?
     }
 
     else {

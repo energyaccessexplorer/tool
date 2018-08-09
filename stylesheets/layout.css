@@ -4,7 +4,7 @@ body {
 
 #playground {
   display: flex;
-  flex-flow: row wrap;
+  flex-flow: row nowrap;
 
   flex-direction: row;
 
@@ -24,7 +24,7 @@ body {
 }
 
 #visual {
-  flex: 1;
+  flex: 0;
   flex-flow: row nowrap;
 }
 

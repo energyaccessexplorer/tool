@@ -1,43 +1,15 @@
-function ea_map_setup(bounds) {
+function ea_map_setup(bounds, dimensions) {
   const b = bounds;
-  const p = document.querySelector('#playground');
 
   const w = (b[1][0] - b[0][0]);
   const h = (b[1][1] - b[0][1]);
 
   const center = [b[0][0] + (Math.abs(w/2)), b[0][1] + (Math.abs(h/2))];
 
-  let width, height;
-
-  if (w < h) {
-    width = p.clientWidth -
-      (p.querySelector('#controls').clientWidth +
-       p.querySelector('#layers').clientWidth);
-
-    height = (h/w) * width;
-  }
-
-  else {
-    height = document.querySelector('body').clientHeight -
-      (document.querySelector('nav').clientHeight +
-       document.querySelector('#views').clientHeight);
-
-    width = (w/h) * height;
-  }
-
-  const svg = d3.select('#svg-map')
-        .attr('width', width)
-        .attr('height', height);
-
-  const maparea = document.querySelector('#maparea')
-  maparea.style['width'] = width + "px";
-  maparea.style['height'] = height + "px";
-
-  const coord_tooltip = document.querySelector('body')
-        .appendChild(elem(`<div id="coord-tooltip"></div>`));
-
-  ea_canvas = document.querySelector('canvas#plot');
-  ea_canvas.style['width'] = width + "px";
+  const svg = d3.select('#svg-map');
+  svg
+    .attr('width', dimensions.width)
+    .attr('height', dimensions.height);
 
   d3.queue()
     .defer(d3.json, `${ea_path_root}lib/${ea_ccn3}-adm0.json`)
@@ -61,7 +33,7 @@ function ea_map_setup(bounds) {
 
       ea_svg_land_mask(ea_map, { width: width, height: height });
 
-      mapbox_setup(b);
+      mapbox_setup(bounds);
     });
 }
 

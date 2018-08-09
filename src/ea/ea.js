@@ -50,7 +50,8 @@ async function ea_init(tree, collection, bounds) {
 
   ea_controls_tree(tree, collection);
 
-  ea_map_setup(bounds);
+  let dimensions = ea_layout_map();
+  ea_map_setup(bounds, dimensions);
 
   ea_dummy = {
     id: "dummy",

@@ -145,3 +145,30 @@ function ea_ui_flash_setup() {
     flash.addEventListener('click', () => flash.style['display'] = 'none');
   };
 }
+
+function ea_layout_map() {
+  const p = document.querySelector('#playground');
+
+  let width, height;
+
+  width = p.clientWidth -
+    (p.querySelector('#controls').clientWidth +
+     p.querySelector('#layers').clientWidth) + 10;
+
+  height = document.querySelector('#visual').clientHeight
+
+  const coord_tooltip = document.querySelector('body')
+        .appendChild(elem(`<div id="coord-tooltip"></div>`));
+
+  ea_canvas = document.querySelector('canvas#plot');
+  ea_canvas.style['width'] = width + "px";
+
+  const maparea = document.querySelector('#maparea');
+  maparea.style['width'] = width + "px";
+  maparea.style['height'] = height + "px";
+
+  return {
+    width: width,
+    height: height
+  };
+}

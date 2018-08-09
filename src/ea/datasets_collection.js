@@ -24,6 +24,7 @@ const ea_datasets_collection = [
         url: "windspeed.tif",
         clamp: false,
         factor: 1/100,
+        precision: 2,
         domain: [100, 1700],
       }
     }
@@ -38,9 +39,7 @@ const ea_datasets_collection = [
       heatmaps: {
         url: "poverty.tif",
         clamp: false,
-        domain: [0, 1],
-        precision: 2,
-        factor: 100,
+        domain: [0, 100],
         weight: 5,
       }
     }

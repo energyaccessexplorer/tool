@@ -273,9 +273,15 @@ function ea_controls_active(ds, callback) {
 };
 
 function ea_controls_range(ds, label) {
+  const d = ds.views.heatmaps.domain
+
+  const range_norm = d3.scaleLinear().domain([0,1]).range(d);
+  const domain = d.slice(0);
+
   function update_range_value(x,i,el) {
-    domain[i] = range_norm(x).toFixed(ds.views.heatmaps.precision || 0);
-    el.innerText = Math.round(domain[i] * (ds.views.heatmaps.factor || 1));
+    let v = domain[i] = range_norm(x);
+    el.innerText = (v * (ds.views.heatmaps.factor || 1)).toFixed(ds.views.heatmaps.precision || 0);
+
     ds.tmp_domain = domain;
   };
 
@@ -283,11 +289,6 @@ function ea_controls_range(ds, label) {
 <div class="control-group">
   <div class="weight-label">${label}:</div>
 </div>`);
-
-  const d = ds.views.heatmaps.domain
-
-  const range_norm = d3.scaleLinear().domain([0,1]).range(d);
-  const domain = d.slice(0);
 
   const l = elem(`
 <div class="label">

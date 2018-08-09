@@ -236,8 +236,6 @@ async function ea_overlord(msg) {
       });
 
       ea_controls_blur_control_groups(true);
-
-      ea_canvas_plot(ea_dummy); // TODO: this is wrong.
     }
 
     else {

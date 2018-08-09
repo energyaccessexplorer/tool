@@ -148,6 +148,15 @@ function ea_layers_datasets(list) {
   layers_list.innerHTML = "";
 
   ldc.forEach(ds => layers_list.appendChild(ea_layers_dataset_elem(ds)));
+
+  const style = 'style="font-size: smaller; text-align: center;"';
+
+  if (list.length === 0)
+    layers_list.innerHTML = `<pre ${style}>No layers selected.</pre>`;
+
+  else if (typeof ldc.find(i => i.views.polygons) === 'undefined')
+    layers_list.appendChild(elem(`<pre ${style}>No layers with polygons selected.</pre>`));
+
   sortable('#layers-list', 'enable');
 }
 

@@ -51,7 +51,7 @@ const ea_datasets_collection = [
 
     views: {
       polygons: {
-        endpoint: 'envelope_minigrids',
+        endpoint: "envelope_minigrids",
         symbol: "square",
       },
       heatmaps: {
@@ -196,8 +196,8 @@ const ea_datasets_collection = [
     views: {
       heatmaps: {
         url: "population.tif",
-        clamp: false,
-        domain: [0, 5000],
+        clamp: true,
+        domain: [0, 6500],
         weight: 5,
       }
     }
@@ -217,7 +217,7 @@ const ea_datasets_collection = [
     },
     options: {
       'mobile': "Mobile ownership",
-      'radio': "Radio ownership",
+      'radio': "Radio Ownership",
       'livestock': "Livestock ownership",
       'ironrooftop': "Iron Sheet Roofing"
     },
@@ -241,7 +241,7 @@ const ea_datasets_collection = [
     id: "crops",
     type: "mutant",
     description: "Crops",
-    unit: "?",
+    unit: "Metric Tons of Production",
     hosts: ["crops-rainfed", "crops-irrigated"],
 
     views: null
@@ -250,7 +250,7 @@ const ea_datasets_collection = [
     id: "crops-rainfed",
     type: "raster",
     description: "Crops Rainfed",
-    unit: "?",
+    unit: null,
 
     views: {
       heatmaps: {
@@ -265,7 +265,7 @@ const ea_datasets_collection = [
     id: "crops-irrigated",
     type: "raster",
     description: "Crops Irrigated",
-    unit: "?",
+    unit: null,
 
     views: {
       heatmaps: {

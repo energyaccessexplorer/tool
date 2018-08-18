@@ -79,24 +79,6 @@ require([
   window.GeoTIFF = geotiff;
   window.plotty = plotty;
 
-  plotty.addColorScale(
-    "hot-reverse",
-    plotty.colorscales['hot'].colors.slice(0).reverse(),
-    plotty.colorscales['hot'].positions
-  );
-
-  plotty.addColorScale(
-    "yignbu-reverse",
-    plotty.colorscales['yignbu'].colors.slice(0).reverse(),
-    plotty.colorscales['yignbu'].positions
-  );
-
-  plotty.addColorScale(
-    "jet-reverse",
-    plotty.colorscales['jet'].colors.slice(0).reverse(),
-    plotty.colorscales['jet'].positions
-  );
-
   ea_datasets_districts();
 
   ea_ui_flash = ea_ui_flash_setup();

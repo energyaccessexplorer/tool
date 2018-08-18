@@ -128,19 +128,21 @@ function ea_analysis(type) {
 
   for (var i = 0; i < ds.raster.length; i++) {
     const t = collection.reduce((a, c, k, l) => {
+      // On this reduce loop, we 'annihilate' points that come as -1
+      // (or nodata) since we wouldn't know what value to assign for
+      // the analysis. We assume they have been clipped out.
+      //
       if (a === -1) return -1;
 
       const v = c.raster[i];
-      const d = c.domain;
+      if (v === c.nodata) return -1;
 
-      if (c.weight === Infinity)
-        return (v === c.nodata) ? a : scales[k](v) * full_weight;
-
-      let sv = scales[k](v);
-
-      sv = (sv < 0 || sv > 1) ? c.nodata : sv;
-
-      if (sv === c.nodata) return -1;
+      // If the scaling function clamped, the following wont
+      // happend. But if there the values are above our analysis
+      // domain, we assume clipping by setting -1 (nodata).
+      //
+      const sv = scales[k](v);
+      if (sv < 0 || sv > 1) return -1;
 
       return (sv * c.weight) + a;
     }, 0);

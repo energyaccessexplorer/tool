@@ -12,7 +12,7 @@ function ea_datasets_scale_fn(ds, type) {
 
   switch (v) {
   case 'key':
-    s = (x) => (!x || x === ds.nodata) ? -1 : lin(ea_districts[x][o]);
+    s = x => (!x || x === ds.nodata) ? -1 : lin(ea_districts[x][o]);
     break;
 
   case 'identity':
@@ -28,7 +28,7 @@ function ea_datasets_scale_fn(ds, type) {
   }
 
   return s;
-}
+};
 
 async function ea_datasets_load(ds, t) {
   if (!ds.id) throw `Argument Error: ${ds} does not look like a dataset`;
@@ -40,7 +40,7 @@ async function ea_datasets_load(ds, t) {
   ds.color_scale_svg = ea_svg_color_gradient(ds.color_scale_fn);
 
 	ea_ui_dataset_loading(ds, false);
-}
+};
 
 async function ea_datasets_active(ds, v) {
   if (!ds || !ds.id) {
@@ -58,11 +58,11 @@ async function ea_datasets_active(ds, v) {
     target: ds,
     caller: "ea_datasets_active",
   });
-}
+};
 
 function ea_datasets_features(ds) {
   ea_client(ds.endpoint, 'GET', null,
-    (r) => {
+    r => {
       ds.features = r[0]['jsonb_build_object'].features;
 
       ea_map_load_features({
@@ -73,33 +73,35 @@ function ea_datasets_features(ds) {
       });
     }
   );
-}
+};
 
 async function ea_datasets_points() {
   const ds = this;
 
-  const load_em = () => {
-    ea_map_load_points(
-      ea_map,
-      ds.features,
-      ds.id,
-      ds.views.polygons.symbol,
-      1
-    )
-  }
+  const load_em = _ => {
+    ea_map_load_points({
+      map: ea_map,
+      features: ds.features,
+      cls: ds.id,
+      symbol: ds.views.polygons.symbol,
+      scale: 1
+    })
+  };
 
-  if (ds.features) load_em();
+  if (ds.features)
+    load_em();
+
   else
     await ea_client(
       `${ea_settings.database}/${ds.views.polygons.endpoint}`, 'GET', null,
-      (r) => {
+      r => {
         ds.features = r[0]['jsonb_build_object'].features;
         load_em();
       }
     );
 
   return ds;
-}
+};
 
 async function ea_datasets_tiff(ds, method, payload) {
   if (ds.raster) ;
@@ -119,7 +121,7 @@ async function ea_datasets_tiff(ds, method, payload) {
   }
 
   return ds;
-}
+};
 
 function ea_datasets_hexblob(hex) {
   const byteBuf = new Uint8Array(new ArrayBuffer(hex.length/2));
@@ -131,7 +133,7 @@ function ea_datasets_hexblob(hex) {
   // fake_download(blob);
 
   return blob;
-}
+};
 
 async function ea_datasets_tiff_stream() {
   const ds = this;
@@ -140,7 +142,7 @@ async function ea_datasets_tiff_stream() {
   else {
     let data = null;
 
-    await ea_client(`${ea_settings.database}/${ds.endpoint}`, 'GET', null, (r) => data = r);
+    await ea_client(`${ea_settings.database}/${ds.endpoint}`, 'GET', null, r => data = r);
 
     await ea_datasets_tiff(
       ds,
@@ -149,7 +151,7 @@ async function ea_datasets_tiff_stream() {
   }
 
   return ds;
-}
+};
 
 async function ea_datasets_tiff_rpc_stream(v) {
   const ds = this;
@@ -161,7 +163,7 @@ async function ea_datasets_tiff_rpc_stream(v) {
     const payload = { };
     payload[ds.unit] = v || ds.init;
 
-    await ea_client(`${ea_settings.database}/${ds.endpoint}`, 'POST', payload, (r) => data = r);
+    await ea_client(`${ea_settings.database}/${ds.endpoint}`, 'POST', payload, r => data = r);
 
     await ea_datasets_tiff(
       ds,
@@ -170,7 +172,7 @@ async function ea_datasets_tiff_rpc_stream(v) {
   }
 
   return ds;
-}
+};
 
 async function ea_datasets_tiff_url() {
   const ds = this;
@@ -179,13 +181,13 @@ async function ea_datasets_tiff_url() {
   else await ea_datasets_tiff(ds, GeoTIFF.fromUrl, `${ea_path_root}data/${ea_ccn3}/${ds.views.heatmaps.url}`);
 
   return ds;
-}
+};
 
 function ea_datasets_districts() {
   d3.request(`${ea_path_root}/data/${ea_ccn3}/districts-data.csv`)
     .mimeType("text/csv")
-    .response((xhr) => {
-      ea_districts = d3.csvParse(xhr.responseText, (d) => {
+    .response(xhr => {
+      ea_districts = d3.csvParse(xhr.responseText, d => {
         return {
           oid: +d.OBJECTID,
           district: d.District,
@@ -199,4 +201,4 @@ function ea_datasets_districts() {
 
       ea_districts.unshift(null);
     }).get();
-}
+};

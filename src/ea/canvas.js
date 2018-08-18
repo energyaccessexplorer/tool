@@ -5,8 +5,9 @@ function ea_canvas_setup(dummy) {
   ea_canvas.setAttribute("height", i.getHeight());
 
   // STRANGE: force the canvas to 2d...
+  //
   ea_canvas.getContext('2d');
-}
+};
 
 function ea_canvas_draw(et, tmp) {
   if (typeof ea_plot_imagedata === 'undefined' || ea_plot_imagedata === null) return;
@@ -26,7 +27,7 @@ function ea_canvas_draw(et, tmp) {
   ea_plot.ctx.scale(et.k, et.k);
   ea_plot.ctx.drawImage(tmp, 0, 0);
   ea_plot.ctx.restore();
-}
+};
 
 function ea_canvas_plot(ds) {
   if (!ds) return;
@@ -56,4 +57,4 @@ function ea_canvas_plot(ds) {
   tmp_canvas.remove();
 
   return plot;
-}
+};

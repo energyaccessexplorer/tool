@@ -1,10 +1,10 @@
 include default.mk
 
 start:
-	@ static-server -noauth -port ${WEB_PORT}
+	@static-server -noauth -port ${WEB_PORT}
 
 stop:
-	-@lsof -t -i :${WEB_PORT} | xargs kill
+	-@lsof -t -i :${WEB_PORT} | xargs -i kill {}
 
 deploy:
 	sed -i \

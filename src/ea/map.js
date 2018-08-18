@@ -251,7 +251,13 @@ function ea_map_load_features(o) {
   return container;
 }
 
-function ea_map_load_points(m, features, cls, sym, scale) {
+function ea_map_load_points(o) {
+  const m = o.map;
+  const features = o.features;
+  const cls = o.cls;
+  const sym = o.symbol;
+  const scale = o.scale;
+
   if (!scale) scale = 1;
 
   let container = m.map.select(`#${cls}`);

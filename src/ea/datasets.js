@@ -11,20 +11,23 @@ function ea_datasets_scale_fn(ds, type) {
         .range(r)
 
   switch (v) {
-  case 'key':
+  case 'key': {
     s = x => (!x || x === ds.nodata) ? -1 : lin(ea_districts[x][o]);
     break;
+  }
 
-  case 'identity':
+  case 'identity': {
     s = d3.scaleIdentity()
       .domain(t || d)
       .range(r);
     break;
+  }
 
   case 'linear':
-  default:
+  default: {
     s = lin.clamp(ds.views.heatmaps.clamp)
     break;
+  }
   }
 
   return s;

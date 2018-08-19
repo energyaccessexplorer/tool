@@ -110,6 +110,8 @@ const ea_datasets_collection = [
       polygons: {
         endpoint: 'rpc/merged_transmission_lines_geojson',
         symbol: "wye",
+        // this is being overriden:
+        //
         parse: async function(v) {
           let ds = ea_datasets_collection.find(d => d.id === 'transmission-lines');
 

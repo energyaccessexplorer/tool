@@ -103,10 +103,10 @@ async function ea_datasets_points() {
   return ds;
 };
 
-async function ea_datasets_tiff(ds, method, payload) {
+async function ea_datasets_tiff(ds, blob) {
   if (ds.raster) ;
   else {
-    const tiff = await method(payload);
+    const tiff = await GeoTIFF.fromBlob(blob);
     const image = await tiff.getImage();
     const rasters = await image.readRasters();
 
@@ -146,7 +146,6 @@ async function ea_datasets_tiff_stream() {
 
     await ea_datasets_tiff(
       ds,
-      GeoTIFF.fromBlob,
       (await ea_datasets_hexblob(data[0]['tiff'].slice(2))));
   }
 
@@ -167,7 +166,6 @@ async function ea_datasets_tiff_rpc_stream(v) {
 
     await ea_datasets_tiff(
       ds,
-      GeoTIFF.fromBlob,
       (await ea_datasets_hexblob(data[0]['tiff'].slice(2))));
   }
 
@@ -176,9 +174,14 @@ async function ea_datasets_tiff_rpc_stream(v) {
 
 async function ea_datasets_tiff_url() {
   const ds = this;
+  const url = ds.views.heatmaps.url.match('^http') ?
+    ds.views.heatmaps.url :
+    `${ea_path_root}data/${ea_ccn3}/${ds.views.heatmaps.url}`;
 
-  if (ds.raster) ;
-  else await ea_datasets_tiff(ds, GeoTIFF.fromUrl, `${ea_path_root}data/${ea_ccn3}/${ds.views.heatmaps.url}`);
+  await fetch(url)
+    .then(ea_client_check)
+    .then(r => r.blob())
+    .then(b => ea_datasets_tiff(ds, b));
 
   return ds;
 };

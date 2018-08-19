@@ -1,40 +1,37 @@
-function ea_client_connection_errors(err, endpoint) {
-  ea_ui_flash('error', err, endpoint);
-  throw Error(err);
-}
+function ea_client_check(response) {
+  console.log("ea_client_check - response is OK:", response.ok, response);
 
-function ea_client_errors(response) {
-  if (!response.ok) {
-    console.log(response);
-    ea_ui_flash('error', `${response.status}: ${response.statusText}`, response.url);
-    throw Error(response.statusText);
-  }
+  if (response.ok) return response;
 
-  return response;
-}
+  ea_ui_flash('error', `${response.status}: ${response.statusText}`, response.url);
+  throw Error(response.statusText);
+};
 
 async function ea_client(endpoint, method, payload, callback) {
   switch (method) {
-  case "POST":
-		await fetch(endpoint, {
+  case "POST": {
+    const options = {
 			method: 'POST',
 			headers: { "Accept": "application/json", "Content-Type": "application/json" },
 			body: JSON.stringify(payload),
-		})
-      .catch((e) => ea_client_connection_errors(e, endpoint))
-      .then(ea_client_errors)
+		};
+
+		await fetch(endpoint, options)
+      .then(ea_client_check)
       .then(async (r) => await callback(await r.json()));
     break;
+  }
 
-  case "GET":
+  case "GET": {
 		await fetch(endpoint)
-      .catch((e) => ea_client_connection_errors(e, endpoint))
-      .then(ea_client_errors)
-      .then(async (r) => await callback(await r.json()))
+      .then(ea_client_check)
+      .then(async r => await callback(await r.json()))
     break;
+  }
 
-  default:
+  default: {
     throw `Unknown method ${method}`;
     break;
   }
-}
+  }
+};

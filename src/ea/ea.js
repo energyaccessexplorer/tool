@@ -22,29 +22,32 @@ async function ea_init(tree, collection, bounds) {
   })));
 
   collection.forEach(d => {
-    if (d.type === 'mutant')
-      d.views = collection.find(x => x.id === d.hosts[0]).views;
+    if (d.number_type === 'mutant') {
+      let m = collection.find(x => x.id === d.metadata.hosts[0])
+      d.polygons = m.polygons;
+      d.heatmap = m.heatmap;
+    }
 
     d.weight = d.weight || 2;
     d.active = (datasets_layers.indexOf(d.id) > -1);
 
-    if (typeof d.views.heatmaps.color_scale === 'undefined')
-      d.views.heatmaps.color_scale = ea_default_color_scheme;
+    if (typeof d.heatmap.color_scale === 'undefined')
+      d.heatmap.color_scale = ea_default_color_scheme;
 
-    if (d.views.heatmaps.url && d.views.heatmaps.url.match(/\.tif$/))
-      d.views.heatmaps.parse = ea_datasets_tiff_url;
+    if (d.heatmap.url && d.heatmap.url.match(/\.tif$/))
+      d.heatmap.parse = ea_datasets_tiff_url;
 
-    if (d.views && d.views.heatmaps)
-      d.views.heatmaps.band = d.views.heatmaps.band || 0;
+    if (d.heatmap)
+      d.heatmap.band = d.heatmap.band || 0;
 
-    if (d.views.polygons && d.views.polygons.symbol && !d.views.polygons.parse)
-      d.views.polygons.parse = ea_datasets_points;
+    if (d.polygons && d.polygons.symbol && !d.polygons.parse)
+      d.polygons.parse = ea_datasets_points;
 
     d.color_scale_fn = function() {
       return d3.scaleLinear()
-        .domain(plotty.colorscales[d.views.heatmaps.color_scale].positions)
-        .range(plotty.colorscales[d.views.heatmaps.color_scale].colors)
-        .clamp(d.views.heatmaps.clamp || false);
+        .domain(plotty.colorscales[d.heatmap.color_scale].positions)
+        .range(plotty.colorscales[d.heatmap.color_scale].colors)
+        .clamp(d.heatmap.clamp || false);
     }
   });
 
@@ -57,16 +60,14 @@ async function ea_init(tree, collection, bounds) {
     id: "dummy",
     description: "Dummy dataset",
 
-    views: {
-      heatmaps: {
-        url: "districts.tif",
-        parse: ea_datasets_tiff_url,
-        band: 0
-      }
+    heatmap: {
+      url: "districts.tif",
+      parse: ea_datasets_tiff_url,
+      band: 0
     },
   };
 
-  await ea_dummy.views.heatmaps.parse.call(ea_dummy);
+  await ea_dummy.heatmap.parse.call(ea_dummy);
 
   ea_dummy.raster = new Uint16Array(ea_dummy.width * ea_dummy.height).fill(ea_dummy.nodata);
 
@@ -220,7 +221,7 @@ async function ea_overlord(msg) {
         var x;
 
         if (x = ea_datasets_collection.find(d => d.id === i))
-          (typeof x.views.polygons !== 'undefined') ? ea_map_unload(ea_map, x.id) : null;
+          (typeof x.polygons !== 'undefined') ? ea_map_unload(ea_map, x.id) : null;
       });
 
       ea_controls_blur_control_groups(false);
@@ -235,8 +236,8 @@ async function ea_overlord(msg) {
         var x;
 
         if (x = ea_datasets_collection.find(d => d.id === i)) {
-          if (typeof x.views.polygons !== 'undefined')
-            x.views.polygons.parse.call(x);
+          if (typeof x.polygons !== 'undefined')
+            x.polygons.parse.call(x);
         }
       });
 
@@ -266,8 +267,8 @@ async function ea_overlord(msg) {
     if (mode === "heatmaps") {
       ea_layers_heatmaps(heatmaps_layers);
 
-      if (typeof ds.views.heatmaps !== "undefined")
-        (ds.active) ? await ds.views.heatmaps.parse.call(ds) : null
+      if (typeof ds.heatmap !== "undefined")
+        (ds.active) ? await ds.heatmap.parse.call(ds) : null
 
       ea_canvas_plot(ea_analysis(heatmaps_layers[0]));
     }
@@ -275,8 +276,8 @@ async function ea_overlord(msg) {
     else if (mode === "datasets") {
       ea_layers_datasets(datasets_layers);
 
-      if (typeof ds.views.polygons !== "undefined")
-        (ds.active) ? await ds.views.polygons.parse.call(ds) : ea_map_unload(ea_map, ds.id);
+      if (typeof ds.polygons !== "undefined")
+        (ds.active) ? await ds.polygons.parse.call(ds) : ea_map_unload(ea_map, ds.id);
     }
 
     else {

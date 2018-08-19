@@ -103,26 +103,28 @@ function ea_controls_mutant_options(ds) {
   const container = elem(`<div class="control-option"></div>`);
   const select = elem('<select></select>');
 
-  ds.hosts.forEach(o => {
+  ds.metadata.hosts.forEach(o => {
     const host = ea_datasets_collection.find(x => x.id === o);
     select.appendChild(elem(`<option value=${o}>${host.description}</option>`));
   });
 
-  select.value = ds.hosts[0];
+  select.value = ds.metadata.hosts[0];
 
   select.addEventListener('change', async function() {
     const host = ea_datasets_collection.find(x => x.id === this.value);
 
     ds.raster = undefined;
-    ds.views = undefined;
+    ds.polygons = undefined;
+    ds.heatmap = undefined;
     ds.height = undefined;
     ds.width = undefined;
     ds.image = undefined;
     ds.tiff = undefined;
 
-    ds.views = host.views;
+    ds.polygons = host.polygons;
+    ds.heatmap = host.heatmap;
 
-    await host.views.heatmaps.parse.call(host);
+    await host.heatmap.parse.call(host);
     ds.color_scale_svg = ea_svg_color_gradient(ds.color_scale_fn);
 
     ds.raster = host.raster;
@@ -226,16 +228,16 @@ function ea_controls_options(ds) {
 
   // select.appendChild(elem(`<option selected disabled>Select one...</option>`));
 
-  const options = Object.keys(ds.options);
+  const options = Object.keys(ds.metadata.options);
 
   options.forEach((v,i) => {
-    select.appendChild(elem(`<option value=${v}>${ds.options[v]}</option>`));
+    select.appendChild(elem(`<option value=${v}>${ds.metadata.options[v]}</option>`));
   });
 
-  ds.views.heatmaps.scale_option = select.value = options[0]
+  ds.heatmap.scale_option = select.value = options[0];
 
   select.addEventListener('change', function() {
-    ds.views.heatmaps.scale_option = this.value;
+    ds.heatmap.scale_option = this.value;
     ea_datasets_active(ds, true);
   });
 
@@ -273,14 +275,14 @@ function ea_controls_active(ds, callback) {
 };
 
 function ea_controls_range(ds, label) {
-  const d = ds.views.heatmaps.domain
+  const d = [ds.heatmap.domain.min, ds.heatmap.domain.max];
 
   const range_norm = d3.scaleLinear().domain([0,1]).range(d);
   const domain = d.slice(0);
 
   function update_range_value(x,i,el) {
     let v = domain[i] = range_norm(x);
-    el.innerText = (v * (ds.views.heatmaps.factor || 1)).toFixed(ds.views.heatmaps.precision || 0);
+    el.innerText = (v * (ds.heatmap.factor || 1)).toFixed(ds.heatmap.precision || 0);
 
     ds.tmp_domain = domain;
   };

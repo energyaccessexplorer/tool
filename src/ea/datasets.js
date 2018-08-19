@@ -1,9 +1,9 @@
 function ea_datasets_scale_fn(ds, type) {
   let s = null;
-  const d = ds.views.heatmaps.domain || [0,1];
+  const d = (ds.heatmap.domain && [ds.heatmap.domain.min, ds.heatmap.domain.max]) || [0,1];
   const t = ds.tmp_domain;
-  const v = ds.views.heatmaps.scale;
-  const o = ds.views.heatmaps.scale_option;
+  const v = ds.heatmap.scale;
+  const o = ds.heatmap.scale_option;
   const r = ((typeof ds.invert !== 'undefined' && ds.invert.indexOf(type) > -1) ? [1,0] : [0,1]);
 
   const lin = d3.scaleLinear()
@@ -25,7 +25,7 @@ function ea_datasets_scale_fn(ds, type) {
 
   case 'linear':
   default: {
-    s = lin.clamp(ds.views.heatmaps.clamp)
+    s = lin.clamp(ds.heatmap.clamp)
     break;
   }
   }
@@ -38,7 +38,7 @@ async function ea_datasets_load(ds, t) {
 
   ea_ui_dataset_loading(ds, true);
 
-  await ds.views.heatmaps.parse.call(ds);
+  await ds.heatmap.parse.call(ds);
 
   ds.color_scale_svg = ea_svg_color_gradient(ds.color_scale_fn);
 
@@ -51,10 +51,7 @@ async function ea_datasets_active(ds, v) {
     throw `Argument Error: '${ds}' does not look like a dataset`;
   }
 
-  if (ds.active = v)
-    await ea_datasets_load(ds);
-  else
-    if (typeof ds.views.polygons !== 'undefined') ;
+  if (ds.active = v) await ea_datasets_load(ds);
 
   ea_overlord({
     type: "dataset",
@@ -86,7 +83,7 @@ async function ea_datasets_points() {
       map: ea_map,
       features: ds.features,
       cls: ds.id,
-      symbol: ds.views.polygons.symbol,
+      symbol: ds.polygons.symbol,
       scale: 1
     })
   };
@@ -96,7 +93,7 @@ async function ea_datasets_points() {
 
   else
     await ea_client(
-      `${ea_settings.database}/${ds.views.polygons.endpoint}`, 'GET', null,
+      `${ea_settings.database}/${ds.polygons.endpoint}`, 'GET', null,
       r => {
         ds.features = r[0]['jsonb_build_object'].features;
         load_em();
@@ -115,7 +112,7 @@ async function ea_datasets_tiff(ds, blob) {
 
     ds.tiff = tiff;
     ds.image = image;
-    ds.raster = rasters[ds.views.heatmaps.band];
+    ds.raster = rasters[ds.heatmap.band];
 
     ds.width = image.getWidth();
     ds.height = image.getHeight();
@@ -177,9 +174,9 @@ async function ea_datasets_tiff_rpc_stream(v) {
 
 async function ea_datasets_tiff_url() {
   const ds = this;
-  const url = ds.views.heatmaps.url.match('^http') ?
-    ds.views.heatmaps.url :
-    `${ea_path_root}data/${ea_ccn3}/${ds.views.heatmaps.url}`;
+  const url = ds.heatmap.url.match('^http') ?
+    ds.heatmap.url :
+    `${ea_path_root}data/${ea_ccn3}/${ds.heatmap.url}`;
 
   await fetch(url)
     .then(ea_client_check)

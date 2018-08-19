@@ -14,7 +14,7 @@ function ea_layers_update_datasets(list) {
   const c = ea_datasets_collection;
 
   const raster_id = list
-        .find(d => c.find(x => x.id === d && x.active && typeof x.views.polygons === 'undefined'));
+        .find(d => c.find(x => x.id === d && x.active && typeof x.polygons === 'undefined'));
 
   list
     .filter(x => c.find(d => d.id === x && d.features))
@@ -73,8 +73,8 @@ function ea_layers_dataset_elem(ds) {
     ea_ui_flash('info', "Info:", ds.description);
   });
 
-  if (ds.views.polygons && ds.views.polygons.symbol)
-    d.querySelector('.layers-element-descriptor').appendChild(ea_svg_symbol(ds.views.polygons.symbol, ds.id, 36));
+  if (ds.polygons && ds.polygons.symbol)
+    d.querySelector('.layers-element-descriptor').appendChild(ea_svg_symbol(ds.polygons.symbol, ds.id, 36));
 
   return d;
 }
@@ -154,7 +154,7 @@ function ea_layers_datasets(list) {
   if (list.length === 0)
     layers_list.innerHTML = `<pre ${style}>No layers selected.</pre>`;
 
-  else if (typeof ldc.find(i => i.views.polygons) === 'undefined')
+  else if (typeof ldc.find(i => i.polygons) === 'undefined')
     layers_list.appendChild(elem(`<pre ${style}>No layers with polygons selected.</pre>`));
 
   sortable('#layers-list', 'enable');

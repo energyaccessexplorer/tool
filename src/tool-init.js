@@ -71,7 +71,6 @@ require([
   'datasets',
   'mapbox',
   'sortable',
-  'datasets_collection',
   'config',
 ], (d3, topojson, geotiff, plotty) => {
   window.d3 = d3;
@@ -89,7 +88,21 @@ require([
 
   ea_layers_init();
 
-  ea_client(`${ea_path_root}data/${ea_ccn3}/specifics.json`, 'GET', null, async (r) => {
-    ea_init(r['category-tree'], ea_datasets_collection, r['bounds']);
-  })
+  function get_country(ds_collection) {
+    ea_client(`${ea_settings.database}/countries?ccn3=eq.${ea_ccn3}`, 'GET', null, async r => {
+      ea_init(
+        r[0]['category_tree'],
+        ds_collection,
+        r[0]['bounds']);
+    });
+  };
+
+  ea_client(`${ea_settings.database}/categories`, 'GET', null, r => {
+    r.forEach(d => {
+      d.id = d.name;
+      delete d.name;
+    });
+
+    get_country(ea_datasets_collection = r);
+  });
 });

@@ -103,12 +103,12 @@ function ea_controls_mutant_options(ds) {
   const container = elem(`<div class="control-option"></div>`);
   const select = elem('<select></select>');
 
-  ds.metadata.hosts.forEach(o => {
+  ds.metadata.mutant_targets.forEach(o => {
     const host = ea_datasets_collection.find(x => x.id === o);
     select.appendChild(elem(`<option value=${o}>${host.description}</option>`));
   });
 
-  select.value = ds.metadata.hosts[0];
+  select.value = ds.metadata.mutant_targets[0];
 
   select.addEventListener('change', async function() {
     const host = ea_datasets_collection.find(x => x.id === this.value);

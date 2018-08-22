@@ -142,7 +142,7 @@ function ea_map_svg(svg, topofile, name, options) {
               ds.polygons.symbol,
               k
             );
-          else if (ds.polygons.type === 'polygon')
+          else if (ds.polygons.type === 'polygons')
             ea_map_load_features({
               map: _map,
               features: ds.features,

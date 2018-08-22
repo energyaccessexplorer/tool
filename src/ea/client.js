@@ -8,13 +8,14 @@ function ea_client_check(response) {
 };
 
 async function ea_client(endpoint, method, payload, callback) {
+  const options = {
+		headers: { "Accept": "application/json", "Content-Type": "application/json" },
+	};
+
   switch (method) {
   case "POST": {
-    const options = {
-			method: 'POST',
-			headers: { "Accept": "application/json", "Content-Type": "application/json" },
-			body: JSON.stringify(payload),
-		};
+    options.method = 'POST';
+    options.body = JSON.stringify(payload);
 
 		await fetch(endpoint, options)
       .then(ea_client_check)
@@ -23,7 +24,9 @@ async function ea_client(endpoint, method, payload, callback) {
   }
 
   case "GET": {
-		await fetch(endpoint)
+    if (payload == 1) options.headers['Accept'] = "application/vnd.pgrst.object+json";
+
+		await fetch(endpoint, options)
       .then(ea_client_check)
       .then(async r => await callback(await r.json()))
     break;

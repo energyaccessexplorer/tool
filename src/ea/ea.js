@@ -35,11 +35,14 @@ async function ea_init(tree, collection, bounds) {
     if (typeof d.heatmap.color_scale === 'undefined')
       d.heatmap.color_scale = ea_default_color_scheme;
 
-    if (d.heatmap.url && d.heatmap.url.match(/\.tif$/))
+    if (d.heatmap.endpoint)
       d.heatmap.parse = ea_datasets_tiff_url;
 
-    if (d.polygons && d.polygons.symbol && !d.polygons.parse)
+    if (d.polygons && d.polygons.type === 'points')
       d.polygons.parse = ea_datasets_points;
+
+    if (d.polygons && d.polygons.type === 'polygons')
+      d.polygons.parse = ea_datasets_features;
 
     d.color_scale_fn = function() {
       return d3.scaleLinear()
@@ -59,7 +62,7 @@ async function ea_init(tree, collection, bounds) {
     description: "Dummy dataset",
 
     heatmap: {
-      url: "districts.tif",
+      endpoint: "/districts.tif",
       parse: ea_datasets_tiff_url,
     },
   };
@@ -233,8 +236,7 @@ async function ea_overlord(msg) {
         var x;
 
         if (x = ea_datasets_collection.find(d => d.id === i)) {
-          if (typeof x.polygons !== 'undefined')
-            x.polygons.parse.call(x);
+          if (x.polygons) x.polygons.parse.call(x);
         }
       });
 
@@ -273,8 +275,10 @@ async function ea_overlord(msg) {
     else if (mode === "datasets") {
       ea_layers_datasets(datasets_layers);
 
-      if (typeof ds.polygons !== "undefined")
-        (ds.active) ? await ds.polygons.parse.call(ds) : ea_map_unload(ea_map, ds.id);
+      if (ds.polygons)
+        (ds.active) ?
+        await ds.polygons.parse.call(ds) :
+        ea_map_unload(ea_map, ds.id);
     }
 
     else {

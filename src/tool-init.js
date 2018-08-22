@@ -88,21 +88,43 @@ require([
 
   ea_layers_init();
 
-  function get_country(ds_collection) {
-    ea_client(`${ea_settings.database}/countries?ccn3=eq.${ea_ccn3}`, 'GET', null, async r => {
-      ea_init(
-        r[0]['category_tree'],
-        ds_collection,
-        r[0]['bounds']);
-    });
+  function get_datasets(country) {
+    ea_client(
+      `${ea_settings.database}/datasets?country_id=eq.${country.id}&select=*,heatmap_file(*),polygons_file(*),category(*)`, 'GET', null,
+      r => {
+        const collection = r.map(e => {
+          let heatmap = e.category.heatmap;
+          if (heatmap && e.heatmap_file) heatmap.endpoint = e.heatmap_file.endpoint;
+
+          let polygons = e.category.polygons;
+          if (polygons && e.polygons_file) polygons.endpoint = e.polygons_file.endpoint;
+
+          if (e.category.metadata && e.category.metadata.mutant) console.log('mutant: ', e.category_name, e.id);
+          else if (!e.heatmap_file && !e.polygons_file) return undefined;
+
+          return {
+            "description": e.category.description,
+            "description_long": e.category.description_long,
+            "heatmap": heatmap,
+            "polygons": polygons,
+            "id": e.category.name,
+            "unit": e.category.unit,
+            "metadata": e.category.metadata,
+          };
+        });
+
+        ea_datasets_collection = collection.filter(d => d);
+
+        ea_init(
+          country.category_tree,
+          ea_datasets_collection,
+          country.bounds);
+      });
   };
 
-  ea_client(`${ea_settings.database}/categories`, 'GET', null, r => {
-    r.forEach(d => {
-      d.id = d.name;
-      delete d.name;
-    });
-
-    get_country(ea_datasets_collection = r);
-  });
+  ea_client(
+    `${ea_settings.database}/countries?ccn3=eq.${ea_ccn3}`,
+    'GET', 1,
+    r => get_datasets(r)
+  );
 });

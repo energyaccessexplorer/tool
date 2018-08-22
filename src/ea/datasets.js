@@ -63,19 +63,37 @@ async function ea_datasets_active(ds, v) {
   });
 };
 
-function ea_datasets_features(ds) {
-  ea_client(ds.endpoint, 'GET', null,
-    r => {
-      ds.features = r[0]['jsonb_build_object'].features;
+async function ea_datasets_features() {
+  const ds = this;
 
-      ea_map_load_features({
-        map: ea_map,
-        features: ds.features,
-        cls: ds.id,
-        scale: 1,
-      });
-    }
-  );
+  const load_em = _ => {
+    ea_map_load_features({
+      map: ea_map,
+      features: ds.features,
+      cls: ds.id,
+      scale: 1,
+    });
+  };
+
+  if (ds.features)
+    load_em();
+
+  else {
+    const endpoint = ds.polygons.endpoint;
+
+    const url = endpoint.match('^http') ? endpoint :
+          `${ea_path_root}data/${ea_ccn3}/${endpoint}`;
+
+    await ea_client(
+      url, 'GET', null,
+      r => {
+        ds.features = [r.geojson];
+        load_em();
+      }
+    );
+  }
+
+  return ds;
 };
 
 async function ea_datasets_points() {
@@ -94,14 +112,20 @@ async function ea_datasets_points() {
   if (ds.features)
     load_em();
 
-  else
+  else {
+    const endpoint = ds.polygons.endpoint;
+
+    const url = endpoint.match('^http') ? endpoint :
+    `${ea_path_root}data/${ea_ccn3}/${endpoint}`;
+
     await ea_client(
-      `${ea_settings.database}/${ds.polygons.endpoint}`, 'GET', null,
+      url, 'GET', null,
       r => {
-        ds.features = r[0]['jsonb_build_object'].features;
+        ds.features = r.geojson.features;
         load_em();
       }
     );
+  }
 
   return ds;
 };
@@ -149,7 +173,7 @@ async function ea_datasets_tiff_stream() {
 
     await ea_datasets_tiff(
       ds,
-      (await ea_datasets_hexblob(data[0]['tiff'].slice(2))));
+      (await ea_datasets_hexblob(data.tiff.slice(2))));
   }
 
   return ds;
@@ -169,7 +193,7 @@ async function ea_datasets_tiff_rpc_stream(v) {
 
     await ea_datasets_tiff(
       ds,
-      (await ea_datasets_hexblob(data[0]['tiff'].slice(2))));
+      (await ea_datasets_hexblob(data.tiff.slice(2))));
   }
 
   return ds;
@@ -177,11 +201,13 @@ async function ea_datasets_tiff_rpc_stream(v) {
 
 async function ea_datasets_tiff_url() {
   const ds = this;
-  const url = ds.heatmap.url.match('^http') ?
-    ds.heatmap.url :
-    `${ea_path_root}data/${ea_ccn3}/${ds.heatmap.url}`;
+
   if (ds.raster) return ds;
 
+  const endpoint = ds.heatmap.endpoint;
+
+  const url = endpoint.match('^http') ? endpoint :
+    `${ea_path_root}data/${ea_ccn3}/${endpoint}`;
 
   await fetch(url)
     .then(ea_client_check)

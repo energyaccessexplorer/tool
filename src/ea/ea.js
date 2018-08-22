@@ -23,7 +23,8 @@ async function ea_init(tree, collection, bounds) {
 
   collection.forEach(d => {
     if (d.metadata && d.metadata.mutant) {
-      let m = collection.find(x => x.id === d.metadata.mutant_targets[0])
+      let m = collection.find(x => x.id === d.metadata.mutant_targets[0]);
+
       d.polygons = m.polygons;
       d.heatmap = m.heatmap;
     }
@@ -36,9 +37,6 @@ async function ea_init(tree, collection, bounds) {
 
     if (d.heatmap.url && d.heatmap.url.match(/\.tif$/))
       d.heatmap.parse = ea_datasets_tiff_url;
-
-    if (d.heatmap)
-      d.heatmap.band = d.heatmap.band || 0;
 
     if (d.polygons && d.polygons.symbol && !d.polygons.parse)
       d.polygons.parse = ea_datasets_points;
@@ -63,7 +61,6 @@ async function ea_init(tree, collection, bounds) {
     heatmap: {
       url: "districts.tif",
       parse: ea_datasets_tiff_url,
-      band: 0
     },
   };
 

@@ -38,6 +38,9 @@ async function ea_datasets_load(ds, t) {
 
   ea_ui_dataset_loading(ds, true);
 
+  if (!ds.heatmap.parse)
+    console.error(ds.id, "does not have a #heatmap.parse function set!");
+
   await ds.heatmap.parse.call(ds);
 
   ds.color_scale_svg = ea_svg_color_gradient(ds.color_scale_fn);
@@ -112,7 +115,7 @@ async function ea_datasets_tiff(ds, blob) {
 
     ds.tiff = tiff;
     ds.image = image;
-    ds.raster = rasters[ds.heatmap.band];
+    ds.raster = rasters[0];
 
     ds.width = image.getWidth();
     ds.height = image.getHeight();
@@ -177,6 +180,8 @@ async function ea_datasets_tiff_url() {
   const url = ds.heatmap.url.match('^http') ?
     ds.heatmap.url :
     `${ea_path_root}data/${ea_ccn3}/${ds.heatmap.url}`;
+  if (ds.raster) return ds;
+
 
   await fetch(url)
     .then(ea_client_check)

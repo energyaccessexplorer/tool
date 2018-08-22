@@ -6,7 +6,7 @@ function ea_layers_dataset_collection() {
   return ea_datasets_collection
     .filter(d => d.active)
     .sort((a,b) => (list.indexOf(a.id) < list.indexOf(b.id)) ? -1 : 1);
-}
+};
 
 function ea_layers_update_datasets(list) {
   let order = [ea_canvas, ea_map.svg.node()];
@@ -24,7 +24,7 @@ function ea_layers_update_datasets(list) {
   if (list.indexOf(raster_id) === 0) order = order.reverse();
 
   maparea.insertBefore(...order);
-}
+};
 
 function ea_layers_dataset_elem(ds) {
   const d = elem(`
@@ -77,7 +77,7 @@ function ea_layers_dataset_elem(ds) {
     d.querySelector('.layers-element-descriptor').appendChild(ea_svg_symbol(ds.polygons.symbol, ds.id, 36));
 
   return d;
-}
+};
 
 function ea_layers_heatmap_elem(t, v) {
   const svg = ea_svg_color_gradient(_ => {
@@ -116,7 +116,7 @@ function ea_layers_heatmap_elem(t, v) {
   d.querySelector('.layers-element-descriptor').prepend(svg);
 
   return d;
-}
+};
 
 function ea_layers_heatmaps(list) {
   sortable('#layers-list', 'disable');
@@ -135,7 +135,7 @@ function ea_layers_heatmaps(list) {
 
   list.forEach((t,i) => layers_list.appendChild(ea_layers_heatmap_elem(t, lhc[t], i)));
   sortable('#layers-list', 'enable');
-}
+};
 
 function ea_layers_datasets(list) {
   sortable('#layers-list', 'disable');
@@ -158,7 +158,7 @@ function ea_layers_datasets(list) {
     layers_list.appendChild(elem(`<pre ${style}>No layers with polygons selected.</pre>`));
 
   sortable('#layers-list', 'enable');
-}
+};
 
 function ea_layers_init() {
   const layers = document.querySelector('#layers');
@@ -179,4 +179,4 @@ function ea_layers_init() {
           caller: "ea_layers_init",
         })
       });
-}
+};

@@ -63,20 +63,11 @@ async function ea_datasets_active(ds, v) {
   });
 };
 
-async function ea_datasets_features() {
+async function ea_datasets_features(callback) {
   const ds = this;
 
-  const load_em = _ => {
-    ea_map_load_features({
-      map: ea_map,
-      features: ds.features,
-      cls: ds.id,
-      scale: 1,
-    });
-  };
-
   if (ds.features)
-    load_em();
+    callback();
 
   else {
     const endpoint = ds.polygons.endpoint;
@@ -87,8 +78,22 @@ async function ea_datasets_features() {
     await ea_client(
       url, 'GET', null,
       r => {
-        ds.features = [r.geojson];
-        load_em();
+        switch (r.type) {
+        case "Feature":
+          ds.features = [r];
+          break;
+
+        case "FeatureCollection":
+          ds.features = r.features;
+          break;
+
+        default:
+          ea_ui_flash('error', 'Bad GeoJSON file', `'${ds.id}' fetched is not a "Feature" nor "FeatureCollection"`);
+          ds.features = [];
+          break;
+        }
+
+        callback.call(ds);
       }
     );
   }
@@ -97,37 +102,26 @@ async function ea_datasets_features() {
 };
 
 async function ea_datasets_points() {
-  const ds = this;
-
-  const load_em = _ => {
+  return ea_datasets_features.call(this, _ => {
     ea_map_load_points({
       map: ea_map,
-      features: ds.features,
-      cls: ds.id,
-      symbol: ds.polygons.symbol,
+      features: this.features,
+      cls: this.id,
+      symbol: this.polygons.symbol,
       scale: 1
     })
-  };
+  });
+};
 
-  if (ds.features)
-    load_em();
-
-  else {
-    const endpoint = ds.polygons.endpoint;
-
-    const url = endpoint.match('^http') ? endpoint :
-    `${ea_path_root}data/${ea_ccn3}/${endpoint}`;
-
-    await ea_client(
-      url, 'GET', null,
-      r => {
-        ds.features = r.geojson.features;
-        load_em();
-      }
-    );
-  }
-
-  return ds;
+async function ea_datasets_polygons() {
+  return ea_datasets_features.call(this, _ => {
+    ea_map_load_features({
+      map: ea_map,
+      features: this.features,
+      cls: this.id,
+      scale: 1,
+    });
+  });
 };
 
 async function ea_datasets_tiff(ds, blob) {

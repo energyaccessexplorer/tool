@@ -42,7 +42,7 @@ async function ea_init(tree, collection, bounds) {
       d.polygons.parse = ea_datasets_points;
 
     if (d.polygons && d.polygons.type === 'polygons')
-      d.polygons.parse = ea_datasets_features;
+      d.polygons.parse = ea_datasets_polygons;
 
     d.color_scale_fn = function() {
       return d3.scaleLinear()

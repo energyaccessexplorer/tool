@@ -38,10 +38,10 @@ async function ea_init(tree, collection, bounds) {
     if (d.heatmap.endpoint)
       d.heatmap.parse = ea_datasets_tiff_url;
 
-    if (d.polygons && d.polygons.type === 'points')
+    if (d.polygons && d.polygons.shape_type === 'points')
       d.polygons.parse = ea_datasets_points;
 
-    if (d.polygons && d.polygons.type === 'polygons')
+    if (d.polygons && d.polygons.shape_type === 'polygons')
       d.polygons.parse = ea_datasets_polygons;
 
     d.color_scale_fn = function() {

@@ -134,7 +134,7 @@ function ea_map_svg(svg, topofile, name, options) {
       ea_datasets_collection
         .filter(x => x.active && x.features)
         .forEach(ds => {
-          if (ds.polygons.type === 'points')
+          if (ds.polygons.shape_type === 'points')
             ea_map_load_points(
               _map,
               ds.features,
@@ -142,7 +142,7 @@ function ea_map_svg(svg, topofile, name, options) {
               ds.polygons.symbol,
               k
             );
-          else if (ds.polygons.type === 'polygons')
+          else if (ds.polygons.shape_type === 'polygons')
             ea_map_load_features({
               map: _map,
               features: ds.features,

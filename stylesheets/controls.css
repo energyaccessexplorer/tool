@@ -21,6 +21,8 @@
 .controls .weight-label {
   font-size: 0.7em;
   margin-bottom: 0.7em;
+  font-weight: bold;
+  display: inline-block;
 }
 
 .controls .loading {
@@ -44,6 +46,8 @@
   clear: both;
   white-space: nowrap;
   margin-left: 1.5em;
+  margin-right: 1.5em;
+  margin-bottom: 2em;
 }
 
 .controls-category {
@@ -55,25 +59,39 @@
 
 .controls-category-title {
   font-size: 2em;
+  line-height: 2em;
   white-space: nowrap;
   text-transform: uppercase;
   text-align: center;
   font-weight: bold;
   font-family: condensed;
-  padding: 0.5em 0;
-  padding-bottom: 0;
-  color: var(--the-blue);
-  fill: var(--the-blue);
+  background-color: var(--the-blue);
+  color: var(--the-white);
+  fill: var(--the-white);
   cursor: pointer;
 }
 
 .controls-category-title .triangle {
   display: inline-block;
   transform: scale(1.4);
+  display: none;
 }
 
 .controls-category-title .triangle svg {
   vertical-align: middle;
+}
+
+.controls-subcategory-title {
+  font-size: 1.3em;
+  font-family: condensed;
+  font-weight: bold;
+  white-space: nowrap;
+  text-transform: uppercase;
+  box-sizing: border-box;
+  padding: 1em 1.5em;
+  border-bottom: solid 1px #d9d9d9;
+  background-color: white;
+  cursor: pointer;
 }
 
 .controls-subcategory-title .triangle {
@@ -82,25 +100,15 @@
   margin-left: 5px;
 }
 
-.controls-subcategory-title {
-  font-size: 1.3em;
-  font-family: condensed;
-  white-space: nowrap;
-  text-transform: uppercase;
-  box-sizing: border-box;
-  padding: 1em 2em;
-  border-bottom: solid 1px #d9d9d9;
-  cursor: pointer;
-}
-
 .controls-dataset-header {
   cursor: pointer;
   padding-top: 1em;
   padding-bottom: 1em;
+  background-color: #f4f4f4;
 }
 
 .controls-dataset-content {
-  background-color: white;
+  background-color: #f4f4f4;
   box-sizing: border-box;
   padding-top: 1em;
   padding-bottom: 1em;

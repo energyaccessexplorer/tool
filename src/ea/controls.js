@@ -4,12 +4,12 @@ function ea_controls_collapse_subcategory(conel, subel) {
 
   if (d === "none") {
     conel.style['display'] = 'block';
-    c.innerHTML = ea_ui_collapse_triangle('se');
+    c.innerHTML = ea_ui_collapse_triangle('s');
   }
 
   else {
     conel.style['display'] = 'none';
-    c.innerHTML = ea_ui_collapse_triangle('ne');
+    c.innerHTML = ea_ui_collapse_triangle('e');
   }
 };
 
@@ -74,7 +74,7 @@ function ea_controls_tree(tree, collection) {
 <div id=${b.name} class="controls-subcategory">
   <div class="controls-subcategory-title">
     ${b.name}
-    <span class="collapse triangle">${ea_ui_collapse_triangle('se')}</span>
+    <span class="collapse triangle">${ea_ui_collapse_triangle('s')}</span>
   </div>
   <div class="controls-container"></div>
 </div>`));
@@ -134,7 +134,6 @@ function ea_controls_mutant_options(ds) {
   });
 
   container.appendChild(select);
-  container.appendChild(elem('<div>&nbsp;</div>')); // TODO: remove this.
 
   return container;
 };
@@ -301,21 +300,18 @@ function ea_controls_range(ds, label) {
   const v1 = l.querySelector('[bind=v1]');
   const v2 = l.querySelector('[bind=v2]');
 
-  container.appendChild(
-    ea_svg_interval_thingradient(
-      ds.color_scale_fn,
-      x => update_range_value(x, 0, v1),
-      x => update_range_value(x, 1, v2),
-      _ => ea_overlord({
-        type: "dataset",
-        target: ds,
-        caller: "ea_controls_range",
-      })
-    )
+  const svg = ea_svg_interval_thingradient(
+    ds.color_scale_fn,
+    x => update_range_value(x, 0, v1),
+    x => update_range_value(x, 1, v2),
+    _ => ea_overlord({
+      type: "dataset",
+      target: ds,
+      caller: "ea_controls_range",
+    })
   );
 
-  container.appendChild(elem('<br>'));
-
+  container.appendChild(svg);
   container.appendChild(l);
 
   return container;
@@ -335,26 +331,23 @@ function ea_controls_weight(ds) {
   <span>${weights[weights.length - 1]}</span>
 </div>`);
 
-  container.appendChild(
-    ea_svg_range_steps(
-      weights,
-      ds.weight,
-      null,
-      x => {
-        ds.weight = x;
+  const svg = ea_svg_range_steps(
+    weights,
+    ds.weight,
+    null,
+    x => {
+      ds.weight = x;
 
-        ea_overlord({
-          type: "dataset",
-          target: ds,
-          caller: "ea_controls_weight",
-        });
-      },
-      ("weight" === "weight")
-    )
+      ea_overlord({
+        type: "dataset",
+        target: ds,
+        caller: "ea_controls_weight",
+      });
+    },
+    ("weight" === "weight")
   );
 
-  container.appendChild(elem('<br>'));
-
+  container.appendChild(svg);
   container.appendChild(l);
 
   return container;

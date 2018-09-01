@@ -9,7 +9,7 @@ stop:
 deploy:
 	sed -i \
 		-e 's%database: "${DB_SERV_DEV}",%database: "${DB_SERV_PROD}",%' \
-		-e 's%mapboxstyle: null%mapboxstyle: "dark"%' \
+		-e 's%mapboxstyle: null%mapboxstyle: "light"%' \
 		config.js
 
 	@rsync -OPrv \
@@ -23,5 +23,5 @@ deploy:
 
 	sed -i \
 		-e 's%database: "${DB_SERV_PROD}",%database: "${DB_SERV_DEV}",%' \
-		-e 's%mapboxstyle: "dark"%mapboxstyle: null%' \
+		-e 's%mapboxstyle: "light"%mapboxstyle: null%' \
 		config.js

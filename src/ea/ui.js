@@ -3,7 +3,7 @@ function elem(str) {
   d.innerHTML = str;
 
   return d.firstElementChild;
-}
+};
 
 function fake_download(blob) {
   const a = document.createElement('a');
@@ -17,18 +17,18 @@ function fake_download(blob) {
   a.click();
 
   window.URL.revokeObjectURL(url);
-}
+};
 
 function ea_ui_collapse_triangle(d) {
   let t;
 
   switch (d) {
   case 'e':
-    t = 'rotate(-45)translate(-2,-4)';
+    t = 'rotate(-45)translate(0,0)';
     break;
 
   case 's':
-    t = 'rotate(45)translate(-8,0)';
+    t = 'rotate(45)translate(0,-6)';
     break;
 
   case 'n':
@@ -48,22 +48,22 @@ function ea_ui_collapse_triangle(d) {
     break;
 
   default:
-    throw `ea_collapse_triangle: e, ne, s, se, w. Got ${d}.`;
+    throw `ea_ui_collapse_triangle: e, ne, s, se, w. Got ${d}.`;
   }
 
   return `
 <svg width="12px" height="12px" viewBox="0 0 12 12" transform="${t}">
   <polyline points="12,0 12,12 0,12 "/>
 </svg>`;
-}
+};
 
 function ea_ui_spinner() {
   return elem(`<div class="loading"><div class="spinner"></div></div>`);
-}
+};
 
 function ea_ui_app_loading(bool) {
   document.querySelector('#app-loading').style['display'] = bool ? 'block' : 'none';
-}
+};
 
 function ea_ui_dataset_loading(ds, bool) {
   const el = document.querySelector(`#controls-${ds.id}`);
@@ -85,7 +85,7 @@ function ea_ui_dataset_loading(ds, bool) {
   }
 
   return s;
-}
+};
 
 
 function ea_layout_map() {
@@ -113,4 +113,4 @@ function ea_layout_map() {
     width: width,
     height: height
   };
-}
+};

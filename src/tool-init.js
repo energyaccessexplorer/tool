@@ -2,35 +2,6 @@ const ea_path_root = "/maps-and-data/"
 const ea_ccn3 = location.get_query_param('ccn3');
 const ea_default_color_scheme = "electric";
 
-Array.prototype.unique = function() {
-  var key, l, o, ref, value;
-  o = new Object;
-  for (key = l = 0, ref = this.length; 0 <= ref ? l < ref : l > ref; key = 0 <= ref ? ++l : --l) {
-    o[this[key]] = this[key];
-  }
-  return (function() {
-    var results;
-    results = [];
-    for (key in o) {
-      value = o[key];
-      results.push(value);
-    }
-    return results;
-  })();
-};
-
-Array.prototype.remove = function(v) {
-  var e, i, l, len, ref;
-  ref = this;
-  for (i = l = 0, len = ref.length; l < len; i = ++l) {
-    e = ref[i];
-    if (e === v) {
-      return this.splice(i, 1);
-    }
-  }
-  return void 0;
-};
-
 requirejs.config({
   'baseUrl': ea_path_root + '/src',
   'paths': {

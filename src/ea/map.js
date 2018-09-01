@@ -22,10 +22,7 @@ function ea_map_setup(bounds, dimensions) {
         console.log(error);
       }
 
-      ea_map = ea_map_svg(
-        svg, topo, 'adm0',
-        { center: center }
-      );
+      ea_map = ea_map_svg(d3.select('#svg-map'), topo, 'adm0', { center: center });
 
       ea_map_load_features({
         map: ea_map,
@@ -138,13 +135,13 @@ function ea_map_svg(svg, topofile, name, options) {
         .filter(x => x.active && x.features)
         .forEach(ds => {
           if (ds.polygons.shape_type === 'points')
-            ea_map_load_points(
-              _map,
-              ds.features,
-              ds.id,
-              ds.polygons.symbol,
-              k
-            );
+            ea_map_load_points({
+              map: _map,
+              features: ds.features,
+              cls: ds.id,
+              symbol: ds.polygons.symbol,
+              scale: k
+            });
           else if (ds.polygons.shape_type === 'polygons')
             ea_map_load_features({
               map: _map,

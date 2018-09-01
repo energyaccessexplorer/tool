@@ -257,17 +257,17 @@ async function ea_overlord(msg) {
   case "dataset": {
     const ds = msg.target;
 
-    (ds.active) ?
+    ds.active ?
       datasets_layers.unshift(ds.id) :
-      datasets_layers.remove(ds.id);
+      datasets_layers.splice(datasets_layers.indexOf(ds.id), 1); // REMOVE()
 
-    datasets_layers = datasets_layers.unique();
+    datasets_layers = [...new Set(datasets_layers)]; // UNIQUE()
 
     if (mode === "heatmaps") {
       ea_layers_heatmaps(heatmaps_layers);
 
       if (typeof ds.heatmap !== "undefined")
-        (ds.active) ? await ds.heatmap.parse.call(ds) : null
+        ds.active ? await ds.heatmap.parse.call(ds) : null
 
       ea_canvas_plot(ea_analysis(heatmaps_layers[0]));
     }
@@ -276,7 +276,7 @@ async function ea_overlord(msg) {
       ea_layers_datasets(datasets_layers);
 
       if (ds.polygons)
-        (ds.active) ?
+        ds.active ?
         await ds.polygons.parse.call(ds) :
         ea_map_unload(ea_map, ds.id);
     }

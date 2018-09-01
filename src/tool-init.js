@@ -1,6 +1,6 @@
 const ea_path_root = "/maps-and-data/"
 const ea_ccn3 = location.get_query_param('ccn3');
-const ea_default_color_scheme = "electric";
+const ea_default_color_scheme = "ea";
 
 requirejs.config({
   'baseUrl': ea_path_root + '/src',
@@ -50,6 +50,8 @@ require([
   window.topojson = topojson;
   window.GeoTIFF = geotiff;
   window.plotty = plotty;
+
+  plotty.addColorScale("ea", ['#1c4478', '#81b062', '#e5a82e'], [0, 0.5, 1]);
 
   ea_datasets_districts();
 

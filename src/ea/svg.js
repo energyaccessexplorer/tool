@@ -111,7 +111,7 @@ function ea_svg_checkbox(init, callback) {
 
 function ea_svg_range_steps(steps, init, drag_callback, end_callback, is_weight) {
   const radius = (is_weight ? 5 : 6),
-        svgwidth = 150,
+        svgwidth = 225,
         svgheight = (radius * 2) + 2,
         linewidth = radius * 2,
         svgmin = radius + 1,
@@ -471,7 +471,7 @@ function ea_svg_color_gradient(color_scale) {
 
 function ea_svg_interval_thingradient(color_scale, callback1, callback2, end_callback) {
   const radius = 6,
-        svgwidth = 150,
+        svgwidth = 225,
         svgheight = (radius * 2) + 2,
         linewidth = radius * 2,
         svgmin = radius + 1,

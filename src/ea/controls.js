@@ -286,14 +286,12 @@ function ea_controls_range(ds, label) {
     ds.tmp_domain = domain;
   };
 
-  const container = elem(`
-<div class="control-group">
-  <div class="weight-label">${label}:</div>
-</div>`);
+  const container = elem(`<div class="control-group"></div>`);
 
   const l = elem(`
 <div class="label">
   <span bind="v1"></span>
+  <span class="weight-label">${label}</span>
   <span bind="v2"></span>
 </div>`);
 
@@ -320,14 +318,12 @@ function ea_controls_range(ds, label) {
 function ea_controls_weight(ds) {
   const weights = Array.apply(null, Array(5)).map((_, i) => i + 1);
 
-  const container = elem(`
-<div class="control-group">
-  <div class="weight-label">weight:</div>
-</div>`);
+  const container = elem(`<div class="control-group"></div>`);
 
   const l = elem(`
 <div class="label">
   <span>${weights[0]}</span>
+  <span class="weight-label">weight</span>
   <span>${weights[weights.length - 1]}</span>
 </div>`);
 

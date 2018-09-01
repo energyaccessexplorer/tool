@@ -87,27 +87,36 @@ function ea_ui_dataset_loading(ds, bool) {
   return s;
 };
 
-
-function ea_layout_map() {
+function ea_layout_map(bounds) {
   const p = document.querySelector('#playground');
 
   let width, height;
+  const b = bounds;
+
+  const w = (b[1][0] - b[0][0]);
+  const h = (b[1][1] - b[0][1]);
 
   width = p.clientWidth -
     (p.querySelector('#controls').clientWidth +
      p.querySelector('#layers').clientWidth) + 10;
 
-  height = document.querySelector('#visual').clientHeight
+  height = h * (width / w);
 
   const coord_tooltip = document.querySelector('body')
         .appendChild(elem(`<div id="coord-tooltip"></div>`));
 
   ea_canvas = document.querySelector('canvas#plot');
   ea_canvas.style['width'] = width + "px";
+  ea_canvas.style['height'] = height + "px";
 
   const maparea = document.querySelector('#maparea');
   maparea.style['width'] = width + "px";
   maparea.style['height'] = height + "px";
+
+  const svg = d3.select('#svg-map');
+  svg
+    .attr('width', width)
+    .attr('height', height);
 
   return {
     width: width,

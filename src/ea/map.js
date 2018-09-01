@@ -1,15 +1,10 @@
-function ea_map_setup(bounds, dimensions) {
+function ea_map_setup(bounds) {
   const b = bounds;
 
   const w = (b[1][0] - b[0][0]);
   const h = (b[1][1] - b[0][1]);
 
   const center = [b[0][0] + (Math.abs(w/2)), b[0][1] + (Math.abs(h/2))];
-
-  const svg = d3.select('#svg-map');
-  svg
-    .attr('width', dimensions.width)
-    .attr('height', dimensions.height);
 
   d3.queue()
     .defer(d3.json, `${ea_path_root}lib/${ea_ccn3}-adm0.json`)

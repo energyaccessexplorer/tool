@@ -15,7 +15,7 @@ function ea_canvas_draw(et, tmp) {
   const w = ea_canvas.width;
   const h = ea_canvas.height;
 
-  const f = (w/ea_map.width);
+  const f = (h/ea_map.height); // TODO: review this. maybe w should be used on "tall" countries
 
   tmp.getContext('2d')
     .putImageData(ea_plot_imagedata, 0, 0);

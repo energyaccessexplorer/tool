@@ -31,7 +31,11 @@ function ea_countries_setup() {
       const topo = topojson.feature(geo, geo.objects.countries);
 
       if (error) {
-        ea_ui_flash('error', error.target.statusText, error.target.responseURL);
+        flash()
+          .type('error')
+          .title(error.target.statusText)
+          .message(error.target.responseURL)();
+
         console.log(error);
       }
 

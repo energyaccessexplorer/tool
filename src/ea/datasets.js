@@ -88,7 +88,11 @@ async function ea_datasets_features(callback) {
           break;
 
         default:
-          ea_ui_flash('error', 'Bad GeoJSON file', `'${ds.id}' fetched is not a "Feature" nor "FeatureCollection"`);
+          flash()
+            .type('error')
+            .title('Bad GeoJSON file')
+            .message(`'${ds.id}' fetched is not a "Feature" nor "FeatureCollection"`)();
+
           ds.features = [];
           break;
         }

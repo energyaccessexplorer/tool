@@ -53,7 +53,8 @@ function ea_layers_dataset_elem(ds) {
   }
 
   d.querySelector('.layer-type').addEventListener('mouseup', (e) => {
-    ea_ui_flash(null, "this does something, right?");
+    flash()
+      .message("this does something, right?")();
   });
 
   let visible = true;
@@ -70,7 +71,9 @@ function ea_layers_dataset_elem(ds) {
   });
 
   d.querySelector('.layer-info').addEventListener('mouseup', (e) => {
-    ea_ui_flash('info', "Info:", ds.description);
+    flash()
+      .type('info')
+      .message("Info: " + ds.description)();
   });
 
   if (ds.polygons && ds.polygons.symbol)

@@ -12,3 +12,4 @@ countries.json	https://raw.githubusercontent.com/mledoze/countries/master/dist/c
 834-adm0.json	https://raw.githubusercontent.com/energy-data/nzt-electrification/master/assets/TZA-adm0.json
 fonts/arimo.woff2	https://fonts.gstatic.com/s/arimo/v11/P5sMzZCDf9_T_10ZxCE.woff2
 location.js	https://gitlab.com/fabbe/web-toolbelt/raw/master/location.js
+flash.js	https://gitlab.com/fabbe/web-toolbelt/raw/master/flash.js

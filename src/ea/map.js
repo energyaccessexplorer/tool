@@ -15,7 +15,10 @@ function ea_map_setup(bounds, dimensions) {
     .defer(d3.json, `${ea_path_root}lib/${ea_ccn3}-adm0.json`)
     .await((error, topo) => {
       if (error) {
-        ea_ui_flash('error', error.target.statusText, error.target.responseURL);
+        flash()
+          .type('error').title(error.target.statusText)
+          .message(error.target.responseURL)();
+
         console.log(error);
       }
 

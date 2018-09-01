@@ -39,6 +39,7 @@ requirejs.config({
     'geotiff': "../lib/geotiff",
     'plotty': "../lib/plotty",
     'sortable':   "../lib/htmlsortable",
+    'flash':   "../lib/flash",
     'ea': "./ea/ea",
     'datasets': "./ea/datasets",
     'controls': "./ea/controls",
@@ -59,6 +60,7 @@ require([
   'topojson',
   'geotiff',
   'plotty',
+  'flash',
   'ea',
   'map',
   'client',
@@ -79,8 +81,6 @@ require([
   window.plotty = plotty;
 
   ea_datasets_districts();
-
-  ea_ui_flash = ea_ui_flash_setup();
 
   ea_map = null;
 

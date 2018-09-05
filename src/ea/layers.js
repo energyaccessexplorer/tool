@@ -34,7 +34,7 @@ function ea_layers_dataset_elem(ds) {
 
   <div class="layers-element-content">
     <div class="layers-element-header">
-      <div class="layers-element-title">${ds.description}</div>
+      <div class="layers-element-title">${ds.name_long}</div>
 
       <div class="layers-element-controls">
         <div class="layer-type"></div>

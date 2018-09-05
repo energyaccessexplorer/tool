@@ -165,7 +165,7 @@ function ea_controls_elem(ds) {
     }
   });
 
-  header.appendChild(elem(`<span class="controls-dataset-description">${ds.description}</span>`));
+  header.appendChild(elem(`<span class="controls-dataset-description">${ds.name_long}</span>`));
 
   if (ds.unit) {
     header

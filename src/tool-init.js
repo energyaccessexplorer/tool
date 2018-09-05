@@ -76,6 +76,7 @@ require([
           else if (!e.heatmap_file && !e.polygons_file) return undefined;
 
           return {
+            "name_long": e.category.name_long,
             "description": e.category.description,
             "description_long": e.category.description_long,
             "heatmap": heatmap,

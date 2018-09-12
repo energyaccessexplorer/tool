@@ -150,8 +150,4 @@ function ea_countries_overview(c, collection) {
   } else {
     co.innerHTML = `<strong>${c.name.common}</strong> not included`;
   }
-}
-
-function ea_countries_init() {
-
 };

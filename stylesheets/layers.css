@@ -119,20 +119,6 @@
   cursor: pointer;
 }
 
-.layers-element-controls div.layer-type:before {
-  content: 'T';
-}
-
-.layers-element-controls div.layer-visibility:before {
-  content: 'V';
-}
-
-.layers-element-controls div.layer-info:before {
-  content: 'I';
-}
-
-.layers-element-descriptor {
-
 }
 
 .eai {

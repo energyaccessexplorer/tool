@@ -178,7 +178,7 @@ function ea_svg_range_steps(steps, init, drag_callback, end_callback, is_weight)
     marked.attr('width', cx0);
 
     if (typeof drag_callback === 'function') drag_callback(norm(x));
-  }
+  };
 
   c1.call(
     d3.drag()

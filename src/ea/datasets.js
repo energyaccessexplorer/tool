@@ -232,5 +232,6 @@ function ea_datasets_districts() {
       });
 
       ea_districts.unshift(null);
-    }).get();
+    })
+    .get();
 };

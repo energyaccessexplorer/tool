@@ -3,3 +3,5 @@
 /lib
 /src/scratch.js
 /default.mk
+/dist/data
+/dist/lib

@@ -1,3 +1,7 @@
+body {
+  overflow: hidden;
+}
+
 #playground {
   display: flex;
   flex-flow: row nowrap;
@@ -10,13 +14,14 @@
   padding: 0;
 }
 
+#controls-wrapper {
+  width: 33%;
+}
+
 #controls {
-  flex: 0;
-  width: 600px;
-
-  z-index: 0;
-
   display: flex;
+  flex: 0;
+  z-index: 0;
 }
 
 #visual {
@@ -40,7 +45,15 @@
 }
 
 #layers {
-  flex: 0 350px;
+  position: fixed;
+  width: 350px;
+  bottom: 1em;
+  right: 1em;
+}
+
+#layers-list {
+  height: 350px !important;
+  overflow-y: scroll;
 }
 
 div#mapbox-container,
@@ -62,7 +75,7 @@ canvas#plot {
   top: 0;
   left: 0;
 
-  width: 100%;
+  width: auto;
 
   margin: auto;
 }

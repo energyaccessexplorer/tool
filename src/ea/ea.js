@@ -54,7 +54,8 @@ async function ea_init(tree, collection, bounds) {
 
   ea_controls_tree(tree, collection);
 
-  let dimensions = ea_layout_map(bounds);
+  // let dimensions = ea_layout_map(bounds);
+  ea_layout_map(bounds);
   ea_map_setup(bounds);
 
   ea_dummy = {
@@ -165,8 +166,35 @@ function ea_active_heatmaps(type) {
   else if (['eai', 'ani'].indexOf(type) > -1)
     cat = d => true;
 
+  else
+    cat = d => d.id === type;
+
   return ea_datasets_collection
     .filter(d => d.active && cat(d));
+};
+
+function ea_draw_first_active_nopolygons(coll) {
+  let rd = null;
+
+  for (let t of coll) {
+    let x = ea_datasets_collection.find(d => d.id === t && !d.polygons);
+    if (x) { rd = x; break; }
+  }
+
+  if (rd) ea_canvas_plot(ea_analysis(rd.id));
+};
+
+function ea_sort_canvas_svg(coll) {
+  const head = ea_datasets_collection.find(d => d.id === coll[0]);
+
+  if (!head) return;
+
+  const maparea = document.querySelector('#maparea');
+  const svg = maparea.querySelector('#svg-map');
+  const canvas = maparea.querySelector('#plot');
+
+  if (head.polygons) maparea.insertBefore(canvas, svg)
+  else maparea.insertBefore(svg, canvas)
 };
 
 async function ea_overlord(msg) {
@@ -224,8 +252,6 @@ async function ea_overlord(msg) {
           (typeof x.polygons !== 'undefined') ? ea_map_unload(ea_map, x.id) : null;
       });
 
-      ea_controls_blur_control_groups(false);
-
       ea_canvas_plot(ea_analysis(heatmaps_layers[0]));
     }
 
@@ -240,9 +266,8 @@ async function ea_overlord(msg) {
         }
       });
 
-      ea_controls_blur_control_groups(true);
-
-      ea_canvas_plot(ea_dummy); // TODO: should rasters be shown as layers?
+      ea_draw_first_active_nopolygons(datasets_layers);
+      ea_sort_canvas_svg(datasets_layers);
     }
 
     else {
@@ -279,6 +304,9 @@ async function ea_overlord(msg) {
         ds.active ?
         await ds.polygons.parse.call(ds) :
         ea_map_unload(ea_map, ds.id);
+
+      ea_draw_first_active_nopolygons(datasets_layers);
+      ea_sort_canvas_svg(datasets_layers);
     }
 
     else {
@@ -315,6 +343,9 @@ async function ea_overlord(msg) {
         null, null,
         location.set_query_param('datasets-layers', msg.layers.toString())
       );
+
+      ea_draw_first_active_nopolygons(msg.layers);
+      ea_sort_canvas_svg(msg.layers);
     }
 
     else {

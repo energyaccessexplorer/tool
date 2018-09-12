@@ -123,3 +123,31 @@ function ea_layout_map(bounds) {
     height: height
   };
 };
+
+function ea_dataset_modal(ds) {
+  const m = modal()
+    .header(ds.name_long)
+    .content(`
+<section class="information"></section>
+
+<section class="links">
+  <h2>Sources</h2>
+</section>
+`)();
+
+  const modal_el = document.querySelector('dialog.modal');
+
+  let i = modal_el.querySelector('.information');
+  if (ds.information) i.appendChild(elem(`<h3>Information</h3><pre style="font-family: with-serif; white-space: pre-line;">${ds.information}</pre>`));
+
+  let l = modal_el.querySelector('.links');
+  if (ds.polygons) l.appendChild(elem(`<a class="download-link" href="${ds.polygons.endpoint}">Download polygons file</a>`));
+  if (ds.heatmap) l.appendChild(elem(`<a class="download-link" href="${ds.heatmap.endpoint}">Download heatmap file</a>`));
+};
+
+function ea_index_modal(i) {
+  modal()
+    .header(i)
+    .content("Information about " + i)
+    .footer("footer")();
+};

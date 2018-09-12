@@ -5,22 +5,18 @@ body {
 #country-search {
   display: flex;
   position: absolute;
-  top: 6em;
 
-  /* margin: auto;   */
   z-index: 32;
-
-  flex-direction: row wrap;
-  /* height: 2em; */
+  pointer-events: none;
 }
 
 #country-search-input {
   font-size: 3em;
   font-family: monospace;
   padding: 0.5em;
-  width: 20em;
   height: 1em;
   text-align: center;
+  opacity: 0.7;
 }
 
 #country-search-flag {
@@ -52,4 +48,14 @@ h1, h2, h3, h4, h5 {
 
 h5 {
   margin: 0.5em;
+}
+
+#eae {
+  text-align: center;
+  margin: 1em;
+  background-color: #3A75C4;
+  color: white !important;
+  text-decoration: none;
+  display: block;
+  padding: 0.5em 1em;
 }

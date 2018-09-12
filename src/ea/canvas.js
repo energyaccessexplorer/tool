@@ -48,7 +48,10 @@ function ea_canvas_plot(ds) {
 
   ea_plot_imagedata = plot.ctx.getImageData(0, 0, ds.width, ds.height);
 
-  let tmp_canvas = document.createElement("canvas");
+  const tmp_canvas = document.createElement("canvas");
+
+  // keep these:
+  //
   tmp_canvas.setAttribute("width", ea_canvas.width);
   tmp_canvas.setAttribute("height", ea_canvas.height);
 

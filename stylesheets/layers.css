@@ -99,6 +99,12 @@
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+
+  fill: gray;
+}
+
+.eai .layers-element-controls {
+  fill: white;
 }
 
 .layers-element-controls div {
@@ -119,6 +125,8 @@
   cursor: pointer;
 }
 
+.layers-element-descriptor .layer-interval {
+  width: 100%;
 }
 
 .eai {
@@ -128,7 +136,4 @@
   line-height: 1.8em;
 
   white-space: nowrap;
-  text-transform: uppercase;
-  font-weight: bold;
-  font-family: condensed;
 }

@@ -72,6 +72,11 @@ async function ea_datasets_features(callback) {
   else {
     const endpoint = ds.polygons.endpoint;
 
+    if (!endpoint) {
+      console.warn(`Dataset '${ds.id}' should have a polygons (maybe a file-association missing). Endpoint is: `, endpoint);
+      return ds;
+    }
+
     const url = endpoint.match('^http') ? endpoint :
           `${ea_path_root}data/${ea_ccn3}/${endpoint}`;
 
@@ -216,7 +221,12 @@ async function ea_datasets_tiff_url() {
 };
 
 function ea_datasets_districts() {
-  d3.request(`${ea_path_root}/data/${ea_ccn3}/districts-data.csv`)
+  let endpoint = `${ea_path_root}/data/${ea_ccn3}/districts-data.csv`;
+
+  d3.request(endpoint)
+    .on("error", e => {
+      console.warn(`${endpoint} returned ${e.currentTarget.status} and several datasets might depend on this. Bye!`);
+    })
     .mimeType("text/csv")
     .response(xhr => {
       ea_districts = d3.csvParse(xhr.responseText, d => {

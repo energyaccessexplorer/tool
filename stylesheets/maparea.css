@@ -1,5 +1,5 @@
 #maparea {
-  background-color: #333;
+  background-color: var(--the-white);
 }
 
 canvas#plot {

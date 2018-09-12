@@ -17,7 +17,7 @@ function ea_countries_setup() {
   maparea.style['height'] = height + "px";
 
   const coord_tooltip = document.querySelector('body')
-        .appendChild(elem(`<div id="coord-tooltip"></div>`));
+        .appendChild(elem(`<div style="opacity: 0;" id="coord-tooltip"></div>`));
 
   const cs  = document.querySelector('#country-search');
   const csi = cs.querySelector('#country-search-input');
@@ -53,9 +53,14 @@ function ea_countries_setup() {
 
           if (!x) return v;
 
+          csi.style.display = '';
+
           csi.value = x.name.common;
           css.innerHTML = (`<img class="flag"
                                  src="https://cdn.rawgit.com/mledoze/countries/master/data/${x.cca3.toLowerCase()}.svg" />`);
+
+          cs.style.left = `${ (d3.event.pageX + 7) }px`;
+          cs.style.top =  `${ (d3.event.pageY + 15) }px`;
 
           return v;
         },
@@ -65,7 +70,7 @@ function ea_countries_setup() {
 
       // mapbox_setup(b);
     });
-}
+};
 
 function ea_countries_overview(c, collection) {
   const r = collection.find(i => i.country === c.name.common);
@@ -73,7 +78,7 @@ function ea_countries_overview(c, collection) {
   const co = document.querySelector('#country-overview');
   co.innerHTML = `<h2>${c.name.common}</h2>`;
 
-  let demo, pop, area, urban_rural, pol, gdp, pies, ease, dev;
+  let demo, pop, area, urban_rural, pol, gdp, pies, ease, dev, btn;
 
   if (r) {
     demo = elem('<h4>Demographics</h4>');
@@ -115,7 +120,10 @@ function ea_countries_overview(c, collection) {
     if (+r['ease-business'] > 0)
       ease = elem(`<div>Ease of doing business: ${r['ease-business']} / 190</div>`);
 
-    [demo, area, pop, urban_rural, gdp, pies, dev, pol, ease].forEach(t => t ? co.appendChild(t) : null);
+    if (+r['ccn3'] === 834 || +r['ccn3'] === 800)
+      btn = elem(`<a id="eae" href="/maps-and-data/tool?ccn3=${r['ccn3']}">Click to launch tool</a>`);
+
+    [demo, area, pop, urban_rural, gdp, pies, dev, pol, ease, btn].forEach(t => t ? co.appendChild(t) : null);
 
     if (+r['electrification-rate-urban'] > 0) {
       co.querySelector('.pie-charts-legends')

@@ -14,5 +14,27 @@
 }
 
 #views .view.active {
-  background-color: var(--the-white);
+  background-color: var(--the-blue);
+  color: var(--the-white);
+}
+
+h1, h2, h3 {
+  color: var(--the-blue);
+  font-family: condensed;
+}
+
+.download-link {
+  display: block;
+  padding: 0.5em 1em;
+  margin: 1em;
+  max-width: 15em;
+  text-decoration: none;
+  color: var(--the-blue);
+  /* border: 1px solid var(--the-blue); */
+  clear: both;
+}
+
+.download-link:after {
+  margin-left: 1em;
+  content: '\21F2';
 }

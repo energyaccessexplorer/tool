@@ -105,7 +105,7 @@ function ea_controls_mutant_options(ds) {
 
   ds.metadata.mutant_targets.forEach(o => {
     const host = ea_datasets_collection.find(x => x.id === o);
-    select.appendChild(elem(`<option value=${o}>${host.description}</option>`));
+    select.appendChild(elem(`<option value=${o}>${host.name_long}</option>`));
   });
 
   select.value = ds.metadata.mutant_targets[0];
@@ -165,12 +165,10 @@ function ea_controls_elem(ds) {
     }
   });
 
-  header.appendChild(elem(`<span class="controls-dataset-description">${ds.name_long}</span>`));
+  header.appendChild(elem(`<div class="controls-dataset-description">${ds.name_long}</div>`));
 
-  if (ds.unit) {
-    header
-      .appendChild(elem(`<span class="controls-dataset-unit small">(${ds.unit})</span>`));
-  }
+  if (ds.unit)
+    header.appendChild(elem(`<div class="controls-dataset-unit small">(${ds.unit})</div>`));
 
   return controls;
 };
@@ -241,20 +239,8 @@ function ea_controls_options(ds) {
   });
 
   container.appendChild(select);
-  container.appendChild(elem('<div>&nbsp;</div>')); // TODO: remove this.
 
   return container;
-};
-
-function ea_controls_blur_control_groups(bool) {
-  const contel = document.querySelectorAll('.controls-dataset-content');
-
-  contel.forEach((c,i) => {
-    if (c) {
-      c.style['opacity'] = bool ? 0.1 : 1;
-      c.style['pointer-events'] = bool ? 'none' : '';
-    }
-  });
 };
 
 function ea_controls_active(ds, callback) {
@@ -298,8 +284,14 @@ function ea_controls_range(ds, label) {
   const v1 = l.querySelector('[bind=v1]');
   const v2 = l.querySelector('[bind=v2]');
 
+  let csf = _ => {
+    return d3.scaleLinear()
+      .clamp(false)
+      .range([getComputedStyle(document.body).getPropertyValue('--the-blue')])
+  };
+
   const svg = ea_svg_interval_thingradient(
-    ds.color_scale_fn,
+    csf,
     x => update_range_value(x, 0, v1),
     x => update_range_value(x, 1, v2),
     _ => ea_overlord({

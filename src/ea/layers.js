@@ -36,45 +36,19 @@ function ea_layers_dataset_elem(ds) {
     <div class="layers-element-header">
       <div class="layers-element-title">${ds.name_long}</div>
 
-      <div class="layers-element-controls">
-        <div class="layer-type"></div>
-        <div class="layer-visibility"></div>
-        <div class="layer-info"></div>
-      </div>
+      <div class="layers-element-controls"></div>
     </div>
 
     <div class="layers-element-descriptor"></div>
   </div>
 </li>`);
 
-  if (ds.unit) {
-    d.querySelector('.layers-element-title')
-      .appendChild(elem(`<span class="small">&nbsp;&nbsp;(${ds.unit})</span>`));
-  }
+  let lec = d.querySelector('.layers-element-controls');
 
-  d.querySelector('.layer-type').addEventListener('mouseup', (e) => {
-    flash()
-      .message("this does something, right?")();
-  });
+  let dli = elem(`<div class="layer-info">${ea_svg_info(0.75)}</div>`);
+  dli.addEventListener('mouseup', _ => ea_dataset_modal(ds));
 
-  let visible = true;
-  d.querySelector('.layer-visibility').addEventListener('mouseup', (e) => {
-    visible = !visible;
-
-    if (ds.raster) {
-      ea_canvas.style['opacity'] = (visible ? 1 : 0);
-    }
-
-    else if (ds.features) {
-      ea_map.map.select(`#${ds.id}`).style('opacity', (visible ? 1 : 0))
-    }
-  });
-
-  d.querySelector('.layer-info').addEventListener('mouseup', (e) => {
-    flash()
-      .type('info')
-      .message("Info: " + ds.description)();
-  });
+  lec.appendChild(dli);
 
   if (ds.polygons && ds.polygons.symbol)
     d.querySelector('.layers-element-descriptor').appendChild(ea_svg_symbol(ds.polygons.symbol, ds.id, 36));
@@ -99,11 +73,7 @@ function ea_layers_heatmap_elem(t, v) {
     <div class="layers-element-header">
       <div class="layers-element-title">${v}</div>
 
-      <div class="layers-element-controls">
-        <div class="layer-type"></div>
-        <div class="layer-visibility"></div>
-        <div class="layer-info"></div>
-      </div>
+      <div class="layers-element-controls"></div>
     </div>
 
     <div class="layers-element-descriptor">
@@ -115,6 +85,13 @@ function ea_layers_heatmap_elem(t, v) {
     </div>
   </div>
 </li>`);
+
+  let lec = d.querySelector('.layers-element-controls');
+
+  let dli = elem(`<div class="layer-info">${ea_svg_info(0.75)}</div>`);
+  dli.addEventListener('mouseup', _ => ea_index_modal(t));
+
+  lec.appendChild(dli);
 
   d.querySelector('.layers-element-descriptor').prepend(svg);
 
@@ -157,15 +134,30 @@ function ea_layers_datasets(list) {
   if (list.length === 0)
     layers_list.innerHTML = `<pre ${style}>No layers selected.</pre>`;
 
-  else if (typeof ldc.find(i => i.polygons) === 'undefined')
-    layers_list.appendChild(elem(`<pre ${style}>No layers with polygons selected.</pre>`));
-
   sortable('#layers-list', 'enable');
 };
 
 function ea_layers_init() {
   const layers = document.querySelector('#layers');
   const list = layers.querySelector('#layers-list');
+
+  const min_arrow = elem(`
+<div style="display: flex; justify-content: flex-end;">
+  <div style="width: 24px; background-color: rgba(0,0,0,0.7); padding: 0.5em 0.7em; color: white; fill: white; cursor: pointer;">
+    <svg id="icon-arrow-down" viewBox="0 0 38 32" width="100%" height="100%"><title>arrow-down</title><path d="M22.2 18.636l9.879-9.879 5.121 4.243-18 18-18-18 5.121-4.243 9.879 9.879v-17.636h6v17.636z"></path></svg>
+  </div>
+</div>
+`);
+
+  let v = true;
+
+  min_arrow.addEventListener('mouseup', function(e) {
+    v = !v;
+    list.style.display = v ? '' : 'none';
+    min_arrow.style.transform = v ? "scale(1, 1)" : "scale(1, -1)";
+  });
+
+  layers.prepend(min_arrow);
 
   sortable('#layers-list', {
     items: 'li.layers-element',

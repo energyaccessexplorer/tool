@@ -39,7 +39,7 @@ function ea_svg_land_mask(g, o) {
     .style("stroke", 'none');
 };
 
-function ea_svg_checkbox(init, callback) {
+function ea_svg_switch(init, callback) {
   const radius = 7,
         svgwidth = 42,
         svgheight = (radius + 1) * 2,
@@ -109,8 +109,54 @@ function ea_svg_checkbox(init, callback) {
   return svg.node();
 };
 
+function ea_svg_checkbox(init, callback) {
+  const size = 24;
+
+  const svg = d3.select(document.createElementNS(d3.namespaces.svg, "svg"))
+        .attr('class', 'svg-checkbox');
+
+  const g = svg.append('g');
+  const gutter = g.append('rect');
+  const check = g.append('path');
+
+  let status = init || false;
+
+  svg
+    .attr('width', size)
+    .attr('height', size)
+    .style('cursor', 'pointer');
+
+  gutter
+    .attr('stroke', '#ccc')
+    .attr('x', 0)
+    .attr('y', 0)
+    .attr('rx', 1)
+    .attr('ry', 1)
+    .attr('width', size)
+    .attr('height', size);
+
+  check
+    .attr('fill', 'white')
+    .attr('stroke', 'white')
+    .attr('d', "M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z");
+
+  function change(s,i) {
+    gutter
+      .attr('stroke', (s ? '#1c4478' : '#ccc'))
+      .style('fill', (s ? '#1c4478' : 'white'));
+
+    if (typeof callback === 'function' && !i) callback(s);
+  }
+
+  svg.on('click', _ => change(status = !status));
+
+  change(status, init);
+
+  return svg.node();
+};
+
 function ea_svg_range_steps(steps, init, drag_callback, end_callback, is_weight) {
-  const radius = (is_weight ? 5 : 6),
+  const radius = 6,
         svgwidth = 225,
         svgheight = (radius * 2) + 2,
         linewidth = radius * 2,
@@ -164,10 +210,11 @@ function ea_svg_range_steps(steps, init, drag_callback, end_callback, is_weight)
 
   c1
     .attr('r', radius)
-    .attr('cy', svgheight/2)
+    .attr('cy', svgheight/2 + 1)
     .attr('stroke', 'white')
     .attr('stroke-width', 1)
-    .style('cursor', 'grab');
+    .style('cursor', 'grab')
+    .raise();
 
   let x_position;
 
@@ -416,8 +463,8 @@ function ea_svg_pie(container_id, data, outer, inner, colors, inner_text, create
   };
 };
 
-function ea_svg_color_gradient(color_scale) {
-  const radius = 6,
+function ea_svg_color_gradient(color_scale, r) {
+  const radius = r || 6,
         svgwidth = 280,
         svgheight = (radius * 2) + 2,
         linewidth = radius * 2,
@@ -455,7 +502,7 @@ function ea_svg_color_gradient(color_scale) {
   const marked = g.append('rect');
 
   svg
-    .attr('width', svgwidth + 2)
+    .attr('width', "100%")
     .attr('height', svgheight + 2);
 
   marked
@@ -463,7 +510,7 @@ function ea_svg_color_gradient(color_scale) {
     .attr('stroke', 'none')
     .attr('x', 1)
     .attr('y', 1)
-    .attr('width', svgwidth - 2)
+    .attr('width', "100%")
     .attr('height', svgheight - 2);
 
   return svg.node();
@@ -675,4 +722,20 @@ function ea_svg_symbol_pick(str) {
   }
 
   return s;
+};
+
+function ea_svg_info(scale = 1) {
+  return `
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="transform: scale(${scale});">
+    <path d="M0 0h24v24H0z" fill="none"/>
+    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+</svg>`;
+};
+
+function ea_svg_opacity(scale = 1) {
+  return `
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="transform: scale(${scale});">
+    <path fill="none" d="M24 0H0v24h24V0zm0 0H0v24h24V0zM0 24h24V0H0v24z"/>
+    <path d="M17.66 8L12 2.35 6.34 8C4.78 9.56 4 11.64 4 13.64s.78 4.11 2.34 5.67 3.61 2.35 5.66 2.35 4.1-.79 5.66-2.35S20 15.64 20 13.64 19.22 9.56 17.66 8zM6 14c.01-2 .62-3.27 1.76-4.4L12 5.27l4.24 4.38C17.38 10.77 17.99 12 18 14H6z"/>
+</svg>`;
 };

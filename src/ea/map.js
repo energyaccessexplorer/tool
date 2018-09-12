@@ -44,7 +44,23 @@ function ea_map_svg(svg, topofile, name, options) {
   const land = map.append('g').attr('id', "land")
         .attr('fill', "none");
 
-  topo = topojson.feature(topofile, topofile.objects[name]);
+  switch (topofile.type) {
+  case "FeatureCollection": {
+    topo = topofile
+    break;
+  }
+
+  case "Topology": {
+    topo = topojson.feature(topofile, topofile.objects[name]);
+    break;
+  }
+
+  default: {
+    console.warn("Don't know what to do with topofile type:", topofile.type)
+    flash().type('error').message(topofile.type);
+    break;
+  }
+  }
 
   width = +svg.attr('width');
   height = +svg.attr('height');

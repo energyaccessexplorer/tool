@@ -5,3 +5,5 @@
 /default.mk
 /dist/data
 /dist/lib
+/dist/config.js
+/postgrest.conf

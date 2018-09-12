@@ -20,7 +20,7 @@
 
 .controls .weight-label {
   font-size: 0.7em;
-  margin-bottom: 0.7em;
+  margin-top: 0.3em;
   font-weight: bold;
   display: inline-block;
 }
@@ -69,6 +69,10 @@
   color: var(--the-white);
   fill: var(--the-white);
   cursor: pointer;
+
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .controls-category-title .triangle {
@@ -92,6 +96,10 @@
   border-bottom: solid 1px #d9d9d9;
   background-color: white;
   cursor: pointer;
+
+  position: sticky;
+  top: 64px;
+  z-index: 9;
 }
 
 .controls-subcategory-title .triangle {
@@ -104,11 +112,10 @@
   cursor: pointer;
   padding-top: 1em;
   padding-bottom: 1em;
-  background-color: #f4f4f4;
+  background-color: #f1f1f1;
 }
 
 .controls-dataset-content {
-  background-color: #f4f4f4;
   box-sizing: border-box;
   padding-top: 1em;
   padding-bottom: 1em;
@@ -120,42 +127,45 @@
   padding-right: 0.5em;
 }
 
-.controls-dataset-description,
-.controls-dataset-unit {
-  vertical-align: middle;
+.controls-dataset-header .svg-checkbox {
+  transform: scale(0.65);
 }
 
 .controls-dataset-description {
-  text-align: right;
-  white-space: nowrap;
+  display: inline-block;
   margin: auto 0.5em;
+
+  white-space: nowrap;
+  vertical-align: text-top;
 }
 
 .controls-dataset-unit {
+  display: inline-block;
   margin-right: 1em;
+  margin-bottom: 0.7em;
 }
 
 .collapse {
   cursor: pointer;
 }
 
-#controls-preset {
+select#controls-preset,
+#controls select {
   border: none;
   width: 100%;
 
-  font-size: 2em;
-  padding: 0.7em;
+  padding: 0.65em;
   background-color: white;
+}
+
+select#controls-preset {
+  font-size: 2em;
   font-family: condensed;
   font-weight: bold;
   text-transform: uppercase;
 
   text-align-last: center;
   text-align: center;
-
-  appearance: none !important;
-  -moz-appearance: none !important;
-  -webkit-appearance: none !important;
 }
 
 #supply, #demand {

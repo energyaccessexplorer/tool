@@ -181,6 +181,7 @@ function ea_draw_first_active_nopolygons(coll) {
   }
 
   if (rd) ea_canvas_plot(ea_analysis(rd.id));
+  else ea_canvas_plot(ea_analysis(ea_dummy));
 };
 
 function ea_sort_canvas_svg(coll) {

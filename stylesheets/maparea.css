@@ -10,10 +10,6 @@ svg#svg-map {
   opacity: 1.0;
 }
 
-svg#svg-mask {
-  pointer-events: none;
-}
-
 #coord-tooltip {
   position: absolute;
   display: none;

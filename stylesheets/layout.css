@@ -57,8 +57,7 @@ body {
 }
 
 div#mapbox-container,
-svg#svg-map,
-svg#svg-mask {
+svg#svg-map {
   position: absolute;
   top: 0;
   left: 0;

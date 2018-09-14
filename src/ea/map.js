@@ -26,8 +26,6 @@ function ea_map_setup(bounds) {
         scale: 0,
       });
 
-      // ea_svg_land_mask(ea_map, { width: dimensions.width, height: dimensions.height });
-
       mapbox_setup(bounds);
       ea_map.init();
     });

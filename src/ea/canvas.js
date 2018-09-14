@@ -1,9 +1,6 @@
 function ea_canvas_setup(dummy) {
   const i = dummy.image;
 
-  ea_canvas.setAttribute("width", i.getWidth());
-  ea_canvas.setAttribute("height", i.getHeight());
-
   // STRANGE: force the canvas to 2d...
   //
   ea_canvas.getContext('2d');
@@ -45,19 +42,6 @@ function ea_canvas_plot(ds) {
   ea_plot = plot;
 
   plot.render();
-
-  ea_plot_imagedata = plot.ctx.getImageData(0, 0, ds.width, ds.height);
-
-  const tmp_canvas = document.createElement("canvas");
-
-  // keep these:
-  //
-  tmp_canvas.setAttribute("width", ea_canvas.width);
-  tmp_canvas.setAttribute("height", ea_canvas.height);
-
-  ea_canvas_draw(d3.zoomTransform(ea_map.svg.node()), tmp_canvas);
-
-  tmp_canvas.remove();
 
   return plot;
 };

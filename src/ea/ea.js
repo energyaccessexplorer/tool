@@ -54,10 +54,6 @@ async function ea_init(tree, collection, bounds) {
 
   ea_controls_tree(tree, collection);
 
-  // let dimensions = ea_layout_map(bounds);
-  ea_layout_map(bounds);
-  ea_map_setup(bounds);
-
   ea_dummy = {
     id: "dummy",
     description: "Dummy dataset",
@@ -71,6 +67,9 @@ async function ea_init(tree, collection, bounds) {
   await ea_dummy.heatmap.parse.call(ea_dummy);
 
   ea_dummy.raster = new Uint16Array(ea_dummy.width * ea_dummy.height).fill(ea_dummy.nodata);
+
+  ea_layout_map(bounds, [ea_dummy.width, ea_dummy.height]);
+  ea_map_setup(bounds);
 
   ea_canvas_setup(ea_dummy);
 

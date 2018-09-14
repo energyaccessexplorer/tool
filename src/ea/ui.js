@@ -96,18 +96,13 @@ function ea_layout_map(bounds) {
   const w = (b[1][0] - b[0][0]);
   const h = (b[1][1] - b[0][1]);
 
-  width = p.clientWidth -
-    (p.querySelector('#controls').clientWidth +
-     p.querySelector('#layers').clientWidth) + 10;
+  height = p.clientHeight;
 
-  height = h * (width / w);
+  width = p.clientWidth - p.querySelector('#controls').clientWidth + 10;
+  ea_canvas = document.querySelector('canvas#plot');
 
   const coord_tooltip = document.querySelector('body')
         .appendChild(elem(`<div id="coord-tooltip"></div>`));
-
-  ea_canvas = document.querySelector('canvas#plot');
-  ea_canvas.style['width'] = width + "px";
-  ea_canvas.style['height'] = height + "px";
 
   const maparea = document.querySelector('#maparea');
   maparea.style['width'] = width + "px";

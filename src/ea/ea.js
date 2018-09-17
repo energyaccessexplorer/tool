@@ -125,7 +125,7 @@ function ea_analysis(type) {
   const scales = collection.map(d => ea_datasets_scale_fn(d, type));
 
   const full_weight = collection
-        .reduce((a,c,k) => ((c.datatype === "boolean") ? a : c.weight + a), 0);
+        .reduce((a,c,k) => ((c.heatmap.scale === "key-delta") ? a : c.weight + a), 0);
 
   for (var i = 0; i < ds.raster.length; i++) {
     const t = collection.reduce((a, c, k, l) => {
@@ -145,7 +145,10 @@ function ea_analysis(type) {
       const sv = scales[k](v);
       if (sv < 0 || sv > 1) return -1;
 
-      return (sv * c.weight) + a;
+      if (c.heatmap.scale === "key-delta")
+        return a;
+      else
+        return (sv * c.weight) + a;
     }, 0);
 
     ds.raster[i] = (t === -1) ? t : t / full_weight;

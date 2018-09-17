@@ -23,6 +23,11 @@ function ea_datasets_scale_fn(ds, type) {
     break;
   }
 
+  case 'key-delta': {
+    s = x => (ea_districts[x][o] < t[0] || ea_districts[x][o] > t[1]) ? -1 : 1;
+    break;
+  }
+
   case 'linear':
   default: {
     s = lin.clamp(ds.heatmap.clamp)
@@ -220,7 +225,7 @@ async function ea_datasets_tiff_url() {
   return ds;
 };
 
-function ea_datasets_districts() {
+function ea_datasets_districts(ds) {
   let endpoint = `${ea_path_root}/data/${ea_ccn3}/districts-data.csv`;
 
   d3.request(endpoint)
@@ -231,18 +236,17 @@ function ea_datasets_districts() {
     .mimeType("text/csv")
     .response(xhr => {
       ea_districts = d3.csvParse(xhr.responseText, d => {
-        return {
-          oid: +d.OBJECTID,
-          district: d.District,
-          region: d.Region,
-          livestock: +d.Livestock,
-          radio: +d.Radio,
-          mobile: +d.Mobile,
-          ironrooftop: +d.IronRooftop,
-        }
+        const o = { oid: +d[ds.metadata.oid] };
+
+        Object.keys(ds.metadata.options).forEach(k => o[k] = +d[k] || d[k]);
+
+        return o;
       });
 
-      ea_districts.unshift(null);
+      // hack: so we can access them by oid (as an array, they are
+      // generally a sequence starting at 1)
+      //
+      ea_districts.unshift({ oid: 0 });
     })
     .get();
 };

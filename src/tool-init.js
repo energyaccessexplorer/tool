@@ -55,8 +55,6 @@ require([
 
   plotty.addColorScale("ea", ['#1c4478', '#81b062', '#e5a82e'], [0, 0.5, 1]);
 
-  ea_datasets_districts();
-
   ea_map = null;
 
   ea_views_init();

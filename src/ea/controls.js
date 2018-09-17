@@ -194,6 +194,7 @@ function ea_controls(ds) {
   case "mines":
   case "hydro":
   case "facilities":
+  case "health":
   case "powerplants":
   case "transmission-lines":
     controls.appendChild(ea_controls_range(ds, 'proximity in km'));
@@ -201,6 +202,7 @@ function ea_controls(ds) {
     break;
 
   case 'districts':
+  case 'subcounties':
     controls.appendChild(ea_controls_options(ds));
     controls.appendChild(ea_controls_range(ds, 'range'));
     break;

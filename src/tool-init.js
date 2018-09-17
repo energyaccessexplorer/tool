@@ -92,6 +92,10 @@ require([
 
         ea_datasets_collection = collection.filter(d => d);
 
+        ea_datasets_districts(
+          ea_datasets_collection
+            .find(d => d.id === 'districts' || d.id === 'subcounties'));
+
         ea_init(
           country.category_tree,
           ea_datasets_collection,

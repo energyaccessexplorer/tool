@@ -28,6 +28,7 @@ path.hydro {
   stroke: black;
 }
 
+path.health,
 path.facilities {
   fill: red;
   fill-opacity: 1;
@@ -41,6 +42,7 @@ path.transmission-lines {
   stroke-linecap: round;
 }
 
+path.subcounties,
 path.districts {
   fill: black;
   fill-opacity: 0.1;

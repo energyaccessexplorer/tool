@@ -225,7 +225,8 @@ function ea_datasets_districts() {
 
   d3.request(endpoint)
     .on("error", e => {
-      console.warn(`${endpoint} returned ${e.currentTarget.status} and several datasets might depend on this. Bye!`);
+      console.warn(`${endpoint} raised an error and several datasets might depend on this. Bye!`);
+      console.warn(e);
     })
     .mimeType("text/csv")
     .response(xhr => {

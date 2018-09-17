@@ -74,10 +74,10 @@ function ea_map_svg(svg, topofile, name, options) {
     .projection(projection);
 
   const b = geopath.bounds(topo);
-  const angle_width = (b[1][0] - b[0][0]);
-  const angle_height = (b[1][1] - b[0][1]);
+  const geo_width = (b[1][0] - b[0][0]);
+  const geo_height = (b[1][1] - b[0][1]);
 
-  scale = 1 / (Math.max(angle_width / width, angle_height / height));
+  scale = 1 / (Math.max(geo_width / width, geo_height / height));
   translate = [width/2 , height/2];
 
   projection

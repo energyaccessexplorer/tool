@@ -59,7 +59,7 @@ async function ea_init(tree, collection, bounds) {
     description: "Dummy dataset",
 
     heatmap: {
-      endpoint: "/districts.tif",
+      endpoint: "districts.tif",
       parse: ea_datasets_tiff_url,
     },
   };
@@ -139,7 +139,7 @@ function ea_analysis(type) {
       if (v === c.nodata) return -1;
 
       // If the scaling function clamped, the following wont
-      // happend. But if there the values are above our analysis
+      // happen. But if there the values are outside our analysis
       // domain, we assume clipping by setting -1 (nodata).
       //
       const sv = scales[k](v);

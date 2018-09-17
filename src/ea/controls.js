@@ -227,7 +227,7 @@ function ea_controls_options(ds) {
 
   const options = Object.keys(ds.metadata.options);
 
-  options.forEach((v,i) => {
+  options.forEach(v => {
     select.appendChild(elem(`<option value=${v}>${ds.metadata.options[v]}</option>`));
   });
 

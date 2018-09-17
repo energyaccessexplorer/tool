@@ -1,41 +1,48 @@
-.schools {
+path.schools {
   fill: orange;
   fill-opacity: 1;
   stroke: black;
 }
 
-.mines {
+path.mines {
   fill: lightgray;
   fill-opacity: 1;
   stroke: black;
 }
 
-.minigrids {
+path.minigrids {
   fill: yellow;
   fill-opacity: 1;
   stroke: black;
 }
 
-.powerplants {
+path.powerplants {
   fill: hotpink;
   fill-opacity: 1;
   stroke: black;
 }
 
-.hydro {
+path.hydro {
   fill: cyan;
   fill-opacity: 1;
   stroke: black;
 }
 
-.facilities {
+path.facilities {
   fill: red;
   fill-opacity: 1;
   stroke: white;
 }
 
-.transmission-lines {
+path.transmission-lines {
+  fill: none;
+  stroke: black;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+path.districts {
   fill: black;
-  fill-opacity: 0.7;
+  fill-opacity: 0.1;
   stroke: black;
 }

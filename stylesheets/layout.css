@@ -52,7 +52,7 @@ body {
 }
 
 #layers-list {
-  height: 350px !important;
+  max-height: 350px !important;
   overflow-y: scroll;
 }
 

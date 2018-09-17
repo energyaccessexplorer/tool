@@ -193,11 +193,12 @@ function ea_sort_canvas_svg(coll) {
   if (!head) return;
 
   const maparea = document.querySelector('#maparea');
-  const svg = maparea.querySelector('#svg-map');
-  const canvas = maparea.querySelector('#plot');
 
-  if (head.polygons) maparea.insertBefore(canvas, svg)
-  else maparea.insertBefore(svg, canvas)
+  const svg = maparea.querySelector('#svg-map');
+  const mbc = maparea.querySelector('#mapbox-container');
+
+  if (head.polygons) maparea.insertBefore(mbc, svg)
+  else maparea.insertBefore(svg, mbc)
 };
 
 async function ea_overlord(msg) {

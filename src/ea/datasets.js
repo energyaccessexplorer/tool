@@ -83,7 +83,7 @@ async function ea_datasets_features(callback) {
     }
 
     const url = endpoint.match('^http') ? endpoint :
-          `${ea_path_root}data/${ea_ccn3}/${endpoint}`;
+          `${ea_settings.endpoint_base}/${ea_ccn3}/${endpoint}`;
 
     await ea_client(
       url, 'GET', null,
@@ -215,7 +215,7 @@ async function ea_datasets_tiff_url() {
   const endpoint = ds.heatmap.endpoint;
 
   const url = endpoint.match('^http') ? endpoint :
-    `${ea_path_root}data/${ea_ccn3}/${endpoint}`;
+        `${ea_settings.endpoint_base}/${ea_ccn3}/${endpoint}`;
 
   await fetch(url)
     .then(ea_client_check)
@@ -226,7 +226,7 @@ async function ea_datasets_tiff_url() {
 };
 
 function ea_datasets_districts(ds) {
-  let endpoint = `${ea_path_root}/data/${ea_ccn3}/districts-data.csv`;
+  let endpoint = `${ea_settings.endpoint_base}/${ea_ccn3}/districts-data.csv`;
 
   d3.request(endpoint)
     .on("error", e => {

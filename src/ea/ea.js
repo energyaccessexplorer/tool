@@ -2,11 +2,7 @@ async function ea_init(tree, collection, bounds) {
   let datasets_layers_param = location.get_query_param('datasets-layers');
   let datasets_layers;
 
-  if (!datasets_layers_param) {
-    ea_overlord({ type: "init", caller: "ea_init", });
-    datasets_layers = [];
-  }
-
+  if (!datasets_layers_param) datasets_layers = [];
   else datasets_layers = datasets_layers_param.split(',');
 
   tree.forEach(cat => cat.subcategories.forEach(sub => sub.datasets.filter(d => {
@@ -73,7 +69,7 @@ async function ea_init(tree, collection, bounds) {
 
   ea_canvas_setup(ea_dummy);
 
-  (async () => {
+  (async _ => {
     for (var id of datasets_layers) {
       let ds = collection.find(d => d.id === id);
       if (typeof ds !== 'undefined') await ea_datasets_load(ds);
@@ -87,6 +83,59 @@ async function ea_init(tree, collection, bounds) {
   })();
 
   ea_ui_app_loading(false);
+};
+
+async function ea_country_init(ccn3) {
+  let country = null;
+  let it = null;
+
+  await ea_client(
+    `${ea_settings.database}/countries?ccn3=eq.${ccn3}`,
+    'GET', 1,
+    r => country = r
+  );
+
+  await ea_client(
+    `${ea_settings.database}/datasets?country_id=eq.${country.id}&select=*,heatmap_file(*),polygons_file(*),category(*)`, 'GET', null,
+    r => {
+      const collection = r.map(e => {
+        let heatmap = e.category.heatmap;
+        if (heatmap && e.heatmap_file) heatmap.endpoint = e.heatmap_file.endpoint;
+
+        let polygons = e.category.polygons;
+        if (polygons && e.polygons_file) polygons.endpoint = e.polygons_file.endpoint;
+
+        if (e.category.configuration && e.category.configuration.mutant) console.log('mutant: ', e.category_name, e.id);
+        else if (!e.heatmap_file && !e.polygons_file) return undefined;
+
+        return {
+          "name_long": e.category.name_long,
+          "description": e.category.description,
+          "description_long": e.category.description_long,
+          "heatmap": heatmap,
+          "polygons": polygons,
+          "id": e.category.name,
+          "information": e.category.information,
+          "unit": e.category.unit,
+          "metadata": e.metadata,
+          "configuration": e.category.configuration,
+        };
+      });
+
+      const datasets_collection = collection.filter(d => d);
+
+      ea_datasets_districts(
+        datasets_collection
+          .find(d => d.id === 'districts' || d.id === 'subcounties'));
+
+      it = {
+        category_tree: country.category_tree,
+        datasets_collection: datasets_collection,
+        country_bounds: country.bounds
+      };
+    });
+
+  return it;
 };
 
 /*
@@ -117,8 +166,6 @@ function ea_analysis(type) {
     nodata: -1,
     color_scale: ea_default_color_scheme,
   };
-
-  ea_canvas.style['opacity'] = (collection.length === 0) ? 0 : 1;
 
   if (!collection.length) return tmp;
 
@@ -212,6 +259,8 @@ async function ea_overlord(msg) {
   let heatmaps_layers_param = location.get_query_param('heatmaps-layers');
   let datasets_layers_param = location.get_query_param('datasets-layers');
 
+  /* TODO: remove any {heatmaps,datasets}_layers that are not in the collection */
+
   if (!heatmaps_layers_param) {
     heatmaps_layers = ["eai", "ani", "supply", "demand"];
     history.replaceState(
@@ -239,7 +288,26 @@ async function ea_overlord(msg) {
 
   switch (msg.type) {
   case "init": {
-    console.log("Overlord: init");
+    /* TODO: these are the global objects. Fix it: remove. */
+
+    ea_ccn3 = location.get_query_param('ccn3');
+    ea_map = null;
+    ea_plot = null;
+    ea_datasets_collection = null;
+    ea_mapbox = null;
+    ea_dummy = null;
+    ea_canvas = null;
+
+    console.log("EA Overlord: init!");
+
+    const it = await ea_country_init(ea_ccn3);
+    ea_datasets_collection = it.datasets_collection;
+
+    ea_views_init();
+    ea_layers_init();
+
+    ea_init(it.category_tree, it.datasets_collection, it.country_bounds)
+
     break;
   }
 

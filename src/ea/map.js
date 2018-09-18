@@ -7,7 +7,7 @@ function ea_map_setup(bounds) {
   const center = [b[0][0] + (Math.abs(w/2)), b[0][1] + (Math.abs(h/2))];
 
   d3.queue()
-    .defer(d3.json, `${ea_path_root}lib/${ea_ccn3}-adm0.json`)
+    .defer(d3.json, `${ea_settings.app_base}/lib/${ea_ccn3}-adm0.json`)
     .await((error, topo) => {
       if (error) {
         flash()
@@ -26,7 +26,13 @@ function ea_map_setup(bounds) {
         scale: 0,
       });
 
-      mapbox_setup(bounds);
+      if (ea_settings.mapbox_theme) {
+        ea_canvas.style.display = 'none';
+        ea_mapbox = mapbox_setup(bounds, ea_settings.mapbox_theme, ea_settings.mapbox_token);
+      } else {
+        ea_canvas.style.display = '';
+      }
+
       ea_map.init();
     });
 }
@@ -167,8 +173,8 @@ function ea_map_svg(svg, topofile, name, options) {
       const nw = projection.invert(et.invert([0,0]));
       const se = projection.invert(et.invert([width, height]));
 
-      if (typeof mapbox !== 'undefined' && mapbox !== null)
-        mapbox.fitBounds([[nw[0], se[1]], [se[0], nw[1]]], { animate: false });
+      if (typeof ea_mapbox !== 'undefined' && ea_mapbox !== null)
+        ea_mapbox.fitBounds([[nw[0], se[1]], [se[0], nw[1]]], { animate: false });
 
       map.attr("transform", et);
       mask.attr("transform", et);

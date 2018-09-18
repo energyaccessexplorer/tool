@@ -11,8 +11,8 @@ stop:
 deploy:
 	sed -i \
 		-e 's%database: "${DB_SERV_DEV}",%database: "${DB_SERV_PROD}",%' \
-		-e 's%mapboxstyle: null%mapboxstyle: "light"%' \
-		${DIST}/config.js
+		-e 's%mapbox_theme: null%mapbox_theme: "light"%' \
+		${DIST}/settings.js
 
 	@rsync -OPrv \
 		--checksum \
@@ -25,5 +25,5 @@ deploy:
 
 	sed -i \
 		-e 's%database: "${DB_SERV_PROD}",%database: "${DB_SERV_DEV}",%' \
-		-e 's%mapboxstyle: "light"%mapboxstyle: null%' \
-		${DIST}/config.js
+		-e 's%mapbox_theme: "light"%mapbox_theme: null%' \
+		${DIST}/settings.js

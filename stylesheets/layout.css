@@ -74,8 +74,6 @@ canvas#plot {
   top: 0;
   left: 0;
 
-  display: none;
-
   width: auto;
   margin: auto;
 }

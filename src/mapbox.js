@@ -1,16 +1,9 @@
-mapbox = null;
-
-mapbox_setup = (bounds) => {
-  if (!ea_settings.mapboxstyle) {
-    console.info("mapbox_setup: Mapbox disabled. Return.");
-    return;
-  }
-
+function mapbox_setup(bounds, theme, token) {
   mapboxgl.accessToken = ea_settings.mapbox_token;
 
-  mapbox = new mapboxgl.Map({
+  const mapbox = new mapboxgl.Map({
     container: 'mapbox-container',
-    style: `mapbox://styles/mapbox/${ea_settings.mapboxstyle}-v9`,
+    style: `mapbox://styles/mapbox/${theme}-v9`,
     interactive: false,
   });
 
@@ -27,6 +20,7 @@ mapbox_setup = (bounds) => {
     mapbox.addSource('canvas-source', {
       type: 'canvas',
       canvas: 'plot',
+
       coordinates: [
         [r, u],
         [l, u],
@@ -41,4 +35,6 @@ mapbox_setup = (bounds) => {
       type: 'raster',
     });
   });
+
+  return mapbox;
 };

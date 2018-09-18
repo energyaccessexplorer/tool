@@ -24,9 +24,9 @@ function ea_countries_setup() {
   const css = cs.querySelector('#country-search-flag');
 
   d3.queue()
-    .defer(d3.json, ea_path_root + '/lib/world-50m.json')
-    .defer(d3.json, ea_path_root + '/lib/countries.json')
-    .defer(d3.csv,  ea_path_root + '/data/countries-overview.csv')
+    .defer(d3.json, ea_settings.app_base + '/lib/world-50m.json')
+    .defer(d3.json, ea_settings.app_base + '/lib/countries.json')
+    .defer(d3.csv,  ea_settings.app_base + '/data/countries-overview.csv')
     .await((error, geo, countries, countries_overviews) => {
       const topo = topojson.feature(geo, geo.objects.countries);
 
@@ -67,8 +67,6 @@ function ea_countries_setup() {
       }).style('fill', '#A98B6F');
 
       ea_ui_app_loading(false);
-
-      // mapbox_setup(b);
     });
 };
 

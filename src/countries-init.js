@@ -1,7 +1,5 @@
-const ea_path_root = "/maps-and-data/"
-
 requirejs.config({
-  'baseUrl': ea_path_root + '/src',
+  'baseUrl': ea_settings.app_base + '/src',
   'paths': {
     'd3': "../lib/d3",
     'topojson': "../lib/topojson",
@@ -13,7 +11,6 @@ requirejs.config({
     'svg': "./ea/svg",
     'canvas': "./ea/canvas",
     'map': "./ea/map",
-    'config': "../config",
   }
 });
 
@@ -26,7 +23,6 @@ require([
   'ui',
   'datasets',
   'mapbox',
-  'config',
   'countries',
 ], (d3, topojson) => {
   window.d3 = d3;

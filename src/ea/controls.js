@@ -103,12 +103,12 @@ function ea_controls_mutant_options(ds) {
   const container = elem(`<div class="control-option"></div>`);
   const select = elem('<select></select>');
 
-  ds.metadata.mutant_targets.forEach(o => {
+  ds.configuration.mutant_targets.forEach(o => {
     const host = ea_datasets_collection.find(x => x.id === o);
     select.appendChild(elem(`<option value=${o}>${host.name_long}</option>`));
   });
 
-  select.value = ds.metadata.mutant_targets[0];
+  select.value = ds.configuration.mutant_targets[0];
 
   select.addEventListener('change', async function() {
     const host = ea_datasets_collection.find(x => x.id === this.value);
@@ -227,10 +227,10 @@ function ea_controls_options(ds) {
 
   // select.appendChild(elem(`<option selected disabled>Select one...</option>`));
 
-  const options = Object.keys(ds.metadata.options);
+  const options = Object.keys(ds.configuration.options);
 
   options.forEach(v => {
-    select.appendChild(elem(`<option value=${v}>${ds.metadata.options[v]}</option>`));
+    select.appendChild(elem(`<option value=${v}>${ds.configuration.options[v]}</option>`));
   });
 
   ds.heatmap.scale_option = select.value = options[0];

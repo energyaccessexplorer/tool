@@ -22,8 +22,8 @@ async function ea_init(tree, collection, bounds) {
   })));
 
   collection.forEach(d => {
-    if (d.metadata && d.metadata.mutant) {
-      let m = collection.find(x => x.id === d.metadata.mutant_targets[0]);
+    if (d.configuration && d.configuration.mutant) {
+      let m = collection.find(x => x.id === d.configuration.mutant_targets[0]);
 
       d.polygons = m.polygons;
       d.heatmap = m.heatmap;

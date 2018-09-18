@@ -123,7 +123,7 @@ function ea_dataset_modal(ds) {
   const m = modal()
     .header(ds.name_long)
     .content(`
-<section class="information"></section>
+<section class="description"></section>
 
 <section class="links">
   <h2>Sources</h2>
@@ -132,8 +132,8 @@ function ea_dataset_modal(ds) {
 
   const modal_el = document.querySelector('dialog.modal');
 
-  let i = modal_el.querySelector('.information');
-  if (ds.information) i.appendChild(elem(`<h3>Information</h3><pre style="font-family: with-serif; white-space: pre-line;">${ds.information}</pre>`));
+  let d = modal_el.querySelector('.description');
+  if (ds.metadata.description) d.appendChild(elem(`<div><h3>Description</h3><pre style="font-family: with-serif; white-space: pre-line;">${ds.metadata.description}</pre></div>`));
 
   let l = modal_el.querySelector('.links');
   if (ds.polygons) l.appendChild(elem(`<a class="download-link" href="${ds.polygons.endpoint}">Download polygons file</a>`));

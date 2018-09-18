@@ -236,9 +236,9 @@ function ea_datasets_districts(ds) {
     .mimeType("text/csv")
     .response(xhr => {
       ea_districts = d3.csvParse(xhr.responseText, d => {
-        const o = { oid: +d[ds.metadata.oid] };
+        const o = { oid: +d[ds.configuration.oid] };
 
-        Object.keys(ds.metadata.options).forEach(k => o[k] = +d[k] || d[k]);
+        Object.keys(ds.configuration.options).forEach(k => o[k] = +d[k] || d[k]);
 
         return o;
       });

@@ -115,7 +115,6 @@ async function ea_country_init(ccn3) {
           "heatmap": heatmap,
           "polygons": polygons,
           "id": e.category.name,
-          "information": e.category.information,
           "unit": e.category.unit,
           "metadata": e.metadata,
           "configuration": e.category.configuration,

@@ -1,5 +1,5 @@
 function mapbox_setup(bounds, theme, token) {
-  mapboxgl.accessToken = ea_settings.mapbox_token;
+  mapboxgl.accessToken = token;
 
   const mapbox = new mapboxgl.Map({
     container: 'mapbox-container',
@@ -17,16 +17,17 @@ function mapbox_setup(bounds, theme, token) {
     const u = b[1][1];
     const d = b[0][1];
 
+    const coords = [
+      [r, u],
+      [l, u],
+      [l, d],
+      [r, d]
+    ];
+
     mapbox.addSource('canvas-source', {
       type: 'canvas',
       canvas: 'plot',
-
-      coordinates: [
-        [r, u],
-        [l, u],
-        [l, d],
-        [r, d]
-      ],
+      coordinates: coords
     });
 
     mapbox.addLayer({

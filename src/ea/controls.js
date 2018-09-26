@@ -156,16 +156,20 @@ function ea_controls_elem(ds) {
     )
   );
 
-  header.addEventListener('mouseup', function(e) {
+  const clicko = function(e) {
     if (e.target.closest('svg') !== button) {
       let event = document.createEvent('HTMLEvents');
       event.initEvent('click', true, true);
 
       button.dispatchEvent(event);
     }
-  });
+  };
 
-  header.appendChild(elem(`<div class="controls-dataset-description">${ds.name_long}</div>`));
+  const name = elem(`<div class="controls-dataset-name">${ds.name_long}</div>`);
+  header.appendChild(name);
+
+  name.addEventListener('mouseup', clicko);
+  button.addEventListener('mouseup', clicko);
 
   if (ds.unit)
     header.appendChild(elem(`<div class="controls-dataset-unit small">(${ds.unit})</div>`));

@@ -174,6 +174,14 @@ function ea_controls_elem(ds) {
   if (ds.unit)
     header.appendChild(elem(`<div class="controls-dataset-unit small">(${ds.unit})</div>`));
 
+  if (ds.help && (ds.help.why || ds.help.what)) {
+    const help = elem(`<div class="controls-dataset-help">${ea_svg_info()}</div>`);
+
+    header.appendChild(help);
+
+    help.addEventListener('mouseup', _ => ea_category_help_modal(ds));
+  }
+
   return controls;
 };
 

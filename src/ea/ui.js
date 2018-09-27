@@ -120,29 +120,110 @@ function ea_layout_map(bounds) {
 };
 
 function ea_dataset_modal(ds) {
-  const m = modal()
+  let content = elem('<div style="display:flex; flex-flow: row nowrap;">');
+
+  let left = elem('<div class="left" style="flex: 1;">')
+  let right = elem('<div class="right" style="flex: 0 300px; padding-left: 3em;">')
+
+  content.appendChild(left);
+  content.appendChild(right);
+
+  if (ds.metadata.description)
+    left.appendChild(elem(`<section>
+<h3>Description</h3><pre class="description-text">${ds.metadata.description}</pre>
+</section>`));
+
+  if (ds.metadata.suggested_citation)
+    left.appendChild(elem(`<section>
+<h3>Suggested Citation</h3><pre class="description-text">${ds.metadata.suggested_citation}</pre>
+</section>`));
+
+  if (ds.metadata.cautions)
+    left.appendChild(elem(`<section>
+<h3>Cautions</h3><pre class="description-text">${ds.metadata.cautions}</pre>
+</section>`));
+
+  if (ds.metadata.download_original_url)
+    right.appendChild(elem(`<section>
+<a class="download-link" target="_blank" href="${ds.metadata.download_original_url}">Download from Source</a>
+</section>`));
+
+  if (ds.metadata.learn_more_url)
+    right.appendChild(elem(`<section>
+<a class="download-link" target="_blank" href="${ds.metadata.learn_more_url}">Learn More</a>
+</section>`));
+
+  if (ds.metadata.sources)
+    right.appendChild(elem(`<section>
+<h3>Sources</h3><pre class="description-text">${ds.metadata.sources}</pre>
+</section>`));
+
+  if (ds.metadata.spatial_resolution)
+    right.appendChild(elem(`<section>
+<h3>Spatial Resolution</h3><code>${ds.metadata.spatial_resolution}</code>
+</section>`));
+
+  if (ds.metadata.license)
+    right.appendChild(elem(`<section>
+<h3>License</h3><code>${ds.metadata.license}</code>
+</section>`));
+
+  if (ds.metadata.content_date)
+    right.appendChild(elem(`<section>
+<h3>Date of Content</h3><code>${ds.metadata.content_date}</code>
+</section>`));
+
+  modal()
     .header(ds.name_long)
-    .content(`
-<section class="description"></section>
-
-<section class="links">
-  <h2>Sources</h2>
-</section>
-`)();
-
-  const modal_el = document.querySelector('dialog.modal');
-
-  let d = modal_el.querySelector('.description');
-  if (ds.metadata.description) d.appendChild(elem(`<div><h3>Description</h3><pre style="font-family: with-serif; white-space: pre-line;">${ds.metadata.description}</pre></div>`));
-
-  let l = modal_el.querySelector('.links');
-  if (ds.polygons) l.appendChild(elem(`<a class="download-link" href="${ds.polygons.endpoint}">Download polygons file</a>`));
-  if (ds.heatmap) l.appendChild(elem(`<a class="download-link" href="${ds.heatmap.endpoint}">Download heatmap file</a>`));
+    .content(content.outerHTML)();
 };
 
 function ea_index_modal(i) {
+  const titles = {
+    "eai": "Energy Access Index",
+    "ani": "Assistance Need Index",
+    "supply": "The Supply Index",
+    "demand": "The Demand Index"
+  };
+
+  const infos = {
+    "eai": "The Energy Access Index indentifies areas with higher energy demand and supply which are characterized with higher index values. It is an aggregated measure of all selected data sets under both Demand and Supply categories.",
+    "ani": "The Assistance Need Index identifies areas where market assistance is needed the most which are characterized with higher index values. It is an aggregated and weighted measure of selected data sets under both Demand and Supply categories indicating high energy demand, low economic activity, and low access to infrastructure and resources.",
+    "supply": "The Supply Index identifies areas with higher energy supply which are characterized with higher index values. It is an aggregated and weighted measure of all selected data sets under Resource Availability and Infrastructure.",
+    "demand": "The Demand Index identifies areas with higher energy demand which are characterized with higher index values. It is an aggregated and weighted measure of all selected data sets under Demographics and Socio-economic activities."
+  };
+
   modal()
-    .header(i)
-    .content("Information about " + i)
-    .footer("footer")();
+    .header(titles[i])
+    .content(infos[i])
+    .footer('')();
+};
+
+function ea_category_help_modal(ds) {
+  let content = elem('<div>');
+
+  if (ds.help.why)
+    content.appendChild(elem(`<section>
+<h3>Why is this dataset?</h3>
+<p>${ds.help.why}</p>
+</section>`));
+
+  if (ds.help.what)
+    content.appendChild(elem(`<section>
+<h3>What is this dataset?</h3>
+<p>${ds.help.what}</p>
+</section>`));
+
+  modal()
+    .main_style(`
+background-color: white;
+margin: auto;
+max-width: 1200px;
+width: fit-content;
+height: fit-content;
+width: -webkit-fit-content;
+width: -moz-fit-content;
+    `)
+    .header(ds.name_long)
+    .content(content.innerHTML)();
 };

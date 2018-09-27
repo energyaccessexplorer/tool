@@ -38,3 +38,8 @@ h1, h2, h3 {
   margin-left: 1em;
   content: '\21F2';
 }
+
+.description-text {
+  font-family: with-serif, serif;
+  white-space: pre-line;
+}

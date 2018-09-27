@@ -108,6 +108,15 @@ async function ea_country_init(ccn3) {
         if (e.category.configuration && e.category.configuration.mutant) console.log('mutant: ', e.category_name, e.id);
         else if (!e.heatmap_file && !e.polygons_file) return undefined;
 
+        let help = null;
+
+        if (e.category.metadata && (e.category.metadata.why || e.category.metadata.what)) {
+          help = {};
+
+          help['why'] = e.category.metadata.why;
+          help['what'] = e.category.metadata.what;
+        }
+
         return {
           "name_long": e.category.name_long,
           "description": e.category.description,
@@ -118,6 +127,7 @@ async function ea_country_init(ccn3) {
           "unit": e.category.unit,
           "metadata": e.metadata,
           "configuration": e.category.configuration,
+          "help": help
         };
       });
 

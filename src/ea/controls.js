@@ -301,7 +301,7 @@ function ea_controls_range(ds, label) {
   let csf = _ => {
     return d3.scaleLinear()
       .clamp(false)
-      .range([getComputedStyle(document.body).getPropertyValue('--the-blue')])
+      .range([getComputedStyle(document.body).getPropertyValue('--the-green')])
   };
 
   const svg = ea_svg_interval_thingradient(

@@ -5,13 +5,14 @@
   font-weight: bold;
   text-transform: uppercase;
   padding: 0.7em;
-  color: var(--the-blue);
+  color: var(--the-green);
 }
 
 #layers-list {
   margin: 0;
   padding: 0;
   list-style-type: none;
+  background-color: var(--the-white);
 }
 
 #layers-header {
@@ -47,8 +48,8 @@
 }
 
 .layers-element {
+  background-color: var(--the-white);
   display: flex;
-  background-color: white;
   padding: 5px;
   color: #1C4478;
   white-space: nowrap;
@@ -103,10 +104,6 @@
   fill: gray;
 }
 
-.eai .layers-element-controls {
-  fill: white;
-}
-
 .layers-element-controls div {
   display: inline-block;
 
@@ -130,10 +127,15 @@
 }
 
 .eai {
-  background-color: #1C4478;
-  color: white;
+  background-color: var(--the-white);
+  color: var(--the-gray);
+  fill: var(--the-gray);
   padding: 0.5em;
   line-height: 1.8em;
 
   white-space: nowrap;
+}
+
+.eai .layers-element-controls {
+  fill: var(--the-gray);
 }

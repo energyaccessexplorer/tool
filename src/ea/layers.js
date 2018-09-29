@@ -143,9 +143,7 @@ function ea_layers_init() {
 
   const min_arrow = elem(`
 <div style="display: flex; justify-content: flex-end;">
-  <div style="width: 24px; background-color: rgba(0,0,0,0.7); padding: 0.5em 0.7em; color: white; fill: white; cursor: pointer;">
-    <svg id="icon-arrow-down" viewBox="0 0 38 32" width="100%" height="100%"><title>arrow-down</title><path d="M22.2 18.636l9.879-9.879 5.121 4.243-18 18-18-18 5.121-4.243 9.879 9.879v-17.636h6v17.636z"></path></svg>
-  </div>
+  <div style="background-color: rgba(0,0,0,0.7); padding: 0.2em 0.4em; color: white; fill: white; cursor: pointer;">${ea_svg_arrow()}</div>
 </div>
 `);
 

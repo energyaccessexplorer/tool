@@ -8,14 +8,14 @@
   display: block;
   white-space: nowrap;
   padding: 0.7em;
-  color: var(--the-blue);
+  color: var(--the-green);
   cursor: pointer;
-  background-color: #f1f1f1;
+  background-color: var(--the-light-gray);
 }
 
 #views .view.active {
-  background-color: var(--the-blue);
-  color: var(--the-white);
+  background-color: var(--the-white);
+  color: var(--the-green);
 }
 
 h1, h2, h3 {
@@ -30,7 +30,6 @@ h1, h2, h3 {
   max-width: 15em;
   text-decoration: none;
   color: var(--the-blue);
-  /* border: 1px solid var(--the-blue); */
   clear: both;
 }
 

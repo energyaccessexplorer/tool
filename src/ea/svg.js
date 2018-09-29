@@ -43,15 +43,17 @@ function ea_svg_switch(init, callback) {
     .attr('font-weight', "bold")
     .text("OFF");
 
+  const active = getComputedStyle(document.body).getPropertyValue('--the-yellow');
+
   function change(s,i) {
     c1.attr('cx', (s ? svgmax : svgmin));
 
     gutter
-      .style('fill', (s ? '#1c4478' : 'white'))
+      .style('fill', (s ? active : 'white'))
 
     c1
-      .style('fill', (s ? 'white' : '#1c4478'))
-      .style('stroke', (s ? '#1c4478' : 'white'))
+      .style('fill', (s ? 'white' : active))
+      .style('stroke', (s ? active : 'white'))
 
     text
       .attr('x', (s ? (svgmin - 2) : svgmax - (radius * 2) - 4))
@@ -80,6 +82,8 @@ function ea_svg_checkbox(init, callback) {
 
   let status = init || false;
 
+  const active = getComputedStyle(document.body).getPropertyValue('--the-yellow');
+
   svg
     .attr('width', size)
     .attr('height', size)
@@ -101,8 +105,8 @@ function ea_svg_checkbox(init, callback) {
 
   function change(s,i) {
     gutter
-      .attr('stroke', (s ? '#1c4478' : '#ccc'))
-      .style('fill', (s ? '#1c4478' : 'white'));
+      .attr('stroke', (s ? active : '#ccc'))
+      .style('fill', (s ? active : 'white'));
 
     if (typeof callback === 'function' && !i) callback(s);
   }
@@ -115,7 +119,7 @@ function ea_svg_checkbox(init, callback) {
 };
 
 function ea_svg_range_steps(steps, init, drag_callback, end_callback, is_weight) {
-  const radius = 6,
+  const radius = 5,
         svgwidth = 225,
         svgheight = (radius * 2) + 2,
         linewidth = radius * 2,
@@ -170,8 +174,8 @@ function ea_svg_range_steps(steps, init, drag_callback, end_callback, is_weight)
   c1
     .attr('r', radius)
     .attr('cy', svgheight/2 + 1)
-    .attr('stroke', 'white')
-    .attr('stroke-width', 1)
+    .attr('fill', getComputedStyle(document.body).getPropertyValue('--the-green'))
+    .attr('stroke', 'none')
     .style('cursor', 'grab')
     .raise();
 
@@ -476,7 +480,7 @@ function ea_svg_color_gradient(color_scale, r) {
 };
 
 function ea_svg_interval_thingradient(color_scale, callback1, callback2, end_callback) {
-  const radius = 6,
+  const radius = 5,
         svgwidth = 225,
         svgheight = (radius * 2) + 2,
         linewidth = radius * 2,
@@ -530,8 +534,8 @@ function ea_svg_interval_thingradient(color_scale, callback1, callback2, end_cal
     .attr('fill', `url(#gradient-${random})`)
     .attr('stroke', 'none')
     .attr('x', 1)
-    .attr('y', (svgheight / 2) - 2)
-    .attr('height', 4);
+    .attr('y', (svgheight / 2) - 1)
+    .attr('height', 2);
 
   gutter
     .attr('stroke', 'black')
@@ -548,16 +552,14 @@ function ea_svg_interval_thingradient(color_scale, callback1, callback2, end_cal
     .attr('r', radius)
     .attr('cy', svgheight/2)
     .attr('fill', cr[0])
-    .attr('stroke', 'white')
-    .attr('stroke-width', 1)
+    .attr('stroke-width', 'none')
     .style('cursor', 'grab');
 
   c2
     .attr('r', radius)
     .attr('cy', svgheight/2)
     .attr('fill', cr[cr.length-1])
-    .attr('stroke', 'white')
-    .attr('stroke-width', 1)
+    .attr('stroke-width', 'none')
     .style('cursor', 'grab');
 
   umarked1
@@ -685,9 +687,24 @@ function ea_svg_symbol_pick(str) {
 
 function ea_svg_info(scale = 1) {
   return `
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="transform: scale(${scale});">
-    <path d="M0 0h24v24H0z" fill="none"/>
-    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+<svg width="14px" height="14px" viewBox="0 0 14 14">
+  <g stroke="none" stroke-width="1" fill-rule="evenodd">
+    <g transform="translate(-630.000000, -731.000000)">
+      <path d="M636,737 L635,737 L635,738 L636,738 L636,741 L635,741 L635,742 L636,742 L638,742 L639,742 L639,741 L638,741 L638,737 L636,737 Z M637,745 C633.134007,745 630,741.865993 630,738 C630,734.134007 633.134007,731 637,731 C640.865993,731 644,734.134007 644,738 C644,741.865993 640.865993,745 637,745 Z M636,734 L636,736 L638,736 L638,734 L636,734 Z" id="info"></path>
+    </g>
+  </g>
+</svg>
+`;
+};
+
+function ea_svg_arrow() {
+  return `
+<svg width="12px" height="10px" viewBox="0 0 12 10">
+  <g stroke="none" stroke-width="1" fill-rule="evenodd">
+    <g transform="translate(-220.000000, -734.000000)" fill-rule="nonzero">
+      <path d="M227,738.12132 L227,744 L225,744 L225,738.12132 L221.707107,741.414214 L220,740 L226,734 L232,740 L230.292893,741.414214 L227,738.12132 Z" id="arrow-down" transform="translate(226.000000, 739.000000) scale(1, -1) translate(-226.000000, -739.000000) "></path>
+    </g>
+  </g>
 </svg>`;
 };
 

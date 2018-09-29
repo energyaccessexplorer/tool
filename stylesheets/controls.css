@@ -7,7 +7,7 @@
 
 .controls {
   position: relative;
-  background-color: #f1f1f1;
+  background-color: var(--the-darker-white);
   border-bottom: solid 1px #d9d9d9;
 }
 
@@ -23,6 +23,7 @@
   margin-top: 0.3em;
   font-weight: bold;
   display: inline-block;
+  color: darkgray;
 }
 
 .controls .loading {
@@ -58,14 +59,13 @@
 }
 
 .controls-category-title {
-  font-size: 2em;
+  font-size: 1.5em;
+  font-weight: bold;
   line-height: 2em;
   white-space: nowrap;
   text-transform: uppercase;
   text-align: center;
-  font-weight: bold;
-  font-family: condensed;
-  background-color: var(--the-blue);
+  background-color: var(--the-green);
   color: var(--the-white);
   fill: var(--the-white);
   cursor: pointer;
@@ -87,7 +87,6 @@
 
 .controls-subcategory-title {
   font-size: 1.3em;
-  font-family: condensed;
   font-weight: bold;
   white-space: nowrap;
   text-transform: uppercase;
@@ -95,10 +94,11 @@
   padding: 1em 1.5em;
   border-bottom: solid 1px #d9d9d9;
   background-color: white;
+  color: var(--the-green);
   cursor: pointer;
 
   position: sticky;
-  top: 64px;
+  top: 41px;
   z-index: 9;
 }
 
@@ -109,10 +109,9 @@
 }
 
 .controls-dataset-header {
-  cursor: pointer;
   padding-top: 1em;
   padding-bottom: 1em;
-  background-color: #f1f1f1;
+  background-color: var(--the-darkest-white);
 }
 
 .controls-dataset-content {
@@ -128,15 +127,33 @@
 }
 
 .controls-dataset-header .svg-checkbox {
+  cursor: pointer;
   transform: scale(0.65);
 }
 
-.controls-dataset-description {
+.controls-dataset-name {
   display: inline-block;
   margin: auto 0.5em;
 
   white-space: nowrap;
   vertical-align: text-top;
+
+  cursor: pointer;
+}
+
+.controls-dataset-help {
+  display: inline-block;
+  margin: auto 0.5em;
+
+  white-space: nowrap;
+  vertical-align: text-top;
+
+  float: right;
+
+  color: var(--the-gray);
+  fill: var(--the-gray);
+
+  cursor: pointer;
 }
 
 .controls-dataset-unit {
@@ -159,8 +176,7 @@ select#controls-preset,
 }
 
 select#controls-preset {
-  font-size: 2em;
-  font-family: condensed;
+  font-size: 1.5em;
   font-weight: bold;
   text-transform: uppercase;
 

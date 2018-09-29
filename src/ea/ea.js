@@ -1,3 +1,14 @@
+function ea_opacity_tweak() {
+  const dl = location.get_query_param('datasets-layers').split(',');
+
+  const tweak = (dl.length === 1 &&
+                 (dl[0] === 'subcounties' || dl[0] === 'districts'));
+
+  ea_mapbox ?
+    ea_mapbox.setPaintProperty('canvas-layer', 'raster-opacity', (tweak ? 0.2 : 1)) :
+  (ea_canvas ? ea_canvas.style.opacity = (tweak ? 0.2 : 1) : null)
+};
+
 async function ea_init(tree, collection, bounds) {
   let datasets_layers_param = location.get_query_param('datasets-layers');
   let datasets_layers;
@@ -403,6 +414,8 @@ async function ea_overlord(msg) {
       null, null,
       location.set_query_param('datasets-layers', datasets_layers.toString())
     );
+
+    ea_opacity_tweak(datasets_layers);
 
     break;
   }

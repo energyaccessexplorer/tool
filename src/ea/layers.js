@@ -45,7 +45,7 @@ function ea_layers_dataset_elem(ds) {
 
   let lec = d.querySelector('.layers-element-controls');
 
-  let dli = elem(`<div class="layer-info">${ea_svg_info(0.75)}</div>`);
+  let dli = elem(`<div class="layer-info">${ea_svg_info()}</div>`);
   dli.addEventListener('mouseup', _ => ea_dataset_modal(ds));
 
   lec.appendChild(dli);

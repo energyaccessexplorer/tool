@@ -4,7 +4,6 @@ function mapbox_setup(bounds, theme, token) {
   const mapbox = new mapboxgl.Map({
     container: 'mapbox-container',
     style: `mapbox://styles/mapbox/${theme}-v9`,
-    interactive: false,
   });
 
   mapbox.fitBounds(bounds, { animate: false });
@@ -30,12 +29,16 @@ function mapbox_setup(bounds, theme, token) {
       coordinates: coords
     });
 
+    ea_mapbox.first_symbol = mapbox.getStyle().layers.find(l => l.type === 'symbol').id;
+
     mapbox.addLayer({
       id: 'canvas-layer',
       source: 'canvas-source',
       type: 'raster',
-    });
+    }, ea_mapbox.first_symbol);
   });
+
+  mapbox.addControl(new mapboxgl.NavigationControl({ showCompass: false }));
 
   return mapbox;
 };

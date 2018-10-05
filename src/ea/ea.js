@@ -340,8 +340,11 @@ async function ea_overlord(msg) {
       datasets_layers.forEach(i => {
         var x;
 
-        if (x = ea_datasets_collection.find(d => d.id === i))
-          (typeof x.polygons !== 'undefined') ? ea_map_unload(ea_map, x.id) : null;
+        if (x = ea_datasets_collection.find(d => d.id === i)) {
+          if (typeof x.polygons !== 'undefined') {
+            ea_mapbox.setLayoutProperty(i, 'visibility', 'none');
+          }
+        }
       });
 
       ea_canvas_plot(ea_analysis(heatmaps_layers[0]));
@@ -359,7 +362,6 @@ async function ea_overlord(msg) {
       });
 
       ea_draw_first_active_nopolygons(datasets_layers);
-      ea_sort_canvas_svg(datasets_layers);
     }
 
     else {
@@ -392,13 +394,14 @@ async function ea_overlord(msg) {
     else if (mode === "datasets") {
       ea_layers_datasets(datasets_layers);
 
-      if (ds.polygons)
-        ds.active ?
-        await ds.polygons.parse.call(ds) :
-        ea_map_unload(ea_map, ds.id);
+      if (ds.polygons) {
+        if (ds.active)
+          await ds.polygons.parse.call(ds);
+        else
+          if (ea_mapbox.getSource(ds.id)) ea_mapbox.setLayoutProperty(ds.id, 'visibility', 'none');
+      }
 
       ea_draw_first_active_nopolygons(datasets_layers);
-      ea_sort_canvas_svg(datasets_layers);
     }
 
     else {
@@ -439,7 +442,6 @@ async function ea_overlord(msg) {
       );
 
       ea_draw_first_active_nopolygons(msg.layers);
-      ea_sort_canvas_svg(msg.layers);
     }
 
     else {

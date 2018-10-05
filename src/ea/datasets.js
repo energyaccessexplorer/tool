@@ -68,7 +68,57 @@ async function ea_datasets_active(ds, v) {
   });
 };
 
-async function ea_datasets_features(callback) {
+async function ea_datasets_points() {
+  return ea_datasets_geojson.call(this, _ => {
+    if (ea_mapbox.getSource(this.id)) {
+      ea_mapbox.setLayoutProperty(this.id, 'visibility', 'visible');
+      return;
+    }
+
+    ea_mapbox.addSource(this.id, {
+      "type": "geojson",
+      "data": this.features
+    });
+
+    ea_mapbox.addLayer({
+      "id": this.id,
+      "type": "circle",
+      "source": this.id,
+      "paint": {
+        "circle-radius": 3,
+        "circle-color": this.polygons.fill || 'cyan',
+        "circle-stroke-width": 1,
+        "circle-stroke-color": this.polygons.stroke || 'black',
+      },
+    }, ea_mapbox.first_symbol);
+  });
+};
+
+async function ea_datasets_polygons() {
+  return ea_datasets_geojson.call(this, _ => {
+    if (ea_mapbox.getSource(this.id)) {
+      ea_mapbox.setLayoutProperty(this.id, 'visibility', 'visible');
+      return;
+    }
+
+    ea_mapbox.addSource(this.id, {
+      "type": "geojson",
+      "data": this.features
+    });
+
+    ea_mapbox.addLayer({
+      "id": this.id,
+      "type": "line",
+      "source": this.id,
+      "paint": {
+        "line-width": 2,
+        "line-color": this.polygons.fill || 'cyan',
+      },
+    }, ea_mapbox.first_symbol);
+  });
+};
+
+async function ea_datasets_geojson(callback) {
   const ds = this;
 
   if (ds.features)
@@ -87,55 +137,14 @@ async function ea_datasets_features(callback) {
 
     await ea_client(
       url, 'GET', null,
-      r => {
-        switch (r.type) {
-        case "Feature":
-          ds.features = [r];
-          break;
-
-        case "FeatureCollection":
-          ds.features = r.features;
-          break;
-
-        default:
-          flash()
-            .type('error')
-            .title('Bad GeoJSON file')
-            .message(`'${ds.id}' fetched is not a "Feature" nor "FeatureCollection"`)();
-
-          ds.features = [];
-          break;
-        }
-
-        callback.call(ds);
+      async r => {
+        ds.features = r;
+        callback();
       }
     );
   }
 
   return ds;
-};
-
-async function ea_datasets_points() {
-  return ea_datasets_features.call(this, _ => {
-    ea_map_load_points({
-      map: ea_map,
-      features: this.features,
-      cls: this.id,
-      symbol: this.polygons.symbol,
-      scale: 1
-    })
-  });
-};
-
-async function ea_datasets_polygons() {
-  return ea_datasets_features.call(this, _ => {
-    ea_map_load_features({
-      map: ea_map,
-      features: this.features,
-      cls: this.id,
-      scale: 1,
-    });
-  });
 };
 
 async function ea_datasets_tiff(ds, blob) {

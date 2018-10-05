@@ -17,25 +17,14 @@ function ea_map_setup(bounds) {
         console.log(error);
       }
 
-      ea_map = ea_map_svg(d3.select('#svg-map'), topo, 'adm0', { center: center });
+      ea_canvas.style.display = 'none';
+      ea_mapbox = mapbox_setup(bounds, ea_settings.mapbox_theme, ea_settings.mapbox_token);
 
-      ea_map_load_features({
-        map: ea_map,
-        features: ea_map.topo.features,
-        cls: 'land',
-        scale: 0,
-      });
-
-      if (ea_settings.mapbox_theme) {
-        ea_canvas.style.display = 'none';
-        ea_mapbox = mapbox_setup(bounds, ea_settings.mapbox_theme, ea_settings.mapbox_token);
-      } else {
-        ea_canvas.style.display = '';
-      }
-
-      ea_map.init();
+      // 4/5 for a comfy fit here...
+      //
+      // ea_mapbox.fitBounds([], { animate: false });
     });
-}
+};
 
 function ea_map_svg(svg, topofile, name, options) {
   let width, height;
@@ -209,7 +198,7 @@ function ea_map_svg(svg, topofile, name, options) {
   }
 
   return _map;
-}
+};
 
 function ea_map_load_features(o) {
   if (!o.map)
@@ -255,41 +244,4 @@ function ea_map_load_features(o) {
     paths.on('mousedown', (d) => o.mousedown(d.gid || d.id || ''));
 
   return container;
-}
-
-function ea_map_load_points(o) {
-  const m = o.map;
-  const features = o.features;
-  const cls = o.cls;
-  const sym = o.symbol;
-  const scale = o.scale;
-
-  if (!scale) scale = 1;
-
-  let container = m.map.select(`#${cls}`);
-
-  if (container.empty())
-    container = m.map.append('g').attr('id', cls);
-
-  container.selectAll(`path.${ cls }`).remove();
-
-  const symbol = d3.symbol()
-        .size(25 / (scale**2))
-        .type((d) => ea_svg_symbol_pick(sym));
-
-  container.selectAll(`path.${ cls }`)
-    .data(features).enter()
-    .append('path')
-    .attr('d', symbol)
-    .attr('transform', (d) => `translate(${m.projection(d.geometry.coordinates)})`)
-    .attr('stroke-width', (0.5/scale))
-    .attr('class', cls);
-
-  return topo;
-}
-
-function ea_map_unload(g, id) {
-  if (typeof g === 'undefined' || g === null) return;
-
-  g.map.select(`#${id}`).remove();
-}
+};

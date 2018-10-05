@@ -9,21 +9,16 @@ function ea_layers_dataset_collection() {
 };
 
 function ea_layers_update_datasets(list) {
-  let order = [ea_canvas, ea_map.svg.node()];
-  const maparea = document.querySelector('#maparea');
   const c = ea_datasets_collection;
 
-  const raster_id = list
-        .find(d => c.find(x => x.id === d && x.active && typeof x.polygons === 'undefined'));
+  list.reverse().forEach(i => {
+    let d = c.find(x => x.id === i);
 
-  list
-    .filter(x => c.find(d => d.id === x && d.features))
-    .reverse()
-    .forEach(i => ea_map.map.select(`#${i}`).raise());
-
-  if (list.indexOf(raster_id) === 0) order = order.reverse();
-
-  maparea.insertBefore(...order);
+    if (!d.polygons)
+      ea_mapbox.moveLayer('canvas-layer', ea_mapbox.first_symbol);
+    else
+      ea_mapbox.moveLayer(i, ea_mapbox.first_symbol);
+  });
 };
 
 function ea_layers_dataset_elem(ds) {

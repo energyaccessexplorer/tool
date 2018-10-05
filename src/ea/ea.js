@@ -203,7 +203,7 @@ function ea_analysis(type) {
 
   const ds = {
     id: `analysis-${Date.now()}`,
-    domain: null,
+    domain: [0,1],
     width: tmp.width,
     height: tmp.height,
     raster: new Float32Array(tmp.raster.length),
@@ -245,7 +245,7 @@ function ea_analysis(type) {
         return (sv * c.weight) + a;
     }, 0);
 
-    const r = (t === -1) ? t : t / full_weight
+    const r = (t === -1) ? t : t / full_weight;
 
     if (r !== -1) {
       if (r > max) max = r;
@@ -255,7 +255,13 @@ function ea_analysis(type) {
     ds.raster[i] = r;
   }
 
-  ds.domain = [min, max];
+  var f = d3.scaleQuantize().domain([min,max]).range([0, 0.25, 0.5, 0.75, 1]);
+
+  for (var i = 0; i < ds.raster.length; i++) {
+    const r = ds.raster[i];
+    ds.raster[i] = (r === -1) ? -1 : f(r);
+  }
+
   console.log("Finished ea_analysis in:", performance.now() - t0);
 
   return ds;

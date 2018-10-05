@@ -459,6 +459,37 @@ function ea_svg_color_gradient(color_scale, r) {
   return svg.node();
 };
 
+function ea_svg_color_steps(color_scale, r) {
+  const radius = r || 6,
+        svgwidth = 280,
+        svgheight = (radius * 2) + 2,
+        linewidth = radius * 2,
+        svgmin = radius + 1,
+        svgmax = svgwidth - radius - 1;
+
+  const svg = d3.select(document.createElementNS(d3.namespaces.svg, "svg"))
+        .attr('class', 'svg-interval');
+
+  const steps = [0, 0.25, 0.5, 0.75, 1];
+
+  const g = svg.append('g');
+
+  steps.forEach((v,i) => {
+    g.append('rect')
+      .attr('fill', color_scale()(v))
+      .attr('stroke', 'none')
+      .attr('x', (svgwidth / 5) * i)
+      .attr('width', (svgwidth / 5))
+      .attr('height', svgheight)
+  });
+
+  svg
+    .attr('width', "100%")
+    .attr('height', svgheight + 2);
+
+  return svg.node();
+};
+
 function ea_svg_interval_thingradient(color_scale, callback1, callback2, end_callback) {
   const radius = 5,
         svgwidth = 225,

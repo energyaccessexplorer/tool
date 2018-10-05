@@ -42,12 +42,12 @@ function ea_layers_dataset_elem(ds) {
 };
 
 function ea_layers_heatmap_elem(t, v, i) {
-  const svg = ea_svg_color_gradient(_ => {
+  const svg = ea_svg_color_steps(_ => {
     return d3.scaleLinear()
       .domain(plotty.colorscales[ea_default_color_scheme].positions)
       .range(plotty.colorscales[ea_default_color_scheme].colors)
       .clamp(false)
-  });
+  }, 3);
 
   const d = elem(`
 <li bind="${t}"

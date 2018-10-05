@@ -126,7 +126,7 @@
   width: 100%;
 }
 
-.eai {
+.heatmaps-layers {
   background-color: var(--the-white);
   color: var(--the-gray);
   fill: var(--the-gray);
@@ -136,6 +136,15 @@
   white-space: nowrap;
 }
 
-.eai .layers-element-controls {
+.heatmaps-layers .layers-element-controls {
   fill: var(--the-gray);
+}
+
+.heatmaps-layers[bind="demand"]:before,
+.heatmaps-layers[bind="supply"]:before {
+  width: 1em;
+  display: block;
+  content: ' ';
+  border-right: 1px lightgray solid;
+  margin-right: 1em;
 }

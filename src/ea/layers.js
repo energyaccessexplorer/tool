@@ -51,7 +51,7 @@ function ea_layers_dataset_elem(ds) {
   return d;
 };
 
-function ea_layers_heatmap_elem(t, v) {
+function ea_layers_heatmap_elem(t, v, i) {
   const svg = ea_svg_color_gradient(_ => {
     return d3.scaleLinear()
       .domain(plotty.colorscales[ea_default_color_scheme].positions)
@@ -61,8 +61,8 @@ function ea_layers_heatmap_elem(t, v) {
 
   const d = elem(`
 <li bind="${t}"
-    class="layers-element eai">
-  <div class="layers-element-handle"></div>
+    class="layers-element heatmaps-layers">
+  <div class="layers-element-radio"></div>
 
   <div class="layers-element-content">
     <div class="layers-element-header">
@@ -82,34 +82,47 @@ function ea_layers_heatmap_elem(t, v) {
 </li>`);
 
   let lec = d.querySelector('.layers-element-controls');
-
   let dli = elem(`<div class="layer-info">${ea_svg_info(0.75)}</div>`);
   dli.addEventListener('mouseup', _ => ea_index_modal(t));
 
   lec.appendChild(dli);
+
+  let ler = d.querySelector('.layers-element-radio');
+  ler.appendChild(ea_svg_radio(i));
 
   d.querySelector('.layers-element-descriptor').prepend(svg);
 
   return d;
 };
 
-function ea_layers_heatmaps(list) {
-  sortable('#layers-list', 'disable');
+function ea_layers_heatmaps(target) {
+  let nodes;
 
-  const layers = document.querySelector('#layers');
-  const layers_list = layers.querySelector('#layers-list');
-
-  let lhc = {
-    "eai": 'Energy Access Index',
-    "ani": 'Assistance Need Index',
-    "demand": 'Demand Index',
-    "supply": 'Supply Index',
-  };
-
+  const layers_list = document.querySelector('#layers-list');
   layers_list.innerHTML = "";
 
-  list.forEach((t,i) => layers_list.appendChild(ea_layers_heatmap_elem(t, lhc[t], i)));
-  sortable('#layers-list', 'enable');
+  async function trigger_this() {
+    let event = document.createEvent('HTMLEvents');
+    event.initEvent("unselect", true, true);
+
+    await nodes.forEach(n => n.querySelector('.layers-element-radio svg').dispatchEvent(event));
+
+    ea_overlord({
+      type: "heatmap",
+      heatmap: this.getAttribute('bind'),
+      caller: 'ea_layers_heatmaps'
+    });
+  };
+
+  nodes = Object.keys(ea_indexes).map((t,i) => {
+    let node = ea_layers_heatmap_elem(t, ea_indexes[t], t === target);
+
+    node.addEventListener('mouseup', trigger_this);
+
+    layers_list.appendChild(node);
+
+    return node;
+  });
 };
 
 function ea_layers_datasets(list) {

@@ -118,6 +118,58 @@ function ea_svg_checkbox(init, callback) {
   return svg.node();
 };
 
+function ea_svg_radio(init, callback) {
+  const size = 24;
+
+  const svg = d3.select(document.createElementNS(d3.namespaces.svg, "svg"))
+        .attr('class', 'svg-radio');
+
+  const g = svg.append('g');
+  const gutter = g.append('circle');
+  const center = g.append('circle');
+
+  let status = init || false;
+
+  const active = getComputedStyle(document.body).getPropertyValue('--the-yellow');
+
+  svg
+    .attr('width', size)
+    .attr('height', size)
+    .style('cursor', 'pointer');
+
+  gutter
+    .attr('stroke', '#ccc')
+    .attr('fill', 'white')
+    .attr('r', (size/2) - 2)
+    .attr('cx', (size/2))
+    .attr('cy', (size/2));
+
+  center
+    .attr('r', (size/2) * (3/5))
+    .attr('cx', (size/2))
+    .attr('cy', (size/2));
+
+  function change(s,i) {
+    center
+      .style('fill', (s ? active : 'white'))
+      .style('stroke', (s ? active : 'white'));
+
+    if (typeof callback === 'function' && !i) callback(s);
+  };
+
+  svg.on('click', _ => {
+    if (status) return;
+    else change(status = true);
+  });
+
+  let dispatch = svg.dispatch('unselect');
+  dispatch.on('unselect', _ => change((status = false)));
+
+  change(status, init);
+
+  return svg.node();
+};
+
 function ea_svg_range_steps(steps, init, drag_callback, end_callback, is_weight) {
   const radius = 5,
         svgwidth = 225,

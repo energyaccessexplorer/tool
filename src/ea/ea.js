@@ -279,16 +279,16 @@ async function ea_overlord(msg) {
   let heatmaps_layers_param = location.get_query_param('heatmaps-layers');
   let datasets_layers_param = location.get_query_param('datasets-layers');
 
-  /* TODO: remove any {heatmaps,datasets}_layers that are not in the collection */
+  /* TODO: remove any {datasets}_layers that are not in the collection */
 
-  if (!heatmaps_layers_param) {
-    heatmaps_layers = ["eai", "ani", "supply", "demand"];
+  if (Object.keys(ea_indexes).indexOf(heatmaps_layers_param) > -1) {
+    heatmaps_layers = heatmaps_layers_param;
+  } else {
+    heatmaps_layers = "eai";
     history.replaceState(
       null, null,
-      location.set_query_param('heatmaps-layers', heatmaps_layers.toString())
+      location.set_query_param('heatmaps-layers', heatmaps_layers)
     );
-  } else {
-    heatmaps_layers = heatmaps_layers_param.split(',');
   }
 
   if (!datasets_layers_param) {
@@ -347,7 +347,7 @@ async function ea_overlord(msg) {
         }
       });
 
-      ea_canvas_plot(ea_analysis(heatmaps_layers[0]));
+      ea_canvas_plot(ea_analysis(heatmaps_layers));
     }
 
     else if (t === "datasets") {
@@ -388,7 +388,7 @@ async function ea_overlord(msg) {
       if (typeof ds.heatmap !== "undefined")
         ds.active ? await ds.heatmap.parse.call(ds) : null
 
-      ea_canvas_plot(ea_analysis(heatmaps_layers[0]));
+      ea_canvas_plot(ea_analysis(heatmaps_layers));
     }
 
     else if (mode === "datasets") {
@@ -423,17 +423,25 @@ async function ea_overlord(msg) {
     break;
   }
 
-  case "sort": {
+  case "heatmap": {
     if (mode === "heatmaps") {
-      ea_canvas_plot(ea_analysis(msg.layers[0]));
+      ea_canvas_plot(ea_analysis(msg.heatmap));
 
       history.replaceState(
         null, null,
-        location.set_query_param('heatmaps-layers', msg.layers.toString())
+        location.set_query_param('heatmaps-layers', msg.heatmap)
       );
     }
 
-    else if (mode === "datasets") {
+    else {
+      throw `Argument Error: Overlord: Could set the mode ${mode}`;
+    }
+
+    break;
+  }
+
+  case "sort": {
+    if (mode === "datasets") {
       ea_layers_update_datasets(msg.layers);
 
       history.replaceState(

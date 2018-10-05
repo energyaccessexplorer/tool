@@ -18,7 +18,6 @@ requirejs.config({
     'layers': "./ea/layers",
     'client': "./ea/client",
     'svg': "./ea/svg",
-    'canvas': "./ea/canvas",
     'map': "./ea/map",
   }
 });
@@ -34,7 +33,6 @@ require([
   'map',
   'client',
   'svg',
-  'canvas',
   'controls',
   'ui',
   'layers',

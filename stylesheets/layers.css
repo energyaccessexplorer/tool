@@ -1,13 +1,3 @@
-#layers-title {
-  text-align: center;
-  font-family: condensed;
-  font-size: 2em;
-  font-weight: bold;
-  text-transform: uppercase;
-  padding: 0.7em;
-  color: var(--the-green);
-}
-
 #layers-list {
   margin: 0;
   padding: 0;

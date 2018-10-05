@@ -61,24 +61,28 @@ async function ea_init(tree, collection, bounds) {
 
   ea_controls_tree(tree, collection);
 
-  ea_dummy = {
-    id: "dummy",
-    description: "Dummy dataset",
+  {
+    ea_dummy = {
+      id: "dummy",
+      description: "Dummy dataset",
 
-    heatmap: {
-      endpoint: "districts.tif",
-      parse: ea_datasets_tiff_url,
-    },
-  };
+      heatmap: {
+        endpoint: "districts.tif",
+        parse: ea_datasets_tiff_url,
+      },
+    };
 
-  await ea_dummy.heatmap.parse.call(ea_dummy);
+    await ea_dummy.heatmap.parse.call(ea_dummy);
 
-  ea_dummy.raster = new Uint16Array(ea_dummy.width * ea_dummy.height).fill(ea_dummy.nodata);
+    ea_dummy.raster = new Uint16Array(ea_dummy.width * ea_dummy.height).fill(ea_dummy.nodata);
 
-  ea_layout_map(bounds, [ea_dummy.width, ea_dummy.height]);
-  ea_map_setup(bounds);
+    ea_layout_map(bounds, [ea_dummy.width, ea_dummy.height]);
+    ea_map_setup(bounds);
 
-  ea_canvas_setup(ea_dummy);
+    // STRANGE: force the canvas to 2d...
+    //
+    ea_canvas.getContext('2d');
+  }
 
   (async _ => {
     for (var id of datasets_layers) {
@@ -156,6 +160,26 @@ async function ea_country_init(ccn3) {
     });
 
   return it;
+};
+
+function ea_canvas_plot(ds) {
+  if (!ds) return;
+
+  const plot = new plotty.plot({
+    canvas: ea_canvas,
+    data: ds.raster,
+    width: ds.width,
+    height: ds.height,
+    domain: ds.domain,
+    noDataValue: ds.nodata,
+    colorScale: ds.color_scale,
+  });
+
+  ea_plot = plot;
+
+  plot.render();
+
+  return plot;
 };
 
 /*
@@ -263,20 +287,6 @@ function ea_draw_first_active_nopolygons(coll) {
 
   if (rd) ea_canvas_plot(ea_analysis(rd.id));
   else ea_canvas_plot(ea_analysis(ea_dummy));
-};
-
-function ea_sort_canvas_svg(coll) {
-  const head = ea_datasets_collection.find(d => d.id === coll[0]);
-
-  if (!head) return;
-
-  const maparea = document.querySelector('#maparea');
-
-  const svg = maparea.querySelector('#svg-map');
-  const mbc = maparea.querySelector('#mapbox-container');
-
-  if (head.polygons) maparea.insertBefore(mbc, svg)
-  else maparea.insertBefore(svg, mbc)
 };
 
 async function ea_overlord(msg) {

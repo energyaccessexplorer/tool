@@ -70,21 +70,10 @@
   background-color: var(--the-green);
   color: var(--the-white);
   fill: var(--the-white);
-  cursor: pointer;
 
   position: sticky;
   top: 0;
   z-index: 10;
-}
-
-.controls-category-title .triangle {
-  display: inline-block;
-  transform: scale(1.4);
-  display: none;
-}
-
-.controls-category-title .triangle svg {
-  vertical-align: middle;
 }
 
 .controls-subcategory-title {

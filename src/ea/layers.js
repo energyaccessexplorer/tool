@@ -1,13 +1,3 @@
-function ea_layers_dataset_collection() {
-  const curr = document.querySelector('#layers-list').children;
-
-  const list = [].map.call(curr, x => x.getAttribute('bind'));
-
-  return ea_datasets_collection
-    .filter(d => d.active)
-    .sort((a,b) => (list.indexOf(a.id) < list.indexOf(b.id)) ? -1 : 1);
-};
-
 function ea_layers_update_datasets(list) {
   const c = ea_datasets_collection;
 

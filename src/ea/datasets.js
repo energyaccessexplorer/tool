@@ -167,55 +167,6 @@ async function ea_datasets_tiff(ds, blob) {
   return ds;
 };
 
-function ea_datasets_hexblob(hex) {
-  const byteBuf = new Uint8Array(new ArrayBuffer(hex.length/2));
-
-  for (var i = 0; i < hex.length; i += 2)
-    byteBuf[i/2] = parseInt(hex.slice(i, i+2), 16);
-
-  const blob = new Blob([byteBuf], {type: "image/tiff"});
-  // fake_download(blob);
-
-  return blob;
-};
-
-async function ea_datasets_tiff_stream() {
-  const ds = this;
-
-  if (ds.raster) ;
-  else {
-    let data = null;
-
-    await ea_client(`${ea_settings.database}/${ds.endpoint}`, 'GET', null, r => data = r);
-
-    await ea_datasets_tiff(
-      ds,
-      (await ea_datasets_hexblob(data.tiff.slice(2))));
-  }
-
-  return ds;
-};
-
-async function ea_datasets_tiff_rpc_stream(v) {
-  const ds = this;
-
-  if (ds.raster) ;
-  else {
-    let data = null;
-
-    const payload = { };
-    payload[ds.unit] = v || ds.init;
-
-    await ea_client(`${ea_settings.database}/${ds.endpoint}`, 'POST', payload, r => data = r);
-
-    await ea_datasets_tiff(
-      ds,
-      (await ea_datasets_hexblob(data.tiff.slice(2))));
-  }
-
-  return ds;
-};
-
 async function ea_datasets_tiff_url() {
   const ds = this;
 
@@ -232,6 +183,18 @@ async function ea_datasets_tiff_url() {
     .then(b => ea_datasets_tiff(ds, b));
 
   return ds;
+};
+
+function ea_datasets_hexblob(hex) {
+  const byteBuf = new Uint8Array(new ArrayBuffer(hex.length/2));
+
+  for (var i = 0; i < hex.length; i += 2)
+    byteBuf[i/2] = parseInt(hex.slice(i, i+2), 16);
+
+  const blob = new Blob([byteBuf], {type: "image/tiff"});
+  // fake_download(blob);
+
+  return blob;
 };
 
 function ea_datasets_districts(ds) {

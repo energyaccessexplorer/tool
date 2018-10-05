@@ -13,38 +13,6 @@ function ea_controls_collapse_subcategory(conel, subel) {
   }
 };
 
-function ea_controls_collapse_category(catel, show) {
-  if (!catel) {
-    console.warn(`ea_controls_collapse_category: catel is ${catel}. Return.`);
-    return;
-  }
-
-  const subcatel = catel.querySelector('.controls-subcategories');
-  const cti = catel.querySelector('.controls-category-title');
-  const ctr = catel.querySelector('.collapse.triangle')
-
-  let d = (subcatel.style['display'] === "none");
-
-  if (typeof show !== 'undefined') d = show;
-
-  if (d) {
-    ctr.innerHTML = ea_ui_collapse_triangle('w');
-
-    // use empty strings so that the CSS can decide
-    //
-    subcatel.style['display'] = "";
-    cti.style['transform'] = "";
-    catel.style['padding-right'] = "";
-  }
-
-  else {
-    ctr.innerHTML = ea_ui_collapse_triangle('s');
-
-    subcatel.style['display'] = 'none';
-    catel.style['padding-right'] = "0";
-  }
-};
-
 function ea_controls_tree(tree, collection) {
   const ctel = document.querySelector('#controls')
   const height = window.innerHeight - (
@@ -57,16 +25,11 @@ function ea_controls_tree(tree, collection) {
   tree.forEach(a => {
     ctel.appendChild(elem(`
 <div id=${a.name} class="controls-category">
-  <div class="controls-category-title">
-    <span class="collapse triangle">${ea_ui_collapse_triangle('w')}</span> ${a.name}
-  </div>
+  <div class="controls-category-title">${a.name}</div>
   <div class="controls-subcategories"></div>
 </div>`));
 
     const catel = ctel.querySelector(`#${a.name}`);
-    const cti = catel.querySelector('.controls-category-title');
-
-    cti.addEventListener('mouseup', e => ea_controls_collapse_category(catel));
 
     a.subcategories.forEach(b => {
       catel.querySelector('.controls-subcategories')

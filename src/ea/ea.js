@@ -179,7 +179,7 @@ function ea_analysis(type) {
 
   const ds = {
     id: `analysis-${Date.now()}`,
-    domain: [0,1],
+    domain: null,
     width: tmp.width,
     height: tmp.height,
     raster: new Float32Array(tmp.raster.length),
@@ -193,6 +193,9 @@ function ea_analysis(type) {
 
   const full_weight = collection
         .reduce((a,c,k) => ((c.heatmap.scale === "key-delta") ? a : c.weight + a), 0);
+
+  let min = 1;
+  let max = 0;
 
   for (var i = 0; i < ds.raster.length; i++) {
     const t = collection.reduce((a, c, k, l) => {
@@ -218,9 +221,17 @@ function ea_analysis(type) {
         return (sv * c.weight) + a;
     }, 0);
 
-    ds.raster[i] = (t === -1) ? t : t / full_weight;
+    const r = (t === -1) ? t : t / full_weight
+
+    if (r !== -1) {
+      if (r > max) max = r;
+      if (r < min) min = r;
+    }
+
+    ds.raster[i] = r;
   }
 
+  ds.domain = [min, max];
   console.log("Finished ea_analysis in:", performance.now() - t0);
 
   return ds;

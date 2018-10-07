@@ -1,13 +1,10 @@
 function ea_views_init() {
   const el = document.querySelector('#views');
 
-  let views = {
-    datasets: 'inputs',
-    heatmaps: 'outputs'
-  };
+  let views = ['inputs', 'outputs'];
 
-  Object.keys(views).forEach(t => {
-    const btn = elem(`<div class="view">${views[t]}</div>`);
+  views.forEach(v => {
+    const btn = elem(`<div class="view">${v}</div>`);
 
     btn.addEventListener('mouseup', function(e) {
       el.querySelectorAll('.view').forEach(e => e.classList.remove('active'));
@@ -16,12 +13,12 @@ function ea_views_init() {
 
       ea_overlord({
         type: "mode",
-        target: t,
+        target: v,
         caller: "ea_views_init",
       });
     });
 
-    if (location.get_query_param('mode') === t) btn.classList.add('active');
+    if (location.get_query_param('mode') === v) btn.classList.add('active');
 
     el.appendChild(btn);
   })

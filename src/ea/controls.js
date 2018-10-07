@@ -272,7 +272,7 @@ function ea_controls_range(ds, label) {
     x => update_range_value(x, 0, v1),
     x => update_range_value(x, 1, v2),
     _ => ea_overlord({
-      type: "dataset",
+      type: "input",
       target: ds,
       caller: "ea_controls_range",
     })
@@ -304,7 +304,7 @@ function ea_controls_weight(ds) {
       ds.weight = x;
 
       ea_overlord({
-        type: "dataset",
+        type: "input",
         target: ds,
         caller: "ea_controls_weight",
       });
@@ -341,7 +341,7 @@ function ea_controls_steps(ds) {
         await ea_datasets_load(ds, (ds.init = x));
 
         ea_overlord({
-          type: "dataset",
+          type: "input",
           target: ds,
           caller: "ea_controls_steps",
         });

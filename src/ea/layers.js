@@ -98,7 +98,7 @@ function ea_layers_heatmaps(target) {
     await nodes.forEach(n => n.querySelector('.layers-element-radio svg').dispatchEvent(event));
 
     ea_overlord({
-      type: "heatmap",
+      type: "output",
       heatmap: this.getAttribute('bind'),
       caller: 'ea_layers_heatmaps'
     });

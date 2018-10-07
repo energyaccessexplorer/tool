@@ -1,5 +1,5 @@
 function ea_opacity_tweak() {
-  const dl = location.get_query_param('datasets-layers').split(',');
+  const dl = location.get_query_param('inputs').split(',');
 
   const tweak = (dl.length === 1 &&
                  (dl[0] === 'subcounties' || dl[0] === 'districts'));
@@ -10,11 +10,11 @@ function ea_opacity_tweak() {
 };
 
 async function ea_init(tree, collection, bounds) {
-  let datasets_layers_param = location.get_query_param('datasets-layers');
-  let datasets_layers;
+  let inputs_param = location.get_query_param('inputs');
+  let inputs;
 
-  if (!datasets_layers_param) datasets_layers = [];
-  else datasets_layers = datasets_layers_param.split(',');
+  if (!inputs_param) inputs = [];
+  else inputs = inputs_param.split(',');
 
   tree.forEach(cat => cat.subcategories.forEach(sub => sub.datasets.filter(d => {
     const ds = collection.find(x => x.id === d.id);
@@ -37,7 +37,7 @@ async function ea_init(tree, collection, bounds) {
     }
 
     d.weight = d.weight || 2;
-    d.active = (datasets_layers.indexOf(d.id) > -1);
+    d.active = (inputs.indexOf(d.id) > -1);
 
     if (typeof d.heatmap.color_scale === 'undefined')
       d.heatmap.color_scale = ea_default_color_scheme;
@@ -85,7 +85,7 @@ async function ea_init(tree, collection, bounds) {
   }
 
   (async _ => {
-    for (var id of datasets_layers) {
+    for (var id of inputs) {
       let ds = collection.find(d => d.id === id);
       if (typeof ds !== 'undefined') await ea_datasets_load(ds);
     }
@@ -299,37 +299,41 @@ async function ea_overlord(msg) {
   if (!msg) throw "Argument Error: Overlord: I have nothing to do!";
   if (typeof msg.caller === 'undefined' || !msg.caller) throw "Argument Error: Overlord: Who is the caller?";
 
-  let heatmaps_layers;
-  let datasets_layers;
+  let output;
+  let inputs;
 
   let mode = location.get_query_param('mode');
-  let heatmaps_layers_param = location.get_query_param('heatmaps-layers');
-  let datasets_layers_param = location.get_query_param('datasets-layers');
+  let output_param = location.get_query_param('output');
+  let inputs_param = location.get_query_param('inputs');
 
   /* TODO: remove any {datasets}_layers that are not in the collection */
+  function set_inputs_param() {
+    history.replaceState(null, null, location.set_query_param('inputs', inputs.toString()));
+  };
 
-  if (Object.keys(ea_indexes).indexOf(heatmaps_layers_param) > -1) {
-    heatmaps_layers = heatmaps_layers_param;
+  function set_output_param() {
+    history.replaceState(null, null, location.set_query_param('output', output));
+  };
+
+  if (Object.keys(ea_indexes).indexOf(output_param) > -1) {
+    output = output_param;
   } else {
-    heatmaps_layers = "eai";
+    output = "eai";
     history.replaceState(
       null, null,
-      location.set_query_param('heatmaps-layers', heatmaps_layers)
+      location.set_query_param('output', output)
     );
   }
 
-  if (!datasets_layers_param) {
-    datasets_layers = [];
-    history.replaceState(
-      null, null,
-      location.set_query_param('datasets-layers', datasets_layers.toString())
-    );
+  if (!inputs_param) {
+    inputs = [];
+    set_inputs_param();
   } else {
-    datasets_layers = datasets_layers_param.split(',');
+    inputs = inputs_param.split(',');
   }
 
   if (!mode) {
-    mode = 'heatmaps';
+    mode = 'outputs';
     history.replaceState(null, null, location.set_query_param('mode', mode));
   }
 
@@ -361,10 +365,10 @@ async function ea_overlord(msg) {
   case "mode": {
     var t = msg.target;
 
-    if (t === "heatmaps") {
-      ea_layers_heatmaps(heatmaps_layers);
+    if (t === "outputs") {
+      ea_layers_heatmaps(output);
 
-      datasets_layers.forEach(i => {
+      inputs.forEach(i => {
         var x;
 
         if (x = ea_datasets_collection.find(d => d.id === i)) {
@@ -374,13 +378,11 @@ async function ea_overlord(msg) {
         }
       });
 
-      ea_canvas_plot(ea_analysis(heatmaps_layers));
+      ea_canvas_plot(ea_analysis(output));
     }
 
-    else if (t === "datasets") {
-      ea_layers_datasets(datasets_layers);
-
-      datasets_layers.forEach(i => {
+    else if (t === "inputs") {
+      inputs.forEach(i => {
         var x;
 
         if (x = ea_datasets_collection.find(d => d.id === i)) {
@@ -388,7 +390,9 @@ async function ea_overlord(msg) {
         }
       });
 
-      ea_draw_first_active_nopolygons(datasets_layers);
+      ea_layers_datasets(inputs);
+
+      ea_draw_first_active_nopolygons(inputs);
     }
 
     else {
@@ -400,26 +404,26 @@ async function ea_overlord(msg) {
     break;
   }
 
-  case "dataset": {
+  case "input": {
     const ds = msg.target;
 
     ds.active ?
-      datasets_layers.unshift(ds.id) :
-      datasets_layers.splice(datasets_layers.indexOf(ds.id), 1); // REMOVE()
+      inputs.unshift(ds.id) :
+      inputs.splice(inputs.indexOf(ds.id), 1); // REMOVE()
 
-    datasets_layers = [...new Set(datasets_layers)]; // UNIQUE()
+    inputs = [...new Set(inputs)]; // UNIQUE()
 
-    if (mode === "heatmaps") {
-      ea_layers_heatmaps(heatmaps_layers);
+    if (mode === "outputs") {
+      ea_layers_heatmaps(output);
 
       if (typeof ds.heatmap !== "undefined")
         ds.active ? await ds.heatmap.parse.call(ds) : null
 
-      ea_canvas_plot(ea_analysis(heatmaps_layers));
+      ea_canvas_plot(ea_analysis(output));
     }
 
-    else if (mode === "datasets") {
-      ea_layers_datasets(datasets_layers);
+    else if (mode === "inputs") {
+      ea_layers_datasets(inputs);
 
       if (ds.polygons) {
         if (ds.active)
@@ -428,35 +432,29 @@ async function ea_overlord(msg) {
           if (ea_mapbox.getSource(ds.id)) ea_mapbox.setLayoutProperty(ds.id, 'visibility', 'none');
       }
 
-      ea_draw_first_active_nopolygons(datasets_layers);
+      ea_draw_first_active_nopolygons(inputs);
     }
 
     else {
       throw `Argument Error: Overlord: Could not set the mode ${mode}`;
     }
 
-    history.replaceState(
-      null, null,
-      location.set_query_param('heatmaps-layers', heatmaps_layers.toString())
-    );
+    set_output_param();
 
-    history.replaceState(
-      null, null,
-      location.set_query_param('datasets-layers', datasets_layers.toString())
-    );
+    set_inputs_param();
 
-    ea_opacity_tweak(datasets_layers);
+    ea_opacity_tweak(inputs);
 
     break;
   }
 
-  case "heatmap": {
-    if (mode === "heatmaps") {
+  case "output": {
+    if (mode === "outputs") {
       ea_canvas_plot(ea_analysis(msg.heatmap));
 
       history.replaceState(
         null, null,
-        location.set_query_param('heatmaps-layers', msg.heatmap)
+        location.set_query_param('output', msg.heatmap)
       );
     }
 
@@ -468,12 +466,12 @@ async function ea_overlord(msg) {
   }
 
   case "sort": {
-    if (mode === "datasets") {
+    if (mode === "inputs") {
       ea_layers_update_datasets(msg.layers);
 
       history.replaceState(
         null, null,
-        location.set_query_param('datasets-layers', msg.layers.toString())
+        location.set_query_param('inputs', msg.layers.toString())
       );
 
       ea_draw_first_active_nopolygons(msg.layers);

@@ -62,7 +62,7 @@ async function ea_datasets_active(ds, v) {
   if (ds.active = v) await ea_datasets_load(ds);
 
   ea_overlord({
-    type: "dataset",
+    type: "input",
     target: ds,
     caller: "ea_datasets_active",
   });

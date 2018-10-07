@@ -4,12 +4,11 @@ topojson.js	https://unpkg.com/topojson/dist/topojson
 geotiff.js	https://github.com/geotiffjs/geotiff.js/releases/download/v1.0.0-beta.1/geotiff.bundle.min.js
 plotty.js	https://raw.githubusercontent.com/santilland/plotty/master/dist/plotty.min.js
 mapbox-gl.js	https://api.mapbox.com/mapbox-gl-js/v0.49.0/mapbox-gl.js
+mapbox-gl.css	https://api.mapbox.com/mapbox-gl-js/v0.49.0/mapbox-gl.css
 htmlsortable.js	https://raw.githubusercontent.com/lukasoppermann/html5sortable/master/dist/html5sortable.min.js
-mapbox-gl.css	https://api.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css
 world-50m.json	https://unpkg.com/world-atlas/world/50m.json
 world-110m.json	https://unpkg.com/world-atlas/world/110m.json
 countries.json	https://raw.githubusercontent.com/mledoze/countries/master/dist/countries.json
-834-adm0.json	https://raw.githubusercontent.com/energy-data/nzt-electrification/master/assets/TZA-adm0.json
 fonts/lato.woff2	https://fonts.gstatic.com/s/lato/v14/S6uyw4BMUTPHjx4wXg.woff2
 location.js	https://gitlab.com/fabbe/web-toolbelt/raw/master/location.js
 flash.js	https://gitlab.com/fabbe/web-toolbelt/raw/master/flash.js

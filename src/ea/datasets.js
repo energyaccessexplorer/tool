@@ -200,25 +200,22 @@ function ea_datasets_hexblob(hex) {
 function ea_datasets_districts(ds) {
   let endpoint = `${ea_settings.endpoint_base}/${ea_ccn3}/districts-data.csv`;
 
-  d3.request(endpoint)
-    .on("error", e => {
-      console.warn(`${endpoint} raised an error and several datasets might depend on this. Bye!`);
-      console.warn(e);
-    })
-    .mimeType("text/csv")
-    .response(xhr => {
-      ea_districts = d3.csvParse(xhr.responseText, d => {
-        const o = { oid: +d[ds.configuration.oid] };
+  d3.csv(endpoint, function(d) {
+    const o = { oid: +d[ds.configuration.oid] };
 
-        Object.keys(ds.configuration.options).forEach(k => o[k] = +d[k] || d[k]);
+    Object.keys(ds.configuration.options).forEach(k => o[k] = +d[k] || d[k]);
 
-        return o;
-      });
+    return o;
+  })
+    .then(data => {
+      ea_districts = data;
 
       // hack: so we can access them by oid (as an array, they are
       // generally a sequence starting at 1)
       //
       ea_districts.unshift({ oid: 0 });
     })
-    .get();
+    .catch(e => {
+      console.warn(`${endpoint} raised an error and several datasets might depend on this. Bye!`);
+    })
 };

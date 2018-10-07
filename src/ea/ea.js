@@ -148,9 +148,11 @@ async function ea_country_init(ccn3) {
 
       const datasets_collection = collection.filter(d => d);
 
-      ea_datasets_districts(
-        datasets_collection
-          .find(d => d.id === 'districts' || d.id === 'subcounties'));
+      const districts_dataset = datasets_collection
+            .find(d => d.id === 'districts' || d.id === 'subcounties');
+
+      if (districts_dataset) ea_datasets_districts(districts_dataset);
+      else console.warn("No districts/subcounties dataset found.");
 
       it = {
         category_tree: country.category_tree,
@@ -297,30 +299,31 @@ async function ea_overlord(msg) {
   if (!msg) throw "Argument Error: Overlord: I have nothing to do!";
   if (typeof msg.caller === 'undefined' || !msg.caller) throw "Argument Error: Overlord: Who is the caller?";
 
+  let mode;
   let output;
   let inputs;
 
-  let mode = location.get_query_param('mode');
+  let mode_param = location.get_query_param('mode');
   let output_param = location.get_query_param('output');
   let inputs_param = location.get_query_param('inputs');
 
-  /* TODO: remove any {datasets}_layers that are not in the collection */
-  function set_inputs_param() {
-    history.replaceState(null, null, location.set_query_param('inputs', inputs.toString()));
+  function set_mode_param(m) {
+    history.replaceState(null, null, location.set_query_param('mode', (m || output)));
+  }
+
+  function set_output_param(o) {
+    history.replaceState(null, null, location.set_query_param('output', (o || output)));
   };
 
-  function set_output_param() {
-    history.replaceState(null, null, location.set_query_param('output', output));
+  function set_inputs_param(i) {
+    history.replaceState(null, null, location.set_query_param('inputs', (i || inputs).toString()));
   };
 
   if (Object.keys(ea_indexes).indexOf(output_param) > -1) {
     output = output_param;
   } else {
     output = "eai";
-    history.replaceState(
-      null, null,
-      location.set_query_param('output', output)
-    );
+    set_output_param();
   }
 
   if (!inputs_param) {
@@ -330,9 +333,11 @@ async function ea_overlord(msg) {
     inputs = inputs_param.split(',');
   }
 
-  if (!mode) {
+  if (ea_views.indexOf(mode_param) > -1) {
+    mode = mode_param;
+  } else {
     mode = 'outputs';
-    history.replaceState(null, null, location.set_query_param('mode', mode));
+    set_mode_param();
   }
 
   switch (msg.type) {
@@ -350,6 +355,11 @@ async function ea_overlord(msg) {
 
     const it = await ea_country_init(ea_ccn3);
     ea_datasets_collection = it.datasets_collection;
+
+    inputs = inputs
+      .filter(i => ea_datasets_collection.find(t => i === t.id));
+
+    set_inputs_param();
 
     ea_views_init();
     ea_layers_init();
@@ -396,7 +406,7 @@ async function ea_overlord(msg) {
       throw `Argument Error: Overlord: Could not set/find the mode '${mode}'.`;
     }
 
-    history.replaceState(null, null, location.set_query_param('mode', t));
+    set_mode_param(t);
 
     break;
   }
@@ -448,11 +458,7 @@ async function ea_overlord(msg) {
   case "output": {
     if (mode === "outputs") {
       ea_canvas_plot(ea_analysis(msg.heatmap));
-
-      history.replaceState(
-        null, null,
-        location.set_query_param('output', msg.heatmap)
-      );
+      set_output_param(msg.heatmap);
     }
 
     else {
@@ -465,12 +471,7 @@ async function ea_overlord(msg) {
   case "sort": {
     if (mode === "inputs") {
       ea_layers_update_datasets(msg.layers);
-
-      history.replaceState(
-        null, null,
-        location.set_query_param('inputs', msg.layers.toString())
-      );
-
+      set_inputs_param(msg.layers);
       ea_draw_first_active_nopolygons(msg.layers);
     }
 

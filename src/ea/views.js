@@ -1,9 +1,7 @@
 function ea_views_init() {
   const el = document.querySelector('#views');
 
-  let views = ['inputs', 'outputs'];
-
-  views.forEach(v => {
+  ea_views.forEach(v => {
     const btn = elem(`<div class="view">${v}</div>`);
 
     btn.addEventListener('mouseup', function(e) {

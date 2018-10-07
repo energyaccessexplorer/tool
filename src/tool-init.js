@@ -46,6 +46,8 @@ require([
   window.GeoTIFF = geotiff;
   window.plotty = plotty;
 
+  window.ea_views = ['inputs', 'outputs'];
+
   window.ea_indexes = {
     "eai": 'Energy Access Index',
     "demand": 'Demand Index',

@@ -76,7 +76,7 @@ async function ea_init(tree, collection, bounds) {
 
     ea_dummy.raster = new Uint16Array(ea_dummy.width * ea_dummy.height).fill(ea_dummy.nodata);
 
-    ea_layout_map(bounds, [ea_dummy.width, ea_dummy.height]);
+    ea_layout_map(bounds);
     ea_map_setup(bounds);
 
     // STRANGE: force the canvas to 2d...
@@ -174,8 +174,6 @@ function ea_canvas_plot(ds) {
     noDataValue: ds.nodata,
     colorScale: ds.color_scale,
   });
-
-  ea_plot = plot;
 
   plot.render();
 
@@ -343,7 +341,6 @@ async function ea_overlord(msg) {
 
     ea_ccn3 = location.get_query_param('ccn3');
     ea_map = null;
-    ea_plot = null;
     ea_datasets_collection = null;
     ea_mapbox = null;
     ea_dummy = null;

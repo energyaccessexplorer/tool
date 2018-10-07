@@ -16,9 +16,6 @@ function ea_countries_setup() {
   maparea.style['width'] = width + "px";
   maparea.style['height'] = height + "px";
 
-  const coord_tooltip = document.querySelector('body')
-        .appendChild(elem(`<div style="opacity: 0;" id="coord-tooltip"></div>`));
-
   const cs  = document.querySelector('#country-search');
   const csi = cs.querySelector('#country-search-input');
   const css = cs.querySelector('#country-search-flag');

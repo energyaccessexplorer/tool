@@ -101,17 +101,9 @@ function ea_layout_map(bounds) {
   width = p.clientWidth - p.querySelector('#controls').clientWidth + 10;
   ea_canvas = document.querySelector('canvas#plot');
 
-  const coord_tooltip = document.querySelector('body')
-        .appendChild(elem(`<div id="coord-tooltip"></div>`));
-
   const maparea = document.querySelector('#maparea');
   maparea.style['width'] = width + "px";
   maparea.style['height'] = height + "px";
-
-  const svg = d3.select('#svg-map');
-  svg
-    .attr('width', width)
-    .attr('height', height);
 
   return {
     width: width,

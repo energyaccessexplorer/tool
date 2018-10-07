@@ -44,9 +44,7 @@ require([
   window.d3 = d3;
   window.topojson = topojson;
   window.GeoTIFF = geotiff;
-
   window.plotty = plotty;
-  plotty.addColorScale("ea", ['#1c4478', '#81b062', '#e5a82e'], [0, 0.5, 1]);
 
   window.ea_indexes = {
     "eai": 'Energy Access Index',
@@ -54,6 +52,8 @@ require([
     "supply": 'Supply Index',
     "ani": 'Assistance Need Index',
   };
+
+  plotty.addColorScale("ea", ['#1c4478', '#81b062', '#e5a82e'], [0, 0.5, 1]);
 
   ea_overlord({ type: 'init', caller: 'require' });
 });

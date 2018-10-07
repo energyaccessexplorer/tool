@@ -6,24 +6,10 @@ function ea_map_setup(bounds) {
 
   const center = [b[0][0] + (Math.abs(w/2)), b[0][1] + (Math.abs(h/2))];
 
-  d3.queue()
-    .defer(d3.json, `${ea_settings.app_base}/lib/${ea_ccn3}-adm0.json`)
-    .await((error, topo) => {
-      if (error) {
-        flash()
-          .type('error').title(error.target.statusText)
-          .message(error.target.responseURL)();
+  ea_canvas.style.display = 'none';
+  ea_mapbox = mapbox_setup(bounds, ea_settings.mapbox_theme, ea_settings.mapbox_token);
 
-        console.log(error);
-      }
-
-      ea_canvas.style.display = 'none';
-      ea_mapbox = mapbox_setup(bounds, ea_settings.mapbox_theme, ea_settings.mapbox_token);
-
-      // 4/5 for a comfy fit here...
-      //
-      // ea_mapbox.fitBounds([], { animate: false });
-    });
+  ea_mapbox.zoomTo(ea_mapbox.getZoom() * 0.95, {duration: 0});
 };
 
 function ea_map_svg(svg, topofile, name, options) {

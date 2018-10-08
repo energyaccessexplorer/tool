@@ -20,21 +20,17 @@ function ea_countries_setup() {
   const csi = cs.querySelector('#country-search-input');
   const css = cs.querySelector('#country-search-flag');
 
-  d3.queue()
-    .defer(d3.json, ea_settings.app_base + '/lib/world-50m.json')
-    .defer(d3.json, ea_settings.app_base + '/lib/countries.json')
-    .defer(d3.csv,  ea_settings.app_base + '/data/countries-overview.csv')
-    .await((error, geo, countries, countries_overviews) => {
+  Promise.all([
+    d3.json(ea_settings.app_base + '/lib/world-50m.json'),
+    d3.json(ea_settings.app_base + '/lib/countries.json'),
+    d3.csv(ea_settings.app_base + '/data/countries-overview.csv')
+  ])
+    .then(results => {
+      let geo = results[0];
+      let countries = results[1];
+      let countries_overviews = results[2];
+
       const topo = topojson.feature(geo, geo.objects.countries);
-
-      if (error) {
-        flash()
-          .type('error')
-          .title(error.target.statusText)
-          .message(error.target.responseURL)();
-
-        console.log(error);
-      }
 
       ea_map = ea_map_svg(svg, geo, 'countries', { center: [0,0], scale: 350 });
 
@@ -64,6 +60,13 @@ function ea_countries_setup() {
       }).style('fill', '#A98B6F');
 
       ea_ui_app_loading(false);
+    })
+    .catch(error => {
+      flash()
+        .type('error')
+        .title(error)();
+
+      console.log(error);
     });
 };
 

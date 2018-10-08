@@ -1,7 +1,6 @@
 #views .view {
   text-align: center;
-  font-family: condensed;
-  font-size: 2em;
+  font-size: 1.2em;
   font-weight: bold;
   text-transform: uppercase;
   flex: 1;
@@ -20,7 +19,6 @@
 
 h1, h2, h3 {
   color: var(--the-blue);
-  font-family: condensed;
 }
 
 .download-link {

@@ -21,14 +21,16 @@ function ea_countries_setup() {
   const css = cs.querySelector('#country-search-flag');
 
   Promise.all([
+    d3.json(ea_settings.database + '/countries?online'),
     d3.json(ea_settings.app_base + '/lib/world-50m.json'),
     d3.json(ea_settings.app_base + '/lib/countries.json'),
     d3.csv(ea_settings.app_base + '/data/countries-overview.csv')
   ])
     .then(results => {
-      let geo = results[0];
-      let countries = results[1];
-      let countries_overviews = results[2];
+      let countries_online = results[0];
+      let geo = results[1];
+      let countries = results[2];
+      let countries_overviews = results[3];
 
       const topo = topojson.feature(geo, geo.objects.countries);
 
@@ -40,7 +42,7 @@ function ea_countries_setup() {
         cls: 'land',
         scale: 0,
         classed: (v) => typeof countries_overviews.find(c => c.ccn3 === v) !== 'undefined',
-        mousedown: (v) => ea_countries_overview(countries.find(c => c.ccn3 === v), countries_overviews),
+        mousedown: (v) => ea_countries_overview(countries.find(c => c.ccn3 === v), countries_overviews, countries_online),
         mouseover: (v) => {
           const x = countries.find(c => c.ccn3 === v);
 
@@ -70,7 +72,7 @@ function ea_countries_setup() {
     });
 };
 
-function ea_countries_overview(c, collection) {
+function ea_countries_overview(c, collection, online) {
   const r = collection.find(i => i.country === c.name.common);
 
   const co = document.querySelector('#country-overview');
@@ -118,7 +120,7 @@ function ea_countries_overview(c, collection) {
     if (+r['ease-business'] > 0)
       ease = elem(`<div>Ease of doing business: ${r['ease-business']} / 190</div>`);
 
-    if (+r['ccn3'] === 834 || +r['ccn3'] === 800)
+    if (online.map(x => x['ccn3']).indexOf(+r['ccn3']) > -1)
       btn = elem(`<a id="eae" href="/maps-and-data/tool?ccn3=${r['ccn3']}">Click to launch tool</a>`);
 
     [demo, area, pop, urban_rural, gdp, pies, dev, pol, ease, btn].forEach(t => t ? co.appendChild(t) : null);

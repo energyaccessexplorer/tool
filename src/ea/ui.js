@@ -167,7 +167,7 @@ function ea_dataset_modal(ds) {
 
   modal()
     .header(ds.name_long)
-    .content(content.outerHTML)();
+    .content(content)();
 };
 
 function ea_index_modal(i) {
@@ -187,8 +187,7 @@ function ea_index_modal(i) {
 
   modal()
     .header(titles[i])
-    .content(infos[i])
-    .footer('')();
+    .content(infos[i])();
 };
 
 function ea_category_help_modal(ds) {
@@ -217,5 +216,5 @@ width: -webkit-fit-content;
 width: -moz-fit-content;
     `)
     .header(ds.name_long)
-    .content(content.innerHTML)();
+    .content(content)();
 };

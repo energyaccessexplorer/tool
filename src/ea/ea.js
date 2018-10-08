@@ -308,7 +308,7 @@ async function ea_overlord(msg) {
   let inputs_param = location.get_query_param('inputs');
 
   function set_mode_param(m) {
-    history.replaceState(null, null, location.set_query_param('mode', (m || output)));
+    history.replaceState(null, null, location.set_query_param('mode', (m || mode)));
   }
 
   function set_output_param(o) {

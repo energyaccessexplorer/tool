@@ -6,6 +6,7 @@ requirejs.config({
     'ea': "./ea/ea",
     'datasets': "./ea/datasets",
     'countries': "./ea/countries",
+    'flash': "../lib/flash",
     'ui': "./ea/ui",
     'client': "./ea/client",
     'svg': "./ea/svg",
@@ -24,6 +25,7 @@ require([
   'datasets',
   'mapbox',
   'countries',
+  'flash',
 ], (d3, topojson) => {
   window.d3 = d3;
   window.topojson = topojson;

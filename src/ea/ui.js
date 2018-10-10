@@ -90,6 +90,13 @@ function ea_ui_dataset_loading(ds, bool) {
 function ea_layout_map(bounds) {
   const p = document.querySelector('#playground');
 
+  const ch = window.innerHeight - (
+    document.querySelector('nav').clientHeight +
+    document.querySelector('#controls-preset').clientHeight
+  );
+
+  document.querySelector('#controls').style['height'] = `${ch}px`;
+
   let width, height;
   const b = bounds;
 

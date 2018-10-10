@@ -9,177 +9,21 @@ function ea_opacity_tweak() {
   (ea_canvas ? ea_canvas.style.opacity = (tweak ? 0.2 : 1) : null)
 };
 
-async function ea_init(tree, collection, bounds) {
-  let inputs_param = location.get_query_param('inputs');
-  let inputs;
-
-  if (!inputs_param) inputs = [];
-  else inputs = inputs_param.split(',');
-
-  tree.forEach(cat => cat.subcategories.forEach(sub => sub.datasets.filter(d => {
-    const ds = collection.find(x => x.id === d.id);
-
-    if (!ds) {
-      console.warn(`Dataset '${d.id}' not found:`, ds);
-      return false;
-    }
-
-    ds.invert = d.invert;
-    ds.category = cat.name;
-  })));
-
-  for (var d of collection) {
-    if (d.configuration && d.configuration.mutant) {
-      let m = collection.find(x => x.id === d.configuration.mutant_targets[0]);
-
-      if (!m) {
-        flash()
-          .type(null)
-          .timeout(0)
-          .title(`'${d.id}' dataset is misconfigured.`)
-          .message(`Removing it because I cannot find host dataset: ${d.configuration.mutant_targets[0]}.`)();
-
-        delete collection[collection.indexOf(d)];
-
-        continue;
-      } else {
-        d.polygons = m.polygons;
-        d.heatmap = m.heatmap;
-      }
-    }
-
-    d.weight = d.weight || 2;
-    d.active = (inputs.indexOf(d.id) > -1);
-
-    if (typeof d.heatmap.color_scale === 'undefined')
-      d.heatmap.color_scale = ea_default_color_scheme;
-
-    if (d.heatmap.endpoint)
-      d.heatmap.parse = ea_datasets_tiff_url;
-
-    if (d.polygons && d.polygons.shape_type === 'points')
-      d.polygons.parse = ea_datasets_points;
-
-    if (d.polygons && d.polygons.shape_type === 'polygons')
-      d.polygons.parse = ea_datasets_polygons;
-
-    d.color_scale_fn = function() {
-      return d3.scaleLinear()
-        .domain(plotty.colorscales[d.heatmap.color_scale].positions)
-        .range(plotty.colorscales[d.heatmap.color_scale].colors)
-        .clamp(d.heatmap.clamp || false);
-    }
-  };
-
-  collection = await collection.filter(d => d);
-
-  ea_controls_tree(tree, collection);
-
-  {
-    ea_dummy = {
-      id: "dummy",
-      description: "Dummy dataset",
-
-      heatmap: {
-        endpoint: "districts.tif",
-        parse: ea_datasets_tiff_url,
-      },
-    };
-
-    await ea_dummy.heatmap.parse.call(ea_dummy);
-
-    ea_dummy.raster = new Uint16Array(ea_dummy.width * ea_dummy.height).fill(ea_dummy.nodata);
-
-    ea_layout_map(bounds);
-    ea_map_setup(bounds);
-
-    // STRANGE: force the canvas to 2d...
-    //
-    ea_canvas.getContext('2d');
-  }
-
-  (async _ => {
-    for (var id of inputs) {
-      let ds = collection.find(d => d.id === id);
-      if (typeof ds !== 'undefined') await ea_datasets_load(ds);
-    }
-
-    ea_overlord({
-      type: "mode",
-      target: location.get_query_param('mode'),
-      caller: "ea_init_again",
-    });
-  })();
-
-  ea_ui_app_loading(false);
-};
-
 async function ea_country_init(ccn3) {
   let country = null;
-  let it = null;
 
   await ea_client(
     `${ea_settings.database}/countries?ccn3=eq.${ccn3}`,
-    'GET', 1,
-    r => country = r
+    'GET', 1, r => country = r
   );
 
-  await ea_client(
-    `${ea_settings.database}/datasets?country_id=eq.${country.id}&select=*,heatmap_file(*),polygons_file(*),category(*)`, 'GET', null,
-    r => {
-      const collection = r.map(e => {
-        let heatmap = e.category.heatmap;
-        if (heatmap && e.heatmap_file) heatmap.endpoint = e.heatmap_file.endpoint;
-
-        let polygons = e.category.polygons;
-        if (polygons && e.polygons_file) polygons.endpoint = e.polygons_file.endpoint;
-
-        if (e.category.configuration && e.category.configuration.mutant) console.log('mutant: ', e.category_name, e.id);
-        else if (!e.heatmap_file && !e.polygons_file) return undefined;
-
-        let help = null;
-
-        if (e.category.metadata && (e.category.metadata.why || e.category.metadata.what)) {
-          help = {};
-
-          help['why'] = e.category.metadata.why;
-          help['what'] = e.category.metadata.what;
-        }
-
-        return {
-          "name_long": e.category.name_long,
-          "description": e.category.description,
-          "description_long": e.category.description_long,
-          "heatmap": heatmap,
-          "polygons": polygons,
-          "id": e.category.name,
-          "unit": e.category.unit,
-          "metadata": e.metadata,
-          "configuration": e.category.configuration,
-          "help": help
-        };
-      });
-
-      const datasets_collection = collection.filter(d => d);
-
-      const districts_dataset = datasets_collection
-            .find(d => d.id === 'districts' || d.id === 'subcounties');
-
-      if (districts_dataset) ea_datasets_districts(districts_dataset);
-      else console.warn("No districts/subcounties dataset found.");
-
-      it = {
-        category_tree: country.category_tree,
-        datasets_collection: datasets_collection,
-        country_bounds: country.bounds
-      };
-    });
-
-  return it;
+  return country;
 };
 
 function ea_canvas_plot(ds) {
   if (!ds) return;
+
+  ea_current_analysis = ds;
 
   const plot = new plotty.plot({
     canvas: ea_canvas,
@@ -365,20 +209,56 @@ async function ea_overlord(msg) {
     ea_dummy = null;
     ea_canvas = null;
 
-    console.log("EA Overlord: init!");
+    const country = await ea_country_init(ea_ccn3);
+    const collection  = await ea_datasets_init(country.id, inputs);
 
-    const it = await ea_country_init(ea_ccn3);
-    ea_datasets_collection = it.datasets_collection;
-
-    inputs = inputs
-      .filter(i => ea_datasets_collection.find(t => i === t.id));
-
+    inputs = inputs.filter(i => collection.find(t => i === t.id));
     set_inputs_param();
 
     ea_views_init();
     ea_layers_init();
 
-    ea_init(it.category_tree, it.datasets_collection, it.country_bounds)
+    ea_datasets_collection = collection;
+
+    ea_controls_tree(country.category_tree, ea_datasets_collection);
+
+    ea_layout_map(country.bounds);
+    ea_map_setup(country.bounds);
+
+    // STRANGE: force the canvas to 2d...
+    //
+    ea_canvas.getContext('2d');
+
+    (async _ => {
+      for (var id of inputs) {
+        let ds = ea_datasets_collection.find(d => d.id === id);
+        if (typeof ds !== 'undefined') await ea_datasets_load(ds);
+      }
+
+      ea_overlord({
+        type: "mode",
+        target: location.get_query_param('mode'),
+        caller: "ea_init",
+      });
+
+      ea_ui_app_loading(false);
+    })();
+
+    {
+      ea_dummy = {
+        id: "dummy",
+        description: "Dummy dataset",
+
+        heatmap: {
+          endpoint: "districts.tif",
+          parse: ea_datasets_tiff_url,
+        },
+      };
+
+      await ea_dummy.heatmap.parse.call(ea_dummy);
+
+      ea_dummy.raster = new Uint16Array(ea_dummy.width * ea_dummy.height).fill(ea_dummy.nodata);
+    }
 
     break;
   }

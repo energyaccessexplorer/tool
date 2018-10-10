@@ -15,12 +15,18 @@ function ea_controls_collapse_subcategory(conel, subel) {
 
 function ea_controls_tree(tree, collection) {
   const ctel = document.querySelector('#controls')
-  const height = window.innerHeight - (
-    document.querySelector('nav').clientHeight +
-    document.querySelector('#controls-preset').clientHeight
-  );
 
-  ctel.style['height'] = `${height}px`;
+  tree.forEach(cat => cat.subcategories.forEach(sub => sub.datasets.filter(d => {
+    const ds = ea_datasets_collection.find(x => x.id === d.id);
+
+    if (!ds) {
+      console.warn(`Dataset '${d.id}' not found:`, ds);
+      return false;
+    }
+
+    ds.invert = d.invert;
+    ds.category = cat.name;
+  })));
 
   tree.forEach(a => {
     ctel.appendChild(elem(`

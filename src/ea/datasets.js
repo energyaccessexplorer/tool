@@ -1,3 +1,98 @@
+async function ea_datasets_init(country_id, inputs) {
+  let collection = null;
+
+  await ea_client(
+    `${ea_settings.database}/datasets?country_id=eq.${country_id}&select=*,heatmap_file(*),polygons_file(*),category(*)`, 'GET', null,
+    r => {
+      const map = r.map(e => {
+        let heatmap = e.category.heatmap;
+        if (heatmap && e.heatmap_file) heatmap.endpoint = e.heatmap_file.endpoint;
+
+        let polygons = e.category.polygons;
+        if (polygons && e.polygons_file) polygons.endpoint = e.polygons_file.endpoint;
+
+        if (e.category.configuration && e.category.configuration.mutant) console.log('mutant: ', e.category_name, e.id);
+        else if (!e.heatmap_file && !e.polygons_file) return undefined;
+
+        let help = null;
+
+        if (e.category.metadata && (e.category.metadata.why || e.category.metadata.what)) {
+          help = {};
+
+          help['why'] = e.category.metadata.why;
+          help['what'] = e.category.metadata.what;
+        }
+
+        return {
+          "active": (inputs.indexOf(e.category.name) > -1),
+          "name_long": e.category.name_long,
+          "description": e.category.description,
+          "description_long": e.category.description_long,
+          "heatmap": heatmap,
+          "polygons": polygons,
+          "id": e.category.name,
+          "unit": e.category.unit,
+          "metadata": e.metadata,
+          "configuration": e.category.configuration,
+          "weight": (e.metadata.weight || e.category.weight || 2),
+          "help": help
+        };
+      });
+
+      collection = map.filter(d => d)
+
+      for (var d of collection) {
+        if (d.configuration && d.configuration.mutant) {
+          let m = collection.find(x => x.id === d.configuration.mutant_targets[0]);
+
+          if (!m) {
+            flash()
+              .type(null)
+              .timeout(0)
+              .title(`'${d.id}' dataset is misconfigured.`)
+              .message(`Removing it because I cannot find host dataset: ${d.configuration.mutant_targets[0]}.`)();
+
+            delete collection[collection.indexOf(d)];
+
+            continue;
+          } else {
+            d.polygons = m.polygons;
+            d.heatmap = m.heatmap;
+          }
+        }
+
+        if (typeof d.heatmap.color_scale === 'undefined')
+          d.heatmap.color_scale = ea_default_color_scheme;
+
+        if (d.heatmap.endpoint)
+          d.heatmap.parse = ea_datasets_tiff_url;
+
+        if (d.polygons && d.polygons.shape_type === 'points')
+          d.polygons.parse = ea_datasets_points;
+
+        if (d.polygons && d.polygons.shape_type === 'polygons')
+          d.polygons.parse = ea_datasets_polygons;
+
+        d.color_scale_fn = function() {
+          return d3.scaleLinear()
+            .domain(plotty.colorscales[d.heatmap.color_scale].positions)
+            .range(plotty.colorscales[d.heatmap.color_scale].colors)
+            .clamp(d.heatmap.clamp || false);
+        }
+      }
+
+      collection = collection.filter(d => d);
+
+      const districts_dataset = collection
+            .find(d => d.id === 'districts' || d.id === 'subcounties');
+
+      if (districts_dataset) ea_datasets_districts(districts_dataset);
+      else console.warn("No districts/subcounties dataset found.");
+    });
+
+  return collection;
+};
+
 function ea_datasets_scale_fn(ds, type) {
   let s = null;
   const d = (ds.heatmap.domain && [ds.heatmap.domain.min, ds.heatmap.domain.max]) || [0,1];

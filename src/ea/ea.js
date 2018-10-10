@@ -28,12 +28,24 @@ async function ea_init(tree, collection, bounds) {
     ds.category = cat.name;
   })));
 
-  collection.forEach(d => {
+  for (var d of collection) {
     if (d.configuration && d.configuration.mutant) {
       let m = collection.find(x => x.id === d.configuration.mutant_targets[0]);
 
-      d.polygons = m.polygons;
-      d.heatmap = m.heatmap;
+      if (!m) {
+        flash()
+          .type(null)
+          .timeout(0)
+          .title(`'${d.id}' dataset is misconfigured.`)
+          .message(`Removing it because I cannot find host dataset: ${d.configuration.mutant_targets[0]}.`)();
+
+        delete collection[collection.indexOf(d)];
+
+        continue;
+      } else {
+        d.polygons = m.polygons;
+        d.heatmap = m.heatmap;
+      }
     }
 
     d.weight = d.weight || 2;
@@ -57,7 +69,9 @@ async function ea_init(tree, collection, bounds) {
         .range(plotty.colorscales[d.heatmap.color_scale].colors)
         .clamp(d.heatmap.clamp || false);
     }
-  });
+  };
+
+  collection = await collection.filter(d => d);
 
   ea_controls_tree(tree, collection);
 

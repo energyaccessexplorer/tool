@@ -40,3 +40,17 @@ h1, h2, h3 {
   font-family: with-serif, serif;
   white-space: pre-line;
 }
+
+table.summary {
+  font-family: monospace;
+}
+
+table.summary td {
+  text-align: right;
+  padding: 3px 5px;
+}
+
+table.summary .index-name {
+  text-align: left;
+  font-family: without-serif, sans-serif;
+}

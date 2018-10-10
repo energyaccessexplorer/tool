@@ -500,3 +500,51 @@ async function ea_overlord(msg) {
     throw `Overlord: I don't know message type '${msg.type}'`
   }
 };
+
+function ea_summary() {
+  const summary = {};
+
+  for (var k of Object.keys(ea_indexes)) {
+    let a = ea_analysis(k);
+
+    summary[k] = {
+      "low":      a.raster.filter(x => x >= 0   && x < 0.2).length,
+      "low-med":  a.raster.filter(x => x >= 0.2 && x < 0.4).length,
+      "med":      a.raster.filter(x => x >= 0.4 && x < 0.6).length,
+      "med-high": a.raster.filter(x => x >= 0.6 && x < 0.8).length,
+      "high":     a.raster.filter(x => x >= 0.8 && x <= 1).length,
+    };
+  }
+
+  const table = elem(`
+<table class="summary">
+<thead>
+  <tr><th></th> <th>0-20</th> <th>20-40</th> <th>40-60</th> <th>60-80</th> <th>80-100</th></tr>
+</thead>
+
+<tbody></tbody>
+</table`);
+
+  const tbody = table.querySelector('tbody');
+
+  for (var k of Object.keys(summary)) {
+    let tr = document.createElement('tr')
+
+    tr.innerHTML = `
+<td class="index-name">${ea_indexes[k]}</td>
+<td>${summary[k]['low']}</td>
+<td>${summary[k]['low-med']}</td>
+<td>${summary[k]['med']}</td>
+<td>${summary[k]['med-high']}</td>
+<td>${summary[k]['high']}</td>
+`;
+
+    tbody.appendChild(tr);
+  }
+
+  modal()
+    .header('Index Summaries')
+    .content(table)();
+
+  return summary;
+};

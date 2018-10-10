@@ -36,7 +36,7 @@ function ea_controls_tree(tree, collection) {
         .appendChild(elem(`
 <div id=${b.name} class="controls-subcategory">
   <div class="controls-subcategory-title">
-    ${b.name}
+    ${ea_category_dict[b.name]}
     <span class="collapse triangle">${ea_ui_collapse_triangle('s')}</span>
   </div>
   <div class="controls-container"></div>
@@ -160,6 +160,7 @@ function ea_controls(ds) {
   case "population":
   case 'windspeed':
   case 'nighttime-lights':
+  case 'accessibility':
     controls.appendChild(ea_controls_range(ds, 'range'));
     controls.appendChild(ea_controls_weight(ds));
     break;

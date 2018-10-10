@@ -55,6 +55,13 @@ require([
     "ani": 'Assistance Need Index',
   };
 
+  window.ea_category_dict = {
+    "demographics": "Demographics",
+    "productive-uses": "Social and Productive Uses",
+    "resources": "Resources",
+    "infrastructure": "Infrastructure",
+  };
+
   plotty.addColorScale("ea", ['#1c4478', '#81b062', '#e5a82e'], [0, 0.5, 1]);
 
   ea_overlord({ type: 'init', caller: 'require' });

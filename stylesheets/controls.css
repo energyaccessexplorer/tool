@@ -9,6 +9,7 @@
   position: relative;
   background-color: var(--the-darker-white);
   border-bottom: solid 1px #d9d9d9;
+  padding: 0.7em;
 }
 
 .controls .label {
@@ -59,7 +60,7 @@
 }
 
 .controls-category-title {
-  font-size: 1.1em;
+  font-size: 1.2em;
   font-weight: lighter;
   line-height: 2em;
   padding: 0.4em;
@@ -82,7 +83,7 @@
   white-space: nowrap;
   text-transform: uppercase;
   box-sizing: border-box;
-  padding: 1em 2em;
+  padding: 1em 0.7em;
   border-bottom: solid 1px #d9d9d9;
   background-color: white;
   color: var(--the-green);
@@ -96,25 +97,16 @@
 .controls-subcategory-title .triangle {
   display: inline-block;
   transform: scale(1.15);
-  margin-left: 5px;
-}
-
-.controls-dataset-header {
-  padding-top: 1em;
-  padding-bottom: 1em;
-  background-color: var(--the-darkest-white);
+  margin-right: 1em;
 }
 
 .controls-dataset-content {
   box-sizing: border-box;
   padding-top: 1em;
-  padding-bottom: 1em;
 }
 
-.controls-dataset-header,
-.controls-dataset-content {
-  padding-left: 1.5em;
-  padding-right: 0.5em;
+.controls-dataset-header {
+  padding-bottom: 0.3em;
 }
 
 .controls-dataset-header .svg-checkbox {
@@ -134,7 +126,6 @@
 
 .controls-dataset-help {
   display: inline-block;
-  margin: 0.5em;
 
   white-space: nowrap;
   vertical-align: text-top;
@@ -145,12 +136,6 @@
   fill: var(--the-gray);
 
   cursor: pointer;
-}
-
-.controls-dataset-unit {
-  display: inline-block;
-  margin-right: 1em;
-  margin-bottom: 0.7em;
 }
 
 .collapse {
@@ -168,7 +153,6 @@ select#controls-preset,
 
 select#controls-preset {
   font-size: 1.5em;
-  font-weight: bold;
   text-transform: uppercase;
 
   text-align-last: center;

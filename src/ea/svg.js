@@ -100,7 +100,7 @@ function ea_svg_radio(init, callback) {
 
 function ea_svg_range_steps(steps, init, drag_callback, end_callback, is_weight) {
   const radius = 5,
-        svgwidth = 225,
+        svgwidth = 256,
         svgheight = (radius * 2) + 2,
         linewidth = radius * 2,
         svgmin = radius + 1,
@@ -492,7 +492,7 @@ function ea_svg_color_steps(color_scale, r) {
 
 function ea_svg_interval_thingradient(color_scale, callback1, callback2, end_callback) {
   const radius = 5,
-        svgwidth = 225,
+        svgwidth = 256,
         svgheight = (radius * 2) + 2,
         linewidth = radius * 2,
         svgmin = radius + 1,

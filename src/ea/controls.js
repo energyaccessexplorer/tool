@@ -42,8 +42,8 @@ function ea_controls_tree(tree, collection) {
         .appendChild(elem(`
 <div id=${b.name} class="controls-subcategory">
   <div class="controls-subcategory-title">
-    ${ea_category_dict[b.name]}
     <span class="collapse triangle">${ea_ui_collapse_triangle('s')}</span>
+    ${ea_category_dict[b.name]}
   </div>
   <div class="controls-container"></div>
 </div>`));
@@ -140,9 +140,6 @@ function ea_controls_elem(ds) {
   name.addEventListener('mouseup', clicko);
   button.addEventListener('mouseup', clicko);
 
-  if (ds.unit)
-    header.appendChild(elem(`<div class="controls-dataset-unit small">(${ds.unit})</div>`));
-
   if (ds.help && (ds.help.why || ds.help.what)) {
     const help = elem(`<div class="controls-dataset-help">${ea_svg_info()}</div>`);
 
@@ -167,7 +164,7 @@ function ea_controls(ds) {
   case 'windspeed':
   case 'nighttime-lights':
   case 'accessibility':
-    controls.appendChild(ea_controls_range(ds, 'range'));
+    controls.appendChild(ea_controls_range(ds, (ds.unit || 'range')));
     controls.appendChild(ea_controls_weight(ds));
     break;
 
@@ -179,19 +176,19 @@ function ea_controls(ds) {
   case "health":
   case "powerplants":
   case "transmission-lines":
-    controls.appendChild(ea_controls_range(ds, 'proximity in km'));
+    controls.appendChild(ea_controls_range(ds, (ds.unit || 'proximity in km')));
     controls.appendChild(ea_controls_weight(ds));
     break;
 
   case 'districts':
   case 'subcounties':
     controls.appendChild(ea_controls_options(ds));
-    controls.appendChild(ea_controls_range(ds, 'range'));
+    controls.appendChild(ea_controls_range(ds, (ds.unit || 'range')));
     break;
 
   case 'crops':
     controls.appendChild(ea_controls_mutant_options(ds));
-    controls.appendChild(ea_controls_range(ds, 'range'));
+    controls.appendChild(ea_controls_range(ds, (ds.unit || 'range')));
     controls.appendChild(ea_controls_weight(ds));
     break;
 
@@ -271,7 +268,7 @@ function ea_controls_range(ds, label) {
   let csf = _ => {
     return d3.scaleLinear()
       .clamp(false)
-      .range([getComputedStyle(document.body).getPropertyValue('--the-green')])
+      .range([getComputedStyle(document.body).getPropertyValue('--the-green')]);
   };
 
   const svg = ea_svg_interval_thingradient(

@@ -11,7 +11,7 @@ function ea_layers_update_datasets(list) {
   });
 };
 
-function ea_layers_dataset_elem(ds) {
+function ea_layers_input_elem(ds) {
   const d = elem(`
 <li bind="${ds.id}"
     class="layers-element">
@@ -41,7 +41,7 @@ function ea_layers_dataset_elem(ds) {
   return d;
 };
 
-function ea_layers_heatmap_elem(t, v, i) {
+function ea_layers_output_elem(t, v, i) {
   const svg = ea_svg_color_steps(_ => {
     return d3.scaleLinear()
       .domain(plotty.colorscales[ea_default_color_scheme].positions)
@@ -85,7 +85,7 @@ function ea_layers_heatmap_elem(t, v, i) {
   return d;
 };
 
-function ea_layers_heatmaps(target) {
+function ea_layers_outputs(target) {
   let nodes;
 
   const layers_list = document.querySelector('#layers-list');
@@ -100,12 +100,12 @@ function ea_layers_heatmaps(target) {
     ea_overlord({
       type: "output",
       heatmap: this.getAttribute('bind'),
-      caller: 'ea_layers_heatmaps'
+      caller: 'ea_layers_outputs'
     });
   };
 
   nodes = Object.keys(ea_indexes).map((t,i) => {
-    let node = ea_layers_heatmap_elem(t, ea_indexes[t], t === target);
+    let node = ea_layers_output_elem(t, ea_indexes[t], t === target);
 
     node.addEventListener('mouseup', trigger_this);
 
@@ -115,7 +115,7 @@ function ea_layers_heatmaps(target) {
   });
 };
 
-function ea_layers_datasets(list) {
+function ea_layers_inputs(list) {
   sortable('#layers-list', 'disable');
 
   const layers = document.querySelector('#layers');
@@ -125,7 +125,7 @@ function ea_layers_datasets(list) {
 
   layers_list.innerHTML = "";
 
-  ldc.forEach(ds => layers_list.appendChild(ea_layers_dataset_elem(ds)));
+  ldc.forEach(ds => layers_list.appendChild(ea_layers_input_elem(ds)));
 
   const style = 'style="font-size: smaller; text-align: center;"';
 

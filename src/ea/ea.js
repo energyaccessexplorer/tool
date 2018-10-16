@@ -267,7 +267,7 @@ async function ea_overlord(msg) {
     var t = msg.target;
 
     if (t === "outputs") {
-      ea_layers_heatmaps(output);
+      ea_layers_outputs(output);
 
       inputs.forEach(i => {
         var x;
@@ -291,7 +291,7 @@ async function ea_overlord(msg) {
         }
       });
 
-      ea_layers_datasets(inputs);
+      ea_layers_inputs(inputs);
 
       ea_draw_first_active_nopolygons(inputs);
     }
@@ -315,7 +315,7 @@ async function ea_overlord(msg) {
     inputs = [...new Set(inputs)]; // UNIQUE()
 
     if (mode === "outputs") {
-      ea_layers_heatmaps(output);
+      ea_layers_outputs(output);
 
       if (typeof ds.heatmap !== "undefined")
         ds.active ? await ds.heatmap.parse.call(ds) : null
@@ -324,7 +324,7 @@ async function ea_overlord(msg) {
     }
 
     else if (mode === "inputs") {
-      ea_layers_datasets(inputs);
+      ea_layers_inputs(inputs);
 
       if (ds.polygons) {
         if (ds.active)

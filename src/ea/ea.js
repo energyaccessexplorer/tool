@@ -160,10 +160,12 @@ async function ea_overlord(msg) {
   let mode;
   let output;
   let inputs;
+  let preset;
 
   let mode_param = location.get_query_param('mode');
   let output_param = location.get_query_param('output');
   let inputs_param = location.get_query_param('inputs');
+  let preset_param = location.get_query_param('preset');
 
   function set_mode_param(m) {
     history.replaceState(null, null, location.set_query_param('mode', (m || mode)));
@@ -176,6 +178,11 @@ async function ea_overlord(msg) {
   function set_inputs_param(i) {
     history.replaceState(null, null, location.set_query_param('inputs', (i || inputs).toString()));
   };
+
+  function set_preset_param(p) {
+    document.querySelector('#controls-preset').value = (p || 'custom');
+    history.replaceState(null, null, location.set_query_param('preset', (p || 'custom')));
+  }
 
   if (Object.keys(ea_indexes).indexOf(output_param) > -1) {
     output = output_param;
@@ -198,6 +205,13 @@ async function ea_overlord(msg) {
     set_mode_param();
   }
 
+  if ([null, 'market','planning', 'investment'].indexOf(preset_param) < 0) {
+    preset = 'planning';
+    set_preset_param(preset);
+  } else {
+    preset = preset_param;
+  }
+
   switch (msg.type) {
   case "init": {
     /* TODO: these are the global objects. Fix it: remove. */
@@ -210,11 +224,28 @@ async function ea_overlord(msg) {
     ea_canvas = null;
 
     const country = await ea_country_init(ea_ccn3);
-    const collection  = await ea_datasets_init(country.id, inputs);
+    const collection  = await ea_datasets_init(country.id, inputs, preset);
 
-    inputs = inputs.filter(i => collection.find(t => i === t.id));
+    {
+      ea_dummy = {
+        id: "dummy",
+        description: "Dummy dataset",
+
+        heatmap: {
+          endpoint: "districts.tif",
+          parse: ea_datasets_tiff_url,
+        },
+      };
+
+      await ea_dummy.heatmap.parse.call(ea_dummy);
+
+      ea_dummy.raster = new Uint16Array(ea_dummy.width * ea_dummy.height).fill(ea_dummy.nodata);
+    }
+
+    inputs = collection.filter(t => t.active).map(x => x.id);
     set_inputs_param();
 
+    ea_presets_init(preset);
     ea_views_init();
     ea_layers_init();
 
@@ -244,22 +275,6 @@ async function ea_overlord(msg) {
       ea_ui_app_loading(false);
     })();
 
-    {
-      ea_dummy = {
-        id: "dummy",
-        description: "Dummy dataset",
-
-        heatmap: {
-          endpoint: "districts.tif",
-          parse: ea_datasets_tiff_url,
-        },
-      };
-
-      await ea_dummy.heatmap.parse.call(ea_dummy);
-
-      ea_dummy.raster = new Uint16Array(ea_dummy.width * ea_dummy.height).fill(ea_dummy.nodata);
-    }
-
     break;
   }
 
@@ -273,7 +288,7 @@ async function ea_overlord(msg) {
         var x;
 
         if (x = ea_datasets_collection.find(d => d.id === i)) {
-          if (typeof x.polygons !== 'undefined') {
+          if (typeof x.polygons !== 'undefined' && ea_mapbox.getSource(i)) {
             ea_mapbox.setLayoutProperty(i, 'visibility', 'none');
           }
         }
@@ -307,6 +322,8 @@ async function ea_overlord(msg) {
 
   case "input": {
     const ds = msg.target;
+
+    set_preset_param(null);
 
     ds.active ?
       inputs.unshift(ds.id) :
@@ -358,6 +375,42 @@ async function ea_overlord(msg) {
     else {
       throw `Argument Error: Overlord: Could set the mode ${mode}`;
     }
+
+    break;
+  }
+
+  case "preset": {
+    set_preset_param(msg.value);
+
+    if (!msg.value) return;
+
+    if (mode === "outputs") {
+      ea_layers_outputs(output);
+
+      for (let ds of ea_datasets_collection) {
+        let r = ea_presets_set(ds, msg.value);
+
+        if (typeof ds.heatmap !== "undefined")
+          ds.active ? await ds.heatmap.parse.call(ds) : null
+      }
+
+      ea_canvas_plot(ea_analysis(output));
+    }
+
+    else if (mode === "inputs") {
+      ea_datasets_collection.forEach(async ds => {
+        let r = ea_presets_set(ds, msg.value);
+
+        if (ea_mapbox.getSource(ds.id))
+          ea_mapbox.setLayoutProperty(ds.id, 'visibility', (r ? 'visible' : 'none'));
+      });
+
+      ea_layers_inputs(inputs);
+    }
+
+    inputs = ea_datasets_collection.filter(t => t.active).map(x => x.id)
+
+    set_inputs_param(inputs);
 
     break;
   }

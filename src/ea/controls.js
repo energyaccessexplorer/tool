@@ -116,22 +116,32 @@ function ea_controls_elem(ds) {
 
   const header = controls.querySelector('.controls-dataset-header');
 
-  let button;
-
-  header.appendChild(
-    button = ea_controls_active(
-      ds,
-      (v) => ea_datasets_active(ds,v)
-    )
+  const check = ea_controls_active(
+    ds,
+    (v) => ea_datasets_active(ds,v)
   );
 
+  const button = check.svg;
+
+  header.appendChild(button);
+
+  ds.checkbox_change = check.change;
+
   const clicko = function(e) {
+    ds.active = !ds.active;
+
     if (e.target.closest('svg') !== button) {
       let event = document.createEvent('HTMLEvents');
       event.initEvent('click', true, true);
 
       button.dispatchEvent(event);
     }
+
+    ea_overlord({
+      type: "input",
+      target: ds,
+      caller: "ea_controls_elem clicko",
+    });
   };
 
   const name = elem(`<div class="controls-dataset-name">${ds.name_long}</div>`);
@@ -148,12 +158,19 @@ function ea_controls_elem(ds) {
     help.addEventListener('mouseup', _ => ea_category_help_modal(ds));
   }
 
+  check.change(ds.active);
+
   return controls;
 };
 
 function ea_controls(ds) {
   const _controls = ea_controls_elem(ds);
   const controls = _controls.querySelector('.controls-dataset-content');
+
+  const weight_group = ea_controls_weight(ds);
+  ds.weight_change = weight_group.weight_control.change;
+
+  let range_group;
 
   controls.style['display'] = ds.active ? '' : 'none';
 
@@ -164,8 +181,9 @@ function ea_controls(ds) {
   case 'windspeed':
   case 'nighttime-lights':
   case 'accessibility':
-    controls.appendChild(ea_controls_range(ds, (ds.unit || 'range')));
-    controls.appendChild(ea_controls_weight(ds));
+    range_group = ea_controls_range(ds, (ds.unit || 'range'));
+    controls.appendChild(range_group.elem);
+    controls.appendChild(weight_group.elem);
     break;
 
   case "schools":
@@ -176,20 +194,23 @@ function ea_controls(ds) {
   case "health":
   case "powerplants":
   case "transmission-lines":
-    controls.appendChild(ea_controls_range(ds, (ds.unit || 'proximity in km')));
-    controls.appendChild(ea_controls_weight(ds));
+    range_group = ea_controls_range(ds, (ds.unit || 'proximity in km'))
+    controls.appendChild(range_group.elem);
+    controls.appendChild(weight_group.elem);
     break;
 
   case 'districts':
   case 'subcounties':
+    range_group = ea_controls_range(ds, (ds.unit || 'range'))
     controls.appendChild(ea_controls_options(ds));
-    controls.appendChild(ea_controls_range(ds, (ds.unit || 'range')));
+    controls.appendChild(range_group.elem);
     break;
 
   case 'crops':
+    range_group = ea_controls_range(ds, (ds.unit || 'range'))
     controls.appendChild(ea_controls_mutant_options(ds));
-    controls.appendChild(ea_controls_range(ds, (ds.unit || 'range')));
-    controls.appendChild(ea_controls_weight(ds));
+    controls.appendChild(range_group.elem);
+    controls.appendChild(weight_group.elem);
     break;
 
   default:
@@ -271,8 +292,9 @@ function ea_controls_range(ds, label) {
       .range([getComputedStyle(document.body).getPropertyValue('--the-green')]);
   };
 
-  const svg = ea_svg_interval_thingradient(
+  const range_control = ea_svg_interval_thingradient(
     csf,
+    (ds.init_domain ? [range_norm.invert(ds.init_domain[0]), range_norm.invert(ds.init_domain[1])] : null),
     x => update_range_value(x, 0, v1),
     x => update_range_value(x, 1, v2),
     _ => ea_overlord({
@@ -282,13 +304,16 @@ function ea_controls_range(ds, label) {
     })
   );
 
-  container.appendChild(svg);
+  container.appendChild(range_control.svg);
   container.appendChild(l);
 
-  return container;
+  return {
+    elem: container,
+    range_control: range_control
+  };
 };
 
-function ea_controls_weight(ds) {
+function ea_controls_weight(ds, init) {
   const weights = Array.apply(null, Array(5)).map((_, i) => i + 1);
 
   const container = elem(`<div class="control-group"></div>`);
@@ -300,7 +325,7 @@ function ea_controls_weight(ds) {
   <span>${weights[weights.length - 1]}</span>
 </div>`);
 
-  const svg = ea_svg_range_steps(
+  const weight_control = ea_svg_range_steps(
     weights,
     ds.weight,
     null,
@@ -316,10 +341,13 @@ function ea_controls_weight(ds) {
     ("weight" === "weight")
   );
 
-  container.appendChild(svg);
+  container.appendChild(weight_control.svg);
   container.appendChild(l);
 
-  return container;
+  return {
+    elem: container,
+    weight_control: weight_control
+  };
 };
 
 function ea_controls_steps(ds) {

@@ -43,7 +43,10 @@ function ea_svg_checkbox(init, callback) {
 
   change(status, init);
 
-  return svg.node();
+  return {
+    svg: svg.node(),
+    change: change
+  };
 };
 
 function ea_svg_radio(init, callback) {
@@ -170,6 +173,15 @@ function ea_svg_range_steps(steps, init, drag_callback, end_callback, is_weight)
     if (typeof drag_callback === 'function') drag_callback(norm(x));
   };
 
+  function change(v) {
+    const cx0 = denorm(v);
+
+    c1.attr('cx', cx0);
+    marked.attr('width', cx0);
+
+    if (typeof drag_callback === 'function') drag_callback(v);
+  };
+
   c1.call(
     d3.drag()
       .on('drag', () => {
@@ -182,7 +194,10 @@ function ea_svg_range_steps(steps, init, drag_callback, end_callback, is_weight)
 
   dragged(denorm(init));
 
-  return svg.node();
+  return {
+    svg: svg.node(),
+    change: change
+  };
 };
 
 function ea_svg_interval(color_scale, callback1, callback2, end_callback) {
@@ -490,7 +505,7 @@ function ea_svg_color_steps(color_scale, r) {
   return svg.node();
 };
 
-function ea_svg_interval_thingradient(color_scale, callback1, callback2, end_callback) {
+function ea_svg_interval_thingradient(color_scale, init, callback1, callback2, end_callback) {
   const radius = 5,
         svgwidth = 256,
         svgheight = (radius * 2) + 2,
@@ -634,10 +649,20 @@ function ea_svg_interval_thingradient(color_scale, callback1, callback2, end_cal
       })
   );
 
-  drag_callback(c1, svgmin, svgmin, svgmax - svgmin, callback1);
-  drag_callback(c2, svgmax, svgmin, svgmax - svgmin, callback2);
+  function change(a,b) {
+    console.log(a,b);
+  };
 
-  return svg.node();
+  const i0 = (init ? norm.invert(init[0]) : svgmin);
+  const i1 = (init ? norm.invert(init[1]) : svgmax);
+
+  drag_callback(c1, i0, i0, i1 - i0, callback1);
+  drag_callback(c2, i1, i0, i1 - i0, callback2);
+
+  return {
+    svg: svg.node(),
+    change: change
+  };
 };
 
 function ea_svg_symbol(sym, cls, size) {

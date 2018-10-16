@@ -19,6 +19,7 @@ requirejs.config({
     'client': "./ea/client",
     'svg': "./ea/svg",
     'map': "./ea/map",
+    'presets': "./ea/presets",
   }
 });
 
@@ -30,6 +31,7 @@ require([
   'flash',
   'modal',
   'ea',
+  'presets',
   'map',
   'client',
   'svg',

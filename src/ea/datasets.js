@@ -1,4 +1,4 @@
-async function ea_datasets_init(country_id, inputs) {
+async function ea_datasets_init(country_id, inputs, preset) {
   let collection = null;
 
   await ea_client(
@@ -23,8 +23,7 @@ async function ea_datasets_init(country_id, inputs) {
           help['what'] = e.category.metadata.what;
         }
 
-        return {
-          "active": (inputs.indexOf(e.category.name) > -1),
+        const o = {
           "name_long": e.category.name_long,
           "description": e.category.description,
           "description_long": e.category.description_long,
@@ -34,9 +33,51 @@ async function ea_datasets_init(country_id, inputs) {
           "unit": e.category.unit,
           "metadata": e.metadata,
           "configuration": e.category.configuration,
-          "weight": (e.metadata.weight || e.category.weight || 2),
           "help": help
         };
+
+        let pp = {};
+
+        if (e.presets && e.presets.length) {
+          e.presets.forEach(p => {
+            return pp[p.name] = {
+              "weight": p.weight,
+              "min": p.min,
+              "max": p.max
+            };
+          });
+        }
+        else if (e.category.presets && e.category.presets.length) {
+          e.category.presets.forEach(p => {
+            return pp[p.name] = {
+              "weight": p.weight,
+              "min": p.min,
+              "max": p.max
+            };
+          });
+        }
+
+        let ppempty = Object.keys(pp).length === 0;
+        let p = pp[preset]
+
+        if (!ppempty && p) {
+          o.weight = p.weight;
+          // o.init_domain = [p.min, p.max];
+          o.init_domain = null;
+        } else {
+          o.weight = 2;
+          o.init_domain = null;
+        }
+
+        if (inputs.length) {
+          o.active = (inputs.indexOf(e.category.name) > -1)
+        } else {
+          o.active = (!ppempty && p);
+        }
+
+        o.presets = pp;
+
+        return o;
       });
 
       collection = map.filter(d => d)
@@ -84,7 +125,7 @@ async function ea_datasets_init(country_id, inputs) {
       collection = collection.filter(d => d);
 
       const districts_dataset = collection
-            .find(d => d.id === 'districts' || d.id === 'subcounties');
+            .find(d => d.id === 'districts' || d.id === 'counties' || d.id === 'subcounties');
 
       if (districts_dataset) ea_datasets_districts(districts_dataset);
       else console.warn("No districts/subcounties dataset found.");
@@ -133,7 +174,7 @@ function ea_datasets_scale_fn(ds, type) {
   return s;
 };
 
-async function ea_datasets_load(ds, t) {
+async function ea_datasets_load(ds) {
   if (!ds.id) throw `Argument Error: ${ds} does not look like a dataset`;
 
   ea_ui_dataset_loading(ds, true);
@@ -155,12 +196,6 @@ async function ea_datasets_active(ds, v) {
   }
 
   if (ds.active = v) await ea_datasets_load(ds);
-
-  ea_overlord({
-    type: "input",
-    target: ds,
-    caller: "ea_datasets_active",
-  });
 };
 
 async function ea_datasets_points() {

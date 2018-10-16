@@ -205,11 +205,11 @@ async function ea_overlord(msg) {
     set_mode_param();
   }
 
-  if ([null, 'market','planning', 'investment'].indexOf(preset_param) < 0) {
-    preset = 'planning';
-    set_preset_param(preset);
-  } else {
+  if (['market','planning', 'investment', 'custom'].indexOf(preset_param) > -1) {
     preset = preset_param;
+  } else {
+    preset = 'custom';
+    set_preset_param();
   }
 
   switch (msg.type) {
@@ -350,6 +350,9 @@ async function ea_overlord(msg) {
           if (ea_mapbox.getSource(ds.id)) ea_mapbox.setLayoutProperty(ds.id, 'visibility', 'none');
       }
 
+      if (typeof ds.heatmap !== "undefined")
+        ds.active ? await ds.heatmap.parse.call(ds) : null;
+
       ea_draw_first_active_nopolygons(inputs);
     }
 
@@ -391,25 +394,27 @@ async function ea_overlord(msg) {
         let r = ea_presets_set(ds, msg.value);
 
         if (typeof ds.heatmap !== "undefined")
-          ds.active ? await ds.heatmap.parse.call(ds) : null
+          ds.active ? await ds.heatmap.parse.call(ds) : null;
       }
 
       ea_canvas_plot(ea_analysis(output));
     }
 
     else if (mode === "inputs") {
-      ea_datasets_collection.forEach(async ds => {
+      for (let ds of ea_datasets_collection) {
         let r = ea_presets_set(ds, msg.value);
+
+        if (typeof ds.heatmap !== "undefined")
+          ds.active ? await ds.heatmap.parse.call(ds) : null;
 
         if (ea_mapbox.getSource(ds.id))
           ea_mapbox.setLayoutProperty(ds.id, 'visibility', (r ? 'visible' : 'none'));
-      });
-
-      ea_layers_inputs(inputs);
+      };
     }
 
     inputs = ea_datasets_collection.filter(t => t.active).map(x => x.id)
 
+    ea_layers_inputs(inputs);
     set_inputs_param(inputs);
 
     break;

@@ -26,13 +26,15 @@ class MapboxThemeControl {
 <input type="radio" name="mapbox_theme" value="satellite" /> <label>Satellite</label> <br><br>
 <input type="radio" name="mapbox_theme" value="streets" /> <label>Streets</label> <br><br>
 <input type="radio" name="mapbox_theme" value="satellite-streets" /> <label>Satellite Streets</label> <br><br>
+<input type="radio" name="mapbox_theme" value="" /> <label>None</label> <br><br>
 </div>`);
 
       radios.querySelector(`input[value="${ea_settings.mapbox_theme}"]`).setAttribute('checked', true);
 
       radios.querySelectorAll('input[name="mapbox_theme"]').forEach(e => {
         e.addEventListener('change', _ => {
-          ea_mapbox.setStyle('mapbox://styles/mapbox/' + e.value + '-v9');
+          ea_mapbox.setStyle(mapbox_theme_pick(e.value));
+          ea_settings.mapbox_theme = e.value;
           mapbox_canvas(ea_mapbox);
         });
       });
@@ -51,6 +53,22 @@ class MapboxThemeControl {
     this._container.parentNode.removeChild(this._container);
     this._map = undefined;
   }
+};
+
+function mapbox_theme_pick(theme) {
+  let t = (theme === "" ? null : theme);
+
+  return (t ? `mapbox://styles/mapbox/${t}-v9` : {
+    version: 8,
+    sources: {},
+    layers: [{
+      "id": "background",
+      "type": "background",
+      "paint": {
+        "background-color": "white"
+      }
+    }]
+  });
 };
 
 function mapbox_canvas(m, coords) {
@@ -76,7 +94,7 @@ function mapbox_setup(bounds, theme, token) {
 
   const mapbox = new mapboxgl.Map({
     container: 'mapbox-container',
-    style: `mapbox://styles/mapbox/${theme}-v9`,
+    style: mapbox_theme_pick(theme)
   });
 
   mapbox.fitBounds(bounds, { animate: false });

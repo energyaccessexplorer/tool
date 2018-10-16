@@ -37,7 +37,7 @@ function ea_svg_checkbox(init, callback) {
       .style('fill', (s ? active : 'white'));
 
     if (typeof callback === 'function' && !i) callback(s);
-  }
+  };
 
   svg.on('click', _ => change(status = !status));
 
@@ -287,7 +287,7 @@ function ea_svg_interval(color_scale, callback1, callback2, end_callback) {
       .attr('width', w);
 
     if (typeof callback === 'function') callback(norm(cx).toFixed(2));
-  }
+  };
 
   c1.call(
     d3.drag()
@@ -406,7 +406,7 @@ function ea_svg_pie(container_id, data, outer, inner, colors, inner_text, create
       console.log('due to a bug in FF... return.')
       return;
     }
-  }
+  };
 
   function tween(a) {
     const i = d3.interpolate(this._current, a);
@@ -619,7 +619,7 @@ function ea_svg_interval_thingradient(color_scale, init, callback1, callback2, e
     }
 
     if (typeof callback === 'function') callback(norm(cx).toFixed(2));
-  }
+  };
 
   c1.call(
     d3.drag()
@@ -650,6 +650,7 @@ function ea_svg_interval_thingradient(color_scale, init, callback1, callback2, e
   );
 
   function change(a,b) {
+    // TODO: this
     console.log(a,b);
   };
 

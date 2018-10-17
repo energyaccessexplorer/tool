@@ -141,10 +141,10 @@ function ea_active_heatmaps(type) {
     .filter(d => d.active && cat(d));
 };
 
-function ea_draw_first_active_nopolygons(coll) {
+function ea_draw_first_active_nopolygons(list) {
   let rd = null;
 
-  for (let t of coll) {
+  for (let t of list.slice(0)) {
     let x = ea_datasets_collection.find(d => d.id === t && !d.polygons);
     if (x) { rd = x; break; }
   }
@@ -242,7 +242,11 @@ async function ea_overlord(msg) {
       ea_dummy.raster = new Uint16Array(ea_dummy.width * ea_dummy.height).fill(ea_dummy.nodata);
     }
 
-    inputs = collection.filter(t => t.active).map(x => x.id);
+    inputs = collection
+      .filter(t => t.active)
+      .map(x => x.id)
+      .sort((a,b) => (inputs.indexOf(a) < inputs.indexOf(b)) ? -1 : 1);
+
     set_inputs_param();
 
     ea_presets_init(preset);
@@ -268,7 +272,7 @@ async function ea_overlord(msg) {
 
       ea_overlord({
         type: "mode",
-        target: location.get_query_param('mode'),
+        target: mode,
         caller: "ea_init",
       });
 
@@ -280,6 +284,8 @@ async function ea_overlord(msg) {
 
   case "mode": {
     var t = msg.target;
+
+    set_mode_param(t);
 
     if (t === "outputs") {
       ea_layers_outputs(output);
@@ -298,24 +304,24 @@ async function ea_overlord(msg) {
     }
 
     else if (t === "inputs") {
-      inputs.forEach(i => {
+      ea_layers_inputs(inputs);
+
+      for (var i of inputs) {
         var x;
 
         if (x = ea_datasets_collection.find(d => d.id === i)) {
-          if (x.polygons) x.polygons.parse.call(x);
+          if (x.polygons) await x.polygons.parse.call(x);
         }
-      });
-
-      ea_layers_inputs(inputs);
+      }
 
       ea_draw_first_active_nopolygons(inputs);
+
+      ea_layers_sort_inputs(inputs);
     }
 
     else {
       throw `Argument Error: Overlord: Could not set/find the mode '${mode}'.`;
     }
-
-    set_mode_param(t);
 
     break;
   }
@@ -422,7 +428,7 @@ async function ea_overlord(msg) {
 
   case "sort": {
     if (mode === "inputs") {
-      ea_layers_update_datasets(msg.layers);
+      ea_layers_sort_inputs(msg.layers);
       set_inputs_param(msg.layers);
       ea_draw_first_active_nopolygons(msg.layers);
     }

@@ -1,14 +1,16 @@
-function ea_layers_update_datasets(list) {
+function ea_layers_sort_inputs(list) {
   const c = ea_datasets_collection;
 
-  list.reverse().forEach(i => {
+  for (let i of list.slice(0).reverse()) {
     let d = c.find(x => x.id === i);
 
-    if (!d.polygons)
+    if (!d.polygons) {
       ea_mapbox.moveLayer('canvas-layer', ea_mapbox.first_symbol);
-    else
+    }
+    else {
       ea_mapbox.moveLayer(i, ea_mapbox.first_symbol);
-  });
+    }
+  }
 };
 
 function ea_layers_input_elem(ds) {

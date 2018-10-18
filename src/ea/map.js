@@ -10,6 +10,8 @@ function ea_map_setup(bounds) {
   ea_mapbox = mapbox_setup(bounds, ea_settings.mapbox_theme, ea_settings.mapbox_token);
 
   ea_mapbox.zoomTo(ea_mapbox.getZoom() * 0.95, {duration: 0});
+
+  document.querySelector('#maparea').appendChild(elem(`<div id="summary-button" onclick="ea_summary();">Summary</div>`));
 };
 
 function ea_map_svg(svg, topofile, name, options) {

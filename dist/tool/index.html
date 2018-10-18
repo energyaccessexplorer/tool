@@ -31,19 +31,15 @@
              class="no-desktop"
              type="checkbox">
 
-      <a href="#"
-         class="no-desktop">
-        <label for="toggle">
-          <svg style="width:24px;height:24px" viewBox="0 0 24 14">
-            <path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" />
-          </svg>&nbsp;
-        </label>
-      </a>
+      <label for="toggle" class="no-desktop">
+        <svg style="width:24px;height:24px" viewBox="0 0 24 14">
+          <path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" />
+        </svg>&nbsp;
+      </label>
 
       <a id="energy-access-link"
-         href="/"
-         class="toggleable">
-        Energy Access Explorer (beta)
+         href="/">
+        Energy Access Explorer <sup style="vertical-align: top; font-size: 0.8em;">ß</sup>
       </a>
 
       <div id="navigation-links">
@@ -51,6 +47,11 @@
            style="color: var(--the-yellow);"
            class="toggleable">
           Maps&nbsp;&amp;&nbsp;Data
+        </a>
+
+        <a href="/methodology"
+           class="toggleable">
+          Methodology
         </a>
 
         <a href="/user-stories"
@@ -61,11 +62,6 @@
         <a href="/about"
            class="toggleable">
           About
-        </a>
-
-        <a href="/contribute"
-           class="toggleable">
-          Contribute
         </a>
       </div>
     </nav>
@@ -101,7 +97,7 @@
       <div class="spinner"></div>
 
       <p style="font-size: small">
-        fetching things...
+        Loading data...
       </p>
     </div>
   </body>

@@ -6,7 +6,7 @@ function ea_opacity_tweak() {
 
   ea_mapbox ?
     ea_mapbox.setPaintProperty('canvas-layer', 'raster-opacity', (tweak ? 0.2 : 1)) :
-  (ea_canvas ? ea_canvas.style.opacity = (tweak ? 0.2 : 1) : null)
+    (ea_canvas ? ea_canvas.style.opacity = (tweak ? 0.2 : 1) : null)
 };
 
 async function ea_country_init(ccn3) {

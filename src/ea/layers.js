@@ -94,10 +94,10 @@ function ea_layers_outputs(target) {
   layers_list.innerHTML = "";
 
   async function trigger_this() {
-    let event = document.createEvent('HTMLEvents');
-    event.initEvent("unselect", true, true);
+    let unselect = document.createEvent('HTMLEvents');
+    unselect.initEvent("unselect", true, true);
 
-    await nodes.forEach(n => n.querySelector('.layers-element-radio svg').dispatchEvent(event));
+    await nodes.forEach(n => n.querySelector('.layers-element-radio svg').dispatchEvent(unselect));
 
     ea_overlord({
       type: "output",
@@ -109,7 +109,7 @@ function ea_layers_outputs(target) {
   nodes = Object.keys(ea_indexes).map((t,i) => {
     let node = ea_layers_output_elem(t, ea_indexes[t], t === target);
 
-    node.addEventListener('mouseup', trigger_this);
+    node.querySelector('.layers-element-radio svg').addEventListener('mouseup', _ => trigger_this.apply(node));
 
     layers_list.appendChild(node);
 

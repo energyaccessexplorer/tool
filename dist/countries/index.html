@@ -38,7 +38,40 @@
          href="/">
         Energy Access Explorer
       </a>
+
+      <div id="navigation-links">
+        <a href="/maps-and-data/countries"
+           class="toggleable">
+          Maps&nbsp;&amp;&nbsp;Data
+        </a>
+
+        <a href="/methodology"
+           class="toggleable">
+          Methodology
+        </a>
+
+        <a href="/user-stories"
+           class="toggleable">
+          User&nbsp;Stories
+        </a>
+
+        <a href="/about"
+           class="toggleable">
+          About
+        </a>
+      </div>
     </nav>
+
+    <script>
+      (function() {
+        var links = document.querySelectorAll('nav #navigation-links a');
+
+        for (var l of links) {
+          if (location.pathname.match(new RegExp(l.getAttribute('href'))))
+            l.classList.add("active");
+        }
+      })();
+    </script>
 
     <div id="country-search">
       <input id="country-search-input"

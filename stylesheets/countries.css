@@ -38,8 +38,22 @@ body {
   padding: 1em;
 }
 
-svg .selectable {
-  fill: #3A75C4;
+#map {
+  background-color: var(--the-white);
+}
+
+.land {
+  stroke-width: 0.7;
+  stroke: lightgray;
+  fill: white;
+}
+
+.land.selectable {
+  fill: var(--the-green);
+}
+
+.land.active {
+  fill: var(--the-yellow);
 }
 
 h1, h2, h3, h4, h5 {

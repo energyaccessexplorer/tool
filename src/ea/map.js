@@ -218,7 +218,7 @@ function ea_map_load_features(o) {
     .data(o.features).enter()
     .append('path')
     .attr('class', (o.cls || ''))
-    .attr('id', d => d.gid || d.id || null)
+    .attr('id', d => o.cls + "-" + (d.gid || d.id || null))
     .attr('d', o.map.geopath)
     .attr('stroke-width', o.scale ? (0.5/o.scale) : 0);
 
@@ -227,6 +227,12 @@ function ea_map_load_features(o) {
 
   if (typeof o.mouseover === 'function')
     paths.on('mouseover', (d) => o.mouseover(d.gid || d.id || ''));
+
+  if (typeof o.mouseenter === 'function')
+    paths.on('mouseenter', (d) => o.mouseenter(d.gid || d.id || ''));
+
+  if (typeof o.mouseleave === 'function')
+    paths.on('mouseleave', (d) => o.mouseleave(d.gid || d.id || ''));
 
   if (typeof o.mousedown === 'function')
     paths.on('mousedown', (d) => o.mousedown(d.gid || d.id || ''));

@@ -43,12 +43,18 @@ function ea_countries_setup() {
         scale: 0,
         classed: (v) => typeof countries_overviews.find(c => c.ccn3 === v) !== 'undefined',
         mousedown: (v) => ea_countries_overview(countries.find(c => c.ccn3 === v), countries_overviews, countries_online),
-        mouseover: (v) => {
+        mouseover: function(v) {
+        },
+
+        mouseenter: function(v) {
           const x = countries.find(c => c.ccn3 === v);
 
           if (!x) return v;
 
+          cs.style.display = '';
           csi.style.display = '';
+
+          ea_map.svg.select(`.land#land-${v}`).classed('active', true);
 
           csi.value = x.name.common;
           css.innerHTML = (`<img class="flag"
@@ -59,7 +65,12 @@ function ea_countries_setup() {
 
           return v;
         },
-      }).style('fill', '#A98B6F');
+
+        mouseleave: function(v) {
+          ea_map.svg.select(`.land#land-${v}`).classed('active', false);
+          cs.style.display = 'none';
+        },
+      });
 
       ea_ui_app_loading(false);
     })

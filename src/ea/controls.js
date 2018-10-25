@@ -321,7 +321,7 @@ function ea_controls_weight(ds, init) {
   const l = elem(`
 <div class="label">
   <span>${weights[0]}</span>
-  <span class="weight-label">weight</span>
+  <span class="weight-label">importance</span>
   <span>${weights[weights.length - 1]}</span>
 </div>`);
 

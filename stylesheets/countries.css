@@ -53,7 +53,7 @@ h5 {
 #eae {
   text-align: center;
   margin: 1em;
-  background-color: #3A75C4;
+  background-color: var(--the-green);
   color: white !important;
   text-decoration: none;
   display: block;

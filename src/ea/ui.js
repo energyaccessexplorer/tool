@@ -213,6 +213,11 @@ function ea_category_help_modal(ds) {
 </section>`));
 
   modal()
+    .header_style(`
+padding: 1em;
+font-size: 1.4em;
+color: var(--the-green);
+    `)
     .main_style(`
 background-color: white;
 margin: auto;
@@ -221,6 +226,10 @@ width: fit-content;
 height: fit-content;
 width: -webkit-fit-content;
 width: -moz-fit-content;
+font-size: 1.2em;
+margin-top: 3.5em;
+max-width: 800px;
+padding: 1em;
     `)
     .header(ds.name_long)
     .content(content)();

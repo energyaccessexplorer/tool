@@ -62,6 +62,10 @@
   color: #95A8C1;
 }
 
+.layers-element-radio {
+  margin-top: 10px;
+}
+
 .layers-element-content {
   flex: 1;
   display: block;

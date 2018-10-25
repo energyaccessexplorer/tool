@@ -155,6 +155,11 @@ select#controls-preset {
 
   text-align-last: center;
   text-align: center;
+
+  -webkit-appearance: none;
+  appearance: none;
+
+  background: url(../images/triangle-down.svg) 100% 0 no-repeat;
 }
 
 #supply, #demand {

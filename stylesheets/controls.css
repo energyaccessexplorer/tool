@@ -105,6 +105,7 @@
 
 .controls-dataset-header {
   padding-bottom: 0.3em;
+  cursor: pointer;
 }
 
 .controls-dataset-header .svg-checkbox {

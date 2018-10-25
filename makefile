@@ -9,7 +9,7 @@ stop:
 	-@lsof -t -i :${PGREST_PORT} | xargs -i kill {}
 
 deploy:
-	sed -i \
+	@sed -i \
 		-e 's%database: "${DB_SERV_DEV}",%database: "${DB_SERV_PROD}",%' \
 		${DIST}/settings.js
 
@@ -22,6 +22,6 @@ deploy:
 		--exclude=makefile \
 		./${DIST}/ ${SRV_USER}@${SRV_SERVER}:${SRV_DEST}
 
-	sed -i \
+	@sed -i \
 		-e 's%database: "${DB_SERV_PROD}",%database: "${DB_SERV_DEV}",%' \
 		${DIST}/settings.js

@@ -166,7 +166,7 @@ function ea_datasets_scale_fn(ds, type) {
 
   case 'linear':
   default: {
-    s = lin.clamp(ds.heatmap.clamp)
+    s = lin.clamp(ds.heatmap.clamp);
     break;
   }
   }

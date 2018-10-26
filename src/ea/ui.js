@@ -194,6 +194,25 @@ function ea_index_modal(i) {
 
   modal()
     .header(titles[i])
+    .header_style(`
+padding: 1em;
+font-size: 1.4em;
+color: var(--the-green);
+position: relative;
+    `)
+    .main_style(`
+background-color: white;
+margin: auto;
+max-width: 1200px;
+width: fit-content;
+height: fit-content;
+width: -webkit-fit-content;
+width: -moz-fit-content;
+font-size: 1.2em;
+margin-top: 3.5em;
+max-width: 800px;
+padding: 1em;
+    `)
     .content(infos[i])();
 };
 
@@ -217,6 +236,7 @@ function ea_category_help_modal(ds) {
 padding: 1em;
 font-size: 1.4em;
 color: var(--the-green);
+position: relative;
     `)
     .main_style(`
 background-color: white;

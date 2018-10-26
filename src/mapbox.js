@@ -21,11 +21,9 @@ class MapboxThemeControl {
       let radios = elem(`<div>
 <h3>Background map style</h3>
 
-<input type="radio" name="mapbox_theme" value="basic" /> <label>Basic (default)</label> <br><br>
-<input type="radio" name="mapbox_theme" value="dark" /> <label>Dark</label> <br><br>
+<input type="radio" name="mapbox_theme" value="basic" /> <label>Light (default)</label> <br><br>
 <input type="radio" name="mapbox_theme" value="satellite" /> <label>Satellite</label> <br><br>
-<input type="radio" name="mapbox_theme" value="streets" /> <label>Streets</label> <br><br>
-<input type="radio" name="mapbox_theme" value="satellite-streets" /> <label>Satellite Streets</label> <br><br>
+<input type="radio" name="mapbox_theme" value="dark" /> <label>Dark</label> <br><br>
 <input type="radio" name="mapbox_theme" value="" /> <label>None</label> <br><br>
 </div>`);
 

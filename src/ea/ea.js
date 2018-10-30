@@ -1,8 +1,7 @@
 function ea_opacity_tweak() {
   const dl = location.get_query_param('inputs').split(',');
 
-  const tweak = (dl.length === 1 &&
-                 (dl[0] === 'subcounties' || dl[0] === 'districts'));
+  const tweak = (dl.length === 1 && (dl[0] === 'boundaries'));
 
   ea_mapbox ?
     ea_mapbox.setPaintProperty('canvas-layer', 'raster-opacity', (tweak ? 0.2 : 1)) :
@@ -226,13 +225,27 @@ async function ea_overlord(msg) {
     const country = await ea_country_init(ea_ccn3);
     const collection = await ea_datasets_init(country.id, inputs, preset);
 
+    const boundaries_ds = collection.find(d => d.id === 'boundaries');
+
+    if (!boundaries_ds) {
+      flash()
+        .type('error')
+        .title("Misconfigured country")
+        .message(`
+It's missing a boundaries dataset. <b>I'm stoping here.</b>
+Please reporty this to energyaccessexplorer@wri.org.
+`)();
+
+      return;
+    }
+
     {
       ea_dummy = {
         id: "dummy",
         description: "Dummy dataset",
 
         heatmap: {
-          endpoint: "districts.tif",
+          endpoint: boundaries_ds.heatmap.endpoint,
           parse: ea_datasets_tiff_url,
         },
       };
@@ -265,6 +278,10 @@ async function ea_overlord(msg) {
     //
     ea_canvas.getContext('2d');
 
+    await boundaries_ds.polygons.parse.call(boundaries_ds);
+    await boundaries_ds.heatmap.parse.call(boundaries_ds);
+    await boundaries_ds.csv.parse.call(boundaries_ds);
+
     (async _ => {
       for (var id of inputs) {
         let ds = ea_datasets_collection.find(d => d.id === id);
@@ -274,6 +291,13 @@ async function ea_overlord(msg) {
       ea_overlord({
         type: "mode",
         target: mode,
+        caller: "ea_init",
+      });
+
+      ea_overlord({
+        type: "sort",
+        target: mode,
+        layers: inputs,
         caller: "ea_init",
       });
 
@@ -314,6 +338,8 @@ async function ea_overlord(msg) {
 
         if (x = ea_datasets_collection.find(d => d.id === i)) {
           if (x.polygons) await x.polygons.parse.call(x);
+          if (x.heatmap) await x.heatmap.parse.call(x);
+          if (x.csv) await x.csv.parse.call(x);
         }
       }
 
@@ -346,6 +372,9 @@ async function ea_overlord(msg) {
       if (ds.heatmap)
         ds.active ? await ds.heatmap.parse.call(ds) : null;
 
+      if (ds.csv)
+        ds.active ? await ds.csv.parse.call(ds) : null;
+
       ea_canvas_plot(ea_analysis(output));
     }
 
@@ -361,6 +390,9 @@ async function ea_overlord(msg) {
 
       if (ds.heatmap)
         ds.active ? await ds.heatmap.parse.call(ds) : null;
+
+      if (ds.csv)
+        ds.active ? await ds.csv.parse.call(ds) : null;
 
       ea_draw_first_active_nopolygons(inputs);
     }

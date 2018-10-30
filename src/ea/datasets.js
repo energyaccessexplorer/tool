@@ -2,7 +2,7 @@ async function ea_datasets_init(country_id, inputs, preset) {
   let collection = null;
 
   await ea_client(
-    `${ea_settings.database}/datasets?country_id=eq.${country_id}&select=*,heatmap_file(*),polygons_file(*),category(*)`, 'GET', null,
+    `${ea_settings.database}/datasets?country_id=eq.${country_id}&select=*,heatmap_file(*),polygons_file(*),csv_file(*),category(*)`, 'GET', null,
     r => {
       const map = r.map(e => {
         let heatmap, polygons, csv, help = null;
@@ -15,6 +15,11 @@ async function ea_datasets_init(country_id, inputs, preset) {
         if (e.polygons_file) {
           polygons = e.category.polygons;
           polygons.endpoint = e.polygons_file.endpoint;
+        }
+
+        if (e.csv_file) {
+          csv = e.configuration.csv;
+          csv.endpoint = e.csv_file.endpoint;
         }
 
         if (e.category.configuration && e.category.configuration.mutant) console.log('mutant: ', e.category_name, e.id);
@@ -35,6 +40,7 @@ async function ea_datasets_init(country_id, inputs, preset) {
           "name_long": name_long,
           "description": e.category.description,
           "description_long": e.category.description_long,
+          "csv": csv,
           "heatmap": heatmap,
           "polygons": polygons,
           "id": e.category.name,
@@ -110,6 +116,8 @@ async function ea_datasets_init(country_id, inputs, preset) {
           }
         }
 
+        if (d.csv)
+          d.csv.parse = ea_datasets_csv;
 
         if (d.heatmap) {
           d.heatmap.parse = ea_datasets_tiff_url;
@@ -139,12 +147,6 @@ async function ea_datasets_init(country_id, inputs, preset) {
       }
 
       collection = collection.filter(d => d);
-
-      const districts_dataset = collection
-            .find(d => d.id === 'districts' || d.id === 'counties' || d.id === 'subcounties');
-
-      if (districts_dataset) ea_datasets_districts(districts_dataset);
-      else console.warn("No districts/subcounties dataset found.");
     });
 
   return collection;
@@ -212,6 +214,7 @@ async function ea_datasets_load(ds) {
   else
     await ds.heatmap.parse.call(ds);
 
+  if (ds.csv) await ds.csv.parse.call(ds);
 
   ds.color_scale_svg = ea_svg_color_gradient(ds.color_scale_fn);
 
@@ -275,6 +278,41 @@ async function ea_datasets_polygons() {
       },
     }, ea_mapbox.first_symbol);
   });
+};
+
+async function ea_datasets_csv(callback) {
+  const ds = this;
+
+  if (ds.table) return;
+
+  else {
+    const endpoint = ds.csv.endpoint;
+
+    if (!endpoint) {
+      console.warn(`Dataset '${ds.id}' should have a csv (maybe a file-association missing). Endpoint is: `, endpoint);
+      return ds;
+    }
+
+    const url = endpoint.match('^http') ? endpoint :
+          `${ea_settings.endpoint_base}/${ea_ccn3}/${endpoint}`;
+
+    d3.csv(url, function(d) {
+      const o = { oid: +d[ds.csv.oid] };
+      Object.keys(ds.csv.options).forEach(k => o[k] = +d[k] || d[k]);
+      return o;
+    })
+      .then(data => {
+        // HACK: so we can access them by oid (as an array, they are
+        // generally a sequence starting at 1)
+        //
+        if (data[0]['oid'] === 1) data.unshift({ oid: 0 });
+
+        ds.table = data;
+      })
+      .catch(e => {
+        console.warn(`${endpoint} raised an error and several datasets might depend on this. Bye!`);
+      });
+  }
 };
 
 async function ea_datasets_geojson(callback) {
@@ -354,27 +392,4 @@ function ea_datasets_hexblob(hex) {
   // fake_download(blob);
 
   return blob;
-};
-
-function ea_datasets_districts(ds) {
-  let endpoint = `${ea_settings.endpoint_base}/${ea_ccn3}/districts-data.csv`;
-
-  d3.csv(endpoint, function(d) {
-    const o = { oid: +d[ds.configuration.oid] };
-
-    Object.keys(ds.configuration.options).forEach(k => o[k] = +d[k] || d[k]);
-
-    return o;
-  })
-    .then(data => {
-      ea_districts = data;
-
-      // hack: so we can access them by oid (as an array, they are
-      // generally a sequence starting at 1)
-      //
-      ea_districts.unshift({ oid: 0 });
-    })
-    .catch(e => {
-      console.warn(`${endpoint} raised an error and several datasets might depend on this. Bye!`);
-    })
 };

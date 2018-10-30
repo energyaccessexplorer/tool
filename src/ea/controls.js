@@ -205,8 +205,7 @@ function ea_controls(ds) {
     controls.appendChild(weight_group.elem);
     break;
 
-  case 'districts':
-  case 'subcounties':
+  case "boundaries":
     range_group = ea_controls_range(ds, (ds.unit || 'percentage'))
     controls.appendChild(ea_controls_options(ds));
     controls.appendChild(range_group.elem);
@@ -233,10 +232,10 @@ function ea_controls_options(ds) {
 
   // select.appendChild(elem(`<option selected disabled>Select one...</option>`));
 
-  const options = Object.keys(ds.configuration.options);
+  const options = Object.keys(ds.csv.options);
 
   options.forEach(v => {
-    select.appendChild(elem(`<option value=${v}>${ds.configuration.options[v]}</option>`));
+    select.appendChild(elem(`<option value=${v}>${ds.csv.options[v]}</option>`));
   });
 
   ds.heatmap.scale_option = select.value = options[0];

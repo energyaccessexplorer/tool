@@ -27,8 +27,12 @@ async function ea_datasets_init(country_id, inputs, preset) {
           help['what'] = e.category.metadata.what;
         }
 
+        let name_long = e.category.name_long;
+        if (e.configuration && e.configuration.name_override)
+          name_long = e.configuration.name_override;
+
         const o = {
-          "name_long": e.category.name_long,
+          "name_long": name_long,
           "description": e.category.description,
           "description_long": e.category.description_long,
           "heatmap": heatmap,
@@ -159,11 +163,6 @@ function ea_datasets_scale_fn(ds, type) {
         .range(r)
 
   switch (v) {
-  case 'key': {
-    s = x => (!x || x === ds.nodata) ? -1 : lin(ea_districts[x][o]);
-    break;
-  }
-
   case 'identity': {
     s = d3.scaleIdentity()
       .domain(t || d)
@@ -171,8 +170,23 @@ function ea_datasets_scale_fn(ds, type) {
     break;
   }
 
+  case 'key-linear': {
+    s = x => {
+      let z = ds.table[x];
+      if (!z) return -1;
+
+      return (!x || x === ds.nodata) ? -1 : lin.clamp(ds.heatmap.clamp)(z[o]);
+    };
+    break;
+  }
+
   case 'key-delta': {
-    s = x => (ea_districts[x][o] < t[0] || ea_districts[x][o] > t[1]) ? -1 : 1;
+    s = x => {
+      let z = ds.table[x];
+      if (!z) return -1;
+
+      return (z[o] < t[0] || z[o] > t[1]) ? -1 : 1;
+    };
     break;
   }
 

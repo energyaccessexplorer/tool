@@ -99,7 +99,11 @@ function ea_controls_mutant_options(ds) {
     ds.raster = host.raster;
     ds.image = host.image;
 
-    ea_datasets_active(ds, true);
+    ea_overlord({
+      type: "input",
+      target: ds,
+      caller: "ea_controls_mutant_options",
+    });
   });
 
   container.appendChild(select);
@@ -194,6 +198,7 @@ function ea_controls(ds) {
   case "facilities":
   case "health":
   case "powerplants":
+  case "geothermal":
   case "transmission-lines":
     range_group = ea_controls_range(ds, (ds.unit || 'proximity in km'))
     controls.appendChild(range_group.elem);
@@ -202,7 +207,7 @@ function ea_controls(ds) {
 
   case 'districts':
   case 'subcounties':
-    range_group = ea_controls_range(ds, (ds.unit || 'range'))
+    range_group = ea_controls_range(ds, (ds.unit || 'percentage'))
     controls.appendChild(ea_controls_options(ds));
     controls.appendChild(range_group.elem);
     break;
@@ -238,7 +243,12 @@ function ea_controls_options(ds) {
 
   select.addEventListener('change', function() {
     ds.heatmap.scale_option = this.value;
-    ea_datasets_active(ds, true);
+
+    ea_overlord({
+      type: "input",
+      target: ds,
+      caller: "ea_controls_options",
+    })
   });
 
   container.appendChild(select);

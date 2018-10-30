@@ -237,9 +237,10 @@ async function ea_overlord(msg) {
         },
       };
 
-      await ea_dummy.heatmap.parse.call(ea_dummy);
-
-      ea_dummy.raster = new Uint16Array(ea_dummy.width * ea_dummy.height).fill(ea_dummy.nodata);
+      (async _ => {
+        await ea_dummy.heatmap.parse.call(ea_dummy);
+        ea_dummy.raster = new Uint16Array(ea_dummy.width * ea_dummy.height).fill(-1);
+      })();
     }
 
     inputs = collection
@@ -299,6 +300,8 @@ async function ea_overlord(msg) {
           }
         }
       });
+
+      ea_opacity_tweak(inputs);
 
       ea_canvas_plot(ea_analysis(output));
     }
@@ -431,6 +434,10 @@ async function ea_overlord(msg) {
       ea_layers_sort_inputs(msg.layers);
       set_inputs_param(msg.layers);
       ea_draw_first_active_nopolygons(msg.layers);
+    }
+
+    else if (mode === "outputs") {
+      console.info("Overlord: Sorting in outputs mode has no efect... OK.");
     }
 
     else {

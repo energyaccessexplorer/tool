@@ -5,16 +5,20 @@ async function ea_datasets_init(country_id, inputs, preset) {
     `${ea_settings.database}/datasets?country_id=eq.${country_id}&select=*,heatmap_file(*),polygons_file(*),category(*)`, 'GET', null,
     r => {
       const map = r.map(e => {
-        let heatmap = e.category.heatmap;
-        if (heatmap && e.heatmap_file) heatmap.endpoint = e.heatmap_file.endpoint;
+        let heatmap, polygons, csv, help = null;
 
-        let polygons = e.category.polygons;
-        if (polygons && e.polygons_file) polygons.endpoint = e.polygons_file.endpoint;
+        if (e.heatmap_file) {
+          heatmap = e.category.heatmap
+          heatmap.endpoint = e.heatmap_file.endpoint;
+        }
+
+        if (e.polygons_file) {
+          polygons = e.category.polygons;
+          polygons.endpoint = e.polygons_file.endpoint;
+        }
 
         if (e.category.configuration && e.category.configuration.mutant) console.log('mutant: ', e.category_name, e.id);
         else if (!e.heatmap_file && !e.polygons_file) return undefined;
-
-        let help = null;
 
         if (e.category.metadata && (e.category.metadata.why || e.category.metadata.what)) {
           help = {};
@@ -102,17 +106,25 @@ async function ea_datasets_init(country_id, inputs, preset) {
           }
         }
 
-        if (typeof d.heatmap.color_scale === 'undefined')
-          d.heatmap.color_scale = ea_default_color_scheme;
 
-        if (d.heatmap.endpoint)
+        if (d.heatmap) {
           d.heatmap.parse = ea_datasets_tiff_url;
+          d.heatmap.color_scale = ea_default_color_scheme;
+        }
 
-        if (d.polygons && d.polygons.shape_type === 'points')
-          d.polygons.parse = ea_datasets_points;
+        if (d.polygons) {
+          switch (d.polygons.shape_type) {
+          case "points": {
+            d.polygons.parse = ea_datasets_points;
+            break;
+          }
 
-        if (d.polygons && d.polygons.shape_type === 'polygons')
-          d.polygons.parse = ea_datasets_polygons;
+          case "polygons": {
+            d.polygons.parse = ea_datasets_polygons;
+            break;
+          }
+          }
+        }
 
         d.color_scale_fn = function() {
           return d3.scaleLinear()
@@ -179,10 +191,13 @@ async function ea_datasets_load(ds) {
 
   ea_ui_dataset_loading(ds, true);
 
-  if (!ds.heatmap.parse)
-    console.error(ds.id, "does not have a #heatmap.parse function set!");
+  if (!ds.heatmap || !ds.heatmap.parse) {
+    console.warn(ds.id, "does not have a #heatmap.parse function set! I'm setting ds.heatmap to 'null'");
+    ds.heatmap = null;
+  }
+  else
+    await ds.heatmap.parse.call(ds);
 
-  await ds.heatmap.parse.call(ds);
 
   ds.color_scale_svg = ea_svg_color_gradient(ds.color_scale_fn);
 

@@ -224,7 +224,7 @@ async function ea_overlord(msg) {
     ea_canvas = null;
 
     const country = await ea_country_init(ea_ccn3);
-    const collection  = await ea_datasets_init(country.id, inputs, preset);
+    const collection = await ea_datasets_init(country.id, inputs, preset);
 
     {
       ea_dummy = {
@@ -294,7 +294,7 @@ async function ea_overlord(msg) {
         var x;
 
         if (x = ea_datasets_collection.find(d => d.id === i)) {
-          if (typeof x.polygons !== 'undefined' && ea_mapbox.getSource(i)) {
+          if (x.polygons && ea_mapbox.getSource(i)) {
             ea_mapbox.setLayoutProperty(i, 'visibility', 'none');
           }
         }
@@ -340,8 +340,8 @@ async function ea_overlord(msg) {
     if (mode === "outputs") {
       ea_layers_outputs(output);
 
-      if (typeof ds.heatmap !== "undefined")
-        ds.active ? await ds.heatmap.parse.call(ds) : null
+      if (ds.heatmap)
+        ds.active ? await ds.heatmap.parse.call(ds) : null;
 
       ea_canvas_plot(ea_analysis(output));
     }
@@ -356,7 +356,7 @@ async function ea_overlord(msg) {
           if (ea_mapbox.getSource(ds.id)) ea_mapbox.setLayoutProperty(ds.id, 'visibility', 'none');
       }
 
-      if (typeof ds.heatmap !== "undefined")
+      if (ds.heatmap)
         ds.active ? await ds.heatmap.parse.call(ds) : null;
 
       ea_draw_first_active_nopolygons(inputs);
@@ -399,7 +399,7 @@ async function ea_overlord(msg) {
       for (let ds of ea_datasets_collection) {
         let r = ea_presets_set(ds, msg.value);
 
-        if (typeof ds.heatmap !== "undefined")
+        if (ds.heatmap)
           ds.active ? await ds.heatmap.parse.call(ds) : null;
       }
 
@@ -410,7 +410,7 @@ async function ea_overlord(msg) {
       for (let ds of ea_datasets_collection) {
         let r = ea_presets_set(ds, msg.value);
 
-        if (typeof ds.heatmap !== "undefined")
+        if (ds.heatmap)
           ds.active ? await ds.heatmap.parse.call(ds) : null;
 
         if (ea_mapbox.getSource(ds.id))

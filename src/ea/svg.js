@@ -666,60 +666,23 @@ function ea_svg_interval_thingradient(color_scale, init, callback1, callback2, e
   };
 };
 
-function ea_svg_symbol(sym, cls, size) {
+function ea_svg_symbol(fill, stroke) {
+  const size = 28;
+
   const container = d3.select(document.createElementNS(d3.namespaces.svg, "svg"))
         .attr("width", size)
         .attr("height", size);
 
-  const symbol = d3.symbol()
-        .size((size**2) / 4)
-        .type((d) => ea_svg_symbol_pick(sym));
-
   container
-    .append('path')
-    .attr('class', cls)
-    .attr('d', symbol)
-    .attr('transform', `translate(${size/2}, ${size/2})`)
-    .attr('stroke-width', 1);
+    .append('circle')
+    .attr('r', 12)
+    .attr('cx', size/2)
+    .attr('cy', size/2)
+    .attr('fill', fill)
+    .attr('stroke', stroke.color)
+    .attr('stroke-width', stroke.width);
 
   return container.node();
-};
-
-function ea_svg_symbol_pick(str) {
-  let s = null;
-
-  switch (str) {
-  case 'triangle':
-    s = d3.symbolTriangle;
-    break;
-
-  case 'wye':
-    s = d3.symbolWye;
-    break;
-
-  case 'star':
-    s = d3.symbolStar;
-    break;
-
-  case 'square':
-    s = d3.symbolSquare;
-    break;
-
-  case 'cross':
-    s = d3.symbolCross;
-    break;
-
-  case 'diamond':
-    s = d3.symbolDiamond;
-    break;
-
-  case 'circle':
-  default:
-    s = d3.symbolCircle;
-    break;
-  }
-
-  return s;
 };
 
 function ea_svg_info(scale = 1) {

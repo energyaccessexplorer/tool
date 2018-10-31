@@ -26,7 +26,7 @@ function ea_layers_input_elem(ds) {
       <div class="layers-element-controls"></div>
     </div>
 
-    <div class="layers-element-descriptor"></div>
+    <div class="layers-element-description"></div>
   </div>
 </li>`);
 
@@ -37,8 +37,15 @@ function ea_layers_input_elem(ds) {
 
   lec.appendChild(dli);
 
-  if (ds.polygons && ds.polygons.symbol)
-    d.querySelector('.layers-element-descriptor').appendChild(ea_svg_symbol(ds.polygons.symbol, ds.id, 36));
+  let e;
+
+  if (ds.polygons)
+    e = ds.polygons.symbol_svg;
+
+  if (!ds.polygons && ds.heatmap)
+    e = ds.color_scale_svg;
+
+  if (e) d.querySelector('.layers-element-description').appendChild(e);
 
   return d;
 };

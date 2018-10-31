@@ -115,8 +115,12 @@
   cursor: pointer;
 }
 
-.layers-element-descriptor .layer-interval {
-  width: 100%;
+.layers-element-description  {
+  margin-top: 12px;
+}
+
+.layers-element-description .svg-interval {
+  width: 275px;
 }
 
 .heatmaps-layers {

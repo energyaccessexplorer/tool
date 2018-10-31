@@ -218,6 +218,14 @@ async function ea_datasets_load(ds) {
 
   ds.color_scale_svg = ea_svg_color_gradient(ds.color_scale_fn);
 
+  if (ds.polygons) {
+    if (ds.polygons.shape_type === "points")
+      ds.polygons.symbol_svg = ea_svg_symbol(ds.polygons.fill, { width: 1, color: ds.polygons.stroke });
+
+    else if (ds.polygons.shape_type === "polygons")
+      ds.polygons.symbol_svg = ea_svg_symbol(null, { width: 3, color: ds.polygons.fill });
+  }
+
 	ea_ui_dataset_loading(ds, false);
 };
 
@@ -273,7 +281,7 @@ async function ea_datasets_polygons() {
       "type": "line",
       "source": this.id,
       "paint": {
-        "line-width": 2,
+        "line-width": 1,
         "line-color": this.polygons.fill || 'cyan',
       },
     }, ea_mapbox.first_symbol);

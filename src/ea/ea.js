@@ -278,10 +278,6 @@ Please reporty this to energyaccessexplorer@wri.org.
     //
     ea_canvas.getContext('2d');
 
-    await boundaries_ds.polygons.parse.call(boundaries_ds);
-    await boundaries_ds.heatmap.parse.call(boundaries_ds);
-    await boundaries_ds.csv.parse.call(boundaries_ds);
-
     (async _ => {
       for (var id of inputs) {
         let ds = ea_datasets_collection.find(d => d.id === id);
@@ -292,13 +288,14 @@ Please reporty this to energyaccessexplorer@wri.org.
         type: "mode",
         target: mode,
         caller: "ea_init",
-      });
-
-      ea_overlord({
-        type: "sort",
-        target: mode,
-        layers: inputs,
-        caller: "ea_init",
+        callback: _ => {
+          ea_overlord({
+            type: "sort",
+            target: mode,
+            layers: inputs,
+            caller: "ea_init callback",
+          })
+        }
       });
 
       ea_ui_app_loading(false);
@@ -482,6 +479,8 @@ Please reporty this to energyaccessexplorer@wri.org.
   default:
     throw `Overlord: I don't know message type '${msg.type}'`
   }
+
+  if (typeof msg.callback === 'function') msg.callback();
 };
 
 function ea_summary() {

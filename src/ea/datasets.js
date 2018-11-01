@@ -116,33 +116,36 @@ async function ea_datasets_init(country_id, inputs, preset) {
           }
         }
 
-        if (d.csv)
-          d.csv.parse = ea_datasets_csv;
+        if (d.csv) d.csv.parse = ea_datasets_csv;
 
         if (d.heatmap) {
           d.heatmap.parse = ea_datasets_tiff_url;
           d.heatmap.color_scale = ea_default_color_scheme;
+
+          d.color_scale_fn = function() {
+            return d3.scaleLinear()
+              .domain(plotty.colorscales[d.heatmap.color_scale].positions)
+              .range(plotty.colorscales[d.heatmap.color_scale].colors)
+              .clamp(d.heatmap.clamp || false);
+          };
+
+          d.color_scale_svg = ea_svg_color_gradient(d.color_scale_fn);
         }
 
         if (d.polygons) {
           switch (d.polygons.shape_type) {
           case "points": {
+            d.polygons.symbol_svg = ea_svg_symbol(d.polygons.fill, { width: 1, color: d.polygons.stroke });
             d.polygons.parse = ea_datasets_points;
             break;
           }
 
           case "polygons": {
+            d.polygons.symbol_svg = ea_svg_symbol(null, { width: 3, color: d.polygons.fill });
             d.polygons.parse = ea_datasets_polygons;
             break;
           }
           }
-        }
-
-        d.color_scale_fn = function() {
-          return d3.scaleLinear()
-            .domain(plotty.colorscales[d.heatmap.color_scale].positions)
-            .range(plotty.colorscales[d.heatmap.color_scale].colors)
-            .clamp(d.heatmap.clamp || false);
         }
       }
 
@@ -213,18 +216,6 @@ async function ea_datasets_load(ds) {
   }
   else
     await ds.heatmap.parse.call(ds);
-
-  if (ds.csv) await ds.csv.parse.call(ds);
-
-  ds.color_scale_svg = ea_svg_color_gradient(ds.color_scale_fn);
-
-  if (ds.polygons) {
-    if (ds.polygons.shape_type === "points")
-      ds.polygons.symbol_svg = ea_svg_symbol(ds.polygons.fill, { width: 1, color: ds.polygons.stroke });
-
-    else if (ds.polygons.shape_type === "polygons")
-      ds.polygons.symbol_svg = ea_svg_symbol(null, { width: 3, color: ds.polygons.fill });
-  }
 
 	ea_ui_dataset_loading(ds, false);
 };

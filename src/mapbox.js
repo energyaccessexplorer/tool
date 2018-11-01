@@ -1,3 +1,20 @@
+mapbox_themes = [{
+  "name": "Light Basemap with no labels",
+  "value": "resourcewatch/cjhqgk77j0r7h2sqw220p7imy"
+}, {
+  "name": "Satellite",
+  "value": "resourcewatch/cjhqiecof53wv2rl9gw4cehmy"
+}, {
+  "name": "Light labels",
+  "value": "resourcewatch/cjgcf9rs05qnu2rrpp4qzucox"
+}, {
+  "name": "Dark labels",
+  "value": "resourcewatch/cjgcf9gqk9tmm2spd9zr0tml3"
+}, {
+  "name": "Boundaries",
+  "value": "resourcewatch/cjgcf8qdaai1x2rn6w3j4q805"
+}];
+
 class MapboxThemeControl {
   onAdd(map) {
     this._map = map;
@@ -17,17 +34,14 @@ class MapboxThemeControl {
 
     button.addEventListener('mouseup', function() {
       let content = elem('<div>');
+      let radios = elem(`<div><h3>Background map style</h3></div>`);
 
-      let radios = elem(`<div>
-<h3>Background map style</h3>
+      for (let t of mapbox_themes) {
+        radios.appendChild(elem(`<div><input type="radio" name="mapbox_theme" value="${t.value}" /> <label>${t.name}</label><br><br></div>`));
+      }
 
-<input type="radio" name="mapbox_theme" value="basic" /> <label>Light (default)</label> <br><br>
-<input type="radio" name="mapbox_theme" value="satellite" /> <label>Satellite</label> <br><br>
-<input type="radio" name="mapbox_theme" value="dark" /> <label>Dark</label> <br><br>
-<input type="radio" name="mapbox_theme" value="" /> <label>None</label> <br><br>
-</div>`);
-
-      radios.querySelector(`input[value="${ea_settings.mapbox_theme}"]`).setAttribute('checked', true);
+      let current = radios.querySelector(`input[value="${ea_settings.mapbox_theme}"]`)
+      if (current) current.setAttribute('checked', true);
 
       radios.querySelectorAll('input[name="mapbox_theme"]').forEach(e => {
         e.addEventListener('change', _ => {
@@ -56,7 +70,7 @@ class MapboxThemeControl {
 function mapbox_theme_pick(theme) {
   let t = (theme === "" ? null : theme);
 
-  return (t ? `mapbox://styles/mapbox/${t}-v9` : {
+  return (t ? `mapbox://styles/${t}` : {
     version: 8,
     sources: {},
     layers: [{
@@ -87,12 +101,12 @@ function mapbox_canvas(m, coords) {
   }, ea_mapbox.first_symbol);
 }
 
-function mapbox_setup(bounds, theme, token) {
-  mapboxgl.accessToken = token;
+function mapbox_setup(bounds) {
+  mapboxgl.accessToken = ea_settings.mapbox_token;
 
   const mapbox = new mapboxgl.Map({
     container: 'mapbox-container',
-    style: mapbox_theme_pick(theme)
+    style: mapbox_theme_pick(ea_settings.mapbox_theme)
   });
 
   mapbox.fitBounds(bounds, { animate: false });

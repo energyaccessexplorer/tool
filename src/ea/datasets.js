@@ -141,7 +141,7 @@ async function ea_datasets_init(country_id, inputs, preset) {
           }
 
           case "polygons": {
-            d.polygons.symbol_svg = ea_svg_symbol(null, { width: 3, color: d.polygons.fill });
+            d.polygons.symbol_svg = ea_svg_symbol(d.polygons.fill, { width: 3, color: d.polygons.stroke });
             d.polygons.parse = ea_datasets_polygons;
             break;
           }
@@ -273,7 +273,7 @@ async function ea_datasets_polygons() {
       "source": this.id,
       "paint": {
         "line-width": 1,
-        "line-color": this.polygons.fill || 'cyan',
+        "line-color": this.polygons.stroke,
       },
     }, ea_mapbox.first_symbol);
   });

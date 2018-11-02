@@ -96,7 +96,7 @@ function ea_countries_overview(c, collection, online) {
     dev = elem('<h4>Development</h4>');
 
     if (+r['population'] > 0)
-      pop = elem(`<div>Population: ${(+r['population']).toLocaleString()} Million</div>`);
+      pop = elem(`<div>Population: ${(+r['population']).toLocaleString()} million</div>`);
 
     if (+r['area'] > 0)
       area = elem(`<div>Area: ${(+c['area']).toLocaleString()} km<sup>2</sup></div>`);
@@ -129,7 +129,7 @@ function ea_countries_overview(c, collection, online) {
 </div>`);
 
     if (+r['ease-business'] > 0)
-      ease = elem(`<div>Ease of doing business: ${r['ease-business']} / 190</div>`);
+      ease = elem(`<div>Ease of doing business: ${r['ease-business']}/190</div>`);
 
     if (online.map(x => x['ccn3']).indexOf(+r['ccn3']) > -1)
       btn = elem(`<a id="eae" href="/maps-and-data/tool?ccn3=${r['ccn3']}">Click to launch tool</a>`);

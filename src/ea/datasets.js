@@ -122,7 +122,7 @@ async function ea_datasets_init(country_id, inputs, preset) {
           d.heatmap.parse = ea_datasets_tiff_url;
           d.heatmap.color_scale = ea_default_color_scheme;
 
-          d.color_scale_fn = function() {
+          d.color_scale_fn = _ => {
             return d3.scaleLinear()
               .domain(plotty.colorscales[d.heatmap.color_scale].positions)
               .range(plotty.colorscales[d.heatmap.color_scale].colors)

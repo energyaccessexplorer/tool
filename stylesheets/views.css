@@ -72,3 +72,40 @@ table.summary .index-name {
   text-align: left;
   font-family: without-serif, sans-serif;
 }
+
+#country-dropdown {
+  position: absolute;
+  right: 0;
+  top: 80px;
+
+  line-height: initial;
+  width: max-content;
+
+  background-color: var(--the-white);
+}
+
+.country-dropdown-element {
+  padding: 5px 10px;
+  cursor: pointer;
+  display: block;
+  text-align: left;
+}
+
+.country-dropdown-element:hover {
+  background-color: var(--the-darkest-white);
+}
+
+.country-dropdown-name,
+.country-dropdown-image {
+  display: inline-block;
+}
+
+.country-dropdown-name {
+  vertical-align: top;
+  margin: 0 0.5em;
+  line-height: 2.1em;
+}
+
+.country-dropdown-image img {
+  max-height: 2em;
+}

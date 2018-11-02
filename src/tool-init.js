@@ -20,6 +20,7 @@ requirejs.config({
     'svg': "./ea/svg",
     'map': "./ea/map",
     'presets': "./ea/presets",
+    'search': "./ea/search",
   }
 });
 
@@ -37,6 +38,7 @@ require([
   'svg',
   'controls',
   'ui',
+  'search',
   'layers',
   'views',
   'datasets',

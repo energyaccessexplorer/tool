@@ -207,8 +207,16 @@ function ea_controls(ds) {
 
   case "boundaries":
     range_group = ea_controls_range(ds, (ds.unit || 'percentage'))
-    controls.appendChild(ea_controls_options(ds));
-    controls.appendChild(range_group.elem);
+
+    const o = ea_controls_options(ds);
+    if (o) {
+      controls.appendChild(o);
+      controls.appendChild(range_group.elem);
+    }
+    else {
+      controls.remove();
+    }
+
     break;
 
   case 'crops':
@@ -227,6 +235,11 @@ function ea_controls(ds) {
 };
 
 function ea_controls_options(ds) {
+  if (!ds.csv) {
+    console.warn(`ea_controls_options: '${ds.id}' does not have a csv_file assigned. Returning.`);
+    return null;
+  }
+
   const container = elem(`<div class="control-option"></div>`);
   const select = elem('<select></select>');
 

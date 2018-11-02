@@ -187,6 +187,8 @@ function ea_datasets_scale_fn(ds, type) {
 
   case 'key-delta': {
     s = x => {
+      if (!ds.table) return;
+
       let z = ds.table[x];
       if (!z) return -1;
 

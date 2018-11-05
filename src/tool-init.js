@@ -10,6 +10,7 @@ requirejs.config({
     'sortable':   "../lib/htmlsortable",
     'flash': "../lib/flash",
     'modal': "../lib/modal",
+    'mapbox-gl': "../lib/mapbox-gl",
     'ea': "./ea/ea",
     'datasets': "./ea/datasets",
     'controls': "./ea/controls",
@@ -29,6 +30,7 @@ require([
   'topojson',
   'geotiff',
   'plotty',
+  'mapbox-gl',
   'flash',
   'modal',
   'ea',
@@ -44,11 +46,12 @@ require([
   'datasets',
   'mapbox',
   'sortable',
-], (d3, topojson, geotiff, plotty) => {
+], (d3, topojson, geotiff, plotty, mapboxgl) => {
   window.d3 = d3;
   window.topojson = topojson;
   window.GeoTIFF = geotiff;
   window.plotty = plotty;
+  window.mapboxgl = mapboxgl;
 
   window.ea_views = ['inputs', 'outputs'];
 

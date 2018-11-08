@@ -166,6 +166,8 @@ async function ea_overlord(msg) {
   let inputs_param = location.get_query_param('inputs');
   let preset_param = location.get_query_param('preset');
 
+  let canvas_source;
+
   function set_mode_param(m) {
     history.replaceState(null, null, location.set_query_param('mode', (m || mode)));
   }
@@ -479,6 +481,10 @@ Please reporty this to energyaccessexplorer@wri.org.
   default:
     throw `Overlord: I don't know message type '${msg.type}'`
   }
+
+  canvas_source = ea_mapbox.getSource('canvas-source');
+
+  if (canvas_source) canvas_source.play() && canvas_source.pause();
 
   if (typeof msg.callback === 'function') msg.callback();
 };

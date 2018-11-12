@@ -71,13 +71,13 @@ function mapbox_theme_pick(theme) {
   let t = (theme === "" ? null : theme);
 
   return (t ? `mapbox://styles/${t}` : {
-    version: 8,
-    sources: {},
-    layers: [{
-      "id": "background",
-      "type": "background",
+    "version": 8,
+    "sources": {},
+    "layers": [{
+      "id": 'background',
+      "type": 'background',
       "paint": {
-        "background-color": "white"
+        "background-color": 'white'
       }
     }]
   });
@@ -85,9 +85,9 @@ function mapbox_theme_pick(theme) {
 
 function mapbox_canvas(m, coords) {
   m.addSource('canvas-source', {
-    type: 'canvas',
-    canvas: 'plot',
-    coordinates: coords
+    "type": 'canvas',
+    "canvas": 'plot',
+    "coordinates": coords
   });
 
   const c = m.getStyle().layers.find(l => l.type === 'symbol')
@@ -95,9 +95,9 @@ function mapbox_canvas(m, coords) {
   ea_mapbox.first_symbol = ((c && c.id) || undefined);
 
   m.addLayer({
-    id: 'canvas-layer',
-    source: 'canvas-source',
-    type: 'raster',
+    "id": 'canvas-layer',
+    "source": 'canvas-source',
+    "type": 'raster',
   }, ea_mapbox.first_symbol);
 }
 
@@ -105,8 +105,8 @@ function mapbox_setup(bounds) {
   mapboxgl.accessToken = ea_settings.mapbox_token;
 
   const mapbox = new mapboxgl.Map({
-    container: 'mapbox-container',
-    style: mapbox_theme_pick(ea_settings.mapbox_theme)
+    "container": 'mapbox-container',
+    "style": mapbox_theme_pick(ea_settings.mapbox_theme)
   });
 
   mapbox.fitBounds(bounds, { animate: false });

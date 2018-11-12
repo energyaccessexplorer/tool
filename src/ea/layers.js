@@ -107,9 +107,9 @@ function ea_layers_outputs(target) {
     await nodes.forEach(n => n.querySelector('.layers-element-radio svg').dispatchEvent(unselect));
 
     ea_overlord({
-      type: "output",
-      heatmap: this.getAttribute('bind'),
-      caller: 'ea_layers_outputs'
+      "type": 'output',
+      "heatmap": this.getAttribute('bind'),
+      "caller": 'ea_layers_outputs'
     });
   };
 
@@ -165,18 +165,18 @@ function ea_layers_init() {
   layers.prepend(min_arrow);
 
   sortable('#layers-list', {
-    items: 'li.layers-element',
-    forcePlaceholderSize: true,
-    placeholder: '<li class="layers-element-place-holder"></li>',
-    handle: '.layers-element-handle',
+    "items": 'li.layers-element',
+    "forcePlaceholderSize": true,
+    "placeholder": '<li class="layers-element-place-holder"></li>',
+    "handle": '.layers-element-handle',
   })[0]
     .addEventListener(
       'sortupdate',
       (e) => {
         ea_overlord({
-          type: "sort",
-          layers: e.detail.destination.items.map(i => i.getAttribute('bind')),
-          caller: "ea_layers_init",
+          "type": 'sort',
+          "layers": e.detail.destination.items.map(i => i.getAttribute('bind')),
+          "caller": 'ea_layers_init',
         })
       });
 };

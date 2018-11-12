@@ -37,14 +37,12 @@ function ea_countries_setup() {
       ea_map = ea_map_svg(svg, geo, 'countries', { center: [0,0], scale: 350 });
 
       ea_map_load_features({
-        map: ea_map,
-        features: topo.features,
-        cls: 'land',
-        scale: 0,
-        classed: (v) => typeof countries_overviews.find(c => c.ccn3 === v) !== 'undefined',
-        mousedown: (v) => ea_countries_overview(countries.find(c => c.ccn3 === v), countries_overviews, countries_online),
-        mouseover: function(v) {
-        },
+        "map": ea_map,
+        "features": topo.features,
+        "cls": "land",
+        "scale": 0,
+        "classed": (v) => typeof countries_overviews.find(c => c.ccn3 === v) !== 'undefined',
+        "mousedown": (v) => ea_countries_overview(countries.find(c => c.ccn3 === v), countries_overviews, countries_online),
 
         mouseenter: function(v) {
           const x = countries.find(c => c.ccn3 === v);

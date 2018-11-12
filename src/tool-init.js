@@ -56,10 +56,10 @@ require([
   window.ea_views = ['inputs', 'outputs'];
 
   window.ea_indexes = {
-    "eai": 'Energy Access Index',
-    "demand": 'Demand Index',
-    "supply": 'Supply Index',
-    "ani": 'Assistance Need Index',
+    "eai": "Energy Access Index",
+    "demand": "Demand Index",
+    "supply": "Supply Index",
+    "ani": "Assistance Need Index",
   };
 
   window.ea_category_dict = {
@@ -71,5 +71,8 @@ require([
 
   plotty.addColorScale("ea", ['#1c4478', '#81b062', '#e5a82e'], [0, 0.5, 1]);
 
-  ea_overlord({ type: 'init', caller: 'require' });
+  ea_overlord({
+    "type": 'init',
+    "caller": 'require'
+  });
 });

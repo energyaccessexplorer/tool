@@ -238,17 +238,21 @@ padding: 1em;
 function ea_category_help_modal(ds) {
   let content = elem('<div>');
 
-  if (ds.help.why)
-    content.appendChild(elem(`<section>
-<h3>Why is this dataset?</h3>
-<p>${ds.help.why}</p>
-</section>`));
-
   if (ds.help.what)
-    content.appendChild(elem(`<section>
-<h3>What is this dataset?</h3>
-<p>${ds.help.what}</p>
-</section>`));
+    content.appendChild(elem(`
+<section>
+  <h3>What is this dataset?</h3>
+  <p>${ds.help.what}</p>
+</section>
+`));
+
+  if (ds.help.why)
+    content.appendChild(elem(`
+<section>
+  <h3>Why is this dataset?</h3>
+  <p>${ds.help.why}</p>
+</section>
+`));
 
   modal()
     .header_style(`

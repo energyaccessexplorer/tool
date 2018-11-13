@@ -87,6 +87,7 @@ function mapbox_canvas(m, coords) {
   m.addSource('canvas-source', {
     "type": 'canvas',
     "canvas": 'plot',
+    "animate": false,
     "coordinates": coords
   });
 

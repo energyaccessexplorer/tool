@@ -495,7 +495,16 @@ Please reporty this to energyaccessexplorer@wri.org.
 
   canvas_source = ea_mapbox.getSource('canvas-source');
 
-  if (canvas_source) canvas_source.play() && canvas_source.pause();
+  // 'animate' is set to false on mapbox's configuration, since we don't want
+  // mapbox eating the CPU at 60FPS for nothing.
+  //
+  // TODO: remove this hack. find a better way to redraw the canvas. as of v0.50
+  // there doesn't seem to be a good way to do this...
+  //
+  if (canvas_source) {
+    canvas_source.play();
+    setTimeout(_ => canvas_source.pause, 300);
+  }
 
   if (typeof msg.callback === 'function') msg.callback();
 };

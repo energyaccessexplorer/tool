@@ -111,7 +111,12 @@ async function ea_datasets_init(country_id, inputs, preset) {
 
             continue;
           } else {
+            d.configuration.host = m.id;
             d.polygons = m.polygons;
+
+            d.color_scale_svg = m.color_scale_svg;
+            d.color_scale_fn = m.color_scale_fn;
+
             d.heatmap = m.heatmap;
           }
         }
@@ -120,16 +125,7 @@ async function ea_datasets_init(country_id, inputs, preset) {
 
         if (d.heatmap) {
           d.heatmap.parse = ea_datasets_tiff_url;
-          d.heatmap.color_scale = ea_default_color_scheme;
-
-          d.color_scale_fn = _ => {
-            return d3.scaleLinear()
-              .domain(plotty.colorscales[d.heatmap.color_scale].positions)
-              .range(plotty.colorscales[d.heatmap.color_scale].colors)
-              .clamp(d.heatmap.clamp || false);
-          };
-
-          d.color_scale_svg = ea_svg_color_gradient(d.color_scale_fn);
+          ea_datasets_generate_color_scale(d);
         }
 
         if (d.polygons) {
@@ -205,6 +201,32 @@ function ea_datasets_scale_fn(ds, type) {
   }
 
   return s;
+};
+
+function ea_datasets_generate_color_scale(ds) {
+  if (ds.configuration && ds.configuration.mutant) return;
+
+  let cs = ds.heatmap.color_stops;
+  let c = ea_default_color_scale;
+  let d = ea_default_color_domain;
+
+  if (!cs || !cs.length)
+    ds.heatmap.color_stops = cs = ea_default_color_stops;
+  else {
+    d = Array(cs.length).fill(0).map((x,i) => (0 + i * (1/(cs.length-1))));
+    plotty.addColorScale((c = ds.id), cs.reverse(), d);
+  }
+
+  ds.heatmap.color_scale = c;
+
+  ds.color_scale_fn = _ => {
+    return d3.scaleLinear()
+      .domain(d)
+      .range(cs)
+      .clamp(ds.heatmap.clamp || false);
+  };
+
+  ds.color_scale_svg = ea_svg_color_steps(ds.color_scale_fn);
 };
 
 async function ea_datasets_load(ds) {

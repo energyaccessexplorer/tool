@@ -1,4 +1,4 @@
-const ea_default_color_scheme = "ea";
+const ea_default_color_scale = "ea";
 
 requirejs.config({
   'baseUrl': ea_settings.app_base + '/src',
@@ -69,7 +69,9 @@ require([
     "infrastructure": "Infrastructure",
   };
 
-  plotty.addColorScale("ea", ['#1c4478', '#81b062', '#e5a82e'], [0, 0.5, 1]);
+  ea_default_color_domain = [0, 0.5, 1];
+  ea_default_color_stops = ['#1c4478', '#81b062', '#e5a82e'];
+  plotty.addColorScale("ea", ea_default_color_stops, ea_default_color_domain);
 
   ea_overlord({
     "type": 'init',

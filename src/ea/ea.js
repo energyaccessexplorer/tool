@@ -58,6 +58,17 @@ function ea_analysis(type) {
     return null;
   }
 
+  let cs = ea_default_color_scale;
+
+  let single_input = ea_datasets_collection.find(d => d.id === type);
+
+  if (single_input) {
+    cs = single_input.heatmap.color_scale;
+
+    if (single_input.configuration && single_input.configuration.mutant)
+      cs = ea_datasets_collection.find(d => d.id === single_input.configuration.host).heatmap.color_scale;
+  }
+
   const ds = {
     id: `analysis-${Date.now()}`,
     domain: [0,1],
@@ -65,7 +76,7 @@ function ea_analysis(type) {
     height: tmp.height,
     raster: new Float32Array(tmp.raster.length),
     nodata: -1,
-    color_scale: ea_default_color_scheme,
+    color_scale: cs,
   };
 
   if (!collection.length) return tmp;

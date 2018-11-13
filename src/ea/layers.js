@@ -53,8 +53,8 @@ function ea_layers_input_elem(ds) {
 function ea_layers_output_elem(t, v, i) {
   const svg = ea_svg_color_steps(_ => {
     return d3.scaleLinear()
-      .domain(plotty.colorscales[ea_default_color_scheme].positions)
-      .range(plotty.colorscales[ea_default_color_scheme].colors)
+      .domain(ea_default_color_domain)
+      .range(ea_default_color_stops)
       .clamp(false)
   }, 3);
 

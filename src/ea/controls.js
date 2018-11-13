@@ -90,12 +90,14 @@ function ea_controls_mutant_options(ds) {
     ds.image = undefined;
     ds.tiff = undefined;
 
+    ds.configuration.host = host.id;
     ds.polygons = host.polygons;
-    ds.heatmap = host.heatmap;
+    ds.color_scale_svg = host.color_scale_svg;
+    ds.color_scale_fn = host.color_scale_fn;
 
     await host.heatmap.parse.call(host);
-    ds.color_scale_svg = ea_svg_color_gradient(ds.color_scale_fn);
 
+    ds.heatmap = host.heatmap;
     ds.raster = host.raster;
     ds.image = host.image;
 

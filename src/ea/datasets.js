@@ -1,154 +1,195 @@
-async function ea_datasets_init(country_id, inputs, preset) {
-  let collection = null;
+window.DSTable = {};
 
-  await ea_client(
-    `${ea_settings.database}/datasets?country_id=eq.${country_id}&select=*,heatmap_file(*),polygons_file(*),csv_file(*),category(*)`, 'GET', null,
-    r => {
-      const map = r.map(e => {
-        let heatmap, polygons, csv, help = null;
+class DS {
+  constructor(e, preset, inputs) {
+    this.id = e.category.name;
 
-        if (e.heatmap_file) {
-          heatmap = e.category.heatmap
-          heatmap.endpoint = e.heatmap_file.endpoint;
-        }
+    this.name_long = (e.configuration && e.configuration.name_override) ?
+      e.configuration.name_override :
+      e.category.name_long;
 
-        if (e.polygons_file) {
-          polygons = e.category.polygons;
-          polygons.endpoint = e.polygons_file.endpoint;
-        }
+    if (e.category.unit)
+      this.unit = e.category.unit;
 
-        if (e.csv_file) {
-          csv = e.configuration.csv;
-          csv.endpoint = e.csv_file.endpoint;
-        }
+    this.metadata = e.metadata;
 
-        if (e.category.configuration && e.category.configuration.mutant) console.log('mutant: ', e.category_name, e.id);
-        else if (!e.heatmap_file && !e.polygons_file) return undefined;
+    this.configuration = e.category.configuration;
 
-        if (e.category.metadata && (e.category.metadata.why || e.category.metadata.what)) {
-          help = {};
+    this.mutant = !!(e.category.configuration && e.category.configuration.mutant);
 
-          help['why'] = e.category.metadata.why;
-          help['what'] = e.category.metadata.what;
-        }
+    if (e.heatmap_file) {
+      this.heatmap = e.category.heatmap
+      this.heatmap.endpoint = e.heatmap_file.endpoint;
+      this.heatmap.parse = ea_datasets_tiff_url;
 
-        let name_long = e.category.name_long;
-        if (e.configuration && e.configuration.name_override)
-          name_long = e.configuration.name_override;
+      this.gen_color_scale();
+    }
 
-        const o = {
-          "name_long": name_long,
-          "description": e.category.description,
-          "description_long": e.category.description_long,
-          "csv": csv,
-          "heatmap": heatmap,
-          "polygons": polygons,
-          "id": e.category.name,
-          "unit": e.category.unit,
-          "metadata": e.metadata,
-          "configuration": e.category.configuration,
-          "help": help
-        };
+    if (e.polygons_file) {
+      this.polygons = e.category.polygons;
+      this.polygons.endpoint = e.polygons_file.endpoint;
 
-        let pp = {};
-
-        if (e.presets && e.presets.length) {
-          e.presets.forEach(p => {
-            return pp[p.name] = {
-              "weight": p.weight,
-              "min": p.min,
-              "max": p.max
-            };
-          });
-        }
-        else if (e.category.presets && e.category.presets.length) {
-          e.category.presets.forEach(p => {
-            return pp[p.name] = {
-              "weight": p.weight,
-              "min": p.min,
-              "max": p.max
-            };
-          });
-        }
-
-        let ppempty = Object.keys(pp).length === 0;
-        let p = pp[preset]
-
-        if (!ppempty && p) {
-          o.weight = p.weight;
-          // o.init_domain = [p.min, p.max];
-          o.init_domain = null;
-        } else {
-          o.weight = 2;
-          o.init_domain = null;
-        }
-
-        if (inputs.length) {
-          o.active = (inputs.indexOf(e.category.name) > -1)
-        } else {
-          o.active = (!ppempty && p);
-        }
-
-        o.presets = pp;
-
-        return o;
-      });
-
-      collection = map.filter(d => d)
-
-      for (var d of collection) {
-        if (d.configuration && d.configuration.mutant) {
-          let m = collection.find(x => x.id === d.configuration.mutant_targets[0]);
-
-          if (!m) {
-            flash()
-              .type(null)
-              .timeout(0)
-              .title(`'${d.id}' dataset is misconfigured.`)
-              .message(`Removing it because I cannot find host dataset: ${d.configuration.mutant_targets[0]}.`)();
-
-            delete collection[collection.indexOf(d)];
-
-            continue;
-          } else {
-            d.configuration.host = m.id;
-            d.polygons = m.polygons;
-
-            d.color_scale_svg = m.color_scale_svg;
-            d.color_scale_fn = m.color_scale_fn;
-
-            d.heatmap = m.heatmap;
-          }
-        }
-
-        if (d.csv) d.csv.parse = ea_datasets_csv;
-
-        if (d.heatmap) {
-          d.heatmap.parse = ea_datasets_tiff_url;
-          ea_datasets_generate_color_scale(d);
-        }
-
-        if (d.polygons) {
-          switch (d.polygons.shape_type) {
-          case "points": {
-            d.polygons.symbol_svg = ea_svg_symbol(d.polygons.fill, { width: 1, color: d.polygons.stroke });
-            d.polygons.parse = ea_datasets_points;
-            break;
-          }
-
-          case "polygons": {
-            d.polygons.symbol_svg = ea_svg_symbol(d.polygons.fill, { width: 3, color: d.polygons.stroke });
-            d.polygons.parse = ea_datasets_polygons;
-            break;
-          }
-          }
-        }
+      switch (this.polygons.shape_type) {
+      case "points": {
+        this.polygons.symbol_svg = ea_svg_symbol(this.polygons.fill, { width: 1, color: this.polygons.stroke });
+        this.polygons.parse = ea_datasets_points;
+        break;
       }
 
-      collection = collection.filter(d => d);
-    });
+      case "polygons": {
+        this.polygons.symbol_svg = ea_svg_symbol(this.polygons.fill, { width: 3, color: this.polygons.stroke });
+        this.polygons.parse = ea_datasets_polygons;
+        break;
+      }
+      }
+    }
 
-  return collection;
+    if (e.csv_file) {
+      this.csv = e.configuration.csv;
+      this.csv.endpoint = e.csv_file.endpoint;
+      this.csv.parse = ea_datasets_csv;
+    }
+
+    if (e.category.metadata && (e.category.metadata.why || e.category.metadata.what)) {
+      this.help = {};
+
+      this.help['why'] = e.category.metadata.why;
+      this.help['what'] = e.category.metadata.what;
+    }
+
+    this.presets = {};
+
+    if (e.presets && e.presets.length) {
+      e.presets.forEach(p => {
+        return this.presets[p.name] = {
+          "weight": p.weight,
+          "min": p.min,
+          "max": p.max
+        };
+      });
+    }
+
+    else if (e.category.presets && e.category.presets.length) {
+      e.category.presets.forEach(p => {
+        return this.presets[p.name] = {
+          "weight": p.weight,
+          "min": p.min,
+          "max": p.max
+        };
+      });
+    }
+
+    let presetsempty = Object.keys(this.presets).length === 0;
+    let p = this.presets[preset]
+
+    if (!presetsempty && p) {
+      this.weight = p.weight;
+      // o.init_domain = [p.min, p.max];
+      this.init_domain = null;
+    } else {
+      this.weight = 2;
+      this.init_domain = null;
+    }
+
+    if (inputs.length) {
+      this.active = (inputs.indexOf(e.category.name) > -1)
+    } else {
+      this.active = (!presetsempty && p);
+    }
+  };
+
+  mutant_init() {
+    if (!this.mutant) throw `${this.id} is not a mutant. Bye.`
+
+    let m = DS.named(this.configuration.mutant_targets[0]);
+
+    this.configuration.host = m.id;
+    this.polygons = m.polygons;
+    this.heatmap = m.heatmap;
+
+    this.color_scale_svg = m.color_scale_svg;
+    this.color_scale_fn = m.color_scale_fn;
+  };
+
+  gen_color_scale() {
+    if (this.configuration && this.configuration.mutant) return;
+
+    let cs = this.heatmap.color_stops;
+    let c = ea_default_color_scale;
+    let d = ea_default_color_domain;
+
+    if (!cs || !cs.length)
+      this.heatmap.color_stops = cs = ea_default_color_stops;
+    else {
+      d = Array(cs.length).fill(0).map((x,i) => (0 + i * (1/(cs.length-1))));
+      plotty.addColorScale((c = this.id), cs.reverse(), d);
+    }
+
+    this.heatmap.color_scale = c;
+
+    this.color_scale_fn = _ => {
+      return d3.scaleLinear()
+        .domain(d)
+        .range(cs)
+        .clamp(this.heatmap.clamp || false);
+    };
+
+    this.color_scale_svg = ea_svg_color_steps(this.color_scale_fn);
+
+  };
+
+  show() {
+    if (ea_mapbox.getSource(this.id))
+      ea_mapbox.setLayoutProperty(this.id, 'visibility', 'visible');
+  };
+
+  hide() {
+    if (ea_mapbox.getSource(this.id))
+      ea_mapbox.setLayoutProperty(this.id, 'visibility', 'none');
+  };
+
+  async turn(v, draw) {
+    if (v && this.polygons) await this.load('polygons');
+    if (v && this.heatmap) await this.load('heatmap');
+    if (v && this.csv) await this.load('csv');
+
+    if (v && draw)
+      this.show();
+    else
+      this.hide();
+  };
+
+  async load(...args) {
+    ea_ui_dataset_loading(this, true);
+
+    for (let a of args) {
+      if (this[a]) await this[a].parse.call(this);
+    }
+
+    ea_ui_dataset_loading(this, false);
+  };
+
+  // class methods
+
+  static get list() {
+    return Object.keys(DSTable).map(i => DSTable[i]);
+  };
+
+  static named(i) {
+    return DSTable[i];
+  };
+}
+
+async function ea_datasets_init(country_id, inputs, preset) {
+  let attrs = '*,heatmap_file(*),polygons_file(*),csv_file(*),category(*)';
+
+  await ea_client(
+    `${ea_settings.database}/datasets?country_id=eq.${country_id}&select=${attrs}`, 'GET', null,
+    r => r.map(e => DSTable[e.category_name] = new DS(e,preset,inputs)));
+
+  DS.list.filter(d => d.mutant).forEach(d => d.mutant_init());
+
+  return DS.list;
 };
 
 function ea_datasets_scale_fn(ds, type) {
@@ -203,62 +244,9 @@ function ea_datasets_scale_fn(ds, type) {
   return s;
 };
 
-function ea_datasets_generate_color_scale(ds) {
-  if (ds.configuration && ds.configuration.mutant) return;
-
-  let cs = ds.heatmap.color_stops;
-  let c = ea_default_color_scale;
-  let d = ea_default_color_domain;
-
-  if (!cs || !cs.length)
-    ds.heatmap.color_stops = cs = ea_default_color_stops;
-  else {
-    d = Array(cs.length).fill(0).map((x,i) => (0 + i * (1/(cs.length-1))));
-    plotty.addColorScale((c = ds.id), cs.reverse(), d);
-  }
-
-  ds.heatmap.color_scale = c;
-
-  ds.color_scale_fn = _ => {
-    return d3.scaleLinear()
-      .domain(d)
-      .range(cs)
-      .clamp(ds.heatmap.clamp || false);
-  };
-
-  ds.color_scale_svg = ea_svg_color_steps(ds.color_scale_fn);
-};
-
-async function ea_datasets_load(ds) {
-  if (!ds.id) throw `Argument Error: ${ds} does not look like a dataset`;
-
-  ea_ui_dataset_loading(ds, true);
-
-  if (!ds.heatmap || !ds.heatmap.parse) {
-    console.warn(ds.id, "does not have a #heatmap.parse function set! I'm setting ds.heatmap to 'null'");
-    ds.heatmap = null;
-  }
-  else
-    await ds.heatmap.parse.call(ds);
-
-	ea_ui_dataset_loading(ds, false);
-};
-
-async function ea_datasets_active(ds, v) {
-  if (!ds || !ds.id) {
-    console.warn(ds);
-    throw `Argument Error: '${ds}' does not look like a dataset`;
-  }
-
-  if (ds.active = v) await ea_datasets_load(ds);
-};
-
 async function ea_datasets_points() {
   return ea_datasets_geojson.call(this, _ => {
-    if (ea_mapbox.getSource(this.id)) {
-      ea_mapbox.setLayoutProperty(this.id, 'visibility', 'visible');
-      return;
-    }
+    if (ea_mapbox.getSource(this.id)) return;
 
     ea_mapbox.addSource(this.id, {
       "type": "geojson",
@@ -281,10 +269,7 @@ async function ea_datasets_points() {
 
 async function ea_datasets_polygons() {
   return ea_datasets_geojson.call(this, _ => {
-    if (ea_mapbox.getSource(this.id)) {
-      ea_mapbox.setLayoutProperty(this.id, 'visibility', 'visible');
-      return;
-    }
+    if (ea_mapbox.getSource(this.id)) return;
 
     ea_mapbox.addSource(this.id, {
       "type": "geojson",

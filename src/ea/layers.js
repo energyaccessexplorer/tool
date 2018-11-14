@@ -1,8 +1,8 @@
 function ea_layers_sort_inputs(list) {
-  const c = ea_datasets_collection;
+  const l = DS.list;
 
   for (let i of list.slice(0).reverse()) {
-    let d = c.find(x => x.id === i);
+    let d = l.find(x => x.id === i);
 
     if (!d.polygons) {
       ea_mapbox.moveLayer('canvas-layer', ea_mapbox.first_symbol);
@@ -130,7 +130,7 @@ function ea_layers_inputs(list) {
   const layers = document.querySelector('#layers');
   const layers_list = layers.querySelector('#layers-list');
 
-  const ldc = list.map(i => ea_datasets_collection.find(d => d.id == i));
+  const ldc = list.map(i => DS.named(i));
 
   layers_list.innerHTML = "";
 

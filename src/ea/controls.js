@@ -17,7 +17,7 @@ function ea_controls_tree(tree, collection) {
   const ctel = document.querySelector('#controls')
 
   tree.forEach(cat => cat.subcategories.forEach(sub => sub.datasets.filter(d => {
-    const ds = ea_datasets_collection.find(x => x.id === d.id);
+    const ds = DS.named(d.id);
 
     if (!ds) {
       console.warn(`Dataset '${d.id}' not found:`, ds);
@@ -72,15 +72,15 @@ function ea_controls_mutant_options(ds) {
   const container = elem(`<div class="control-option"></div>`);
   const select = elem('<select></select>');
 
-  ds.configuration.mutant_targets.forEach(o => {
-    const host = ea_datasets_collection.find(x => x.id === o);
-    select.appendChild(elem(`<option value=${o}>${host.name_long}</option>`));
+  ds.configuration.mutant_targets.forEach(i => {
+    const host = DS.named(i);
+    select.appendChild(elem(`<option value=${i}>${host.name_long}</option>`));
   });
 
   select.value = ds.configuration.mutant_targets[0];
 
   select.addEventListener('change', async function() {
-    const host = ea_datasets_collection.find(x => x.id === this.value);
+    const host = DS.named(this.value);
 
     ds.raster = undefined;
     ds.polygons = undefined;
@@ -122,10 +122,7 @@ function ea_controls_elem(ds) {
 
   const header = controls.querySelector('.controls-dataset-header');
 
-  const check = ea_controls_active(
-    ds,
-    (v) => ea_datasets_active(ds,v)
-  );
+  const check = ea_controls_active(ds, v => ds.active = v);
 
   const button = check.svg;
 

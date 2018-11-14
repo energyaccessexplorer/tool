@@ -60,13 +60,13 @@ function ea_analysis(type) {
 
   let cs = ea_default_color_scale;
 
-  let single_input = ea_datasets_collection.find(d => d.id === type);
+  let single_input = DS.named(type);
 
   if (single_input) {
     cs = single_input.heatmap.color_scale;
 
     if (single_input.configuration && single_input.configuration.mutant)
-      cs = ea_datasets_collection.find(d => d.id === single_input.configuration.host).heatmap.color_scale;
+      cs = DS.named(single_input.configuration.host).heatmap.color_scale;
   }
 
   const ds = {
@@ -147,15 +147,14 @@ function ea_active_heatmaps(type) {
   else
     cat = d => d.id === type;
 
-  return ea_datasets_collection
-    .filter(d => d.active && cat(d));
+  return DS.list.filter(d => d.active && cat(d));
 };
 
 function ea_draw_first_active_nopolygons(list) {
   let rd = null;
 
   for (let t of list.slice(0)) {
-    let x = ea_datasets_collection.find(d => d.id === t && !d.polygons);
+    let x = DS.list.find(d => d.id === t && !d.polygons);
     if (x) { rd = x; break; }
   }
 
@@ -230,7 +229,6 @@ async function ea_overlord(msg) {
 
     ea_ccn3 = location.get_query_param('ccn3');
     ea_map = null;
-    ea_datasets_collection = null;
     ea_mapbox = null;
     ea_dummy = null;
     ea_canvas = null;
@@ -280,9 +278,7 @@ Please reporty this to energyaccessexplorer@wri.org.
     ea_views_init();
     ea_layers_init();
 
-    ea_datasets_collection = collection;
-
-    ea_controls_tree(country.category_tree, ea_datasets_collection);
+    ea_controls_tree(country.category_tree, DS.list);
 
     ea_layout_map(country.bounds);
     ea_map_setup(country.bounds);
@@ -293,8 +289,8 @@ Please reporty this to energyaccessexplorer@wri.org.
 
     (async _ => {
       for (var id of inputs) {
-        let ds = ea_datasets_collection.find(d => d.id === id);
-        if (typeof ds !== 'undefined') await ea_datasets_load(ds);
+        let ds = DS.named(id);
+        if (ds) await ds.load('heatmap', 'polygons', 'csv');
       }
 
       ea_overlord({
@@ -318,7 +314,7 @@ Please reporty this to energyaccessexplorer@wri.org.
   }
 
   case "mode": {
-    var t = msg.target;
+    let t = msg.target;
 
     set_mode_param(t);
 
@@ -326,13 +322,7 @@ Please reporty this to energyaccessexplorer@wri.org.
       ea_layers_outputs(output);
 
       inputs.forEach(i => {
-        var x;
-
-        if (x = ea_datasets_collection.find(d => d.id === i)) {
-          if (x.polygons && ea_mapbox.getSource(i)) {
-            ea_mapbox.setLayoutProperty(i, 'visibility', 'none');
-          }
-        }
+        let x; if (x = DS.named(i)) x.hide();
       });
 
       ea_opacity_tweak(inputs);
@@ -343,13 +333,11 @@ Please reporty this to energyaccessexplorer@wri.org.
     else if (t === "inputs") {
       ea_layers_inputs(inputs);
 
-      for (var i of inputs) {
-        var x;
-
-        if (x = ea_datasets_collection.find(d => d.id === i)) {
+      for (let i of inputs) {
+        let x;
+        if (x = DS.named(i)) {
           if (x.polygons) await x.polygons.parse.call(x);
-          if (x.heatmap) await x.heatmap.parse.call(x);
-          if (x.csv) await x.csv.parse.call(x);
+          x.show();
         }
       }
 
@@ -378,32 +366,13 @@ Please reporty this to energyaccessexplorer@wri.org.
 
     if (mode === "outputs") {
       ea_layers_outputs(output);
-
-      if (ds.heatmap)
-        ds.active ? await ds.heatmap.parse.call(ds) : null;
-
-      if (ds.csv)
-        ds.active ? await ds.csv.parse.call(ds) : null;
-
+      await ds.turn(ds.active, false);
       ea_canvas_plot(ea_analysis(output));
     }
 
     else if (mode === "inputs") {
       ea_layers_inputs(inputs);
-
-      if (ds.polygons) {
-        if (ds.active)
-          await ds.polygons.parse.call(ds);
-        else
-          if (ea_mapbox.getSource(ds.id)) ea_mapbox.setLayoutProperty(ds.id, 'visibility', 'none');
-      }
-
-      if (ds.heatmap)
-        ds.active ? await ds.heatmap.parse.call(ds) : null;
-
-      if (ds.csv)
-        ds.active ? await ds.csv.parse.call(ds) : null;
-
+      await ds.turn(ds.active, true);
       ea_draw_first_active_nopolygons(inputs);
     }
 
@@ -441,29 +410,22 @@ Please reporty this to energyaccessexplorer@wri.org.
     if (mode === "outputs") {
       ea_layers_outputs(output);
 
-      for (let ds of ea_datasets_collection) {
-        let r = ea_presets_set(ds, msg.value);
-
-        if (ds.heatmap)
-          ds.active ? await ds.heatmap.parse.call(ds) : null;
+      for (let ds of DS.list) {
+        ea_presets_set(ds, msg.value);
+        await ds.load();
       }
 
       ea_canvas_plot(ea_analysis(output));
     }
 
     else if (mode === "inputs") {
-      for (let ds of ea_datasets_collection) {
+      for (let ds of DS.list) {
         let r = ea_presets_set(ds, msg.value);
-
-        if (ds.heatmap)
-          ds.active ? await ds.heatmap.parse.call(ds) : null;
-
-        if (ea_mapbox.getSource(ds.id))
-          ea_mapbox.setLayoutProperty(ds.id, 'visibility', (r ? 'visible' : 'none'));
+        if (r) ds.show(); else ds.hide();
       };
     }
 
-    inputs = ea_datasets_collection.filter(t => t.active).map(x => x.id)
+    inputs = DS.list.filter(t => t.active).map(x => x.id)
 
     ea_layers_inputs(inputs);
     set_inputs_param(inputs);

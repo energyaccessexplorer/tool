@@ -11,6 +11,10 @@
     .then(j => {
       country_list = j;
       j.forEach(c => select.appendChild(elem(`<option value="${c.ccn3}">${c.name}</option>`)));
+    })
+    .then(_ => {
+      select.value = location.get_query_param('ccn3');
+      select.querySelector('option[value=""]').innerText = "Select a country";
     });
 
   select.addEventListener('change', function() { window.location = `/maps-and-data/tool/?ccn3=${this.value}` })

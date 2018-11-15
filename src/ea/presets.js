@@ -1,6 +1,7 @@
 function ea_presets_init(v) {
   const el = document.querySelector('#controls-preset');
   el.value = v || "custom";
+  el.querySelector('option[value="custom"]').innerText = "Select a preset";
 
   el.addEventListener('change', function(e) {
     ea_overlord({

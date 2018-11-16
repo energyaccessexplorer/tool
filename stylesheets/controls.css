@@ -143,6 +143,16 @@
   cursor: pointer;
 }
 
+.controls-dataset-collection {
+  font-size: 0.85em;
+  margin-bottom: 2em;
+  margin-top: 0;
+}
+
+.controls-dataset-collection * {
+  color: #666;
+}
+
 .collapse {
   cursor: pointer;
 }

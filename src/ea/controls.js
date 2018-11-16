@@ -218,6 +218,13 @@ function ea_controls(ds) {
 
     break;
 
+  case "transmission-lines-collection":
+    range_group = ea_controls_range(ds, (ds.unit || 'proximity in km'))
+    controls.appendChild(ea_controls_collection_list(ds));
+    controls.appendChild(range_group.elem);
+    controls.appendChild(weight_group.elem);
+    break;
+
   case 'crops':
     range_group = ea_controls_range(ds, (ds.unit || 'range'))
     controls.appendChild(ea_controls_mutant_options(ds));
@@ -370,4 +377,17 @@ function ea_controls_weight(ds, init) {
     elem: container,
     weight_control: weight_control
   };
+};
+
+function ea_controls_collection_list(ds) {
+  if (!ds.collection) return;
+
+  const e = elem('<ul class="controls-dataset-collection">');
+
+  for (let i of ds.configuration.collection) {
+    let d = DS.named(i);
+    e.appendChild(elem(`<li>${d.name_long}</li>`))
+  }
+
+  return e;
 };

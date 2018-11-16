@@ -17,6 +17,12 @@ class DS {
 
     this.mutant = !!(e.category.configuration && e.category.configuration.mutant);
 
+    this.collection = !!(e.configuration && e.configuration.collection);
+
+    if (this.collection) {
+      this.configuration = e.configuration;
+    }
+
     if (e.heatmap_file) {
       this.heatmap = e.category.heatmap
       this.heatmap.endpoint = e.heatmap_file.endpoint;
@@ -111,6 +117,10 @@ class DS {
     this.color_scale_fn = m.color_scale_fn;
   };
 
+  collection_init() {
+    if (!this.collection) throw `${this.id} is not a collection. Bye.`
+  };
+
   gen_color_scale() {
     if (this.configuration && this.configuration.mutant) return;
 
@@ -138,14 +148,20 @@ class DS {
 
   };
 
-  show() {
     if (ea_mapbox.getSource(this.id))
+  async show() {
       ea_mapbox.setLayoutProperty(this.id, 'visibility', 'visible');
+
+    else if (this.collection)
+      for (let i of this.configuration.collection) await DS.named(i).show();
   };
 
-  hide() {
+  async hide() {
     if (ea_mapbox.getSource(this.id))
       ea_mapbox.setLayoutProperty(this.id, 'visibility', 'none');
+
+    else if (this.collection)
+      for (let i of this.configuration.collection) await DS.named(i).hide();
   };
 
   async turn(v, draw) {
@@ -157,14 +173,19 @@ class DS {
       this.show();
     else
       this.hide();
+
+    if (this.collection)
+      for (let i of this.configuration.collection) await DS.named(i).turn(v, draw);
   };
 
   async load(...args) {
     ea_ui_dataset_loading(this, true);
 
-    for (let a of args) {
+    for (let a of args)
       if (this[a]) await this[a].parse.call(this);
-    }
+
+    if (this.collection)
+      for (let i of this.configuration.collection) await DS.named(i).load(...args);
 
     ea_ui_dataset_loading(this, false);
   };
@@ -188,6 +209,7 @@ async function ea_datasets_init(country_id, inputs, preset) {
     r => r.map(e => DSTable[e.category_name] = new DS(e,preset,inputs)));
 
   DS.list.filter(d => d.mutant).forEach(d => d.mutant_init());
+  DS.list.filter(d => d.collection).forEach(d => d.collection_init());
 
   return DS.list;
 };

@@ -119,6 +119,26 @@
   margin-top: 12px;
 }
 
+.layers-element-collection > div,
+.layers-element-collection > svg {
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0.3em;
+}
+
+.layers-element-collection > svg {
+  transform: scale(0.7);
+}
+
+.layers-element-subheader {
+  font-size: 0.7em;
+}
+
+.layers-element-index-description  {
+  font-size: 0.7em;
+  font-style: italic;
+}
+
 .layers-element-description .svg-interval {
   width: 275px;
 }

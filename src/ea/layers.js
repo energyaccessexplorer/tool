@@ -37,20 +37,34 @@ function ea_layers_input_elem(ds) {
 
   lec.appendChild(dli);
 
-  let e;
+  function svg_thing(d) {
+    let e;
+    if (d.polygons) e = d.polygons.symbol_svg;
+    else if (!d.polygons && d.heatmap) e = d.color_scale_svg;
+    return e;
+  }
 
-  if (ds.polygons)
-    e = ds.polygons.symbol_svg;
+  let c = d.querySelector('.layers-element-description');
 
-  if (!ds.polygons && ds.heatmap)
-    e = ds.color_scale_svg;
+  if (ds.collection) {
+    for (let d of ds.configuration.collection) {
+      let x = DS.named(d);
+      let li = elem('<div class="layers-element-collection">');
 
-  if (e) d.querySelector('.layers-element-description').appendChild(e);
+      li.appendChild(svg_thing(x))
+      li.appendChild(elem(`<div class="layers-element-subheader">${x.name_long}</div>`));
+
+      c.appendChild(li);
+    }
+  }
+
+  else
+    c.appendChild(svg_thing(ds));
 
   return d;
 };
 
-function ea_layers_output_elem(t, v, i) {
+function ea_layers_output_elem(t, v, i, x) {
   const svg = ea_svg_color_steps(_ => {
     return d3.scaleLinear()
       .domain(ea_default_color_domain)
@@ -65,7 +79,10 @@ function ea_layers_output_elem(t, v, i) {
 
   <div class="layers-element-content">
     <div class="layers-element-header">
-      <div class="layers-element-title">${v}</div>
+      <div class="layers-element-title">
+        ${v}
+        <div class="layers-element-index-description">${x}</div>
+      </div>
 
       <div class="layers-element-controls"></div>
     </div>
@@ -114,7 +131,7 @@ function ea_layers_outputs(target) {
   };
 
   nodes = Object.keys(ea_indexes).map((t,i) => {
-    let node = ea_layers_output_elem(t, ea_indexes[t], t === target);
+    let node = ea_layers_output_elem(t, ea_indexes[t], t === target, ea_indexes_descriptions[t]);
 
     node.querySelector('.layers-element-radio svg').addEventListener('mouseup', _ => trigger_this.apply(node));
 

@@ -69,10 +69,8 @@ function ea_ui_dataset_loading(ds, bool) {
   const el = document.querySelector(`#controls-${ds.id}`);
   let s;
 
-  if (!el) {
-    console.log(`'#controls-${ds.id}' element not found. Returning.`);
+  if (!el)
     return null;
-  }
 
   if (bool) {
     s = ea_ui_spinner();

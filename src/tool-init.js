@@ -62,6 +62,13 @@ require([
     "ani": "Assistance Need Index",
   };
 
+  window.ea_indexes_descriptions = {
+    "eai": "(Current and/or potential)",
+    "demand": "(Current and/or potential)",
+    "supply": "(Current and/or potential)",
+    "ani": "Need for Assistance Index",
+  };
+
   window.ea_presets = {
     "market": "Market Identification",
     "planning": "Strategic Energy Planning",

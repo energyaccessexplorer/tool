@@ -143,7 +143,7 @@ function ea_draw_first_active_nopolygons(list) {
   let rd = null;
 
   for (let t of list.slice(0)) {
-    let x = DS.list.find(d => d.id === t && !d.polygons);
+    let x = DS.list.find(d => d.id === t && !d.polygons && !d.collection);
     if (x) { rd = x; break; }
   }
 
@@ -325,8 +325,7 @@ Please reporty this to energyaccessexplorer@wri.org.
       for (let i of inputs) {
         let x;
         if (x = DS.named(i)) {
-          if (x.polygons) await x.polygons.parse.call(x);
-          x.show();
+          await x.turn(true, true);
         }
       }
 
@@ -401,7 +400,7 @@ Please reporty this to energyaccessexplorer@wri.org.
 
       for (let ds of DS.list) {
         ea_presets_set(ds, msg.value);
-        await ds.load();
+        await ds.load('heatmap', 'polygons');
       }
 
       ea_canvas_plot(ea_analysis(output));

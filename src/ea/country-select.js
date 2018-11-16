@@ -17,5 +17,5 @@
       select.querySelector('option[value=""]').innerText = "Select a country";
     });
 
-  select.addEventListener('change', function() { window.location = `/maps-and-data/tool/?ccn3=${this.value}` })
+  select.addEventListener('change', function() { window.location = `/maps-and-data/tool/?ccn3=${this.value}`});
 })();

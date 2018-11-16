@@ -326,8 +326,7 @@ async function ea_datasets_csv(callback) {
 async function ea_datasets_geojson(callback) {
   const ds = this;
 
-  if (ds.features)
-    callback();
+  if (ds.features) callback();
 
   else {
     const endpoint = ds.polygons.endpoint;

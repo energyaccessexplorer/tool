@@ -62,6 +62,12 @@ require([
     "ani": "Assistance Need Index",
   };
 
+  window.ea_presets = {
+    "market": "Market Identification",
+    "planning": "Strategic Energy Planning",
+    "investment": "Investment for Impact"
+  };
+
   window.ea_category_dict = {
     "demographics": "Demographics",
     "productive-uses": "Social and Productive Uses",

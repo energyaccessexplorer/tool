@@ -19,7 +19,8 @@
   font-size: 0.8em;
 }
 
-.controls .weight-label {
+.controls .weight-label,
+.controls .weight-label * {
   font-weight: bold;
   display: inline-block;
   color: darkgray;

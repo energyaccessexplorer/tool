@@ -100,14 +100,14 @@ function mapbox_canvas(m, coords) {
     "source": 'canvas-source',
     "type": 'raster',
   }, ea_mapbox.first_symbol);
-}
+};
 
 function mapbox_setup(bounds) {
   mapboxgl.accessToken = ea_settings.mapbox_token;
 
   const mapbox = new mapboxgl.Map({
     "container": 'mapbox-container',
-    "style": mapbox_theme_pick(ea_settings.mapbox_theme)
+    "style": mapbox_theme_pick("")
   });
 
   mapbox.fitBounds(bounds, { animate: false });

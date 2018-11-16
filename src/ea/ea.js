@@ -8,17 +8,6 @@ function ea_opacity_tweak() {
     (ea_canvas ? ea_canvas.style.opacity = (tweak ? 0.2 : 1) : null)
 };
 
-async function ea_country_init(ccn3) {
-  let country = null;
-
-  await ea_client(
-    `${ea_settings.database}/countries?ccn3=eq.${ccn3}`,
-    'GET', 1, r => country = r
-  );
-
-  return country;
-};
-
 function ea_canvas_plot(ds) {
   if (!ds) return;
 
@@ -233,7 +222,7 @@ async function ea_overlord(msg) {
     ea_dummy = null;
     ea_canvas = null;
 
-    const country = await ea_country_init(ea_ccn3);
+    let country; await ea_client(`${ea_settings.database}/countries?ccn3=eq.${ea_ccn3}`, 'GET', 1, r => country = r);
     const collection = await ea_datasets_init(country.id, inputs, preset);
 
     const boundaries_ds = collection.find(d => d.id === 'boundaries');
@@ -303,7 +292,7 @@ Please reporty this to energyaccessexplorer@wri.org.
             target: mode,
             layers: inputs,
             caller: "ea_init callback",
-          })
+          });
         }
       });
 

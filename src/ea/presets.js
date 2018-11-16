@@ -1,5 +1,8 @@
 function ea_presets_init(v) {
   const el = document.querySelector('#controls-preset');
+
+  Object.keys(ea_presets).forEach(k => el.appendChild(elem(`<option value="${k}">${ea_presets[k]}</option>`)));
+
   el.value = v || "custom";
   el.querySelector('option[value="custom"]').innerText = "Select a preset";
 

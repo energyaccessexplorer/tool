@@ -114,29 +114,6 @@ function ea_map_svg(svg, topofile, name, options) {
         k = d3.event.transform.k;
       else
         k = comfy;
-
-      if (typeof ea_datasets_collection === 'undefined') return;
-
-      if (location.get_query_param('mode') === 'datasets')
-      ea_datasets_collection
-        .filter(x => x.active && x.features)
-        .forEach(ds => {
-          if (ds.polygons.shape_type === 'points')
-            ea_map_load_points({
-              map: _map,
-              features: ds.features,
-              cls: ds.id,
-              symbol: ds.polygons.symbol,
-              scale: k
-            });
-          else if (ds.polygons.shape_type === 'polygons')
-            ea_map_load_features({
-              map: _map,
-              features: ds.features,
-              cls: ds.id,
-              scale: k,
-            });
-        });
     };
 
     let zooming = () => {

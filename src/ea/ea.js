@@ -282,19 +282,7 @@ Please reporty this to energyaccessexplorer@wri.org.
         if (ds) await ds.load('heatmap', 'polygons', 'csv');
       }
 
-      ea_overlord({
-        type: "mode",
-        target: mode,
-        caller: "ea_init",
-        callback: _ => {
-          ea_overlord({
-            type: "sort",
-            target: mode,
-            layers: inputs,
-            caller: "ea_init callback",
-          });
-        }
-      });
+      mapbox_change_theme(ea_settings.mapbox_theme);
 
       ea_ui_app_loading(false);
     })();
@@ -430,6 +418,31 @@ Please reporty this to energyaccessexplorer@wri.org.
 
     else if (mode === "outputs") {
       console.info("Overlord: Sorting in outputs mode has no efect... OK.");
+    }
+
+    else {
+      throw `Argument Error: Overlord: Could set the mode ${mode}`;
+    }
+
+    break;
+  }
+
+  case "resort": {
+    for (let i of inputs) {
+      let x;
+      if (x = DS.named(i)) {
+        await x.turn(true, true);
+      }
+    }
+
+    if (mode === "inputs") {
+      ea_layers_sort_inputs(inputs);
+      ea_layers_inputs(inputs);
+      ea_draw_first_active_nopolygons(inputs);
+    }
+
+    else if (mode === "outputs") {
+      ea_layers_outputs(output);
     }
 
     else {

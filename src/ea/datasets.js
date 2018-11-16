@@ -148,8 +148,8 @@ class DS {
 
   };
 
-    if (ea_mapbox.getSource(this.id))
   async show() {
+    if (ea_mapbox.getLayer(this.id))
       ea_mapbox.setLayoutProperty(this.id, 'visibility', 'visible');
 
     else if (this.collection)
@@ -188,6 +188,19 @@ class DS {
       for (let i of this.configuration.collection) await DS.named(i).load(...args);
 
     ea_ui_dataset_loading(this, false);
+  };
+
+  async raise() {
+    if (this.polygons)
+      ea_mapbox.moveLayer(this.id, ea_mapbox.first_symbol);
+
+    else if (!this.polygons && !this.collection)
+      ea_mapbox.moveLayer('canvas-layer', ea_mapbox.first_symbol);
+
+    if (this.collection) {
+      for (let i of this.configuration.collection)
+        DS.named(i).raise();
+    }
   };
 
   // class methods
@@ -268,45 +281,47 @@ function ea_datasets_scale_fn(ds, type) {
 
 async function ea_datasets_points() {
   return ea_datasets_geojson.call(this, _ => {
-    if (ea_mapbox.getSource(this.id)) return;
+    if (typeof ea_mapbox.getSource(this.id) === 'undefined') {
+      ea_mapbox.addSource(this.id, {
+        "type": "geojson",
+        "data": this.features
+      });
+    }
 
-    ea_mapbox.addSource(this.id, {
-      "type": "geojson",
-      "data": this.features
-    });
-
-    ea_mapbox.addLayer({
-      "id": this.id,
-      "type": "circle",
-      "source": this.id,
-      "paint": {
-        "circle-radius": 3,
-        "circle-color": this.polygons.fill || 'cyan',
-        "circle-stroke-width": 1,
-        "circle-stroke-color": this.polygons.stroke || 'black',
-      },
-    }, ea_mapbox.first_symbol);
+    if (typeof ea_mapbox.getLayer(this.id) === 'undefined') {
+      ea_mapbox.addLayer({
+        "id": this.id,
+        "type": "circle",
+        "source": this.id,
+        "paint": {
+          "circle-radius": 3,
+          "circle-color": this.polygons.fill || 'cyan',
+          "circle-stroke-width": 1,
+          "circle-stroke-color": this.polygons.stroke || 'black',
+        },
+      }, ea_mapbox.first_symbol);
+    }
   });
 };
 
 async function ea_datasets_polygons() {
   return ea_datasets_geojson.call(this, _ => {
-    if (ea_mapbox.getSource(this.id)) return;
+    if (!ea_mapbox.getSource(this.id))
+      ea_mapbox.addSource(this.id, {
+        "type": "geojson",
+        "data": this.features
+      });
 
-    ea_mapbox.addSource(this.id, {
-      "type": "geojson",
-      "data": this.features
-    });
-
-    ea_mapbox.addLayer({
-      "id": this.id,
-      "type": "line",
-      "source": this.id,
-      "paint": {
-        "line-width": 1,
-        "line-color": this.polygons.stroke,
-      },
-    }, ea_mapbox.first_symbol);
+    if (!ea_mapbox.getLayer(this.id))
+      ea_mapbox.addLayer({
+        "id": this.id,
+        "type": "line",
+        "source": this.id,
+        "paint": {
+          "line-width": 1,
+          "line-color": this.polygons.stroke,
+        },
+      }, ea_mapbox.first_symbol);
   });
 };
 

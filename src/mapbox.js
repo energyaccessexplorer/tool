@@ -43,13 +43,8 @@ class MapboxThemeControl {
       let current = radios.querySelector(`input[value="${ea_settings.mapbox_theme}"]`)
       if (current) current.setAttribute('checked', true);
 
-      radios.querySelectorAll('input[name="mapbox_theme"]').forEach(e => {
-        e.addEventListener('change', _ => {
-          ea_mapbox.setStyle(mapbox_theme_pick(e.value));
-          ea_settings.mapbox_theme = e.value;
-          mapbox_canvas(ea_mapbox);
-        });
-      });
+      radios.querySelectorAll('input[name="mapbox_theme"]')
+        .forEach(e => e.addEventListener('change', _ => mapbox_change_theme(e.value)));
 
       content.appendChild(radios);
 
@@ -135,4 +130,15 @@ function mapbox_setup(bounds) {
   mapbox.addControl((new MapboxThemeControl()), 'top-right');
 
   return mapbox;
+};
+
+function mapbox_change_theme(theme, callback) {
+  ea_mapbox.once('styledata', _ => {
+    ea_overlord({
+      type: "resort",
+      caller: "mapbox_change_theme",
+    });
+  });
+
+  ea_mapbox.setStyle(mapbox_theme_pick(ea_settings.mapbox_theme = theme));
 };

@@ -1,16 +1,6 @@
-function ea_layers_sort_inputs(list) {
-  const l = DS.list;
-
-  for (let i of list.slice(0).reverse()) {
-    let d = l.find(x => x.id === i);
-
-    if (!d.polygons) {
-      ea_mapbox.moveLayer('canvas-layer', ea_mapbox.first_symbol);
-    }
-    else {
-      ea_mapbox.moveLayer(i, ea_mapbox.first_symbol);
-    }
-  }
+async function ea_layers_sort_inputs(list) {
+  for (let i of list.slice(0).reverse())
+    await DS.named(i).raise();
 };
 
 function ea_layers_input_elem(ds) {

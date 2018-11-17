@@ -82,24 +82,7 @@ function ea_controls_mutant_options(ds) {
   select.addEventListener('change', async function() {
     const host = DS.named(this.value);
 
-    ds.raster = undefined;
-    ds.polygons = undefined;
-    ds.heatmap = undefined;
-    ds.height = undefined;
-    ds.width = undefined;
-    ds.image = undefined;
-    ds.tiff = undefined;
-
-    ds.configuration.host = host.id;
-    ds.polygons = host.polygons;
-    ds.color_scale_svg = host.color_scale_svg;
-    ds.color_scale_fn = host.color_scale_fn;
-
-    await host.heatmap.parse.call(host);
-
-    ds.heatmap = host.heatmap;
-    ds.raster = host.raster;
-    ds.image = host.image;
+    await ds.mutate(host);
 
     ea_overlord({
       type: "input",

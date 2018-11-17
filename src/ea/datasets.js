@@ -117,6 +117,34 @@ class DS {
     this.color_scale_fn = m.color_scale_fn;
   };
 
+  async mutate(host) {
+    if (!this.mutant) throw `${this.id} is not a mutant.`;
+
+    if (!this.configuration.mutant_targets.includes(host.id))
+      throw `${this.id} is not configured to mutate into ${host.id}.`
+
+    this.raster = undefined;
+    this.polygons = undefined;
+    this.heatmap = undefined;
+    this.height = undefined;
+    this.width = undefined;
+    this.image = undefined;
+    this.tiff = undefined;
+
+    this.configuration.host = host.id;
+    this.polygons = host.polygons;
+    this.color_scale_svg = host.color_scale_svg;
+    this.color_scale_fn = host.color_scale_fn;
+
+    await host.heatmap.parse.call(host);
+
+    this.heatmap = host.heatmap;
+    this.raster = host.raster;
+    this.image = host.image;
+
+    return this;
+  };
+
   collection_init() {
     if (!this.collection) throw `${this.id} is not a collection. Bye.`
   };

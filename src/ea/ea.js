@@ -341,15 +341,19 @@ Please reporty this to energyaccessexplorer@wri.org.
     inputs = [...new Set(inputs)]; // UNIQUE()
 
     if (mode === "outputs") {
-      ea_layers_outputs(output);
       await ds.turn(ds.active, false);
+
+      ea_layers_outputs(output);
       ea_canvas_plot(ea_analysis(output));
     }
 
     else if (mode === "inputs") {
-      ea_layers_inputs(inputs);
       await ds.turn(ds.active, true);
+
+      ea_layers_inputs(inputs);
       ea_draw_first_active_nopolygons(inputs);
+
+      ds.raise()
     }
 
     else {

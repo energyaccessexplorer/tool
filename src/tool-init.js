@@ -75,7 +75,7 @@ require([
     "investment": "Investment for Impact"
   };
 
-  window.ea_category_dict = {
+  window.ea_branch_dict = {
     "demographics": "Demographics",
     "productive-uses": "Social and Productive Uses",
     "resources": "Resources",

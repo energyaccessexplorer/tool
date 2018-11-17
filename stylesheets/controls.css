@@ -55,14 +55,14 @@
   margin-bottom: 0.7em;
 }
 
-.controls-category {
+.controls-branch {
   flex: 1 50%;
 
   overflow-y: scroll;
   overflow-x: hidden;
 }
 
-.controls-category-title {
+.controls-branch-title {
   font-size: 1.2em;
   font-weight: lighter;
   line-height: 2em;
@@ -80,7 +80,7 @@
   z-index: 10;
 }
 
-.controls-subcategory-title {
+.controls-subbranch-title {
   font-size: 1em;
   font-weight: bold;
   white-space: nowrap;
@@ -97,7 +97,7 @@
   z-index: 9;
 }
 
-.controls-subcategory-title .triangle {
+.controls-subbranch-title .triangle {
   display: inline-block;
   transform: scale(1.15);
   margin-right: 1em;

@@ -1,4 +1,4 @@
-function ea_controls_collapse_subcategory(conel, subel) {
+function ea_controls_collapse_subbranch(conel, subel) {
   const d = conel.style['display'];
   const c = subel.querySelector('.collapse');
 
@@ -14,9 +14,9 @@ function ea_controls_collapse_subcategory(conel, subel) {
 };
 
 function ea_controls_tree(tree, collection) {
-  const ctel = document.querySelector('#controls')
+  const controls_el = document.querySelector('#controls')
 
-  tree.forEach(cat => cat.subcategories.forEach(sub => sub.datasets.filter(d => {
+  tree.forEach(branch => branch.subbranches.forEach(sub => sub.datasets.filter(d => {
     const ds = DS.named(d.id);
 
     if (!ds) {
@@ -25,34 +25,33 @@ function ea_controls_tree(tree, collection) {
     }
 
     ds.invert = d.invert;
-    ds.category = cat.name;
   })));
 
   tree.forEach(a => {
-    ctel.appendChild(elem(`
-<div id=${a.name} class="controls-category">
-  <div class="controls-category-title">${a.name}</div>
-  <div class="controls-subcategories"></div>
+    controls_el.appendChild(elem(`
+<div id=${a.name} class="controls-branch">
+  <div class="controls-branch-title">${a.name}</div>
+  <div class="controls-subbranches"></div>
 </div>`));
 
-    const catel = ctel.querySelector(`#${a.name}`);
+    const branch_el = controls_el.querySelector(`#${a.name}`);
 
-    a.subcategories.forEach(b => {
-      catel.querySelector('.controls-subcategories')
+    a.subbranches.forEach(b => {
+      branch_el.querySelector('.controls-subbranches')
         .appendChild(elem(`
-<div id=${b.name} class="controls-subcategory">
-  <div class="controls-subcategory-title">
+<div id=${b.name} class="controls-subbranches">
+  <div class="controls-subbranch-title">
     <span class="collapse triangle">${ea_ui_collapse_triangle('s')}</span>
-    ${ea_category_dict[b.name]}
+    ${ea_branch_dict[b.name]}
   </div>
   <div class="controls-container"></div>
 </div>`));
 
-      const subel = catel.querySelector(`#${b.name}`);
+      const subel = branch_el.querySelector(`#${b.name}`);
       const conel = subel.querySelector('.controls-container');
 
-      subel.querySelector('.controls-subcategory-title')
-        .addEventListener('mouseup', e => ea_controls_collapse_subcategory(conel, subel));
+      subel.querySelector('.controls-subbranch-title')
+        .addEventListener('mouseup', e => ea_controls_collapse_subbranch(conel, subel));
 
       b.datasets.forEach(b => {
         const ds = collection.find(x => x.id === b.id);

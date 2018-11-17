@@ -135,7 +135,7 @@ function mapbox_setup(bounds) {
 function mapbox_change_theme(theme, callback) {
   ea_mapbox.once('styledata', _ => {
     ea_overlord({
-      type: "resort",
+      type: "refresh",
       caller: "mapbox_change_theme",
     });
   });

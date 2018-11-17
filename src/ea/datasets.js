@@ -144,8 +144,7 @@ class DS {
         .clamp(this.heatmap.clamp || false);
     };
 
-    this.color_scale_svg = ea_svg_color_steps(this.color_scale_fn);
-
+    this.color_scale_svg = ea_svg_color_steps(this.color_scale_fn, 3);
   };
 
   async show() {

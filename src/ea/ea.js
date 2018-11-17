@@ -1,13 +1,3 @@
-function ea_opacity_tweak() {
-  const dl = location.get_query_param('inputs').split(',');
-
-  const tweak = (dl.length === 1 && (dl[0] === 'boundaries'));
-
-  ea_mapbox ?
-    ea_mapbox.setPaintProperty('canvas-layer', 'raster-opacity', (tweak ? 0.2 : 1)) :
-    (ea_canvas ? ea_canvas.style.opacity = (tweak ? 0.2 : 1) : null)
-};
-
 function ea_canvas_plot(ds) {
   if (!ds) return;
 
@@ -36,7 +26,20 @@ function ea_canvas_plot(ds) {
 function ea_analysis(type) {
   const t0 = performance.now();
 
-  const collection = ea_active_heatmaps(type);
+  const collection = (function(t) {
+    let cat;
+
+    if (['supply', 'demand'].indexOf(t) > -1)
+      cat = d => d.category === t;
+
+    else if (['eai', 'ani'].indexOf(t) > -1)
+      cat = d => true;
+
+    else
+      cat = d => d.id === t;
+
+    return DS.list.filter(d => d.active && cat(d));
+  }).call(null, type);
 
   // we use a dataset as a template just for code-clarity.
   //
@@ -124,33 +127,6 @@ function ea_analysis(type) {
   return ds;
 };
 
-function ea_active_heatmaps(type) {
-  let cat;
-
-  if (['supply', 'demand'].indexOf(type) > -1)
-    cat = d => d.category === type;
-
-  else if (['eai', 'ani'].indexOf(type) > -1)
-    cat = d => true;
-
-  else
-    cat = d => d.id === type;
-
-  return DS.list.filter(d => d.active && cat(d));
-};
-
-function ea_draw_first_active_nopolygons(list) {
-  let rd = null;
-
-  for (let t of list.slice(0)) {
-    let x = DS.list.find(d => d.id === t && !d.polygons && !d.collection);
-    if (x) { rd = x; break; }
-  }
-
-  if (rd) ea_canvas_plot(ea_analysis(rd.id));
-  else ea_canvas_plot(ea_analysis(ea_dummy));
-};
-
 async function ea_overlord(msg) {
   if (!msg) throw "Argument Error: Overlord: I have nothing to do!";
   if (typeof msg.caller === 'undefined' || !msg.caller) throw "Argument Error: Overlord: Who is the caller?";
@@ -164,8 +140,6 @@ async function ea_overlord(msg) {
   let output_param = location.get_query_param('output');
   let inputs_param = location.get_query_param('inputs');
   let preset_param = location.get_query_param('preset');
-
-  let canvas_source;
 
   function set_mode_param(m) {
     history.replaceState(null, null, location.set_query_param('mode', (m || mode)));
@@ -302,7 +276,7 @@ Please reporty this to energyaccessexplorer@wri.org.
         let x; if (x = DS.named(i)) x.hide();
       });
 
-      ea_opacity_tweak(inputs);
+      ea_map_opacity_tweak(inputs);
 
       ea_canvas_plot(ea_analysis(output));
     }
@@ -317,7 +291,7 @@ Please reporty this to energyaccessexplorer@wri.org.
         }
       }
 
-      ea_draw_first_active_nopolygons(inputs);
+      ea_map_draw_first_active_nopolygons(inputs);
 
       ea_layers_sort_inputs(inputs);
     }
@@ -351,7 +325,7 @@ Please reporty this to energyaccessexplorer@wri.org.
       await ds.turn(ds.active, true);
 
       ea_layers_inputs(inputs);
-      ea_draw_first_active_nopolygons(inputs);
+      ea_map_draw_first_active_nopolygons(inputs);
 
       ds.raise()
     }
@@ -364,7 +338,7 @@ Please reporty this to energyaccessexplorer@wri.org.
 
     set_inputs_param();
 
-    ea_opacity_tweak(inputs);
+    ea_map_opacity_tweak(inputs);
 
     break;
   }
@@ -417,7 +391,7 @@ Please reporty this to energyaccessexplorer@wri.org.
     if (mode === "inputs") {
       ea_layers_sort_inputs(msg.layers);
       set_inputs_param(msg.layers);
-      ea_draw_first_active_nopolygons(msg.layers);
+      ea_map_draw_first_active_nopolygons(msg.layers);
     }
 
     else if (mode === "outputs") {
@@ -431,27 +405,12 @@ Please reporty this to energyaccessexplorer@wri.org.
     break;
   }
 
-  case "resort": {
-    for (let i of inputs) {
-      let x;
-      if (x = DS.named(i)) {
-        await x.turn(true, true);
-      }
-    }
-
-    if (mode === "inputs") {
-      ea_layers_sort_inputs(inputs);
-      ea_layers_inputs(inputs);
-      ea_draw_first_active_nopolygons(inputs);
-    }
-
-    else if (mode === "outputs") {
-      ea_layers_outputs(output);
-    }
-
-    else {
-      throw `Argument Error: Overlord: Could set the mode ${mode}`;
-    }
+  case "refresh": {
+    ea_overlord({
+      "type": "mode",
+      "target": mode,
+      "caller": "ea_overlord resort"
+    });
 
     break;
   }
@@ -460,14 +419,14 @@ Please reporty this to energyaccessexplorer@wri.org.
     throw `Overlord: I don't know message type '${msg.type}'`
   }
 
-  canvas_source = ea_mapbox.getSource('canvas-source');
-
   // 'animate' is set to false on mapbox's configuration, since we don't want
   // mapbox eating the CPU at 60FPS for nothing.
   //
   // TODO: remove this hack. find a better way to redraw the canvas. as of v0.50
-  // there doesn't seem to be a good way to do this...
+  // there doesn't seem to be a good way to do this... mapboxgl should return
+  // promises. It doesn't.
   //
+  let canvas_source = ea_mapbox.getSource('canvas-source');
   if (canvas_source) {
     canvas_source.play();
     setTimeout(_ => canvas_source.pause, 300);

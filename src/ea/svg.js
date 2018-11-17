@@ -685,7 +685,7 @@ function ea_svg_symbol(fill, stroke) {
   return container.node();
 };
 
-function ea_svg_info(scale = 1) {
+function ea_svg_info() {
   return `
 <svg width="14px" height="14px" viewBox="0 0 14 14">
   <g stroke="none" stroke-width="1" fill-rule="evenodd">

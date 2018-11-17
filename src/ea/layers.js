@@ -3,15 +3,14 @@ async function ea_layers_sort_inputs(list) {
     await DS.named(i).raise();
 };
 
-function ea_layers_input_elem(ds) {
-  const d = elem(`
-<li bind="${ds.id}"
-    class="layers-element">
-  <div class="layers-element-handle"></div>
+function ea_layers_elem(bind, cls, title) {
+  return elem(`
+<li bind="${bind}"
+    class="layers-element ${cls}">
 
   <div class="layers-element-content">
     <div class="layers-element-header">
-      <div class="layers-element-title">${ds.name_long}</div>
+      <div class="layers-element-title">${title}</div>
 
       <div class="layers-element-controls"></div>
     </div>
@@ -19,7 +18,24 @@ function ea_layers_input_elem(ds) {
     <div class="layers-element-description"></div>
   </div>
 </li>`);
+}
 
+function ea_layers_lowmidhigh() {
+  return elem(`
+<div style="display: flex; justify-content: space-between; padding-right: 0.5em; padding-left: 0.5em;">
+  <div class="thing">Low</div>
+  <div class="thing">Medium</div>
+  <div class="thing">High</div>
+</div>
+`);
+}
+
+function ea_layers_input_elem(ds) {
+  const d = ea_layers_elem(ds.id, '', ds.name_long);
+
+  d.prepend(elem('<div class="layers-element-handle"></div>'))
+
+  let c = d.querySelector('.layers-element-description');
   let lec = d.querySelector('.layers-element-controls');
 
   let dli = elem(`<div class="layer-info">${ea_svg_info()}</div>`);
@@ -32,9 +48,7 @@ function ea_layers_input_elem(ds) {
     if (d.polygons) e = d.polygons.symbol_svg;
     else if (!d.polygons && d.heatmap) e = d.color_scale_svg;
     return e;
-  }
-
-  let c = d.querySelector('.layers-element-description');
+  };
 
   if (ds.collection) {
     for (let d of ds.configuration.collection) {
@@ -48,47 +62,24 @@ function ea_layers_input_elem(ds) {
     }
   }
 
-  else
+  else {
     c.appendChild(svg_thing(ds));
+    if (!ds.polygons && ds.heatmap) c.appendChild(ea_layers_lowmidhigh());
+  }
 
   return d;
 };
 
 function ea_layers_output_elem(t, v, i, x) {
-  const svg = ea_svg_color_steps(_ => {
-    return d3.scaleLinear()
-      .domain(ea_default_color_domain)
-      .range(ea_default_color_stops)
-      .clamp(false)
-  }, 3);
+  const d = ea_layers_elem(t, 'heatmaps-layers', v);
 
-  const d = elem(`
-<li bind="${t}"
-    class="layers-element heatmaps-layers">
-  <div class="layers-element-radio"></div>
+  d.prepend(elem('<div class="layers-element-radio"></div>'))
+  d.querySelector('.layers-element-title').append(elem(`<div class="layers-element-index-description">${x}</div>`))
 
-  <div class="layers-element-content">
-    <div class="layers-element-header">
-      <div class="layers-element-title">
-        ${v}
-        <div class="layers-element-index-description">${x}</div>
-      </div>
-
-      <div class="layers-element-controls"></div>
-    </div>
-
-    <div class="layers-element-descriptor">
-      <div style="display: flex; justify-content: space-between; padding-right: 0.5em; padding-left: 0.5em;">
-        <div class="thing">Low</div>
-        <div class="thing">Medium</div>
-        <div class="thing">High</div>
-      </div>
-    </div>
-  </div>
-</li>`);
-
+  let c = d.querySelector('.layers-element-description');
   let lec = d.querySelector('.layers-element-controls');
-  let dli = elem(`<div class="layer-info">${ea_svg_info(0.75)}</div>`);
+
+  let dli = elem(`<div class="layer-info">${ea_svg_info()}</div>`);
   dli.addEventListener('mouseup', _ => ea_index_modal(t));
 
   lec.appendChild(dli);
@@ -96,7 +87,13 @@ function ea_layers_output_elem(t, v, i, x) {
   let ler = d.querySelector('.layers-element-radio');
   ler.appendChild(ea_svg_radio(i));
 
-  d.querySelector('.layers-element-descriptor').prepend(svg);
+  c.append(ea_layers_lowmidhigh());
+  c.prepend(ea_svg_color_steps(_ => {
+    return d3.scaleLinear()
+      .domain(ea_default_color_domain)
+      .range(ea_default_color_stops)
+      .clamp(false)
+  }, 3));
 
   return d;
 };

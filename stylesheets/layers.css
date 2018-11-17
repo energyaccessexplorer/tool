@@ -39,8 +39,14 @@
 .layers-element {
   background-color: var(--the-white);
   display: flex;
+
+  color: var(--the-gray);
+  fill: var(--the-gray);
+  padding: 0.5em;
+  line-height: 1.8em;
+
   padding: 5px;
-  color: #1C4478;
+
   white-space: nowrap;
 }
 
@@ -49,11 +55,11 @@
 }
 
 .layers-element-handle {
-  min-width: 1em;
+  width: 24px;
 
   background-image: url(../images/layer-handle.svg);
-  background-size: 100% auto;
-  background-position: top center;
+  background-size: 16px auto;
+  background-position: center 4px;
   background-repeat: no-repeat;
 
   cursor: grab;
@@ -62,6 +68,7 @@
   color: #95A8C1;
 }
 
+.layers-element-handle,
 .layers-element-radio {
   margin-top: 10px;
 }
@@ -94,7 +101,7 @@
   -ms-user-select: none;
   user-select: none;
 
-  fill: gray;
+  fill: var(--the-gray);
 }
 
 .layers-element-controls div {
@@ -137,24 +144,6 @@
 .layers-element-index-description  {
   font-size: 0.7em;
   font-style: italic;
-}
-
-.layers-element-description .svg-interval {
-  width: 275px;
-}
-
-.heatmaps-layers {
-  background-color: var(--the-white);
-  color: var(--the-gray);
-  fill: var(--the-gray);
-  padding: 0.5em;
-  line-height: 1.8em;
-
-  white-space: nowrap;
-}
-
-.heatmaps-layers .layers-element-controls {
-  fill: var(--the-gray);
 }
 
 .heatmaps-layers[bind="demand"]:before,

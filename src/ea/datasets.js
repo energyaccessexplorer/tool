@@ -15,7 +15,7 @@ class DS {
 
     this.configuration = e.category.configuration;
 
-    this.mutant = !!(e.category.configuration && e.category.configuration.mutant);
+    this.mutant = !!(e.configuration && e.configuration.mutant);
 
     this.collection = !!(e.configuration && e.configuration.collection);
 

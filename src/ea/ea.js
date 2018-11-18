@@ -286,8 +286,6 @@ Please reporty this to energyaccessexplorer@wri.org.
         let x; if (x = DS.named(i)) x.hide();
       });
 
-      ea_map_opacity_tweak(inputs);
-
       ea_canvas_plot(ea_analysis(output));
     }
 
@@ -347,8 +345,6 @@ Please reporty this to energyaccessexplorer@wri.org.
     set_output_param();
 
     set_inputs_param();
-
-    ea_map_opacity_tweak(inputs);
 
     break;
   }

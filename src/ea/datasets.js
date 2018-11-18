@@ -330,6 +330,7 @@ async function ea_datasets_points() {
         "source": this.id,
         "paint": {
           "circle-radius": 3,
+          "circle-opacity": this.vectors.opacity,
           "circle-color": this.vectors.fill || 'cyan',
           "circle-stroke-width": 1,
           "circle-stroke-color": this.vectors.stroke || 'black',
@@ -374,6 +375,7 @@ async function ea_datasets_polygons() {
         "type": "fill",
         "source": this.id,
         "paint": {
+          "fill-opacity": this.vectors.opacity,
           "fill-color": this.vectors.fill,
           "fill-outline-color": this.vectors.stroke,
         },

@@ -14,19 +14,6 @@ function ea_map_setup(bounds) {
   document.querySelector('#maparea').appendChild(elem(`<div id="summary-button" onclick="ea_summary();">Summary</div>`));
 };
 
-function ea_map_opacity_tweak(inputs) {
-  if (!ea_mapbox.getLayer('canvas-layer')) {
-    console.log("canvas-layer is not here yet. In init, right?");
-    return;
-  }
-
-  const tweak = (inputs.length === 1 && (inputs[0] === 'boundaries'));
-
-  ea_mapbox ?
-    ea_mapbox.setPaintProperty('canvas-layer', 'raster-opacity', (tweak ? 0.2 : 1)) :
-    (ea_canvas ? ea_canvas.style.opacity = (tweak ? 0.2 : 1) : null)
-};
-
 function ea_map_draw_first_active_novectors(list) {
   let rd = null;
 

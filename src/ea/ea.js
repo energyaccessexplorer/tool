@@ -81,6 +81,16 @@ function ea_analysis(type) {
   let min = 1;
   let max = 0;
 
+  // NOTICE: if there is only one dataset which has no weight in calculations
+  // (boundaries with key-delta scale function, for example), we do NOT want an
+  // fully black raster to show as the result. We build a transparent one
+  // instead.
+  //
+  if (collection.length === 1 && full_weight === 0) {
+    ds.raster = ds.raster.fill(-1);
+    return ds;
+  }
+
   for (var i = 0; i < ds.raster.length; i++) {
     const t = collection.reduce((a, c, k, l) => {
       // On this reduce loop, we 'annihilate' points that come as -1
@@ -429,7 +439,9 @@ Please reporty this to energyaccessexplorer@wri.org.
   let canvas_source = ea_mapbox.getSource('canvas-source');
   if (canvas_source) {
     canvas_source.play();
-    setTimeout(_ => canvas_source.pause, 300);
+    setTimeout(_ => {
+      canvas_source.pause();
+    }, 1000);
   }
 
   if (typeof msg.callback === 'function') msg.callback();

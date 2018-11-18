@@ -13,15 +13,11 @@ class DS {
 
     this.metadata = e.metadata;
 
-    this.configuration = e.category.configuration;
+    this.configuration = e.configuration;
 
     this.mutant = !!(e.configuration && e.configuration.mutant);
 
     this.collection = !!(e.configuration && e.configuration.collection);
-
-    if (this.collection) {
-      this.configuration = e.configuration;
-    }
 
     if (e.heatmap_file) {
       this.heatmap = e.category.heatmap
@@ -69,6 +65,9 @@ class DS {
       this.help['what'] = e.category.metadata.what;
     }
 
+    // TODO: this does not seem correct here. 'inputs' and 'presets' arguments
+    // to this constructor feels messy.
+    //
     this.presets = {};
 
     if (e.presets && e.presets.length) {
@@ -245,7 +244,7 @@ class DS {
   static named(i) {
     return DSTable[i];
   };
-}
+};
 
 async function ea_datasets_init(country_id, inputs, preset) {
   let attrs = '*,heatmap_file(*),vectors_file(*),csv_file(*),category(*)';
@@ -254,6 +253,9 @@ async function ea_datasets_init(country_id, inputs, preset) {
     `${ea_settings.database}/datasets?country_id=eq.${country_id}&select=${attrs}`, 'GET', null,
     r => r.map(e => DSTable[e.category_name] = new DS(e,preset,inputs)));
 
+  // We need all the datasets to be initialised _before_ setting
+  // mutant/collection attributes (order is never guaranteed)
+  //
   DS.list.filter(d => d.mutant).forEach(d => d.mutant_init());
   DS.list.filter(d => d.collection).forEach(d => d.collection_init());
 

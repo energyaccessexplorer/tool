@@ -27,11 +27,11 @@ function ea_map_opacity_tweak(inputs) {
     (ea_canvas ? ea_canvas.style.opacity = (tweak ? 0.2 : 1) : null)
 };
 
-function ea_map_draw_first_active_nopolygons(list) {
+function ea_map_draw_first_active_novectors(list) {
   let rd = null;
 
   for (let t of list.slice(0)) {
-    let x = DS.list.find(d => d.id === t && !d.polygons && !d.collection);
+    let x = DS.list.find(d => d.id === t && !d.vectors && !d.collection);
     if (x) { rd = x; break; }
   }
 

@@ -253,7 +253,7 @@ Please reporty this to energyaccessexplorer@wri.org.
     (async _ => {
       for (var id of inputs) {
         let ds = DS.named(id);
-        if (ds) await ds.load('heatmap', 'polygons', 'csv');
+        if (ds) await ds.load('heatmap', 'vectors', 'csv');
       }
 
       mapbox_change_theme(ea_settings.mapbox_theme);
@@ -291,7 +291,7 @@ Please reporty this to energyaccessexplorer@wri.org.
         }
       }
 
-      ea_map_draw_first_active_nopolygons(inputs);
+      ea_map_draw_first_active_novectors(inputs);
 
       ea_layers_sort_inputs(inputs);
     }
@@ -325,7 +325,7 @@ Please reporty this to energyaccessexplorer@wri.org.
       await ds.turn(ds.active, true);
 
       ea_layers_inputs(inputs);
-      ea_map_draw_first_active_nopolygons(inputs);
+      ea_map_draw_first_active_novectors(inputs);
 
       ds.raise()
     }
@@ -366,7 +366,7 @@ Please reporty this to energyaccessexplorer@wri.org.
 
       for (let ds of DS.list) {
         ea_presets_set(ds, msg.value);
-        await ds.load('heatmap', 'polygons');
+        await ds.load('heatmap', 'vectors');
       }
 
       ea_canvas_plot(ea_analysis(output));
@@ -391,7 +391,7 @@ Please reporty this to energyaccessexplorer@wri.org.
     if (mode === "inputs") {
       ea_layers_sort_inputs(msg.layers);
       set_inputs_param(msg.layers);
-      ea_map_draw_first_active_nopolygons(msg.layers);
+      ea_map_draw_first_active_novectors(msg.layers);
     }
 
     else if (mode === "outputs") {

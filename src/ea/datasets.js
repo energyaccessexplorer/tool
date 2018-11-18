@@ -31,20 +31,26 @@ class DS {
       this.gen_color_scale();
     }
 
-    if (e.polygons_file) {
-      this.polygons = e.category.polygons;
-      this.polygons.endpoint = e.polygons_file.endpoint;
+    if (e.vectors_file) {
+      this.vectors = e.category.vectors;
+      this.vectors.endpoint = e.vectors_file.endpoint;
 
-      switch (this.polygons.shape_type) {
+      switch (this.vectors.shape_type) {
       case "points": {
-        this.polygons.symbol_svg = ea_svg_symbol(this.polygons.fill, { width: 1, color: this.polygons.stroke });
-        this.polygons.parse = ea_datasets_points;
+        this.vectors.symbol_svg = ea_svg_symbol(this.vectors.fill, { width: 1, color: this.vectors.stroke });
+        this.vectors.parse = ea_datasets_points;
         break;
       }
 
       case "polygons": {
-        this.polygons.symbol_svg = ea_svg_symbol(this.polygons.fill, { width: 3, color: this.polygons.stroke });
-        this.polygons.parse = ea_datasets_polygons;
+        this.vectors.symbol_svg = ea_svg_symbol(this.vectors.fill, { width: 3, color: this.vectors.stroke });
+        this.vectors.parse = ea_datasets_polygons;
+        break;
+      }
+
+      case "lines": {
+        this.vectors.symbol_svg = ea_svg_symbol('none', { width: 3, color: this.vectors.stroke });
+        this.vectors.parse = ea_datasets_lines;
         break;
       }
       }
@@ -110,7 +116,7 @@ class DS {
     let m = DS.named(this.configuration.mutant_targets[0]);
 
     this.configuration.host = m.id;
-    this.polygons = m.polygons;
+    this.vectors = m.vectors;
     this.heatmap = m.heatmap;
 
     this.color_scale_svg = m.color_scale_svg;
@@ -124,7 +130,7 @@ class DS {
       throw `${this.id} is not configured to mutate into ${host.id}.`
 
     this.raster = undefined;
-    this.polygons = undefined;
+    this.vectors = undefined;
     this.heatmap = undefined;
     this.height = undefined;
     this.width = undefined;
@@ -132,7 +138,7 @@ class DS {
     this.tiff = undefined;
 
     this.configuration.host = host.id;
-    this.polygons = host.polygons;
+    this.vectors = host.vectors;
     this.color_scale_svg = host.color_scale_svg;
     this.color_scale_fn = host.color_scale_fn;
 
@@ -192,7 +198,7 @@ class DS {
   };
 
   async turn(v, draw) {
-    if (v && this.polygons) await this.load('polygons');
+    if (v && this.vectors) await this.load('vectors');
     if (v && this.heatmap) await this.load('heatmap');
     if (v && this.csv) await this.load('csv');
 
@@ -218,10 +224,10 @@ class DS {
   };
 
   async raise() {
-    if (this.polygons)
+    if (this.vectors)
       ea_mapbox.moveLayer(this.id, ea_mapbox.first_symbol);
 
-    else if (!this.polygons && !this.collection)
+    else if (!this.vectors && !this.collection)
       ea_mapbox.moveLayer('canvas-layer', ea_mapbox.first_symbol);
 
     if (this.collection) {
@@ -242,7 +248,7 @@ class DS {
 }
 
 async function ea_datasets_init(country_id, inputs, preset) {
-  let attrs = '*,heatmap_file(*),polygons_file(*),csv_file(*),category(*)';
+  let attrs = '*,heatmap_file(*),vectors_file(*),csv_file(*),category(*)';
 
   await ea_client(
     `${ea_settings.database}/datasets?country_id=eq.${country_id}&select=${attrs}`, 'GET', null,
@@ -322,16 +328,16 @@ async function ea_datasets_points() {
         "source": this.id,
         "paint": {
           "circle-radius": 3,
-          "circle-color": this.polygons.fill || 'cyan',
+          "circle-color": this.vectors.fill || 'cyan',
           "circle-stroke-width": 1,
-          "circle-stroke-color": this.polygons.stroke || 'black',
+          "circle-stroke-color": this.vectors.stroke || 'black',
         },
       }, ea_mapbox.first_symbol);
     }
   });
 };
 
-async function ea_datasets_polygons() {
+async function ea_datasets_lines() {
   return ea_datasets_geojson.call(this, _ => {
     if (!ea_mapbox.getSource(this.id))
       ea_mapbox.addSource(this.id, {
@@ -346,7 +352,28 @@ async function ea_datasets_polygons() {
         "source": this.id,
         "paint": {
           "line-width": 1,
-          "line-color": this.polygons.stroke,
+          "line-color": this.vectors.stroke,
+        },
+      }, ea_mapbox.first_symbol);
+  });
+};
+
+async function ea_datasets_polygons() {
+  return ea_datasets_geojson.call(this, _ => {
+    if (!ea_mapbox.getSource(this.id))
+      ea_mapbox.addSource(this.id, {
+        "type": "geojson",
+        "data": this.features
+      });
+
+    if (!ea_mapbox.getLayer(this.id))
+      ea_mapbox.addLayer({
+        "id": this.id,
+        "type": "fill",
+        "source": this.id,
+        "paint": {
+          "fill-color": this.vectors.fill,
+          "fill-outline-color": this.vectors.stroke,
         },
       }, ea_mapbox.first_symbol);
   });
@@ -393,10 +420,10 @@ async function ea_datasets_geojson(callback) {
   if (ds.features) callback();
 
   else {
-    const endpoint = ds.polygons.endpoint;
+    const endpoint = ds.vectors.endpoint;
 
     if (!endpoint) {
-      console.warn(`Dataset '${ds.id}' should have a polygons (maybe a file-association missing). Endpoint is: `, endpoint);
+      console.warn(`Dataset '${ds.id}' should have a vectors (maybe a file-association missing). Endpoint is: `, endpoint);
       return ds;
     }
 

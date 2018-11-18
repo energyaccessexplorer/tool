@@ -45,8 +45,8 @@ function ea_layers_input_elem(ds) {
 
   function svg_thing(d) {
     let e;
-    if (d.polygons) e = d.polygons.symbol_svg;
-    else if (!d.polygons && d.heatmap) e = d.color_scale_svg;
+    if (d.vectors) e = d.vectors.symbol_svg;
+    else if (!d.vectors && d.heatmap) e = d.color_scale_svg;
     return e;
   };
 
@@ -64,7 +64,7 @@ function ea_layers_input_elem(ds) {
 
   else {
     c.appendChild(svg_thing(ds));
-    if (!ds.polygons && ds.heatmap) c.appendChild(ea_layers_lowmidhigh());
+    if (!ds.vectors && ds.heatmap) c.appendChild(ea_layers_lowmidhigh());
   }
 
   return d;

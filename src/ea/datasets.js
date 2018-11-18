@@ -354,8 +354,9 @@ async function ea_datasets_lines() {
         "type": "line",
         "source": this.id,
         "paint": {
-          "line-width": 1,
+          "line-width": this.vectors.width,
           "line-color": this.vectors.stroke,
+          "line-dasharray": this.vectors.dasharray.split(' ').map(x => +x),
         },
       }, ea_mapbox.first_symbol);
   });

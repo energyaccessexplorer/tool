@@ -78,12 +78,12 @@ function mapbox_theme_pick(theme) {
   });
 };
 
-function mapbox_canvas(m, coords) {
+function mapbox_canvas(m) {
   m.addSource('canvas-source', {
     "type": 'canvas',
     "canvas": 'plot',
     "animate": false,
-    "coordinates": coords
+    "coordinates": m.coords
   });
 
   const c = m.getStyle().layers.find(l => l.type === 'symbol')
@@ -107,33 +107,33 @@ function mapbox_setup(bounds) {
 
   mapbox.fitBounds(bounds, { animate: false });
 
-  mapbox.on('style.load', _ => {
-    const b = bounds;
+  const b = bounds;
 
-    const r = b[0][0];
-    const l = b[1][0];
-    const u = b[1][1];
-    const d = b[0][1];
+  const r = b[0][0];
+  const l = b[1][0];
+  const u = b[1][1];
+  const d = b[0][1];
 
-    const coords = [
-      [r, u],
-      [l, u],
-      [l, d],
-      [r, d]
-    ];
-
-    mapbox_canvas(mapbox, coords);
-  });
+  const coords = [
+    [r, u],
+    [l, u],
+    [l, d],
+    [r, d]
+  ];
 
   mapbox.addControl(new mapboxgl.NavigationControl({ showCompass: false }));
 
   mapbox.addControl((new MapboxThemeControl()), 'top-right');
+
+  mapbox.coords = coords;
 
   return mapbox;
 };
 
 function mapbox_change_theme(theme, callback) {
   ea_mapbox.once('styledata', _ => {
+    mapbox_canvas(ea_mapbox);
+
     ea_overlord({
       type: "refresh",
       caller: "mapbox_change_theme",

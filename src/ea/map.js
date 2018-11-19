@@ -14,18 +14,6 @@ function ea_map_setup(bounds) {
   document.querySelector('#maparea').appendChild(elem(`<div id="summary-button" onclick="ea_summary();">Summary</div>`));
 };
 
-function ea_map_draw_first_active_novectors(list) {
-  let rd = null;
-
-  for (let t of list.slice(0)) {
-    let x = DS.list.find(d => d.id === t && !d.vectors && !d.collection);
-    if (x) { rd = x; break; }
-  }
-
-  if (rd) ea_canvas_plot(ea_analysis(rd.id));
-  else ea_canvas_plot(ea_analysis(ea_dummy));
-};
-
 function ea_map_svg(svg, topofile, name, options) {
   let width, height;
 

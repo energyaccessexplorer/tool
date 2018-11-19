@@ -1,10 +1,10 @@
-function ea_canvas_plot(ds) {
+function ea_canvas_plot(ds, c = ea_canvas) {
   if (!ds) return;
 
   ea_current_analysis = ds;
 
   const plot = new plotty.plot({
-    canvas: ea_canvas,
+    canvas: c,
     data: ds.raster,
     width: ds.width,
     height: ds.height,
@@ -265,12 +265,12 @@ Please reporty this to energyaccessexplorer@wri.org.
     ea_canvas.getContext('2d');
 
     (async _ => {
+      mapbox_change_theme(ea_settings.mapbox_theme);
+
       for (var id of inputs) {
         let ds = DS.named(id);
-        if (ds) await ds.load('heatmap', 'vectors', 'csv');
+        if (ds) await ds.turn(true, false);
       }
-
-      mapbox_change_theme(ea_settings.mapbox_theme);
 
       ea_ui_app_loading(false);
     })();
@@ -291,9 +291,13 @@ Please reporty this to energyaccessexplorer@wri.org.
       });
 
       ea_canvas_plot(ea_analysis(output));
+
+      ea_mapbox.setLayoutProperty('canvas-layer', 'visibility', 'visible');
     }
 
     else if (t === "inputs") {
+      ea_mapbox.setLayoutProperty('canvas-layer', 'visibility', 'none');
+
       ea_layers_inputs(inputs);
 
       for (let i of inputs) {
@@ -302,8 +306,6 @@ Please reporty this to energyaccessexplorer@wri.org.
           await x.turn(true, true);
         }
       }
-
-      ea_map_draw_first_active_novectors(inputs);
 
       ea_layers_sort_inputs(inputs);
     }
@@ -337,7 +339,6 @@ Please reporty this to energyaccessexplorer@wri.org.
       await ds.turn(ds.active, true);
 
       ea_layers_inputs(inputs);
-      ea_map_draw_first_active_novectors(inputs);
 
       ds.raise()
     }
@@ -376,7 +377,7 @@ Please reporty this to energyaccessexplorer@wri.org.
 
       for (let ds of DS.list) {
         ea_presets_set(ds, msg.value);
-        await ds.load('heatmap', 'vectors');
+        await ds.load();
       }
 
       ea_canvas_plot(ea_analysis(output));
@@ -401,7 +402,6 @@ Please reporty this to energyaccessexplorer@wri.org.
     if (mode === "inputs") {
       ea_layers_sort_inputs(msg.layers);
       set_inputs_param(msg.layers);
-      ea_map_draw_first_active_novectors(msg.layers);
     }
 
     else if (mode === "outputs") {

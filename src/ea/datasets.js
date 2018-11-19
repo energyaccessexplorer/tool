@@ -188,19 +188,19 @@ class DS {
   };
 
   async show() {
-    if (ea_mapbox.getLayer(this.id))
-      ea_mapbox.setLayoutProperty(this.id, 'visibility', 'visible');
-
-    else if (this.collection)
+    if (this.collection)
       for (let i of this.configuration.collection) await DS.named(i).show();
+
+    else if (ea_mapbox.getLayer(this.id))
+      ea_mapbox.setLayoutProperty(this.id, 'visibility', 'visible');
   };
 
   async hide() {
-    if (ea_mapbox.getSource(this.id))
-      ea_mapbox.setLayoutProperty(this.id, 'visibility', 'none');
-
-    else if (this.collection)
+    if (this.collection)
       for (let i of this.configuration.collection) await DS.named(i).hide();
+
+    else if (ea_mapbox.getSource(this.id))
+      ea_mapbox.setLayoutProperty(this.id, 'visibility', 'none');
   };
 
   async turn(v, draw) {
@@ -208,33 +208,45 @@ class DS {
     if (v && this.heatmap) await this.load('heatmap');
     if (v && this.csv) await this.load('csv');
 
+    if (this.collection) {
+      for (let i of this.configuration.collection)
+        await DS.named(i).turn(v, draw);
+
+      return;
+    }
+
     if (v && draw)
       this.show();
     else
       this.hide();
-
-    if (this.collection)
-      for (let i of this.configuration.collection) await DS.named(i).turn(v, draw);
   };
 
-  async load(...args) {
+  async load(arg) {
     ea_ui_dataset_loading(this, true);
 
-    for (let a of args)
-      if (this[a]) await this[a].parse.call(this);
+    if (this.collection) {
+      for (let i of this.configuration.collection)
+        await DS.named(i).load(arg);
 
-    if (this.collection)
-      for (let i of this.configuration.collection) await DS.named(i).load(...args);
+      if (this.heatmap) await this.heatmap.parse.call(this);
+
+      ea_ui_dataset_loading(this, false);
+
+      return;
+    }
+
+    if (!arg)
+      await this.turn(true, false);
+
+    else
+      if (this[arg]) await this[arg].parse.call(this);
 
     ea_ui_dataset_loading(this, false);
   };
 
   async raise() {
-    if (this.vectors)
+    if (ea_mapbox.getLayer(this.id))
       ea_mapbox.moveLayer(this.id, ea_mapbox.first_symbol);
-
-    else if (!this.vectors && !this.collection)
-      ea_mapbox.moveLayer('canvas-layer', ea_mapbox.first_symbol);
 
     if (this.collection) {
       for (let i of this.configuration.collection)
@@ -467,8 +479,33 @@ async function ea_datasets_tiff(blob) {
 
     this.width = image.getWidth();
     this.height = image.getHeight();
+
     this.nodata = parseFloat(this.tiff.fileDirectories[0][0].GDAL_NODATA);
 
+    let c = document.createElement('canvas');
+    c.id = `canvas-${this.id}`;
+    c.style.display = 'none';
+
+    document.body.append(c);
+
+    ea_canvas_plot(ea_analysis(this.id), c);
+
+    if (ea_mapbox.getSource(this.id)) return this;
+
+    ea_mapbox.addSource(this.id, {
+      "type": "canvas",
+      "canvas": `canvas-${this.id}`,
+      "animate": false,
+      "coordinates": ea_mapbox.coords
+    });
+
+    ea_mapbox.addLayer({
+      "id": this.id,
+      "type": 'raster',
+      "source": this.id,
+    }, ea_mapbox.first_symbol);
+
+    ea_mapbox.setLayoutProperty(this.id, 'visibility', 'none');
   }
 
   return this;

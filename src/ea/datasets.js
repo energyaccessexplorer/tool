@@ -8,8 +8,15 @@ class DS {
       e.configuration.name_override :
       e.category.name_long;
 
-    if (e.category.unit)
-      this.unit = e.category.unit;
+    let tmp_index = ea_category_tree.map(b => {
+      return {
+        "name": b.name,
+        "datasets": b.subbranches.map(i => i.datasets.map(d=> d.id)).flat() }
+    }).find(i => i.datasets.includes(this.id));
+
+    if (tmp_index) this.indexname = tmp_index.name;
+
+    this.unit = e.category.unit;
 
     this.metadata = e.metadata;
 
@@ -447,24 +454,24 @@ async function ea_datasets_geojson(callback) {
   return ds;
 };
 
-async function ea_datasets_tiff(ds, blob) {
-  if (ds.raster) ;
+async function ea_datasets_tiff(blob) {
+  if (this.raster) ;
   else {
     const tiff = await GeoTIFF.fromBlob(blob);
     const image = await tiff.getImage();
     const rasters = await image.readRasters();
 
-    ds.tiff = tiff;
-    ds.image = image;
-    ds.raster = rasters[0];
+    this.tiff = tiff;
+    this.image = image;
+    this.raster = rasters[0];
 
-    ds.width = image.getWidth();
-    ds.height = image.getHeight();
+    this.width = image.getWidth();
+    this.height = image.getHeight();
+    this.nodata = parseFloat(this.tiff.fileDirectories[0][0].GDAL_NODATA);
 
-    ds.nodata = parseFloat(ds.tiff.fileDirectories[0][0].GDAL_NODATA);
   }
 
-  return ds;
+  return this;
 };
 
 async function ea_datasets_tiff_url() {
@@ -480,7 +487,7 @@ async function ea_datasets_tiff_url() {
   await fetch(url)
     .then(ea_client_check)
     .then(r => r.blob())
-    .then(b => ea_datasets_tiff(ds, b));
+    .then(b => ea_datasets_tiff.call(ds, b));
 
   return ds;
 };

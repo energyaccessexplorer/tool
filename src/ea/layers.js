@@ -18,7 +18,7 @@ function ea_layers_elem(bind, cls, title) {
     <div class="layers-element-description"></div>
   </div>
 </li>`);
-}
+};
 
 function ea_layers_lowmidhigh() {
   return elem(`
@@ -28,7 +28,7 @@ function ea_layers_lowmidhigh() {
   <div class="thing">High</div>
 </div>
 `);
-}
+};
 
 function ea_layers_input_elem(ds) {
   const d = ea_layers_elem(ds.id, '', ds.name_long);

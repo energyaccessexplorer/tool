@@ -86,7 +86,7 @@ function mapbox_canvas(m) {
     "coordinates": m.coords
   });
 
-  const c = m.getStyle().layers.find(l => l.type === 'symbol')
+  const c = m.getStyle().layers.find(l => l.type === 'symbol');
 
   ea_mapbox.first_symbol = ((c && c.id) || undefined);
 

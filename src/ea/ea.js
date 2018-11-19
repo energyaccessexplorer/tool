@@ -27,18 +27,18 @@ function ea_analysis(type) {
   const t0 = performance.now();
 
   const collection = (function(t) {
-    let cat;
+    let idxn;
 
     if (['supply', 'demand'].indexOf(t) > -1)
-      cat = d => d.category === t;
+      idxn = d => d.indexname === t;
 
     else if (['eai', 'ani'].indexOf(t) > -1)
-      cat = d => true;
+      idxn = d => true;
 
     else
-      cat = d => d.id === t;
+      idxn = d => d.id === t;
 
-    return DS.list.filter(d => d.active && cat(d));
+    return DS.list.filter(d => d.active && idxn(d));
   }).call(null, type);
 
   // we use a dataset as a template just for code-clarity.
@@ -205,8 +205,11 @@ async function ea_overlord(msg) {
     ea_mapbox = null;
     ea_dummy = null;
     ea_canvas = null;
+    ea_category_tree = null;
 
     let country; await ea_client(`${ea_settings.database}/countries?ccn3=eq.${ea_ccn3}`, 'GET', 1, r => country = r);
+
+    ea_category_tree = country.category_tree;
     const collection = await ea_datasets_init(country.id, inputs, preset);
 
     const boundaries_ds = collection.find(d => d.id === 'boundaries');
@@ -237,6 +240,7 @@ Please reporty this to energyaccessexplorer@wri.org.
       (async _ => {
         await ea_dummy.heatmap.parse.call(ea_dummy);
         ea_dummy.raster = new Uint16Array(ea_dummy.width * ea_dummy.height).fill(-1);
+        ea_mapbox.setLayoutProperty('dummy', 'visibility', 'none');
       })();
     }
 

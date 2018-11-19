@@ -57,29 +57,26 @@ function ea_ui_collapse_triangle(d) {
 </svg>`;
 };
 
-function ea_ui_spinner() {
-  return elem(`<div class="loading"><div class="spinner"></div></div>`);
-};
-
 function ea_ui_app_loading(bool) {
   document.querySelector('#app-loading').style['display'] = bool ? 'block' : 'none';
 };
 
 function ea_ui_dataset_loading(ds, bool) {
   const el = document.querySelector(`#controls-${ds.id}`);
-  let s;
+  if (!el) return;
+
+  let s = el.querySelector('.loading');
 
   if (!el)
     return null;
 
-  if (bool) {
-    s = ea_ui_spinner();
+  if (bool && !s) {
+    s = elem(`<div class="loading"><div class="spinner"></div></div>`);
     el.append(s);
   }
 
   else {
-    s = el.querySelector('.loading');
-    s.remove();
+    if (s) s.remove();
   }
 
   return s;

@@ -666,7 +666,9 @@ function ea_svg_interval_thingradient(color_scale, init, callback1, callback2, e
   };
 };
 
-function ea_svg_symbol(fill, stroke) {
+function ea_svg_points_symbol() {
+  if (!(this instanceof DS)) throw `${this} should be a DS. Bye.`;
+
   const size = 28;
 
   const container = d3.select(document.createElementNS(d3.namespaces.svg, "svg"))
@@ -678,9 +680,49 @@ function ea_svg_symbol(fill, stroke) {
     .attr('r', 12)
     .attr('cx', size/2)
     .attr('cy', size/2)
-    .attr('fill', fill)
-    .attr('stroke', stroke.color)
-    .attr('stroke-width', stroke.width);
+    .attr('fill', this.vectors.fill)
+    .attr('stroke', this.vectors.stroke)
+    .attr('stroke-width', 2);
+
+  return container.node();
+};
+
+function ea_svg_lines_symbol() {
+  if (!(this instanceof DS)) throw `${this} should be a DS. Bye.`;
+
+  const size = 28;
+
+  const container = d3.select(document.createElementNS(d3.namespaces.svg, "svg"))
+        .attr("width", size)
+        .attr("height", size);
+
+  container
+    .append('path')
+    .attr('d', "M 0.5625,23.71875 C 2.0625,8.0625 14.439788,10.706994 17.625,7.5 20.810212,4.2930056 23.71875,0.375 23.71875,0.375")
+    .attr('fill', 'none')
+    .attr('stroke-dasharray', this.vectors.dasharray)
+    .attr('stroke', this.vectors.stroke)
+    .attr('stroke-width', this.vectors.width * 2);
+
+  return container.node();
+};
+
+function ea_svg_polygons_symbol() {
+  if (!(this instanceof DS)) throw `${this} should be a DS. Bye.`;
+
+  const size = 28;
+
+  const container = d3.select(document.createElementNS(d3.namespaces.svg, "svg"))
+        .attr("width", size)
+        .attr("height", size);
+
+  container
+    .append('path')
+    .attr('d', 'M 3.3615425,10.115331 22.909683,0.94439892 27.851628,19.286265 0.83565943,23.350655 Z')
+    .attr('fill', this.vectors.fill)
+    .attr('fill-opacity', this.vectors.opacity)
+    .attr('stroke', this.vectors.stroke)
+    .attr('stroke-width', this.vectors.width * 2);
 
   return container.node();
 };

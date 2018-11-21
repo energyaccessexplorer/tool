@@ -40,19 +40,19 @@ class DS {
 
       switch (this.vectors.shape_type) {
       case "points": {
-        this.vectors.symbol_svg = ea_svg_symbol(this.vectors.fill, { width: 1, color: this.vectors.stroke });
+        this.vectors.symbol_svg = ea_svg_points_symbol.call(this);
         this.vectors.parse = ea_datasets_points;
         break;
       }
 
       case "polygons": {
-        this.vectors.symbol_svg = ea_svg_symbol(this.vectors.fill, { width: 3, color: this.vectors.stroke });
+        this.vectors.symbol_svg = ea_svg_polygons_symbol.call(this);
         this.vectors.parse = ea_datasets_polygons;
         break;
       }
 
       case "lines": {
-        this.vectors.symbol_svg = ea_svg_symbol('none', { width: 3, color: this.vectors.stroke });
+        this.vectors.symbol_svg = ea_svg_lines_symbol.call(this);
         this.vectors.parse = ea_datasets_lines;
         break;
       }
@@ -367,6 +367,17 @@ async function ea_datasets_lines() {
         "data": this.features
       });
 
+    let da = this.vectors.dasharray.split(' ').map(x => +x);
+
+    // mapbox-gl does not follow SVG's stroke-dasharray convention when it comes
+    // to single numbered arrays.
+    //
+    if (da.length === 1) {
+      (da[0] === 0) ?
+        da = [1] :
+        da = [da[0], da[0]];
+    }
+
     if (!ea_mapbox.getLayer(this.id))
       ea_mapbox.addLayer({
         "id": this.id,
@@ -375,7 +386,7 @@ async function ea_datasets_lines() {
         "paint": {
           "line-width": this.vectors.width,
           "line-color": this.vectors.stroke,
-          "line-dasharray": this.vectors.dasharray.split(' ').map(x => +x),
+          "line-dasharray": da,
         },
       }, ea_mapbox.first_symbol);
   });

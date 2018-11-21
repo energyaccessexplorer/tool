@@ -93,8 +93,8 @@ function ea_svg_radio(init, callback) {
     else change(status = true);
   });
 
-  let dispatch = svg.dispatch('unselect');
-  dispatch.on('unselect', _ => change((status = false)));
+  svg.on('select', _ => change((status = true)));
+  svg.on('unselect', _ => change((status = false)));
 
   change(status, init);
 

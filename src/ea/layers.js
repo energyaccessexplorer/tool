@@ -84,9 +84,6 @@ function ea_layers_output_elem(t, v, i, x) {
 
   lec.appendChild(dli);
 
-  let ler = d.querySelector('.layers-element-radio');
-  ler.appendChild(ea_svg_radio(i));
-
   c.append(ea_layers_lowmidhigh());
   c.prepend(ea_svg_color_steps(_ => {
     return d3.scaleLinear()
@@ -104,11 +101,13 @@ function ea_layers_outputs(target) {
   const layers_list = document.querySelector('#layers-list');
   layers_list.innerHTML = "";
 
-  async function trigger_this() {
-    let unselect = document.createEvent('HTMLEvents');
-    unselect.initEvent("unselect", true, true);
+  function trigger_this() {
+    let e = document.createEvent('HTMLEvents');
 
-    await nodes.forEach(n => n.querySelector('.layers-element-radio svg').dispatchEvent(unselect));
+    for (n of nodes) {
+      e.initEvent((this === n) ? "select" : "unselect", true, true);
+      n.querySelector('.layers-element-radio svg').dispatchEvent(e);
+    }
 
     ea_overlord({
       "type": 'output',
@@ -120,7 +119,11 @@ function ea_layers_outputs(target) {
   nodes = Object.keys(ea_indexes).map((t,i) => {
     let node = ea_layers_output_elem(t, ea_indexes[t], t === target, ea_indexes_descriptions[t]);
 
-    node.querySelector('.layers-element-radio svg').addEventListener('mouseup', _ => trigger_this.apply(node));
+    let ler = node.querySelector('.layers-element-radio');
+    ler.appendChild(ea_svg_radio(t === target));
+
+    node.querySelector('.layers-element-radio svg').addEventListener('mouseup', _ => trigger_this.call(node));
+    node.querySelector('.layers-element-title').addEventListener('mouseup', _ => trigger_this.call(node));
 
     layers_list.appendChild(node);
 

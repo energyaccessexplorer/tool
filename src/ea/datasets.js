@@ -416,10 +416,7 @@ async function ea_datasets_csv(callback) {
       return ds;
     }
 
-    const url = endpoint.match('^http') ? endpoint :
-          `${ea_settings.endpoint_base}/${ea_ccn3}/${endpoint}`;
-
-    d3.csv(url, function(d) {
+    d3.csv(endpoint, function(d) {
       const o = { oid: +d[ds.csv.oid] };
       Object.keys(ds.csv.options).forEach(k => o[k] = +d[k] || d[k]);
       return o;
@@ -451,11 +448,8 @@ async function ea_datasets_geojson(callback) {
       return ds;
     }
 
-    const url = endpoint.match('^http') ? endpoint :
-          `${ea_settings.endpoint_base}/${ea_ccn3}/${endpoint}`;
-
     await ea_client(
-      url, 'GET', null,
+      endpoint, 'GET', null,
       async r => {
         ds.features = r;
         callback();
@@ -518,10 +512,7 @@ async function ea_datasets_tiff_url() {
 
   const endpoint = ds.heatmap.endpoint;
 
-  const url = endpoint.match('^http') ? endpoint :
-        `${ea_settings.endpoint_base}/${ea_ccn3}/${endpoint}`;
-
-  await fetch(url)
+  await fetch(endpoint)
     .then(ea_client_check)
     .then(r => r.blob())
     .then(b => ea_datasets_tiff.call(ds, b));

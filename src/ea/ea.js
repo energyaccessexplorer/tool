@@ -264,9 +264,7 @@ Please reporty this to energyaccessexplorer@wri.org.
     //
     ea_canvas.getContext('2d');
 
-    (async _ => {
-      mapbox_change_theme(ea_settings.mapbox_theme);
-
+    await (async _ => {
       for (var id of inputs) {
         let ds = DS.named(id);
         if (ds) await ds.turn(true, false);
@@ -274,6 +272,8 @@ Please reporty this to energyaccessexplorer@wri.org.
 
       ea_ui_app_loading(false);
     })();
+
+    mapbox_change_theme(ea_settings.mapbox_theme);
 
     break;
   }

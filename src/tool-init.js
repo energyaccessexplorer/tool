@@ -59,7 +59,7 @@ require([
     "eai": "Energy Access Index",
     "demand": "Demand Index",
     "supply": "Supply Index",
-    "ani": "Assistance Need Index",
+    "ani": "Need for Assistance Index",
   };
 
   window.ea_indexes_descriptions = {

@@ -1,27 +1,22 @@
-function ea_canvas_plot(ds, c = ea_canvas) {
-  if (!ds) return;
+function ea_canvas_plot(A, c = ea_canvas) {
+  if (!(A.id && A.raster)) throw `${A.id} is not a A! Bye.`;
 
-  ea_current_analysis = ds;
+  ea_current_analysis = A;
 
   const plot = new plotty.plot({
     canvas: c,
-    data: ds.raster,
-    width: ds.width,
-    height: ds.height,
-    domain: ds.domain,
-    noDataValue: ds.nodata,
-    colorScale: ds.color_scale,
+    data: A.raster,
+    width: A.width,
+    height: A.height,
+    domain: A.domain,
+    noDataValue: A.nodata,
+    colorScale: A.color_scale,
   });
 
   plot.render();
 
   return plot;
 };
-
-/*
- * An analysis is really a new dataset "ds" consisting of a selection of
- * weighed datasets.
- */
 
 function ea_analysis(type) {
   const t0 = performance.now();
@@ -61,7 +56,7 @@ function ea_analysis(type) {
       cs = DS.named(single_input.configuration.host).heatmap.color_scale;
   }
 
-  const ds = {
+  const A = {
     id: `analysis-${Date.now()}`,
     domain: [0,1],
     width: tmp.width,
@@ -87,11 +82,11 @@ function ea_analysis(type) {
   // instead.
   //
   if (collection.length === 1 && full_weight === 0) {
-    ds.raster = ds.raster.fill(-1);
-    return ds;
+    A.raster = A.raster.fill(-1);
+    return A;
   }
 
-  for (var i = 0; i < ds.raster.length; i++) {
+  for (var i = 0; i < A.raster.length; i++) {
     const t = collection.reduce((a, c, k, l) => {
       // On this reduce loop, we 'annihilate' points that come as -1
       // (or nodata) since we wouldn't know what value to assign for
@@ -122,19 +117,19 @@ function ea_analysis(type) {
       if (r < min) min = r;
     }
 
-    ds.raster[i] = r;
+    A.raster[i] = r;
   }
 
   var f = d3.scaleQuantize().domain([min,max]).range([0, 0.25, 0.5, 0.75, 1]);
 
-  for (var i = 0; i < ds.raster.length; i++) {
-    const r = ds.raster[i];
-    ds.raster[i] = (r === -1) ? -1 : f(r);
+  for (var i = 0; i < A.raster.length; i++) {
+    const r = A.raster[i];
+    A.raster[i] = (r === -1) ? -1 : f(r);
   }
 
   console.log("Finished ea_analysis in:", performance.now() - t0);
 
-  return ds;
+  return A;
 };
 
 async function ea_overlord(msg) {

@@ -31,7 +31,8 @@ class DS {
       this.heatmap.endpoint = e.heatmap_file.endpoint;
       this.heatmap.parse = ea_datasets_tiff_url;
 
-      this.gen_color_scale();
+      if (!this.mutant && !this.collection)
+        this.gen_color_scale();
     }
 
     if (e.vectors_file) {
@@ -162,8 +163,6 @@ class DS {
   };
 
   gen_color_scale() {
-    if (this.configuration && this.configuration.mutant) return;
-
     let cs = this.heatmap.color_stops;
     let c = ea_default_color_scale;
     let d = ea_default_color_domain;
@@ -211,14 +210,12 @@ class DS {
     if (this.collection) {
       for (let i of this.configuration.collection)
         await DS.named(i).turn(v, draw);
-
-      return;
     }
 
-    if (v && draw)
-      this.show();
-    else
-      this.hide();
+    else {
+      if (v && draw) this.show();
+      else this.hide();
+    }
   };
 
   async load(arg) {
@@ -229,17 +226,15 @@ class DS {
         await DS.named(i).load(arg);
 
       if (this.heatmap) await this.heatmap.parse.call(this);
-
-      ea_ui_dataset_loading(this, false);
-
-      return;
     }
 
-    if (!arg)
-      await this.turn(true, false);
+    else {
+      if (!arg)
+        await this.turn(true, false);
 
-    else
-      if (this[arg]) await this[arg].parse.call(this);
+      else
+        if (this[arg]) await this[arg].parse.call(this);
+    }
 
     ea_ui_dataset_loading(this, false);
   };
@@ -313,8 +308,6 @@ function ea_datasets_scale_fn(ds, type) {
 
   case 'key-delta': {
     s = x => {
-      if (!ds.table) return;
-
       let z = ds.table[x];
       if (!z) return -1;
 
@@ -475,6 +468,11 @@ async function ea_datasets_tiff(blob) {
   function draw(canvas) {
     ea_canvas_plot(ea_analysis(this.id), canvas);
 
+    if (!ea_mapbox) {
+      console.log('ea_datasets_tiff.draw: ea_mapbox is not here yet. Init?');
+      return;
+    }
+
     if (!ea_mapbox.getSource(this.id))
       ea_mapbox.addSource(this.id, {
         "type": "canvas",
@@ -517,7 +515,8 @@ async function ea_datasets_tiff(blob) {
 
     draw.call(this, c);
 
-    ea_mapbox.setLayoutProperty(this.id, 'visibility', 'none');
+    if (ea_mapbox)
+      ea_mapbox.setLayoutProperty(this.id, 'visibility', 'none');
   }
 
   return this;

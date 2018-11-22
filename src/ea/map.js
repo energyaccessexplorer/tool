@@ -104,7 +104,6 @@ function ea_map_svg(svg, topofile, name, options) {
 
     let zoomstart = () => {
       if (!mask || mask.empty()) mask = d3.select('#mask');
-      if (typeof ea_canvas === 'undefined') return;
     };
 
     let zoomend = () => {

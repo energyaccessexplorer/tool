@@ -143,7 +143,7 @@ async function ea_overlord(msg) {
 
   function set_mode_param(m) {
     history.replaceState(null, null, location.set_query_param('mode', (m || mode)));
-  }
+  };
 
   function set_output_param(o) {
     history.replaceState(null, null, location.set_query_param('output', (o || output)));
@@ -156,7 +156,7 @@ async function ea_overlord(msg) {
   function set_preset_param(p) {
     document.querySelector('#controls-preset').value = (p || 'custom');
     history.replaceState(null, null, location.set_query_param('preset', (p || 'custom')));
-  }
+  };
 
   if (Object.keys(ea_indexes).indexOf(output_param) > -1) {
     output = output_param;
@@ -201,9 +201,9 @@ async function ea_overlord(msg) {
     ea_category_tree = country.category_tree;
     const collection = await ea_datasets_init(country.id, inputs, preset);
 
-    const boundaries_ds = collection.find(d => d.id === 'boundaries');
+    const b = collection.find(d => d.id === 'boundaries');
 
-    if (!boundaries_ds) {
+    if (!b) {
       flash()
         .type('error')
         .title("Misconfigured country")
@@ -212,11 +212,12 @@ It's missing a boundaries dataset. <b>I'm stoping here.</b>
 Please reporty this to energyaccessexplorer@wri.org.
 `)();
 
-      return;
+      throw `Country is missing a boundaries dataset.`;
     }
 
-    let b = DS.named('boundaries');
-    await b.heatmap.parse.call(b);
+    else {
+      await b.heatmap.parse.call(b);
+    }
 
     inputs = collection
       .filter(t => t.active)
@@ -342,9 +343,7 @@ Please reporty this to energyaccessexplorer@wri.org.
   }
 
   case "preset": {
-    set_preset_param(msg.value);
-
-    if (!msg.value) return;
+    if (!msg.value) throw `Argument error: Overlord: Could not set ${msg.value} preset`;
 
     if (mode === "outputs") {
       ea_layers_outputs(output);

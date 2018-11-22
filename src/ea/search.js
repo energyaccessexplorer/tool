@@ -5,8 +5,6 @@
 
   let country_list = null;
 
-  if (!button) return;
-
   button.addEventListener('click', _ => {
     if (country_list) {
       dropdown.style.display = 'block';

@@ -3,8 +3,6 @@
 
   let country_list = null;
 
-  if (!select) return;
-
   fetch(ea_settings.database + '/countries?select=name,cca3,ccn3&online')
     .then(r => r.json())
     .then(j => j.sort((a,b) => a['name'] > b['name'] ? 1 : -1))

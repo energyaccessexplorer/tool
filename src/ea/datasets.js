@@ -472,7 +472,29 @@ async function ea_datasets_geojson(callback) {
 };
 
 async function ea_datasets_tiff(blob) {
-  if (this.raster) ;
+  function draw(canvas) {
+    ea_canvas_plot(ea_analysis(this.id), canvas);
+
+    if (!ea_mapbox.getSource(this.id))
+      ea_mapbox.addSource(this.id, {
+        "type": "canvas",
+        "canvas": `canvas-${this.id}`,
+        "animate": false,
+        "coordinates": ea_mapbox.coords
+      });
+
+    if (!ea_mapbox.getLayer(this.id))
+      ea_mapbox.addLayer({
+        "id": this.id,
+        "type": 'raster',
+        "source": this.id,
+      }, ea_mapbox.first_symbol);
+  };
+
+  if (this.raster) {
+    draw.call(this, document.querySelector(`canvas#canvas-${this.id}`));
+  }
+
   else {
     const tiff = await GeoTIFF.fromBlob(blob);
     const image = await tiff.getImage();
@@ -493,22 +515,7 @@ async function ea_datasets_tiff(blob) {
 
     document.body.append(c);
 
-    ea_canvas_plot(ea_analysis(this.id), c);
-
-    if (ea_mapbox.getSource(this.id)) return this;
-
-    ea_mapbox.addSource(this.id, {
-      "type": "canvas",
-      "canvas": `canvas-${this.id}`,
-      "animate": false,
-      "coordinates": ea_mapbox.coords
-    });
-
-    ea_mapbox.addLayer({
-      "id": this.id,
-      "type": 'raster',
-      "source": this.id,
-    }, ea_mapbox.first_symbol);
+    draw.call(this, c);
 
     ea_mapbox.setLayoutProperty(this.id, 'visibility', 'none');
   }
@@ -519,7 +526,10 @@ async function ea_datasets_tiff(blob) {
 async function ea_datasets_tiff_url() {
   const ds = this;
 
-  if (ds.raster) return ds;
+  if (ds.raster) {
+    ea_datasets_tiff.call(ds);
+    return ds;
+  };
 
   const endpoint = ds.heatmap.endpoint;
 

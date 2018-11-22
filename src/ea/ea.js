@@ -38,12 +38,7 @@ function ea_analysis(type) {
 
   // we use a dataset as a template just for code-clarity.
   //
-  const tmp = ea_dummy;
-
-  if (!tmp.raster) {
-    console.warn("No raster template. Return.");
-    return null;
-  }
+  const tmp = DS.named('boundaries');
 
   let cs = ea_default_color_scale;
 
@@ -61,12 +56,12 @@ function ea_analysis(type) {
     domain: [0,1],
     width: tmp.width,
     height: tmp.height,
-    raster: new Float32Array(tmp.raster.length),
+    raster: new Float32Array(tmp.raster.length).fill(-1),
     nodata: -1,
     color_scale: cs,
   };
 
-  if (!collection.length) return tmp;
+  if (!collection.length) return A;
 
   const scales = collection.map(d => ea_datasets_scale_fn(d, type));
 
@@ -198,7 +193,6 @@ async function ea_overlord(msg) {
     ea_ccn3 = location.get_query_param('ccn3');
     ea_map = null;
     ea_mapbox = null;
-    ea_dummy = null;
     ea_canvas = null;
     ea_category_tree = null;
 
@@ -221,23 +215,8 @@ Please reporty this to energyaccessexplorer@wri.org.
       return;
     }
 
-    {
-      ea_dummy = {
-        id: "dummy",
-        description: "Dummy dataset",
-
-        heatmap: {
-          endpoint: boundaries_ds.heatmap.endpoint,
-          parse: ea_datasets_tiff_url,
-        },
-      };
-
-      (async _ => {
-        await ea_dummy.heatmap.parse.call(ea_dummy);
-        ea_dummy.raster = new Uint16Array(ea_dummy.width * ea_dummy.height).fill(-1);
-        ea_mapbox.setLayoutProperty('dummy', 'visibility', 'none');
-      })();
-    }
+    let b = DS.named('boundaries');
+    await b.heatmap.parse.call(b);
 
     inputs = collection
       .filter(t => t.active)

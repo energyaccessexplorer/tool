@@ -144,8 +144,6 @@ function ea_controls_elem(ds) {
     help.addEventListener('mouseup', _ => ea_category_help_modal(ds));
   }
 
-  check.change(ds.active);
-
   return controls;
 };
 
@@ -259,7 +257,10 @@ function ea_controls_options(ds) {
 function ea_controls_active(ds, callback) {
   return ea_svg_checkbox(ds.active, (s) => {
     const contel = document.querySelector(`.controls#controls-${ds.id}`);
-    if (!contel) return;
+    if (!contel) {
+      console.warn("this shouldn't happen!");
+      return;
+    }
 
     const cs = contel.querySelectorAll('.controls-dataset-content');
 

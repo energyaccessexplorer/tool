@@ -31,17 +31,17 @@ function ea_svg_checkbox(init, callback) {
     .attr('stroke', 'white')
     .attr('d', "M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z");
 
-  function change(s,i) {
+  function change(s,x) {
     gutter
       .attr('stroke', (s ? active : '#ccc'))
       .style('fill', (s ? active : 'white'));
 
-    if (typeof callback === 'function' && !i) callback(s);
+    if ((typeof callback === 'function') && x) callback(s);
   };
 
-  svg.on('click', _ => change(status = !status));
+  svg.on('click', _ => change(status = !status, true));
 
-  change(status, init);
+  change(status, false);
 
   return {
     svg: svg.node(),

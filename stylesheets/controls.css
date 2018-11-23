@@ -171,13 +171,18 @@ select#controls-country,
 select#controls-preset {
   font-size: 1.5em;
 
-  text-align-last: center;
-  text-align: center;
-
   -webkit-appearance: none;
   appearance: none;
 
+  padding-left: 2em;
+
+  border-right: 1px solid lightgray;
+
   background: url(../images/triangle-down.svg) 10px 0 no-repeat;
+}
+
+select#controls-country {
+  border-bottom: 1px solid lightgray;
 }
 
 #supply, #demand {

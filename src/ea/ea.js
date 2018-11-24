@@ -66,46 +66,61 @@ function ea_analysis(type) {
   const scales = collection.map(d => ea_datasets_scale_fn(d, type));
 
   const full_weight = collection
-        .reduce((a,c,k) => ((c.heatmap.scale === "key-delta") ? a : c.weight + a), 0);
+        .reduce((a,c) => ((c.heatmap.scale === "key-delta") ? a : c.weight + a), 0);
 
   let min = 1;
   let max = 0;
 
   // NOTICE: if there is only one dataset which has no weight in calculations
   // (boundaries with key-delta scale function, for example), we do NOT want an
-  // fully black raster to show as the result. We build a transparent one
+  // fully black raster to show as the result. We return the transparent one "A"
   // instead.
   //
-  if (collection.length === 1 && full_weight === 0) {
-    A.raster = A.raster.fill(-1);
-    return A;
-  }
+  if (collection.length === 1 && full_weight === 0) return A;
 
   for (var i = 0; i < A.raster.length; i++) {
-    const t = collection.reduce((a, c, k, l) => {
-      // On this reduce loop, we 'annihilate' points that come as -1
-      // (or nodata) since we wouldn't know what value to assign for
-      // the analysis. We assume they have been clipped out.
+    let a = 0;
+
+    for (let j = 0; j < collection.length; j++) {
+      let c = collection[j];
+
+      // For the rest of the datasets, we 'annihilate' points that are already
+      // as -1 (or nodata) since we wouldn't know what value to assign for the
+      // analysis. In other words, if a dataset has a point has nodata, that
+      // point is useless for the analysis as it is incomparable with other
+      // datasets.
       //
-      if (a === -1) return -1;
+      // We assume they have been clipped out.
+      //
+      if (a === -1) continue;
 
       const v = c.raster[i];
-      if (v === c.nodata) return -1;
+      if (v === c.nodata) {
+        a = -1; continue;
+      }
 
-      // If the scaling function clamped, the following wont
-      // happen. But if there the values are outside our analysis
-      // domain, we assume clipping by setting -1 (nodata).
+      const sv = scales[j](v);
+
+      // Three options: within domain/range, clipping or clamping. This is where
+      // the clipping happens. The clamping was done by the scaling function
+      // above.
       //
-      const sv = scales[k](v);
-      if (sv < 0 || sv > 1) return -1;
+      // If the scaling function clamped, the following will not happen. But if
+      // the value falls outside our analysis domain, we clip it (-1 nodata).
+      //
+      if (sv < 0 || sv > 1) {
+        a = -1; continue;
+      }
 
+      // key-delta scales are simply a filter.
+      //
       if (c.heatmap.scale === "key-delta")
-        return a;
+        continue;
       else
-        return (sv * c.weight) + a;
-    }, 0);
+        a = (sv * c.weight) + a;
+    }
 
-    const r = (t === -1) ? t : t / full_weight;
+    const r = (a === -1) ? a : a / full_weight;
 
     if (r !== -1) {
       if (r > max) max = r;

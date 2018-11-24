@@ -112,12 +112,7 @@ function ea_analysis(type) {
         a = -1; continue;
       }
 
-      // key-delta scales are simply a filter.
-      //
-      if (c.heatmap.scale === "key-delta")
-        continue;
-      else
-        a = (sv * c.weight) + a;
+      a = (sv * c.weight) + a;
     }
 
     const r = (a === -1) ? a : a / full_weight;

@@ -225,6 +225,9 @@ class DS {
       for (let i of this.configuration.collection)
         await DS.named(i).load(arg);
 
+      // TODO: Remove this? It's a hack for transmission-lines-collection not
+      // having per-element rasters but a single collection raster.
+      //
       if (this.heatmap) await this.heatmap.parse.call(this);
     }
 
@@ -278,6 +281,7 @@ async function ea_datasets_init(country_id, inputs, preset) {
 
 function ea_datasets_scale_fn(ds, type) {
   let s = null;
+
   const d = (ds.heatmap.domain && [ds.heatmap.domain.min, ds.heatmap.domain.max]) || [0,1];
   const t = ds.tmp_domain;
   const v = ds.heatmap.scale;
@@ -307,6 +311,13 @@ function ea_datasets_scale_fn(ds, type) {
   }
 
   case 'key-delta': {
+    if (ds.weight !== 1) {
+      console.warn(`${ds.id} is 'key-delta' but has weight ${ds.weight}.
+key-delta functions are meant to be filters.
+Forcing dataset's weight to 1.`);
+      ds.weight = 1;
+    }
+
     s = x => {
       let z = ds.table[x];
       if (!z) return -1;
@@ -487,6 +498,10 @@ async function ea_datasets_tiff(blob) {
         "type": 'raster',
         "source": this.id,
       }, ea_mapbox.first_symbol);
+
+    if (this.id === 'transmission-lines-collection') {
+      ea_mapbox.setLayoutProperty(this.id, 'visibility', 'none');
+    }
   };
 
   if (this.raster) {
@@ -498,14 +513,12 @@ async function ea_datasets_tiff(blob) {
     const image = await tiff.getImage();
     const rasters = await image.readRasters();
 
-    this.tiff = tiff;
-    this.image = image;
     this.raster = rasters[0];
 
     this.width = image.getWidth();
     this.height = image.getHeight();
 
-    this.nodata = parseFloat(this.tiff.fileDirectories[0][0].GDAL_NODATA);
+    this.nodata = parseFloat(tiff.fileDirectories[0][0].GDAL_NODATA);
 
     let c = document.createElement('canvas');
     c.id = `canvas-${this.id}`;
@@ -528,7 +541,7 @@ async function ea_datasets_tiff_url() {
   if (ds.raster) {
     ea_datasets_tiff.call(ds);
     return ds;
-  };
+  }
 
   const endpoint = ds.heatmap.endpoint;
 

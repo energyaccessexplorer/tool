@@ -42,10 +42,9 @@ h1, h2, h3 {
 
 #summary-button {
   position: absolute;
-  bottom: 10px;
+  bottom: 80px;
   left: 10px;
   z-index: 10;
-  cursor: pointer;
 
   text-align: center;
   font-size: 1.2em;

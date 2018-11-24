@@ -188,7 +188,7 @@ class DS {
 
   async show() {
     if (this.collection)
-      for (let i of this.configuration.collection) await DS.named(i).show();
+      await Promise.all(this.configuration.collection.map(i => DS.named(i).show()));
 
     else if (ea_mapbox.getLayer(this.id))
       ea_mapbox.setLayoutProperty(this.id, 'visibility', 'visible');
@@ -196,20 +196,20 @@ class DS {
 
   async hide() {
     if (this.collection)
-      for (let i of this.configuration.collection) await DS.named(i).hide();
+      await Promise.all(this.configuration.collection.map(i => DS.named(i).hide()));
 
     else if (ea_mapbox.getSource(this.id))
       ea_mapbox.setLayoutProperty(this.id, 'visibility', 'none');
   };
 
   async turn(v, draw) {
-    if (v && this.vectors) await this.load('vectors');
-    if (v && this.heatmap) await this.load('heatmap');
-    if (v && this.csv) await this.load('csv');
+    await Promise.all(
+      ['vectors', 'csv', 'heatmap'].map(i => {
+        if (v && this[i]) return this.load(i);
+      }));
 
     if (this.collection) {
-      for (let i of this.configuration.collection)
-        await DS.named(i).turn(v, draw);
+      await Promise.all(this.configuration.collection.map(i => DS.named(i).turn(v, draw)));
     }
 
     else {
@@ -222,8 +222,7 @@ class DS {
     ea_ui_dataset_loading(this, true);
 
     if (this.collection) {
-      for (let i of this.configuration.collection)
-        await DS.named(i).load(arg);
+      await Promise.all(this.configuration.collection.map(i => DS.named(i).load(arg)));
 
       // TODO: Remove this? It's a hack for transmission-lines-collection not
       // having per-element rasters but a single collection raster.

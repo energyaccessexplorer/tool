@@ -249,16 +249,11 @@ Please reporty this to energyaccessexplorer@wri.org.
     //
     ea_canvas.getContext('2d');
 
-    await (async _ => {
-      for (var id of inputs) {
-        let ds = DS.named(id);
-        if (ds) await ds.turn(true, false);
-      }
-
-      ea_ui_app_loading(false);
-    })();
+    await Promise.all(inputs.map(id => DS.named(id).turn(true, false)));
 
     mapbox_change_theme(ea_settings.mapbox_theme);
+
+    ea_ui_app_loading(false);
 
     break;
   }
@@ -285,12 +280,7 @@ Please reporty this to energyaccessexplorer@wri.org.
 
       ea_layers_inputs(inputs);
 
-      for (let i of inputs) {
-        let x;
-        if (x = DS.named(i)) {
-          await x.turn(true, true);
-        }
-      }
+      await Promise.all(inputs.map(id => DS.named(id).turn(true, true)));
 
       ea_layers_sort_inputs(inputs);
     }

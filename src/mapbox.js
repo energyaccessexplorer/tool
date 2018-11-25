@@ -94,6 +94,9 @@ function mapbox_canvas(m) {
     "id": 'canvas-layer',
     "source": 'canvas-source',
     "type": 'raster',
+    "paint": {
+      "raster-resampling": "nearest"
+    }
   }, ea_mapbox.first_symbol);
 };
 

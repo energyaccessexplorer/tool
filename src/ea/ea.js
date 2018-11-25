@@ -245,10 +245,6 @@ Please reporty this to energyaccessexplorer@wri.org.
     ea_layout_map(country.bounds);
     ea_map_setup(country.bounds);
 
-    // STRANGE: force the canvas to 2d...
-    //
-    ea_canvas.getContext('2d');
-
     await Promise.all(inputs.map(id => DS.named(id).turn(true, false)));
 
     mapbox_change_theme(ea_settings.mapbox_theme);

@@ -496,6 +496,9 @@ async function ea_datasets_tiff(blob) {
         "id": this.id,
         "type": 'raster',
         "source": this.id,
+        "paint": {
+          "raster-resampling": "nearest"
+        }
       }, ea_mapbox.first_symbol);
 
     if (this.id === 'transmission-lines-collection') {

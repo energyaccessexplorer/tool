@@ -179,7 +179,7 @@ function ea_controls(ds) {
   case "powerplants":
   case "geothermal":
   case "transmission-lines":
-    range_group = ea_controls_range(ds, (ds.unit || 'proximity in km'))
+    range_group = ea_controls_single(ds, (ds.unit || 'proximity in km'))
     controls.appendChild(range_group.elem);
     controls.appendChild(weight_group.elem);
     break;
@@ -199,7 +199,7 @@ function ea_controls(ds) {
     break;
 
   case "transmission-lines-collection":
-    range_group = ea_controls_range(ds, (ds.unit || 'proximity in km'))
+    range_group = ea_controls_single(ds, (ds.unit || 'proximity in km'))
     controls.appendChild(ea_controls_collection_list(ds));
     controls.appendChild(range_group.elem);
     controls.appendChild(weight_group.elem);
@@ -273,7 +273,7 @@ function ea_controls_active(ds, callback) {
   });
 };
 
-function ea_controls_range(ds, label) {
+function ea_controls_range(ds, label, single) {
   const d = [ds.heatmap.domain.min, ds.heatmap.domain.max];
 
   const range_norm = d3.scaleLinear().domain([0,1]).range(d);
@@ -306,6 +306,7 @@ function ea_controls_range(ds, label) {
 
   const range_control = ea_svg_interval_thingradient(
     csf,
+    single,
     (ds.init_domain ? [range_norm.invert(ds.init_domain[0]), range_norm.invert(ds.init_domain[1])] : null),
     x => update_range_value(x, 0, v1),
     x => update_range_value(x, 1, v2),
@@ -323,6 +324,10 @@ function ea_controls_range(ds, label) {
     elem: container,
     range_control: range_control
   };
+};
+
+function ea_controls_single(ds, label) {
+  return ea_controls_range(ds, label, true);
 };
 
 function ea_controls_weight(ds, init) {

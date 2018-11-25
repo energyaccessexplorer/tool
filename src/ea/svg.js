@@ -505,7 +505,7 @@ function ea_svg_color_steps(color_scale, r) {
   return svg.node();
 };
 
-function ea_svg_interval_thingradient(color_scale, init, callback1, callback2, end_callback) {
+function ea_svg_interval_thingradient(color_scale, single, init, callback1, callback2, end_callback) {
   const radius = 5,
         svgwidth = 256,
         svgheight = (radius * 2) + 2,
@@ -604,8 +604,8 @@ function ea_svg_interval_thingradient(color_scale, init, callback1, callback2, e
     c.attr('cx', cx);
 
     marked
-      .attr('x', rx)
-      .attr('width', w);
+      .attr('x', rx - radius)
+      .attr('width', w + radius);
 
     if (c === c1) {
       umarked1
@@ -659,6 +659,8 @@ function ea_svg_interval_thingradient(color_scale, init, callback1, callback2, e
 
   drag_callback(c1, i0, i0, i1 - i0, callback1);
   drag_callback(c2, i1, i0, i1 - i0, callback2);
+
+  if (single) c1.remove();
 
   return {
     svg: svg.node(),

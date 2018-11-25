@@ -6,7 +6,6 @@ function ea_map_setup(bounds) {
 
   const center = [b[0][0] + (Math.abs(w/2)), b[0][1] + (Math.abs(h/2))];
 
-  ea_canvas.style.display = 'none';
   ea_mapbox = mapbox_setup(bounds);
 
   ea_mapbox.zoomTo(ea_mapbox.getZoom() * 0.95, {duration: 0});

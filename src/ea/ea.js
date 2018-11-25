@@ -1,10 +1,10 @@
-function ea_canvas_plot(A, c = ea_canvas) {
+function ea_canvas_plot(A, canvas) {
   if (!(A.id && A.raster)) throw `${A.id} is not a A! Bye.`;
 
   ea_current_analysis = A;
 
   const plot = new plotty.plot({
-    canvas: c,
+    canvas: canvas,
     data: A.raster,
     width: A.width,
     height: A.height,
@@ -151,6 +151,8 @@ async function ea_overlord(msg) {
   let inputs_param = location.get_query_param('inputs');
   let preset_param = location.get_query_param('preset');
 
+  const output_canvas = document.querySelector('canvas#output');
+
   function set_mode_param(m) {
     history.replaceState(null, null, location.set_query_param('mode', (m || mode)));
   };
@@ -203,7 +205,6 @@ async function ea_overlord(msg) {
     ea_ccn3 = location.get_query_param('ccn3');
     ea_map = null;
     ea_mapbox = null;
-    ea_canvas = null;
     ea_category_tree = null;
 
     let country; await ea_client(`${ea_settings.database}/countries?ccn3=eq.${ea_ccn3}`, 'GET', 1, r => country = r);
@@ -266,7 +267,7 @@ Please reporty this to energyaccessexplorer@wri.org.
         let x; if (x = DS.named(i)) x.hide();
       });
 
-      ea_canvas_plot(ea_analysis(output));
+      ea_canvas_plot(ea_analysis(output), output_canvas);
 
       ea_mapbox.setLayoutProperty('canvas-layer', 'visibility', 'visible');
     }
@@ -303,7 +304,7 @@ Please reporty this to energyaccessexplorer@wri.org.
       await ds.turn(ds.active, false);
 
       ea_layers_outputs(output);
-      ea_canvas_plot(ea_analysis(output));
+      ea_canvas_plot(ea_analysis(output), output_canvas);
     }
 
     else if (mode === "inputs") {
@@ -327,7 +328,7 @@ Please reporty this to energyaccessexplorer@wri.org.
 
   case "output": {
     if (mode === "outputs") {
-      ea_canvas_plot(ea_analysis(msg.heatmap));
+      ea_canvas_plot(ea_analysis(msg.heatmap), output_canvas);
       set_output_param(msg.heatmap);
     }
 
@@ -349,7 +350,7 @@ Please reporty this to energyaccessexplorer@wri.org.
         await ds.load();
       }
 
-      ea_canvas_plot(ea_analysis(output));
+      ea_canvas_plot(ea_analysis(output), output_canvas);
     }
 
     else if (mode === "inputs") {

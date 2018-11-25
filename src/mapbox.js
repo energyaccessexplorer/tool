@@ -81,7 +81,7 @@ function mapbox_theme_pick(theme) {
 function mapbox_canvas(m) {
   m.addSource('canvas-source', {
     "type": 'canvas',
-    "canvas": 'plot',
+    "canvas": 'output',
     "animate": false,
     "coordinates": m.coords
   });

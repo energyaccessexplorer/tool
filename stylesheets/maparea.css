@@ -2,10 +2,6 @@
   background-color: var(--the-white);
 }
 
-canvas#plot {
-  pointer-events: none;
-}
-
 svg#svg-map {
   opacity: 1.0;
 }

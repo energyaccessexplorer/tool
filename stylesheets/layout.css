@@ -69,15 +69,6 @@ svg#svg-map {
   padding: 0;
 }
 
-canvas#plot {
-  position: absolute;
-  top: 0;
-  left: 0;
-
-  width: auto;
-  margin: auto;
-}
-
 #mapbox-container {
   z-index: 0;
 }

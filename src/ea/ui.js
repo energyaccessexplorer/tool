@@ -101,7 +101,6 @@ function ea_layout_map(bounds) {
   height = p.clientHeight;
 
   width = p.clientWidth - p.querySelector('#controls').clientWidth + 10;
-  ea_canvas = document.querySelector('canvas#plot');
 
   const maparea = document.querySelector('#maparea');
   maparea.style['width'] = width + "px";

@@ -30,6 +30,28 @@ function ea_layers_lowmidhigh() {
 `);
 };
 
+function ea_layers_opacity_control(ds) {
+  const e = elem(`<div class="layers-opacity-control"></div>`);
+
+  let csf = _ => {
+    return d3.scaleLinear()
+      .clamp(false)
+      .range([getComputedStyle(document.body).getPropertyValue('--the-green')]);
+  };
+
+  let opacity = 1;
+
+  const grad = ea_svg_interval_thingradient(
+    csf, true, null, null,
+    x => opacity = x,
+    _ => ea_mapbox.setPaintProperty(ds.id, 'raster-opacity', parseFloat(opacity))
+  );
+
+  e.appendChild(grad.svg);
+
+  return e;
+};
+
 function ea_layers_input_elem(ds) {
   const d = ea_layers_elem(ds.id, '', ds.name_long);
 
@@ -37,6 +59,18 @@ function ea_layers_input_elem(ds) {
 
   let c = d.querySelector('.layers-element-description');
   let lec = d.querySelector('.layers-element-controls');
+
+  if (!ds.vectors && !ds.collection) {
+    const loc = ea_layers_opacity_control(ds);
+    d.prepend(loc);
+
+    let dlo = elem(`<div class="layer-opacity">${ea_svg_opacity()}</div>`);
+    dlo.addEventListener('mouseup', _ => loc.style.display = 'block');
+
+    loc.addEventListener('mouseleave', _ => loc.style.display = 'none');
+
+    lec.appendChild(dlo);
+  }
 
   let dli = elem(`<div class="layer-info">${ea_svg_info()}</div>`);
   dli.addEventListener('mouseup', _ => ea_dataset_modal(ds));

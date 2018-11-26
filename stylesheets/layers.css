@@ -39,6 +39,7 @@
 .layers-element {
   background-color: var(--the-white);
   display: flex;
+  position: relative;
 
   color: var(--the-gray);
   fill: var(--the-gray);
@@ -109,12 +110,11 @@
 .layers-element-controls div {
   display: inline-block;
 
-  width: 1em;
-  height: 1em;
-
   background-size: 100%;
   background-position: center center;
   background-repeat: no-repeat;
+
+  margin: 4px;
 
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -155,4 +155,18 @@
   content: ' ';
   border-right: 1px lightgray solid;
   margin-right: 1em;
+}
+
+.layers-opacity-control {
+  position: absolute;
+  top: -10px;
+  right: 20px;
+
+  display: none;
+  background-color: white;
+
+  box-shadow: 0 20px 30px 0 rgba(0,0,0,0.2);
+
+  padding: 16px;
+  padding-bottom: 4px;
 }

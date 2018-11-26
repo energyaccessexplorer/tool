@@ -175,6 +175,7 @@ select#controls-preset {
   appearance: none;
 
   padding-left: 2em;
+  text-align-last: center;
 
   border-right: 1px solid lightgray;
 

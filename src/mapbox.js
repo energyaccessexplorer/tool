@@ -78,19 +78,19 @@ function mapbox_theme_pick(theme) {
   });
 };
 
-function mapbox_canvas(m) {
-  m.addSource('canvas-source', {
+function mapbox_canvas() {
+  ea_mapbox.addSource('canvas-source', {
     "type": 'canvas',
     "canvas": 'output',
     "animate": false,
-    "coordinates": m.coords
+    "coordinates": ea_mapbox.coords
   });
 
-  const c = m.getStyle().layers.find(l => l.type === 'symbol');
+  const c = ea_mapbox.getStyle().layers.find(l => l.type === 'symbol');
 
   ea_mapbox.first_symbol = ((c && c.id) || undefined);
 
-  m.addLayer({
+  ea_mapbox.addLayer({
     "id": 'canvas-layer',
     "source": 'canvas-source',
     "type": 'raster',
@@ -135,7 +135,7 @@ function mapbox_setup(bounds) {
 
 function mapbox_change_theme(theme, callback) {
   ea_mapbox.once('styledata', _ => {
-    mapbox_canvas(ea_mapbox);
+    mapbox_canvas();
 
     ea_overlord({
       type: "refresh",

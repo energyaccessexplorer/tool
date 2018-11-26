@@ -139,13 +139,9 @@ class DS {
     this.raster = undefined;
     this.vectors = undefined;
     this.heatmap = undefined;
-    this.height = undefined;
-    this.width = undefined;
-    this.image = undefined;
-    this.tiff = undefined;
 
     this.configuration.host = host.id;
-    this.vectors = host.vectors;
+
     this.color_scale_svg = host.color_scale_svg;
     this.color_scale_fn = host.color_scale_fn;
 
@@ -153,7 +149,7 @@ class DS {
 
     this.heatmap = host.heatmap;
     this.raster = host.raster;
-    this.image = host.image;
+    this.vectors = host.vectors;
 
     return this;
   };
@@ -501,6 +497,9 @@ async function ea_datasets_tiff(blob) {
         }
       }, ea_mapbox.first_symbol);
 
+    // TODO: Remove this? It's a hack for transmission-lines-collection not
+    // having per-element rasters but a single collection raster.
+    //
     if (this.id === 'transmission-lines-collection') {
       ea_mapbox.setLayoutProperty(this.id, 'visibility', 'none');
     }

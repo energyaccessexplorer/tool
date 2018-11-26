@@ -151,7 +151,7 @@ async function ea_overlord(msg) {
   let inputs_param = location.get_query_param('inputs');
   let preset_param = location.get_query_param('preset');
 
-  const output_canvas = document.querySelector('canvas#output');
+  let output_canvas = document.querySelector('canvas#output');
 
   function set_mode_param(m) {
     history.replaceState(null, null, location.set_query_param('mode', (m || mode)));
@@ -200,16 +200,15 @@ async function ea_overlord(msg) {
 
   switch (msg.type) {
   case "init": {
+    document.body.append(output_canvas = elem('<canvas id="output" style="display: none;">'));
+
+    const ccn3 = location.get_query_param('ccn3');
+    let country; await ea_client(`${ea_settings.database}/countries?ccn3=eq.${ccn3}`, 'GET', 1, r => country = r);
+
     /* TODO: these are the global objects. Fix it: remove. */
-
-    ea_ccn3 = location.get_query_param('ccn3');
-    ea_map = null;
     ea_mapbox = null;
-    ea_category_tree = null;
-
-    let country; await ea_client(`${ea_settings.database}/countries?ccn3=eq.${ea_ccn3}`, 'GET', 1, r => country = r);
-
     ea_category_tree = country.category_tree;
+
     const collection = await ea_datasets_init(country.id, inputs, preset);
 
     const b = collection.find(d => d.id === 'boundaries');

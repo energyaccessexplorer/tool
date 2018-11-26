@@ -55,7 +55,7 @@ function ea_layers_opacity_control(ds) {
 function ea_layers_input_elem(ds) {
   const d = ea_layers_elem(ds.id, '', ds.name_long);
 
-  d.prepend(elem('<div class="layers-element-handle"></div>'))
+  d.prepend(elem('<div class="layers-element-handle"></div>'));
 
   let c = d.querySelector('.layers-element-description');
   let lec = d.querySelector('.layers-element-controls');

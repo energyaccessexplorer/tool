@@ -66,7 +66,7 @@ require([
     "eai": "(Current and/or potential)",
     "demand": "(Current and/or potential)",
     "supply": "(Current and/or potential)",
-    "ani": "Need for Assistance Index",
+    "ani": "Areas where market assistance is needed the most",
   };
 
   window.ea_presets = {

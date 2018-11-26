@@ -21,18 +21,22 @@ async function ea_client(endpoint, method, payload, callback) {
     options.method = 'POST';
     options.body = JSON.stringify(payload);
 
-		await fetch(endpoint, options)
+		return fetch(endpoint, options)
       .then(ea_client_check)
-      .then(async (r) => await callback(await r.json()));
+      .then(r => r.json())
+      .then(j => callback(j));
+
     break;
   }
 
   case "GET": {
     if (payload == 1) options.headers['Accept'] = "application/vnd.pgrst.object+json";
 
-		await fetch(endpoint, options)
+		return fetch(endpoint, options)
       .then(ea_client_check)
-      .then(async r => await callback(await r.json()))
+      .then(r => r.json())
+      .then(j => callback(j))
+
     break;
   }
 

@@ -479,20 +479,21 @@ async function ea_datasets_tiff(blob) {
       return;
     }
 
-    ea_canvas_plot(ea_analysis(this.id), canvas);
-
     if (!ea_mapbox) {
       console.log('ea_datasets_tiff.draw: ea_mapbox is not here yet. Init?');
       return;
     }
 
-    if (!ea_mapbox.getSource(this.id))
+    if (!ea_mapbox.getSource(this.id)) {
+      ea_canvas_plot(ea_analysis(this.id), canvas);
+
       ea_mapbox.addSource(this.id, {
         "type": "canvas",
         "canvas": `canvas-${this.id}`,
         "animate": false,
         "coordinates": ea_mapbox.coords
       });
+    }
 
     if (!ea_mapbox.getLayer(this.id))
       ea_mapbox.addLayer({

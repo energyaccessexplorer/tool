@@ -474,10 +474,7 @@ async function ea_datasets_geojson(callback) {
 
 async function ea_datasets_tiff(blob) {
   function draw(canvas) {
-    if (this.vectors) {
-      console.log(`${this.id} has vectors. Skipping.`);
-      return;
-    }
+    if (this.vectors) return;
 
     if (!ea_mapbox) {
       console.log('ea_datasets_tiff.draw: ea_mapbox is not here yet. Init?');
@@ -495,7 +492,7 @@ async function ea_datasets_tiff(blob) {
       });
     }
 
-    if (!ea_mapbox.getLayer(this.id))
+    if (!ea_mapbox.getLayer(this.id)) {
       ea_mapbox.addLayer({
         "id": this.id,
         "type": 'raster',
@@ -504,6 +501,7 @@ async function ea_datasets_tiff(blob) {
           "raster-resampling": "nearest"
         }
       }, ea_mapbox.first_symbol);
+    }
 
     // TODO: Remove this? It's a hack for transmission-lines-collection not
     // having per-element rasters but a single collection raster.

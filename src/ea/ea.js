@@ -310,7 +310,6 @@ Please reporty this to energyaccessexplorer@wri.org.
       await ds.turn(ds.active, true);
 
       ea_layers_inputs(inputs);
-
       ds.raise()
     }
 

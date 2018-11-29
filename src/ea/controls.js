@@ -170,16 +170,20 @@ function ea_controls(ds) {
     controls.appendChild(weight_group.elem);
     break;
 
+  case "health":
   case "schools":
+    range_group = ea_controls_single(ds, (ds.unit || 'proximity in km'));
+    controls.appendChild(range_group.elem);
+    controls.appendChild(weight_group.elem);
+    break;
+
   case "minigrids":
   case "mines":
   case "hydro":
-  case "facilities":
-  case "health":
   case "powerplants":
   case "geothermal":
   case "transmission-lines":
-    range_group = ea_controls_single(ds, (ds.unit || 'proximity in km'))
+    range_group = ea_controls_range(ds, (ds.unit || 'proximity in km'));
     controls.appendChild(range_group.elem);
     controls.appendChild(weight_group.elem);
     break;
@@ -199,7 +203,7 @@ function ea_controls(ds) {
     break;
 
   case "transmission-lines-collection":
-    range_group = ea_controls_single(ds, (ds.unit || 'proximity in km'))
+    range_group = ea_controls_range(ds, (ds.unit || 'proximity in km'));
     controls.appendChild(ea_controls_collection_list(ds));
     controls.appendChild(range_group.elem);
     controls.appendChild(weight_group.elem);

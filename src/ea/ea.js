@@ -341,27 +341,19 @@ Please reporty this to energyaccessexplorer@wri.org.
   case "preset": {
     if (!msg.value) throw `Argument error: Overlord: Could not set ${msg.value} preset`;
 
+    inputs = DS.list.filter(d => ea_presets_set(d, msg.value)).map(d => d.id);
+
     if (mode === "outputs") {
       ea_layers_outputs(output);
-
-      for (let ds of DS.list) {
-        ea_presets_set(ds, msg.value);
-        await ds.load();
-      }
-
+      await Promise.all(DS.list.map(d => d.turn(d.active, false)));
       ea_canvas_plot(ea_analysis(output), output_canvas);
     }
 
     else if (mode === "inputs") {
-      for (let ds of DS.list) {
-        let r = ea_presets_set(ds, msg.value);
-        if (r) ds.show(); else ds.hide();
-      };
+      await Promise.all(DS.list.map(d => d.turn(d.active, true)));
+      ea_layers_inputs(inputs);
     }
 
-    inputs = DS.list.filter(t => t.active).map(x => x.id)
-
-    ea_layers_inputs(inputs);
     set_inputs_param(inputs);
 
     break;

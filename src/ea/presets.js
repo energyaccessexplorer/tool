@@ -18,18 +18,14 @@ function ea_presets_init(v) {
 function ea_presets_set(d, v) {
   let p = d.presets[v];
 
-  if (p) {
-    d.active = true;
-    if (d.checkbox_change) d.checkbox_change(true);
+  d.active = !!p;
 
+  if (p) {
     d.weight = p.weight;
     if (d.weight_change) d.weight_change(p.weight);
 
     d.init_domain = [p.min, p.max];
   } else {
-    d.active = false;
-    if (d.checkbox_change) d.checkbox_change(false);
-
     d.weight = 2;
     if (d.weight_change) d.weight_change(2);
 

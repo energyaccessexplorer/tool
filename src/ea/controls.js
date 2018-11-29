@@ -254,21 +254,23 @@ function ea_controls_options(ds) {
   return container;
 };
 
+function ea_controls_toggle(ds, status) {
+  const contel = document.querySelector(`.controls#controls-${ds.id}`);
+  if (!contel) return;
+
+  const cs = contel.querySelectorAll('.controls-dataset-content');
+
+  if (ds.checkbox_change) ds.checkbox_change(status);
+
+  cs.forEach((c,i) => {
+    if (status) c.style['display'] = '';
+    else c.style['display'] = 'none';
+  });
+};
+
 function ea_controls_active(ds, callback) {
-  return ea_svg_checkbox(ds.active, (s) => {
-    const contel = document.querySelector(`.controls#controls-${ds.id}`);
-    if (!contel) {
-      console.warn("this shouldn't happen!");
-      return;
-    }
-
-    const cs = contel.querySelectorAll('.controls-dataset-content');
-
-    cs.forEach((c,i) => {
-      if (s) c.style['display'] = '';
-      else c.style['display'] = 'none';
-    });
-
+  return ea_svg_checkbox(ds.active, s => {
+    ea_controls_toggle(ds, s);
     callback(s);
   });
 };

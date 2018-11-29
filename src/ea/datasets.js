@@ -199,6 +199,8 @@ class DS {
   };
 
   async turn(v, draw) {
+    ea_controls_toggle(this, v);
+
     await Promise.all(
       ['vectors', 'csv', 'heatmap'].map(i => {
         if (v && this[i]) return this.load(i);
@@ -472,6 +474,11 @@ async function ea_datasets_geojson(callback) {
 
 async function ea_datasets_tiff(blob) {
   function draw(canvas) {
+    if (this.vectors) {
+      console.log(`${this.id} has vectors. Skipping.`);
+      return;
+    }
+
     ea_canvas_plot(ea_analysis(this.id), canvas);
 
     if (!ea_mapbox) {
@@ -529,7 +536,7 @@ async function ea_datasets_tiff(blob) {
 
     draw.call(this, c);
 
-    if (ea_mapbox)
+    if (ea_mapbox && ea_mapbox.getSource(this.id))
       ea_mapbox.setLayoutProperty(this.id, 'visibility', 'none');
   }
 

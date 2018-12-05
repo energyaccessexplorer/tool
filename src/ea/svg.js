@@ -479,8 +479,7 @@ function ea_svg_color_steps(color_scale, r) {
         svgwidth = 280,
         svgheight = (radius * 2) + 2,
         linewidth = radius * 2,
-        svgmin = radius + 1,
-        svgmax = svgwidth - radius - 1;
+        svgmin = radius + 1;
 
   const svg = d3.select(document.createElementNS(d3.namespaces.svg, "svg"))
         .attr('class', 'svg-interval');
@@ -493,8 +492,8 @@ function ea_svg_color_steps(color_scale, r) {
     g.append('rect')
       .attr('fill', color_scale()(v))
       .attr('stroke', 'none')
-      .attr('x', (svgwidth / 5) * i)
-      .attr('width', (svgwidth / 5))
+      .attr('x', `${(100/steps.length) * i}%`)
+      .attr('width', `${100/steps.length}%`)
       .attr('height', svgheight)
   });
 

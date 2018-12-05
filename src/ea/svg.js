@@ -322,7 +322,7 @@ function ea_svg_interval(color_scale, callback1, callback2, end_callback) {
   return svg.node();
 };
 
-function ea_svg_pie(container_id, data, outer, inner, colors, inner_text, create = true) {
+function ea_svg_pie(co, data, outer, inner, colors, inner_text, create = true) {
   const width =  outer * 2,
         height = outer * 2;
 
@@ -334,7 +334,7 @@ function ea_svg_pie(container_id, data, outer, inner, colors, inner_text, create
         .innerRadius(((inner === null || inner === undefined || inner === false) ? outer - (outer/4) : inner))
         .outerRadius(outer - (outer/15));
 
-  const container = d3.select(container_id);
+  const container = d3.select(co);
 
   let svg = null;
 

@@ -4,7 +4,7 @@ function ea_presets_init(v) {
   Object.keys(ea_presets).forEach(k => el.appendChild(elem(`<option value="${k}">${ea_presets[k]}</option>`)));
 
   el.value = v || "custom";
-  el.querySelector('option[value="custom"]').innerText = "Select a preset";
+  el.querySelector('option[value="custom"]').innerText = "Select an Action";
 
   el.addEventListener('change', function(e) {
     ea_overlord({

@@ -10,7 +10,7 @@ function ea_map_setup(bounds) {
 
   ea_mapbox.zoomTo(ea_mapbox.getZoom() * 0.95, {duration: 0});
 
-  document.querySelector('#maparea').appendChild(elem(`<div id="summary-button" onclick="ea_summary();">Summary</div>`));
+  document.querySelector('#maparea').appendChild(elem(`<div id="summary-button" onclick="ea_summary();">Snapshot</div>`));
 };
 
 function ea_map_svg(svg, topofile, name, options) {

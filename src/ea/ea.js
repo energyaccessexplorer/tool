@@ -184,7 +184,7 @@ async function ea_overlord(msg) {
     inputs = inputs_param.split(',');
   }
 
-  if (ea_views.indexOf(mode_param) > -1) {
+  if (Object.keys(ea_views).indexOf(mode_param) > -1) {
     mode = mode_param;
   } else {
     mode = 'outputs';

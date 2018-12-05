@@ -153,17 +153,17 @@ function ea_dataset_modal(ds) {
 
   if (ds.metadata.spatial_resolution)
     right.appendChild(elem(`<section>
-<h3>Spatial Resolution</h3><code>${ds.metadata.spatial_resolution}</code>
+<h3>Spatial Resolution</h3>${ds.metadata.spatial_resolution}
 </section>`));
 
   if (ds.metadata.license)
     right.appendChild(elem(`<section>
-<h3>License</h3><code>${ds.metadata.license}</code>
+<h3>License</h3>${ds.metadata.license}
 </section>`));
 
   if (ds.metadata.content_date)
     right.appendChild(elem(`<section>
-<h3>Date of Content</h3><code>${ds.metadata.content_date}</code>
+<h3>Date of Content</h3>${ds.metadata.content_date}
 </section>`));
 
   modal()

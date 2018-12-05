@@ -23,9 +23,11 @@ function ea_layers_elem(bind, cls, title) {
 function ea_layers_lowmidhigh() {
   return elem(`
 <div style="display: flex; justify-content: space-between; padding-right: 0.5em; padding-left: 0.5em;">
-  <div class="thing">Low</div>
-  <div class="thing">Medium</div>
-  <div class="thing">High</div>
+  <div>20</div>
+  <div>40</div>
+  <div>60</div>
+  <div>80</div>
+  <div>100</div>
 </div>
 `);
 };
@@ -48,6 +50,12 @@ function ea_layers_opacity_control(ds) {
   );
 
   e.appendChild(grad.svg);
+  e.appendChild(elem(`
+<div style="display: flex; justify-content: space-between; padding-right: 0.5em; padding-left: 0.5em; font-size: 0.8em;">
+  <span>0%</span>
+  <span>Opacity</span>
+  <span>100%</span>
+</div>`));
 
   return e;
 };

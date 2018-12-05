@@ -53,7 +53,10 @@ require([
   window.plotty = plotty;
   window.mapboxgl = mapboxgl;
 
-  window.ea_views = ['inputs', 'outputs'];
+  window.ea_views = {
+    "inputs": "Data",
+    "outputs": "Analysis"
+  };
 
   window.ea_indexes = {
     "eai": "Energy Access Index",
@@ -66,13 +69,13 @@ require([
     "eai": "(Current and/or potential)",
     "demand": "(Current and/or potential)",
     "supply": "(Current and/or potential)",
-    "ani": "Areas where market assistance is needed the most",
+    "ani": "(Areas where financial assistance is needed)",
   };
 
   window.ea_presets = {
-    "market": "Market Identification",
-    "planning": "Strategic Energy Planning",
-    "investment": "Investment for Impact"
+    "market": "Exploring new energy markets",
+    "planning": "Planning for electrification",
+    "investment": "Investing for impact"
   };
 
   window.ea_branch_dict = {

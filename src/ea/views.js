@@ -1,8 +1,8 @@
 function ea_views_init() {
   const el = document.querySelector('#views');
 
-  ea_views.forEach(v => {
-    const btn = elem(`<div class="view">${v}</div>`);
+  Object.keys(ea_views).forEach(v => {
+    const btn = elem(`<div class="view">${ea_views[v]}</div>`);
 
     btn.addEventListener('mouseup', function(e) {
       el.querySelectorAll('.view').forEach(e => e.classList.remove('active'));

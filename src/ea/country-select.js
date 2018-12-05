@@ -12,7 +12,7 @@
     })
     .then(_ => {
       select.value = location.get_query_param('ccn3');
-      select.querySelector('option[value=""]').innerText = "Select a country";
+      select.querySelector('option[value=""]').innerText = "Select a Country";
     });
 
   select.addEventListener('change', function() { window.location = `/maps-and-data/tool/?ccn3=${this.value}`});

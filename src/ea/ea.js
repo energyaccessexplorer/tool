@@ -137,21 +137,13 @@ function ea_analysis(type) {
   return A;
 };
 
-async function ea_overlord(msg) {
-  if (!msg) throw "Argument Error: Overlord: I have nothing to do!";
-  if (typeof msg.caller === 'undefined' || !msg.caller) throw "Argument Error: Overlord: Who is the caller?";
-
-  let mode;
-  let output;
-  let inputs;
-  let preset;
+function ea_state_sync() {
+  let mode, output, inputs, preset;
 
   let mode_param = location.get_query_param('mode');
   let output_param = location.get_query_param('output');
   let inputs_param = location.get_query_param('inputs');
   let preset_param = location.get_query_param('preset');
-
-  let output_canvas = document.querySelector('canvas#output');
 
   function set_mode_param(m) {
     history.replaceState(null, null, location.set_query_param('mode', (m || mode)));
@@ -198,6 +190,26 @@ async function ea_overlord(msg) {
     set_preset_param();
   }
 
+  return {
+    mode: mode,
+    set_mode_param: set_mode_param,
+    output: output,
+    set_output_param: set_output_param,
+    inputs: inputs,
+    set_inputs_param: set_inputs_param,
+    preset: preset,
+    set_preset_param: set_preset_param,
+  };
+};
+
+async function ea_overlord(msg) {
+  if (!msg) throw "Argument Error: Overlord: I have nothing to do!";
+  if (typeof msg.caller === 'undefined' || !msg.caller) throw "Argument Error: Overlord: Who is the caller?";
+
+  let output_canvas = document.querySelector('canvas#output');
+
+  const state = ea_state_sync();
+
   switch (msg.type) {
   case "init": {
     document.body.append(output_canvas = elem('<canvas id="output" style="display: none;">'));
@@ -209,7 +221,7 @@ async function ea_overlord(msg) {
     ea_mapbox = null;
     ea_category_tree = country.category_tree;
 
-    const collection = await ea_datasets_init(country.id, inputs, preset);
+    const collection = await ea_datasets_init(country.id, state.inputs, state.preset);
 
     const b = collection.find(d => d.id === 'boundaries');
 
@@ -229,14 +241,14 @@ Please reporty this to energyaccessexplorer@wri.org.
       await b.heatmap.parse.call(b);
     }
 
-    inputs = collection
+    const inputs = collection
       .filter(t => t.active)
       .map(x => x.id)
-      .sort((a,b) => (inputs.indexOf(a) < inputs.indexOf(b)) ? -1 : 1);
+      .sort((a,b) => (state.inputs.indexOf(a) < state.inputs.indexOf(b)) ? -1 : 1);
 
-    set_inputs_param();
+    state.set_inputs_param();
 
-    ea_presets_init(preset);
+    ea_presets_init(state.preset);
     ea_views_init();
     ea_layers_init();
 
@@ -257,16 +269,16 @@ Please reporty this to energyaccessexplorer@wri.org.
   case "mode": {
     let t = msg.target;
 
-    set_mode_param(t);
+    state.set_mode_param(t);
 
     if (t === "outputs") {
-      ea_layers_outputs(output);
+      ea_layers_outputs(state.output);
 
-      inputs.forEach(i => {
+      state.inputs.forEach(i => {
         let x; if (x = DS.named(i)) x.hide();
       });
 
-      ea_canvas_plot(ea_analysis(output), output_canvas);
+      ea_canvas_plot(ea_analysis(state.output), output_canvas);
 
       ea_mapbox.setLayoutProperty('canvas-layer', 'visibility', 'visible');
     }
@@ -274,15 +286,15 @@ Please reporty this to energyaccessexplorer@wri.org.
     else if (t === "inputs") {
       ea_mapbox.setLayoutProperty('canvas-layer', 'visibility', 'none');
 
-      ea_layers_inputs(inputs);
+      ea_layers_inputs(state.inputs);
 
-      await Promise.all(inputs.map(id => DS.named(id).turn(true, true)));
+      await Promise.all(state.inputs.map(id => DS.named(id).turn(true, true)));
 
-      ea_layers_sort_inputs(inputs);
+      ea_layers_sort_inputs(state.inputs);
     }
 
     else {
-      throw `Argument Error: Overlord: Could not set/find the mode '${mode}'.`;
+      throw `Argument Error: Overlord: Could not set/find the mode '${state.mode}'.`;
     }
 
     break;
@@ -291,22 +303,22 @@ Please reporty this to energyaccessexplorer@wri.org.
   case "input": {
     const ds = msg.target;
 
-    set_preset_param(null);
+    state.set_preset_param(null);
 
     ds.active ?
-      inputs.unshift(ds.id) :
-      inputs.splice(inputs.indexOf(ds.id), 1); // REMOVE()
+      state.inputs.unshift(ds.id) :
+      state.inputs.splice(state.inputs.indexOf(ds.id), 1); // REMOVE()
 
-    inputs = [...new Set(inputs)]; // UNIQUE()
+    const inputs = [...new Set(state.inputs)]; // UNIQUE()
 
-    if (mode === "outputs") {
+    if (state.mode === "outputs") {
       await ds.turn(ds.active, false);
 
-      ea_layers_outputs(output);
-      ea_canvas_plot(ea_analysis(output), output_canvas);
+      ea_layers_outputs(state.output);
+      ea_canvas_plot(ea_analysis(state.output), output_canvas);
     }
 
-    else if (mode === "inputs") {
+    else if (state.mode === "inputs") {
       await ds.turn(ds.active, true);
 
       ea_layers_inputs(inputs);
@@ -314,24 +326,24 @@ Please reporty this to energyaccessexplorer@wri.org.
     }
 
     else {
-      throw `Argument Error: Overlord: Could not set the mode ${mode}`;
+      throw `Argument Error: Overlord: Could not set the mode ${state.mode}`;
     }
 
-    set_output_param();
+    state.set_output_param();
 
-    set_inputs_param();
+    state.set_inputs_param();
 
     break;
   }
 
   case "output": {
-    if (mode === "outputs") {
+    if (state.mode === "outputs") {
       ea_canvas_plot(ea_analysis(msg.heatmap), output_canvas);
-      set_output_param(msg.heatmap);
+      state.set_output_param(msg.heatmap);
     }
 
     else {
-      throw `Argument Error: Overlord: Could set the mode ${mode}`;
+      throw `Argument Error: Overlord: Could set the mode ${state.mode}`;
     }
 
     break;
@@ -340,36 +352,36 @@ Please reporty this to energyaccessexplorer@wri.org.
   case "preset": {
     if (!msg.value) throw `Argument error: Overlord: Could not set ${msg.value} preset`;
 
-    inputs = DS.list.filter(d => ea_presets_set(d, msg.value)).map(d => d.id);
+    const inputs = DS.list.filter(d => ea_presets_set(d, msg.value)).map(d => d.id);
 
-    if (mode === "outputs") {
-      ea_layers_outputs(output);
+    if (state.mode === "outputs") {
+      ea_layers_outputs(state.output);
       await Promise.all(DS.list.map(d => d.turn(d.active, false)));
-      ea_canvas_plot(ea_analysis(output), output_canvas);
+      ea_canvas_plot(ea_analysis(state.output), output_canvas);
     }
 
-    else if (mode === "inputs") {
+    else if (state.mode === "inputs") {
       await Promise.all(DS.list.map(d => d.turn(d.active, true)));
       ea_layers_inputs(inputs);
     }
 
-    set_inputs_param(inputs);
+    state.set_inputs_param(inputs);
 
     break;
   }
 
   case "sort": {
-    if (mode === "inputs") {
+    if (state.mode === "inputs") {
       ea_layers_sort_inputs(msg.layers);
-      set_inputs_param(msg.layers);
+      state.set_inputs_param(msg.layers);
     }
 
-    else if (mode === "outputs") {
+    else if (state.mode === "outputs") {
       console.info("Overlord: Sorting in outputs mode has no efect... OK.");
     }
 
     else {
-      throw `Argument Error: Overlord: Could set the mode ${mode}`;
+      throw `Argument Error: Overlord: Could set the mode ${state.mode}`;
     }
 
     break;
@@ -378,7 +390,7 @@ Please reporty this to energyaccessexplorer@wri.org.
   case "refresh": {
     ea_overlord({
       "type": "mode",
-      "target": mode,
+      "target": state.mode,
       "caller": "ea_overlord resort"
     });
 

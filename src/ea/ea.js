@@ -246,7 +246,7 @@ Please reporty this to energyaccessexplorer@wri.org.
       .map(x => x.id)
       .sort((a,b) => (state.inputs.indexOf(a) < state.inputs.indexOf(b)) ? -1 : 1);
 
-    state.set_inputs_param();
+    state.set_inputs_param(inputs);
 
     ea_presets_init(state.preset);
     ea_views_init();
@@ -330,7 +330,6 @@ Please reporty this to energyaccessexplorer@wri.org.
     }
 
     state.set_output_param();
-
     state.set_inputs_param();
 
     break;

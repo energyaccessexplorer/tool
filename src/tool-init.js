@@ -21,6 +21,7 @@ requirejs.config({
     'svg': "./ea/svg",
     'map': "./ea/map",
     'presets': "./ea/presets",
+    'auxiliary': "./ea/auxiliary",
     'country-select': "./ea/country-select",
   }
 });
@@ -35,6 +36,7 @@ require([
   'modal',
   'ea',
   'presets',
+  'auxiliary',
   'map',
   'client',
   'svg',

@@ -43,10 +43,18 @@ function ea_analysis(type) {
 
   if (!collection.length) return A;
 
-  const scales = collection.map(d => ea_datasets_scale_fn(d, type));
+  const tots = collection
+        .reduce((a,d) => {
+          a[d.indexname] += d.weight;
+          a[d.id] = d.indexname;
+          return a;
+        }, { "supply": 0, "demand": 0 });
 
-  const full_weight = collection
-        .reduce((a,c) => ((c.heatmap.scale === "key-delta") ? a : c.weight + a), 0);
+  const weights = {};
+
+  collection.forEach(d => weights[d.id] = d.weight / (tots[d.indexname] * 2));
+
+  const scales = collection.map(d => ea_datasets_scale_fn(d, type));
 
   let min = 1;
   let max = 0;
@@ -56,6 +64,9 @@ function ea_analysis(type) {
   // fully black raster to show as the result. We return the transparent one "A"
   // instead.
   //
+  const full_weight = collection
+        .reduce((a,c) => ((c.heatmap.scale === "key-delta") ? a : c.weight + a), 0);
+
   if (collection.length === 1 && full_weight === 0) return A;
 
   for (var i = 0; i < A.raster.length; i++) {
@@ -92,17 +103,15 @@ function ea_analysis(type) {
         a = -1; continue;
       }
 
-      a = (sv * c.weight) + a;
+      a = (sv * weights[c.id]) + a;
     }
 
-    const r = (a === -1) ? a : a / full_weight;
-
-    if (r !== -1) {
-      if (r > max) max = r;
-      if (r < min) min = r;
+    if (a !== -1) {
+      if (a > max) max = a;
+      if (a < min) min = a;
     }
 
-    A.raster[i] = r;
+    A.raster[i] = a;
   }
 
   var f = d3.scaleQuantize().domain([min,max]).range([0, 0.25, 0.5, 0.75, 1]);
@@ -112,7 +121,7 @@ function ea_analysis(type) {
     A.raster[i] = (r === -1) ? -1 : f(r);
   }
 
-  console.log("Finished ea_analysis in:", performance.now() - t0);
+  console.log("Finished ea_analysis in:", performance.now() - t0, weights);
 
   return A;
 };

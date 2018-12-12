@@ -10,6 +10,7 @@
 
     <link href="/maps-and-data/stylesheets/countries.css" rel="stylesheet" />
     <link href="/maps-and-data/stylesheets/maparea.css" rel="stylesheet" />
+    <link href="/maps-and-data/stylesheets/views.css" rel="stylesheet" />
 
     <title>Energy Access Explorer</title>
   </head>
@@ -73,18 +74,27 @@
       })();
     </script>
 
-    <div id="country-search">
-      <input id="country-search-input"
+    <div id="country-float">
+      <input id="country-float-name"
              type="text"
              style="display: none;"
              placeholder="country name" />
 
-      <div id="country-search-flag"></div>
+      <div id="country-float-flag"></div>
     </div>
 
-    <div id="country-overview">click on a (green) country on the map</div>
-
     <div id="playground">
+      <div id="left-panel">
+        <div style="color: var(--the-green); font-weight: bold; padding: 1em;">
+          Click on a (green) country on the map
+        </div>
+
+        <div id="country-select">
+          <div id="country-search-input" style="color: var(--the-green); font-weight: bold; padding: 1em;">Select a country</div>
+          <div id="country-dropdown"></div>
+        </div>
+      </div>
+
       <div id="maparea">
         <div id="mapbox-container"></div>
         <svg id="svg-map"><g id="map"></g></svg>
@@ -93,10 +103,7 @@
 
     <div id="app-loading" class="loading">
       <div class="spinner"></div>
-
-      <p style="font-size: small">
-        Loading data...
-      </p>
+      <p style="font-size: small">Loading data...</p>
     </div>
   </body>
 

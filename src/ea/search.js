@@ -1,7 +1,6 @@
 (function() {
-  const nav = document.querySelector('nav');
-  const button = nav.querySelector('#country-search');
-  const dropdown = nav.querySelector('#country-dropdown');
+  const button = document.querySelector('#country-select');
+  const dropdown = document.querySelector('#country-dropdown');
 
   let country_list = null;
 
@@ -17,14 +16,20 @@
       .then(j => {
         country_list = j;
         j.forEach(c => {
-          let e = elem(`<div class="country-dropdown-element">
-<div class="country-dropdown-image">
-  <img class="flag" src="https://cdn.rawgit.com/mledoze/countries/master/data/${c.cca3.toLowerCase()}.svg" />
-</div>
-<div class="country-dropdown-name">${c.name}</div>
-</div>`);
+          let e = elem(`
+<div class="country-dropdown-element">
+  <div class="country-dropdown-image">
+    <img class="flag" src="https://cdn.rawgit.com/mledoze/countries/master/data/${c.cca3.toLowerCase()}.svg" />
+  </div>
 
-          e.addEventListener('click', _ => window.location = `/maps-and-data/tool/?ccn3=${c.ccn3}`);
+  <div class="country-dropdown-name">${c.name}</div>
+</div>
+`);
+
+          e.addEventListener('click', _ => {
+            console.log(countries, c.ccn3)
+            ea_countries_overview(countries.find(x => +x.ccn3 === c.ccn3), countries_overviews, countries_online)
+          });
 
           dropdown.appendChild(e);
         });

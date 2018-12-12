@@ -6,12 +6,15 @@ requirejs.config({
     'ea': "./ea/ea",
     'datasets': "./ea/datasets",
     'countries': "./ea/countries",
+    'auxiliary': "./ea/auxiliary",
     'flash': "../lib/flash",
+    'modal': "../lib/modal",
     'ui': "./ea/ui",
     'client': "./ea/client",
     'svg': "./ea/svg",
     'canvas': "./ea/canvas",
     'map': "./ea/map",
+    'search': "./ea/search",
   }
 });
 
@@ -22,10 +25,13 @@ require([
   'client',
   'svg',
   'ui',
+  'auxiliary',
   'datasets',
   'mapbox',
   'countries',
   'flash',
+  'modal',
+  'search',
 ], (d3, topojson) => {
   window.d3 = d3;
   window.topojson = topojson;

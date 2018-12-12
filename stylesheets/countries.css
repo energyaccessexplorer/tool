@@ -2,58 +2,91 @@ body {
   overflow: hidden;
 }
 
-#country-search {
+#playground {
+  position: relative;
+}
+
+#left-panel {
+  position: absolute;
+  background-color: white;
+  width: 320px;
+
+  z-index: 32;
+}
+
+#country-select-header {
+  font-size: 1.5em;
+  padding: 0.65em;
+  cursor: pointer;
+}
+
+#country-float {
   display: flex;
   position: absolute;
 
-  z-index: 32;
+  z-index: 16;
   pointer-events: none;
 }
 
-#country-search-input {
-  font-size: 3em;
-  font-family: monospace;
+#country-float-name {
+  font-size: 2em;
   padding: 0.5em;
   height: 1em;
   text-align: center;
   opacity: 0.7;
 }
 
-#country-search-flag {
+#country-float-flag {
   display: block;
 }
 
-#country-search-flag img {
+#country-float-flag img {
   margin-left: 5px;
-  height: 82px;
+  height: 67px;
 }
 
-#country-overview {
-  display: block;
-  position: absolute;
-  top: 12em;
-  left: 0;
-  z-index: 32;
-  background-color: white;
-  padding: 1em;
+#country-name {
+  text-transform: uppercase;
+  text-align: left;
+  font-weight: bold;
+  font-size: 1.6em;
+}
+
+#nav {
+  z-index: 1;
 }
 
 #map {
   background-color: var(--the-white);
 }
 
+.overview-line {
+  margin-bottom: 15px;
+}
+
 .land {
   stroke-width: 0.7;
-  stroke: lightgray;
+  stroke: #ccc;
   fill: white;
 }
 
 .land.selectable {
-  fill: var(--the-green);
+  fill: var(--the-light-green);
+  stroke: white;
 }
 
 .land.active {
-  fill: var(--the-yellow);
+  fill: var(--the-green);
+}
+
+.pie-charts {
+  stroke: white;
+  stroke-width: 2px;
+}
+
+.pie-charts-legends {
+  font-size: 0.8em;
+  margin-bottom: 1em;
 }
 
 h1, h2, h3, h4, h5 {
@@ -62,14 +95,16 @@ h1, h2, h3, h4, h5 {
 
 h5 {
   margin: 0.5em;
+  text-transform: uppercase;
+  color: var(--the-green);
 }
 
 #eae {
   text-align: center;
-  margin: 1em;
+  margin: 1em auto;
   background-color: var(--the-green);
   color: white !important;
   text-decoration: none;
   display: block;
-  padding: 0.5em 1em;
+  padding: 0.9em 1.3em;
 }

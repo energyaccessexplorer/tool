@@ -1,8 +1,15 @@
+#controls-wrapper {
+  display: flex;
+  flex-flow: row wrap;
+}
+
 #controls {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+
+  flex: 1 100%;
 }
 
 .controls {
@@ -157,9 +164,7 @@
   cursor: pointer;
 }
 
-select#controls-preset,
-select#controls-country,
-#controls select {
+#controls-wrapper select {
   border: none;
   width: 100%;
 
@@ -167,23 +172,35 @@ select#controls-country,
   background-color: white;
 }
 
+.controls-select-container {
+  flex: 0 1 50%;
+  box-sizing: border-box;
+
+  font-size: 1.2em;
+
+  color: var(--the-white);
+  background-color: var(--the-green);
+
+  padding: 10px 15px;
+}
+
 select#controls-country,
 select#controls-preset {
-  font-size: 1.5em;
-
   -webkit-appearance: none;
   appearance: none;
 
-  padding-left: 2em;
-  text-align-last: center;
+  font-size: 1em;
+  padding: 0.5em;
 
-  border-right: 1px solid lightgray;
+  color: var(--the-white);
+  background: url(../images/triangle-down.svg) 100% 0 no-repeat;
+  background-color: var(--the-green);
 
-  background: url(../images/triangle-down.svg) 10px 0 no-repeat;
 }
 
-select#controls-country {
-  border-bottom: 1px solid lightgray;
+select#controls-country option,
+select#controls-preset option {
+  background-color: var(--the-white);
 }
 
 #supply, #demand {

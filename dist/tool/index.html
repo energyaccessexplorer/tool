@@ -69,13 +69,19 @@
 
     <div id="playground">
       <div id="controls-wrapper">
-        <select id="controls-country">
-          <option value="" selected disabled></option>
-        </select>
+        <div class="controls-select-container">
+          Select a Country:
+          <select id="controls-country">
+            <option value="" selected disabled></option>
+          </select>
+        </div>
 
-        <select id="controls-preset">
-          <option value="custom" selected disabled></option>
-        </select>
+        <div class="controls-select-container">
+          Select an Action:
+          <select id="controls-preset">
+            <option value="custom" selected></option>
+          </select>
+        </div>
 
         <div id="controls"></div>
       </div>

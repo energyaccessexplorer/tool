@@ -20,14 +20,25 @@ function ea_layers_elem(bind, cls, title) {
 </li>`);
 };
 
-function ea_layers_lowmidhigh() {
+function ea_layers_0_100(){
   return elem(`
-<div style="display: flex; justify-content: space-between; padding-right: 0.5em; padding-left: 0.5em;">
+<div style="display: flex; justify-content: space-between; margin-right: -0.5em; padding-left: 0.2em;">
+  <div>0</div>
   <div>20</div>
   <div>40</div>
   <div>60</div>
   <div>80</div>
   <div>100</div>
+</div>
+`);
+};
+
+function ea_layers_lowmidhigh(){
+  return elem(`
+<div style="display: flex; justify-content: space-between; padding-right: -0.5em; padding-left: 0.2em;">
+  <div>LOW</div>
+  <div>MID</div>
+  <div>HIGH</div>
 </div>
 `);
 };
@@ -126,7 +137,7 @@ function ea_layers_output_elem(t, v, i, x) {
 
   lec.appendChild(dli);
 
-  c.append(ea_layers_lowmidhigh());
+  c.append(ea_layers_0_100());
   c.prepend(ea_svg_color_steps(_ => {
     return d3.scaleLinear()
       .domain(ea_default_color_domain)

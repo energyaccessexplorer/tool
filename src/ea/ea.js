@@ -163,6 +163,9 @@ Please reporty this to energyaccessexplorer@wri.org.
 
     else {
       await b.heatmap.parse.call(b);
+
+      document.querySelector('#controls-wrapper')
+        .insertBefore(ea_controls(b), document.querySelector('#controls'));
     }
 
     const inputs = collection

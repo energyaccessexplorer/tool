@@ -191,6 +191,9 @@ function ea_controls(ds) {
   case "boundaries":
     range_group = ea_controls_range(ds, (ds.unit || 'percentage'))
 
+    _controls.querySelector('.controls-dataset-header').remove();
+    _controls.prepend(elem(`<div class="controls-dataset-name">${ds.name_long}</div>`));
+
     const o = ea_controls_options(ds);
     if (o) {
       controls.appendChild(o);

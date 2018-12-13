@@ -172,6 +172,29 @@
   background-color: white;
 }
 
+#controls-boundaries {
+  width: 100%;
+  display: flex;
+}
+
+#controls-boundaries .svg-checkbox {
+  display: none;
+}
+
+#controls-boundaries .control-group {
+  flex: 0;
+  text-align: center;
+}
+
+#controls-boundaries .control-group .label {
+  width: 258px;
+  margin: auto;
+}
+
+#controls-boundaries .controls-dataset-name {
+  margin: 1.5em
+}
+
 .controls-select-container {
   flex: 0 1 50%;
   box-sizing: border-box;

@@ -121,7 +121,7 @@ function ea_analysis(type) {
     A.raster[i] = (r === -1) ? -1 : f(r);
   }
 
-  console.log("Finished ea_analysis in:", performance.now() - t0, weights);
+  console.log("Finished ea_analysis in:", performance.now() - t0, weights, tots);
 
   return A;
 };
@@ -246,7 +246,7 @@ Please reporty this to energyaccessexplorer@wri.org.
       await ds.turn(ds.active, true);
 
       ea_layers_inputs(inputs);
-      ds.raise()
+      ds.raise();
     }
 
     else {

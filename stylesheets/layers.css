@@ -148,8 +148,8 @@
   font-style: italic;
 }
 
-.heatmaps-layers[bind="demand"]:before,
-.heatmaps-layers[bind="supply"]:before {
+.outputs-layers[bind="demand"]:before,
+.outputs-layers[bind="supply"]:before {
   width: 1em;
   display: block;
   content: ' ';

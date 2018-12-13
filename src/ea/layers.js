@@ -124,7 +124,7 @@ function ea_layers_input_elem(ds) {
 };
 
 function ea_layers_output_elem(t, v, i, x) {
-  const d = ea_layers_elem(t, 'heatmaps-layers', v);
+  const d = ea_layers_elem(t, 'outputs-layers', v);
 
   d.prepend(elem('<div class="layers-element-radio"></div>'))
   d.querySelector('.layers-element-title').append(elem(`<div class="layers-element-index-description">${x}</div>`))

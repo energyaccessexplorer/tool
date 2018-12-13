@@ -52,10 +52,11 @@ function ea_state_sync() {
   }
 
   if (!inputs_param) {
-    inputs = [];
+    inputs = ['boundaries'];
     set_inputs_param();
   } else {
     inputs = inputs_param.split(',');
+    if (!inputs.includes('boundaries')) inputs.unshift('boundaries');
   }
 
   if (Object.keys(ea_views).indexOf(mode_param) > -1) {

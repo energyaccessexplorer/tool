@@ -45,14 +45,16 @@ function ea_analysis(type) {
 
   const tots = collection
         .reduce((a,d) => {
-          a[d.indexname] += d.weight;
-          a[d.id] = d.indexname;
+          if (d.indexname) a[d.indexname] += d.weight;
           return a;
         }, { "supply": 0, "demand": 0 });
 
   const weights = {};
 
-  collection.forEach(d => weights[d.id] = d.weight / (tots[d.indexname] * 2));
+  collection.forEach(d => {
+    if (d.indexname)
+      weights[d.id] = d.weight / (tots[d.indexname] * 2)
+  });
 
   const scales = collection.map(d => ea_datasets_scale_fn(d, type));
 
@@ -103,7 +105,8 @@ function ea_analysis(type) {
         a = -1; continue;
       }
 
-      a = (sv * weights[c.id]) + a;
+      const w = weights[c.id];
+      a = w ? (sv * w) + a : a;
     }
 
     if (a !== -1) {
@@ -257,7 +260,7 @@ Please reporty this to energyaccessexplorer@wri.org.
     }
 
     state.set_output_param();
-    state.set_inputs_param();
+    state.set_inputs_param(inputs);
 
     break;
   }

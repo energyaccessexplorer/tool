@@ -82,10 +82,13 @@
 
 .layers-element-header {
   display: flex;
+  flex-flow: row wrap;
   justify-content: space-between;
 }
 
 .layers-element-title {
+  flex: 1 0;
+
   margin-right: 1em;
 
   -webkit-user-select: none;
@@ -97,7 +100,7 @@
 }
 
 .layers-element-controls {
-  float: right;
+  text-align: right;
 
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -105,6 +108,10 @@
   user-select: none;
 
   fill: var(--the-gray);
+}
+
+.outputs-layers .layers-element-controls {
+  flex: 1 1 100%;
 }
 
 .layers-element-controls div {
@@ -143,9 +150,14 @@
   font-size: 0.7em;
 }
 
-.layers-element-index-description  {
+.layers-element-index-description,
+.layers-element-useless {
   font-size: 0.7em;
   font-style: italic;
+}
+
+.layers-element-index-description {
+  float: right;
 }
 
 .outputs-layers[bind="demand"]:before,

@@ -127,10 +127,14 @@ function ea_layers_output_elem(t, v, i, x) {
   const d = ea_layers_elem(t, 'outputs-layers', v);
 
   d.prepend(elem('<div class="layers-element-radio"></div>'))
-  d.querySelector('.layers-element-title').append(elem(`<div class="layers-element-index-description">${x}</div>`))
+
+  d.querySelector('.layers-element-title')
+    .append(elem(`<span><span>&nbsp;&nbsp;</span><span class="layers-element-index-description">${x}</span></span>`))
 
   let c = d.querySelector('.layers-element-description');
   let lec = d.querySelector('.layers-element-controls');
+
+  lec.appendChild(elem('<div class="layers-element-useless">What does this mean?</div>'));
 
   let dli = elem(`<div class="layer-info">${ea_svg_info()}</div>`);
   dli.addEventListener('mouseup', _ => ea_index_modal(t));

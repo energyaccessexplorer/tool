@@ -201,10 +201,14 @@ class DS {
   async turn(v, draw) {
     ea_controls_toggle(this, v);
 
+    ea_ui_dataset_loading(this, true);
+
     await Promise.all(
       ['vectors', 'csv', 'heatmap'].map(i => {
         if (v && this[i]) return this.load(i);
       }));
+
+    ea_ui_dataset_loading(this, false);
 
     if (this.collection) {
       await Promise.all(this.configuration.collection.map(i => DS.named(i).turn(v, draw)));
@@ -217,8 +221,6 @@ class DS {
   };
 
   async load(arg) {
-    ea_ui_dataset_loading(this, true);
-
     if (this.collection) {
       await Promise.all(this.configuration.collection.map(i => DS.named(i).load(arg)));
 
@@ -235,8 +237,6 @@ class DS {
       else
         if (this[arg]) await this[arg].parse.call(this);
     }
-
-    ea_ui_dataset_loading(this, false);
   };
 
   async raise() {

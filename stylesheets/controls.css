@@ -213,12 +213,15 @@ select#controls-preset {
   appearance: none;
 
   font-size: 1em;
-  padding: 0.5em;
+  padding: 0.5em 0;
+  margin: 0 0.5em;
+  border-bottom: 1px solid white;
+
+  width: 280px;
 
   color: var(--the-white);
-  background: url(../images/triangle-down.svg) 100% 0 no-repeat;
+  background: url(../images/triangle-down.svg) 255px 0 no-repeat;
   background-color: var(--the-green);
-
 }
 
 select#controls-country option,

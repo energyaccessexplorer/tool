@@ -177,7 +177,7 @@ function ea_layers_outputs(target) {
 
     ea_overlord({
       "type": 'output',
-      "heatmap": this.getAttribute('bind'),
+      "target": this.getAttribute('bind'),
       "caller": 'ea_layers_outputs'
     });
   };
@@ -248,7 +248,7 @@ function ea_layers_init() {
       (e) => {
         ea_overlord({
           "type": 'sort',
-          "layers": e.detail.destination.items.map(i => i.getAttribute('bind')),
+          "target": e.detail.destination.items.map(i => i.getAttribute('bind')),
           "caller": 'ea_layers_init',
         })
       });

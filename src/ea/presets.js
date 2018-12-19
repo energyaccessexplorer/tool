@@ -9,8 +9,8 @@ function ea_presets_init(v) {
   el.addEventListener('change', function(e) {
     ea_overlord({
       type: "preset",
-      value: this.value,
       caller: "ea_presets_init change"
+      "target": this.value,
     });
   });
 };

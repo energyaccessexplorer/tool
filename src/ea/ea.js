@@ -267,8 +267,8 @@ Please reporty this to energyaccessexplorer@wri.org.
 
   case "output": {
     if (state.mode === "outputs") {
-      ea_canvas_plot(ea_analysis(msg.heatmap), output_canvas);
-      state.set_output_param(msg.heatmap);
+      ea_canvas_plot(ea_analysis(msg.target), output_canvas);
+      state.set_output_param(msg.target);
     }
 
     else {
@@ -279,9 +279,9 @@ Please reporty this to energyaccessexplorer@wri.org.
   }
 
   case "preset": {
-    if (!msg.value) throw `Argument error: Overlord: Could not set ${msg.value} preset`;
+    if (!msg.target) throw `Argument error: Overlord: Could not set ${msg.target} preset`;
 
-    const inputs = DS.list.filter(d => ea_presets_set(d, msg.value)).map(d => d.id);
+    const inputs = DS.list.filter(d => ea_presets_set(d, msg.target)).map(d => d.id);
 
     if (state.mode === "outputs") {
       ea_layers_outputs(state.output);
@@ -301,8 +301,8 @@ Please reporty this to energyaccessexplorer@wri.org.
 
   case "sort": {
     if (state.mode === "inputs") {
-      ea_layers_sort_inputs(msg.layers);
-      state.set_inputs_param(msg.layers);
+      ea_layers_sort_inputs(msg.target);
+      state.set_inputs_param(msg.target);
     }
 
     else if (state.mode === "outputs") {

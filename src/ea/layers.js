@@ -176,7 +176,7 @@ function ea_layers_outputs(target) {
     }
 
     ea_overlord({
-      "type": 'output',
+      "type": 'index',
       "target": this.getAttribute('bind'),
       "caller": 'ea_layers_outputs'
     });

@@ -230,7 +230,7 @@ Please reporty this to energyaccessexplorer@wri.org.
     break;
   }
 
-  case "input": {
+  case "dataset": {
     const ds = msg.target;
 
     state.set_preset_param(null);
@@ -265,7 +265,7 @@ Please reporty this to energyaccessexplorer@wri.org.
     break;
   }
 
-  case "output": {
+  case "index": {
     if (state.mode === "outputs") {
       ea_canvas_plot(ea_analysis(msg.target), output_canvas);
       state.set_output_param(msg.target);

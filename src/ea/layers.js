@@ -43,6 +43,15 @@ function ea_layers_lowmidhigh(){
 `);
 };
 
+function ea_layers_min_max(ds) {
+  return elem(`
+<div style="display: flex; justify-content: space-between; padding-right: 0.2em; padding-left: 0.2em;">
+  <div>${ds.heatmap.domain.min}</div>
+  <div>${ds.heatmap.domain.max}</div>
+</div>
+`);
+};
+
 function ea_layers_opacity_control(ds) {
   const e = elem(`<div class="layers-opacity-control"></div>`);
 
@@ -72,7 +81,7 @@ function ea_layers_opacity_control(ds) {
 };
 
 function ea_layers_input_elem(ds) {
-  const d = ea_layers_elem(ds.id, '', ds.name_long);
+  const d = ea_layers_elem(ds.id, '', ds.name_long + (ds.unit ? ` (${ ds.unit })` : ''));
 
   d.prepend(elem('<div class="layers-element-handle"></div>'));
 
@@ -117,7 +126,7 @@ function ea_layers_input_elem(ds) {
 
   else {
     c.appendChild(svg_thing(ds));
-    if (!ds.vectors && ds.heatmap) c.appendChild(ea_layers_lowmidhigh());
+    if (!ds.vectors && ds.heatmap) c.appendChild(ea_layers_min_max(ds));
   }
 
   return d;

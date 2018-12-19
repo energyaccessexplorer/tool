@@ -273,7 +273,7 @@ function ea_countries_overview(c, collection, online) {
     co.innerHTML = `<strong>${c.name.common}</strong> not included`;
   }
 
-  modal()
-    .header(`<h2 id="country-name" style="margin: 0 auto; text-align: center;">${c.name.common}</h2>`)
-    .content(co)()
+  ea_modal
+    .header(`<div style="text-transform: uppercase; color: var(--the-white)">${c.name.common}</div>`)
+    .content(co)();
 };

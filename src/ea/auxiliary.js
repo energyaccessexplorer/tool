@@ -146,7 +146,7 @@ function ea_summary() {
     tbody.appendChild(tr);
   }
 
-  modal()
+  ea_modal
     .header('Index Summaries')
     .content(table)();
 

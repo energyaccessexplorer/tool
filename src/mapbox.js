@@ -48,7 +48,7 @@ class MapboxThemeControl {
 
       content.appendChild(radios);
 
-      modal()
+      ea_modal
         .header("Map configuration")
         .content(content)();
     });

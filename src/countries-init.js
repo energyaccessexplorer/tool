@@ -37,4 +37,6 @@ require([
   ea_map = null;
 
   ea_countries_setup();
+
+  ea_modal_setup();
 });

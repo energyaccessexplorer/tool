@@ -91,6 +91,8 @@ require([
   ea_default_color_stops = ['#1c4478', '#81b062', '#e5a82e'];
   plotty.addColorScale("ea", ea_default_color_stops, ea_default_color_domain);
 
+  ea_modal_setup();
+
   ea_overlord({
     "type": 'init',
     "caller": 'require'

@@ -20,7 +20,7 @@ function ea_layers_elem(bind, cls, title) {
 </li>`);
 };
 
-function ea_layers_0_100(){
+function ea_layers_0_100() {
   return elem(`
 <div style="display: flex; justify-content: space-between; margin-right: -0.5em; padding-left: 0.2em;">
   <div>0</div>
@@ -33,7 +33,7 @@ function ea_layers_0_100(){
 `);
 };
 
-function ea_layers_lowmidhigh(){
+function ea_layers_lowmidhigh() {
   return elem(`
 <div style="display: flex; justify-content: space-between; padding-right: -0.5em; padding-left: 0.2em;">
   <div>LOW</div>

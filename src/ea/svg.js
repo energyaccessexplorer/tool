@@ -476,7 +476,6 @@ function ea_svg_color_gradient(color_scale, r) {
 
 function ea_svg_color_steps(color_scale, r) {
   const radius = r || 6,
-        svgwidth = 280,
         svgheight = (radius * 2) + 2,
         linewidth = radius * 2,
         svgmin = radius + 1;

@@ -35,6 +35,82 @@ function ea_countries_setup() {
       window.countries = results[2];
       window.countries_overviews = results[3];
 
+      const dropdown = document.querySelector('#country-dropdown');
+      const button = document.querySelector('#country-select');
+
+      dropdown.style.height = (document.querySelector('#maparea').clientHeight - 120) + "px";
+
+      countries_overviews.forEach(c => {
+        let cc = countries.find(x => x.ccn3 === c.ccn3);
+
+        let e = elem(`
+<div class="country-dropdown-element" bind="${cc.ccn3}">
+  <div class="country-dropdown-image">
+    <img class="flag" src="https://cdn.rawgit.com/mledoze/countries/master/data/${cc.cca3.toLowerCase()}.svg" />
+  </div>
+
+  <div class="country-dropdown-name">${cc.name.common}</div>
+</div>`);
+
+        e.addEventListener(
+          'click',
+          _ => ea_countries_overview(
+            countries.find(x => x.ccn3 === c.ccn3),
+            countries_overviews,
+            countries_online
+          )
+        );
+
+        dropdown.appendChild(e);
+      });
+
+      dropdown.addEventListener('mouseleave', _ => dropdown.style.display = 'none');
+      dropdown.addEventListener('mouseenter', _ => dropdown.style.display = 'block');
+
+      button.addEventListener('click', _ => dropdown.style.display = 'block');
+      button.addEventListener('mouseleave', _ => dropdown.style.display = 'none');
+      button.addEventListener('mouseenter', _ => dropdown.style.display = 'block');
+
+      const input = button.querySelector('input');
+
+      const elements = dropdown.querySelectorAll('.country-dropdown-element');
+
+      input.addEventListener('keyup', e => {
+        dropdown.style.display = 'block'
+
+        if (e.code === "Enter") {
+          for (x of elements) {
+            if (x.style.display === 'block') {
+              let ccn3 = x.getAttribute('bind');
+
+              if (ccn3)  {
+                ea_countries_overview(
+                  countries.find(t => t.ccn3 === ccn3),
+                  countries_overviews,
+                  countries_online
+                )
+              }
+
+              break;
+            }
+          };
+        }
+
+        let i = input.value;
+
+        if (i === '') {
+          elements.forEach(e => e.style.display = 'block');
+          return;
+        }
+
+        elements.forEach(e => {
+          let cname = e.querySelector('.country-dropdown-name').innerText;
+          e.style.display = (cname.toLowerCase().indexOf(i.toLowerCase()) != -1) ? 'block' : 'none';
+        });
+      });
+
+      // button.addEventListener('mouseleave', _ => dropdown.style.display = 'none');
+
       const topo = topojson.feature(geo, geo.objects.countries);
 
       ea_map = ea_map_svg(svg, geo, 'countries', { center: [0,0], scale: 350 });
@@ -147,11 +223,11 @@ function ea_countries_overview(c, collection, online) {
 </div>`);
 
     if (online.map(x => x['ccn3']).indexOf(+r['ccn3']) > -1)
-      btn = elem(`<button id="eae" onclick="window.location = '/maps-and-data/tool?ccn3=${r['ccn3']}'">Click to launch tool</a>`);
+      btn = elem(`<div><br><button id="eae" onclick="window.location = '/maps-and-data/tool?ccn3=${r['ccn3']}'">Click to launch tool</a></div>`);
 
     [pop, urban_rural, pies, gdp, dev, area, pol, rate, ease, btn].forEach(t => t ? co.appendChild(t) : null);
 
-    if (+r['electrification-rate-urban'] > 0) {
+    if (+r['electrificYation-rate-urban'] > 0) {
       co.querySelector('.pie-charts-legends')
         .appendChild(elem(`
 <div class="overview-line">

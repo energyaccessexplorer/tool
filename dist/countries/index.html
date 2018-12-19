@@ -84,13 +84,29 @@
     </div>
 
     <div id="playground">
-      <div id="left-panel">
-        <div style="color: var(--the-green); font-weight: bold; padding: 1em;">
+      <div id="left-panel"
+           style="background-color: var(--the-darker-white);">
+        <div style="color: var(--the-green);
+                    font-weight: bold; padding: 1em;
+                    background-color: var(--the-darker-white);
+                    border-top: solid 1px #d9d9d9;
+                    border-right: solid 1px #d9d9d9;
+                    border-bottom: solid 1px #d9d9d9;">
+
           Click on a (green) country on the map
         </div>
 
-        <div id="country-select">
-          <div id="country-search-input" style="color: var(--the-green); font-weight: bold; padding: 1em;">Select a country</div>
+        <div id="country-select"
+             style="border-bottom: solid 1px #d9d9d9; border-right: solid 1px #d9d9d9;">
+          <input id="country-search-input"
+                 style="background-color: var(--the-darker-white);
+                        font-weight: bold;
+                        padding: 1.35em 1.1em;
+                        width: 290px;
+                        border: none;"
+                 placeholder="Search for a country" />
+          </input>
+
           <div id="country-dropdown"></div>
         </div>
       </div>

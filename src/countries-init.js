@@ -14,7 +14,6 @@ requirejs.config({
     'svg': "./ea/svg",
     'canvas': "./ea/canvas",
     'map': "./ea/map",
-    'search': "./ea/search",
   }
 });
 
@@ -31,7 +30,6 @@ require([
   'countries',
   'flash',
   'modal',
-  'search',
 ], (d3, topojson) => {
   window.d3 = d3;
   window.topojson = topojson;

@@ -66,8 +66,8 @@ function ea_layout_map(bounds) {
 
   const ch = window.innerHeight - (
     document.querySelector('nav').clientHeight +
-    document.querySelector('#controls-boundaries').clientHeight +
-    document.querySelector('.controls-select-container').clientHeight
+      document.querySelector('#controls-boundaries').clientHeight +
+      document.querySelector('.controls-select-container').clientHeight
   );
 
   document.querySelector('#controls').style['height'] = `${ch}px`;

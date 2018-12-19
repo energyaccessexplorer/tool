@@ -84,9 +84,9 @@ function ea_controls_mutant_options(ds) {
     await ds.mutate(host);
 
     ea_overlord({
-      target: ds,
-      caller: "ea_controls_mutant_options",
       "type": "dataset",
+      "target": ds,
+      "caller": "ea_controls_mutant_options",
     });
   });
 
@@ -127,9 +127,9 @@ function ea_controls_elem(ds) {
     }
 
     ea_overlord({
-      target: ds,
-      caller: "ea_controls_elem clicko",
       "type": "dataset",
+      "target": ds,
+      "caller": "ea_controls_elem clicko",
     });
   };
 
@@ -250,9 +250,9 @@ function ea_controls_options(ds) {
     ds.heatmap.scale_option = this.value;
 
     ea_overlord({
-      target: ds,
-      caller: "ea_controls_options",
       "type": "dataset",
+      "target": ds,
+      "caller": "ea_controls_options",
     })
   });
 
@@ -320,9 +320,9 @@ function ea_controls_range(ds, label, single) {
     x => update_range_value(x, 0, v1),
     x => update_range_value(x, 1, v2),
     _ => ea_overlord({
-      target: ds,
-      caller: "ea_controls_range",
       "type": "dataset",
+      "target": ds,
+      "caller": "ea_controls_range",
     })
   );
 
@@ -359,9 +359,9 @@ function ea_controls_weight(ds, init) {
       ds.weight = x;
 
       ea_overlord({
-        target: ds,
-        caller: "ea_controls_weight",
         "type": "dataset",
+        "target": ds,
+        "caller": "ea_controls_weight",
       });
     },
     ("weight" === "weight")

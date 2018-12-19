@@ -172,9 +172,9 @@ Please reporty this to energyaccessexplorer@wri.org.
     }
 
     const inputs = collection
-      .filter(t => t.active)
-      .map(x => x.id)
-      .sort((a,b) => (state.inputs.indexOf(a) < state.inputs.indexOf(b)) ? -1 : 1);
+          .filter(t => t.active)
+          .map(x => x.id)
+          .sort((a,b) => (state.inputs.indexOf(a) < state.inputs.indexOf(b)) ? -1 : 1);
 
     state.set_inputs_param(inputs);
 
@@ -320,7 +320,7 @@ Please reporty this to energyaccessexplorer@wri.org.
     ea_overlord({
       "type": "mode",
       "target": state.mode,
-      "caller": "ea_overlord resort"
+      "caller": "ea_overlord refresh"
     });
 
     break;

@@ -133,13 +133,11 @@ async function ea_overlord(msg) {
   if (!msg) throw "Argument Error: Overlord: I have nothing to do!";
   if (typeof msg.caller === 'undefined' || !msg.caller) throw "Argument Error: Overlord: Who is the caller?";
 
-  let output_canvas = document.querySelector('canvas#output');
-
   const state = ea_state_sync();
 
   switch (msg.type) {
   case "init": {
-    document.body.append(output_canvas = elem('<canvas id="output" style="display: none;">'));
+    document.body.append(elem('<canvas id="output" style="display: none;">'));
 
     const ccn3 = location.get_query_param('ccn3');
     let country; await ea_client(`${ea_settings.database}/countries?ccn3=eq.${ccn3}`, 'GET', 1, r => country = r);
@@ -209,7 +207,7 @@ Please reporty this to energyaccessexplorer@wri.org.
         let x; if (x = DS.named(i)) x.hide();
       });
 
-      ea_canvas_plot(ea_analysis(state.output), output_canvas);
+      ea_canvas_plot(ea_analysis(state.output));
 
       ea_mapbox.setLayoutProperty('canvas-layer', 'visibility', 'visible');
     }
@@ -246,7 +244,7 @@ Please reporty this to energyaccessexplorer@wri.org.
       await ds.turn(ds.active, false);
 
       ea_layers_outputs(state.output);
-      ea_canvas_plot(ea_analysis(state.output), output_canvas);
+      ea_canvas_plot(ea_analysis(state.output));
     }
 
     else if (state.mode === "inputs") {
@@ -268,7 +266,7 @@ Please reporty this to energyaccessexplorer@wri.org.
 
   case "index": {
     if (state.mode === "outputs") {
-      ea_canvas_plot(ea_analysis(msg.target), output_canvas);
+      ea_canvas_plot(ea_analysis(msg.target));
       state.set_output_param(msg.target);
     }
 
@@ -287,7 +285,7 @@ Please reporty this to energyaccessexplorer@wri.org.
     if (state.mode === "outputs") {
       ea_layers_outputs(state.output);
       await Promise.all(DS.list.map(d => d.turn(d.active, false)));
-      ea_canvas_plot(ea_analysis(state.output), output_canvas);
+      ea_canvas_plot(ea_analysis(state.output));
     }
 
     else if (state.mode === "inputs") {

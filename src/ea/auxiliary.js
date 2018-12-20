@@ -88,7 +88,7 @@ function ea_state_sync() {
 function ea_canvas_plot(A, canvas) {
   if (!(A.id && A.raster)) throw `${A.id} is not a A! Bye.`;
 
-  ea_current_analysis = A;
+  if (!canvas) canvas = document.querySelector('canvas#output');
 
   const plot = new plotty.plot({
     canvas: canvas,

@@ -1,4 +1,4 @@
-mapbox_themes = [{
+resourcewatch_styles = [{
   "name": "Light Basemap with no labels",
   "value": "resourcewatch/cjhqgk77j0r7h2sqw220p7imy"
 }, {
@@ -14,6 +14,19 @@ mapbox_themes = [{
   "name": "Boundaries",
   "value": "resourcewatch/cjgcf8qdaai1x2rn6w3j4q805"
 }];
+
+default_styles = [{
+  "name": "Light (default)",
+  "value": "mapbox/basic-v9"
+}, {
+  "name": "Satellite",
+  "value": "mapbox/satellite-v9"
+}, {
+  "name": "Dark",
+  "value": "mapbox/dark-v9"
+}];
+
+mapbox_styles = default_styles;
 
 class MapboxThemeControl {
   onAdd(map) {
@@ -36,7 +49,7 @@ class MapboxThemeControl {
       let content = elem('<div>');
       let radios = elem(`<div><h3>Background map style</h3></div>`);
 
-      for (let t of mapbox_themes) {
+      for (let t of mapbox_styles) {
         radios.appendChild(elem(`<div><input type="radio" name="mapbox_theme" value="${t.value}" /> <label>${t.name}</label><br><br></div>`));
       }
 

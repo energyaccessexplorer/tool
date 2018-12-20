@@ -200,9 +200,9 @@ function ea_svg_range_steps(steps, init, drag_callback, end_callback, is_weight)
   };
 };
 
-function ea_svg_interval(color_scale, callback1, callback2, end_callback) {
-  const radius = 6,
-        svgwidth = 150,
+function ea_svg_interval_gradient(color_scale, callback1, callback2, end_callback) {
+  const radius = 5,
+        svgwidth = 256,
         svgheight = (radius * 2) + 2,
         linewidth = radius * 2,
         svgmin = radius + 1,
@@ -503,7 +503,7 @@ function ea_svg_color_steps(color_scale, r) {
   return svg.node();
 };
 
-function ea_svg_interval_thingradient(color_scale, single, init, callback1, callback2, end_callback) {
+function ea_svg_interval(single, init, callback1, callback2, end_callback) {
   const radius = 5,
         svgwidth = 256,
         svgheight = (radius * 2) + 2,
@@ -511,33 +511,10 @@ function ea_svg_interval_thingradient(color_scale, single, init, callback1, call
         svgmin = radius + 1,
         svgmax = svgwidth - radius - 1;
 
-  const random = Math.random();
-
   const norm = d3.scaleLinear().domain([svgmin, svgmax]).range([0,1]);
 
   const svg = d3.select(document.createElementNS(d3.namespaces.svg, "svg"))
         .attr('class', 'svg-interval');
-
-  const gradient = svg.append("defs")
-        .append("linearGradient")
-        .attr("id", `gradient-${random}`)
-        .attr("x1", "0%")
-        .attr("y1", "0%")
-        .attr("x2", "100%")
-        .attr("y2", "0%")
-        .attr("spreadMethod", "pad");
-
-  const cr = color_scale().range();
-  const cd = color_scale().domain();
-
-  const clamp = color_scale().clamp();
-
-  cr.forEach((v,i) => {
-    gradient.append("stop")
-      .attr("offset", `${cd[i] * 100}%`)
-      .attr("stop-color", v)
-      .attr("stop-opacity", 1);
-  });
 
   const g = svg.append('g');
 
@@ -550,12 +527,14 @@ function ea_svg_interval_thingradient(color_scale, single, init, callback1, call
   const c1 = g.append('circle');
   const c2 = g.append('circle');
 
+  const fill = getComputedStyle(document.body).getPropertyValue('--the-green');
+
   svg
     .attr('width', svgwidth + 2)
     .attr('height', svgheight + 2);
 
   marked
-    .attr('fill', `url(#gradient-${random})`)
+    .attr('fill', fill)
     .attr('stroke', 'none')
     .attr('x', 1)
     .attr('y', (svgheight / 2) - 1)
@@ -575,28 +554,16 @@ function ea_svg_interval_thingradient(color_scale, single, init, callback1, call
   c1
     .attr('r', radius)
     .attr('cy', svgheight/2)
-    .attr('fill', cr[0])
+    .attr('fill', fill)
     .attr('stroke-width', 'none')
     .style('cursor', 'grab');
 
   c2
     .attr('r', radius)
     .attr('cy', svgheight/2)
-    .attr('fill', cr[cr.length-1])
+    .attr('fill', fill)
     .attr('stroke-width', 'none')
     .style('cursor', 'grab');
-
-  umarked1
-    .attr('fill', cr[0])
-    .attr('stroke', 'none')
-    .attr('y', (svgheight / 2) - 2)
-    .attr('height', 4);
-
-  umarked2
-    .attr('fill', cr[cr.length - 1])
-    .attr('stroke', 'none')
-    .attr('y', (svgheight / 2) - 2)
-    .attr('height', 4);
 
   function drag_callback(c, cx, rx, w, callback) {
     c.attr('cx', cx);
@@ -604,17 +571,6 @@ function ea_svg_interval_thingradient(color_scale, single, init, callback1, call
     marked
       .attr('x', rx - radius)
       .attr('width', w + radius);
-
-    if (c === c1) {
-      umarked1
-        .attr('width', (clamp ? rx : 0));
-    }
-
-    else if (c === c2) {
-      umarked2
-        .attr('x', cx)
-        .attr('width', (clamp ? svgwidth - cx : 0));
-    }
 
     if (typeof callback === 'function') callback(norm(cx).toFixed(2));
   };
@@ -648,7 +604,7 @@ function ea_svg_interval_thingradient(color_scale, single, init, callback1, call
   );
 
   function change(a,b) {
-    // TODO: this
+    // TODO: set the values from the outer world (preset/settings)
     console.log(a,b);
   };
 

@@ -314,14 +314,7 @@ function ea_controls_range(ds, label, single) {
   const v1 = l.querySelector('[bind=v1]');
   const v2 = l.querySelector('[bind=v2]');
 
-  let csf = _ => {
-    return d3.scaleLinear()
-      .clamp(false)
-      .range([getComputedStyle(document.body).getPropertyValue('--the-green')]);
-  };
-
-  const range_control = ea_svg_interval_thingradient(
-    csf,
+  const range_control = ea_svg_interval(
     single,
     (ds.init_domain ? [range_norm.invert(ds.init_domain[0]), range_norm.invert(ds.init_domain[1])] : null),
     x => update_range_value(x, 0, v1),

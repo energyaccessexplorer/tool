@@ -55,16 +55,10 @@ function ea_layers_min_max(ds) {
 function ea_layers_opacity_control(ds) {
   const e = elem(`<div class="layers-opacity-control"></div>`);
 
-  let csf = _ => {
-    return d3.scaleLinear()
-      .clamp(false)
-      .range([getComputedStyle(document.body).getPropertyValue('--the-green')]);
-  };
-
   let opacity = 1;
 
-  const grad = ea_svg_interval_thingradient(
-    csf, true, null, null,
+  const grad = ea_svg_interval(
+    true, null, null,
     x => opacity = x,
     _ => ea_mapbox.setPaintProperty(ds.id, 'raster-opacity', parseFloat(opacity))
   );

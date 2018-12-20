@@ -101,7 +101,7 @@ function ea_layers_input_elem(ds) {
   }
 
   let dli = elem(`<div class="layer-info">${ea_svg_info()}</div>`);
-  dli.addEventListener('mouseup', _ => ea_dataset_modal(ds));
+  dli.addEventListener('mouseup', _ => ea_ui_dataset_modal(ds));
 
   lec.appendChild(dli);
 
@@ -146,7 +146,7 @@ function ea_layers_output_elem(t, v, i, x) {
   lec.appendChild(elem('<div class="layers-element-useless">What does this mean?</div>'));
 
   let dli = elem(`<div class="layer-info">${ea_svg_info()}</div>`);
-  dli.addEventListener('mouseup', _ => ea_index_modal(t));
+  dli.addEventListener('mouseup', _ => ea_ui_index_modal(t));
 
   lec.appendChild(dli);
 

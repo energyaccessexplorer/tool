@@ -179,12 +179,13 @@ Please reporty this to energyaccessexplorer@wri.org.
     state.set_inputs_param(inputs);
 
     ea_presets_init(state.preset);
-    ea_views_init();
+    ea_ui_views_init();
+
     ea_layers_init();
 
     ea_controls_tree(country.category_tree, DS.list);
 
-    ea_layout_map(country.bounds);
+    ea_ui_layout_map(country.bounds);
     ea_map_setup(country.bounds);
 
     await Promise.all(inputs.map(id => DS.named(id).turn(true, false)));

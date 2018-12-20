@@ -141,7 +141,7 @@ function ea_controls_elem(ds) {
   if (ds.help && (ds.help.why || ds.help.what)) {
     header.appendChild(help);
 
-    help.addEventListener('mouseup', _ => ea_category_help_modal(ds));
+    help.addEventListener('mouseup', _ => ea_ui_category_help_modal(ds));
   }
 
   return controls;

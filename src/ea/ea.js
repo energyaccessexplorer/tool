@@ -1,3 +1,16 @@
+/*
+ * ea_analysis
+ *
+ * Given a collection of active DS's, their weights, domains and scaling
+ * functions; create a new DS whose raster is a "normalised weighted average".
+ *
+ * @param "type" string. That can be:
+ *   - The ID of a dataset.
+ *   - The shortname of an index: eai, ani, demand or supply.
+ *
+ * returns DS to be plotted onto a canvas
+ */
+
 function ea_analysis(type) {
   const t0 = performance.now();
 
@@ -43,6 +56,9 @@ function ea_analysis(type) {
 
   if (!collection.length) return A;
 
+  // Add up how much demand and supply datasets will account for. Then, just
+  // below, these values will be split into 50-50 of the total analysis.
+  //
   const tots = collection
         .reduce((a,d) => {
           if (d.indexname) a[d.indexname] += d.weight;
@@ -56,8 +72,13 @@ function ea_analysis(type) {
       weights[d.id] = d.weight / (tots[d.indexname] * 2)
   });
 
+  // Each dataset has a different scaling function. We cache these to optimise
+  // the huge loop we are about to do.
+  //
   const scales = collection.map(d => ea_datasets_scale_fn(d, type));
 
+  // The values will be normalised. Initialise the values:
+  //
   let min = 1;
   let max = 0;
 
@@ -109,6 +130,8 @@ function ea_analysis(type) {
       a = w ? (sv * w) + a : a;
     }
 
+    // Record the new min/max values:
+    //
     if (a !== -1) {
       if (a > max) max = a;
       if (a < min) min = a;
@@ -117,6 +140,9 @@ function ea_analysis(type) {
     A.raster[i] = a;
   }
 
+  // For user-friendlyness, the new raster is "quantised". It increases the
+  // heatmaps' contrast.
+  //
   var f = d3.scaleQuantize().domain([min,max]).range([0, 0.25, 0.5, 0.75, 1]);
 
   for (var i = 0; i < A.raster.length; i++) {
@@ -128,6 +154,51 @@ function ea_analysis(type) {
 
   return A;
 };
+
+/*
+ * ea_overlord
+ *
+ * Connects the entire app, changes states and updates components accordingly.
+ *
+ * Any communication between the app's components:
+ *   - controls
+ *   - layers
+ *   - map
+ *   - datasets
+ *   ... etc. should be done via this function.
+ *
+ * @param "msg" object.
+ *
+ *   type (required)
+ *      init: init the app. doh!
+ *      mode: set the entire app between {outputs, inputs} mode
+ *      dataset: change params or (de)activate a DS
+ *      index: change the currently shown index
+ *      preset: change the preset
+ *      sort: sort the datasets/layers
+ *      refresh: a auxiliary to re-set the mode
+ *
+ *      Each type might (and will) do different things depending on the current
+ *      mode.
+ *
+ *   target
+ *      Is context specific to the type. They are obvious:
+ *
+ *      init: null
+ *      mode: "inputs" or "outputs"
+ *      dataset: a DS object
+ *      index: "demand", "supply", "eai" or "ani"
+ *      preset: "market", "planning", "investment", or "custom"
+ *      sort: an array with the ID's of the active datasets
+ *      refresh: "inputs" or "outputs"
+ *
+ *   caller (required)
+ *      The name of the function calling ea_overlord. auxiliary for debugging
+ *      purposes.
+ * }
+ *
+ * returns nothing
+ */
 
 async function ea_overlord(msg) {
   if (!msg) throw "Argument Error: Overlord: I have nothing to do!";

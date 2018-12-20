@@ -1,3 +1,13 @@
+/*
+ * elem
+ *
+ * Create a _SINGLE_ HTMLElement from a string and return it.
+ *
+ * @param "str" string. The HTML.
+ *
+ * returns an Object with the handled params and their set_ methods.
+ */
+
 function elem(str) {
   const d = document.createElement('div');
   d.innerHTML = str;
@@ -18,6 +28,13 @@ function fake_download(blob) {
 
   window.URL.revokeObjectURL(url);
 };
+/*
+ * ea_state_sync
+ *
+ * Gather the parameters from the current URL, clean them up, set the defaults
+ *
+ * returns an Object with the handled params and their set_ methods.
+ */
 
 function ea_state_sync() {
   let mode, output, inputs, preset;
@@ -84,6 +101,18 @@ function ea_state_sync() {
     set_preset_param: set_preset_param,
   };
 };
+
+/*
+ * ea_canvas_plot
+ *
+ * Just a shorthand to plotty.plot
+ * (see https://github.com/santilland/plotty.git)
+ *
+ * @param "A" a DS-looking thing
+ * @param "canvas" a canvas element (optional, will default to canvas#output)
+ *
+ * returns a plotty object.
+ */
 
 function ea_canvas_plot(A, canvas) {
   if (!(A.id && A.raster)) throw `${A.id} is not a A! Bye.`;

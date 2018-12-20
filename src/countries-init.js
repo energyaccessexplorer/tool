@@ -39,4 +39,6 @@ require([
   ea_countries_setup();
 
   ea_modal_setup();
+
+  ea_flash_setup();
 });

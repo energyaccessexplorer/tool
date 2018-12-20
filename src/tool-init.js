@@ -91,6 +91,8 @@ require([
 
   ea_modal_setup();
 
+  ea_flash_setup();
+
   ea_overlord({
     "type": 'init',
     "caller": 'require'

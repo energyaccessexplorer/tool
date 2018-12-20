@@ -153,7 +153,7 @@ async function ea_overlord(msg) {
     const b = collection.find(d => d.id === 'boundaries');
 
     if (!b) {
-      flash()
+      ea_flash
         .type('error')
         .title("Misconfigured country")
         .message(`

@@ -3,7 +3,7 @@ function ea_client_check(response) {
 
   if (response.ok) return response;
 
-  flash()
+  ea_flash
     .type('error')
     .title(`${response.status}: ${response.statusText}`)
     .message(response.url)();

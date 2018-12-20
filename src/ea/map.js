@@ -37,7 +37,9 @@ function ea_map_svg(svg, topofile, name, options) {
 
   default: {
     console.warn("Don't know what to do with topofile type:", topofile.type)
-    flash().type('error').message(topofile.type)();
+    ea_flash
+      .type('error')
+      .message(topofile.type)();
     break;
   }
   }

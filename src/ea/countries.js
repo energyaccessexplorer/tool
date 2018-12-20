@@ -156,7 +156,7 @@ function ea_countries_setup() {
       ea_ui_app_loading(false);
     })
     .catch(error => {
-      flash()
+      ea_flash
         .type('error')
         .title(error)();
 

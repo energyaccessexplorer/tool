@@ -1,152 +1,3 @@
-function ea_controls_collapse_subbranch(conel, subel) {
-  const d = conel.style['display'];
-  const c = subel.querySelector('.collapse');
-
-  if (d === "none") {
-    conel.style['display'] = 'block';
-    c.innerHTML = ea_ui_collapse_triangle('s');
-  }
-
-  else {
-    conel.style['display'] = 'none';
-    c.innerHTML = ea_ui_collapse_triangle('e');
-  }
-};
-
-function ea_controls_tree(tree, collection) {
-  const controls_el = document.querySelector('#controls')
-
-  tree.forEach(branch => branch.subbranches.forEach(sub => sub.datasets.filter(d => {
-    const ds = DS.named(d.id);
-
-    if (!ds) {
-      console.warn(`Dataset '${d.id}' not found:`, ds);
-      return false;
-    }
-
-    ds.invert = d.invert;
-  })));
-
-  tree.forEach(a => {
-    controls_el.appendChild(elem(`
-<div id=${a.name} class="controls-branch">
-  <div class="controls-branch-title">${a.name}</div>
-  <div class="controls-subbranches"></div>
-</div>`));
-
-    const branch_el = controls_el.querySelector(`#${a.name}`);
-
-    a.subbranches.forEach(b => {
-      branch_el.querySelector('.controls-subbranches')
-        .appendChild(elem(`
-<div id=${b.name} class="controls-subbranches">
-  <div class="controls-subbranch-title">
-    <span class="collapse triangle">${ea_ui_collapse_triangle('s')}</span>
-    ${ea_branch_dict[b.name]}
-  </div>
-  <div class="controls-container"></div>
-</div>`));
-
-      const subel = branch_el.querySelector(`#${b.name}`);
-      const conel = subel.querySelector('.controls-container');
-
-      subel.querySelector('.controls-subbranch-title')
-        .addEventListener('mouseup', e => ea_controls_collapse_subbranch(conel, subel));
-
-      b.datasets.forEach(b => {
-        const ds = collection.find(x => x.id === b.id);
-
-        if (ds) {
-          conel.appendChild(ea_controls(ds));
-        }
-        else {
-          console.warn(`'${b.id}' dataset not found.`);
-        }
-      });
-    });
-  });
-};
-
-function ea_controls_mutant_options(ds) {
-  const container = elem(`<div class="control-option"></div>`);
-  const select = elem('<select></select>');
-
-  ds.configuration.mutant_targets.forEach(i => {
-    const host = DS.named(i);
-    select.appendChild(elem(`<option value=${i}>${host.name_long}</option>`));
-  });
-
-  select.value = ds.configuration.mutant_targets[0];
-
-  select.addEventListener('change', async function() {
-    const host = DS.named(this.value);
-
-    await ds.mutate(host);
-
-    ea_overlord({
-      "type": "dataset",
-      "target": ds,
-      "caller": "ea_controls_mutant_options",
-    });
-  });
-
-  container.appendChild(select);
-
-  return container;
-};
-
-function ea_controls_elem(ds) {
-  const controls = elem(`
-<div id="controls-${ds.id}" class="controls">
-  <div class="controls-dataset-header"></div>
-  <div class="controls-dataset-content"></div>
-</div>`);
-
-  const header = controls.querySelector('.controls-dataset-header');
-
-  const check = ea_controls_active(ds, v => ds.active = v);
-
-  const button = check.svg;
-
-  header.appendChild(button);
-
-  ds.checkbox_change = check.change;
-
-  const help = elem(`<div class="controls-dataset-help">${ea_svg_info()}</div>`);
-
-  const clicko = function(e) {
-    ds.active = !ds.active;
-
-    if (e.target.closest('div') === help) return;
-
-    if (e.target.closest('svg') !== button) {
-      let event = document.createEvent('HTMLEvents');
-      event.initEvent('click', true, true);
-
-      button.dispatchEvent(event);
-    }
-
-    ea_overlord({
-      "type": "dataset",
-      "target": ds,
-      "caller": "ea_controls_elem clicko",
-    });
-  };
-
-  const name = elem(`<div class="controls-dataset-name">${ds.name_long}</div>`);
-  header.appendChild(name);
-
-  header.addEventListener('mouseup', clicko);
-
-  if (ds.help && (ds.help.why || ds.help.what)) {
-    header.appendChild(help);
-
-    help.addEventListener('mouseup', _ => ea_ui_category_help_modal(ds));
-  }
-
-  return controls;
-};
-
 function ea_controls(ds) {
   const _controls = ea_controls_elem(ds);
   const controls = _controls.querySelector('.controls-dataset-content');
@@ -205,6 +56,20 @@ function ea_controls(ds) {
 
     break;
 
+  case "boundaries-bis":
+    range_group = ea_controls_range(ds, (ds.unit || 'percentage'))
+
+    const opts = ea_controls_options(ds);
+    if (opts) {
+      controls.appendChild(opts);
+      controls.appendChild(range_group.elem);
+    }
+    else {
+      controls.remove();
+    }
+
+    break;
+
   case "transmission-lines-collection":
     range_group = ea_controls_range(ds, (ds.unit || 'proximity in km'));
     controls.appendChild(ea_controls_collection_list(ds));
@@ -225,6 +90,155 @@ function ea_controls(ds) {
   }
 
   return _controls;
+};
+
+function ea_controls_elem(ds) {
+  const controls = elem(`
+<div id="controls-${ds.id}" class="controls">
+  <div class="controls-dataset-header"></div>
+  <div class="controls-dataset-content"></div>
+</div>`);
+
+  const header = controls.querySelector('.controls-dataset-header');
+
+  const check = ea_svg_checkbox(ds.active, s => ea_controls_toggle(ds, ds.active = s));
+
+  const button = check.svg;
+
+  header.appendChild(button);
+
+  ds.checkbox_change = check.change;
+
+  const help = elem(`<div class="controls-dataset-help">${ea_svg_info()}</div>`);
+
+  const clicko = function(e) {
+    ds.active = !ds.active;
+
+    if (e.target.closest('div') === help) return;
+
+    if (e.target.closest('svg') !== button) {
+      let event = document.createEvent('HTMLEvents');
+      event.initEvent('click', true, true);
+
+      button.dispatchEvent(event);
+    }
+
+    ea_overlord({
+      "type": "dataset",
+      "target": ds,
+      "caller": "ea_controls_elem clicko",
+    });
+  };
+
+  const name = elem(`<div class="controls-dataset-name">${ds.name_long}</div>`);
+  header.appendChild(name);
+
+  header.addEventListener('mouseup', clicko);
+
+  if (ds.help && (ds.help.why || ds.help.what)) {
+    header.appendChild(help);
+
+    help.addEventListener('mouseup', _ => ea_ui_category_help_modal(ds));
+  }
+
+  return controls;
+};
+
+function ea_controls_tree(tree, collection) {
+  const controls_el = document.querySelector('#controls')
+
+  tree.forEach(branch => branch.subbranches.forEach(sub => sub.datasets.filter(d => {
+    const ds = DS.named(d.id);
+
+    if (!ds) {
+      console.warn(`Dataset '${d.id}' not found:`, ds);
+      return false;
+    }
+
+    ds.invert = d.invert;
+  })));
+
+  tree.forEach(a => {
+    controls_el.appendChild(elem(`
+<div id=${a.name} class="controls-branch">
+  <div class="controls-branch-title">${a.name}</div>
+  <div class="controls-subbranches"></div>
+</div>`));
+
+    const branch_el = controls_el.querySelector(`#${a.name}`);
+
+    a.subbranches.forEach(b => {
+      branch_el.querySelector('.controls-subbranches')
+        .appendChild(elem(`
+<div id=${b.name} class="controls-subbranches">
+  <div class="controls-subbranch-title">
+    <span class="collapse triangle">${ea_ui_collapse_triangle('s')}</span>
+    ${ea_branch_dict[b.name]}
+  </div>
+  <div class="controls-container"></div>
+</div>`));
+
+      const subel = branch_el.querySelector(`#${b.name}`);
+      const conel = subel.querySelector('.controls-container');
+
+      subel.querySelector('.controls-subbranch-title')
+        .addEventListener('mouseup', e => ea_controls_collapse_subbranch(conel, subel));
+
+      b.datasets.forEach(b => {
+        const ds = collection.find(x => x.id === b.id);
+
+        if (ds) {
+          conel.appendChild(ea_controls(ds));
+        }
+        else {
+          console.warn(`'${b.id}' dataset not found.`);
+        }
+      });
+    });
+  });
+};
+
+function ea_controls_collapse_subbranch(conel, subel) {
+  const d = conel.style['display'];
+  const c = subel.querySelector('.collapse');
+
+  if (d === "none") {
+    conel.style['display'] = 'block';
+    c.innerHTML = ea_ui_collapse_triangle('s');
+  }
+
+  else {
+    conel.style['display'] = 'none';
+    c.innerHTML = ea_ui_collapse_triangle('e');
+  }
+};
+
+function ea_controls_mutant_options(ds) {
+  const container = elem(`<div class="control-option"></div>`);
+  const select = elem('<select></select>');
+
+  ds.configuration.mutant_targets.forEach(i => {
+    const host = DS.named(i);
+    select.appendChild(elem(`<option value=${i}>${host.name_long}</option>`));
+  });
+
+  select.value = ds.configuration.mutant_targets[0];
+
+  select.addEventListener('change', async function() {
+    const host = DS.named(this.value);
+
+    await ds.mutate(host);
+
+    ea_overlord({
+      "type": "dataset",
+      "target": ds,
+      "caller": "ea_controls_mutant_options",
+    });
+  });
+
+  container.appendChild(select);
+
+  return container;
 };
 
 function ea_controls_options(ds) {
@@ -272,13 +286,6 @@ function ea_controls_toggle(ds, status) {
   cs.forEach((c,i) => {
     if (status) c.style['display'] = '';
     else c.style['display'] = 'none';
-  });
-};
-
-function ea_controls_active(ds, callback) {
-  return ea_svg_checkbox(ds.active, s => {
-    ea_controls_toggle(ds, s);
-    callback(s);
   });
 };
 

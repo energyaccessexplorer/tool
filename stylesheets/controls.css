@@ -227,6 +227,7 @@ select#controls-preset {
 select#controls-country option,
 select#controls-preset option {
   background-color: var(--the-white);
+  color: var(--the-color);
 }
 
 #supply, #demand {

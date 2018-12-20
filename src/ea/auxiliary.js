@@ -15,19 +15,6 @@ function elem(str) {
   return d.firstElementChild;
 };
 
-function fake_download(blob) {
-  const a = document.createElement('a');
-  document.body.appendChild(a);
-
-  a.style = "display:none;";
-
-  const url = URL.createObjectURL(blob);
-  a.href = url;
-  a.download = "ea_download";
-  a.click();
-
-  window.URL.revokeObjectURL(url);
-};
 /*
  * ea_state_sync
  *

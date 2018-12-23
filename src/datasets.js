@@ -334,6 +334,12 @@ Forcing dataset's weight to 1.`);
   return s;
 };
 
+/*
+ * The following functions fetch and load the different types of data to the
+ * datasets geojsons (points, lines or polygons), CSV's or rasters.
+ *
+ */
+
 async function ea_datasets_geojson(callback) {
   const ds = this;
 

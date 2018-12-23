@@ -2,34 +2,17 @@ const ea_default_color_scale = "ea";
 
 requirejs.config({
   'baseUrl': ea_settings.app_base + '/src',
-  'paths': {
-    'd3': "../lib/d3",
-    'topojson': "../lib/topojson",
-    'geotiff': "../lib/geotiff",
-    'plotty': "../lib/plotty",
-    'sortable':   "../lib/htmlsortable",
-    'flash': "../lib/flash",
-    'modal': "../lib/modal",
-    'mapbox-gl': "../lib/mapbox-gl",
-    'ea': "./ea/ea",
-    'datasets': "./ea/datasets",
-    'controls': "./ea/controls",
-    'ui': "./ea/ui",
-    'layers': "./ea/layers",
-    'client': "./ea/client",
-    'svg': "./ea/svg",
-    'auxiliary': "./ea/auxiliary",
-  }
 });
 
 require([
-  'd3',
-  'topojson',
-  'geotiff',
-  'plotty',
-  'mapbox-gl',
-  'flash',
-  'modal',
+  '../lib/d3',
+  '../lib/topojson',
+  '../lib/geotiff',
+  '../lib/plotty',
+  '../lib/mapbox-gl',
+  '../lib/flash',
+  '../lib/modal',
+  '../lib/htmlsortable',
   'ea',
   'auxiliary',
   'client',
@@ -39,7 +22,6 @@ require([
   'layers',
   'datasets',
   'mapbox',
-  'sortable',
 ], (d3, topojson, geotiff, plotty, mapboxgl) => {
   window.d3 = d3;
   window.topojson = topojson;

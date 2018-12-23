@@ -1,6 +1,4 @@
 function ea_client_check(response) {
-  // console.log("ea_client_check - response is OK:", response.ok, response);
-
   if (response.ok) return response;
 
   ea_flash

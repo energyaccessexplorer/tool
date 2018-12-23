@@ -219,7 +219,7 @@ function ea_ui_category_help_modal(ds) {
     .content(content)();
 };
 
-function ea_modal_setup() {
+function ea_ui_modal_setup() {
   window.ea_modal = modal()
     .header_style(`
 padding: 1em;
@@ -259,7 +259,7 @@ padding: 1.7em;
     `);
 };
 
-function ea_flash_setup() {
+function ea_ui_flash_setup() {
   window.ea_flash = flash()
     .style(`
 color: white !important;

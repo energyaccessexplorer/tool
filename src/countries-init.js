@@ -13,14 +13,12 @@ requirejs.config({
     'client': "./ea/client",
     'svg': "./ea/svg",
     'canvas': "./ea/canvas",
-    'map': "./ea/map",
   }
 });
 
 require([
   'd3',
   'topojson',
-  'map',
   'client',
   'svg',
   'ui',
@@ -38,7 +36,7 @@ require([
 
   ea_countries_setup();
 
-  ea_modal_setup();
+  ea_ui_modal_setup();
 
-  ea_flash_setup();
+  ea_ui_flash_setup();
 });

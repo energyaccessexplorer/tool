@@ -2,7 +2,7 @@ include default.mk
 
 start:
 	@static-server -noauth -port ${WEB_PORT} -dir ./dist &
-	@postgrest ./postgrest.conf &
+	@postgrest postgrest.conf &
 
 stop:
 	-@lsof -t -i :${WEB_PORT} | xargs -i kill {}

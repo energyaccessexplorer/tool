@@ -29,7 +29,7 @@ class DS {
     if (e.heatmap_file) {
       this.heatmap = e.category.heatmap
       this.heatmap.endpoint = e.heatmap_file.endpoint;
-      this.heatmap.parse = ea_datasets_tiff_url;
+      this.heatmap.parse = ea_datasets_tiff;
 
       if (!this.mutant && !this.collection)
         this.gen_color_scale();
@@ -334,6 +334,146 @@ Forcing dataset's weight to 1.`);
   return s;
 };
 
+async function ea_datasets_geojson(callback) {
+  const ds = this;
+
+  if (ds.features) callback();
+
+  else {
+    const endpoint = ds.vectors.endpoint;
+
+    if (!endpoint) {
+      console.warn(`Dataset '${ds.id}' should have a vectors (maybe a file-association missing). Endpoint is: `, endpoint);
+      return ds;
+    }
+
+    await ea_client(
+      endpoint, 'GET', null,
+      async r => {
+        ds.features = r;
+        callback();
+      }
+    );
+  }
+
+  return ds;
+};
+
+async function ea_datasets_csv(callback) {
+  const ds = this;
+
+  if (ds.table) return;
+
+  else {
+    const endpoint = ds.csv.endpoint;
+
+    if (!endpoint) {
+      console.warn(`Dataset '${ds.id}' should have a csv (maybe a file-association missing). Endpoint is: `, endpoint);
+      return ds;
+    }
+
+    d3.csv(endpoint, function(d) {
+      const o = { oid: +d[ds.csv.oid] };
+      Object.keys(ds.csv.options).forEach(k => o[k] = +d[k] || d[k]);
+      return o;
+    })
+      .then(data => {
+        // HACK: so we can access them by oid (as an array, they are
+        // generally a sequence starting at 1)
+        //
+        if (data[0]['oid'] === 1) data.unshift({ oid: 0 });
+
+        ds.table = data;
+      })
+      .catch(e => {
+        console.warn(`${endpoint} raised an error and several datasets might depend on this. Bye!`);
+      });
+  }
+};
+
+async function ea_datasets_tiff() {
+  const ds = this;
+
+  async function run_it(blob) {
+    function draw(canvas) {
+      if (this.vectors) return;
+
+      if (!ea_mapbox.getSource(this.id)) {
+        ea_canvas_plot(ea_analysis(this.id), canvas);
+
+        ea_mapbox.addSource(this.id, {
+          "type": "canvas",
+          "canvas": `canvas-${this.id}`,
+          "animate": false,
+          "coordinates": ea_mapbox.coords
+        });
+      }
+
+      if (!ea_mapbox.getLayer(this.id)) {
+        ea_mapbox.addLayer({
+          "id": this.id,
+          "type": 'raster',
+          "source": this.id,
+          "paint": {
+            "raster-resampling": "nearest"
+          }
+        }, ea_mapbox.first_symbol);
+      }
+
+      // TODO: Remove this? It's a hack for transmission-lines-collection not
+      // having per-element rasters but a single collection raster.
+      //
+      if (this.id === 'transmission-lines-collection') {
+        ea_mapbox.setLayoutProperty(this.id, 'visibility', 'none');
+      }
+    };
+
+    if (this.raster) {
+      draw.call(this, document.querySelector(`canvas#canvas-${this.id}`));
+    }
+
+    else {
+      const tiff = await GeoTIFF.fromBlob(blob);
+      const image = await tiff.getImage();
+      const rasters = await image.readRasters();
+
+      this.raster = rasters[0];
+
+      this.width = image.getWidth();
+      this.height = image.getHeight();
+
+      this.nodata = parseFloat(tiff.fileDirectories[0][0].GDAL_NODATA);
+
+      let c = document.createElement('canvas');
+      c.id = `canvas-${this.id}`;
+      c.style.display = 'none';
+
+      document.body.append(c);
+
+      draw.call(this, c);
+
+      if (ea_mapbox && ea_mapbox.getSource(this.id))
+        ea_mapbox.setLayoutProperty(this.id, 'visibility', 'none');
+    }
+
+    return this;
+  };
+
+  if (ds.raster) {
+    run_it.call(ds);
+    return ds;
+  }
+
+  const endpoint = ds.heatmap.endpoint;
+
+  await fetch(endpoint)
+    .then(ea_client_check)
+    .then(r => r.blob())
+    .then(b => run_it.call(ds, b));
+
+  return ds;
+};
+
 async function ea_datasets_points() {
   return ea_datasets_geojson.call(this, _ => {
     if (typeof ea_mapbox.getSource(this.id) === 'undefined') {
@@ -413,161 +553,4 @@ async function ea_datasets_polygons() {
         },
       }, ea_mapbox.first_symbol);
   });
-};
-
-async function ea_datasets_csv(callback) {
-  const ds = this;
-
-  if (ds.table) return;
-
-  else {
-    const endpoint = ds.csv.endpoint;
-
-    if (!endpoint) {
-      console.warn(`Dataset '${ds.id}' should have a csv (maybe a file-association missing). Endpoint is: `, endpoint);
-      return ds;
-    }
-
-    d3.csv(endpoint, function(d) {
-      const o = { oid: +d[ds.csv.oid] };
-      Object.keys(ds.csv.options).forEach(k => o[k] = +d[k] || d[k]);
-      return o;
-    })
-      .then(data => {
-        // HACK: so we can access them by oid (as an array, they are
-        // generally a sequence starting at 1)
-        //
-        if (data[0]['oid'] === 1) data.unshift({ oid: 0 });
-
-        ds.table = data;
-      })
-      .catch(e => {
-        console.warn(`${endpoint} raised an error and several datasets might depend on this. Bye!`);
-      });
-  }
-};
-
-async function ea_datasets_geojson(callback) {
-  const ds = this;
-
-  if (ds.features) callback();
-
-  else {
-    const endpoint = ds.vectors.endpoint;
-
-    if (!endpoint) {
-      console.warn(`Dataset '${ds.id}' should have a vectors (maybe a file-association missing). Endpoint is: `, endpoint);
-      return ds;
-    }
-
-    await ea_client(
-      endpoint, 'GET', null,
-      async r => {
-        ds.features = r;
-        callback();
-      }
-    );
-  }
-
-  return ds;
-};
-
-async function ea_datasets_tiff(blob) {
-  function draw(canvas) {
-    if (this.vectors) return;
-
-    if (!ea_mapbox) {
-      console.log('ea_datasets_tiff.draw: ea_mapbox is not here yet. Init?');
-      return;
-    }
-
-    if (!ea_mapbox.getSource(this.id)) {
-      ea_canvas_plot(ea_analysis(this.id), canvas);
-
-      ea_mapbox.addSource(this.id, {
-        "type": "canvas",
-        "canvas": `canvas-${this.id}`,
-        "animate": false,
-        "coordinates": ea_mapbox.coords
-      });
-    }
-
-    if (!ea_mapbox.getLayer(this.id)) {
-      ea_mapbox.addLayer({
-        "id": this.id,
-        "type": 'raster',
-        "source": this.id,
-        "paint": {
-          "raster-resampling": "nearest"
-        }
-      }, ea_mapbox.first_symbol);
-    }
-
-    // TODO: Remove this? It's a hack for transmission-lines-collection not
-    // having per-element rasters but a single collection raster.
-    //
-    if (this.id === 'transmission-lines-collection') {
-      ea_mapbox.setLayoutProperty(this.id, 'visibility', 'none');
-    }
-  };
-
-  if (this.raster) {
-    draw.call(this, document.querySelector(`canvas#canvas-${this.id}`));
-  }
-
-  else {
-    const tiff = await GeoTIFF.fromBlob(blob);
-    const image = await tiff.getImage();
-    const rasters = await image.readRasters();
-
-    this.raster = rasters[0];
-
-    this.width = image.getWidth();
-    this.height = image.getHeight();
-
-    this.nodata = parseFloat(tiff.fileDirectories[0][0].GDAL_NODATA);
-
-    let c = document.createElement('canvas');
-    c.id = `canvas-${this.id}`;
-    c.style.display = 'none';
-
-    document.body.append(c);
-
-    draw.call(this, c);
-
-    if (ea_mapbox && ea_mapbox.getSource(this.id))
-      ea_mapbox.setLayoutProperty(this.id, 'visibility', 'none');
-  }
-
-  return this;
-};
-
-async function ea_datasets_tiff_url() {
-  const ds = this;
-
-  if (ds.raster) {
-    ea_datasets_tiff.call(ds);
-    return ds;
-  }
-
-  const endpoint = ds.heatmap.endpoint;
-
-  await fetch(endpoint)
-    .then(ea_client_check)
-    .then(r => r.blob())
-    .then(b => ea_datasets_tiff.call(ds, b));
-
-  return ds;
-};
-
-function ea_datasets_hexblob(hex) {
-  const byteBuf = new Uint8Array(new ArrayBuffer(hex.length/2));
-
-  for (var i = 0; i < hex.length; i += 2)
-    byteBuf[i/2] = parseInt(hex.slice(i, i+2), 16);
-
-  const blob = new Blob([byteBuf], {type: "image/tiff"});
-  // fake_download(blob);
-
-  return blob;
 };

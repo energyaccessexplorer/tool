@@ -143,7 +143,9 @@ function mapbox_setup(bounds) {
 
   mapbox.coords = coords;
 
-  return mapbox;
+  mapbox.zoomTo(mapbox.getZoom() * 0.95, {duration: 0});
+
+  return (ea_mapbox = mapbox);
 };
 
 function mapbox_change_theme(theme, callback) {

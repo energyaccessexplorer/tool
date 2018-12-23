@@ -18,10 +18,7 @@ requirejs.config({
     'layers': "./ea/layers",
     'client': "./ea/client",
     'svg': "./ea/svg",
-    'map': "./ea/map",
-    'presets': "./ea/presets",
     'auxiliary': "./ea/auxiliary",
-    'country-select': "./ea/country-select",
   }
 });
 
@@ -34,14 +31,11 @@ require([
   'flash',
   'modal',
   'ea',
-  'presets',
   'auxiliary',
-  'map',
   'client',
   'svg',
   'controls',
   'ui',
-  'country-select',
   'layers',
   'datasets',
   'mapbox',
@@ -89,9 +83,8 @@ require([
   ea_default_color_stops = ['#1c4478', '#81b062', '#e5a82e'];
   plotty.addColorScale("ea", ea_default_color_stops, ea_default_color_domain);
 
-  ea_modal_setup();
-
-  ea_flash_setup();
+  ea_ui_modal_setup();
+  ea_ui_flash_setup();
 
   ea_overlord({
     "type": 'init',

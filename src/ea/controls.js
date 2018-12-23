@@ -388,3 +388,60 @@ function ea_controls_collection_list(ds) {
 
   return e;
 };
+
+function ea_controls_country_setup() {
+  const select = document.querySelector('#controls-country');
+
+  let country_list = null;
+
+  fetch(ea_settings.database + '/countries?select=name,cca3,ccn3&online')
+    .then(r => r.json())
+    .then(j => j.sort((a,b) => a['name'] > b['name'] ? 1 : -1))
+    .then(j => {
+      country_list = j;
+      j.forEach(c => select.appendChild(elem(`<option value="${c.ccn3}">${c.name}</option>`)));
+    })
+    .then(_ => {
+      select.value = location.get_query_param('ccn3');
+      select.querySelector('option[value=""]').innerText = "Select a Country";
+    });
+
+  select.addEventListener('change', function() { window.location = `./?ccn3=${this.value}`});
+};
+
+function ea_controls_presets_init(v) {
+  const el = document.querySelector('#controls-preset');
+
+  Object.keys(ea_presets).forEach(k => el.appendChild(elem(`<option value="${k}">${ea_presets[k]}</option>`)));
+
+  el.value = v || "custom";
+  el.querySelector('option[value="custom"]').innerText = "Custom Analysis";
+
+  el.addEventListener('change', function(e) {
+    ea_overlord({
+      "type": "preset",
+      "target": this.value,
+      "caller": "ea_controls_presets_init change"
+    });
+  });
+};
+
+function ea_controls_presets_set(d, v) {
+  let p = d.presets[v];
+
+  d.active = !!p;
+
+  if (p) {
+    d.weight = p.weight;
+    if (d.weight_change) d.weight_change(p.weight);
+
+    d.init_domain = [p.min, p.max];
+  } else {
+    d.weight = 2;
+    if (d.weight_change) d.weight_change(2);
+
+    d.init_domain = null;
+  }
+
+  return d.active;
+};

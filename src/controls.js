@@ -144,7 +144,7 @@ function ea_controls_elem(ds) {
   return controls;
 };
 
-function ea_controls_tree(tree, collection) {
+function ea_controls_tree(tree, list) {
   const controls_el = document.querySelector('#controls')
 
   tree.forEach(branch => branch.subbranches.forEach(sub => sub.datasets.filter(d => {
@@ -185,7 +185,7 @@ function ea_controls_tree(tree, collection) {
         .addEventListener('mouseup', e => ea_controls_collapse_subbranch(conel, subel));
 
       b.datasets.forEach(b => {
-        const ds = collection.find(x => x.id === b.id);
+        const ds = list.find(x => x.id === b.id);
 
         if (ds) {
           conel.appendChild(ea_controls(ds));

@@ -1,7 +1,7 @@
 /*
  * ea_analysis
  *
- * Given a collection of active DS's, their weights, domains and scaling
+ * Given a list of active DS's, their weights, domains and scaling
  * functions; create a new DS whose raster is a "normalised weighted average".
  *
  * @param "type" string. That can be:
@@ -14,7 +14,7 @@
 function ea_analysis(type) {
   const t0 = performance.now();
 
-  const collection = (function(t) {
+  const list = (function(t) {
     let idxn;
 
     if (['supply', 'demand'].indexOf(t) > -1)
@@ -54,12 +54,12 @@ function ea_analysis(type) {
     color_scale: cs,
   };
 
-  if (!collection.length) return A;
+  if (!list.length) return A;
 
   // Add up how much demand and supply datasets will account for. Then, just
   // below, these values will be split into 50-50 of the total analysis.
   //
-  const tots = collection
+  const tots = list
         .reduce((a,d) => {
           if (d.indexname) a[d.indexname] += d.weight;
           return a;
@@ -67,7 +67,7 @@ function ea_analysis(type) {
 
   const weights = {};
 
-  collection.forEach(d => {
+  list.forEach(d => {
     if (d.indexname)
       weights[d.id] = d.weight / (tots[d.indexname] * 2)
   });
@@ -75,7 +75,7 @@ function ea_analysis(type) {
   // Each dataset has a different scaling function. We cache these to optimise
   // the huge loop we are about to do.
   //
-  const scales = collection.map(d => d.scale_fn(type));
+  const scales = list.map(d => d.scale_fn(type));
 
   // The values will be normalised. Initialise the values:
   //
@@ -87,16 +87,16 @@ function ea_analysis(type) {
   // fully black raster to show as the result. We return the transparent one "A"
   // instead.
   //
-  const full_weight = collection
+  const full_weight = list
         .reduce((a,c) => ((c.heatmap.scale === "key-delta") ? a : c.weight + a), 0);
 
-  if (collection.length === 1 && full_weight === 0) return A;
+  if (list.length === 1 && full_weight === 0) return A;
 
   for (var i = 0; i < A.raster.length; i++) {
     let a = 0;
 
-    for (let j = 0; j < collection.length; j++) {
-      let c = collection[j];
+    for (let j = 0; j < list.length; j++) {
+      let c = list[j];
 
       // For the rest of the datasets, we 'annihilate' points that are already
       // as -1 (or nodata) since we wouldn't know what value to assign for the
@@ -217,9 +217,9 @@ async function ea_overlord(msg) {
     ea_mapbox = null;
     ea_category_tree = country.category_tree;
 
-    const collection = await ea_datasets_collection_init(country.id, state.inputs, state.preset);
+    const list = await ea_datasets_list_init(country.id, state.inputs, state.preset);
 
-    const b = collection.find(d => d.id === 'boundaries');
+    const b = list.find(d => d.id === 'boundaries');
 
     if (!b) {
       ea_flash
@@ -240,7 +240,7 @@ Please reporty this to energyaccessexplorer@wri.org.
         .insertBefore(ea_controls(b), document.querySelector('#controls'));
     }
 
-    const inputs = collection
+    const inputs = list
           .filter(t => t.active)
           .map(x => x.id)
           .sort((a,b) => (state.inputs.indexOf(a) < state.inputs.indexOf(b)) ? -1 : 1);

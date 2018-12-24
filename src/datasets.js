@@ -313,7 +313,7 @@ Forcing dataset's weight to 1.`);
   };
 };
 
-async function ea_datasets_collection_init(country_id, inputs, preset) {
+async function ea_datasets_list_init(country_id, inputs, preset) {
   let attrs = '*,heatmap_file(*),vectors_file(*),csv_file(*),category(*)';
 
   await ea_client(

@@ -164,8 +164,8 @@ function ea_countries_setup() {
     });
 };
 
-function ea_countries_overview(c, collection, online) {
-  const r = collection.find(i => i.country === c.name.common);
+function ea_countries_overview(c, list, online) {
+  const r = list.find(i => i.country === c.name.common);
 
   const co = elem('<div class="country-overview">');
 

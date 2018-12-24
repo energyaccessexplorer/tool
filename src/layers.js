@@ -243,7 +243,7 @@ function ea_layers_init() {
   })[0]
     .addEventListener(
       'sortupdate',
-      (e) => {
+      e => {
         ea_overlord({
           "type": 'sort',
           "target": e.detail.destination.items.map(i => i.getAttribute('bind')),

@@ -75,7 +75,7 @@ function ea_analysis(type) {
   // Each dataset has a different scaling function. We cache these to optimise
   // the huge loop we are about to do.
   //
-  const scales = collection.map(d => ea_datasets_scale_fn(d, type));
+  const scales = collection.map(d => d.scale_fn(type));
 
   // The values will be normalised. Initialise the values:
   //
@@ -217,7 +217,7 @@ async function ea_overlord(msg) {
     ea_mapbox = null;
     ea_category_tree = country.category_tree;
 
-    const collection = await ea_datasets_init(country.id, state.inputs, state.preset);
+    const collection = await ea_datasets_collection_init(country.id, state.inputs, state.preset);
 
     const b = collection.find(d => d.id === 'boundaries');
 

@@ -260,7 +260,7 @@ class DS {
   };
 };
 
-async function ea_datasets_init(country_id, inputs, preset) {
+async function ea_datasets_collection_init(country_id, inputs, preset) {
   let attrs = '*,heatmap_file(*),vectors_file(*),csv_file(*),category(*)';
 
   await ea_client(
@@ -337,50 +337,45 @@ Forcing dataset's weight to 1.`);
 /*
  * The following functions fetch and load the different types of data to the
  * datasets geojsons (points, lines or polygons), CSV's or rasters.
- *
  */
 
 async function ea_datasets_geojson(callback) {
-  const ds = this;
-
-  if (ds.features) callback();
+  if (this.features) callback();
 
   else {
-    const endpoint = ds.vectors.endpoint;
+    const endpoint = this.vectors.endpoint;
 
     if (!endpoint) {
-      console.warn(`Dataset '${ds.id}' should have a vectors (maybe a file-association missing). Endpoint is: `, endpoint);
-      return ds;
+      console.warn(`Dataset '${this.id}' should have a vectors (maybe a file-association missing). Endpoint is: `, endpoint);
+      return this;
     }
 
     await ea_client(
       endpoint, 'GET', null,
       async r => {
-        ds.features = r;
+        this.features = r;
         callback();
       }
     );
   }
 
-  return ds;
+  return this;
 };
 
 async function ea_datasets_csv(callback) {
-  const ds = this;
-
-  if (ds.table) return;
+  if (this.table) return;
 
   else {
-    const endpoint = ds.csv.endpoint;
+    const endpoint = this.csv.endpoint;
 
     if (!endpoint) {
-      console.warn(`Dataset '${ds.id}' should have a csv (maybe a file-association missing). Endpoint is: `, endpoint);
-      return ds;
+      console.warn(`Dataset '${this.id}' should have a csv (maybe a file-association missing). Endpoint is: `, endpoint);
+      return this;
     }
 
-    d3.csv(endpoint, function(d) {
-      const o = { oid: +d[ds.csv.oid] };
-      Object.keys(ds.csv.options).forEach(k => o[k] = +d[k] || d[k]);
+    d3.csv(endpoint, d => {
+      const o = { oid: +d[this.csv.oid] };
+      Object.keys(this.csv.options).forEach(k => o[k] = +d[k] || d[k]);
       return o;
     })
       .then(data => {
@@ -389,7 +384,7 @@ async function ea_datasets_csv(callback) {
         //
         if (data[0]['oid'] === 1) data.unshift({ oid: 0 });
 
-        ds.table = data;
+        this.table = data;
       })
       .catch(e => {
         console.warn(`${endpoint} raised an error and several datasets might depend on this. Bye!`);
@@ -398,8 +393,6 @@ async function ea_datasets_csv(callback) {
 };
 
 async function ea_datasets_tiff() {
-  const ds = this;
-
   async function run_it(blob) {
     function draw(canvas) {
       if (this.vectors) return;
@@ -465,19 +458,19 @@ async function ea_datasets_tiff() {
     return this;
   };
 
-  if (ds.raster) {
-    run_it.call(ds);
-    return ds;
+  if (this.raster) {
+    run_it.call(this);
+    return this;
   }
 
-  const endpoint = ds.heatmap.endpoint;
+  const endpoint = this.heatmap.endpoint;
 
   await fetch(endpoint)
     .then(ea_client_check)
     .then(r => r.blob())
-    .then(b => run_it.call(ds, b));
+    .then(b => run_it.call(this, b));
 
-  return ds;
+  return this;
 };
 
 async function ea_datasets_points() {

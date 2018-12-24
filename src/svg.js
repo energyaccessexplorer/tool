@@ -184,12 +184,12 @@ function ea_svg_range_steps(steps, init, drag_callback, end_callback, is_weight)
 
   c1.call(
     d3.drag()
-      .on('drag', () => {
+      .on('drag', _ => {
         x_position = Math.max(svgmin, Math.min(d3.event.x, svgmax));
         dragged(x_position);
       })
-      .on('start', () => c1.raise())
-      .on('end', () => (typeof end_callback === 'function') ? end_callback(norm(x_position)) : 0)
+      .on('start', _ => c1.raise())
+      .on('end', _ => (typeof end_callback === 'function') ? end_callback(norm(x_position)) : 0)
   );
 
   dragged(denorm(init));
@@ -205,7 +205,7 @@ function ea_svg_pie(co, data, outer, inner, colors, inner_text, create = true) {
         height = outer * 2;
 
   const pie = d3.pie()
-        .value((d) => d[0])
+        .value(d => d[0])
         .sort(null);
 
   const arc = d3.arc()
@@ -289,7 +289,7 @@ function ea_svg_pie(co, data, outer, inner, colors, inner_text, create = true) {
   function tween(a) {
     const i = d3.interpolate(this._current, a);
     this._current = i(0);
-    return (t) => arc(i(t));
+    return t => arc(i(t));
   };
 
   return {
@@ -402,28 +402,28 @@ function ea_svg_interval(single, init, callback1, callback2, end_callback) {
 
   c1.call(
     d3.drag()
-      .on('drag', () => {
+      .on('drag', _ => {
         const c2x = c2.attr('cx');
         const cx = Math.min(c2x, Math.max(d3.event.x, svgmin));
 
         drag_callback(c1, cx, cx, c2x - cx, callback1);
       })
-      .on('start', () => c1.raise())
-      .on('end', () => {
+      .on('start', _ => c1.raise())
+      .on('end', _ => {
         if (typeof end_callback === 'function') end_callback();
       })
   );
 
   c2.call(
     d3.drag()
-      .on('drag', () => {
+      .on('drag', _ => {
         const c1x = c1.attr('cx');
         const cx = Math.max(c1x, Math.min(d3.event.x, svgmax));
 
         drag_callback(c2, cx, c1x, cx - c1x, callback2);
       })
-      .on('start', () => c2.raise())
-      .on('end', () => {
+      .on('start', _ => c2.raise())
+      .on('end', _ => {
         if (typeof end_callback === 'function') end_callback();
       })
   );

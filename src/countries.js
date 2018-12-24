@@ -113,9 +113,9 @@ function ea_countries_setup() {
 
       const topo = topojson.feature(geo, geo.objects.countries);
 
-      ea_map = ea_map_svg(svg, geo, 'countries', { center: [0,0], scale: 350 });
+      ea_map = ea_countries_map_svg(svg, geo, 'countries', { center: [0,0], scale: 350 });
 
-      ea_map_load_features({
+      ea_countries_map_load_features({
         "map": ea_map,
         "features": topo.features,
         "cls": "land",
@@ -278,7 +278,7 @@ function ea_countries_overview(c, collection, online) {
     .content(co)();
 };
 
-function ea_map_svg(svg, topofile, name, options) {
+function ea_countries_map_svg(svg, topofile, name, options) {
   let width, height;
 
   let projection, geopath, scale;
@@ -355,11 +355,11 @@ function ea_map_svg(svg, topofile, name, options) {
     let zt = d3.zoomIdentity;
     const tooltip = d3.select('#coord-tooltip');
 
-    let mouseenter = () => tooltip.style('display', "block");
+    let mouseenter = _ => tooltip.style('display', "block");
 
-    let mouseleave = () => tooltip.style('display', "none");
+    let mouseleave = _ => tooltip.style('display', "none");
 
-    let mousemove = () => {
+    let mousemove = _ => {
       const p = projection.invert(zt.invert(d3.mouse(svg.node())))
 
       tooltip
@@ -368,11 +368,11 @@ function ea_map_svg(svg, topofile, name, options) {
         .style('top', `${ (d3.event.pageY + 15) }px`);
     };
 
-    let zoomstart = () => {
+    let zoomstart = _ => {
       if (!mask || mask.empty()) mask = d3.select('#mask');
     };
 
-    let zoomend = () => {
+    let zoomend = _ => {
       let k;
 
       if (d3.event)
@@ -381,7 +381,7 @@ function ea_map_svg(svg, topofile, name, options) {
         k = comfy;
     };
 
-    let zooming = () => {
+    let zooming = _ => {
       let et;
 
       if (d3.event)
@@ -414,7 +414,7 @@ function ea_map_svg(svg, topofile, name, options) {
     zoom.scaleBy(svg, comfy);
     zoom.translateTo(svg, _map.width/10, _map.height/10);
 
-    _map.init = () => {
+    _map.init = _ => {
       var d = d3.dispatch("init");
 
       d.on("init", _ => {
@@ -430,7 +430,7 @@ function ea_map_svg(svg, topofile, name, options) {
   return _map;
 };
 
-function ea_map_load_features(o) {
+function ea_countries_map_load_features(o) {
   if (!o.map)
     throw "Argument Error: o.map is missing";
 
@@ -465,19 +465,19 @@ function ea_map_load_features(o) {
     .attr('stroke-width', o.scale ? (0.5/o.scale) : 0);
 
   if (typeof o.classed === 'function')
-    paths.classed("selectable", (d) => o.classed(d.gid || d.id || null));
+    paths.classed("selectable", d => o.classed(d.gid || d.id || null));
 
   if (typeof o.mouseover === 'function')
-    paths.on('mouseover', (d) => o.mouseover(d.gid || d.id || ''));
+    paths.on('mouseover', d => o.mouseover(d.gid || d.id || ''));
 
   if (typeof o.mouseenter === 'function')
-    paths.on('mouseenter', (d) => o.mouseenter(d.gid || d.id || ''));
+    paths.on('mouseenter', d => o.mouseenter(d.gid || d.id || ''));
 
   if (typeof o.mouseleave === 'function')
-    paths.on('mouseleave', (d) => o.mouseleave(d.gid || d.id || ''));
+    paths.on('mouseleave', d => o.mouseleave(d.gid || d.id || ''));
 
   if (typeof o.mousedown === 'function')
-    paths.on('mousedown', (d) => o.mousedown(d.gid || d.id || ''));
+    paths.on('mousedown', d => o.mousedown(d.gid || d.id || ''));
 
   return container;
 };

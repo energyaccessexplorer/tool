@@ -1,7 +1,7 @@
 window.DSTable = {};
 
 class DS {
-  constructor(e, preset, inputs) {
+  constructor(e) {
     this.id = e.category.name;
 
     this.name_long = (e.configuration && e.configuration.name_override) ?
@@ -73,9 +73,6 @@ class DS {
       this.help['what'] = e.category.metadata.what;
     }
 
-    // TODO: this does not seem correct here. 'inputs' and 'presets' arguments
-    // to this constructor feels messy.
-    //
     this.presets = {};
 
     if (e.presets && e.presets.length) {
@@ -97,7 +94,9 @@ class DS {
         };
       });
     }
+  };
 
+  init(active, preset) {
     let presetsempty = Object.keys(this.presets).length === 0;
     let p = this.presets[preset]
 
@@ -110,12 +109,8 @@ class DS {
       this.init_domain = null;
     }
 
-    if (inputs.length) {
-      this.active = (inputs.indexOf(e.category.name) > -1)
-    } else {
-      this.active = (!presetsempty && p);
-    }
-  };
+    this.active = active || (!presetsempty && p);
+  }
 
   mutant_init() {
     if (!this.mutant) throw `${this.id} is not a mutant. Bye.`
@@ -156,6 +151,64 @@ class DS {
 
   collection_init() {
     if (!this.collection) throw `${this.id} is not a collection. Bye.`
+  };
+
+  scale_fn(indexname) {
+    let s = null;
+
+    const d = (this.heatmap.domain && [this.heatmap.domain.min, this.heatmap.domain.max]) || [0,1];
+    const t = this.tmp_domain;
+    const v = this.heatmap.scale;
+    const o = this.heatmap.scale_option;
+    const r = ((typeof this.invert !== 'undefined' && this.invert.indexOf(indexname) > -1) ? [1,0] : [0,1]);
+
+    const lin = d3.scaleLinear()
+          .domain(t || d)
+          .range(r)
+
+    switch (v) {
+    case 'identity': {
+      s = d3.scaleIdentity()
+        .domain(t || d)
+        .range(r);
+      break;
+    }
+
+    case 'key-linear': {
+      s = x => {
+        let z = this.table[x];
+        if (!z) return -1;
+
+        return (!x || x === this.nodata) ? -1 : lin.clamp(this.heatmap.clamp)(z[o]);
+      };
+      break;
+    }
+
+    case 'key-delta': {
+      if (this.weight !== 1) {
+        console.warn(`${this.id} is 'key-delta' but has weight ${this.weight}.
+key-delta functions are meant to be filters.
+Forcing dataset's weight to 1.`);
+        this.weight = 1;
+      }
+
+      s = x => {
+        let z = this.table[x];
+        if (!z) return -1;
+
+        return (z[o] < t[0] || z[o] > t[1]) ? -1 : 1;
+      };
+      break;
+    }
+
+    case 'linear':
+    default: {
+      s = lin.clamp(this.heatmap.clamp);
+      break;
+    }
+    }
+
+    return s;
   };
 
   gen_color_scale() {
@@ -265,7 +318,14 @@ async function ea_datasets_collection_init(country_id, inputs, preset) {
 
   await ea_client(
     `${ea_settings.database}/datasets?country_id=eq.${country_id}&select=${attrs}`, 'GET', null,
-    r => r.map(e => DSTable[e.category_name] = new DS(e,preset,inputs)));
+    r => r.map(e => {
+      let active = (inputs.indexOf(e.category.name) > -1);
+
+      let ds = new DS(e);
+      ds.init(active, preset);
+
+      return DSTable[e.category_name] = ds;
+    }));
 
   // We need all the datasets to be initialised _before_ setting
   // mutant/collection attributes (order is never guaranteed)
@@ -274,64 +334,6 @@ async function ea_datasets_collection_init(country_id, inputs, preset) {
   DS.list.filter(d => d.collection).forEach(d => d.collection_init());
 
   return DS.list;
-};
-
-function ea_datasets_scale_fn(ds, type) {
-  let s = null;
-
-  const d = (ds.heatmap.domain && [ds.heatmap.domain.min, ds.heatmap.domain.max]) || [0,1];
-  const t = ds.tmp_domain;
-  const v = ds.heatmap.scale;
-  const o = ds.heatmap.scale_option;
-  const r = ((typeof ds.invert !== 'undefined' && ds.invert.indexOf(type) > -1) ? [1,0] : [0,1]);
-
-  const lin = d3.scaleLinear()
-        .domain(t || d)
-        .range(r)
-
-  switch (v) {
-  case 'identity': {
-    s = d3.scaleIdentity()
-      .domain(t || d)
-      .range(r);
-    break;
-  }
-
-  case 'key-linear': {
-    s = x => {
-      let z = ds.table[x];
-      if (!z) return -1;
-
-      return (!x || x === ds.nodata) ? -1 : lin.clamp(ds.heatmap.clamp)(z[o]);
-    };
-    break;
-  }
-
-  case 'key-delta': {
-    if (ds.weight !== 1) {
-      console.warn(`${ds.id} is 'key-delta' but has weight ${ds.weight}.
-key-delta functions are meant to be filters.
-Forcing dataset's weight to 1.`);
-      ds.weight = 1;
-    }
-
-    s = x => {
-      let z = ds.table[x];
-      if (!z) return -1;
-
-      return (z[o] < t[0] || z[o] > t[1]) ? -1 : 1;
-    };
-    break;
-  }
-
-  case 'linear':
-  default: {
-    s = lin.clamp(ds.heatmap.clamp);
-    break;
-  }
-  }
-
-  return s;
 };
 
 /*

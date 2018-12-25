@@ -365,6 +365,7 @@ Please reporty this to energyaccessexplorer@wri.org.
       ea_layers_inputs(inputs);
     }
 
+    state.set_preset_param(msg.target);
     state.set_inputs_param(inputs);
 
     break;

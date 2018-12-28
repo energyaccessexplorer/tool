@@ -227,7 +227,7 @@ function ea_countries_overview(c, list, online) {
 
     [pop, urban_rural, pies, gdp, dev, area, pol, rate, ease, btn].forEach(t => t ? co.appendChild(t) : null);
 
-    if (+r['electrificYation-rate-urban'] > 0) {
+    if (+r['electrification-rate-urban'] > 0) {
       co.querySelector('.pie-charts-legends')
         .appendChild(elem(`
 <div class="overview-line">

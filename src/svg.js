@@ -200,7 +200,7 @@ function ea_svg_range_steps(steps, init, drag_callback, end_callback, is_weight)
   };
 };
 
-function ea_svg_pie(co, data, outer, inner, colors, inner_text, create = true) {
+function ea_svg_pie(data, outer, inner, colors, inner_text) {
   const width =  outer * 2,
         height = outer * 2;
 
@@ -212,30 +212,12 @@ function ea_svg_pie(co, data, outer, inner, colors, inner_text, create = true) {
         .innerRadius(((inner === null || inner === undefined || inner === false) ? outer - (outer/4) : inner))
         .outerRadius(outer - (outer/15));
 
-  const container = d3.select(co);
-
-  let svg = null;
-
-  if (create) {
-    svg = container.append("svg")
+  let svg = d3.select(document.createElementNS(d3.namespaces.svg, "svg"))
       .attr("width", width)
       .attr("height", height);
-  }
 
-  else
-    svg = container.select('svg');
-
-  let g = null;
-
-  if (! create) {
-    g = svg.append("g")
+  let g = svg.append("g")
       .attr("transform", `translate(${ svg.attr('width') / 2 }, ${ svg.attr('height') / 2 })`);
-  }
-
-  else {
-    g = svg.append("g")
-      .attr("transform", `translate(${ outer }, ${ outer })`);
-  }
 
   let path = g
       .datum(data)
@@ -249,7 +231,7 @@ function ea_svg_pie(co, data, outer, inner, colors, inner_text, create = true) {
   const text = svg.append("text")
         .attr("dy", ".35em")
         .attr("font-size", `${ outer / 47 }em`)
-        .attr("class", "monospace pie-center");
+        .attr("class", "pie-center");
 
   function change(v) {
     let t = "";
@@ -295,7 +277,8 @@ function ea_svg_pie(co, data, outer, inner, colors, inner_text, create = true) {
   return {
     change: change,
     tween: tween,
-    path: path
+    path: path,
+    svg: svg.node(),
   };
 };
 

@@ -234,18 +234,21 @@ function ea_countries_overview(c, list, online) {
   Electrified:&nbsp;<strong>${r['electrification-rate-urban']}%</strong>
 </div>`));
 
-      ea_svg_pie(
-        co.querySelector('.pie-charts'),
-        [[+r['electrification-rate-urban']], [100 - +r['electrification-rate-urban']]],
-        50,
-        0,
+      let eru = ea_svg_pie(
+        [
+          [+r['electrification-rate-urban']],
+          [100 - +r['electrification-rate-urban']]
+        ],
+        50, 0,
         [
           getComputedStyle(document.body).getPropertyValue('--the-light-green'),
           getComputedStyle(document.body).getPropertyValue('--the-green')
         ],
-        "",
-        true
-      ).change(0);
+        ""
+      );
+
+      co.querySelector('.pie-charts').appendChild(eru.svg);
+      eru.change(0);
     }
 
     if (+r['electrification-rate-rural'] > 0) {
@@ -255,18 +258,21 @@ function ea_countries_overview(c, list, online) {
   Electrified:&nbsp;<strong>${r['electrification-rate-rural']}%</strong>
 </div>`));
 
-      ea_svg_pie(
-        co.querySelector('.pie-charts'),
-        [[+r['electrification-rate-rural']], [100 - (+r['electrification-rate-rural'])]],
-        50,
-        0,
+      let err = ea_svg_pie(
+        [
+          [+r['electrification-rate-rural']],
+          [100 - (+r['electrification-rate-rural'])]
+        ],
+        50, 0,
         [
           getComputedStyle(document.body).getPropertyValue('--the-light-green'),
           getComputedStyle(document.body).getPropertyValue('--the-green')
         ],
-        "",
-        true
-      ).change(0);
+        ""
+      );
+
+      co.querySelector('.pie-charts').appendChild(err.svg);
+      err.change(0);
     }
 
   } else {

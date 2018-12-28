@@ -145,6 +145,9 @@ function mapbox_setup(bounds) {
 
   mapbox.zoomTo(mapbox.getZoom() * 0.95, {duration: 0});
 
+  mapbox.dragRotate.disable();
+  mapbox.touchZoomRotate.disableRotation();
+
   return (ea_mapbox = mapbox);
 };
 

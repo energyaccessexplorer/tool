@@ -57,8 +57,8 @@ require([
     "infrastructure": "Infrastructure",
   };
 
-  ea_default_color_domain = [0, 0.5, 1];
-  ea_default_color_stops = ['#1c4478', '#81b062', '#e5a82e'];
+  ea_default_color_domain = [0, 0.25, 0.5, 0.75, 1];
+  ea_default_color_stops = ["#1c4478", "#4f7a6d", "#81b062", "#b3ac48", "#e5a82e"];
   plotty.addColorScale("ea", ea_default_color_stops, ea_default_color_domain);
   ea_default_color_scale = "ea";
 

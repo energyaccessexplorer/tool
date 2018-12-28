@@ -69,7 +69,7 @@ function ea_analysis(type) {
 
   list.forEach(d => {
     if (d.indexname)
-      weights[d.id] = d.weight / (tots[d.indexname] * 2)
+      weights[d.id] = d.weight / (tots[d.indexname] * 2);
   });
 
   // Each dataset has a different scaling function. We cache these to optimise

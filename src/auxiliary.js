@@ -95,25 +95,28 @@ function ea_state_sync() {
  * Just a shorthand to plotty.plot
  * (see https://github.com/santilland/plotty.git)
  *
- * @param "A" a DS-looking thing
- * @param "canvas" a canvas element (optional, will default to canvas#output)
+ * @param "raster" []numbers
+ * @param "canvas" a canvas element (if null, will default to canvas#output)
+ * @param "color_scale" string. name of the color scale to draw.
  *
  * returns a plotty object.
  */
 
-function ea_canvas_plot(A, canvas) {
-  if (!(A.id && A.raster)) throw `${A.id} is not a A! Bye.`;
+function ea_canvas_plot(raster, canvas, color_scale = 'ea') {
+  if (!raster.length) throw "ea_canvas_plot: no raster given.";
 
   if (!canvas) canvas = document.querySelector('canvas#output');
 
+  const A = DS.named('boundaries');
+
   const plot = new plotty.plot({
     canvas: canvas,
-    data: A.raster,
+    data: raster,
     width: A.width,
     height: A.height,
-    domain: A.domain,
-    noDataValue: A.nodata,
-    colorScale: A.color_scale,
+    domain: [0,1],
+    noDataValue: -1,
+    colorScale: color_scale,
   });
 
   plot.render();
@@ -121,50 +124,104 @@ function ea_canvas_plot(A, canvas) {
   return plot;
 };
 
-function ea_summary() {
-  const summary = {};
 
-  for (var k of Object.keys(ea_indexes)) {
-    let a = ea_analysis(k);
+async function ea_summary() {
+  const pop = DS.named('population');
+  await pop.load('heatmap');
+  const p = pop.raster;
 
-    summary[k] = {
-      "low":      a.raster.filter(x => x >= 0   && x < 0.2).length,
-      "low-med":  a.raster.filter(x => x >= 0.2 && x < 0.4).length,
-      "med":      a.raster.filter(x => x >= 0.4 && x < 0.6).length,
-      "med-high": a.raster.filter(x => x >= 0.6 && x < 0.8).length,
-      "high":     a.raster.filter(x => x >= 0.8 && x <= 1).length,
-    };
-  }
+  const content = elem(`<div style="display: flex; flex-flow: row nowrap;">`);
 
-  const table = elem(`
-<table class="summary">
-<thead>
-  <tr><th></th> <th>0-20</th> <th>20-40</th> <th>40-60</th> <th>60-80</th> <th>80-100</th></tr>
-</thead>
+  const sizes = {
+    "eai": 100,
+    "ani": 100,
+    "demand": 50,
+    "supply": 50,
+  };
 
-<tbody></tbody>
-</table`);
+  Object.keys(ea_indexes).forEach(idxn => {
+    let a = ea_analysis(ea_list_filter_type(idxn),idxn);
 
-  const tbody = table.querySelector('tbody');
+    let groups = [0, 0, 0, 0, 0];
 
-  for (var k of Object.keys(summary)) {
-    let tr = document.createElement('tr')
+    for (let i = 0; i < a.length; i++) {
+      let x = a[i];
+      let v = p[i];
+      let t = 0;
 
-    tr.innerHTML = `
-<td class="index-name">${ea_indexes[k]}</td>
-<td>${summary[k]['low']}</td>
-<td>${summary[k]['low-med']}</td>
-<td>${summary[k]['med']}</td>
-<td>${summary[k]['med-high']}</td>
-<td>${summary[k]['high']}</td>
-`;
+      if (x === -1) continue;
 
-    tbody.appendChild(tr);
-  }
+      if (x >= 0   && x < 0.2) t = 0;
+      else if (x >= 0.2 && x < 0.4) t = 1;
+      else if (x >= 0.4 && x < 0.6) t = 2;
+      else if (x >= 0.6 && x < 0.8) t = 3;
+      else if (x >= 0.8 && x <= 1)  t = 4;
+
+      groups[t] += v;
+    }
+
+    let total = groups.reduce((a,b) => a + b, 0);
+    let percs = groups.reduce((a,b) => { a.push(b/total); return a; }, []);
+
+    let pie = ea_svg_pie(
+      percs.map(x => [x]),
+      75, 0,
+      ea_default_color_stops,
+      null
+    );
+
+    console.log(idxn, percs);
+
+    let e = elem(`
+<div style="text-align: center;">
+  <div class="pie-svg-container"></div>
+  <div class="indexname">${ea_indexes[idxn]}</div>
+</div>
+`);
+
+    pie.change(0);
+    e.querySelector('.pie-svg-container').appendChild(pie.svg);
+
+    content.appendChild(e);
+  });
 
   ea_modal
-    .header('Index Summaries')
-    .content(table)();
+    .header("Index Summaries - Population impact")
+    .content(content)();
+};
 
-  return summary;
+function ea_list_filter_type(type) {
+  let idxn;
+
+  if (['supply', 'demand'].indexOf(type) > -1)
+    idxn = d => d.indexname === type;
+
+  else if (['eai', 'ani'].indexOf(type) > -1)
+    idxn = d => true;
+
+  else
+    idxn = d => d.id === type;
+
+  return DS.list.filter(d => d.active && idxn(d));
+};
+
+function ea_plot_active_analysis(type, cs = 'ea') {
+  const list = ea_list_filter_type(type);
+
+  ea_canvas_plot(ea_analysis(list, type));
+
+  // 'animate' is set to false on mapbox's configuration, since we don't want
+  // mapbox eating the CPU at 60FPS for nothing.
+  //
+  // TODO: remove this hack. find a better way to redraw the canvas. as of v0.50
+  // there doesn't seem to be a good way to do this... mapboxgl should return
+  // promises. It doesn't.
+  //
+  let canvas_source = ea_mapbox.getSource('canvas-source');
+  if (canvas_source) {
+    canvas_source.play();
+    setTimeout(_ => {
+      canvas_source.pause();
+    }, 1000);
+  }
 };

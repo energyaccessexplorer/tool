@@ -399,8 +399,18 @@ async function ea_datasets_tiff() {
     function draw(canvas) {
       if (this.vectors) return;
 
+      let d = this.heatmap.domain;
+
       if (!ea_mapbox.getSource(this.id)) {
-        ea_canvas_plot(ea_analysis(this.id), canvas);
+        (new plotty.plot({
+          canvas: canvas,
+          data: this.raster,
+          width: this.width,
+          height: this.height,
+          domain: [d.min, d.max],
+          noDataValue: this.nodata,
+          colorScale: this.heatmap.color_scale,
+        })).render();
 
         ea_mapbox.addSource(this.id, {
           "type": "canvas",

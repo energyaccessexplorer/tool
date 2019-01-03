@@ -4,57 +4,20 @@
  * Given a list of active DS's, their weights, domains and scaling
  * functions; create a new DS whose raster is a "normalised weighted average".
  *
+ * @param "list" []DS. List of datasets to be processed.
+ *
  * @param "type" string. That can be:
- *   - The ID of a dataset.
- *   - The shortname of an index: eai, ani, demand or supply.
+ *   - ID of a dataset, or
+ *   - the shortname of an index: eai, ani, demand or supply. Some datasets behave
+ *     differently depending on this.
  *
  * returns DS to be plotted onto a canvas
  */
 
-function ea_analysis(type) {
+function ea_analysis(list, type) {
   const t0 = performance.now();
 
-  const list = (function(t) {
-    let idxn;
-
-    if (['supply', 'demand'].indexOf(t) > -1)
-      idxn = d => d.indexname === t;
-
-    else if (['eai', 'ani'].indexOf(t) > -1)
-      idxn = d => true;
-
-    else
-      idxn = d => d.id === t;
-
-    return DS.list.filter(d => d.active && idxn(d));
-  }).call(null, type);
-
-  // we use a dataset as a template just for code-clarity.
-  //
-  const tmp = DS.named('boundaries');
-
-  let cs = ea_default_color_scale;
-
-  let single_input = DS.named(type);
-
-  if (single_input) {
-    cs = single_input.heatmap.color_scale;
-
-    if (single_input.configuration && single_input.configuration.mutant)
-      cs = DS.named(single_input.configuration.host).heatmap.color_scale;
-  }
-
-  const A = {
-    id: `analysis-${Date.now()}`,
-    domain: [0,1],
-    width: tmp.width,
-    height: tmp.height,
-    raster: new Float32Array(tmp.raster.length).fill(-1),
-    nodata: -1,
-    color_scale: cs,
-  };
-
-  if (!list.length) return A;
+  const raster = new Float32Array(list[0] ? list[0].raster.length : 1).fill(-1);
 
   // Add up how much demand and supply datasets will account for. Then, just
   // below, these values will be split into 50-50 of the total analysis.
@@ -84,15 +47,15 @@ function ea_analysis(type) {
 
   // NOTICE: if there is only one dataset which has no weight in calculations
   // (boundaries with key-delta scale function, for example), we do NOT want an
-  // fully black raster to show as the result. We return the transparent one "A"
+  // fully black raster to show as the result. We return the transparent raster.
   // instead.
   //
   const full_weight = list
         .reduce((a,c) => ((c.heatmap.scale === "key-delta") ? a : c.weight + a), 0);
 
-  if (list.length === 1 && full_weight === 0) return A;
+  if (list.length === 1 && full_weight === 0) return raster;
 
-  for (var i = 0; i < A.raster.length; i++) {
+  for (var i = 0; i < raster.length; i++) {
     let a = 0;
 
     for (let j = 0; j < list.length; j++) {
@@ -137,22 +100,22 @@ function ea_analysis(type) {
       if (a < min) min = a;
     }
 
-    A.raster[i] = a;
+    raster[i] = a;
   }
 
-  // For user-friendlyness, the new raster is "quantised". It increases the
+  // For user-friendlyness, the new raster is "quantised" as it increases the
   // heatmaps' contrast.
   //
-  var f = d3.scaleQuantize().domain([min,max]).range([0, 0.25, 0.5, 0.75, 1]);
+  var f = d3.scaleQuantize().domain([min,max]).range(ea_default_color_domain);
 
-  for (var i = 0; i < A.raster.length; i++) {
-    const r = A.raster[i];
-    A.raster[i] = (r === -1) ? -1 : f(r);
+  for (var i = 0; i < raster.length; i++) {
+    const r = raster[i];
+    raster[i] = (r === -1) ? -1 : f(r);
   }
 
   console.log("Finished ea_analysis in:", performance.now() - t0, weights, tots);
 
-  return A;
+  return raster;
 };
 
 /*
@@ -220,17 +183,19 @@ async function ea_overlord(msg) {
     const list = await ea_datasets_list_init(country.id, state.inputs, state.preset);
 
     const b = list.find(d => d.id === 'boundaries');
+    const p = list.find(d => d.id === 'population');
 
-    if (!b) {
+    if (!b || !p) {
       ea_flash
         .type('error')
         .title("Misconfigured country")
         .message(`
-It's missing a boundaries dataset. <b>I'm stoping here.</b>
+It's missing a boundaries or population dataset. <b>I'm stoping here.</b>
 Please reporty this to energyaccessexplorer@wri.org.
 `)();
 
-      throw `Country is missing a boundaries dataset.`;
+      if (!b) throw `Country is missing a 'boundaries' dataset.`;
+      if (!p) throw `Country is missing a 'population' dataset.`;
     }
 
     else {
@@ -279,7 +244,7 @@ Please reporty this to energyaccessexplorer@wri.org.
         let x; if (x = DS.named(i)) x.hide();
       });
 
-      ea_canvas_plot(ea_analysis(state.output));
+      ea_plot_active_analysis(state.output);
 
       ea_mapbox.setLayoutProperty('canvas-layer', 'visibility', 'visible');
     }
@@ -316,7 +281,7 @@ Please reporty this to energyaccessexplorer@wri.org.
       await ds.turn(ds.active, false);
 
       ea_layers_outputs(state.output);
-      ea_canvas_plot(ea_analysis(state.output));
+      ea_plot_active_analysis(state.output);
     }
 
     else if (state.mode === "inputs") {
@@ -338,7 +303,7 @@ Please reporty this to energyaccessexplorer@wri.org.
 
   case "index": {
     if (state.mode === "outputs") {
-      ea_canvas_plot(ea_analysis(msg.target));
+      ea_plot_active_analysis(msg.target);
       state.set_output_param(msg.target);
     }
 
@@ -357,7 +322,7 @@ Please reporty this to energyaccessexplorer@wri.org.
     if (state.mode === "outputs") {
       ea_layers_outputs(state.output);
       await Promise.all(DS.list.map(d => d.turn(d.active, false)));
-      ea_canvas_plot(ea_analysis(state.output));
+      ea_plot_active_analysis(state.output);
     }
 
     else if (state.mode === "inputs") {
@@ -400,21 +365,6 @@ Please reporty this to energyaccessexplorer@wri.org.
 
   default:
     throw `Overlord: I don't know message type '${msg.type}'`
-  }
-
-  // 'animate' is set to false on mapbox's configuration, since we don't want
-  // mapbox eating the CPU at 60FPS for nothing.
-  //
-  // TODO: remove this hack. find a better way to redraw the canvas. as of v0.50
-  // there doesn't seem to be a good way to do this... mapboxgl should return
-  // promises. It doesn't.
-  //
-  let canvas_source = ea_mapbox.getSource('canvas-source');
-  if (canvas_source) {
-    canvas_source.play();
-    setTimeout(_ => {
-      canvas_source.pause();
-    }, 1000);
   }
 
   if (typeof msg.callback === 'function') msg.callback();

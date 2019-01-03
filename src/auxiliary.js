@@ -124,6 +124,15 @@ function ea_canvas_plot(raster, canvas, color_scale = 'ea') {
   return plot;
 };
 
+/*
+ * ea_summary
+ *
+ * Given the current dataset selection, calculate the population impact through
+ * the 'population' dataset on all Indexes. Draw some pie graphs and a modal
+ * about it.
+ *
+ * This is triggered by the "snapshot" button.
+ */
 
 async function ea_summary() {
   const pop = DS.named('population');
@@ -190,6 +199,14 @@ async function ea_summary() {
     .content(content)();
 };
 
+/*
+ * ea_list_filter_type
+ *
+ * Utility.
+ *
+ * @param "type" string. ID or indexname.
+ */
+
 function ea_list_filter_type(type) {
   let idxn;
 
@@ -204,6 +221,15 @@ function ea_list_filter_type(type) {
 
   return DS.list.filter(d => d.active && idxn(d));
 };
+
+/*
+ * ea_plot_active_analysis
+ *
+ * Utility.
+ *
+ * @param "type" string. ID or indexname.
+ * @param "cs" string. Default color_scale to 'ea'.
+ */
 
 function ea_plot_active_analysis(type, cs = 'ea') {
   const list = ea_list_filter_type(type);

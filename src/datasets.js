@@ -153,6 +153,18 @@ class DS {
     if (!this.collection) throw `${this.id} is not a collection. Bye.`
   };
 
+  /*
+   * ea_datasets_scale_fn
+   *
+   * Extract the scaling function given a dataset and the current parameters.
+   *
+   * @param "indexname" string.
+   *   current index being drawn and decide if the range of the function should be
+   *   inverted.
+   *
+   * returns function (ds domain) -> [0,1]
+   */
+
   scale_fn(indexname) {
     let s = null;
 
@@ -312,6 +324,21 @@ Forcing dataset's weight to 1.`);
     return DSTable[i];
   };
 };
+
+/*
+ * ea_datasets_list_init
+ *
+ * 1. fetch the datasets list from the API
+ * 2. generate DS objects
+ * 3. store them in DSTable
+ * 4. initialise mutants and collections
+ *
+ * @param "country_id"
+ * @param "inputs" string[] with DS.id's
+ * @param "preset" string ("custom", "market", "investment", "planning")
+ *
+ * returns DS[]
+ */
 
 async function ea_datasets_list_init(country_id, inputs, preset) {
   let attrs = '*,heatmap_file(*),vectors_file(*),csv_file(*),category(*)';

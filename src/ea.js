@@ -1,8 +1,8 @@
 /*
  * ea_analysis
  *
- * Given a list of active DS's, their weights, domains and scaling
- * functions; create a new DS whose raster is a "normalised weighted average".
+ * Given a list of DS's, their weights, domains and scaling functions; create a
+ * new DS whose raster is a "normalised weighted average".
  *
  * @param "list" []DS. List of datasets to be processed.
  *

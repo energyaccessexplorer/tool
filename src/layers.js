@@ -1,5 +1,5 @@
 /*
- *
+ * This file contains the functionality for the layers.
  */
 
 async function ea_layers_sort_inputs(list) {

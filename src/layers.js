@@ -2,9 +2,41 @@
  * This file contains the functionality for the layers.
  */
 
-async function ea_layers_sort_inputs(list) {
-  for (let i of list.slice(0).reverse())
-    await DS.named(i).raise();
+function ea_layers_init() {
+  const layers = document.querySelector('#layers');
+  const list = layers.querySelector('#layers-list');
+
+  const min_arrow = elem(`
+<div style="display: flex; justify-content: flex-end;">
+  <div style="background-color: rgba(0,0,0,0.7); padding: 0.2em 0.4em; color: white; fill: white; cursor: pointer;">${ea_svg_arrow()}</div>
+</div>
+`);
+
+  let v = true;
+
+  min_arrow.addEventListener('mouseup', function(e) {
+    v = !v;
+    list.style.display = v ? '' : 'none';
+    min_arrow.style.transform = v ? "scale(1, 1)" : "scale(1, -1)";
+  });
+
+  layers.prepend(min_arrow);
+
+  sortable('#layers-list', {
+    "items": 'li.layers-element',
+    "forcePlaceholderSize": true,
+    "placeholder": '<li class="layers-element-place-holder"></li>',
+    "handle": '.layers-element-handle',
+  })[0]
+    .addEventListener(
+      'sortupdate',
+      e => {
+        ea_overlord({
+          "type": 'sort',
+          "target": e.detail.destination.items.map(i => i.getAttribute('bind')),
+          "caller": 'ea_layers_init',
+        })
+      });
 };
 
 function ea_layers_elem(bind, cls, title) {
@@ -22,60 +54,6 @@ function ea_layers_elem(bind, cls, title) {
     <div class="layers-element-description"></div>
   </div>
 </li>`);
-};
-
-function ea_layers_0_100() {
-  return elem(`
-<div style="display: flex; justify-content: space-between; margin-right: -0.5em; padding-left: 0.2em;">
-  <div>0</div>
-  <div>20</div>
-  <div>40</div>
-  <div>60</div>
-  <div>80</div>
-  <div>100</div>
-</div>
-`);
-};
-
-function ea_layers_lowmidhigh() {
-  return elem(`
-<div style="display: flex; justify-content: space-between; padding-right: -0.5em; padding-left: 0.2em;">
-  <div>LOW</div>
-  <div>MID</div>
-  <div>HIGH</div>
-</div>
-`);
-};
-
-function ea_layers_min_max(ds) {
-  return elem(`
-<div style="display: flex; justify-content: space-between; padding-right: 0.2em; padding-left: 0.2em;">
-  <div>${ds.heatmap.domain.min}</div>
-  <div>${ds.heatmap.domain.max}</div>
-</div>
-`);
-};
-
-function ea_layers_opacity_control(ds) {
-  const e = elem(`<div class="layers-opacity-control"></div>`);
-
-  let opacity = 1;
-
-  const grad = ea_svg_interval(
-    true, null, null,
-    x => opacity = x,
-    _ => ea_mapbox.setPaintProperty(ds.id, 'raster-opacity', parseFloat(opacity))
-  );
-
-  e.appendChild(grad.svg);
-  e.appendChild(elem(`
-<div style="display: flex; justify-content: space-between; padding-right: 0.5em; padding-left: 0.5em; font-size: 0.8em;">
-  <span>0%</span>
-  <span>Opacity</span>
-  <span>100%</span>
-</div>`));
-
-  return e;
 };
 
 function ea_layers_input_elem(ds) {
@@ -159,6 +137,26 @@ function ea_layers_output_elem(t, v, i, x) {
   return d;
 };
 
+function ea_layers_inputs(list) {
+  sortable('#layers-list', 'disable');
+
+  const layers = document.querySelector('#layers');
+  const layers_list = layers.querySelector('#layers-list');
+
+  const ldc = list.map(i => DS.named(i));
+
+  layers_list.innerHTML = "";
+
+  ldc.forEach(ds => layers_list.appendChild(ea_layers_input_elem(ds)));
+
+  const style = 'style="font-size: smaller; text-align: center;"';
+
+  if (list.length === 0)
+    layers_list.innerHTML = `<pre ${style}>No layers selected.</pre>`;
+
+  sortable('#layers-list', 'enable');
+};
+
 function ea_layers_outputs(target) {
   let nodes;
 
@@ -195,59 +193,61 @@ function ea_layers_outputs(target) {
   });
 };
 
-function ea_layers_inputs(list) {
-  sortable('#layers-list', 'disable');
-
-  const layers = document.querySelector('#layers');
-  const layers_list = layers.querySelector('#layers-list');
-
-  const ldc = list.map(i => DS.named(i));
-
-  layers_list.innerHTML = "";
-
-  ldc.forEach(ds => layers_list.appendChild(ea_layers_input_elem(ds)));
-
-  const style = 'style="font-size: smaller; text-align: center;"';
-
-  if (list.length === 0)
-    layers_list.innerHTML = `<pre ${style}>No layers selected.</pre>`;
-
-  sortable('#layers-list', 'enable');
+async function ea_layers_sort_inputs(list) {
+  for (let i of list.slice(0).reverse())
+    await DS.named(i).raise();
 };
 
-function ea_layers_init() {
-  const layers = document.querySelector('#layers');
-  const list = layers.querySelector('#layers-list');
+function ea_layers_opacity_control(ds) {
+  const e = elem(`<div class="layers-opacity-control"></div>`);
 
-  const min_arrow = elem(`
-<div style="display: flex; justify-content: flex-end;">
-  <div style="background-color: rgba(0,0,0,0.7); padding: 0.2em 0.4em; color: white; fill: white; cursor: pointer;">${ea_svg_arrow()}</div>
+  let opacity = 1;
+
+  const grad = ea_svg_interval(
+    true, null, null,
+    x => opacity = x,
+    _ => ea_mapbox.setPaintProperty(ds.id, 'raster-opacity', parseFloat(opacity))
+  );
+
+  e.appendChild(grad.svg);
+  e.appendChild(elem(`
+<div style="display: flex; justify-content: space-between; padding-right: 0.5em; padding-left: 0.5em; font-size: 0.8em;">
+  <span>0%</span>
+  <span>Opacity</span>
+  <span>100%</span>
+</div>`));
+
+  return e;
+};
+
+function ea_layers_0_100() {
+  return elem(`
+<div style="display: flex; justify-content: space-between; margin-right: -0.5em; padding-left: 0.2em;">
+  <div>0</div>
+  <div>20</div>
+  <div>40</div>
+  <div>60</div>
+  <div>80</div>
+  <div>100</div>
 </div>
 `);
+};
 
-  let v = true;
+function ea_layers_lowmidhigh() {
+  return elem(`
+<div style="display: flex; justify-content: space-between; padding-right: -0.5em; padding-left: 0.2em;">
+  <div>LOW</div>
+  <div>MID</div>
+  <div>HIGH</div>
+</div>
+`);
+};
 
-  min_arrow.addEventListener('mouseup', function(e) {
-    v = !v;
-    list.style.display = v ? '' : 'none';
-    min_arrow.style.transform = v ? "scale(1, 1)" : "scale(1, -1)";
-  });
-
-  layers.prepend(min_arrow);
-
-  sortable('#layers-list', {
-    "items": 'li.layers-element',
-    "forcePlaceholderSize": true,
-    "placeholder": '<li class="layers-element-place-holder"></li>',
-    "handle": '.layers-element-handle',
-  })[0]
-    .addEventListener(
-      'sortupdate',
-      e => {
-        ea_overlord({
-          "type": 'sort',
-          "target": e.detail.destination.items.map(i => i.getAttribute('bind')),
-          "caller": 'ea_layers_init',
-        })
-      });
+function ea_layers_min_max(ds) {
+  return elem(`
+<div style="display: flex; justify-content: space-between; padding-right: 0.2em; padding-left: 0.2em;">
+  <div>${ds.heatmap.domain.min}</div>
+  <div>${ds.heatmap.domain.max}</div>
+</div>
+`);
 };

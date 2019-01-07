@@ -252,7 +252,6 @@ width: -webkit-fit-content;
 width: -moz-fit-content;
 font-size: 1.2em;
 margin-top: 3.2em;
-max-width: 800px;
     `)
     .content_style(`
 padding: 1.7em;

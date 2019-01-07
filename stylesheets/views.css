@@ -71,3 +71,39 @@ table.summary .index-name {
   text-align: left;
   font-family: without-serif, sans-serif;
 }
+
+.number-labels {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-around;
+  width: 400px;
+  padding: 1em;
+  border: 1px solid darkgrey;
+  margin: auto;
+  margin-top: 2em;
+}
+
+.number-labels-row > th,
+.number-labels > div {
+  color: white;
+  padding: 5px 7px;
+}
+
+#graphs {
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+.tab.hidden {
+  display: none !important;
+}
+
+.big-green-button {
+  text-align: center;
+  margin: 1em auto;
+  background-color: var(--the-green);
+  color: white !important;
+  text-decoration: none;
+  display: block;
+  padding: 0.9em 1.3em;
+}

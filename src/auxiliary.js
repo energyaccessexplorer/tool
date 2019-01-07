@@ -131,7 +131,7 @@ function ea_canvas_plot(raster, canvas, color_scale = 'ea') {
  * the 'population' dataset on all Indexes. Draw some pie graphs and a modal
  * about it.
  *
- * This is triggered by the "snapshot" button.
+ * This is triggered by the "Snapshot" button.
  */
 
 async function ea_summary() {
@@ -139,7 +139,11 @@ async function ea_summary() {
   await pop.load('heatmap');
   const p = pop.raster;
 
-  const content = elem(`<div style="display: flex; flex-flow: row nowrap;">`);
+  const content = elem(`<div></div>`);
+
+  const graphs_tab = elem(`<div class="tab"></div>`);
+  const graphs = elem(`<div id="graphs"></div>`);
+  graphs_tab.appendChild(graphs);
 
   const sizes = {
     "eai": 100,
@@ -148,8 +152,12 @@ async function ea_summary() {
     "supply": 50,
   };
 
+  const summary = {};
+
+  nodata = pop.nodata;
+
   Object.keys(ea_indexes).forEach(idxn => {
-    let a = ea_analysis(ea_list_filter_type(idxn),idxn);
+    let a = ea_analysis(ea_list_filter_type(idxn), idxn);
 
     let groups = [0, 0, 0, 0, 0];
 
@@ -158,7 +166,7 @@ async function ea_summary() {
       let v = p[i];
       let t = 0;
 
-      if (x === -1) continue;
+      if (v == nodata) continue;
 
       if (x >= 0   && x < 0.2) t = 0;
       else if (x >= 0.2 && x < 0.4) t = 1;
@@ -172,17 +180,14 @@ async function ea_summary() {
     let total = groups.reduce((a,b) => a + b, 0);
     let percs = groups.reduce((a,b) => { a.push(b/total); return a; }, []);
 
-    let pie = ea_svg_pie(
-      percs.map(x => [x]),
-      75, 0,
-      ea_default_color_stops,
-      null
-    );
+    summary[idxn] = groups;
 
-    console.log(idxn, percs);
+    console.log(idxn, percs, groups);
+
+    let pie = ea_svg_pie(percs.map(x => [x]), 75, 0, ea_default_color_stops, null);
 
     let e = elem(`
-<div style="text-align: center;">
+<div style="text-align: center; margin: 0 1em;">
   <div class="pie-svg-container"></div>
   <div class="indexname">${ea_indexes[idxn]}</div>
 </div>
@@ -191,12 +196,89 @@ async function ea_summary() {
     pie.change(0);
     e.querySelector('.pie-svg-container').appendChild(pie.svg);
 
-    content.appendChild(e);
+    graphs.appendChild(e);
   });
+
+  const s = ea_default_color_stops;
+
+  const legend = elem(`
+<div class="number-labels">
+  <div style="background-color: ${s[0]}">0-20</div>
+  <div style="background-color: ${s[1]}">20-40</div>
+  <div style="background-color: ${s[2]}">40-60</div>
+  <div style="background-color: ${s[3]}">60-80</div>
+  <div style="background-color: ${s[4]}">80-100</div>
+</div>
+`);
+
+  const table = elem(`
+<table class="summary tab hidden">
+<thead>
+  <tr class="number-labels-row">
+    <th></th>
+    <th style="background-color: ${s[0]}">0-20</th>
+    <th style="background-color: ${s[1]}">20-40</th>
+    <th style="background-color: ${s[2]}">40-60</th>
+    <th style="background-color: ${s[3]}">60-80</th>
+    <th style="background-color: ${s[4]}">80-100</th>
+  </tr>
+</thead>
+
+<tbody></tbody>
+</table`);
+
+  const tbody = table.querySelector('tbody');
+
+  for (var k of Object.keys(summary)) {
+    let tr = document.createElement('tr')
+
+    tr.innerHTML = `
+<td class="index-name">${ea_indexes[k]}</td>
+<td>${(summary[k][0]).toLocaleString()}</td>
+<td>${(summary[k][1]).toLocaleString()}</td>
+<td>${(summary[k][2]).toLocaleString()}</td>
+<td>${(summary[k][3]).toLocaleString()}</td>
+<td>${(summary[k][4]).toLocaleString()}</td>
+`;
+
+    tbody.appendChild(tr);
+  }
+
+  const switcho = elem(`<button class="big-green-button">Summary Table</button>`);
+  switcho.addEventListener("click", _ => {
+    for (let e of content.querySelectorAll('.tab'))
+      e.classList.toggle('hidden');
+  });
+
+  content.appendChild(graphs_tab);
+  graphs_tab.appendChild(legend);
+
+  content.appendChild(table);
+  content.appendChild(switcho);
 
   ea_modal
     .header("Index Summaries - Population impact")
     .content(content)();
+
+  return content;
+};
+
+/*
+ * ea_summary_wrapper
+ *
+ * A hack. For javascript reasons, ea_ui_app_loading does not get executed in a
+ * blocking manner.
+ */
+
+function ea_summary_wrapper() {
+  const prom = new Promise((resolve, rej) => {
+    ea_ui_app_loading(true);
+    setTimeout(_ => resolve("Success!"), 100);
+  });
+
+  prom
+    .then(ea_summary)
+    .then(_ => ea_ui_app_loading(false));
 };
 
 /*

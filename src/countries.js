@@ -18,7 +18,6 @@ function ea_countries_setup() {
 
   const cf  = document.querySelector('#country-float');
   const cfn = cf.querySelector('#country-float-name');
-  const cff = cf.querySelector('#country-float-flag');
 
   let curr_c = null;
 
@@ -45,10 +44,6 @@ function ea_countries_setup() {
 
         let e = elem(`
 <div class="country-dropdown-element" bind="${cc.ccn3}">
-  <div class="country-dropdown-image">
-    <img class="flag" src="https://cdn.rawgit.com/mledoze/countries/master/data/${cc.cca3.toLowerCase()}.svg" />
-  </div>
-
   <div class="country-dropdown-name">${cc.name.common}</div>
 </div>`);
 
@@ -136,8 +131,6 @@ function ea_countries_setup() {
           else curr_c = x;
 
           cfn.value = x.name.common;
-          cff.innerHTML = (`<img class="flag"
-                                 src="https://cdn.rawgit.com/mledoze/countries/master/data/${x.cca3.toLowerCase()}.svg" />`);
 
           const px = Math.min(window.innerWidth - cf.offsetWidth - 105, (d3.event.pageX + 7));
           const py = Math.min(window.innerHeight - cf.offsetHeight, (d3.event.pageY + 15));

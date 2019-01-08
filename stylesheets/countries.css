@@ -91,7 +91,15 @@ body {
 }
 
 .overview-line {
-  margin-bottom: 15px;
+  margin-bottom: 1em;
+}
+
+.overview-line:last-of-type {
+  margin-bottom: 1.5em;
+}
+
+.overview-line svg {
+  transform: scaleX(-1);
 }
 
 .land {
@@ -127,14 +135,4 @@ h5 {
   margin: 0.5em;
   text-transform: uppercase;
   color: var(--the-green);
-}
-
-#eae {
-  text-align: center;
-  margin: 1em auto;
-  background-color: var(--the-green);
-  color: white !important;
-  text-decoration: none;
-  display: block;
-  padding: 0.9em 1.3em;
 }

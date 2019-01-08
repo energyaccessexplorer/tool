@@ -177,11 +177,10 @@ function ea_countries_overview(c, list, online) {
   <strong>Area:</strong> ${(+c['area']).toLocaleString()} km<sup>2</sup>
 </div>`);
 
-
     if (+r['urban-perc'] + +r['rural-perc'] === 100)
       urban_rural = elem(`
 <div><br>
-  <div style="display: flex; width: 300px; justify-content: space-around;">
+  <div style="display: flex; justify-content: space-around;">
     <h5>Urban:&nbsp;${r['urban-perc']}%</h5>
     <h5>Rural:&nbsp;${r['rural-perc']}%</h5>
   </div>
@@ -198,8 +197,7 @@ function ea_countries_overview(c, list, online) {
 
     pies = elem(`
 <div class="overview-line">
-  <div class="pie-charts-legends" style="display: flex; width: 300px; justify-content: space-around;"></div>
-  <div class="pie-charts" style="display: flex; width: 300px; justify-content: space-around;"></div>
+  <div class="pie-charts" style="display: flex; justify-content: space-around;"></div>
 </div>`);
 
 
@@ -215,15 +213,16 @@ function ea_countries_overview(c, list, online) {
   <strong>Ease of doing business:</strong> ${r['ease-business']}/190
 </div>`);
 
-    if (online.map(x => x['ccn3']).indexOf(+r['ccn3']) > -1)
-      btn = elem(`<div><br><button id="eae" onclick="window.location = '/maps-and-data/tool?ccn3=${r['ccn3']}'">Click to launch tool</a></div>`);
+    if (online.map(x => x['ccn3']).indexOf(+r['ccn3']) > -1) {
+      btn = elem(`<button class="big-green-button" onclick="window.location = '/maps-and-data/tool?ccn3=${r['ccn3']}'">Continue</button>`);
+    }
 
     [pop, urban_rural, pies, gdp, dev, area, pol, rate, ease, btn].forEach(t => t ? co.appendChild(t) : null);
 
     if (+r['electrification-rate-urban'] > 0) {
-      co.querySelector('.pie-charts-legends')
+      co.querySelector('.pie-charts')
         .appendChild(elem(`
-<div class="overview-line">
+<div class="overview-line small">
   Electrified:&nbsp;<strong>${r['electrification-rate-urban']}%</strong>
 </div>`));
 
@@ -245,9 +244,9 @@ function ea_countries_overview(c, list, online) {
     }
 
     if (+r['electrification-rate-rural'] > 0) {
-      co.querySelector('.pie-charts-legends')
+      co.querySelector('.pie-charts')
         .appendChild(elem(`
-<div class="overview-line">
+<div class="overview-line small">
   Electrified:&nbsp;<strong>${r['electrification-rate-rural']}%</strong>
 </div>`));
 

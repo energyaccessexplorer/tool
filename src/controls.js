@@ -429,7 +429,14 @@ function ea_controls_presets_init(v) {
 function ea_controls_presets_set(d, v) {
   let p = d.presets[v];
 
-  d.active = !!p;
+  // DS 'boundaries' should always remain active even if no preset is
+  // present. It does not change calculations anyway since it's scaling function
+  // is a "delta-key".
+  //
+  if (d.id == 'boundaries')
+    d.active = true;
+  else
+    d.active = !!p;
 
   if (p) {
     d.weight = p.weight;

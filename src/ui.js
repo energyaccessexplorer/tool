@@ -251,10 +251,10 @@ height: fit-content;
 width: -webkit-fit-content;
 width: -moz-fit-content;
 font-size: 1.2em;
-margin-top: 3.2em;
+margin-top: 80px;
     `)
     .content_style(`
-padding: 1.7em;
+padding: 1.2em;
     `);
 };
 

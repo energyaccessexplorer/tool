@@ -106,7 +106,7 @@ function ea_canvas_plot(raster, canvas, color_scale = 'ea') {
   const A = DS.named('boundaries');
 
   if (!raster.length) {
-    console.warn("ea_canvas_plot: no raster given. Filling up with a blank one...");
+    console.warn("ea_canvas_plot: no raster given. Filling up with a blank (transparent) one...");
     raster = new Float32Array(A.raster.length).fill(-1);
   };
 
@@ -142,7 +142,11 @@ async function ea_summary() {
   await pop.load('heatmap');
   const p = pop.raster;
 
-  const content = elem(`<div></div>`);
+  const content = elem(`
+<div>
+  <div style="text-transform: uppercase; margin: 0 -1.2em 1.2em -1.2em; padding-left: 1.2em; padding-bottom: 1.2em; border-bottom: 1px solid lightgray;">Share of population for each index and category<div>
+</div>
+`);
 
   const graphs_tab = elem(`<div class="tab"></div>`);
   const graphs = elem(`<div id="graphs"></div>`);
@@ -190,7 +194,7 @@ async function ea_summary() {
     let pie = ea_svg_pie(percs.map(x => [x]), 75, 0, ea_default_color_stops, null);
 
     let e = elem(`
-<div style="text-align: center; margin: 0 1em;">
+<div style="text-align: center; margin: 0 1em; max-width: 150px;">
   <div class="pie-svg-container"></div>
   <div class="indexname">${ea_indexes[idxn]}</div>
 </div>
@@ -260,7 +264,7 @@ async function ea_summary() {
   content.appendChild(switcho);
 
   ea_modal
-    .header("Index Summaries - Population impact")
+    .header("Snapshot")
     .content(content)();
 
   return content;

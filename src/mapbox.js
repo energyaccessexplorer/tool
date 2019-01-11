@@ -45,26 +45,7 @@ class MapboxThemeControl {
 
     this._container.appendChild(button);
 
-    button.addEventListener('mouseup', function() {
-      let content = elem('<div>');
-      let radios = elem(`<div><h3>Background map style</h3></div>`);
-
-      for (let t of mapbox_styles) {
-        radios.appendChild(elem(`<div><input type="radio" name="mapbox_theme" value="${t.value}" /> <label>${t.name}</label><br><br></div>`));
-      }
-
-      let current = radios.querySelector(`input[value="${ea_settings.mapbox_theme}"]`)
-      if (current) current.setAttribute('checked', true);
-
-      radios.querySelectorAll('input[name="mapbox_theme"]')
-        .forEach(e => e.addEventListener('change', _ => mapbox_change_theme(e.value)));
-
-      content.appendChild(radios);
-
-      ea_modal
-        .header("Map configuration")
-        .content(content)();
-    });
+    button.addEventListener('mouseup', e => mapbox_theme_control_popup(e.target.closest('button')));
 
     return this._container;
   }
@@ -74,6 +55,39 @@ class MapboxThemeControl {
     this._map = undefined;
   }
 };
+
+function mapbox_theme_control_popup(btn) {
+  let x = elem('<div id="mapbox-theme-control-popup">');
+  let radios = elem(`<div>`);
+
+  for (let t of mapbox_styles) {
+    radios.appendChild(elem(`<div class="radio-group"><input id="mapbox_theme_${t.value}" type="radio" name="mapbox_theme" value="${t.value}" /> <label for="mapbox_theme_${t.value}">${t.name}</label></div>`));
+  }
+
+  let current = radios.querySelector(`input[value="${ea_settings.mapbox_theme}"]`)
+  if (current) current.setAttribute('checked', true);
+
+  radios.querySelectorAll('input[name="mapbox_theme"]')
+    .forEach(e => e.addEventListener('change', _ => mapbox_change_theme(e.value)));
+
+  x.addEventListener('mouseleave', _ => x.remove());
+
+  x.appendChild(radios);
+
+  const r = btn.getBoundingClientRect();
+
+  x.style = `
+position: absolute;
+top: ${r.top + 36}px;
+right: 4px;
+background-color: white;
+box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+border-radius: 4px;
+padding: 16px;
+`;
+
+  document.body.appendChild(x);
+}
 
 function mapbox_theme_pick(theme) {
   let t = (theme === "" ? null : theme);

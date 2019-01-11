@@ -103,11 +103,14 @@ function ea_state_sync() {
  */
 
 function ea_canvas_plot(raster, canvas, color_scale = 'ea') {
-  if (!raster.length) throw "ea_canvas_plot: no raster given.";
+  const A = DS.named('boundaries');
+
+  if (!raster.length) {
+    console.warn("ea_canvas_plot: no raster given. Filling up with a blank one...");
+    raster = new Float32Array(A.raster.length).fill(-1);
+  };
 
   if (!canvas) canvas = document.querySelector('canvas#output');
-
-  const A = DS.named('boundaries');
 
   const plot = new plotty.plot({
     canvas: canvas,

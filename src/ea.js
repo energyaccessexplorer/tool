@@ -17,7 +17,7 @@
 function ea_analysis(list, type) {
   const t0 = performance.now();
 
-  const raster = new Float32Array(list[0] ? list[0].raster.length : 1).fill(-1);
+  const raster = new Float32Array(list[0] ? list[0].raster.length : 0).fill(-1);
 
   // Add up how much demand and supply datasets will account for. Then, just
   // below, these values will be split into 50-50 of the total analysis.

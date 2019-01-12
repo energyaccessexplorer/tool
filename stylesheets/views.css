@@ -1,20 +1,22 @@
 #views .view {
   text-align: center;
-  font-size: 1.2em;
-  font-weight: bold;
-  text-transform: uppercase;
   flex: 1;
   display: block;
-  white-space: nowrap;
-  padding: 0.7em;
-  color: var(--the-green);
+  padding: 0.7em 1em;
   cursor: pointer;
   background-color: var(--the-light-gray);
 }
 
+#views .view-name {
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 1.2em;
+  color: var(--the-green);
+  margin-bottom: 5px;
+}
+
 #views .view.active {
   background-color: var(--the-white);
-  color: var(--the-green);
 }
 
 h1, h2, h3 {

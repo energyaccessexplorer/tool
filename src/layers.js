@@ -51,7 +51,7 @@ function ea_layers_elem(bind, cls, title) {
       <div class="layers-element-controls"></div>
     </div>
 
-    <div class="layers-element-description"></div>
+    <div class="layers-element-details"></div>
   </div>
 </li>`);
 };
@@ -61,7 +61,7 @@ function ea_layers_input_elem(ds) {
 
   d.prepend(elem('<div class="layers-element-handle"></div>'));
 
-  let c = d.querySelector('.layers-element-description');
+  let c = d.querySelector('.layers-element-details');
   let lec = d.querySelector('.layers-element-controls');
 
   if (!ds.vectors && !ds.collection) {
@@ -111,21 +111,19 @@ function ea_layers_input_elem(ds) {
 function ea_layers_output_elem(t, v, i, x) {
   const d = ea_layers_elem(t, 'outputs-layers', v);
 
-  d.prepend(elem('<div class="layers-element-radio"></div>'))
+  d.prepend(elem('<div class="layers-element-radio"></div>'));
 
-  d.querySelector('.layers-element-title')
-    .append(elem(`<span><span>&nbsp;&nbsp;</span><span class="layers-element-index-description">${x}</span></span>`))
+  const h = d.querySelector('.layers-element-header');
+  h.append(elem(`<div class="layers-element-index-description">${x}</div>`));
 
-  let c = d.querySelector('.layers-element-description');
-  let lec = d.querySelector('.layers-element-controls');
+  const u = elem('<div class="layers-element-useless">What does this mean?</div>');
+  h.insertBefore(u, d.querySelector('.layers-element-controls'));
 
-  lec.appendChild(elem('<div class="layers-element-useless">What does this mean?</div>'));
-
-  let dli = elem(`<div class="layer-info">${ea_svg_info()}</div>`);
+  const dli = elem(`<span class="layer-info">&nbsp;&nbsp;&nbsp;${ea_svg_info()}</span>`);
   dli.addEventListener('mouseup', _ => ea_ui_index_modal(t));
+  u.appendChild(dli);
 
-  lec.appendChild(dli);
-
+  const c = d.querySelector('.layers-element-details');
   c.append(ea_layers_0_100());
   c.prepend(ea_svg_color_steps(_ => {
     return d3.scaleLinear()

@@ -26,8 +26,14 @@ require([
   window.mapboxgl = mapboxgl;
 
   ea_views = {
-    "inputs": "Data",
-    "outputs": "Analysis"
+    "inputs": {
+      "name": "Data",
+      "description": "Underlying data that go into the analysis"
+    },
+    "outputs": {
+      "name": "Analysis",
+      "description": "Results of the analysis"
+    }
   };
 
   ea_indexes = {

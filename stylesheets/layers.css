@@ -131,7 +131,7 @@
   cursor: pointer;
 }
 
-.layers-element-description  {
+.layers-element-details  {
   margin-top: 12px;
 }
 
@@ -152,11 +152,11 @@
 
 .layers-element-index-description,
 .layers-element-useless {
-  font-size: 0.7em;
+  font-size: 0.8em;
   font-style: italic;
 }
 
-.layers-element-index-description {
+.layers-element-index-useless {
   float: right;
 }
 

@@ -96,7 +96,12 @@ function ea_ui_views_init() {
   const el = document.querySelector('#views');
 
   Object.keys(ea_views).forEach(v => {
-    const btn = elem(`<div class="view">${ea_views[v]}</div>`);
+    const btn = elem(`
+<div class="view">
+  <div class="view-name">${ea_views[v]['name']}</div>
+  <div class="view-description">${ea_views[v]['description']}</div>
+</div>
+`);
 
     btn.addEventListener('mouseup', function(e) {
       el.querySelectorAll('.view').forEach(e => e.classList.remove('active'));

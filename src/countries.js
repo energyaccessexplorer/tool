@@ -214,7 +214,8 @@ function ea_countries_overview(c, list, online) {
 </div>`);
 
     if (online.map(x => x['ccn3']).indexOf(+r['ccn3']) > -1) {
-      btn = elem(`<button class="big-green-button" onclick="window.location = '/maps-and-data/tool?ccn3=${r['ccn3']}'">Continue</button>`);
+      btn = elem(`<button class="big-green-button">Continue</button>`);
+      btn.addEventListener('click', _ => ea_countries_action_modal(r));
     }
 
     [pop, urban_rural, pies, gdp, dev, area, pol, rate, ease, btn].forEach(t => t ? co.appendChild(t) : null);
@@ -274,6 +275,50 @@ function ea_countries_overview(c, list, online) {
   ea_modal
     .header(`<div style="text-transform: uppercase; color: var(--the-white)">${c.name.common}</div>`)
     .content(co)();
+};
+
+function ea_countries_action_modal(c) {
+  let preset = "";
+
+  const content = elem(`
+<div>
+  <h2>What group do you belong to?</h2>
+  <p>Picking a group will lead you to pre-set data selections and settings appropriate for your group's interests.</p>
+</div>
+  `);
+
+  const pbtns = elem(`<div class="presets-buttons" style="display: flex; justify-content: space-around;">`);
+
+  for (let p in ea_presets) {
+    let b = elem(`
+<div class="thumbnail pop-hover" style="background-image: url(); background-color: #999; width: 15em; height: 15em; font-size: 0.84em;">
+  <h3>${ea_presets[p].short}</h3>
+  <p>${ea_presets[p].long}</p>
+</div>
+`);
+
+    b.addEventListener("click", async _ => {
+      for (let x of pbtns.querySelectorAll('.thumbnail'))
+        await x.classList.remove('selected');
+
+      b.classList.add('selected');
+      preset = p;
+    });
+
+    pbtns.appendChild(b);
+  }
+
+  const btn = elem(`<button class="big-green-button">Click to launch the tool</button>`);
+  btn.addEventListener('click', _ => window.location = `/maps-and-data/tool?ccn3=${c['ccn3']}&preset=${preset}`);
+
+  content.appendChild(pbtns);
+  content.appendChild(btn);
+
+  ea_modal().remove();
+
+  ea_modal
+    .header(`<div style="text-transform: uppercase; color: var(--the-white)">${c['country']}</div>`)
+    .content(content)();
 };
 
 function ea_countries_map_svg(svg, topofile, name, options) {

@@ -1,21 +1,4 @@
 /*
- * elem
- *
- * Create a _SINGLE_ HTMLElement from a string and return it.
- *
- * @param "str" string. The HTML.
- *
- * returns an Object with the handled params and their set_ methods.
- */
-
-function elem(str) {
-  const d = document.createElement('div');
-  d.innerHTML = str;
-
-  return d.firstElementChild;
-};
-
-/*
  * ea_state_sync
  *
  * Gather the parameters from the current URL, clean them up, set the defaults

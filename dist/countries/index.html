@@ -5,6 +5,9 @@
     <meta charset="utf-8">
     <script src="/maps-and-data/settings.js"></script>
 
+    <script src="./libs.js"></script>
+    <script src="./main.js"></script>
+
     <link href="/stylesheets/style.css" rel="stylesheet" />
     <link href="/stylesheets/nav.css" rel="stylesheet" />
 
@@ -123,6 +126,31 @@
     </div>
   </body>
 
-  <script data-main="/maps-and-data/src/countries-init"
-          src="/maps-and-data/lib/require.js"></script>
+  <script>
+    ea_presets = {
+      "market": {
+        "short": "Exploring new energy markets",
+        "long": "Interested in where there is demand for electricity away from the existing grid."
+      },
+      "planning": {
+        "short": "Planning for electrification",
+        "long": "Interested in the overall picture of where demand and supply exists."
+      },
+      "investment": {
+        "short": "Investing for Impact",
+        "long": "Interested in where there is a lack of funding for renewable energy systems."
+      },
+      "custom": {
+        "short": "Other",
+        "long": "Customize the data analysis to your own interests."
+      }
+    };
+
+    ea_map = null;
+
+    ea_countries_setup();
+
+    ea_ui_modal_setup();
+    ea_ui_flash_setup();
+  </script>
 </html>

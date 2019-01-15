@@ -1,4 +1,3 @@
-require.js	http://requirejs.org/docs/release/2.3.5/minified/require.js
 d3.js	https://d3js.org/d3.v5.min.js
 topojson.js	https://unpkg.com/topojson/dist/topojson
 geotiff.js	https://github.com/geotiffjs/geotiff.js/releases/download/v1.0.0-beta.1/geotiff.bundle.min.js

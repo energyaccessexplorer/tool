@@ -523,3 +523,21 @@ function ea_svg_opacity() {
 </svg>
 `;
 };
+
+function ea_svg_layer_handle() {
+  return `
+<svg width="16" height="16" viewBox="0 0 32 32" version="1.1" style="">
+  <g>
+    <circle cx="28.063301" cy="28.25821" r="3.6749561" />
+    <circle cx="28.196936" cy="3.936680" r="3.6749561" />
+    <circle cx="28.063301" cy="16.23151" r="3.6749561" />
+    <circle cx="3.6749566" cy="28.25824" r="3.6749561" />
+    <circle cx="3.8085892" cy="3.936710" r="3.6749561" />
+    <circle cx="3.6749566" cy="16.23154" r="3.6749561" />
+    <circle cx="16.108364" cy="28.25821" r="3.6749561" />
+    <circle cx="16.241997" cy="3.936680" r="3.6749561" />
+    <circle cx="16.108364" cy="16.23151" r="3.6749561" />
+  </g>
+</svg>
+`;
+};

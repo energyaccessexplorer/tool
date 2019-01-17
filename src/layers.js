@@ -59,7 +59,7 @@ function ea_layers_elem(bind, cls, title) {
 function ea_layers_input_elem(ds) {
   const d = ea_layers_elem(ds.id, '', ds.name_long + (ds.unit ? ` (${ ds.unit })` : ''));
 
-  d.prepend(elem('<div class="layers-element-handle"></div>'));
+  d.prepend(elem(`<div class="layers-element-handle">${ea_svg_layer_handle()}</div>`));
 
   let c = d.querySelector('.layers-element-details');
   let lec = d.querySelector('.layers-element-controls');

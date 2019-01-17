@@ -58,15 +58,12 @@
 .layers-element-handle {
   width: 24px;
 
-  background-image: url(../images/layer-handle.svg);
-  background-size: 16px auto;
-  background-position: center 4px;
-  background-repeat: no-repeat;
+  fill: #aaa;
+  fill-opacity: 1;
+  stroke: none;
 
   cursor: grab;
   cursor: -webkit-grab;
-
-  color: #95A8C1;
 }
 
 .layers-element-handle,

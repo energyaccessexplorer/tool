@@ -164,54 +164,38 @@ function ea_countries_overview(c, list, online) {
 
   let demo, pop, area, urban_rural, pol, gdp, pies, ease, dev, btn, rate;
 
+  function ovline(n,v) {
+    return elem(`<div class="overview-line"><strong>${n}:</strong> ${v}</div>`);
+  };
+
   if (r) {
     if (+r['population'] > 0)
-      pop = elem(`
-<div class="overview-line">
-  <strong>Population:</strong> ${(+r['population']).toLocaleString()} Million
-</div>`);
+      pop = ovline("Population", `${(+r['population']).toLocaleString()} Million`);
 
     if (+r['area'] > 0)
-      area = elem(`
-<div class="overview-line">
-  <strong>Area:</strong> ${(+c['area']).toLocaleString()} km<sup>2</sup>
-</div>`);
+      area = ovline("Area", `${(+c['area']).toLocaleString()} km<sup>2</sup>`);
 
     if (+r['urban-perc'] + +r['rural-perc'] === 100)
       urban_rural = elem(`
-<div><br>
-  <div style="display: flex; justify-content: space-around;">
-    <h5>Urban:&nbsp;${r['urban-perc']}%</h5>
-    <h5>Rural:&nbsp;${r['rural-perc']}%</h5>
-  </div>
-</div>`);
+<div style="display: flex; justify-content: space-around;">
+  <h5>Urban:&nbsp;${r['urban-perc']}%</h5>
+  <h5>Rural:&nbsp;${r['rural-perc']}%</h5>
+</div>
+`);
 
     if (+r['energy-access-policy-support'] > 0)
-      pol = elem(`
-<div class="overview-line">
-  <strong>Policy support for energy access:</strong> ${(r['energy-access-policy-support'])}/100
-</div>`);
+      pol = ovline("Policy support for energy access", `${(r['energy-access-policy-support'])}/100`);
 
-    if (+r['energy-access-comprehensive-policy-support'] > 0)
-      gdp = elem(`<div>GDP per capita: USD ${(+r['gdp-per-capita']).toFixed(2).toLocaleString()}</div>`);
+    if (+r['gdp-per-capita'] > 0)
+      gdp = ovline("GDP per capita", `USD ${(+r['gdp-per-capita']).toFixed(2).toLocaleString()}`);
 
-    pies = elem(`
-<div class="overview-line">
-  <div class="pie-charts" style="display: flex; justify-content: space-around;"></div>
-</div>`);
-
+    pies = elem(`<div class="pie-charts" style="display: flex; justify-content: space-around; margin-bottom: 40px;"></div>`);
 
     if (+r['electrification-rate-national'] > 0)
-      rate = elem(`
-<div class="overview-line">
-  <strong>Electrification Rate:</strong> ${r['electrification-rate-national']}%
-</div>`);
+      rate = ovline("Electrification Rate", `${r['electrification-rate-national']}%`);
 
     if (+r['ease-business'] > 0)
-      ease = elem(`
-<div class="overview-line">
-  <strong>Ease of doing business:</strong> ${r['ease-business']}/190
-</div>`);
+      ease = ovline("Ease of doing business", `${r['ease-business']}/190`);
 
     if (online.map(x => x['ccn3']).indexOf(+r['ccn3']) > -1) {
       btn = elem(`<button class="big-green-button">Continue</button>`);
@@ -222,10 +206,7 @@ function ea_countries_overview(c, list, online) {
 
     if (+r['electrification-rate-urban'] > 0) {
       co.querySelector('.pie-charts')
-        .appendChild(elem(`
-<div class="overview-line small">
-  Electrified:&nbsp;<strong>${r['electrification-rate-urban']}%</strong>
-</div>`));
+        .appendChild(elem(`<span class="small">Electrified:&nbsp;<strong>${r['electrification-rate-urban']}%</strong></span>`));
 
       let eru = ea_svg_pie(
         [
@@ -246,10 +227,7 @@ function ea_countries_overview(c, list, online) {
 
     if (+r['electrification-rate-rural'] > 0) {
       co.querySelector('.pie-charts')
-        .appendChild(elem(`
-<div class="overview-line small">
-  Electrified:&nbsp;<strong>${r['electrification-rate-rural']}%</strong>
-</div>`));
+        .appendChild(elem(`<span class="small">Electrified:&nbsp;<strong>${r['electrification-rate-rural']}%</strong></span>`));
 
       let err = ea_svg_pie(
         [

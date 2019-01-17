@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <script src="/maps-and-data/settings.js"></script>
+
+    <script src="./libs.js"></script>
+    <script src="./main.js"></script>
+
+    <link href="/stylesheets/style.css" rel="stylesheet" />
+    <link href="/stylesheets/nav.css" rel="stylesheet" />
+
+    <link href="/maps-and-data/lib/mapbox-gl.css" rel="stylesheet" />
+    <link href="/maps-and-data/stylesheets/layout.css" rel="stylesheet" />
+    <link href="/maps-and-data/stylesheets/controls.css" rel="stylesheet" />
+    <link href="/maps-and-data/stylesheets/maparea.css" rel="stylesheet" />
+    <link href="/maps-and-data/stylesheets/layers.css" rel="stylesheet" />
+    <link href="/maps-and-data/stylesheets/datasets.css" rel="stylesheet" />
+    <link href="/maps-and-data/stylesheets/views.css" rel="stylesheet" />
+
+    <title>Energy Access Explorer</title>
+  </head>
+
+  <body>
+    <nav>
+      <input id="toggle"
+             class="no-desktop"
+             type="checkbox">
+
+      <label for="toggle" class="no-desktop">
+        <svg style="width:24px;height:24px" viewBox="0 0 24 14">
+          <path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" />
+        </svg>&nbsp;
+      </label>
+
+      <a id="energy-access-link"
+         href="/">
+        Energy Access Explorer
+      </a>
+
+      <div id="navigation-links">
+        <a href="/maps-and-data/countries"
+           style="color: var(--the-yellow);"
+           class="toggleable">
+          Maps&nbsp;&amp;&nbsp;Data
+        </a>
+
+        <a href="/methodology"
+           class="toggleable">
+          Methodology
+        </a>
+
+        <a href="/user-stories"
+           class="toggleable">
+          User&nbsp;Stories
+        </a>
+
+        <a href="/about"
+           class="toggleable">
+          About
+        </a>
+
+        <a href="/get-involved"
+           class="toggleable">
+          Get Involved
+        </a>
+      </div>
+    </nav>
+
+    <div id="playground">
+      <div id="controls-wrapper">
+        <div class="controls-select-container">
+          Select a Country:
+          <select id="controls-country">
+            <option value="" selected disabled></option>
+          </select>
+        </div>
+
+        <div class="controls-select-container">
+          Select an Action:
+          <select id="controls-preset">
+            <option value="custom" selected></option>
+          </select>
+        </div>
+
+        <div id="controls"></div>
+      </div>
+
+      <div id="visual">
+        <div id="maparea">
+          <div id="mapbox-container"></div>
+          <div id="summary-button" onclick="ea_summary_wrapper();">Snapshot</div>
+        </div>
+      </div>
+
+      <div id="layers">
+        <div id="views"></div>
+        <ul id="layers-list"></ul>
+      </div>
+    </div>
+
+    <div id="app-loading" class="loading">
+      <div class="spinner"></div>
+
+      <p style="font-size: small">Loading data...</p>
+    </div>
+  </body>
+
+  <script>
+    ea_views = {
+      "inputs": {
+        "name": "Data",
+        "description": "Underlying data that go into the analysis"
+      },
+      "outputs": {
+        "name": "Analysis",
+        "description": "Results of the analysis"
+      }
+    };
+
+    ea_indexes = {
+      "eai": "Energy Access Index",
+      "demand": "Demand Index",
+      "supply": "Supply Index",
+      "ani": "Need for Assistance Index",
+    };
+
+    ea_indexes_descriptions = {
+      "eai": "(Current and/or potential)",
+      "demand": "(Current and/or potential)",
+      "supply": "(Current and/or potential)",
+      "ani": "(Areas where financial assistance is needed)",
+    };
+
+    ea_presets = {
+      "market": "Exploring new energy markets",
+      "planning": "Planning for electrification",
+      "investment": "Investing for impact"
+    };
+
+    ea_branch_dict = {
+      "demographics": "Demographics",
+      "productive-uses": "Social and Productive Uses",
+      "resources": "Resources",
+      "infrastructure": "Infrastructure",
+    };
+
+    ea_default_color_domain = [0, 0.25, 0.5, 0.75, 1];
+    ea_default_color_stops = ["#1c4478", "#4f7a6d", "#81b062", "#b3ac48", "#e5a82e"];
+    plotty.addColorScale("ea", ea_default_color_stops, ea_default_color_domain);
+    ea_default_color_scale = "ea";
+
+    ea_ui_modal_setup();
+    ea_ui_flash_setup();
+
+    ea_overlord({
+      "type": 'init',
+      "caller": 'require'
+    });
+  </script>
+</html>

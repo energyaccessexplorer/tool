@@ -109,17 +109,21 @@ body {
 }
 
 .land.selectable {
-  fill: var(--the-light-green);
+  fill: var(--the-light-gray);
+  stroke: gray;
+}
+
+.land.online {
+  fill: var(--the-green);
   stroke: white;
 }
 
-.land.active {
+.land.online {
   fill: var(--the-green);
 }
 
-.pie-charts {
-  stroke: white;
-  stroke-width: 2px;
+.land.active {
+  fill: var(--the-yellow);
 }
 
 .pie-charts-legends {

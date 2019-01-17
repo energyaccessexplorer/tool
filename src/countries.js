@@ -146,6 +146,17 @@ function ea_countries_setup() {
         },
       });
 
+      for (let co of countries_overviews) {
+        let o = ea_map.svg.select(`.land#land-${co.ccn3}`);
+        o.raise();
+      }
+
+      for (let co of countries_online) {
+        let o = ea_map.svg.select(`.land#land-${co.ccn3}`);
+        o.classed('online', true);
+        o.raise();
+      }
+
       ea_ui_app_loading(false);
     })
     .catch(error => {

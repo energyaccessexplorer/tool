@@ -21,18 +21,51 @@ function ea_countries_setup() {
 
   let curr_c = null;
 
+  // We save a copy of this. Fetching from carto makes offline development
+  // impossible and it's sometimes super slow.
+  //
+  // let overviews_query = (`https://wri-rw.carto.com/api/v2/sql?q=select
+  // LPAD(ccn3::text, 3, 0::text) as ccn3
+  // , country
+  // , population
+  // , area_km2 as area
+  // , gdp_percap_7_5_18 as "gdp-per-capita"
+  // , urban_p_pop as "urban-perc"
+  // , rural_p_pop as "rural-perc"
+  // , urban_elec_rate as "electrification-rate-urban"
+  // , rural_elec_rate as "electrification-rate-rural"
+  // , total_elec_rate as "electrification-rate-national"
+  // , policy_pct as "energy-access-policy-support"
+  // , ease_of_business as "ease-business"
+  // from country_indicators
+  // `).replace("\n", ' ');
+  //
+  // d3.json(overviews_query).then(function(obj) {
+  //   var a = document.createElement('a');
+  //   a.style = "display:none;";
+  //   document.body.appendChild(a);
+  //
+  //   var blob = new Blob([JSON.stringify(obj)], { type: "application/json" });
+  //   var url = URL.createObjectURL(blob);
+  //   a.href = url;
+  //   a.download = "countries-overviews.json";
+  //   a.click();
+  //
+  //   window.URL.revokeObjectURL(url);
+  // });
+
   Promise.all([
     d3.json(ea_settings.database + '/countries?online'),
     d3.json(ea_settings.app_base + '/lib/world-50m.json'),
     d3.json(ea_settings.app_base + '/lib/countries.json'),
-    d3.csv(ea_settings.app_base + '/data/countries-overview.csv')
+    d3.json(ea_settings.app_base + '/lib/country-overviews.json')
   ])
     .then(results => {
       let geo = results[1];
 
       window.countries_online = results[0];
       window.countries = results[2];
-      window.countries_overviews = results[3];
+      window.countries_overviews = results[3].rows;
 
       const dropdown = document.querySelector('#country-dropdown');
       const button = document.querySelector('#country-select');

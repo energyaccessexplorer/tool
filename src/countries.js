@@ -56,9 +56,9 @@ function ea_countries_setup() {
 
   Promise.all([
     d3.json(ea_settings.database + '/countries?online'),
-    d3.json(ea_settings.app_base + '/lib/world-50m.json'),
-    d3.json(ea_settings.app_base + '/lib/countries.json'),
-    d3.json(ea_settings.app_base + '/lib/country-overviews.json')
+    d3.json('../lib/world-50m.json'),
+    d3.json('../lib/countries.json'),
+    d3.json('../lib/country-overviews.json')
   ])
     .then(results => {
       let geo = results[1];

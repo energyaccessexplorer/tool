@@ -8,7 +8,6 @@ htmlsortable.js	https://raw.githubusercontent.com/lukasoppermann/html5sortable/m
 world-50m.json	https://unpkg.com/world-atlas/world/50m.json
 world-110m.json	https://unpkg.com/world-atlas/world/110m.json
 countries.json	https://raw.githubusercontent.com/mledoze/countries/master/dist/countries.json
-fonts/lato.woff2	https://fonts.gstatic.com/s/lato/v14/S6uyw4BMUTPHjx4wXg.woff2
 location.js	https://gitlab.com/fabbe/web-toolbelt/raw/master/location.js
 flash.js	https://gitlab.com/fabbe/web-toolbelt/raw/master/flash.js
 modal.js	https://gitlab.com/fabbe/web-toolbelt/raw/master/modal.js

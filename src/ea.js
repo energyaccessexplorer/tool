@@ -224,11 +224,9 @@ Please reporty this to energyaccessexplorer@wri.org.
     mapbox_setup(country.bounds);
 
     await Promise.all(inputs.map(id => DS.named(id).turn(true, false)));
-
     mapbox_change_theme(ea_settings.mapbox_theme);
 
     ea_ui_app_loading(false);
-
     break;
   }
 

@@ -166,14 +166,17 @@ function mapbox_setup(bounds) {
 };
 
 function mapbox_change_theme(theme, callback) {
-  ea_mapbox.once('styledata', _ => {
+  const do_it = _ => {
     mapbox_canvas();
 
     ea_overlord({
       type: "refresh",
       caller: "mapbox_change_theme",
     });
-  });
+  };
 
+  ea_mapbox.once('style.load', do_it);
   ea_mapbox.setStyle(mapbox_theme_pick(ea_settings.mapbox_theme = theme));
+
+  if (theme === "") do_it();
 };

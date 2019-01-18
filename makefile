@@ -1,11 +1,32 @@
+# Copy and customise these in a default.mk
+#
+# WEB_PORT = 4231
+# PGREST_PORT = 6798
+#
+# SRV_USER = someuser
+# SRV_SERVER = example.org
+# SRV_DEST = /srv/http/energyaccessexplorer
+#
+# DB_SERV_DEV = http://localhost:${PGREST_PORT}
+# DB_SERV_PROD = https://api-energyaccessexplorer.example.org
+#
+# STATIC_SERVER = python3 -m http.server ${WEB_PORT}
+# WATCH = <whatever daemon you use observe code changes>
+#
 include default.mk
 
-LIB=./dist/lib
-SRC=./src
+DIST = dist
+LIB = ${DIST}/lib
+SRC = src
+
+default: build
 
 start:
-	@static-server -noauth -port ${WEB_PORT} -dir ./dist &
+	(cd ${DIST} && ${STATIC_SERVER}) &
 	@postgrest postgrest.conf &
+
+watch:
+	${WATCH} ${SRC} "make build"
 
 stop:
 	-@lsof -t -i :${WEB_PORT} | xargs -i kill {}
@@ -14,6 +35,8 @@ stop:
 build: build-tool build-countries
 
 build-tool:
+	@echo "Building tool"
+
 	@cat ${LIB}/d3.js \
 		${LIB}/geotiff.js \
 		${LIB}/plotty.js \
@@ -23,7 +46,8 @@ build-tool:
 		${LIB}/location.js \
 		${LIB}/htmlsortable.js > ./dist/tool/libs.js
 
-	@cat ${SRC}/ea.js \
+	@echo -n "const ea_settings = " | cat - settings.json \
+		${SRC}/ea.js \
 		${SRC}/auxiliary.js \
 		${SRC}/client.js \
 		${SRC}/svg.js \
@@ -34,18 +58,22 @@ build-tool:
 		${SRC}/mapbox.js > ./dist/tool/main.js
 
 build-countries:
+	@echo "Building countries"
+
 	@cat ${LIB}/d3.js \
 		${LIB}/topojson.js \
 		${LIB}/flash.js \
 		${LIB}/modal.js > ./dist/countries/libs.js
 
-	@cat ${SRC}/svg.js \
+	@echo -n "const ea_settings = " | cat - settings.json \
+		${SRC}/svg.js \
 		${SRC}/ui.js \
 		${SRC}/countries.js > ./dist/countries/main.js
 
 synced:
 	@rsync -OPrv \
 		--dry-run \
+		--info=FLIST0 \
 		--checksum \
 		--copy-links \
 		--delete-before \

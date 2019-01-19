@@ -202,17 +202,17 @@ function ea_countries_setup() {
 };
 
 function ea_countries_overview(c, list, online) {
-  const r = list.find(i => i.country === c.name.common);
+  const r = list.find(i => +i.ccn3 === +c.ccn3);
 
-  const co = elem('<div class="country-overview">');
-
-  let demo, pop, area, urban_rural, pol, gdp, pies, ease, dev, btn, rate;
+  let co, demo, pop, area, urban_rural, pol, gdp, pies, ease, dev, btn, rate;
 
   function ovline(n,v) {
     return elem(`<div class="overview-line"><strong>${n}:</strong> ${v}</div>`);
   };
 
   if (r) {
+    co = elem('<div class="country-overview">');
+
     if (+r['population'] > 0)
       pop = ovline("Population", `${(+r['population']).toLocaleString()} Million`);
 
@@ -221,9 +221,9 @@ function ea_countries_overview(c, list, online) {
 
     if (+r['urban-perc'] + +r['rural-perc'] === 100)
       urban_rural = elem(`
-<div style="display: flex; justify-content: space-around;">
-  <h5>Urban:&nbsp;${r['urban-perc']}%</h5>
-  <h5>Rural:&nbsp;${r['rural-perc']}%</h5>
+<div style="display: flex; justify-content: space-around; text-align: center; text-transform: uppercase; color: var(--the-green);">
+  <strong style="margin: 0.5em;">Urban:&nbsp;${r['urban-perc']}%</strong>
+  <strong style="margin: 0.5em;">Rural:&nbsp;${r['rural-perc']}%</strong>
 </div>
 `);
 
@@ -248,14 +248,16 @@ function ea_countries_overview(c, list, online) {
 
     [pop, urban_rural, pies, gdp, dev, area, pol, rate, ease, btn].forEach(t => t ? co.appendChild(t) : null);
 
+    let w = elem('<div style="display: flex; justify-content: space-around; width: 240px; border-right: 1px solid lightgray; padding: 0 1em;">');
+    co.querySelector('.pie-charts').appendChild(w);
+
     if (+r['electrification-rate-urban'] > 0) {
-      co.querySelector('.pie-charts')
-        .appendChild(elem(`<span class="small">Electrified:&nbsp;<strong>${r['electrification-rate-urban']}%</strong></span>`));
+      w.appendChild(elem(`<span class="small">Electrified:&nbsp;<strong>${r['electrification-rate-urban']}%</strong></span>`));
 
       let eru = ea_svg_pie(
         [
-          [+r['electrification-rate-urban']],
-          [100 - +r['electrification-rate-urban']]
+          [100 - +r['electrification-rate-urban']],
+          [+r['electrification-rate-urban']]
         ],
         50, 0,
         [
@@ -265,18 +267,20 @@ function ea_countries_overview(c, list, online) {
         ""
       );
 
-      co.querySelector('.pie-charts').appendChild(eru.svg);
+      w.appendChild(eru.svg);
       eru.change(0);
     }
 
+    w = elem('<div style="display: flex; justify-content: space-around; width: 240px; padding: 0 1em;">');
+    co.querySelector('.pie-charts').appendChild(w);
+
     if (+r['electrification-rate-rural'] > 0) {
-      co.querySelector('.pie-charts')
-        .appendChild(elem(`<span class="small">Electrified:&nbsp;<strong>${r['electrification-rate-rural']}%</strong></span>`));
+      w.appendChild(elem(`<span class="small">Electrified:&nbsp;<strong>${r['electrification-rate-rural']}%</strong></span>`));
 
       let err = ea_svg_pie(
         [
-          [+r['electrification-rate-rural']],
-          [100 - (+r['electrification-rate-rural'])]
+          [100 - (+r['electrification-rate-rural'])],
+          [+r['electrification-rate-rural']]
         ],
         50, 0,
         [
@@ -286,17 +290,21 @@ function ea_countries_overview(c, list, online) {
         ""
       );
 
-      co.querySelector('.pie-charts').appendChild(err.svg);
+      w.appendChild(err.svg);
       err.change(0);
     }
 
-  } else {
-    co.innerHTML = `<strong>${c.name.common}</strong> not included`;
-  }
+    ea_modal
+      .header(`<div style="text-transform: uppercase; color: var(--the-white)">${c.name.common}</div>`)
+      .content(co)();
 
-  ea_modal
-    .header(`<div style="text-transform: uppercase; color: var(--the-white)">${c.name.common}</div>`)
-    .content(co)();
+  } else {
+    ea_flash
+      .type(null)
+      .timeout(2000)
+      .title(c.name.common)
+      .message("Is not included in the project")();
+  }
 };
 
 function ea_countries_action_modal(c) {

@@ -87,36 +87,35 @@
     </div>
 
     <div id="playground">
-      <div id="left-panel"
-           style="background-color: var(--the-darker-white);">
-        <div style="color: var(--the-green);
-                    font-weight: bold;
+      <div id="country-select"
+           style="background-color: var(--the-darker-white);
+                  position: absolute;
+                  top: 20px;
+                  left: 30px;">
+        <input id="country-search-input"
+               placeholder="Search here for a country"
+               autofocus />
+
+        <div id="country-dropdown"></div>
+
+        <div style="font-weight: bold;
+                    font-size: 0.9em;
                     padding: 1em;
                     background-color: var(--the-darker-white);
-                    border-top: solid 1px #d9d9d9;
-                    border-right: solid 1px #d9d9d9;
-                    border-bottom: solid 1px #d9d9d9;">
-
-          Click on a (green) country on the map
-        </div>
-
-        <div id="country-select"
-             style="border-bottom: solid 1px #d9d9d9; border-right: solid 1px #d9d9d9;">
-          <input id="country-search-input"
-                 style="background-color: var(--the-darker-white);
-                        font-weight: bold;
-                        padding: 1.35em 1.1em;
-                        width: 290px;
-                        border: none;"
-                 placeholder="Search for a country" />
-
-          <div id="country-dropdown"></div>
+                    border: solid 1px #d9d9d9;
+                    border-top: none">
+          or click on a country on the map
         </div>
       </div>
 
       <div id="maparea">
-        <div id="mapbox-container"></div>
         <svg id="svg-map"><g id="map"></g></svg>
+      </div>
+
+      <div id="country-selection-legend">
+        <div class="land online">mapped</div>
+        <div class="land selectable">considered</div>
+        <div class="land">not considered</div>
       </div>
     </div>
 

@@ -6,18 +6,12 @@ body {
   position: relative;
 }
 
-#left-panel {
+#country-select {
   position: absolute;
   background-color: white;
   width: 320px;
 
   z-index: 9;
-}
-
-#country-select-header {
-  font-size: 1.5em;
-  padding: 0.65em;
-  cursor: pointer;
 }
 
 #country-float {
@@ -36,17 +30,46 @@ body {
   opacity: 0.7;
 }
 
+#country-search-input {
+  color: var(--the-black);
+  background-color: var(--the-white);
+  font-size: 1.3em;
+  padding: 1.35em 1.1em;
+  border: solid 1px #d9d9d9;
+  width: 100%;
+  box-sizing: border-box
+}
+
+#country-search-input::placeholder {
+  color: var(--the-green);
+}
+
+#country-selection-legend {
+  position: absolute;
+  bottom: 40px;
+  right: 15px;
+  background-color: white;
+  border: 1px solid lightgray;
+  font-size: 1.2em;
+}
+
+#country-selection-legend > div {
+  text-align: center;
+  padding: 10px 20px;
+}
+
 #country-dropdown {
   position: absolute;
 
   line-height: initial;
-  width: max-content;
 
-  background-color: var(--the-white);
+  background-color: white;
+  border: solid 1px #d9d9d9;
 
-  width: 100%;
   overflow-y: scroll;
   overflow-x: hidden;
+  box-sizing: border-box;
+  width: 100%;
 
   display: none;
 }
@@ -70,26 +93,6 @@ body {
   line-height: 2.1em;
 }
 
-#country-search-input::placeholder {
-  color: var(--the-green);
-  font-size: 1.2em;
-}
-
-#country-name {
-  text-transform: uppercase;
-  text-align: left;
-  font-weight: bold;
-  font-size: 1.6em;
-}
-
-#nav {
-  z-index: 1;
-}
-
-#map {
-  background-color: var(--the-white);
-}
-
 .overview-line {
   margin-bottom: 1em;
 }
@@ -106,37 +109,22 @@ body {
   stroke-width: 0.7;
   stroke: #ccc;
   fill: white;
+  background-color: white;
 }
 
 .land.selectable {
   fill: var(--the-light-gray);
+  background-color: var(--the-light-gray);
   stroke: gray;
 }
 
 .land.online {
   fill: var(--the-green);
+  background-color: var(--the-green);
   stroke: white;
-}
-
-.land.online {
-  fill: var(--the-green);
+  color: white;
 }
 
 .land.active {
   fill: var(--the-yellow);
-}
-
-.pie-charts-legends {
-  font-size: 0.8em;
-  margin-bottom: 1em;
-}
-
-h1, h2, h3, h4, h5 {
-  text-align: center;
-}
-
-h5 {
-  margin: 0.5em;
-  text-transform: uppercase;
-  color: var(--the-green);
 }

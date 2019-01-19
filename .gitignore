@@ -1,8 +1,10 @@
-/data*
-/lib
-/src/scratch.js
+/data
 /default.mk
 /dist/data
 /dist/lib
-/dist/settings.js
+/dist/countries/libs.js
+/dist/countries/main.js
+/dist/tool/libs.js
+/dist/tool/main.js
+/settings.json
 /postgrest.conf

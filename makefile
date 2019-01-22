@@ -18,6 +18,7 @@ include default.mk
 DIST = dist
 LIB = ${DIST}/lib
 SRC = src
+CSS = stylesheets
 
 default: build
 
@@ -59,6 +60,15 @@ build-tool:
 		${SRC}/datasets.js \
 		${SRC}/mapbox.js > ./dist/tool/main.js
 
+	@cat \
+	  ${CSS}/layout.css \
+	  ${CSS}/controls.css \
+	  ${CSS}/maparea.css \
+	  ${CSS}/layers.css \
+	  ${CSS}/datasets.css \
+	  ${CSS}/views.css \
+		> ${DIST}/tool/main.css
+
 build-countries:
 	@echo "Building countries"
 	@mkdir -p ${DIST}/countries
@@ -73,6 +83,12 @@ build-countries:
 		${SRC}/svg.js \
 		${SRC}/ui.js \
 		${SRC}/countries.js > ./dist/countries/main.js
+
+	@cat \
+	  ${CSS}/countries.css \
+	  ${CSS}/maparea.css \
+	  ${CSS}/views.css \
+		> ${DIST}/countries/main.css
 
 synced:
 	@rsync -OPrv \

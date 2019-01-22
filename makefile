@@ -15,41 +15,44 @@
 #
 include default.mk
 
-DIST = dist
+DIST = ./dist
+SRC = ./src
+CSS = ./stylesheets
 LIB = ${DIST}/lib
-SRC = src
-CSS = stylesheets
 
 default: build
+
+build: build-tool build-countries
 
 start:
 	(cd ${DIST} && ${STATIC_SERVER}) &
 	@postgrest postgrest.conf &
 
 watch:
-	${WATCH} ${SRC} "make build"
+	@ WATCH_CMD="make build" ${WATCH} ${SRC} ${CSS} ${VIEWS}
 
 stop:
 	-@lsof -t -i :${WEB_PORT} | xargs -i kill {}
 	-@lsof -t -i :${PGREST_PORT} | xargs -i kill {}
-
-build: build-tool build-countries
 
 build-tool:
 	@echo "Building tool"
 	@mkdir -p ${DIST}/tool
 	@cp ${SRC}/tool.html ${DIST}/tool/index.html
 
-	@cat ${LIB}/d3.js \
+	@cat \
+		${LIB}/d3.js \
 		${LIB}/geotiff.js \
 		${LIB}/plotty.js \
 		${LIB}/mapbox-gl.js \
 		${LIB}/flash.js \
 		${LIB}/modal.js \
 		${LIB}/location.js \
-		${LIB}/htmlsortable.js > ./dist/tool/libs.js
+		${LIB}/htmlsortable.js \
+		> ${DIST}/tool/libs.js
 
-	@echo -n "const ea_settings = " | cat - settings.json \
+	@echo -n "const ea_settings = " | cat - \
+		settings.json \
 		${SRC}/ea.js \
 		${SRC}/auxiliary.js \
 		${SRC}/client.js \
@@ -58,7 +61,8 @@ build-tool:
 		${SRC}/ui.js \
 		${SRC}/layers.js \
 		${SRC}/datasets.js \
-		${SRC}/mapbox.js > ./dist/tool/main.js
+		${SRC}/mapbox.js \
+		> ${DIST}/tool/main.js
 
 	@cat \
 	  ${CSS}/layout.css \
@@ -74,15 +78,19 @@ build-countries:
 	@mkdir -p ${DIST}/countries
 	@cp ${SRC}/countries.html ${DIST}/countries/index.html
 
-	@cat ${LIB}/d3.js \
+	@cat \
+		${LIB}/d3.js \
 		${LIB}/topojson.js \
 		${LIB}/flash.js \
-		${LIB}/modal.js > ./dist/countries/libs.js
+		${LIB}/modal.js \
+		> ${DIST}/countries/libs.js
 
-	@echo -n "const ea_settings = " | cat - settings.json \
+	@echo -n "const ea_settings = " | cat - \
+		settings.json \
 		${SRC}/svg.js \
 		${SRC}/ui.js \
-		${SRC}/countries.js > ./dist/countries/main.js
+		${SRC}/countries.js \
+		> ${DIST}/countries/main.js
 
 	@cat \
 	  ${CSS}/countries.css \
@@ -100,12 +108,14 @@ synced:
 		--exclude=.git \
 		--exclude=default.mk \
 		--exclude=makefile \
-		./${DIST}/ ${SRV_USER}@${SRV_SERVER}:${SRV_DEST}
+		${DIST}/ ${SRV_USER}@${SRV_SERVER}:${SRV_DEST}
 
 deploy:
 	@sed -i \
 		-e 's%database: "${DB_SERV_DEV}",%database: "${DB_SERV_PROD}",%' \
-		${DIST}/settings.js
+		settings.json
+
+	make build
 
 	@rsync -OPrv \
 		--checksum \
@@ -114,8 +124,8 @@ deploy:
 		--exclude=.git \
 		--exclude=default.mk \
 		--exclude=makefile \
-		./${DIST}/ ${SRV_USER}@${SRV_SERVER}:${SRV_DEST}
+		${DIST}/ ${SRV_USER}@${SRV_SERVER}:${SRV_DEST}
 
 	@sed -i \
 		-e 's%database: "${DB_SERV_PROD}",%database: "${DB_SERV_DEV}",%' \
-		${DIST}/settings.js
+		settings.json

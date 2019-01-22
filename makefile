@@ -36,6 +36,8 @@ build: build-tool build-countries
 
 build-tool:
 	@echo "Building tool"
+	@mkdir -p ${DIST}/tool
+	@cp ${SRC}/tool.html ${DIST}/tool/index.html
 
 	@cat ${LIB}/d3.js \
 		${LIB}/geotiff.js \
@@ -59,6 +61,8 @@ build-tool:
 
 build-countries:
 	@echo "Building countries"
+	@mkdir -p ${DIST}/countries
+	@cp ${SRC}/countries.html ${DIST}/countries/index.html
 
 	@cat ${LIB}/d3.js \
 		${LIB}/topojson.js \

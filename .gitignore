@@ -1,10 +1,5 @@
 /data
 /default.mk
-/dist/data
-/dist/lib
-/dist/countries/libs.js
-/dist/countries/main.js
-/dist/tool/libs.js
-/dist/tool/main.js
+/dist
 /settings.json
 /postgrest.conf

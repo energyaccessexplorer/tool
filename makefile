@@ -17,6 +17,7 @@ include default.mk
 
 DIST = ./dist
 SRC = ./src
+VIEWS = ./views
 CSS = ./stylesheets
 LIB = ${DIST}/lib
 
@@ -38,7 +39,7 @@ stop:
 build-tool:
 	@echo "Building tool"
 	@mkdir -p ${DIST}/tool
-	@cp ${SRC}/tool.html ${DIST}/tool/index.html
+	@cp ${VIEWS}/tool.html ${DIST}/tool/index.html
 
 	@cat \
 		${LIB}/d3.js \
@@ -76,7 +77,7 @@ build-tool:
 build-countries:
 	@echo "Building countries"
 	@mkdir -p ${DIST}/countries
-	@cp ${SRC}/countries.html ${DIST}/countries/index.html
+	@cp ${VIEWS}/countries.html ${DIST}/countries/index.html
 
 	@cat \
 		${LIB}/d3.js \

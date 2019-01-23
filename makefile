@@ -113,7 +113,7 @@ synced:
 
 deploy:
 	@sed -i \
-		-e 's%database: "${DB_SERV_DEV}",%database: "${DB_SERV_PROD}",%' \
+		-e 's%"database": "${DB_SERV_DEV}",%"database": "${DB_SERV_PROD}",%' \
 		settings.json
 
 	make build
@@ -128,5 +128,5 @@ deploy:
 		${DIST}/ ${SRV_USER}@${SRV_SERVER}:${SRV_DEST}
 
 	@sed -i \
-		-e 's%database: "${DB_SERV_PROD}",%database: "${DB_SERV_DEV}",%' \
+		-e 's%"database": "${DB_SERV_PROD}",%"database": "${DB_SERV_DEV}",%' \
 		settings.json

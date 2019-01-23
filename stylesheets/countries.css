@@ -10,7 +10,10 @@ body {
   position: absolute;
   background-color: white;
   width: 320px;
-
+  background-color: var(--the-darker-white);
+  position: absolute;
+  top: 0;
+  left: 0;
   z-index: 9;
 }
 

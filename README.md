@@ -3,7 +3,7 @@
 This is the source code for the primary visualisation of the platform. A live
 version found [here](https://energyaccessexplorer.org/maps-and-data/countries).
 
-# Development
+## Development
 
 Is written in plain/modern Javascript (ES6). No framework was chosen. Instead
 traditional C-style programming pattern is enforced. Libraries have been chosen
@@ -29,11 +29,13 @@ A few plugins are used only for convinience. See `dependencies.tsv`.
 Assumptions made:
 
 - development is in a Unix-like environment (cat, sed, echo, make...)
-- a static web server and rsync are installed
-- an PostgREST API instance is running. See the database
-  [repo](https://github.com/energyaccessexplorer/database)
-- (optionally) the website is running. See the website
-  [repo](https://github.com/energyaccessexplorer/website)
+- [PostgREST](https://postgrest.org) is installed.
+- an PostgreSQL instance is running and also the
+  [database](https://github.com/energyaccessexplorer/database)
+- a web server
+- (optionally) rsync
+- (optionally) the website is running. See the
+  [website](https://github.com/energyaccessexplorer/website)
 
 The `makefile` contains basic tasks for development/deployment. To get
 started, you will need to

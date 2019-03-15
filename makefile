@@ -1,13 +1,12 @@
 # Copy and customise these in a default.mk
 #
 # WEB_PORT = 4231
-# PGREST_PORT = 6798
 #
 # SRV_USER = someuser
 # SRV_SERVER = example.org
 # SRV_DEST = /srv/http/energyaccessexplorer
 #
-# DB_SERV_DEV = http://localhost:${PGREST_PORT}
+# DB_SERV_DEV = http://api-eneryaccessexplorer.localhost
 # DB_SERV_PROD = https://api-energyaccessexplorer.example.org
 #
 # STATIC_SERVER = python3 -m http.server ${WEB_PORT}
@@ -27,14 +26,12 @@ build: build-tool build-countries
 
 start:
 	(cd ${DIST} && ${STATIC_SERVER}) &
-	@postgrest postgrest.conf &
 
 watch:
 	@ WATCH_CMD="make build" ${WATCH} ${SRC} ${CSS} ${VIEWS}
 
 stop:
-	-@lsof -t -i :${WEB_PORT} | xargs -i kill {}
-	-@lsof -t -i :${PGREST_PORT} | xargs -i kill {}
+	-@lsof -t -i :${WEB_PORT} | xargs -I {} kill -9 {}
 
 build-tool:
 	@echo "Building tool"

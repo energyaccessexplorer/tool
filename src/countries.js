@@ -68,7 +68,7 @@ function ea_countries_setup() {
       window.countries_overviews = results[3].rows;
 
       const dropdown = document.querySelector('#country-dropdown');
-      const button = document.querySelector('#country-select');
+      const input = document.querySelector('#country-search-input');
 
       dropdown.style.height = (document.querySelector('#maparea').clientHeight - 120) + "px";
 
@@ -81,25 +81,23 @@ function ea_countries_setup() {
 </div>`);
 
         e.addEventListener(
-          'click',
-          _ => ea_countries_overview(
-            countries.find(x => x.ccn3 === c.ccn3),
-            countries_overviews,
-            countries_online
-          )
+          'mouseup',
+          _ => {
+            ea_countries_overview(
+              countries.find(x => x.ccn3 === c.ccn3),
+              countries_overviews,
+              countries_online
+            );
+
+            dropdown.style.display = 'none';
+          }
         );
 
         dropdown.appendChild(e);
       });
 
       dropdown.addEventListener('mouseleave', _ => dropdown.style.display = 'none');
-      dropdown.addEventListener('mouseenter', _ => dropdown.style.display = 'block');
-
-      button.addEventListener('click', _ => dropdown.style.display = 'block');
-      button.addEventListener('mouseleave', _ => dropdown.style.display = 'none');
-      button.addEventListener('mouseenter', _ => dropdown.style.display = 'block');
-
-      const input = button.querySelector('input');
+      input.addEventListener('mouseenter', _ => dropdown.style.display = 'block');
 
       const elements = dropdown.querySelectorAll('.country-dropdown-element');
 
@@ -213,6 +211,8 @@ function ea_countries_overview(c, list, online) {
   if (r) {
     co = elem('<div class="country-overview">');
 
+    co.appendChild(elem(`<h2>${c.name.common}</h2>`));
+
     if (+r['population'] > 0)
       pop = ovline("Population", `${(+r['population']).toLocaleString()} Million`);
 
@@ -294,10 +294,10 @@ function ea_countries_overview(c, list, online) {
       err.change(0);
     }
 
-    ea_modal
-      .header(`<div style="text-transform: uppercase; color: var(--the-white)">${c.name.common}</div>`)
-      .content(co)();
+    const overview = document.querySelector('#country-overview')
 
+    overview.innerHTML = "";
+    overview.appendChild(co);
   } else {
     ea_flash
       .type(null)
@@ -343,8 +343,6 @@ function ea_countries_action_modal(c) {
 
   content.appendChild(pbtns);
   content.appendChild(btn);
-
-  ea_modal().remove();
 
   ea_modal
     .header(`<div style="text-transform: uppercase; color: var(--the-white)">${c['country']}</div>`)

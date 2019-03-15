@@ -9,12 +9,21 @@ body {
 #country-select {
   position: absolute;
   background-color: white;
-  width: 320px;
-  background-color: var(--the-darker-white);
+  width: 450px;
+  background-color: var(--the-white);
   position: absolute;
   top: 0;
   left: 0;
   z-index: 9;
+}
+
+#country-overview {
+  border: solid 1px #d9d9d9;
+  border-top: none;
+}
+
+.country-overview {
+  padding: 1em 1em 0 1em;
 }
 
 #country-float {
@@ -82,7 +91,6 @@ body {
   cursor: pointer;
   display: block;
   text-align: left;
-  width: 300px;
 }
 
 .country-dropdown-element:hover {

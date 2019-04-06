@@ -306,7 +306,11 @@ function ea_countries_overview(c, list, online) {
 
     const overview = document.querySelector('#country-overview')
 
+    const dismiss = elem('<a style="display: block; text-align: right;" href="#">dismiss</a>')
+    dismiss.addEventListener('mouseup', e => overview.innerHTML = "");
+
     overview.innerHTML = "";
+    co.append(dismiss)
     overview.appendChild(co);
   } else {
     ea_flash

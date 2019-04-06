@@ -8,7 +8,7 @@ function ea_layers_init() {
 
   const min_arrow = elem(`
 <div style="display: flex; justify-content: flex-end;">
-  <div style="background-color: rgba(0,0,0,0.7); padding: 0.2em 0.4em; color: white; fill: white; cursor: pointer;">${ea_svg_arrow()}</div>
+  <div style="background-color: rgba(0,0,0,0.7); padding: 0.2em 0.6em; color: white; fill: white; cursor: pointer;">${ea_svg_arrow()}</div>
 </div>
 `);
 

@@ -505,7 +505,7 @@ function ea_svg_info() {
 
 function ea_svg_arrow() {
   return `
-<svg width="12px" height="10px" viewBox="0 0 12 10">
+<svg width="15px" height="12px" viewBox="0 0 12 10">
   <g stroke="none" stroke-width="1" fill-rule="evenodd">
     <g transform="translate(-220.000000, -734.000000)" fill-rule="nonzero">
       <path d="M227,738.12132 L227,744 L225,744 L225,738.12132 L221.707107,741.414214 L220,740 L226,734 L232,740 L230.292893,741.414214 L227,738.12132 Z" id="arrow-down" transform="translate(226.000000, 739.000000) scale(1, -1) translate(-226.000000, -739.000000) "></path>

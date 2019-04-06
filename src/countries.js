@@ -112,14 +112,14 @@ function ea_countries_setup() {
       const elements = dropdown.querySelectorAll('.country-dropdown-element');
 
       input.addEventListener('keyup', e => {
-        dropdown.style.display = 'block'
+        dropdown.style.display = 'block';
 
         if (e.code === "Enter") {
           for (x of elements) {
             if (x.style.display === 'block') {
               let ccn3 = x.getAttribute('bind');
 
-              if (ccn3)  {
+              if (ccn3) {
                 ea_countries_overview(
                   countries.find(t => t.ccn3 === ccn3),
                   countries_overviews,

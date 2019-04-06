@@ -96,8 +96,18 @@ function ea_countries_setup() {
         dropdown.appendChild(e);
       });
 
-      dropdown.addEventListener('mouseleave', _ => dropdown.style.display = 'none');
       input.addEventListener('mouseenter', _ => dropdown.style.display = 'block');
+
+      dropdown.addEventListener('mouseleave', e => {
+        if (e.relatedTarget === input) return;
+        dropdown.style.display = 'none';
+      });
+
+      input.addEventListener('mouseleave', e => {
+        if (e.relatedTarget === dropdown ||
+            e.relatedTarget.classList.contains('country-dropdown-element')) return;
+        dropdown.style.display = 'none';
+      });
 
       const elements = dropdown.querySelectorAll('.country-dropdown-element');
 

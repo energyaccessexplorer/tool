@@ -94,6 +94,7 @@ table.summary .index-name {
 #graphs {
   display: flex;
   flex-flow: row nowrap;
+  justify-content: center;
 }
 
 .tab.hidden {

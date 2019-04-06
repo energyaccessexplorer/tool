@@ -174,6 +174,8 @@ async function ea_summary() {
 
     console.log(idxn, percs, groups);
 
+    if (percs.includes(NaN)) return;
+
     let pie = ea_svg_pie(percs.map(x => [x]), 75, 0, ea_default_color_stops, null);
 
     let e = elem(`

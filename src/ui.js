@@ -83,7 +83,6 @@ function ea_ui_layout_map(bounds) {
   width = p.clientWidth - p.querySelector('#controls').clientWidth + 10;
 
   const maparea = document.querySelector('#maparea');
-  maparea.style['width'] = width + "px";
   maparea.style['height'] = height + "px";
 
   return {

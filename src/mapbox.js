@@ -132,6 +132,7 @@ function mapbox_setup(bounds) {
 
   const mapbox = new mapboxgl.Map({
     "container": 'mapbox-container',
+    "trackResize": true,
     "style": mapbox_theme_pick("")
   });
 

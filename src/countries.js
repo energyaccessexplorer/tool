@@ -347,16 +347,14 @@ function ea_countries_action_modal(c) {
 
       b.classList.add('selected');
       preset = p;
+
+      window.location = `/maps-and-data/tool?ccn3=${c['ccn3']}&preset=${preset}`;
     });
 
     pbtns.appendChild(b);
   }
 
-  const btn = elem(`<button class="big-green-button">Click to launch the tool</button>`);
-  btn.addEventListener('click', _ => window.location = `/maps-and-data/tool?ccn3=${c['ccn3']}&preset=${preset}`);
-
   content.appendChild(pbtns);
-  content.appendChild(btn);
 
   ea_modal
     .header(`<div style="text-transform: uppercase; color: var(--the-white)">${c['country']}</div>`)

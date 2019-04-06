@@ -10,11 +10,11 @@ class DS {
 
     let tmp_index = ea_category_tree.map(b => {
       return {
-        "name": b.name,
+        "name": b.name || null,
         "datasets": b.subbranches.map(i => i.datasets.map(d=> d.id)).flat() }
     }).find(i => i.datasets.includes(this.id));
 
-    if (tmp_index) this.indexname = tmp_index.name;
+    this.indexname = tmp_index ? tmp_index.name : null;
 
     this.unit = e.category.unit;
 

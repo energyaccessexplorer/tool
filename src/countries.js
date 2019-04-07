@@ -141,7 +141,7 @@ function ea_countries_setup() {
 
         elements.forEach(e => {
           let cname = e.querySelector('.country-dropdown-name').innerText;
-          e.style.display = (cname.toLowerCase().indexOf(i.toLowerCase()) != -1) ? 'block' : 'none';
+          e.style.display = (cname.toLowerCase().includes(i.toLowerCase())) ? 'block' : 'none';
         });
       });
 
@@ -251,7 +251,7 @@ function ea_countries_overview(c, list, online) {
     if (+r['ease-business'] > 0)
       ease = ovline("Ease of doing business", `${r['ease-business']}/190`);
 
-    if (online.map(x => x['ccn3']).indexOf(+r['ccn3']) > -1) {
+    if (online.map(x => x['ccn3']).includes(+r['ccn3'])) {
       btn = elem(`<button class="big-green-button">Continue</button>`);
       btn.addEventListener('click', _ => ea_countries_action_modal(r));
     }

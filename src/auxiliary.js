@@ -31,7 +31,7 @@ function ea_state_sync() {
     history.replaceState(null, null, location.set_query_param('preset', (p || 'custom')));
   };
 
-  if (Object.keys(ea_indexes).indexOf(output_param) > -1) {
+  if (Object.keys(ea_indexes).includes(output_param)) {
     output = output_param;
   } else {
     output = "eai";
@@ -46,14 +46,14 @@ function ea_state_sync() {
     if (!inputs.includes('boundaries')) inputs.unshift('boundaries');
   }
 
-  if (Object.keys(ea_views).indexOf(mode_param) > -1) {
+  if (Object.keys(ea_views).includes(mode_param)) {
     mode = mode_param;
   } else {
     mode = 'outputs';
     set_mode_param();
   }
 
-  if (['market','planning', 'investment', 'custom'].indexOf(preset_param) > -1) {
+  if (['market','planning', 'investment', 'custom'].includes(preset_param)) {
     preset = preset_param;
   } else {
     preset = 'custom';
@@ -284,10 +284,10 @@ function ea_summary_wrapper() {
 function ea_list_filter_type(type) {
   let idxn;
 
-  if (['supply', 'demand'].indexOf(type) > -1)
+  if (['supply', 'demand'].includes(type))
     idxn = d => d.indexname === type || d.indexname === null;
 
-  else if (['eai', 'ani'].indexOf(type) > -1)
+  else if (['eai', 'ani'].includes(type))
     idxn = d => true;
 
   else

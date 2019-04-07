@@ -172,7 +172,7 @@ class DS {
     const t = this.tmp_domain;
     const v = this.heatmap.scale;
     const o = this.heatmap.scale_option;
-    const r = ((typeof this.invert !== 'undefined' && this.invert.indexOf(indexname) > -1) ? [1,0] : [0,1]);
+    const r = ((typeof this.invert !== 'undefined' && this.invert.includes(indexname)) ? [1,0] : [0,1]);
 
     const lin = d3.scaleLinear()
           .domain(t || d)
@@ -346,7 +346,7 @@ async function ea_datasets_list_init(country_id, inputs, preset) {
   await ea_client(
     `${ea_settings.database}/datasets?country_id=eq.${country_id}&select=${attrs}`, 'GET', null,
     r => r.map(e => {
-      let active = (inputs.indexOf(e.category.name) > -1);
+      let active = (inputs.includes(e.category.name));
 
       let ds = new DS(e);
       ds.init(active, preset);

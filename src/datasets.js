@@ -488,10 +488,12 @@ async function ea_datasets_tiff() {
 
       document.body.append(c);
 
-      draw.call(this, c);
+      if (ea_mapbox) {
+        draw.call(this, c);
 
-      if (ea_mapbox && ea_mapbox.getSource(this.id))
-        ea_mapbox.setLayoutProperty(this.id, 'visibility', 'none');
+        if (ea_mapbox.getSource(this.id))
+          ea_mapbox.setLayoutProperty(this.id, 'visibility', 'none');
+      }
     }
 
     return this;

@@ -2,6 +2,10 @@
   background-color: var(--the-white);
 }
 
+canvas.mapboxgl-canvas {
+  cursor: crosshair;
+}
+
 svg#svg-map {
   opacity: 1.0;
 }

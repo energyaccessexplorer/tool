@@ -308,7 +308,8 @@ function ea_list_filter_type(type) {
 function ea_plot_active_analysis(type, cs = 'ea') {
   const list = ea_list_filter_type(type);
 
-  ea_canvas_plot(ea_analysis(list, type));
+  const raster = ea_analysis(list, type);
+  ea_canvas_plot(raster);
 
   // 'animate' is set to false on mapbox's configuration, since we don't want
   // mapbox eating the CPU at 60FPS for nothing.
@@ -319,9 +320,50 @@ function ea_plot_active_analysis(type, cs = 'ea') {
   //
   let canvas_source = ea_mapbox.getSource('canvas-source');
   if (canvas_source) {
+    canvas_source.raster = raster;
     canvas_source.play();
     setTimeout(_ => {
       canvas_source.pause();
     }, 1000);
   }
+};
+
+/*
+ * ea_coordinates_in_raster
+ *
+ * Transform a set of coordinates to the "relative position" inside a raster
+ * that is bound to an area
+ *
+ * @param "coords" int[2]. Coordinates in Longitude/Latitude to be transformed.
+ * @param "bounds" int[2][2]. Bounding box containing the raster data.
+ * @param "raster" { width int, height int, novalue numeric, array numeric[] }
+ *        full description.
+ */
+
+function ea_coordinates_raster(coords, bounds, raster) {
+  if (coords.length !== 2)
+    throw Error(`ea_coordinates_raster: expected and array of length 2. Got ${coords}`);
+
+  const cw = bounds[1][0] - bounds[0][0];
+  const ch = bounds[1][1] - bounds[2][1];
+
+  let x = (coords[0] - bounds[0][0]);
+  let y = (bounds[0][1] - coords[1]); // yes, right that is.
+
+  a = null;
+
+  if ((x > 0 && x < cw &&
+       y > 0 && y < ch ))
+  {
+    a = {
+      x: Math.floor((x * raster.width) / cw),
+      y: Math.floor((y * raster.height) / ch)
+    }
+
+    let v = raster.array[(a.y * raster.width) + a.x];
+
+    a.value = v === raster.nodata ? null : v;
+  }
+
+  return a;
 };

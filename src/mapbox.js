@@ -163,6 +163,13 @@ function mapbox_setup(bounds) {
   mapbox.dragRotate.disable();
   mapbox.touchZoomRotate.disableRotation();
 
+  mapbox.on('mouseup', e => ea_overlord({
+    type: "map",
+    target: "click",
+    event: e,
+    caller: "mapbox mouseup"
+  }));
+
   return (ea_mapbox = mapbox);
 };
 

@@ -140,6 +140,7 @@ function ea_analysis(list, type) {
  *      preset: change the preset
  *      sort: sort the datasets/layers
  *      refresh: a auxiliary to re-set the mode
+ *      map: handle user-map interactions
  *
  *      Each type might (and will) do different things depending on the current
  *      mode.
@@ -154,6 +155,7 @@ function ea_analysis(list, type) {
  *      preset: "market", "planning", "investment", or "custom"
  *      sort: an array with the ID's of the active datasets
  *      refresh: "inputs" or "outputs"
+ *      map: "click"
  *
  *   caller (required)
  *      The name of the function calling ea_overlord. auxiliary for debugging
@@ -359,6 +361,52 @@ Please reporty this to energyaccessexplorer@wri.org.
     });
 
     break;
+  }
+
+  case "map": {
+    if (msg.target === "click") {
+      const e = msg.event;
+
+      const b = DSTable['boundaries'];
+      let nodata = b.nodata;
+
+      let r = null;
+
+      if (state.mode === "outputs") {
+        r = ea_mapbox.getSource('canvas-source').raster;
+        nodata = -1;
+      }
+
+      else {
+        const i = state.inputs[0];
+        const t = DSTable[i];
+        r = t.raster;
+
+        if (t.features) {
+          const et = ea_mapbox.queryRenderedFeatures(e.point)[0];
+
+          if (et.source === i) {
+            console.log(et);
+            return;
+          }
+        }
+      }
+
+      const rc = ea_coordinates_raster(
+        [e.lngLat.lng, e.lngLat.lat],
+        ea_mapbox.coords,
+        {
+          array: r,
+          width: b.width,
+          height: b.height,
+          nodata: nodata
+        }
+      );
+
+      console.log(rc);
+
+      break;
+    }
   }
 
   default:

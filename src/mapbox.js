@@ -20,7 +20,7 @@ default_styles = [{
   "value": "mapbox/basic-v9"
 }, {
   "name": "Satellite",
-  "value": "mapbox/satellite-v9"
+  "value": "mapbox/satellite-streets-v9"
 }, {
   "name": "Dark",
   "value": "mapbox/dark-v9"

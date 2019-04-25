@@ -185,19 +185,17 @@ async function ea_overlord(msg) {
     const list = await ea_datasets_list_init(country.id, state.inputs, state.preset);
 
     const b = list.find(d => d.id === 'boundaries');
-    const p = list.find(d => d.id === 'population');
 
-    if (!b || !p) {
+    if (!b) {
       ea_flash
         .type('error')
         .title("Misconfigured country")
         .message(`
-It's missing a boundaries or population dataset. <b>I'm stoping here.</b>
-Please reporty this to energyaccessexplorer@wri.org.
+It's missing a boundaries. <b>I'm stoping here.</b>
+Please report this to energyaccessexplorer@wri.org.
 `)();
 
       if (!b) throw `Country is missing a 'boundaries' dataset.`;
-      if (!p) throw `Country is missing a 'population' dataset.`;
     }
 
     else {
@@ -226,6 +224,7 @@ Please reporty this to energyaccessexplorer@wri.org.
     mapbox_setup(country.bounds);
 
     await Promise.all(inputs.map(id => DS.named(id).turn(true, false)));
+
     mapbox_change_theme(ea_settings.mapbox_theme);
 
     ea_ui_app_loading(false);
@@ -384,6 +383,8 @@ Please reporty this to energyaccessexplorer@wri.org.
 
         if (t.features) {
           const et = ea_mapbox.queryRenderedFeatures(e.point)[0];
+
+          if (!et) return;
 
           if (et.source === i) {
             console.log(et);

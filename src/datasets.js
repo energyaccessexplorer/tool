@@ -110,7 +110,7 @@ class DS {
     }
 
     this.active = active || (!presetsempty && p);
-  }
+  };
 
   mutant_init() {
     if (!this.mutant) throw `${this.id} is not a mutant. Bye.`
@@ -171,7 +171,7 @@ class DS {
     const d = (this.heatmap.domain && [this.heatmap.domain.min, this.heatmap.domain.max]) || [0,1];
     const t = this.tmp_domain;
     const v = this.heatmap.scale;
-    const o = this.heatmap.scale_option;
+    const o = this.filter_option;
     const r = ((typeof this.invert !== 'undefined' && this.invert.includes(indexname)) ? [1,0] : [0,1]);
 
     const lin = d3.scaleLinear()
@@ -575,13 +575,14 @@ async function ea_datasets_lines() {
 
 async function ea_datasets_polygons() {
   return ea_datasets_geojson.call(this, _ => {
-    if (!ea_mapbox.getSource(this.id))
+    if (!ea_mapbox.getSource(this.id)) {
       ea_mapbox.addSource(this.id, {
         "type": "geojson",
         "data": this.features
       });
+    }
 
-    if (!ea_mapbox.getLayer(this.id))
+    if (!ea_mapbox.getLayer(this.id)) {
       ea_mapbox.addLayer({
         "id": this.id,
         "type": "fill",
@@ -592,5 +593,6 @@ async function ea_datasets_polygons() {
           "fill-outline-color": this.vectors.stroke,
         },
       }, ea_mapbox.first_symbol);
+    }
   });
 };

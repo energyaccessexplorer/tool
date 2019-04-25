@@ -415,7 +415,7 @@ function ea_countries_map_svg(svg, topofile, name, options) {
   projection
     .scale(opts.scale || scale)
     .center(opts.center || [0,0])
-    .translate(opts.translate || translate)
+    .translate(opts.translate || translate);
 
   const _map = {
     topo: topo,

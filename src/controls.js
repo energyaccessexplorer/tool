@@ -40,7 +40,7 @@ function ea_controls(ds) {
     break;
 
   case "boundaries":
-    range_group = ea_controls_range(ds, (ds.unit || 'percentage'))
+    range_group = ea_controls_range(ds, (ds.unit || 'percentage'));
 
     _controls.querySelector('.controls-dataset-header').remove();
     _controls.prepend(elem(`<div class="controls-dataset-name">${ds.name_long}</div>`));
@@ -57,7 +57,7 @@ function ea_controls(ds) {
     break;
 
   case "boundaries-bis":
-    range_group = ea_controls_range(ds, (ds.unit || 'percentage'))
+    range_group = ea_controls_range(ds, (ds.unit || 'percentage'));
 
     const opts = ea_controls_options(ds);
     if (opts) {
@@ -78,7 +78,7 @@ function ea_controls(ds) {
     break;
 
   case 'crops':
-    range_group = ea_controls_range(ds, (ds.unit || 'range'))
+    range_group = ea_controls_range(ds, (ds.unit || 'range'));
     controls.appendChild(ea_controls_mutant_options(ds));
     controls.appendChild(range_group.elem);
     controls.appendChild(weight_group.elem);
@@ -145,7 +145,7 @@ function ea_controls_elem(ds) {
 };
 
 function ea_controls_tree(tree, list) {
-  const controls_el = document.querySelector('#controls')
+  const controls_el = document.querySelector('#controls');
 
   tree.forEach(branch => branch.subbranches.forEach(sub => sub.datasets.filter(d => {
     const ds = DS.named(d.id);
@@ -258,16 +258,16 @@ function ea_controls_options(ds) {
     select.appendChild(elem(`<option value=${v}>${ds.csv.options[v]}</option>`));
   });
 
-  ds.heatmap.scale_option = select.value = options[0];
+  ds.filter_option = select.value = options[0];
 
   select.addEventListener('change', function() {
-    ds.heatmap.scale_option = this.value;
+    ds.filter_option = this.value;
 
     ea_overlord({
       "type": "dataset",
       "target": ds,
       "caller": "ea_controls_options",
-    })
+    });
   });
 
   container.appendChild(select);
@@ -383,7 +383,7 @@ function ea_controls_collection_list(ds) {
 
   for (let i of ds.configuration.collection) {
     let d = DS.named(i);
-    e.appendChild(elem(`<li>${d.name_long}</li>`))
+    e.appendChild(elem(`<li>${d.name_long}</li>`));
   }
 
   return e;

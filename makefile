@@ -63,12 +63,12 @@ build-tool:
 		> ${DIST}/tool/main.js
 
 	@cat \
-	  ${CSS}/layout.css \
-	  ${CSS}/controls.css \
-	  ${CSS}/maparea.css \
-	  ${CSS}/layers.css \
-	  ${CSS}/datasets.css \
-	  ${CSS}/views.css \
+		${CSS}/layout.css \
+		${CSS}/controls.css \
+		${CSS}/maparea.css \
+		${CSS}/layers.css \
+		${CSS}/datasets.css \
+		${CSS}/views.css \
 		> ${DIST}/tool/main.css
 
 build-countries:
@@ -91,9 +91,9 @@ build-countries:
 		> ${DIST}/countries/main.js
 
 	@cat \
-	  ${CSS}/countries.css \
-	  ${CSS}/maparea.css \
-	  ${CSS}/views.css \
+		${CSS}/countries.css \
+		${CSS}/maparea.css \
+		${CSS}/views.css \
 		> ${DIST}/countries/main.css
 
 synced:

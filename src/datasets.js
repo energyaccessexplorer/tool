@@ -153,6 +153,24 @@ class DS {
     if (!this.collection) throw `${this.id} is not a collection. Bye.`
   };
 
+  filter_set() {
+    if (!this.filter_option) return;
+
+    if (this.features) {
+      const so = this.filter_option;
+      const cso = this.configuration.polygons[so]
+
+      const min = Math.min.apply(null, this.features.features.map(f => f.properties[cso]));
+      const max = Math.max.apply(null, this.features.features.map(f => f.properties[cso]));
+
+      const s = d3.scaleLinear().domain([min,max]).range([0,1]);
+
+      this.features.features.forEach(f => f.properties.opacity = s(f.properties[cso]));
+
+      ea_mapbox.getSource(this.id).setData(this.features);
+    }
+  };
+
   /*
    * ea_datasets_scale_fn
    *
@@ -583,12 +601,14 @@ async function ea_datasets_polygons() {
     }
 
     if (!ea_mapbox.getLayer(this.id)) {
+      this.filter_set();
+
       ea_mapbox.addLayer({
         "id": this.id,
         "type": "fill",
         "source": this.id,
         "paint": {
-          "fill-opacity": this.vectors.opacity,
+          "fill-opacity": ['get', 'opacity'],
           "fill-color": this.vectors.fill,
           "fill-outline-color": this.vectors.stroke,
         },

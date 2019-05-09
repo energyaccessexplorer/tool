@@ -270,6 +270,8 @@ Please report this to energyaccessexplorer@wri.org.
 
     state.set_preset_param(null);
 
+    ds.filter_set();
+
     ds.active ?
       state.inputs.unshift(ds.id) :
       state.inputs.splice(state.inputs.indexOf(ds.id), 1); // REMOVE()

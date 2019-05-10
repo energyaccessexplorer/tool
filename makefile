@@ -12,6 +12,8 @@
 # STATIC_SERVER = python3 -m http.server ${WEB_PORT}
 # WATCH = <whatever daemon you use observe code changes>
 #
+# MAPBOX_DEFAULT_THEME=mapbox/basic-v9
+#
 include default.mk
 
 DIST = ./dist
@@ -111,6 +113,7 @@ synced:
 deploy:
 	@sed -i \
 		-e 's%"database": "${DB_SERV_DEV}",%"database": "${DB_SERV_PROD}",%' \
+		-e 's%"mapbox_theme": "",%"mapbox_theme": "${MAPBOX_DEFAULT_THEME}",%' \
 		settings.json
 
 	make build
@@ -126,4 +129,5 @@ deploy:
 
 	@sed -i \
 		-e 's%"database": "${DB_SERV_PROD}",%"database": "${DB_SERV_DEV}",%' \
+		-e 's%"mapbox_theme": "${MAPBOX_DEFAULT_THEME}",%"mapbox_theme": "",%' \
 		settings.json

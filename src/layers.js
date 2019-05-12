@@ -76,11 +76,6 @@ function ea_layers_input_elem(ds) {
     lec.appendChild(dlo);
   }
 
-  let dli = elem(`<div class="layer-info">${ea_svg_info()}</div>`);
-  dli.addEventListener('mouseup', _ => ea_ui_dataset_modal(ds));
-
-  lec.appendChild(dli);
-
   function svg_thing(d) {
     let e;
     if (d.vectors) e = d.vectors.symbol_svg;

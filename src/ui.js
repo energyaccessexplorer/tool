@@ -134,6 +134,11 @@ function ea_ui_dataset_modal(ds) {
 <h3>Description</h3><pre class="description-text">${ds.metadata.description}</pre>
 </section>`));
 
+  if (ds.help && ds.help.why)
+    left.appendChild(elem(`<section>
+<h3>Why is this dataset used?</h3><pre>${ds.help.why}</pre>
+</section>`));
+
   if (ds.metadata.suggested_citation)
     left.appendChild(elem(`<section>
 <h3>Suggested Citation</h3><pre class="description-text">${ds.metadata.suggested_citation}</pre>
@@ -197,30 +202,6 @@ function ea_ui_index_modal(i) {
   ea_modal
     .header(titles[i])
     .content(infos[i])();
-};
-
-function ea_ui_category_help_modal(ds) {
-  let content = elem('<div>');
-
-  if (ds.help.what)
-    content.appendChild(elem(`
-<section>
-  <h3>What is this dataset?</h3>
-  <p>${ds.help.what}</p>
-</section>
-`));
-
-  if (ds.help.why)
-    content.appendChild(elem(`
-<section>
-  <h3>Why is this dataset?</h3>
-  <p>${ds.help.why}</p>
-</section>
-`));
-
-  ea_modal
-    .header(ds.name_long)
-    .content(content)();
 };
 
 function ea_ui_modal_setup() {

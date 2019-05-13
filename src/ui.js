@@ -179,9 +179,10 @@ function ea_ui_dataset_modal(ds) {
 <h3>Date of Content</h3>${ds.metadata.content_date}
 </section>`));
 
-  ea_modal
-    .header(ds.name_long)
-    .content(content)();
+  ea_modal.set({
+    header: ds.name_long,
+    content: content
+  }).show();
 };
 
 function ea_ui_index_modal(i) {
@@ -199,48 +200,10 @@ function ea_ui_index_modal(i) {
     "demand": "The Demand Index identifies areas with higher energy demand which are characterized with higher index values. It is an aggregated and weighted measure of all selected data sets under Demographics and Socio-economic activities."
   };
 
-  ea_modal
-    .header(titles[i])
-    .content(infos[i])();
-};
-
-function ea_ui_modal_setup() {
-  window.ea_modal = modal()
-    .header_style(`
-padding: 1em;
-padding-left: 1.3em;
-font-size: 1.1em;
-background-color: var(--the-green);
-color: var(--the-white);
-position: relative;
-    `)
-    .close_style(`
-position: absolute;
-top: 0.5em;
-right: 0.5em;
-text-decoration: none;
-font-size: 1.4em;
-line-height: 1em;
-width: 1em;
-display: block;
-text-align: center;
-vertical-align: middle;
-color: var(--the-white);
-`)
-    .main_style(`
-background-color: white;
-margin: auto;
-max-width: 1200px;
-width: fit-content;
-height: fit-content;
-width: -webkit-fit-content;
-width: -moz-fit-content;
-font-size: 1.2em;
-margin-top: 80px;
-    `)
-    .content_style(`
-padding: 1.2em;
-    `);
+  ea_modal.set({
+    header: titles[i],
+    content: infos[i]
+  }).show();
 };
 
 function ea_ui_flash_setup() {

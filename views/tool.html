@@ -145,7 +145,7 @@
     plotty.addColorScale("ea", ea_default_color_stops, ea_default_color_domain);
     ea_default_color_scale = "ea";
 
-    ea_ui_modal_setup();
+    window.ea_modal = new modal("ea-modal", {});
     ea_ui_flash_setup();
 
     ea_overlord({

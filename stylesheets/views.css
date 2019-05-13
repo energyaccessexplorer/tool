@@ -110,3 +110,47 @@ table.summary .index-name {
   display: block;
   padding: 0.9em 1.3em;
 }
+
+dialog main {
+  background-color: white;
+  margin: auto;
+  max-width: 1200px;
+  width: fit-content;
+  height: fit-content;
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  font-size: 1.2em;
+  margin-top: 80px !important;
+}
+
+dialog header {
+  padding: 1em;
+  padding-left: 1.3em;
+  font-size: 1.1em;
+  background-color: var(--the-green);
+  color: var(--the-white);
+  position: relative;
+}
+
+dialog .close {
+  position: absolute;
+  top: 0.5em;
+  right: 0.5em;
+  text-decoration: none;
+  font-size: 1.4em;
+  line-height: 1em;
+  width: 1em;
+  display: block;
+  text-align: center;
+  vertical-align: middle;
+  color: var(--the-white);
+}
+
+dialog content {
+  padding: 1.2em;
+}
+
+dialog pre {
+  max-width: 850px;
+  white-space: pre-line;
+}

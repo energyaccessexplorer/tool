@@ -356,9 +356,10 @@ function ea_countries_action_modal(c) {
 
   content.appendChild(pbtns);
 
-  ea_modal
-    .header(`<div style="text-transform: uppercase; color: var(--the-white)">${c['country']}</div>`)
-    .content(content)();
+  ea_modal.set({
+    header: elem(`<div style="text-transform: uppercase; color: var(--the-white)">${c['country']}</div>`),
+    content: content
+  }).show();
 };
 
 function ea_countries_map_svg(svg, topofile, name, options) {

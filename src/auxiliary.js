@@ -248,9 +248,10 @@ async function ea_summary() {
   content.appendChild(table);
   content.appendChild(switcho);
 
-  ea_modal
-    .header("Snapshot")
-    .content(content)();
+  ea_modal.set({
+    header: "Snapshot",
+    content: content
+  }).show();
 
   return content;
 };

@@ -109,12 +109,12 @@ function ea_controls_elem(ds) {
 
   ds.checkbox_change = check.change;
 
-  const help = elem(`<div class="controls-dataset-help">${ea_svg_info()}</div>`);
+  const info = elem(`<div class="controls-dataset-info">${ea_svg_info()}</div>`);
 
   const clicko = function(e) {
     ds.active = !ds.active;
 
-    if (e.target.closest('div') === help) return;
+    if (e.target.closest('div') === info) return;
 
     if (e.target.closest('svg') !== button) {
       let event = document.createEvent('HTMLEvents');
@@ -132,14 +132,10 @@ function ea_controls_elem(ds) {
 
   const name = elem(`<div class="controls-dataset-name">${ds.name_long}</div>`);
   header.appendChild(name);
-
+  header.appendChild(info);
   header.addEventListener('mouseup', clicko);
 
-  if (ds.help && (ds.help.why || ds.help.what)) {
-    header.appendChild(help);
-
-    help.addEventListener('mouseup', _ => ea_ui_dataset_modal(ds));
-  }
+  info.addEventListener('mouseup', _ => ea_ui_dataset_modal(ds));
 
   return controls;
 };

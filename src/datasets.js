@@ -20,6 +20,10 @@ class DS {
 
     this.metadata = e.metadata;
 
+    if (e.category.metadata && (e.category.metadata.why)) {
+      this.why = e.category.metadata.why;
+    }
+
     this.configuration = e.configuration;
 
     this.mutant = !!(e.configuration && e.configuration.mutant);
@@ -64,13 +68,6 @@ class DS {
       this.csv = e.configuration.csv;
       this.csv.endpoint = e.csv_file.endpoint;
       this.csv.parse = ea_datasets_csv;
-    }
-
-    if (e.category.metadata && (e.category.metadata.why || e.category.metadata.what)) {
-      this.help = {};
-
-      this.help['why'] = e.category.metadata.why;
-      this.help['what'] = e.category.metadata.what;
     }
 
     this.presets = {};

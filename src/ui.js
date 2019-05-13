@@ -134,9 +134,9 @@ function ea_ui_dataset_modal(ds) {
 <h3>Description</h3><pre class="description-text">${ds.metadata.description}</pre>
 </section>`));
 
-  if (ds.help && ds.help.why)
+  if (ds.why)
     left.appendChild(elem(`<section>
-<h3>Why is this dataset used?</h3><pre>${ds.help.why}</pre>
+<h3>Why is this dataset used?</h3><pre>${ds.why}</pre>
 </section>`));
 
   if (ds.metadata.suggested_citation)

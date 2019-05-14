@@ -164,7 +164,7 @@ class DS {
 
       this.features.features.forEach(f => f.properties.opacity = s(f.properties[cso]));
 
-      ea_mapbox.getSource(this.id).setData(this.features);
+      let src; if (src = ea_mapbox.getSource(this.id)) src.setData(this.features);
     }
   };
 

@@ -43,7 +43,10 @@ function ea_state_sync() {
     set_inputs_param();
   } else {
     inputs = inputs_param.split(',');
-    if (!inputs.includes('boundaries')) inputs.unshift('boundaries');
+
+    // TODO: decide on this:
+    //
+    // if (!inputs.includes('boundaries')) inputs.unshift('boundaries');
   }
 
   if (Object.keys(ea_views).includes(mode_param)) {

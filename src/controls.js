@@ -56,20 +56,6 @@ function ea_controls(ds) {
 
     break;
 
-  case "boundaries-bis":
-    range_group = ea_controls_range(ds, (ds.unit || 'percentage'));
-
-    const opts = ea_controls_options(ds);
-    if (opts) {
-      controls.appendChild(opts);
-      controls.appendChild(range_group.elem);
-    }
-    else {
-      controls.remove();
-    }
-
-    break;
-
   case "transmission-lines-collection":
     range_group = ea_controls_range(ds, (ds.unit || 'proximity in km'));
     controls.appendChild(ea_controls_collection_list(ds));

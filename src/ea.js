@@ -191,7 +191,7 @@ async function ea_overlord(msg) {
         .type('error')
         .title("Misconfigured country")
         .message(`
-It's missing a boundaries. <b>I'm stoping here.</b>
+It's missing a 'boundaries' dataset. <b>I'm stoping here.</b>
 Please report this to energyaccessexplorer@wri.org.
 `)();
 

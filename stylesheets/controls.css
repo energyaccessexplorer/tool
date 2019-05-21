@@ -175,9 +175,15 @@
 #controls-boundaries {
   width: 100%;
   display: flex;
+  min-height: 153px;
 }
 
 #controls-boundaries .svg-checkbox {
+  vertical-align: top;
+  padding-top: 1.7em;
+}
+
+#controls-boundaries .controls-dataset-info {
   display: none;
 }
 
@@ -192,7 +198,11 @@
 }
 
 #controls-boundaries .controls-dataset-name {
-  margin: 1.5em
+  margin: 1.5em 0.5em;
+}
+
+#controls-boundaries .controls-dataset-content {
+  margin-left: 1.5em;
 }
 
 .controls-select-container {

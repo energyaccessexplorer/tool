@@ -228,6 +228,9 @@ Please report this to energyaccessexplorer@wri.org.
     mapbox_change_theme(ea_settings.mapbox_theme);
 
     ea_ui_app_loading(false);
+
+    ea_nanny_start();
+
     break;
   }
 

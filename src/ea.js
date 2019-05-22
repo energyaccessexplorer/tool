@@ -158,8 +158,8 @@ function ea_analysis(list, type) {
  *      map: "click"
  *
  *   caller (required)
- *      The name of the function calling ea_overlord. auxiliary for debugging
- *      purposes.
+ *      The name of the function calling ea_overlord. Useful for debugging
+ *      and behavioural decisions based on it.
  * }
  *
  * returns nothing
@@ -268,12 +268,14 @@ Please report this to energyaccessexplorer@wri.org.
   case "dataset": {
     const ds = msg.target;
 
+    const resort = !["ea_controls_range", "ea_controls_weight"].includes(msg.caller);
+
     state.set_preset_param(null);
 
     ds.filter_set();
 
     ds.active ?
-      state.inputs.unshift(ds.id) :
+      (resort && state.inputs.unshift(ds.id)) :
       state.inputs.splice(state.inputs.indexOf(ds.id), 1); // REMOVE()
 
     const inputs = [...new Set(state.inputs)]; // UNIQUE()
@@ -289,7 +291,8 @@ Please report this to energyaccessexplorer@wri.org.
       await ds.turn(ds.active, true);
 
       ea_layers_inputs(inputs);
-      ds.raise();
+
+      if (resort) ds.raise();
     }
 
     else {

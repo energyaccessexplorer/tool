@@ -181,7 +181,8 @@ function ea_ui_dataset_modal(ds) {
 
   ea_modal.set({
     header: ds.name_long,
-    content: content
+    content: content,
+    footer: null
   }).show();
 };
 
@@ -202,7 +203,8 @@ function ea_ui_index_modal(i) {
 
   ea_modal.set({
     header: titles[i],
-    content: infos[i]
+    content: infos[i],
+    footer: null
   }).show();
 };
 
@@ -226,13 +228,12 @@ border: 1px solid white;
  * Create a _SINGLE_ HTMLElement from a string and return it.
  *
  * @param "str" string. The HTML.
- *
- * returns an Object with the handled params and their set_ methods.
+ * @param "p" string. Wrap the HTML "str" in "p" (allows multi element "str")
  */
 
-function elem(str) {
-  const d = document.createElement('div');
+function elem(str, p) {
+  var d = document.createElement(p ? p : 'div');
   d.innerHTML = str;
 
-  return d.firstElementChild;
+  return p ? d : d.firstElementChild;
 };

@@ -39,14 +39,10 @@ function ea_state_sync() {
   }
 
   if (!inputs_param) {
-    inputs = ['boundaries'];
+    inputs = [];
     set_inputs_param();
   } else {
     inputs = inputs_param.split(',');
-
-    // TODO: decide on this:
-    //
-    // if (!inputs.includes('boundaries')) inputs.unshift('boundaries');
   }
 
   if (Object.keys(ea_views).includes(mode_param)) {
@@ -131,8 +127,7 @@ async function ea_summary() {
   const content = elem(`
 <div>
   <div style="text-transform: uppercase; margin: 0 -1.2em 1.2em -1.2em; padding-left: 1.2em; padding-bottom: 1.2em; border-bottom: 1px solid lightgray;">Share of population for each index and category<div>
-</div>
-`);
+</div>`);
 
   const graphs_tab = elem(`<div class="tab"></div>`);
   const graphs = elem(`<div id="graphs"></div>`);
@@ -147,7 +142,7 @@ async function ea_summary() {
 
   const summary = {};
 
-  nodata = pop.nodata;
+  const nodata = pop.nodata;
 
   Object.keys(ea_indexes).forEach(idxn => {
     let a = ea_analysis(ea_list_filter_type(idxn), idxn);
@@ -185,8 +180,7 @@ async function ea_summary() {
 <div style="text-align: center; margin: 0 1em; max-width: 150px;">
   <div class="pie-svg-container"></div>
   <div class="indexname">${ea_indexes[idxn]}</div>
-</div>
-`);
+</div>`);
 
     pie.change(0);
     e.querySelector('.pie-svg-container').appendChild(pie.svg);
@@ -203,8 +197,7 @@ async function ea_summary() {
   <div style="background-color: ${s[2]}">40-60</div>
   <div style="background-color: ${s[3]}">60-80</div>
   <div style="background-color: ${s[4]}">80-100</div>
-</div>
-`);
+</div>`);
 
   const table = elem(`
 <table class="summary tab hidden">
@@ -233,8 +226,7 @@ async function ea_summary() {
 <td>${(summary[k][1]).toLocaleString()}</td>
 <td>${(summary[k][2]).toLocaleString()}</td>
 <td>${(summary[k][3]).toLocaleString()}</td>
-<td>${(summary[k][4]).toLocaleString()}</td>
-`;
+<td>${(summary[k][4]).toLocaleString()}</td>`;
 
     tbody.appendChild(tr);
   }
@@ -253,7 +245,8 @@ async function ea_summary() {
 
   ea_modal.set({
     header: "Snapshot",
-    content: content
+    content: content,
+    footer: null
   }).show();
 
   return content;

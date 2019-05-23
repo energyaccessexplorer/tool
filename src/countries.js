@@ -358,7 +358,8 @@ function ea_countries_action_modal(c) {
 
   ea_modal.set({
     header: elem(`<div style="text-transform: uppercase; color: var(--the-white)">${c['country']}</div>`),
-    content: content
+    content: content,
+    footer: null
   }).show();
 };
 

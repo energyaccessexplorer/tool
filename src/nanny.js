@@ -19,14 +19,21 @@ function ea_nanny_pick_element(query, opts) {
   y = el.offsetTop;
   x = el.offsetLeft;
 
+  let body;
+
+  if (opts.message instanceof HTMLElement)
+    body = opts.message;
+  else
+    body = elem(opts.message, 'p');
+
   const marker = elem(`
 <aside class="nanny-marker">
   <span class="nanny-caret"></span>
 
   <p><strong>${opts.title}</strong></p>
-  <p>${opts.message}</p>
 </aside>`);
 
+  marker.appendChild(body);
   document.body.appendChild(marker);
 
   let orient, numx, numy;

@@ -83,8 +83,7 @@ right: 4px;
 background-color: white;
 box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
 border-radius: 4px;
-padding: 16px;
-`;
+padding: 16px;`;
 
   document.body.appendChild(x);
 }

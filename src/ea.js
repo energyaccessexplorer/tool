@@ -391,11 +391,19 @@ Please report this to energyaccessexplorer@wri.org.
 
         if (t.features) {
           const et = ea_mapbox.queryRenderedFeatures(e.point)[0];
+          console.info("Feature Properties:", et.properties);
 
           if (!et) return;
 
           if (et.source === i) {
-            console.log(et);
+            let at;
+
+            if (!t.configuration || !(at = t.configuration.features_attr_map)) {
+              console.warn("Dataset is not configured to display info. (configuration.features_attr_map)");
+              return;
+            }
+
+            if (at) ea_pointer(at, et.properties, e);
             return;
           }
         }

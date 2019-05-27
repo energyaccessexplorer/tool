@@ -364,3 +364,10 @@ function ea_coordinates_raster(coords, bounds, raster) {
 
   return a;
 };
+
+function ea_pointer(dict, prop, event) {
+  const t = document.createElement('table');
+  dict.forEach(e => t.appendChild(elem(`<td>${e.target}</td><td>${prop[e.dataset]}</td>`, 'tr')));
+
+  mapbox_pointer(t, event.originalEvent.pageX, event.originalEvent.pageY)
+};

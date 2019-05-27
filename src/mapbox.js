@@ -187,3 +187,34 @@ function mapbox_change_theme(theme, callback) {
 
   if (theme === "") do_it();
 };
+
+function mapbox_pointer(content, x, y) {
+  let p = document.querySelector('#mapbox-pointer');
+
+  if (!p) {
+    p = elem('<div id="mapbox-pointer">');
+    p.style = `
+position: absolute;
+background-color: white;
+box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+border-radius: 0 4px 4px 4px;
+padding: 16px;`;
+  }
+
+  p.style.left = x + "px";
+  p.style.top  = y + "px";
+
+  if (content instanceof HTMLElement)
+    p.appendChild(content);
+  else
+    p.innerHTML = content;
+
+  document.body.appendChild(p);
+
+  let l;
+
+  document.body.addEventListener('mousemove', (l = function() {
+    p.remove();
+    document.removeEventListener('mousemove', l);
+  }));
+};

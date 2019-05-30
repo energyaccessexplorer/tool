@@ -103,10 +103,7 @@ function ea_analysis(list, type) {
     raster[i] = a;
   }
 
-  // For user-friendlyness, the new raster is "quantised" as it increases the
-  // heatmaps' contrast.
-  //
-  var f = d3.scaleQuantize().domain([min,max]).range(ea_default_color_domain);
+  var f = d3.scaleLinear().domain([min,max]).range([0,1]);
 
   for (var i = 0; i < raster.length; i++) {
     const r = raster[i];

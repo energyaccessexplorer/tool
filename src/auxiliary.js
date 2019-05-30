@@ -145,7 +145,16 @@ async function ea_summary() {
   const nodata = pop.nodata;
 
   Object.keys(ea_indexes).forEach(idxn => {
-    let a = ea_analysis(ea_list_filter_type(idxn), idxn);
+    let raster = ea_analysis(ea_list_filter_type(idxn), idxn);
+
+    var f = d3.scaleQuantize().domain([0,1]).range(ea_default_color_domain);
+
+    let a = new Float32Array(raster.length).fill(-1);
+
+    for (var i = 0; i < raster.length; i++) {
+      const r = raster[i];
+      a[i] = (r === -1) ? -1 : f(r);
+    }
 
     let groups = [0, 0, 0, 0, 0];
 

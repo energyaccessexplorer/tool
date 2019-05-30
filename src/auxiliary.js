@@ -376,7 +376,7 @@ function ea_coordinates_raster(coords, bounds, raster) {
 
 function ea_pointer(dict, prop, event) {
   const t = document.createElement('table');
-  dict.forEach(e => t.appendChild(elem(`<td>${e.target}</td><td>${prop[e.dataset]}</td>`, 'tr')));
+  dict.forEach(e => t.appendChild(elem(`<td><strong>${e.target}</strong></td><td>${prop[e.dataset]}</td>`, 'tr')));
 
   mapbox_pointer(t, event.originalEvent.pageX, event.originalEvent.pageY)
 };

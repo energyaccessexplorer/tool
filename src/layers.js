@@ -222,8 +222,7 @@ function ea_layers_0_100() {
   <div>60</div>
   <div>80</div>
   <div>100</div>
-</div>
-`);
+</div>`);
 };
 
 function ea_layers_lowmidhigh() {
@@ -232,15 +231,13 @@ function ea_layers_lowmidhigh() {
   <div>LOW</div>
   <div>MID</div>
   <div>HIGH</div>
-</div>
-`);
+</div>`);
 };
 
 function ea_layers_min_max(ds) {
   return elem(`
 <div style="display: flex; justify-content: space-between; padding-right: 0.2em; padding-left: 0.2em;">
-  <div>${ds.heatmap.domain.min}</div>
-  <div>${ds.heatmap.domain.max}</div>
-</div>
-`);
+  <div>${ds.heatmap.domain.min * ds.heatmap.factor}</div>
+  <div>${ds.heatmap.domain.max * ds.heatmap.factor}</div>
+</div>`);
 };

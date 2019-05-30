@@ -86,7 +86,7 @@ border-radius: 4px;
 padding: 16px;`;
 
   document.body.appendChild(x);
-}
+};
 
 function mapbox_theme_pick(theme) {
   let t = (theme === "" ? null : theme);

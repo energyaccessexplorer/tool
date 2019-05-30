@@ -176,6 +176,7 @@ async function ea_overlord(msg) {
     let country; await ea_client(`${ea_settings.database}/countries?ccn3=eq.${ccn3}`, 'GET', 1, r => country = r);
 
     /* TODO: these are the global objects. Fix it: remove. */
+    ea_country = country;
     ea_mapbox = null;
     ea_category_tree = country.category_tree;
 

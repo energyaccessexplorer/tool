@@ -210,6 +210,8 @@ Please report this to energyaccessexplorer@wri.org.
           .map(x => x.id)
           .sort((a,b) => (state.inputs.indexOf(a) < state.inputs.indexOf(b)) ? -1 : 1);
 
+    if (!inputs.length) inputs.push('boundaries');
+
     state.set_inputs_param(inputs);
 
     ea_ui_views_init();

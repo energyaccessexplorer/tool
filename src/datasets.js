@@ -247,7 +247,7 @@ Forcing dataset's weight to 1.`);
       this.heatmap.color_stops = cs = ea_default_color_stops;
     else {
       d = Array(cs.length).fill(0).map((x,i) => (0 + i * (1/(cs.length-1))));
-      plotty.addColorScale((c = this.id), cs.reverse(), d);
+      plotty.addColorScale((c = this.id), cs, d);
     }
 
     this.heatmap.color_scale = c;

@@ -258,6 +258,8 @@ async function ea_summary() {
     footer: null
   }).show();
 
+  ea_report();
+
   return content;
 };
 

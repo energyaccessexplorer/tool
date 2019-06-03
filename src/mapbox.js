@@ -132,6 +132,7 @@ function mapbox_setup(bounds) {
   const mapbox = new mapboxgl.Map({
     "container": 'mapbox-container',
     "trackResize": true,
+    "preserveDrawingBuffer": true, // this allows us to get canvas.toDataURL()
     "style": mapbox_theme_pick("")
   });
 

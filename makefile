@@ -63,6 +63,7 @@ build-tool:
 		${SRC}/datasets.js \
 		${SRC}/mapbox.js \
 		${SRC}/nanny.js \
+		${SRC}/report.js \
 		> ${DIST}/tool/main.js
 
 	@cat \

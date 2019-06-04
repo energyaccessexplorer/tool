@@ -125,7 +125,7 @@ function ea_layers_output_elem(t, v, i, x) {
       .domain(ea_default_color_domain)
       .range(ea_default_color_stops)
       .clamp(false)
-  }, 3));
+  }, 3, ea_default_color_domain));
 
   return d;
 };

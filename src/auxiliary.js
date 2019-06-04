@@ -382,3 +382,28 @@ function ea_pointer(dict, prop, event) {
 
   mapbox_pointer(t, event.originalEvent.pageX, event.originalEvent.pageY)
 };
+
+function hex_to_rgba(str) {
+  let c;
+  if (str.match(/^#([A-Fa-f0-9]{3}){1,2}$/)) {
+    c = str.substring(1).split('');
+
+    if (c.length === 3) c = [c[0], c[0], c[1], c[1], c[2], c[2]];
+
+    c = '0x' + c.join('');
+
+    return [(c>>16)&255, (c>>8)&255, c&255, 255];
+  }
+
+  throw new Error("hex_to_rgba: argument doesn't match");
+};
+
+function interval_index(v, arr, clamp) {
+  // TODO: implement non-clamp?
+  //
+  for (let i = 0; i < arr.length-1; i++) {
+    if (v >= arr[i] && v <= arr[i+1]) return i;
+  }
+
+  return -1;
+};

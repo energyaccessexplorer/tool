@@ -247,19 +247,60 @@ Forcing dataset's weight to 1.`);
       this.heatmap.color_stops = cs = ea_default_color_stops;
     else {
       d = Array(cs.length).fill(0).map((x,i) => (0 + i * (1/(cs.length-1))));
-      plotty.addColorScale((c = this.id), cs, d);
     }
 
-    this.heatmap.color_scale = c;
+    {
+      let intervals;
 
-    this.color_scale_fn = _ => {
-      return d3.scaleLinear()
-        .domain(d)
-        .range(cs)
-        .clamp(this.heatmap.clamp || false);
-    };
+      if (this.heatmap.configuration && (intervals = this.heatmap.configuration.intervals)) {
+        let l = intervals.length;
 
-    this.color_scale_svg = ea_svg_color_steps(this.color_scale_fn, 3);
+        let s = d3.scaleLinear()
+            .domain([0,255])
+            .range([this.heatmap.domain.min, this.heatmap.domain.max])
+            .clamp(true);
+
+        const a = new Uint8Array(1024).fill(-1);
+        for (let i = 0; i < 1024; i += 4) {
+          let j = interval_index(s(i), intervals, this.heatmap.clamp);
+
+          if (j === -1) {
+            a[i] = a[i+1] = a[i+2] = a[i+3] = 0;
+            continue;
+          }
+
+          let cj = cs[j];
+
+          let color = hex_to_rgba(cs[j]);
+
+          a[i] = color[0];
+          a[i+1] = color[1];
+          a[i+2] = color[2];
+          a[i+3] = color[3];
+        }
+
+        plotty.colorscales[c = this.id] = a;
+
+        this.heatmap.color_scale = c;
+
+        this.color_scale_fn = _ => (x,i) => cs[i];
+      }
+
+      else {
+        plotty.addColorScale((c = this.id), cs, d);
+
+        this.heatmap.color_scale = c;
+
+        this.color_scale_fn = _ => {
+          return d3.scaleLinear()
+            .domain(d)
+            .range(cs)
+            .clamp(this.heatmap.clamp || false);
+        };
+      }
+    }
+
+    this.color_scale_svg = ea_svg_color_steps(this.color_scale_fn, 3, d);
   };
 
   async show() {

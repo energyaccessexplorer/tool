@@ -283,7 +283,7 @@ Forcing dataset's weight to 1.`);
 
         this.heatmap.color_scale = c;
 
-        this.color_scale_fn = _ => (x,i) => cs[i];
+        this.color_scale_fn = (x,i) => cs[i];
       }
 
       else {
@@ -291,16 +291,14 @@ Forcing dataset's weight to 1.`);
 
         this.heatmap.color_scale = c;
 
-        this.color_scale_fn = _ => {
-          return d3.scaleLinear()
-            .domain(d)
-            .range(cs)
-            .clamp(this.heatmap.clamp || false);
-        };
+        this.color_scale_fn = d3.scaleLinear()
+          .domain(d)
+          .range(cs)
+          .clamp(this.heatmap.clamp || false);
       }
     }
 
-    this.color_scale_svg = ea_svg_color_steps(this.color_scale_fn, 3, d);
+    this.color_scale_svg = ea_svg_color_steps(this.color_scale_fn, d);
   };
 
   async show() {

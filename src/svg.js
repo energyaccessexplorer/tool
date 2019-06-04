@@ -282,11 +282,8 @@ function ea_svg_pie(data, outer, inner, colors, inner_text) {
   };
 };
 
-function ea_svg_color_steps(color_scale, r, steps) {
-  const radius = r || 6,
-        svgheight = (radius * 2) + 2,
-        linewidth = radius * 2,
-        svgmin = radius + 1;
+function ea_svg_color_steps(color_scale, steps, height) {
+  const h = height || 8;
 
   const svg = d3.select(document.createElementNS(d3.namespaces.svg, "svg"))
         .attr('class', 'svg-interval');
@@ -295,16 +292,16 @@ function ea_svg_color_steps(color_scale, r, steps) {
 
   steps.forEach((v,i) => {
     g.append('rect')
-      .attr('fill', color_scale()(v,i))
+      .attr('fill', color_scale(v,i))
       .attr('stroke', 'none')
       .attr('x', `${(100/steps.length) * i}%`)
       .attr('width', `${100/steps.length}%`)
-      .attr('height', svgheight)
+      .attr('height', h);
   });
 
   svg
     .attr('width', "100%")
-    .attr('height', svgheight + 2);
+    .attr('height', h);
 
   return svg.node();
 };

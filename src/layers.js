@@ -120,12 +120,12 @@ function ea_layers_output_elem(t, v, i, x) {
 
   const c = d.querySelector('.layers-element-details');
   c.append(ea_layers_0_100());
-  c.prepend(ea_svg_color_steps(_ => {
-    return d3.scaleLinear()
+  c.prepend(ea_svg_color_steps(
+    d3.scaleLinear()
       .domain(ea_default_color_domain)
       .range(ea_default_color_stops)
-      .clamp(false)
-  }, 3, ea_default_color_domain));
+      .clamp(false),
+    ea_default_color_domain));
 
   return d;
 };

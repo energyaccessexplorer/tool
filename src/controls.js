@@ -386,7 +386,9 @@ function ea_controls_country_setup() {
       select.querySelector('option[value=""]').innerText = "Select a Country";
     });
 
-  select.addEventListener('change', function() { window.location = `./?ccn3=${this.value}`});
+  select.addEventListener('change', function() {
+    location = location.search.replace(/ccn3=[0-9]{3}/, `ccn3=${this.value}`);
+  });
 };
 
 function ea_controls_presets_init(v) {

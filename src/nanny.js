@@ -81,6 +81,8 @@ function ea_nanny_next() {
 };
 
 function ea_nanny_start() {
+  if (typeof ea_nanny_steps === 'undefined') return;
+
   if (ea_state_sync().inputs.length > 1) return;
 
   const w = localStorage.getItem('needs-nanny');

@@ -18,6 +18,8 @@ class DS {
 
     this.unit = e.category.unit;
 
+    this.weight = e.category.weight || 2;
+
     this.metadata = e.metadata;
 
     if (e.category.metadata && (e.category.metadata.why)) {
@@ -37,6 +39,11 @@ class DS {
 
       if (!this.mutant && !this.collection)
         this.gen_color_scale();
+
+      if (this.heatmap) {
+        let hi = this.heatmap.init;
+        if (hi) this.init_domain = [hi.min, hi.max];
+      }
     }
 
     if (e.vectors_file) {
@@ -100,9 +107,6 @@ class DS {
     if (!presetsempty && p) {
       this.weight = p.weight;
       // o.init_domain = [p.min, p.max];
-      this.init_domain = null;
-    } else {
-      this.weight = 2;
       this.init_domain = null;
     }
 

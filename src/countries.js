@@ -348,7 +348,7 @@ function ea_countries_action_modal(c) {
       b.classList.add('selected');
       preset = p;
 
-      window.location = `/maps-and-data/tool?ccn3=${c['ccn3']}&preset=${preset}`;
+      location = `/maps-and-data/tool?ccn3=${c['ccn3']}&preset=${preset}`;
     });
 
     pbtns.appendChild(b);

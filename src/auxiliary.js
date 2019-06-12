@@ -376,7 +376,7 @@ function ea_coordinates_raster(coords, bounds, raster) {
   return a;
 };
 
-function ea_pointer(dict, prop, event) {
+function table_pointer(dict, prop, event) {
   const t = document.createElement('table');
   dict.forEach(e => t.appendChild(elem(`<td><strong>${e.target}</strong></td><td>${prop[e.dataset]}</td>`, 'tr')));
 

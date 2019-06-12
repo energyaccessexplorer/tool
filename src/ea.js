@@ -377,23 +377,25 @@ Please report this to energyaccessexplorer@wri.org.
       const b = DSTable['boundaries'];
       let nodata = b.nodata;
 
-      let r = null;
+      let t;
 
       if (state.mode === "outputs") {
-        r = ea_mapbox.getSource('canvas-source').raster;
+        t = {
+          raster: ea_mapbox.getSource('canvas-source').raster,
+          name_long: "Analysis"
+        }
         nodata = -1;
       }
 
       else {
         const i = state.inputs[0];
-        const t = DSTable[i];
-        r = t.raster;
+        t = DS.named(i);
 
         if (t.features) {
           const et = ea_mapbox.queryRenderedFeatures(e.point)[0];
-          console.info("Feature Properties:", et.properties);
-
           if (!et) return;
+
+          console.info("Feature Properties:", et.properties);
 
           if (et.source === i) {
             let at;
@@ -403,9 +405,13 @@ Please report this to energyaccessexplorer@wri.org.
               return;
             }
 
-            if (at) ea_pointer(at, et.properties, e);
-            return;
+            if (at) table_pointer(at, et.properties, e);
           }
+
+          return;
+        }
+        else if (t.raster) {
+          // go on... next part applies to outputs.
         }
       }
 
@@ -413,14 +419,21 @@ Please report this to energyaccessexplorer@wri.org.
         [e.lngLat.lng, e.lngLat.lat],
         ea_mapbox.coords,
         {
-          array: r,
+          array: t.raster,
           width: b.width,
           height: b.height,
           nodata: nodata
         }
       );
 
-      console.log(rc);
+      if (rc.value) {
+        table_pointer([{
+          "target": t.name_long,
+          "dataset": "value"
+        }], {
+          "value": `${(rc.value).toFixed(2)} <code>${t.unit || ''}</code>`
+        }, e);
+      }
 
       break;
     }

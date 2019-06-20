@@ -266,7 +266,7 @@ Forcing dataset's weight to 1.`);
 
         const a = new Uint8Array(1024).fill(-1);
         for (let i = 0; i < 1024; i += 4) {
-          let j = interval_index(s(i), intervals, this.heatmap.clamp);
+          let j = interval_index(s(i/4), intervals, this.heatmap.clamp);
 
           if (j === -1) {
             a[i] = a[i+1] = a[i+2] = a[i+3] = 0;

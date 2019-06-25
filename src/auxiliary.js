@@ -337,7 +337,7 @@ function ea_plot_active_analysis(type, cs = 'ea') {
 };
 
 /*
- * ea_coordinates_in_raster
+ * ea_coordinates_raster
  *
  * Transform a set of coordinates to the "relative position" inside a raster
  * that is bound to an area

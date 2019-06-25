@@ -16,9 +16,6 @@ function ea_countries_setup() {
   maparea.style['width'] = width + "px";
   maparea.style['height'] = height + "px";
 
-  const cf  = document.querySelector('#country-float');
-  const cfn = cf.querySelector('#country-float-name');
-
   let curr_c = null;
 
   // We save a copy of this. Fetching from carto makes offline development
@@ -163,27 +160,15 @@ function ea_countries_setup() {
 
           if (!x) return v;
 
-          cf.style.display = '';
-          cfn.style.display = '';
-
           ea_map.svg.select(`.land#land-${v}`).classed('active', true);
 
           if (curr_c === x) return;
           else curr_c = x;
 
-          cfn.value = x.name.common;
-
-          const px = Math.min(window.innerWidth - cf.offsetWidth - 105, (d3.event.pageX + 7));
-          const py = Math.min(window.innerHeight - cf.offsetHeight, (d3.event.pageY + 15));
-
-          cf.style.left = `${ px }px`;
-          cf.style.top =  `${ py }px`;
-
           return v;
         },
         "mouseleave": v => {
           ea_map.svg.select(`.land#land-${v}`).classed('active', false);
-          cf.style.display = 'none';
         },
       });
 
@@ -205,7 +190,7 @@ function ea_countries_setup() {
         .type('error')
         .title(error)();
 
-      console.log(error);
+      console.error(error);
     });
 };
 

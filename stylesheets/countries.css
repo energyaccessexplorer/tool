@@ -26,22 +26,6 @@ body {
   padding: 1em;
 }
 
-#country-float {
-  display: flex;
-  position: absolute;
-
-  z-index: 16;
-  pointer-events: none;
-}
-
-#country-float-name {
-  font-size: 2em;
-  padding: 0.5em;
-  height: 1em;
-  text-align: center;
-  opacity: 0.7;
-}
-
 #country-search-input {
   color: var(--the-black);
   background-color: var(--the-white);

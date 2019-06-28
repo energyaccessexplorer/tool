@@ -24,7 +24,7 @@ LIB = ${DIST}/lib
 
 default: build
 
-build: build-tool build-countries
+build: build-tool build-countries build-select
 
 start:
 	(cd ${DIST} && ${STATIC_SERVER}) &
@@ -99,6 +99,32 @@ build-countries:
 		${CSS}/maparea.css \
 		${CSS}/views.css \
 		> ${DIST}/countries/main.css
+
+build-select:
+	@echo "Building select"
+	@mkdir -p ${DIST}/select
+	@cp ${VIEWS}/select.html ${DIST}/select/index.html
+
+	@cat \
+		${LIB}/d3.js \
+		${LIB}/topojson.js \
+		${LIB}/flash.js \
+		${LIB}/modal.js \
+		> ${DIST}/select/libs.js
+
+	@echo -n "const ea_settings = " | cat - \
+		settings.json \
+		${SRC}/svg.js \
+		${SRC}/ui.js \
+		${SRC}/countries.js \
+		${SRC}/select.js \
+		> ${DIST}/select/main.js
+
+	@cat \
+		${CSS}/select.css \
+		${CSS}/maparea.css \
+		${CSS}/views.css \
+		> ${DIST}/select/main.css
 
 synced:
 	@rsync -OPrv \

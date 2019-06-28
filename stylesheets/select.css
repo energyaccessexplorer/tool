@@ -1,0 +1,21 @@
+body {
+  overflow: hidden;
+}
+
+#playground {
+  width: 1200px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.country-item {
+  font-size: 1.5em;
+  text-align: center;
+  cursor: pointer;
+  display: inline-block;
+  width: 300px;
+}
+
+.country-item svg {
+  filter: drop-shadow(0px 0px 1.5px #000);
+}

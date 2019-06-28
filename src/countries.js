@@ -342,7 +342,7 @@ function ea_countries_action_modal(c) {
   content.appendChild(pbtns);
 
   ea_modal.set({
-    header: elem(`<div style="text-transform: uppercase; color: var(--the-white)">${c['country']}</div>`),
+    header: elem(`<div style="text-transform: uppercase; color: var(--the-white)">${c['name']['common']}</div>`),
     content: content,
     footer: null
   }).show();

@@ -275,11 +275,13 @@ Please report this to energyaccessexplorer@wri.org.
 
     state.set_preset_param(null);
 
-    ds.filter_set();
+    ds.filter_set(ds.subid);
 
-    ds.active ?
-      (resort && state.inputs.unshift(ds.id)) :
-      state.inputs.splice(state.inputs.indexOf(ds.id), 1); // REMOVE()
+    if (!ds.subid) {
+      ds.active ?
+        (resort && state.inputs.unshift(ds.id)) :
+        state.inputs.splice(state.inputs.indexOf(ds.id), 1); // REMOVE()
+    }
 
     const inputs = [...new Set(state.inputs)]; // UNIQUE()
 

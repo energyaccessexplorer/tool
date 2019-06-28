@@ -4,6 +4,8 @@ class DS {
   constructor(e) {
     this.id = e.category.name;
 
+    this.category = e.category;
+
     this.name_long = (e.configuration && e.configuration.name_override) ?
       e.configuration.name_override :
       e.category.name_long;
@@ -36,6 +38,8 @@ class DS {
       this.heatmap = e.category.heatmap
       this.heatmap.endpoint = e.heatmap_file.endpoint;
       this.heatmap.parse = ea_datasets_tiff;
+
+      this.multifilter = !!(this.heatmap && this.heatmap.scale === 'multi-key-delta');
 
       if (!this.mutant && !this.collection)
         this.gen_color_scale();
@@ -75,6 +79,8 @@ class DS {
       this.csv = e.configuration.csv;
       this.csv.endpoint = e.csv_file.endpoint;
       this.csv.parse = ea_datasets_csv;
+
+      if (this.csv.options) this.filter_option = Object.keys(this.csv.options)[0];
     }
 
     this.presets = {};
@@ -154,12 +160,42 @@ class DS {
     if (!this.collection) throw `${this.id} is not a collection. Bye.`
   };
 
-  filter_set() {
-    if (!this.filter_option) return;
+  multifilter_init() {
+    for (let v in this.csv.options) {
+      // we can do this because category is plain JSON, not javascript.
+      const cat = JSON.parse(JSON.stringify(this.category));
+      cat.name = this.id + "-" + v;
+
+      let d = new DS({ category: cat });
+
+      d.init(false, null);
+
+      d.heatmap = this.heatmap;
+      d.vectors = this.vectors;
+      d.csv = this.csv;
+
+      d.subid = v;
+      d.parent = this;
+
+      DSTable[cat.name] = d;
+    };
+  };
+
+  filter_set(o) {
+    if (this.subid) {
+      this.parent.filter_set(o);
+      return;
+    }
+
+    if (o === this.filter_option) return;
+
+    if (o)
+      this.filter_option = o;
+    else
+      o = Object.keys(this.csv.options)[0];
 
     if (this.features) {
-      const so = this.filter_option;
-      const cso = this.configuration.polygons[so]
+      const cso = this.configuration.polygons[o]
 
       const min = Math.min.apply(null, this.features.features.map(f => f.properties[cso]));
       const max = Math.max.apply(null, this.features.features.map(f => f.properties[cso]));
@@ -228,6 +264,29 @@ Forcing dataset's weight to 1.`);
         if (!z) return -1;
 
         return (z[o] < t[0] || z[o] > t[1]) ? -1 : 1;
+      };
+      break;
+    }
+
+    case 'multi-key-delta': {
+      let bs = DS.list.filter(d => d.id.match(new RegExp(`^${this.id}-`)));
+
+      s = x => {
+        let z = this.table[x];
+        if (!z) return -1;
+
+        let a = 0;
+
+        for (let b of bs) {
+          if (a === -1) return a;
+
+          let bo = b.subid;
+          let to = b.tmp_domain;
+
+          a = (z[bo] < to[0] || z[bo] > to[1]) ? -1 : 1;
+        }
+
+        return a;
       };
       break;
     }
@@ -417,6 +476,7 @@ async function ea_datasets_list_init(country_id, inputs, preset) {
   //
   DS.list.filter(d => d.mutant).forEach(d => d.mutant_init());
   DS.list.filter(d => d.collection).forEach(d => d.collection_init());
+  DS.list.filter(d => d.multifilter).forEach(d => d.multifilter_init());
 
   return DS.list;
 };
@@ -641,7 +701,7 @@ async function ea_datasets_polygons() {
     }
 
     if (!ea_mapbox.getLayer(this.id)) {
-      this.filter_set();
+      this.filter_set(this.subid);
 
       ea_mapbox.addLayer({
         "id": this.id,

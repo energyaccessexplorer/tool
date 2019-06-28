@@ -39,9 +39,8 @@ function ea_controls(ds) {
     controls.appendChild(weight_group.elem);
     break;
 
-  case "boundaries":
+  case "boundaries-temp-disabled": // NOTE: left as a reference...
     range_group = ea_controls_range(ds, (ds.unit || 'percentage'));
-
 
     const o = ea_controls_options(ds);
     if (o) {
@@ -50,6 +49,21 @@ function ea_controls(ds) {
     }
     else {
       controls.remove();
+    }
+
+    break;
+
+  case "boundaries":
+    for (let v in ds.csv.options) {
+      let d = DS.named(ds.id + "-" + v);
+
+      range_group = ea_controls_range(d, (d.unit || 'percentage'));
+
+      let sb = elem('<div style="display: flex; justify-content: space-between; padding: 0.5em 3em;">');
+      sb.append(elem(`<div>${ds.csv.options[v]}</div>`));
+      sb.append(range_group.elem);
+
+      controls.appendChild(sb);
     }
 
     break;

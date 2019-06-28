@@ -174,8 +174,6 @@
 
 #controls-boundaries {
   width: 100%;
-  display: flex;
-  min-height: 153px;
 }
 
 #controls-boundaries .svg-checkbox {

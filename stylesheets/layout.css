@@ -54,6 +54,41 @@ body {
 #layers-list {
   max-height: 475px !important;
   overflow-y: scroll;
+  padding-bottom: 3em !important;
+}
+
+#drawer {
+  border-top: 1px solid lightgray;
+  position: absolute;
+  padding: 1em;
+  bottom: 0;
+  right: 0;
+  color: #141414;
+  fill: #141414;
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-around;
+  background-color: #F8F8F8;
+}
+
+#drawer-message {
+  display: none;
+  position: absolute;
+  background-color: #141414;
+  right: 0;
+  bottom: 0;
+  padding-right: 2em;
+}
+
+#drawer-message p {
+  color: #f1f1f1;
+  white-space: pre;
+}
+
+#drawer span:hover #drawer-message {
+  display: block;
 }
 
 div#mapbox-container,

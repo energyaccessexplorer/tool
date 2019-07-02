@@ -138,7 +138,7 @@ function ea_layers_inputs(list) {
 
   const ldc = list.map(i => DS.named(i));
 
-  layers_list.innerHTML = "";
+  elem_empty(layers_list);
 
   ldc.forEach(ds => layers_list.appendChild(ea_layers_input_elem(ds)));
 

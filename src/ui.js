@@ -237,3 +237,20 @@ function elem(str, p) {
 
   return p ? d : d.firstElementChild;
 };
+
+
+/*
+ * elem_empty
+ *
+ * Remove elements children one by one. This is supposed to be faster
+ * than memory safer than `el.innerHTML = ""`.
+ *
+ * @param "el" HTMLElement.
+ */
+
+function elem_empty(e) {
+  if (e instanceof HTMLElement)
+    while (e.lastChild) e.removeChild(e.lastChild);
+  else
+    throw "Argument: argument is not HTMLElment";
+};

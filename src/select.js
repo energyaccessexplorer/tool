@@ -67,13 +67,13 @@ function ea_select_setup() {
       for (let co of countries_online) {
         let ko = countries.find(c => +c.ccn3 === co.ccn3);
         let d = elem(`
-<div class="country-item"
+<div class="country-item" ripple
      iso3="${ko.ccn3}">
   <h2 class="country-name">${ko.name.common}</h2>
 </div>`);
 
         d.addEventListener('mouseup', function() {
-          ea_countries_action_modal(countries.find(c => c.ccn3 === ko.ccn3));
+          setTimeout(_ => ea_countries_action_modal(countries.find(c => c.ccn3 === ko.ccn3)), 350);
         });
 
         d.append(ea_select_topo_flag(co))

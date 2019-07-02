@@ -101,7 +101,7 @@ function ea_svg_radio(init, callback) {
   return svg.node();
 };
 
-function ea_svg_range_steps(steps, init, drag_callback, end_callback, is_weight) {
+function ea_svg_range_steps(steps, init, drag_callback, end_callback) {
   const radius = 5,
         svgwidth = 256,
         svgheight = (radius * 2) + 2,
@@ -117,7 +117,6 @@ function ea_svg_range_steps(steps, init, drag_callback, end_callback, is_weight)
 
   const g = svg.append('g');
 
-  const marked = g.append('rect');
   const gutter = g.append('rect');
 
   const c1 = g.append('circle');
@@ -126,23 +125,14 @@ function ea_svg_range_steps(steps, init, drag_callback, end_callback, is_weight)
     .attr('width', svgwidth + 2)
     .attr('height', svgheight + 2);
 
-  marked
-    .attr('stroke', 'none')
-    .attr('rx', radius)
-    .attr('ry', radius)
-    .attr('x', 1)
-    .attr('y', 1)
-    .attr('height', (is_weight ? 0 : svgheight - 2));
-
   gutter
-    .attr('stroke', (is_weight ? 'none' : 'white'))
-    .attr('fill', (is_weight ? 'lightgray' : 'transparent'))
+    .attr('stroke', 'black')
+    .attr('stroke-width', 0.1)
+    .attr('fill', 'transparent')
     .attr('x', 1)
-    .attr('y', (is_weight ? svgheight/2 : 1))
-    .attr('rx', (is_weight ? 0 : radius))
-    .attr('ry', (is_weight ? 0 : radius))
+    .attr('y', (svgheight / 2) - 1)
     .attr('width', svgwidth - 2)
-    .attr('height', (is_weight ? 1 : svgheight - 2));
+    .attr('height', 1);
 
   steps.forEach(s => {
     g.append('rect')
@@ -150,13 +140,13 @@ function ea_svg_range_steps(steps, init, drag_callback, end_callback, is_weight)
       .attr('y', radius - 2)
       .attr('fill', 'lightgray')
       .attr('stroke', 'none')
-      .attr('width', 1)
+      .attr('width', 0.5)
       .attr('height', radius + 2);
   });
 
   c1
     .attr('r', radius)
-    .attr('cy', svgheight/2 + 1)
+    .attr('cy', svgheight/2)
     .attr('fill', getComputedStyle(document.body).getPropertyValue('--the-green'))
     .attr('stroke', 'none')
     .style('cursor', 'grab')
@@ -165,20 +155,12 @@ function ea_svg_range_steps(steps, init, drag_callback, end_callback, is_weight)
   let x_position;
 
   function dragged(x) {
-    const cx0 = denorm(norm(x));
-
-    c1.attr('cx', cx0);
-    marked.attr('width', cx0);
-
+    c1.attr('cx', denorm(norm(x)));
     if (typeof drag_callback === 'function') drag_callback(norm(x));
   };
 
   function change(v) {
-    const cx0 = denorm(v);
-
-    c1.attr('cx', cx0);
-    marked.attr('width', cx0);
-
+    c1.attr('cx', denorm(v));
     if (typeof drag_callback === 'function') drag_callback(v);
   };
 
@@ -340,7 +322,7 @@ function ea_svg_interval(single, init, callback1, callback2, end_callback) {
     .attr('fill', fill)
     .attr('stroke', 'none')
     .attr('x', 1)
-    .attr('y', (svgheight / 2) - 1)
+    .attr('y', (svgheight / 2) - 1.5)
     .attr('height', 2);
 
   gutter

@@ -357,8 +357,7 @@ function ea_controls_weight(ds, init) {
         "target": ds,
         "caller": "ea_controls_weight",
       });
-    },
-    ("weight" === "weight")
+    }
   );
 
   container.appendChild(weight_control.svg);

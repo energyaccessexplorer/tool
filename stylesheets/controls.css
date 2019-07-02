@@ -39,7 +39,19 @@
   top: 0;
   height: 100%;
   width: 100%;
-  text-align: center;
+  text-align: left;
+}
+
+.controls .loading .spinner {
+  display: inline-block;
+  border: 1px solid #333;
+  border-radius: 50%;
+  border-top: 1px solid #f1f1f1;
+  background-color: #aaaaaa;
+  animation: spin 2s linear infinite;
+  width: 20px;
+  height: 20px;
+  margin: 0.5em;
 }
 
 .controls .svg-checkbox {

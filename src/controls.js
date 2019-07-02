@@ -383,24 +383,35 @@ function ea_controls_collection_list(ds) {
 };
 
 function ea_controls_country_setup() {
-  const select = document.querySelector('#controls-country');
+  const datalist = document.querySelector('datalist#controls-country');
+  const input = document.querySelector('input[list="controls-country"]');
 
   let country_list = null;
+
+  const curr_ccn3 = +location.get_query_param('ccn3');
+
+  function set_default() {
+    const c = country_list.find(c => c.ccn3 === curr_ccn3);
+    if (c) input.value = c.name;
+  };
 
   fetch(ea_settings.database + '/countries?select=name,cca3,ccn3&online')
     .then(r => r.json())
     .then(j => j.sort((a,b) => a['name'] > b['name'] ? 1 : -1))
     .then(j => {
       country_list = j;
-      j.forEach(c => select.appendChild(elem(`<option value="${c.ccn3}">${c.name}</option>`)));
-    })
-    .then(_ => {
-      select.value = location.get_query_param('ccn3');
-      select.querySelector('option[value=""]').innerText = "Select a Country";
+      j.forEach(c => datalist.appendChild(elem(`<option value="${c.name}"></option>`)));
+      set_default();
     });
 
-  select.addEventListener('change', function() {
-    location = location.search.replace(/ccn3=[0-9]{3}/, `ccn3=${this.value}`);
+  input.addEventListener('focus', function() { this.value = ""; });
+
+  input.addEventListener('blur', set_default);
+
+  input.addEventListener('change', function() {
+    const c = country_list.find(c => c.name === this.value);
+    if (c && curr_ccn3 !== c.ccn3)
+      location = location.search.replace(/ccn3=[0-9]{3}/, `ccn3=${c.ccn3}`);
   });
 };
 

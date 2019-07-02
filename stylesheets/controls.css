@@ -216,7 +216,7 @@
 }
 
 .controls-select-container {
-  flex: 0 1 50%;
+  width: 100%;
   box-sizing: border-box;
 
   font-size: 1.2em;
@@ -224,10 +224,25 @@
   color: var(--the-white);
   background-color: var(--the-green);
 
-  padding: 10px 15px;
+  padding: 10px 0;
+  text-align: center;
 }
 
-select#controls-country,
+input[list="controls-country"] {
+  font-size: 1.7em;
+  padding: 0.5em 1em;
+
+  font-family: without-serif;
+  font-weight: lighter;
+
+  text-align: center;
+  margin: auto;
+
+  color: white;
+  background-color: var(--the-green);
+  border: none;
+}
+
 select#controls-preset {
   -webkit-appearance: none;
   appearance: none;
@@ -247,7 +262,6 @@ select#controls-preset {
   background-color: var(--the-green);
 }
 
-select#controls-country option,
 select#controls-preset option {
   background-color: var(--the-white);
   color: var(--the-color);

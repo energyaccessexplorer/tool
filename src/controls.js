@@ -93,7 +93,7 @@ function ea_controls(ds) {
 function ea_controls_elem(ds) {
   const controls = elem(`
 <div id="controls-${ds.id}" class="controls">
-  <div class="controls-dataset-header"></div>
+  <div class="controls-dataset-header" ripple></div>
   <div class="controls-dataset-content"></div>
 </div>`);
 

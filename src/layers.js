@@ -39,10 +39,10 @@ function ea_layers_init() {
       });
 };
 
-function ea_layers_elem(bind, cls, title) {
+function ea_layers_elem(bind, cls, title, attrs) {
   return elem(`
 <li bind="${bind}"
-    class="layers-element ${cls}">
+    class="layers-element ${cls}" ${attrs || ''}>
 
   <div class="layers-element-content">
     <div class="layers-element-header">
@@ -104,7 +104,7 @@ function ea_layers_input_elem(ds) {
 };
 
 function ea_layers_output_elem(t, v, i, x) {
-  const d = ea_layers_elem(t, 'outputs-layers', v);
+  const d = ea_layers_elem(t, 'outputs-layers', v, 'ripple');
 
   d.prepend(elem('<div class="layers-element-radio"></div>'));
 

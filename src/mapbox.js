@@ -78,14 +78,14 @@ function mapbox_theme_control_popup(btn) {
 
   x.style = `
 position: absolute;
-top: ${r.top + 36}px;
-right: 4px;
+top: 120px;
+right: 10px;
 background-color: white;
 box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
 border-radius: 4px;
 padding: 16px;`;
 
-  document.body.appendChild(x);
+  document.querySelector('#playground #visual').appendChild(x);
 };
 
 function mapbox_theme_pick(theme) {

@@ -47,16 +47,15 @@ body {
 }
 
 #layers {
-  position: fixed;
+  position: relative;
   width: 500px;
-  bottom: 1em;
-  right: 1em;
+  background-color: white;
 }
 
 #layers-list {
-  max-height: 475px !important;
   overflow-y: scroll;
-  padding-bottom: 3em !important;
+  box-shadow: 3px 1px 5px rgba(0,0,0,0.3);
+  z-index: 1;
 }
 
 #drawer {

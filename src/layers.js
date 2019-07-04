@@ -6,22 +6,6 @@ function ea_layers_init() {
   const layers = document.querySelector('#layers');
   const list = layers.querySelector('#layers-list');
 
-  const min_arrow = elem(`
-<div style="display: flex; justify-content: flex-end;">
-  <div style="background-color: rgba(0,0,0,0.7); padding: 0.2em 0.6em; color: white; fill: white; cursor: pointer;">${ea_svg_arrow()}</div>
-</div>
-`);
-
-  let v = true;
-
-  min_arrow.addEventListener('mouseup', function(e) {
-    v = !v;
-    list.style.display = v ? '' : 'none';
-    min_arrow.style.transform = v ? "scale(1, 1)" : "scale(1, -1)";
-  });
-
-  layers.prepend(min_arrow);
-
   sortable('#layers-list', {
     "items": 'li.layers-element',
     "forcePlaceholderSize": true,

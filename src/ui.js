@@ -85,6 +85,14 @@ function ea_ui_layout_map(bounds) {
   const maparea = document.querySelector('#maparea');
   maparea.style['height'] = height + "px";
 
+  const lh = window.innerHeight - (
+    document.querySelector('nav').clientHeight +
+      document.querySelector('#views').clientHeight +
+      300 + document.querySelector('#drawer').clientHeight
+  );
+
+  document.querySelector('#layers-list').style['height'] = `${lh}px`;
+
   return {
     width: width,
     height: height

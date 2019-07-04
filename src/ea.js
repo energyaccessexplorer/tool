@@ -170,8 +170,6 @@ async function ea_overlord(msg) {
 
   switch (msg.type) {
   case "init": {
-    document.body.append(elem('<canvas id="output" style="display: none;">'));
-
     const ccn3 = location.get_query_param('ccn3');
     let country; await ea_client(`${ea_settings.database}/countries?ccn3=eq.${ccn3}`, 'GET', 1, r => country = r);
 
@@ -265,6 +263,8 @@ Please report this to energyaccessexplorer@wri.org.
       throw `Argument Error: Overlord: Could not set/find the mode '${state.mode}'.`;
     }
 
+    document.querySelector('#canvas-output-container').style.visibility = (t === 'inputs') ? 'visible' : 'hidden';
+
     break;
   }
 
@@ -298,6 +298,8 @@ Please report this to energyaccessexplorer@wri.org.
       ea_layers_inputs(inputs);
 
       if (resort) ds.raise();
+
+      ea_plot_active_analysis(state.output);
     }
 
     else {

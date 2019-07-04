@@ -319,6 +319,8 @@ function ea_plot_active_analysis(type, cs = 'ea') {
   const raster = ea_analysis(list, type);
   ea_canvas_plot(raster);
 
+  document.querySelector('#canvas-output-title').innerText = ea_indexes[type];
+
   // 'animate' is set to false on mapbox's configuration, since we don't want
   // mapbox eating the CPU at 60FPS for nothing.
   //

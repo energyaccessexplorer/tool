@@ -112,3 +112,20 @@ svg#svg-map {
 #mapbox-theme-control-popup .radio-group + .radio-group {
   margin-top: 8px;
 }
+
+#canvas-output-container {
+  height: 300px;
+  margin-top: 3px;
+  box-sizing: border-box;
+  z-index: 0;
+  text-align: center;
+}
+
+#canvas-output-title {
+  padding: 0.7em 1em;
+  text-align: left;
+}
+
+canvas#output {
+  height: 100%;
+}

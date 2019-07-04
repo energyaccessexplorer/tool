@@ -27,6 +27,8 @@ body {
 #visual {
   flex: 1 0;
   flex-flow: row nowrap;
+
+  position: relative;
 }
 
 #views {

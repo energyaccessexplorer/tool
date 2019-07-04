@@ -177,8 +177,7 @@ function ea_layers_outputs(target) {
     let ler = node.querySelector('.layers-element-radio');
     ler.appendChild(ea_svg_radio(t === target));
 
-    node.querySelector('.layers-element-radio svg').addEventListener('mouseup', _ => trigger_this.call(node));
-    node.querySelector('.layers-element-title').addEventListener('mouseup', _ => trigger_this.call(node));
+    node.addEventListener('mouseup', _ => trigger_this.call(node));
 
     layers_list.appendChild(node);
 

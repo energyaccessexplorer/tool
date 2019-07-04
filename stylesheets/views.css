@@ -160,7 +160,7 @@ dialog .close {
 }
 
 dialog content {
-  padding: 1.2em;
+  padding: 1.7em !important;
 }
 
 dialog pre {

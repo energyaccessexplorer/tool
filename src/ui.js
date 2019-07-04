@@ -96,22 +96,23 @@ function ea_ui_views_init() {
 
   Object.keys(ea_views).forEach(v => {
     const btn = elem(`
-<div class="view">
+<div class="view" ripple>
   <div class="view-name">${ea_views[v]['name']}</div>
-  <div class="view-description">${ea_views[v]['description']}</div>
 </div>
 `);
 
     btn.addEventListener('mouseup', function(e) {
       el.querySelectorAll('.view').forEach(e => e.classList.remove('active'));
 
-      btn.classList.add('active');
+      setTimeout(_ => {
+        ea_overlord({
+          "type": "mode",
+          "target": v,
+          "caller": "ea_views_init",
+        });
 
-      ea_overlord({
-        "type": "mode",
-        "target": v,
-        "caller": "ea_views_init",
-      });
+        btn.classList.add('active');
+      }, 100);
     });
 
     if (location.get_query_param('mode') === v) btn.classList.add('active');
@@ -237,7 +238,6 @@ function elem(str, p) {
 
   return p ? d : d.firstElementChild;
 };
-
 
 /*
  * elem_empty

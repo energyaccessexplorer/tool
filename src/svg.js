@@ -195,6 +195,7 @@ function ea_svg_pie(data, outer, inner, colors, inner_text) {
         .outerRadius(outer - (outer/15));
 
   let svg = d3.select(document.createElementNS(d3.namespaces.svg, "svg"))
+      .attr('class', 'svg-pie')
       .attr("width", width)
       .attr("height", height);
 

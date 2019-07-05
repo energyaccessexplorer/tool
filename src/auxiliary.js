@@ -313,13 +313,15 @@ function ea_list_filter_type(type) {
  * @param "cs" string. Default color_scale to 'ea'.
  */
 
-function ea_plot_active_analysis(type, cs = 'ea') {
+async function ea_plot_active_analysis(type, cs = 'ea') {
   const list = ea_list_filter_type(type);
 
-  const raster = ea_analysis(list, type);
+  const raster = await ea_analysis(list, type);
   ea_canvas_plot(raster);
 
   document.querySelector('#canvas-output-title').innerText = ea_indexes[type];
+  document.querySelector('#index-graphs-title').innerText = ea_indexes[type];
+  document.querySelector('#index-graphs-description').innerText = ea_indexes_descriptions[type];
 
   // 'animate' is set to false on mapbox's configuration, since we don't want
   // mapbox eating the CPU at 60FPS for nothing.
@@ -331,6 +333,8 @@ function ea_plot_active_analysis(type, cs = 'ea') {
     canvas_source.play();
     canvas_source.pause();
   }
+
+  return raster;
 };
 
 /*

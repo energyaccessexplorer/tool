@@ -20,6 +20,7 @@ h1, h2, h3 {
   background-color: var(--the-white) !important;
 }
 
+#index-graphs-title,
 #views .view-name {
   font-weight: bold;
   text-transform: uppercase;

@@ -134,6 +134,7 @@ svg#svg-map {
   text-align: center;
 }
 
+#index-graphs-title,
 #canvas-output-title {
   padding: 0.7em 1em;
   text-align: left;

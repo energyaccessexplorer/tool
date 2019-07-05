@@ -213,6 +213,7 @@ Please report this to energyaccessexplorer@wri.org.
     ea_ui_views_init();
 
     ea_layers_init();
+    ea_indexes_init();
 
     ea_controls_country_setup();
     ea_controls_presets_init(state.preset);
@@ -244,7 +245,7 @@ Please report this to energyaccessexplorer@wri.org.
         let x; if (x = DS.named(i)) x.hide();
       });
 
-      ea_plot_active_analysis(state.output);
+      ea_plot_active_analysis(state.output).then(raster => ea_indexes_graphs(raster));
 
       ea_mapbox.setLayoutProperty('canvas-layer', 'visibility', 'visible');
     }
@@ -288,8 +289,8 @@ Please report this to energyaccessexplorer@wri.org.
     if (state.mode === "outputs") {
       await ds.turn(ds.active, false);
 
-      ea_plot_active_analysis(state.output);
       ea_indexes_list(state.output);
+      ea_plot_active_analysis(state.output).then(raster => ea_indexes_graphs(raster));
     }
 
     else if (state.mode === "inputs") {
@@ -314,8 +315,8 @@ Please report this to energyaccessexplorer@wri.org.
 
   case "index": {
     if (state.mode === "outputs") {
-      ea_plot_active_analysis(msg.target);
       state.set_output_param(msg.target);
+      ea_plot_active_analysis(msg.target).then(raster => ea_indexes_graphs(raster));
     }
 
     else {

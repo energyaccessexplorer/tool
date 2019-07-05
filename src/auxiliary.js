@@ -404,3 +404,8 @@ function interval_index(v, arr, clamp) {
 
   return -1;
 };
+
+function right_pane(t) {
+  document.querySelector('#layers').style.display = (t === 'inputs') ? '' : 'none';
+  document.querySelector('#indexes-pane').style.display = (t === 'outputs') ? '' : 'none';
+};

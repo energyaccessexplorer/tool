@@ -23,10 +23,13 @@ function ea_layers_init() {
       });
 };
 
-function ea_layers_elem(bind, cls, title, attrs) {
-  return elem(`
-<li bind="${bind}"
-    class="layers-element ${cls}" ${attrs || ''}>
+function ea_layers_elem(ds) {
+  const title = ds.name_long + (ds.unit ? ` (${ ds.unit })` : '');
+
+  const d = elem(`
+<li bind="${ds.id}"
+    class="layers-element">
+  <div class="layers-element-handle">${ea_svg_layer_handle()}</div>
 
   <div class="layers-element-content">
     <div class="layers-element-header">
@@ -38,12 +41,6 @@ function ea_layers_elem(bind, cls, title, attrs) {
     <div class="layers-element-details"></div>
   </div>
 </li>`);
-};
-
-function ea_layers_input_elem(ds) {
-  const d = ea_layers_elem(ds.id, '', ds.name_long + (ds.unit ? ` (${ ds.unit })` : ''));
-
-  d.prepend(elem(`<div class="layers-element-handle">${ea_svg_layer_handle()}</div>`));
 
   let c = d.querySelector('.layers-element-details');
   let lec = d.querySelector('.layers-element-controls');
@@ -87,33 +84,6 @@ function ea_layers_input_elem(ds) {
   return d;
 };
 
-function ea_layers_output_elem(t, v, i, x) {
-  const d = ea_layers_elem(t, 'outputs-layers', v, 'ripple');
-
-  d.prepend(elem('<div class="layers-element-radio"></div>'));
-
-  const h = d.querySelector('.layers-element-header');
-  h.append(elem(`<div class="layers-element-index-description">${x}</div>`));
-
-  const u = elem('<div class="layers-element-useless">What does this mean?</div>');
-  h.insertBefore(u, d.querySelector('.layers-element-controls'));
-
-  const dli = elem(`<span class="layer-info">&nbsp;&nbsp;&nbsp;${ea_svg_info()}</span>`);
-  dli.addEventListener('mouseup', _ => ea_ui_index_modal(t));
-  u.appendChild(dli);
-
-  const c = d.querySelector('.layers-element-details');
-  c.append(ea_layers_0_100());
-  c.prepend(ea_svg_color_steps(
-    d3.scaleLinear()
-      .domain(ea_default_color_domain)
-      .range(ea_default_color_stops)
-      .clamp(false),
-    ea_default_color_domain));
-
-  return d;
-};
-
 function ea_layers_inputs(list) {
   sortable('#layers-list', 'disable');
 
@@ -124,7 +94,7 @@ function ea_layers_inputs(list) {
 
   elem_empty(layers_list);
 
-  ldc.forEach(ds => layers_list.appendChild(ea_layers_input_elem(ds)));
+  ldc.forEach(ds => layers_list.appendChild(ea_layers_elem(ds)));
 
   const style = 'style="font-size: smaller; text-align: center;"';
 
@@ -132,41 +102,6 @@ function ea_layers_inputs(list) {
     layers_list.innerHTML = `<pre ${style}>No layers selected.</pre>`;
 
   sortable('#layers-list', 'enable');
-};
-
-function ea_layers_outputs(target) {
-  let nodes;
-
-  const layers_list = document.querySelector('#layers-list');
-  layers_list.innerHTML = "";
-
-  function trigger_this() {
-    let e = document.createEvent('HTMLEvents');
-
-    for (n of nodes) {
-      e.initEvent((this === n) ? "select" : "unselect", true, true);
-      n.querySelector('.layers-element-radio svg').dispatchEvent(e);
-    }
-
-    ea_overlord({
-      "type": 'index',
-      "target": this.getAttribute('bind'),
-      "caller": 'ea_layers_outputs'
-    });
-  };
-
-  nodes = Object.keys(ea_indexes).map((t,i) => {
-    let node = ea_layers_output_elem(t, ea_indexes[t], t === target, ea_indexes_descriptions[t]);
-
-    let ler = node.querySelector('.layers-element-radio');
-    ler.appendChild(ea_svg_radio(t === target));
-
-    node.addEventListener('mouseup', _ => trigger_this.call(node));
-
-    layers_list.appendChild(node);
-
-    return node;
-  });
 };
 
 async function ea_layers_sort_inputs(list) {

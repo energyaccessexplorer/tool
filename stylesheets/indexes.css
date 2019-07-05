@@ -1,0 +1,37 @@
+#indexes-list {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  background-color: var(--the-white);
+}
+
+#indexes-list .element {
+  background-color: var(--the-white);
+  display: flex;
+
+  color: var(--the-gray);
+  fill: var(--the-gray);
+  padding: 0.5em;
+  line-height: 1.8em;
+
+  padding: 5px;
+
+  white-space: nowrap;
+}
+
+#indexes-list .element span {
+  padding: 0.5em;
+}
+
+#indexes-list .element .radio {
+  margin-top: 10px;
+}
+
+#indexes-list .element[bind="demand"]:before,
+#indexes-list .element[bind="supply"]:before {
+  width: 1em;
+  display: block;
+  content: ' ';
+  border-right: solid 1px #d9d9d9;
+  margin-right: 1em;
+}

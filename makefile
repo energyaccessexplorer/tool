@@ -60,10 +60,12 @@ build-tool:
 		${SRC}/controls.js \
 		${SRC}/ui.js \
 		${SRC}/layers.js \
+		${SRC}/indexes.js \
 		${SRC}/datasets.js \
 		${SRC}/mapbox.js \
 		${SRC}/nanny.js \
 		${SRC}/report.js \
+		${SRC}/countries.js \
 		> ${DIST}/tool/main.js
 
 	@cat \
@@ -71,6 +73,7 @@ build-tool:
 		${CSS}/controls.css \
 		${CSS}/maparea.css \
 		${CSS}/layers.css \
+		${CSS}/indexes.css \
 		${CSS}/datasets.css \
 		${CSS}/views.css \
 		> ${DIST}/tool/main.css

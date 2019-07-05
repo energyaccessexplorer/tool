@@ -238,7 +238,7 @@ Please report this to energyaccessexplorer@wri.org.
     state.set_mode_param(t);
 
     if (t === "outputs") {
-      ea_layers_outputs(state.output);
+      ea_indexes_list(state.output);
 
       state.inputs.forEach(i => {
         let x; if (x = DS.named(i)) x.hide();
@@ -263,7 +263,7 @@ Please report this to energyaccessexplorer@wri.org.
       throw `Argument Error: Overlord: Could not set/find the mode '${state.mode}'.`;
     }
 
-    document.querySelector('#canvas-output-container').style.visibility = (t === 'inputs') ? 'visible' : 'hidden';
+    right_pane(t);
 
     break;
   }
@@ -288,8 +288,8 @@ Please report this to energyaccessexplorer@wri.org.
     if (state.mode === "outputs") {
       await ds.turn(ds.active, false);
 
-      ea_layers_outputs(state.output);
       ea_plot_active_analysis(state.output);
+      ea_indexes_list(state.output);
     }
 
     else if (state.mode === "inputs") {
@@ -331,7 +331,7 @@ Please report this to energyaccessexplorer@wri.org.
     const inputs = DS.list.filter(d => ea_controls_presets_set(d, msg.target)).map(d => d.id);
 
     if (state.mode === "outputs") {
-      ea_layers_outputs(state.output);
+      ea_indexes_list(state.output);
       await Promise.all(DS.list.map(d => d.turn(d.active, false)));
       ea_plot_active_analysis(state.output);
     }

@@ -1,5 +1,8 @@
 async function ea_indexes_analyse(raster) {
   const pop = DS.named('population');
+
+  if (!pop) return null;
+
   await pop.load('heatmap');
   const p = pop.raster;
   const nodata = pop.nodata;
@@ -65,6 +68,8 @@ async function ea_indexes_graphs(raster) {
   scale.append(ea_layers_0_100());
 
   const t = await ea_indexes_analyse(raster);
+
+  if (!t) return;
 
   const ppie = ea_svg_pie(t['population']['distribution'].map(x => [x]), 75, 0, ea_default_color_stops, null);
   const apie = ea_svg_pie(t['area']['distribution'].map(x => [x]), 75, 0, ea_default_color_stops, null);

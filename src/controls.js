@@ -54,6 +54,8 @@ function ea_controls(ds) {
     break;
 
   case "boundaries":
+    if (!ds.csv) break;
+
     for (let v in ds.csv.options) {
       let d = DS.named(ds.id + "-" + v);
 

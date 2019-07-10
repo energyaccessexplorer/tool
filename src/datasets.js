@@ -161,6 +161,8 @@ class DS {
   };
 
   multifilter_init() {
+    if (!this.csv) return;
+
     for (let v in this.csv.options) {
       // we can do this because category is plain JSON, not javascript.
       const cat = JSON.parse(JSON.stringify(this.category));
@@ -195,7 +197,7 @@ class DS {
       o = Object.keys(this.csv.options)[0];
 
     if (this.features) {
-      const cso = this.configuration.polygons[o]
+      const cso = this.configuration.polygons[o];
 
       const min = Math.min.apply(null, this.features.features.map(f => f.properties[cso]));
       const max = Math.max.apply(null, this.features.features.map(f => f.properties[cso]));
@@ -242,6 +244,8 @@ class DS {
     }
 
     case 'key-linear': {
+      if (!this.table) return (s = x => 1);
+
       s = x => {
         let z = this.table[x];
         if (!z) return -1;
@@ -252,6 +256,8 @@ class DS {
     }
 
     case 'key-delta': {
+      if (!this.table) return (s = x => 1);
+
       if (this.weight !== 1) {
         console.warn(`${this.id} is 'key-delta' but has weight ${this.weight}.
 key-delta functions are meant to be filters.
@@ -269,6 +275,8 @@ Forcing dataset's weight to 1.`);
     }
 
     case 'multi-key-delta': {
+      if (!this.table) return (s = x => 1);
+
       let bs = DS.list.filter(d => d.id.match(new RegExp(`^${this.id}-`)));
 
       s = x => {

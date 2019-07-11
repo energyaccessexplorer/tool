@@ -64,6 +64,7 @@ build-tool:
 		${SRC}/datasets.js \
 		${SRC}/mapbox.js \
 		${SRC}/nanny.js \
+		${SRC}/nanny-steps.js \
 		${SRC}/report.js \
 		${SRC}/countries.js \
 		> ${DIST}/tool/main.js

@@ -70,6 +70,10 @@ function ea_report() {
 
       if (d.unit) u = `<code>(${d.unit})</code>`;
 
+      // TODO: We should be showing a list of the children datasets and values
+      //
+      if (d.multifilter) d.tmp_domain = [];
+
       doc.fromHTML(`<li> ${d.name_long} ${u} ${d.tmp_domain.join(' - ')}</li>`, lp, c, {});
       c += 16;
     });

@@ -59,7 +59,8 @@ function ea_layers_elem(ds) {
 
   function svg_thing(d) {
     let e;
-    if (d.vectors) e = d.vectors.symbol_svg;
+    if (d.vectors && (!d.vectors.color_stops || !d.vectors.color_stops.length)) e = d.vectors.symbol_svg;
+    if (d.vectors && (d.vectors.color_stops && d.vectors.color_stops.length)) e = d.color_scale_svg;
     else if (!d.vectors && d.heatmap) e = d.color_scale_svg;
     return e;
   };
@@ -79,6 +80,7 @@ function ea_layers_elem(ds) {
   else {
     c.appendChild(svg_thing(ds));
     if (!ds.vectors && ds.heatmap) c.appendChild(ea_layers_min_max(ds));
+    if (ds.vectors && (ds.vectors.color_stops && ds.vectors.color_stops.length)) c.appendChild(ea_layers_0_100(ds));
   }
 
   return d;

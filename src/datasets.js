@@ -178,12 +178,18 @@ class DS {
 
       d.subid = v;
       d.parent = this;
+      d.active_filter = true;
 
       DSTable[cat.name] = d;
     };
   };
 
   filter_set(o) {
+    if (!this.table && this.features) {
+      this.features.features.forEach((f,i) => f.properties.color =  d3.schemeCategory10[i%10]);
+      return;
+    }
+
     if (this.subid) {
       this.parent.filter_set(o);
       return;
@@ -193,18 +199,25 @@ class DS {
 
     if (o)
       this.filter_option = o;
-    else
+    else {
       o = Object.keys(this.csv.options)[0];
+      this.name_long = this.csv.options[o];
+    }
 
     if (this.features) {
       const cso = this.configuration.polygons[o];
+      let cs = this.vectors.color_stops;
+      if (!cs || !cs.length) cs = this.vectors.color_stops = ea_default_color_stops;
 
       const min = Math.min.apply(null, this.features.features.map(f => f.properties[cso]));
       const max = Math.max.apply(null, this.features.features.map(f => f.properties[cso]));
 
-      const s = d3.scaleLinear().domain([min,max]).range([0,1]);
+      const f = max <= 1 ? 1 : 100;
+      const d = Array(cs.length).fill(0).map((x,i) => (0 + i * (f/(cs.length-1))));
+      const s = d3.scaleLinear().domain(d).range(cs);
 
-      this.features.features.forEach(f => f.properties.opacity = s(f.properties[cso]));
+      this.features.features.forEach(f => f.properties.color = s(f.properties[cso]));
+      this.color_scale_svg = ea_svg_color_steps(s,d);
 
       let src; if (src = ea_mapbox.getSource(this.id)) src.setData(this.features);
     }
@@ -277,7 +290,7 @@ Forcing dataset's weight to 1.`);
     case 'multi-key-delta': {
       if (!this.table) return (s = x => 1);
 
-      let bs = DS.list.filter(d => d.id.match(new RegExp(`^${this.id}-`)));
+      let bs = DS.list.filter(d => d.id.match(new RegExp(`^${this.id}-`)) && d.active_filter);
 
       s = x => {
         let z = this.table[x];
@@ -716,8 +729,7 @@ async function ea_datasets_polygons() {
         "type": "fill",
         "source": this.id,
         "paint": {
-          "fill-opacity": ['get', 'opacity'],
-          "fill-color": this.vectors.fill,
+          "fill-color": ['get', 'color'],
           "fill-outline-color": this.vectors.stroke,
         },
       }, ea_mapbox.first_symbol);

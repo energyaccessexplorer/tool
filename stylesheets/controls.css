@@ -176,6 +176,17 @@
   cursor: pointer;
 }
 
+.controls-multifilter-elem {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  padding: 1em 1em;
+}
+
+.controls-multifilter-elem.active {
+  background-color: #e4e4e4;
+}
+
 #controls-wrapper select {
   border: none;
   width: 100%;
@@ -188,11 +199,6 @@
   width: 100%;
 }
 
-#controls-boundaries .svg-checkbox {
-  vertical-align: top;
-  padding-top: 1.7em;
-}
-
 #controls-boundaries .controls-dataset-info {
   display: none;
 }
@@ -200,6 +206,7 @@
 #controls-boundaries .control-group {
   flex: 0;
   text-align: center;
+  margin-bottom: unset;
 }
 
 #controls-boundaries .control-group .label {
@@ -212,7 +219,8 @@
 }
 
 #controls-boundaries .controls-dataset-content {
-  margin-left: 1.5em;
+  margin: 0 0 0 2.5em;
+  padding: 0;
 }
 
 .controls-select-container {

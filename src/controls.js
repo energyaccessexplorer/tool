@@ -54,16 +54,52 @@ function ea_controls(ds) {
     break;
 
   case "boundaries":
+    _controls.querySelector('.controls-dataset-header').remove();
+    _controls.prepend(elem(`<div class="controls-subbranch-title">&nbsp;&nbsp;&nbsp;${ds.name_long}</div>`));
+
     if (!ds.csv) break;
+
+    const sbs = [];
+    let first = true;
 
     for (let v in ds.csv.options) {
       let d = DS.named(ds.id + "-" + v);
 
-      range_group = ea_controls_range(d, (d.unit || 'percentage'));
+      let a = true;
 
-      let sb = elem('<div style="display: flex; justify-content: space-between; padding: 0.5em 3em;">');
-      sb.append(elem(`<div>${ds.csv.options[v]}</div>`));
+      const check = ea_svg_checkbox(true, s => {
+        d.active_filter = a = s;
+        update();
+      });
+
+      const button = check.svg;
+
+      range_group = ea_controls_range(d, (d.unit || 'percentage'), false, update);
+
+      let sb = elem('<div class="controls-multifilter-elem" ripple>');
+      sb.append(button);
+
+      const title = elem(`<div class="control-group">${ds.csv.options[v]}</div>`)
+      sb.append(title);
       sb.append(range_group.elem);
+
+      sb.addEventListener('mousedown', e => (e.target !== check.svg) ? update() : null);
+
+      sbs.push(sb);
+
+      function update() {
+        for (let s of sbs) s.classList.remove('active');
+        sb.classList.add('active');
+        ds.name_long = ds.csv.options[v];
+
+        ea_overlord({
+          "type": "dataset",
+          "target": d,
+          "caller": "ea_controls_elem multifilter",
+        });
+      };
+
+      if (first) { sb.classList.add('active'); first = false; }
 
       controls.appendChild(sb);
     }
@@ -285,7 +321,7 @@ function ea_controls_toggle(ds, status) {
   });
 };
 
-function ea_controls_range(ds, label, single) {
+function ea_controls_range(ds, label, single, callback) {
   const d = [ds.heatmap.domain.min, ds.heatmap.domain.max];
 
   const range_norm = d3.scaleLinear().domain([0,1]).range(d);
@@ -315,11 +351,15 @@ function ea_controls_range(ds, label, single) {
     (ds.init_domain ? [range_norm.invert(ds.init_domain[0]), range_norm.invert(ds.init_domain[1])] : null),
     x => update_range_value(x, 0, v1),
     x => update_range_value(x, 1, v2),
-    _ => ea_overlord({
-      "type": "dataset",
-      "target": ds,
-      "caller": "ea_controls_range",
-    })
+    _ => {
+      if (typeof callback === 'function') callback();
+
+      ea_overlord({
+        "type": "dataset",
+        "target": ds,
+        "caller": "ea_controls_range",
+      });
+    }
   );
 
   container.appendChild(range_control.svg);

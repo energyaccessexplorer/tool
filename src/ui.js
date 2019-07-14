@@ -195,14 +195,6 @@ function ea_ui_dataset_modal(ds) {
   }).show();
 };
 
-function ea_ui_index_modal(i) {
-  ea_modal.set({
-    header: ea_indexes[i],
-    content: ea_indexes_infos[i],
-    footer: null
-  }).show();
-};
-
 function ea_ui_flash_setup() {
   window.ea_flash = flash()
     .style(`

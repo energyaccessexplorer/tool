@@ -111,7 +111,7 @@ function ea_indexes_init(o) {
   });
 
   document.querySelector('#index-graphs-info').append(elem(ea_svg_info()));
-  document.querySelector('#index-graphs-info').addEventListener('mouseup', _ => ea_ui_index_modal(location.get_query_param('output')));
+  document.querySelector('#index-graphs-info').addEventListener('mouseup', _ => ea_indexes_modal());
 };
 
 function ea_indexes_list(target) {
@@ -158,4 +158,21 @@ function ea_indexes_list(target) {
 
     return node;
   });
+};
+
+function ea_indexes_modal() {
+  const c = elem(`<div>`);
+
+  for (let i in ea_indexes) {
+    const s = elem(`<section>`);
+
+    c.append(elem(ea_indexes[i], 'h3'));
+    c.append(elem(ea_indexes_infos[i], 'p'));
+  }
+
+  ea_modal.set({
+    header: "Energy Access Explorer Indexes",
+    content: c,
+    footer: null
+  }).show();
 };

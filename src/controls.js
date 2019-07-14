@@ -78,10 +78,10 @@ function ea_controls(ds) {
 
       let sb = elem('<div class="controls-multifilter-elem" ripple>');
       const title = elem(`<div class="control-group">${ds.csv.options[v]}</div>`)
+
+      sb.addEventListener('mousedown', e => (e.target.closest('svg') !== check.svg) ? update() : null);
+
       sb.append(button, title, range_group.elem);
-
-      sb.addEventListener('mousedown', e => (e.target !== check.svg) ? update() : null);
-
       sbs.push(sb);
 
       function update() {

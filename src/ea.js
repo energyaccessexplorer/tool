@@ -431,11 +431,13 @@ Please report this to energyaccessexplorer@wri.org.
       );
 
       if (rc && rc.value) {
+        v = rc.value * t.heatmap.factor;
+
         table_pointer([{
           "target": t.name_long,
           "dataset": "value"
         }], {
-          "value": `${(rc.value).toFixed(2)} <code>${t.unit || ''}</code>`
+          "value": `${v.toFixed(2)} <code>${t.unit || ''}</code>`
         }, e);
       }
       else {

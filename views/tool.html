@@ -111,9 +111,22 @@
         </div>
 
         <div id="drawer">
-          <span>
+          <div onclick="ea_help();">
+            Help
+            <div bind="help-message">
+              <p>
+                What can we help you with?
+
+                <ul>
+                  <li><a onclick="ea_nanny_force_start();">Restart tutorial</a></li>
+                </ul>
+              </p>
+            </div>
+          </div>
+
+          <div>
             Disclaimer
-            <div id="drawer-message">
+            <div id="disclaimer-message">
               <p>
                 The maps are for illustrative purposes and do not imply the
                 expression of any opinion on the part of WRI, concerning the
@@ -121,7 +134,7 @@
                 delimitation of frontiers or boundaries.
               </p>
             </div>
-          </span>
+          </div>
         </div>
       </div>
     </div>

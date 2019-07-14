@@ -86,7 +86,20 @@ body {
   background-color: #F8F8F8;
 }
 
-#drawer-message {
+#drawer > div {
+  display: block;
+  width: 100%;
+  text-align: center;
+  border-right: 1px solid lightgray;
+  cursor: pointer;
+  padding: 1em;
+}
+
+[bind=help-message] {
+  display: none;
+}
+
+#disclaimer-message {
   display: none;
   position: absolute;
   background-color: #141414;
@@ -95,12 +108,12 @@ body {
   padding-right: 2em;
 }
 
-#drawer-message p {
+#disclaimer-message p {
   color: #f1f1f1;
   white-space: pre;
 }
 
-#drawer span:hover #drawer-message {
+#drawer > div:hover #disclaimer-message {
   display: block;
 }
 

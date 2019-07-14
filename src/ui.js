@@ -188,6 +188,17 @@ border: 1px solid white;
 `);
 };
 
+function ea_help() {
+  const hm = document.querySelector('[bind=help-message]').cloneNode(true);
+  hm.style.display = 'block';
+
+  ea_modal.set({
+    header: "Help",
+    content: hm,
+    footer: null
+  }).show();
+};
+
 /*
  * elem
  *

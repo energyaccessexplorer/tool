@@ -2,6 +2,10 @@ h1, h2, h3 {
   color: var(--the-green);
 }
 
+a {
+  cursor: pointer;
+}
+
 #views {
   position: absolute;
   width: 100%;

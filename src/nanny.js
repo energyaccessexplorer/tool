@@ -168,10 +168,25 @@ function ea_nanny_start() {
 
   const w = localStorage.getItem('needs-nanny');
 
-  if (!w || !w.match(/false/)) {
-    setTimeout(_ => ea_nanny_steps[(ea_nanny_current_step = 0)](), 1000)
-  }
-}
+  if (!w || !w.match(/false/))
+    ea_nanny_steps[(ea_nanny_current_step = 0)]();
+};
+
+function ea_nanny_force_start() {
+  history.replaceState(null, null, location.set_query_param('inputs', 'boundaries'));
+  history.replaceState(null, null, location.set_query_param('output', 'eai'));
+  history.replaceState(null, null, location.set_query_param('mode', 'inputs'));
+
+  DS.list.filter(d => d.active && d.id != 'boundaries').forEach(d => d.turn(false, false));
+
+  ea_overlord({
+    "type": "refresh",
+    "target": null,
+    "caller": "ea_nanny_force_start"
+  });
+
+  ea_nanny_start();
+};
 
 function ea_nanny_finish() {
   console.log("Nanny's done.");

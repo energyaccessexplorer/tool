@@ -319,7 +319,7 @@ async function ea_plot_active_analysis(type, cs = 'ea') {
   const raster = await ea_analysis(list, type);
   ea_canvas_plot(raster);
 
-  document.querySelector('#canvas-output-title').innerText = ea_indexes[type];
+  document.querySelector('#canvas-output-select').value = type;
   document.querySelector('#index-graphs-title').innerText = ea_indexes[type];
   document.querySelector('#index-graphs-description').innerText = ea_indexes_descriptions[type];
 

@@ -213,7 +213,7 @@ Please report this to energyaccessexplorer@wri.org.
     ea_ui_views_init();
 
     ea_layers_init();
-    ea_indexes_init();
+    ea_indexes_init(state.output);
 
     ea_controls_country_setup();
     ea_controls_presets_init(state.preset);
@@ -313,14 +313,8 @@ Please report this to energyaccessexplorer@wri.org.
   }
 
   case "index": {
-    if (state.mode === "outputs") {
-      state.set_output_param(msg.target);
-      ea_plot_active_analysis(msg.target).then(raster => ea_indexes_graphs(raster));
-    }
-
-    else {
-      throw `Argument Error: Overlord: Could set the mode ${state.mode}`;
-    }
+    state.set_output_param(msg.target);
+    ea_plot_active_analysis(msg.target).then(raster => ea_indexes_graphs(raster));
 
     break;
   }

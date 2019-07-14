@@ -134,10 +134,17 @@ svg#svg-map {
   text-align: center;
 }
 
-#index-graphs-title,
-#canvas-output-title {
+#index-graphs-title {
   padding: 0.7em 1em;
   text-align: left;
+}
+
+#canvas-output-select {
+  display: block;
+  padding: 0.7em 1em;
+  border: none;
+  font-size: 1em;
+  background-color: white;
 }
 
 canvas#output {

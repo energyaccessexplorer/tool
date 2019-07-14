@@ -17,15 +17,15 @@ function ea_controls(ds) {
   case 'nighttime-lights':
   case 'accessibility':
     range_group = ea_controls_range(ds, (ds.unit || 'range'));
-    controls.appendChild(range_group.elem);
-    controls.appendChild(weight_group.elem);
+    controls.append(range_group.elem);
+    controls.append(weight_group.elem);
     break;
 
   case "health":
   case "schools":
     range_group = ea_controls_single(ds, (ds.unit || 'proximity in km'));
-    controls.appendChild(range_group.elem);
-    controls.appendChild(weight_group.elem);
+    controls.append(range_group.elem);
+    controls.append(weight_group.elem);
     break;
 
   case "minigrids":
@@ -35,8 +35,8 @@ function ea_controls(ds) {
   case "geothermal":
   case "transmission-lines":
     range_group = ea_controls_range(ds, (ds.unit || 'proximity in km'));
-    controls.appendChild(range_group.elem);
-    controls.appendChild(weight_group.elem);
+    controls.append(range_group.elem);
+    controls.append(weight_group.elem);
     break;
 
   case "boundaries-temp-disabled": // NOTE: left as a reference...
@@ -44,8 +44,8 @@ function ea_controls(ds) {
 
     const o = ea_controls_options(ds);
     if (o) {
-      controls.appendChild(o);
-      controls.appendChild(range_group.elem);
+      controls.append(o);
+      controls.append(range_group.elem);
     }
     else {
       controls.remove();
@@ -101,23 +101,23 @@ function ea_controls(ds) {
 
       if (first) { sb.classList.add('active'); first = false; }
 
-      controls.appendChild(sb);
+      controls.append(sb);
     }
 
     break;
 
   case "transmission-lines-collection":
     range_group = ea_controls_range(ds, (ds.unit || 'proximity in km'));
-    controls.appendChild(ea_controls_collection_list(ds));
-    controls.appendChild(range_group.elem);
-    controls.appendChild(weight_group.elem);
+    controls.append(ea_controls_collection_list(ds));
+    controls.append(range_group.elem);
+    controls.append(weight_group.elem);
     break;
 
   case 'crops':
     range_group = ea_controls_range(ds, (ds.unit || 'range'));
-    controls.appendChild(ea_controls_mutant_options(ds));
-    controls.appendChild(range_group.elem);
-    controls.appendChild(weight_group.elem);
+    controls.append(ea_controls_mutant_options(ds));
+    controls.append(range_group.elem);
+    controls.append(weight_group.elem);
     break;
 
   default:
@@ -141,7 +141,7 @@ function ea_controls_elem(ds) {
 
   const button = check.svg;
 
-  header.appendChild(button);
+  header.append(button);
 
   ds.checkbox_change = check.change;
 
@@ -167,8 +167,8 @@ function ea_controls_elem(ds) {
   };
 
   const name = elem(`<div class="controls-dataset-name">${ds.name_long}</div>`);
-  header.appendChild(name);
-  header.appendChild(info);
+  header.append(name);
+  header.append(info);
   header.addEventListener('mouseup', clicko);
 
   info.addEventListener('mouseup', _ => ea_ui_dataset_modal(ds));
@@ -191,7 +191,7 @@ function ea_controls_tree(tree, list) {
   })));
 
   tree.forEach(a => {
-    controls_el.appendChild(elem(`
+    controls_el.append(elem(`
 <div id=${a.name} class="controls-branch">
   <div class="controls-branch-title">${a.name}</div>
   <div class="controls-subbranches"></div>
@@ -201,7 +201,7 @@ function ea_controls_tree(tree, list) {
 
     a.subbranches.forEach(b => {
       branch_el.querySelector('.controls-subbranches')
-        .appendChild(elem(`
+        .append(elem(`
 <div id=${b.name} class="controls-subbranches">
   <div class="controls-subbranch-title">
     <span class="collapse triangle">${ea_ui_collapse_triangle('s')}</span>
@@ -220,7 +220,7 @@ function ea_controls_tree(tree, list) {
         const ds = list.find(x => x.id === b.id);
 
         if (ds) {
-          conel.appendChild(ea_controls(ds));
+          conel.append(ea_controls(ds));
         }
         else {
           console.warn(`'${b.id}' dataset not found.`);
@@ -251,7 +251,7 @@ function ea_controls_mutant_options(ds) {
 
   ds.configuration.mutant_targets.forEach(i => {
     const host = DS.named(i);
-    select.appendChild(elem(`<option value=${i}>${host.name_long}</option>`));
+    select.append(elem(`<option value=${i}>${host.name_long}</option>`));
   });
 
   select.value = ds.configuration.mutant_targets[0];
@@ -268,7 +268,7 @@ function ea_controls_mutant_options(ds) {
     });
   });
 
-  container.appendChild(select);
+  container.append(select);
 
   return container;
 };
@@ -282,12 +282,12 @@ function ea_controls_options(ds) {
   const container = elem(`<div class="control-option"></div>`);
   const select = elem('<select></select>');
 
-  // select.appendChild(elem(`<option selected disabled>Select one...</option>`));
+  // select.append(elem(`<option selected disabled>Select one...</option>`));
 
   const options = Object.keys(ds.csv.options);
 
   options.forEach(v => {
-    select.appendChild(elem(`<option value=${v}>${ds.csv.options[v]}</option>`));
+    select.append(elem(`<option value=${v}>${ds.csv.options[v]}</option>`));
   });
 
   ds.filter_option = select.value = options[0];
@@ -302,7 +302,7 @@ function ea_controls_options(ds) {
     });
   });
 
-  container.appendChild(select);
+  container.append(select);
 
   return container;
 };
@@ -362,8 +362,8 @@ function ea_controls_range(ds, label, single, callback) {
     }
   );
 
-  container.appendChild(range_control.svg);
-  container.appendChild(l);
+  container.append(range_control.svg);
+  container.append(l);
 
   return {
     elem: container,
@@ -402,8 +402,8 @@ function ea_controls_weight(ds, init) {
     }
   );
 
-  container.appendChild(weight_control.svg);
-  container.appendChild(l);
+  container.append(weight_control.svg);
+  container.append(l);
 
   return {
     elem: container,
@@ -418,7 +418,7 @@ function ea_controls_collection_list(ds) {
 
   for (let i of ds.configuration.collection) {
     let d = DS.named(i);
-    e.appendChild(elem(`<li>${d.name_long}</li>`));
+    e.append(elem(`<li>${d.name_long}</li>`));
   }
 
   return e;
@@ -442,7 +442,7 @@ function ea_controls_country_setup() {
     .then(j => j.sort((a,b) => a['name'] > b['name'] ? 1 : -1))
     .then(j => {
       country_list = j;
-      j.forEach(c => datalist.appendChild(elem(`<option value="${c.name}"></option>`)));
+      j.forEach(c => datalist.append(elem(`<option value="${c.name}"></option>`)));
       set_default();
     });
 
@@ -460,7 +460,7 @@ function ea_controls_country_setup() {
 function ea_controls_presets_init(v) {
   const el = document.querySelector('#controls-preset');
 
-  Object.keys(ea_presets).forEach(k => el.appendChild(elem(`<option value="${k}">${ea_presets[k]}</option>`)));
+  Object.keys(ea_presets).forEach(k => el.append(elem(`<option value="${k}">${ea_presets[k]}</option>`)));
 
   el.value = v || "custom";
   el.querySelector('option[value="custom"]').innerText = "Custom Analysis";

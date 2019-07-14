@@ -54,7 +54,7 @@ function ea_layers_elem(ds) {
 
     loc.addEventListener('mouseleave', _ => loc.style.display = 'none');
 
-    lec.appendChild(dlo);
+    lec.append(dlo);
   }
 
   function svg_thing(d) {
@@ -70,17 +70,17 @@ function ea_layers_elem(ds) {
       let x = DS.named(d);
       let li = elem('<div class="layers-element-collection">');
 
-      li.appendChild(svg_thing(x))
-      li.appendChild(elem(`<div class="layers-element-subheader">${x.name_long}</div>`));
+      li.append(svg_thing(x))
+      li.append(elem(`<div class="layers-element-subheader">${x.name_long}</div>`));
 
-      c.appendChild(li);
+      c.append(li);
     }
   }
 
   else {
-    c.appendChild(svg_thing(ds));
-    if (!ds.vectors && ds.heatmap) c.appendChild(ea_layers_min_max(ds));
-    if (ds.vectors && (ds.vectors.color_stops && ds.vectors.color_stops.length)) c.appendChild(ea_layers_0_100(ds));
+    c.append(svg_thing(ds));
+    if (!ds.vectors && ds.heatmap) c.append(ea_layers_min_max(ds));
+    if (ds.vectors && (ds.vectors.color_stops && ds.vectors.color_stops.length)) c.append(ea_layers_0_100(ds));
   }
 
   return d;
@@ -96,7 +96,7 @@ function ea_layers_inputs(list) {
 
   elem_empty(layers_list);
 
-  ldc.forEach(ds => layers_list.appendChild(ea_layers_elem(ds)));
+  ldc.forEach(ds => layers_list.append(ea_layers_elem(ds)));
 
   if (list.length === 0)
     layers_list.innerHTML = `<code>No layers selected.</code>`;
@@ -120,8 +120,8 @@ function ea_layers_opacity_control(ds) {
     _ => ea_mapbox.setPaintProperty(ds.id, 'raster-opacity', parseFloat(opacity))
   );
 
-  e.appendChild(grad.svg);
-  e.appendChild(elem(`
+  e.append(grad.svg);
+  e.append(elem(`
 <div style="display: flex; justify-content: space-between; padding-right: 0.5em; padding-left: 0.5em; font-size: 0.8em;">
   <span>0%</span>
   <span>Opacity</span>

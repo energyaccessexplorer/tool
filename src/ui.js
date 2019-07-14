@@ -125,7 +125,7 @@ function ea_ui_views_init() {
 
     if (location.get_query_param('mode') === v) btn.classList.add('active');
 
-    el.appendChild(btn);
+    el.append(btn);
   });
 };
 
@@ -135,56 +135,56 @@ function ea_ui_dataset_modal(ds) {
   let left = elem('<div class="left" style="flex: 1;">')
   let right = elem('<div class="right" style="flex: 0 300px; padding-left: 3em;">')
 
-  content.appendChild(left);
-  content.appendChild(right);
+  content.append(left);
+  content.append(right);
 
   if (ds.metadata.description)
-    left.appendChild(elem(`<section>
+    left.append(elem(`<section>
 <h3>Description</h3><pre class="description-text">${ds.metadata.description}</pre>
 </section>`));
 
   if (ds.why)
-    left.appendChild(elem(`<section>
+    left.append(elem(`<section>
 <h3>Why is this dataset used?</h3><pre>${ds.why}</pre>
 </section>`));
 
   if (ds.metadata.suggested_citation)
-    left.appendChild(elem(`<section>
+    left.append(elem(`<section>
 <h3>Suggested Citation</h3><pre class="description-text">${ds.metadata.suggested_citation}</pre>
 </section>`));
 
   if (ds.metadata.cautions)
-    left.appendChild(elem(`<section>
+    left.append(elem(`<section>
 <h3>Cautions</h3><pre class="description-text">${ds.metadata.cautions}</pre>
 </section>`));
 
   if (ds.metadata.download_original_url)
-    right.appendChild(elem(`<section>
+    right.append(elem(`<section>
 <a class="download-link" target="_blank" href="${ds.metadata.download_original_url}">Download from Source</a>
 </section>`));
 
   if (ds.metadata.learn_more_url)
-    right.appendChild(elem(`<section>
+    right.append(elem(`<section>
 <a class="download-link" target="_blank" href="${ds.metadata.learn_more_url}">Learn More</a>
 </section>`));
 
   if (ds.metadata.sources)
-    right.appendChild(elem(`<section>
+    right.append(elem(`<section>
 <h3>Sources</h3><pre class="description-text">${ds.metadata.sources}</pre>
 </section>`));
 
   if (ds.metadata.spatial_resolution)
-    right.appendChild(elem(`<section>
+    right.append(elem(`<section>
 <h3>Spatial Resolution</h3>${ds.metadata.spatial_resolution}
 </section>`));
 
   if (ds.metadata.license)
-    right.appendChild(elem(`<section>
+    right.append(elem(`<section>
 <h3>License</h3>${ds.metadata.license}
 </section>`));
 
   if (ds.metadata.content_date)
-    right.appendChild(elem(`<section>
+    right.append(elem(`<section>
 <h3>Date of Content</h3>${ds.metadata.content_date}
 </section>`));
 

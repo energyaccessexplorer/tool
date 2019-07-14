@@ -31,8 +31,8 @@ function ea_nanny_pick_element(query, opts) {
   <p><strong>${opts.title}</strong></p>
 </aside>`);
 
-  marker.appendChild(body);
-  document.body.appendChild(marker);
+  marker.append(body);
+  document.body.append(marker);
 
   const caret = marker.querySelector('.nanny-caret');
 

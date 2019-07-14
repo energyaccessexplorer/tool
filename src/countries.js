@@ -40,7 +40,7 @@ function ea_countries_setup() {
   // d3.json(overviews_query).then(function(obj) {
   //   var a = document.createElement('a');
   //   a.style = "display:none;";
-  //   document.body.appendChild(a);
+  //   document.body.append(a);
   //
   //   var blob = new Blob([JSON.stringify(obj)], { type: "application/json" });
   //   var url = URL.createObjectURL(blob);
@@ -90,7 +90,7 @@ function ea_countries_setup() {
           }
         );
 
-        dropdown.appendChild(e);
+        dropdown.append(e);
       });
 
       input.addEventListener('mouseenter', _ => dropdown.style.display = 'block');
@@ -206,7 +206,7 @@ function ea_countries_overview(c, list, online) {
   if (r) {
     co = elem('<div class="country-overview">');
 
-    co.appendChild(elem(`<h2>${c.name.common}</h2>`));
+    co.append(elem(`<h2>${c.name.common}</h2>`));
 
     if (+r['population'] > 0)
       pop = ovline("Population", `${(+r['population']).toLocaleString()} Million`);
@@ -241,13 +241,13 @@ function ea_countries_overview(c, list, online) {
       btn.addEventListener('click', _ => ea_countries_action_modal(r));
     }
 
-    [pop, urban_rural, pies, gdp, dev, area, pol, rate, ease, btn].forEach(t => t ? co.appendChild(t) : null);
+    [pop, urban_rural, pies, gdp, dev, area, pol, rate, ease, btn].forEach(t => t ? co.append(t) : null);
 
     let w = elem('<div style="display: flex; justify-content: space-around; width: 240px; border-right: 1px solid lightgray; padding: 0 1em;">');
-    co.querySelector('.pie-charts').appendChild(w);
+    co.querySelector('.pie-charts').append(w);
 
     if (+r['electrification-rate-urban'] > 0) {
-      w.appendChild(elem(`<span class="small">Electrified:&nbsp;<strong>${r['electrification-rate-urban']}%</strong></span>`));
+      w.append(elem(`<span class="small">Electrified:&nbsp;<strong>${r['electrification-rate-urban']}%</strong></span>`));
 
       let eru = ea_svg_pie(
         [
@@ -262,15 +262,15 @@ function ea_countries_overview(c, list, online) {
         ""
       );
 
-      w.appendChild(eru.svg);
+      w.append(eru.svg);
       eru.change(0);
     }
 
     w = elem('<div style="display: flex; justify-content: space-around; width: 240px; padding: 0 1em;">');
-    co.querySelector('.pie-charts').appendChild(w);
+    co.querySelector('.pie-charts').append(w);
 
     if (+r['electrification-rate-rural'] > 0) {
-      w.appendChild(elem(`<span class="small">Electrified:&nbsp;<strong>${r['electrification-rate-rural']}%</strong></span>`));
+      w.append(elem(`<span class="small">Electrified:&nbsp;<strong>${r['electrification-rate-rural']}%</strong></span>`));
 
       let err = ea_svg_pie(
         [
@@ -285,7 +285,7 @@ function ea_countries_overview(c, list, online) {
         ""
       );
 
-      w.appendChild(err.svg);
+      w.append(err.svg);
       err.change(0);
     }
 
@@ -296,7 +296,7 @@ function ea_countries_overview(c, list, online) {
 
     elem_empty(overview);
     co.append(dismiss)
-    overview.appendChild(co);
+    overview.append(co);
   } else {
     ea_flash
       .type(null)
@@ -336,10 +336,10 @@ function ea_countries_action_modal(c) {
       location = `/maps-and-data/tool?ccn3=${c['ccn3']}&preset=${preset}`;
     });
 
-    pbtns.appendChild(b);
+    pbtns.append(b);
   }
 
-  content.appendChild(pbtns);
+  content.append(pbtns);
 
   ea_modal.set({
     header: elem(`<div style="text-transform: uppercase; color: var(--the-white)">${c['name']['common']}</div>`),

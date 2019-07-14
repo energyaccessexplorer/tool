@@ -150,11 +150,11 @@ function ea_indexes_list(target) {
     let node = i_elem(t, ea_indexes[t], ea_indexes_descriptions[t]);
 
     let ler = node.querySelector('.radio');
-    ler.appendChild(ea_svg_radio(t === target));
+    ler.append(ea_svg_radio(t === target));
 
     node.addEventListener('mouseup', _ => setTimeout(_ => trigger_this.call(node), 10));
 
-    indexes_list.appendChild(node);
+    indexes_list.append(node);
 
     return node;
   });

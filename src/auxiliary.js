@@ -131,7 +131,7 @@ async function ea_summary() {
 
   const graphs_tab = elem(`<div class="tab"></div>`);
   const graphs = elem(`<div id="graphs"></div>`);
-  graphs_tab.appendChild(graphs);
+  graphs_tab.append(graphs);
 
   const sizes = {
     "eai": 100,
@@ -192,9 +192,9 @@ async function ea_summary() {
 </div>`);
 
     pie.change(0);
-    e.querySelector('.pie-svg-container').appendChild(pie.svg);
+    e.querySelector('.pie-svg-container').append(pie.svg);
 
-    graphs.appendChild(e);
+    graphs.append(e);
   });
 
   const s = ea_default_color_stops;
@@ -237,7 +237,7 @@ async function ea_summary() {
 <td>${(summary[k][3]).toLocaleString()}</td>
 <td>${(summary[k][4]).toLocaleString()}</td>`;
 
-    tbody.appendChild(tr);
+    tbody.append(tr);
   }
 
   const switcho = elem(`<button class="big-green-button">Summary Table</button>`);
@@ -246,11 +246,11 @@ async function ea_summary() {
       e.classList.toggle('hidden');
   });
 
-  content.appendChild(graphs_tab);
-  graphs_tab.appendChild(legend);
+  content.append(graphs_tab);
+  graphs_tab.append(legend);
 
-  content.appendChild(table);
-  content.appendChild(switcho);
+  content.append(table);
+  content.append(switcho);
 
   ea_modal.set({
     header: "Snapshot",
@@ -379,7 +379,7 @@ function ea_coordinates_raster(coords, bounds, raster) {
 
 function table_pointer(dict, prop, event) {
   const t = document.createElement('table');
-  dict.forEach(e => t.appendChild(elem(`<td><strong>${e.target}</strong></td><td>${prop[e.dataset]}</td>`, 'tr')));
+  dict.forEach(e => t.append(elem(`<td><strong>${e.target}</strong></td><td>${prop[e.dataset]}</td>`, 'tr')));
 
   mapbox_pointer(t, event.originalEvent.pageX, event.originalEvent.pageY)
 };

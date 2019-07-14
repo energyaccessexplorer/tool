@@ -121,10 +121,10 @@ function ea_report() {
     s0.src = "/maps-and-data/lib/jspdf.js";
     s1.src = "/maps-and-data/lib/jspdf-autotable.js";
 
-    s0.onload = _ => document.head.appendChild(s1);
+    s0.onload = _ => document.head.append(s1);
     s1.onload = gen_pdf;
 
-    document.head.appendChild(s0);
+    document.head.append(s0);
   } else {
     gen_pdf();
   };

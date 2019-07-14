@@ -43,7 +43,7 @@ class MapboxThemeControl {
 </button>
 `);
 
-    this._container.appendChild(button);
+    this._container.append(button);
 
     button.addEventListener('mouseup', e => mapbox_theme_control_popup(e.target.closest('button')));
 
@@ -61,7 +61,7 @@ function mapbox_theme_control_popup(btn) {
   let radios = elem(`<div>`);
 
   for (let t of mapbox_styles) {
-    radios.appendChild(elem(`<div class="radio-group"><input id="mapbox_theme_${t.value}" type="radio" name="mapbox_theme" value="${t.value}" /> <label for="mapbox_theme_${t.value}">${t.name}</label></div>`));
+    radios.append(elem(`<div class="radio-group"><input id="mapbox_theme_${t.value}" type="radio" name="mapbox_theme" value="${t.value}" /> <label for="mapbox_theme_${t.value}">${t.name}</label></div>`));
   }
 
   let current = radios.querySelector(`input[value="${ea_settings.mapbox_theme}"]`)
@@ -72,7 +72,7 @@ function mapbox_theme_control_popup(btn) {
 
   x.addEventListener('mouseleave', _ => x.remove());
 
-  x.appendChild(radios);
+  x.append(radios);
 
   const r = btn.getBoundingClientRect();
 
@@ -85,7 +85,7 @@ box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
 border-radius: 4px;
 padding: 16px;`;
 
-  document.querySelector('#playground #visual').appendChild(x);
+  document.querySelector('#playground #visual').append(x);
 };
 
 function mapbox_theme_pick(theme) {
@@ -206,11 +206,11 @@ padding: 16px;`;
   p.style.top  = y + "px";
 
   if (content instanceof HTMLElement)
-    p.appendChild(content);
+    p.append(content);
   else
     p.innerHTML = content;
 
-  document.body.appendChild(p);
+  document.body.append(p);
 
   let l;
 

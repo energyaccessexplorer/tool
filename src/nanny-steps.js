@@ -9,9 +9,9 @@ const ea_nanny_steps = [
 
     let yes, no, never;
 
-    footer.appendChild(yes = elem(`<button>Yes, let's do this!</button>`));
-    footer.appendChild(no = elem(`<button>No. Ask me later.</button>`));
-    footer.appendChild(never = elem(`<button>No, don't ask me again.</button>`));
+    footer.append(yes = elem(`<button>Yes, let's do this!</button>`));
+    footer.append(no = elem(`<button>No. Ask me later.</button>`));
+    footer.append(never = elem(`<button>No, don't ask me again.</button>`));
 
     yes.addEventListener('mouseup', ea_nanny_next);
     no.addEventListener('mouseup', ea_modal.hide);

@@ -3,7 +3,7 @@
  */
 
 function ea_layers_init() {
-  const layers = document.querySelector('#layers');
+  const layers = document.querySelector('#layers-pane');
   const list = layers.querySelector('#layers-list');
 
   sortable('#layers-list', {
@@ -91,7 +91,7 @@ function ea_layers_elem(ds) {
 function ea_layers_inputs(list) {
   sortable('#layers-list', 'disable');
 
-  const layers = document.querySelector('#layers');
+  const layers = document.querySelector('#layers-pane');
   const layers_list = layers.querySelector('#layers-list');
 
   const ldc = list.map(i => DS.named(i));

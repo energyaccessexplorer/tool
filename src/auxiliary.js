@@ -408,6 +408,6 @@ function interval_index(v, arr, clamp) {
 };
 
 function right_pane(t) {
-  document.querySelector('#layers').style.display = (t === 'inputs') ? '' : 'none';
+  document.querySelector('#layers-pane').style.display = (t === 'inputs') ? '' : 'none';
   document.querySelector('#indexes-pane').style.display = (t === 'outputs') ? '' : 'none';
 };

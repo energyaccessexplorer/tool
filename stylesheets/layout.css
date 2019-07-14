@@ -58,7 +58,7 @@ body {
 }
 
 #indexes-pane,
-#layers {
+#layers-pane {
   display: flex;
   flex-flow: column nowrap;
 

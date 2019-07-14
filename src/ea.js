@@ -425,7 +425,9 @@ Please report this to energyaccessexplorer@wri.org.
       );
 
       if (rc && rc.value) {
-        v = rc.value * t.heatmap.factor;
+        v = rc.value;
+
+        if (t.heatmap) v = v * t.heatmap.factor;
 
         table_pointer([{
           "target": t.name_long,

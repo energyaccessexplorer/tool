@@ -51,7 +51,11 @@ function ea_controls(ds) {
 
   case "boundaries":
     _controls.querySelector('.controls-dataset-header').remove();
-    _controls.prepend(elem(`<div class="controls-subbranch-title">&nbsp;&nbsp;&nbsp;${ds.name_long}</div>`));
+    _controls.prepend(elem(`
+<div class="controls-subbranch-title">
+  <span class="collapse triangle">${ea_ui_collapse_triangle('s')}</span>
+  ${ds.name_long}
+</div>`));
 
     if (!ds.csv) break;
 
@@ -96,6 +100,9 @@ function ea_controls(ds) {
 
       controls.append(sb);
     }
+
+    _controls.querySelector('.controls-subbranch-title')
+      .addEventListener('mouseup', e => elem_collapse(controls, _controls.querySelector('.controls-subbranch-title')));
 
     break;
 
@@ -200,7 +207,7 @@ function ea_controls_tree(tree, list) {
       const conel = subel.querySelector('.controls-container');
 
       subel.querySelector('.controls-subbranch-title')
-        .addEventListener('mouseup', e => ea_controls_collapse_subbranch(conel, subel));
+        .addEventListener('mouseup', e => elem_collapse(conel, subel));
 
       b.datasets.forEach(b => {
         const ds = list.find(x => x.id === b.id);
@@ -214,21 +221,6 @@ function ea_controls_tree(tree, list) {
       });
     });
   });
-};
-
-function ea_controls_collapse_subbranch(conel, subel) {
-  const d = conel.style['display'];
-  const c = subel.querySelector('.collapse');
-
-  if (d === "none") {
-    conel.style['display'] = 'block';
-    c.innerHTML = ea_ui_collapse_triangle('s');
-  }
-
-  else {
-    conel.style['display'] = 'none';
-    c.innerHTML = ea_ui_collapse_triangle('e');
-  }
 };
 
 function ea_controls_mutant_options(ds) {

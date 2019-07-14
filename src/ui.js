@@ -219,3 +219,18 @@ function elem_empty(e) {
   else
     throw "Argument: argument is not HTMLElment";
 };
+
+function elem_collapse(el, t) {
+  const d = el.style['display'];
+  const c = t.querySelector('.collapse');
+
+  if (d === "none") {
+    el.style['display'] = 'block';
+    c.innerHTML = ea_ui_collapse_triangle('s');
+  }
+
+  else {
+    el.style['display'] = 'none';
+    c.innerHTML = ea_ui_collapse_triangle('e');
+  }
+};

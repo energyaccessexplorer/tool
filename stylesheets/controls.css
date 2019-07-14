@@ -1,15 +1,8 @@
-#controls-wrapper {
-  display: flex;
-  flex-flow: row wrap;
-}
-
 #controls {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-
-  flex: 1 100%;
 }
 
 .controls {
@@ -197,6 +190,7 @@
 
 #controls-boundaries {
   width: 100%;
+  flex: 0 0 auto;
 }
 
 #controls-boundaries .controls-dataset-info {
@@ -226,6 +220,8 @@
 .controls-select-container {
   width: 100%;
   box-sizing: border-box;
+
+  flex: 0 0 auto;
 
   font-size: 1.2em;
 

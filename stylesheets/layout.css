@@ -16,12 +16,17 @@ body {
 
 #controls-wrapper {
   width: 42em;
+  display: flex;
+  flex-flow: column nowrap;
+  flex: 0;
+  z-index: 0;
 }
 
 #controls {
   display: flex;
-  flex: 0;
+  flex: 1 1 auto;
   z-index: 0;
+  overflow: hidden;
 }
 
 #visual {
@@ -47,39 +52,33 @@ body {
 }
 
 #right-pane {
-  position: relative;
+  display: flex;
+  flex-flow: column nowrap;
   width: 500px;
 }
 
 #indexes-pane,
 #layers {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 500px;
-  background-color: white;
+  display: flex;
+  flex-flow: column nowrap;
+
+  flex: 1 0 auto;
+  width: 100%;
 }
 
 #indexes-list,
 #layers-list {
-  overflow-y: scroll;
-  box-shadow: 3px 1px 5px rgba(0,0,0,0.3);
   z-index: 1;
 }
 
-#indexes-list {
-  overflow-y: unset;
+#layers-list {
+  overflow-y: scroll;
 }
 
 #drawer {
   border-top: 1px solid lightgray;
-  position: absolute;
-  padding: 1em;
-  bottom: 0;
-  right: 0;
   color: #141414;
   fill: #141414;
-  cursor: pointer;
   width: 100%;
   box-sizing: border-box;
   display: flex;
@@ -131,7 +130,6 @@ svg#svg-map {
   margin-top: 3px;
   box-sizing: border-box;
   z-index: 0;
-  text-align: center;
 }
 
 #index-graphs-title {
@@ -142,9 +140,6 @@ svg#svg-map {
 #canvas-output-select {
   display: block;
   padding: 0.7em 1em;
-  border: none;
-  font-size: 1em;
-  background-color: white;
 }
 
 canvas#output {

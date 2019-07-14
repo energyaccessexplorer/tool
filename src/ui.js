@@ -61,42 +61,22 @@ function ea_ui_dataset_loading(ds, bool) {
   return s;
 };
 
-function ea_ui_layout_map(bounds) {
+function ea_ui_layout() {
+  const n = document.querySelector('nav');
   const p = document.querySelector('#playground');
+  const m = p.querySelector('#maparea');
+  const c = p.querySelector('#controls-wrapper');
+  const r = p.querySelector('#right-pane');
+  const o = r.querySelector('#canvas-output-container');
+  const d = r.querySelector('#drawer');
+  const l = r.querySelector('#layers-list');
 
-  const ch = window.innerHeight - (
-    document.querySelector('nav').clientHeight +
-      document.querySelector('#controls-boundaries').clientHeight +
-      document.querySelector('.controls-select-container').clientHeight
-  );
+  p.style['height'] =
+    c.style['height'] =
+    m.style['height'] =
+    window.innerHeight - n.clientHeight + "px";
 
-  document.querySelector('#controls').style['height'] = `${ch}px`;
-
-  let width, height;
-  const b = bounds;
-
-  const w = (b[1][0] - b[0][0]);
-  const h = (b[1][1] - b[0][1]);
-
-  height = p.clientHeight;
-
-  width = p.clientWidth - p.querySelector('#controls').clientWidth + 10;
-
-  const maparea = document.querySelector('#maparea');
-  maparea.style['height'] = height + "px";
-
-  const lh = window.innerHeight - (
-    document.querySelector('nav').clientHeight +
-      document.querySelector('#views').clientHeight +
-      300 + document.querySelector('#drawer').clientHeight
-  );
-
-  document.querySelector('#layers-list').style['height'] = `${lh}px`;
-
-  return {
-    width: width,
-    height: height
-  };
+  l.style['height'] = p.clientHeight - (o.clientHeight + d.clientHeight + 4) + "px";
 };
 
 function ea_ui_views_init() {

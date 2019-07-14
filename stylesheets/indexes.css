@@ -3,6 +3,7 @@
   padding: 0;
   list-style-type: none;
   background-color: var(--the-white);
+  box-shadow: 3px 1px 5px rgba(0,0,0,0.3);
 }
 
 #indexes-list .element {
@@ -38,6 +39,7 @@
 
 #index-graphs {
   padding: 0.7em 0 2em;
+  background-color: white;
 }
 
 #index-graphs-container {
@@ -68,4 +70,15 @@
 #index-graphs-info {
   padding-right: 1em;
   float: right;
+}
+
+#canvas-output-container {
+  background-color: white;
+  text-align: center;
+}
+
+#canvas-output-select {
+  border: none;
+  font-size: 1em;
+  background-color: white;
 }

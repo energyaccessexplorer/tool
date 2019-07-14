@@ -219,7 +219,7 @@ Please report this to energyaccessexplorer@wri.org.
     ea_controls_presets_init(state.preset);
     ea_controls_tree(country.category_tree, DS.list);
 
-    ea_ui_layout_map(country.bounds);
+    ea_ui_layout();
     mapbox_setup(country.bounds);
 
     await Promise.all(inputs.map(id => DS.named(id).turn(true, false)));

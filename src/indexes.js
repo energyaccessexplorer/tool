@@ -58,14 +58,14 @@ async function ea_indexes_graphs(raster) {
 
   const scale = elem('<div>');
 
-  scale.append(ea_svg_color_steps(
-    d3.scaleLinear()
-      .domain(ea_default_color_domain)
-      .range(ea_default_color_stops)
-      .clamp(false),
-    ea_default_color_domain));
-
-  scale.append(ea_layers_0_100());
+  scale.append(
+    ea_svg_color_steps(
+      d3.scaleLinear()
+        .domain(ea_default_color_domain)
+        .range(ea_default_color_stops)
+        .clamp(false),
+      ea_default_color_domain),
+    ea_layers_0_100());
 
   const t = await ea_indexes_analyse(raster);
 
@@ -90,9 +90,7 @@ async function ea_indexes_graphs(raster) {
   pe.append(ppie.svg);
   ae.append(apie.svg);
 
-  index_graphs.append(ae);
-  index_graphs.append(pe);
-  index_graphs.append(scale);
+  index_graphs.append(ae, pe, scale);
 };
 
 function ea_indexes_init(o) {
@@ -166,8 +164,9 @@ function ea_indexes_modal() {
   for (let i in ea_indexes) {
     const s = elem(`<section>`);
 
-    c.append(elem(ea_indexes[i], 'h3'));
-    c.append(elem(ea_indexes_infos[i], 'p'));
+    c.append(
+      elem(ea_indexes[i], 'h3'),
+      elem(ea_indexes_infos[i], 'p'));
   }
 
   ea_modal.set({

@@ -17,15 +17,13 @@ function ea_controls(ds) {
   case 'nighttime-lights':
   case 'accessibility':
     range_group = ea_controls_range(ds, (ds.unit || 'range'));
-    controls.append(range_group.elem);
-    controls.append(weight_group.elem);
+    controls.append(range_group.elem, weight_group.elem);
     break;
 
   case "health":
   case "schools":
     range_group = ea_controls_single(ds, (ds.unit || 'proximity in km'));
-    controls.append(range_group.elem);
-    controls.append(weight_group.elem);
+    controls.append(range_group.elem, weight_group.elem);
     break;
 
   case "minigrids":
@@ -35,8 +33,7 @@ function ea_controls(ds) {
   case "geothermal":
   case "transmission-lines":
     range_group = ea_controls_range(ds, (ds.unit || 'proximity in km'));
-    controls.append(range_group.elem);
-    controls.append(weight_group.elem);
+    controls.append(range_group.elem, weight_group.elem);
     break;
 
   case "boundaries-temp-disabled": // NOTE: left as a reference...
@@ -44,8 +41,7 @@ function ea_controls(ds) {
 
     const o = ea_controls_options(ds);
     if (o) {
-      controls.append(o);
-      controls.append(range_group.elem);
+      controls.append(o, range_group.elem);
     }
     else {
       controls.remove();
@@ -77,11 +73,8 @@ function ea_controls(ds) {
       range_group = ea_controls_range(d, (d.unit || 'percentage'), false, update);
 
       let sb = elem('<div class="controls-multifilter-elem" ripple>');
-      sb.append(button);
-
       const title = elem(`<div class="control-group">${ds.csv.options[v]}</div>`)
-      sb.append(title);
-      sb.append(range_group.elem);
+      sb.append(button, title, range_group.elem);
 
       sb.addEventListener('mousedown', e => (e.target !== check.svg) ? update() : null);
 
@@ -108,16 +101,12 @@ function ea_controls(ds) {
 
   case "transmission-lines-collection":
     range_group = ea_controls_range(ds, (ds.unit || 'proximity in km'));
-    controls.append(ea_controls_collection_list(ds));
-    controls.append(range_group.elem);
-    controls.append(weight_group.elem);
+    controls.append(ea_controls_collection_list(ds), range_group.elem, weight_group.elem);
     break;
 
   case 'crops':
     range_group = ea_controls_range(ds, (ds.unit || 'range'));
-    controls.append(ea_controls_mutant_options(ds));
-    controls.append(range_group.elem);
-    controls.append(weight_group.elem);
+    controls.append(ea_controls_mutant_options(ds), range_group.elem, weight_group.elem);
     break;
 
   default:
@@ -140,8 +129,6 @@ function ea_controls_elem(ds) {
   const check = ea_svg_checkbox(ds.active, s => ea_controls_toggle(ds, ds.active = s));
 
   const button = check.svg;
-
-  header.append(button);
 
   ds.checkbox_change = check.change;
 
@@ -167,8 +154,7 @@ function ea_controls_elem(ds) {
   };
 
   const name = elem(`<div class="controls-dataset-name">${ds.name_long}</div>`);
-  header.append(name);
-  header.append(info);
+  header.append(button, name, info);
   header.addEventListener('mouseup', clicko);
 
   info.addEventListener('mouseup', _ => ea_ui_dataset_modal(ds));
@@ -362,8 +348,7 @@ function ea_controls_range(ds, label, single, callback) {
     }
   );
 
-  container.append(range_control.svg);
-  container.append(l);
+  container.append(range_control.svg, l);
 
   return {
     elem: container,
@@ -402,8 +387,7 @@ function ea_controls_weight(ds, init) {
     }
   );
 
-  container.append(weight_control.svg);
-  container.append(l);
+  container.append(weight_control.svg, l);
 
   return {
     elem: container,

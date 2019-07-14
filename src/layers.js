@@ -70,8 +70,10 @@ function ea_layers_elem(ds) {
       let x = DS.named(d);
       let li = elem('<div class="layers-element-collection">');
 
-      li.append(svg_thing(x))
-      li.append(elem(`<div class="layers-element-subheader">${x.name_long}</div>`));
+      li.append(
+        svg_thing(x),
+        elem(`<div class="layers-element-subheader">${x.name_long}</div>`)
+      );
 
       c.append(li);
     }
@@ -120,8 +122,9 @@ function ea_layers_opacity_control(ds) {
     _ => ea_mapbox.setPaintProperty(ds.id, 'raster-opacity', parseFloat(opacity))
   );
 
-  e.append(grad.svg);
-  e.append(elem(`
+  e.append(
+    grad.svg,
+    elem(`
 <div style="display: flex; justify-content: space-between; padding-right: 0.5em; padding-left: 0.5em; font-size: 0.8em;">
   <span>0%</span>
   <span>Opacity</span>

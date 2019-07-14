@@ -5,13 +5,11 @@ const ea_nanny_steps = [
   <p>Would you like us to guide you through the basics?</p>
 </div>`);
 
-    const footer = elem(`<div></div>`);
+    const footer = elem(`<div>`);
 
-    let yes, no, never;
-
-    footer.append(yes = elem(`<button>Yes, let's do this!</button>`));
-    footer.append(no = elem(`<button>No. Ask me later.</button>`));
-    footer.append(never = elem(`<button>No, don't ask me again.</button>`));
+    const yes = elem(`<button>Yes, let's do this!</button>`);
+    const no = elem(`<button>No. Ask me later.</button>`);
+    const never = elem(`<button>No, don't ask me again.</button>`);
 
     yes.addEventListener('mouseup', ea_nanny_next);
     no.addEventListener('mouseup', ea_modal.hide);
@@ -19,6 +17,8 @@ const ea_nanny_steps = [
       localStorage.setItem('needs-nanny', false);
       ea_modal.hide();
     });
+
+    footer.append(yes, no, never);
 
     ea_modal.set({
       header: "Welcome to Energy Access Explorer",

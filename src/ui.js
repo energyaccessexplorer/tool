@@ -135,8 +135,7 @@ function ea_ui_dataset_modal(ds) {
   let left = elem('<div class="left" style="flex: 1;">')
   let right = elem('<div class="right" style="flex: 0 300px; padding-left: 3em;">')
 
-  content.append(left);
-  content.append(right);
+  content.append(left, right);
 
   if (ds.metadata.description)
     left.append(elem(`<section>

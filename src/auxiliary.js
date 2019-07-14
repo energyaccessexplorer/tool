@@ -246,11 +246,9 @@ async function ea_summary() {
       e.classList.toggle('hidden');
   });
 
-  content.append(graphs_tab);
   graphs_tab.append(legend);
 
-  content.append(table);
-  content.append(switcho);
+  content.append(graphs_tab, table, switcho);
 
   ea_modal.set({
     header: "Snapshot",

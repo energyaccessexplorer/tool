@@ -196,23 +196,9 @@ function ea_ui_dataset_modal(ds) {
 };
 
 function ea_ui_index_modal(i) {
-  const titles = {
-    "eai": "Energy Access Index",
-    "ani": "Assistance Need Index",
-    "supply": "The Supply Index",
-    "demand": "The Demand Index"
-  };
-
-  const infos = {
-    "eai": "The Energy Access Index indentifies areas with higher energy demand and supply which are characterized with higher index values. It is an aggregated measure of all selected data sets under both Demand and Supply categories.",
-    "ani": "The Assistance Need Index identifies areas where market assistance is needed the most which are characterized with higher index values. It is an aggregated and weighted measure of selected data sets under both Demand and Supply categories indicating high energy demand, low economic activity, and low access to infrastructure and resources.",
-    "supply": "The Supply Index identifies areas with higher energy supply which are characterized with higher index values. It is an aggregated and weighted measure of all selected data sets under Resource Availability and Infrastructure.",
-    "demand": "The Demand Index identifies areas with higher energy demand which are characterized with higher index values. It is an aggregated and weighted measure of all selected data sets under Demographics and Socio-economic activities."
-  };
-
   ea_modal.set({
-    header: titles[i],
-    content: infos[i],
+    header: ea_indexes[i],
+    content: ea_indexes_infos[i],
     footer: null
   }).show();
 };

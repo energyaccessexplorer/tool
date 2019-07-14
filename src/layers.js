@@ -98,10 +98,8 @@ function ea_layers_inputs(list) {
 
   ldc.forEach(ds => layers_list.appendChild(ea_layers_elem(ds)));
 
-  const style = 'style="font-size: smaller; text-align: center;"';
-
   if (list.length === 0)
-    layers_list.innerHTML = `<pre ${style}>No layers selected.</pre>`;
+    layers_list.innerHTML = `<code>No layers selected.</code>`;
 
   sortable('#layers-list', 'enable');
 };

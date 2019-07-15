@@ -21,6 +21,7 @@ function ea_select_topo_flag(c) {
     .append('image')
     .attr('href', `../mledoze-countries/data/${cca3}.svg`)
     .attr('height', 30)
+    .attr('width', 45)
     .attr('preserveAspectRatio', "xMaxYMin slice")
 
   const g = svg.append('g');

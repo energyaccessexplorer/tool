@@ -70,31 +70,36 @@ function ea_controls(ds) {
 
       const check = ea_svg_checkbox(true, s => {
         d.active_filter = a = s;
-        update();
-      });
 
-      const button = check.svg;
-
-      range_group = ea_controls_range(d, (d.unit || 'percentage'), false, update);
-
-      let sb = elem('<div class="controls-multifilter-elem" ripple>');
-      const title = elem(`<div class="control-group">${ds.csv.options[v]}</div>`)
-
-      sb.addEventListener('mousedown', e => (e.target.closest('svg') !== check.svg) ? update() : null);
-
-      sb.append(button, title, range_group.elem);
-      sbs.push(sb);
-
-      function update() {
-        for (let s of sbs) s.classList.remove('active');
-        sb.classList.add('active');
-        ds.name_long = ds.csv.options[v];
+        select();
 
         ea_overlord({
           "type": "dataset",
           "target": d,
           "caller": "ea_controls_elem multifilter",
         });
+      });
+
+      const checkbox = check.svg;
+
+      range_group = ea_controls_range(d, (d.unit || 'percentage'), false, select);
+
+      let sb = elem('<div class="controls-multifilter-elem" ripple>');
+      const title = elem(`<div class="control-group">${ds.csv.options[v]}</div>`)
+
+      sb.append(checkbox, title, range_group.elem);
+      sbs.push(sb);
+
+      sb.addEventListener('mousedown', e => {
+        if (e.target.closest('svg') === range_group.elem) return;
+
+        if (e.target.closest('svg') !== checkbox) select();
+      });
+
+      function select() {
+        for (let s of sbs) s.classList.remove('active');
+        sb.classList.add('active');
+        ds.name_long = ds.csv.options[v];
       };
 
       if (first) { sb.classList.add('active'); first = false; }

@@ -77,6 +77,7 @@ build-tool:
 		${CSS}/indexes.css \
 		${CSS}/datasets.css \
 		${CSS}/views.css \
+		${CSS}/ripple.css \
 		> ${DIST}/tool/main.css
 
 build-countries:
@@ -128,6 +129,7 @@ build-select:
 		${CSS}/select.css \
 		${CSS}/maparea.css \
 		${CSS}/views.css \
+		${CSS}/ripple.css \
 		> ${DIST}/select/main.css
 
 synced:

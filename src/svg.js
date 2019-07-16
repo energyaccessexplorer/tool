@@ -414,6 +414,7 @@ function ea_svg_points_symbol() {
   const size = 28;
 
   const container = d3.select(document.createElementNS(d3.namespaces.svg, "svg"))
+        .attr("class", 'svg-point')
         .attr("width", size)
         .attr("height", size);
 

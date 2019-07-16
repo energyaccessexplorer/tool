@@ -36,7 +36,7 @@ function ea_controls(ds) {
     controls.append(range_group.elem, weight_group.elem);
     break;
 
-  case "boundaries-temp-disabled": // NOTE: left as a reference...
+  case "boundaries-temp-disabled": { // NOTE: left as a reference...
     range_group = ea_controls_range(ds, (ds.unit || 'percentage'));
 
     const o = ea_controls_options(ds);
@@ -48,12 +48,13 @@ function ea_controls(ds) {
     }
 
     break;
+  }
 
-  case "boundaries":
+  case "boundaries": {
     _controls.querySelector('.controls-dataset-header').remove();
     _controls.prepend(elem(`
 <div class="controls-subbranch-title">
-  <span class="collapse triangle">${ea_ui_collapse_triangle('s')}</span>
+  <span class="collapse triangle">${ea_ui_collapse_triangle(ds.active ? 's' : 'e')}</span>
   ${ds.name_long}
 </div>`));
 
@@ -105,6 +106,7 @@ function ea_controls(ds) {
       .addEventListener('mouseup', e => elem_collapse(controls, _controls.querySelector('.controls-subbranch-title')));
 
     break;
+  }
 
   case "transmission-lines-collection":
     range_group = ea_controls_range(ds, (ds.unit || 'proximity in km'));

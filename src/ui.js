@@ -40,27 +40,6 @@ function ea_ui_app_loading(bool) {
   document.querySelector('#app-loading').style['display'] = bool ? 'block' : 'none';
 };
 
-function ea_ui_dataset_loading(ds, bool) {
-  const el = document.querySelector(`#controls-${ds.id}`);
-  if (!el) return;
-
-  let s = el.querySelector('.loading');
-
-  if (!el)
-    return null;
-
-  if (bool && !s) {
-    s = elem(`<div class="loading"><div class="spinner"></div></div>`);
-    el.append(s);
-  }
-
-  else {
-    if (s) s.remove();
-  }
-
-  return s;
-};
-
 function ea_ui_layout() {
   const n = document.querySelector('nav');
   const p = document.querySelector('#playground');

@@ -1,69 +1,7 @@
 #controls {
-  -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-}
-
-.controls {
-  position: relative;
-  background-color: var(--the-darker-white);
-  border-bottom: solid 1px #d9d9d9;
-}
-
-.controls .label {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  font-size: 0.8em;
-}
-
-.controls .weight-label,
-.controls .weight-label * {
-  font-weight: bold;
-  display: inline-block;
-  color: darkgray;
-}
-
-.controls .loading {
-  position: absolute;
-  background-color: rgba(0,0,0,0.3);
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 100%;
-  text-align: left;
-}
-
-.controls .loading .spinner {
-  display: inline-block;
-  border: 1px solid #333;
-  border-radius: 50%;
-  border-top: 1px solid #f1f1f1;
-  background-color: #aaaaaa;
-  animation: spin 2s linear infinite;
-  width: 20px;
-  height: 20px;
-  margin: 0.5em;
-}
-
-.controls .svg-checkbox {
-  margin-bottom: -4px;
-  fill: var(--the-blue);
-  transform: scale(0.8);
-}
-
-.control-option,
-.control-group {
-  clear: both;
-  white-space: nowrap;
-  margin-left: 1.5em;
-  margin-right: 1.5em;
-  margin-bottom: 2em;
-}
-
-.control-group:last-child {
-  margin-bottom: 0.7em;
 }
 
 .controls-branch {
@@ -114,50 +52,9 @@
   margin-right: 1em;
 }
 
-.controls-dataset-header {
-  padding: 0.7em;
-  cursor: pointer;
-}
-
-.controls-dataset-content {
-  box-sizing: border-box;
-  padding: 0.7em;
-  padding-top: 1em;
-}
-
-.controls-dataset-header .svg-checkbox {
-  cursor: pointer;
-  transform: scale(0.65);
-  vertical-align: bottom;
-}
-
-.controls-dataset-name {
-  display: inline-block;
-  margin: auto 0.5em;
-
-  white-space: nowrap;
-
-  cursor: pointer;
-}
-
-.controls-dataset-info {
-  display: inline-block;
-
-  white-space: nowrap;
-  vertical-align: text-top;
-  line-height: 1.5em;
-
-  float: right;
-
-  color: var(--the-gray);
-  fill: var(--the-gray);
-
-  cursor: pointer;
-}
-
 .controls-dataset-collection {
   font-size: 0.85em;
-  margin-bottom: 2em;
+  margin-bottom: 1em;
   margin-top: 0;
 }
 
@@ -173,7 +70,7 @@
   display: flex;
   justify-content: space-between;
   margin: 0;
-  padding: 1em 1em;
+  padding: 1em 2em;
 }
 
 .controls-multifilter-elem.active {
@@ -191,10 +88,12 @@
 #controls-boundaries {
   width: 100%;
   flex: 0 0 auto;
+  color: var(--the-color);
+  white-space: nowrap;
 }
 
-#controls-boundaries .controls-dataset-info {
-  display: none;
+#controls-boundaries content {
+  padding: 0;
 }
 
 #controls-boundaries .control-group {
@@ -204,17 +103,23 @@
 }
 
 #controls-boundaries .control-group .label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8em;
+
   width: 258px;
   margin: auto;
 }
 
-#controls-boundaries .controls-dataset-name {
-  margin: 1.5em 0.5em;
+#controls-boundaries .control-group .label .unit-label {
+  font-weight: bold;
+  color: darkgray;
 }
 
-#controls-boundaries .controls-dataset-content {
-  margin: 0 0 0 2.5em;
-  padding: 0;
+#controls-boundaries .svg-checkbox {
+  margin-bottom: -4px;
+  fill: var(--the-blue);
+  transform: scale(0.7);
 }
 
 .controls-select-container {

@@ -207,6 +207,149 @@
   </script>
 
   <script src="/javascripts/gapps.js"></script>
+
+  <template id="ds-controls-template">
+    <style>
+      @import "./ripple.css";
+
+      main {
+        background-color: var(--the-darker-white);
+        border-bottom: solid 1px #d9d9d9;
+        color: var(--the-color);
+        position: relative;
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+
+        white-space: nowrap;
+
+        padding: 0.7em;
+        cursor: pointer;
+      }
+
+      [name=name_long] {
+        flex: 1;
+        display: block;
+        margin: auto 0.5em;
+        line-height: 1.5em;
+      }
+
+      [name=info],
+      [name=checkbox] {
+        flex: 0;
+        display: block;
+      }
+
+      [name=checkbox] {
+        margin-bottom: -4px;
+        transform: scale(0.6);
+      }
+
+      [name=info] {
+        line-height: 1.5em;
+      }
+
+      content {
+        display: block;
+        box-sizing: border-box;
+        padding: 0.7em;
+      }
+
+      .weight-group,
+      .range-group {
+        display: block;
+        padding: 0.9em 1.5em 0.9em 1.5em;
+      }
+
+      .label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.8em;
+      }
+
+      .unit-label {
+        font-weight: bold;
+        color: darkgray;
+      }
+
+      .control-option {
+        margin-left: 1.5em;
+        margin-right: 2.5em;
+        margin-bottom: 0.9em;
+      }
+
+      select {
+        border: none;
+        box-sizing: content-box;
+
+        padding: 0.65em;
+
+        width: 100%;
+
+        background-color: white;
+      }
+
+      .loading {
+        position: absolute;
+        display: none;
+        background-color: rgba(0,0,0,0.3);
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 100%;
+        text-align: left;
+        z-index: 1;
+      }
+
+      .loading .spinner {
+        display: block;
+        position: relative;
+        top: 3px;
+        left: 3px;
+        border: 1px solid #333;
+        border-radius: 50%;
+        border-top: 1px solid #f1f1f1;
+        background-color: #aaaaaa;
+        animation: spin 2s linear infinite;
+        width: 20px;
+        height: 20px;
+        margin: 0.5em;
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
+
+    <main>
+      <div class="loading"><div class="spinner"></div></div>
+
+      <header ripple>
+        <slot name="checkbox"></slot>
+        <slot name="name_long"></slot>
+        <slot name="info"></slot>
+      </header>
+
+      <content>
+        <div class="group">
+          <slot name="collection-list"></slot>
+          <slot name="mutant-options"></slot>
+        </div>
+
+        <div class="group range-group">
+          <slot name="range-slider"></slot>
+        </div>
+
+        <div class="group weight-group">
+          <slot name="weight-slider"></slot>
+        </div>
+      </content>
+    </main>
+  </template>
+
   <template id="ds-input-template">
     <style>
       @import "./svg.css";

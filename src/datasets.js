@@ -428,16 +428,15 @@ Forcing dataset's weight to 1.`);
   };
 
   async turn(v, draw) {
-    ea_controls_toggle(this, v); // TODO: this shouldn't be here.
-
-    ea_ui_dataset_loading(this, true);
+    this.controls_el.loading(true);
 
     await Promise.all(
       ['vectors', 'csv', 'heatmap'].map(i => {
         if (v && this[i]) return this.load(i);
       }));
 
-    ea_ui_dataset_loading(this, false);
+    this.controls_el.loading(false);
+
     if (this.mutant) {
       this.mutate(DS.named(this.configuration.host));
     }

@@ -1,181 +1,3 @@
-function ea_controls(ds) {
-  const _controls = ea_controls_elem(ds);
-  const controls = _controls.querySelector('.controls-dataset-content');
-
-  const weight_group = ea_controls_weight(ds);
-  ds.weight_change = weight_group.weight_control.change;
-
-  let range_group;
-
-  controls.style['display'] = ds.active ? '' : 'none';
-
-  switch (ds.id) {
-  case "ghi":
-  case "poverty":
-  case "population":
-  case 'windspeed':
-  case 'nighttime-lights':
-  case 'accessibility':
-    range_group = ea_controls_range(ds, (ds.unit || 'range'));
-    controls.append(range_group.elem, weight_group.elem);
-    break;
-
-  case "health":
-  case "schools":
-    range_group = ea_controls_single(ds, (ds.unit || 'proximity in km'));
-    controls.append(range_group.elem, weight_group.elem);
-    break;
-
-  case "minigrids":
-  case "mines":
-  case "hydro":
-  case "powerplants":
-  case "geothermal":
-  case "transmission-lines":
-    range_group = ea_controls_range(ds, (ds.unit || 'proximity in km'));
-    controls.append(range_group.elem, weight_group.elem);
-    break;
-
-  case "boundaries-temp-disabled": { // NOTE: left as a reference...
-    range_group = ea_controls_range(ds, (ds.unit || 'percentage'));
-
-    const o = ea_controls_options(ds);
-    if (o) {
-      controls.append(o, range_group.elem);
-    }
-    else {
-      controls.remove();
-    }
-
-    break;
-  }
-
-  case "boundaries": {
-    _controls.querySelector('.controls-dataset-header').remove();
-    _controls.prepend(elem(`
-<div class="controls-subbranch-title">
-  <span class="collapse triangle">${ea_ui_collapse_triangle(ds.active ? 's' : 'e')}</span>
-  ${ds.name_long}
-</div>`));
-
-    if (!ds.csv) break;
-
-    const sbs = [];
-    let first = true;
-
-    for (let v in ds.csv.options) {
-      let d = DS.named(ds.id + "-" + v);
-
-      let a = true;
-
-      const check = ea_svg_checkbox(true, s => {
-        d.active_filter = a = s;
-
-        select();
-
-        ea_overlord({
-          "type": "dataset",
-          "target": d,
-          "caller": "ea_controls_elem multifilter",
-        });
-      });
-
-      const checkbox = check.svg;
-
-      range_group = ea_controls_range(d, (d.unit || 'percentage'), false, select);
-
-      let sb = elem('<div class="controls-multifilter-elem" ripple>');
-      const title = elem(`<div class="control-group">${ds.csv.options[v]}</div>`)
-
-      sb.append(checkbox, title, range_group.elem);
-      sbs.push(sb);
-
-      sb.addEventListener('mousedown', e => {
-        if (e.target.closest('svg') === range_group.elem) return;
-
-        if (e.target.closest('svg') !== checkbox) select();
-      });
-
-      function select() {
-        for (let s of sbs) s.classList.remove('active');
-        sb.classList.add('active');
-        ds.name_long = ds.csv.options[v];
-      };
-
-      if (first) { sb.classList.add('active'); first = false; }
-
-      controls.append(sb);
-    }
-
-    _controls.querySelector('.controls-subbranch-title')
-      .addEventListener('mouseup', e => elem_collapse(controls, _controls.querySelector('.controls-subbranch-title')));
-
-    break;
-  }
-
-  case "transmission-lines-collection":
-    range_group = ea_controls_range(ds, (ds.unit || 'proximity in km'));
-    controls.append(ea_controls_collection_list(ds), range_group.elem, weight_group.elem);
-    break;
-
-  case 'crops':
-    range_group = ea_controls_range(ds, (ds.unit || 'range'));
-    controls.append(ea_controls_mutant_options(ds), range_group.elem, weight_group.elem);
-    break;
-
-  default:
-    throw `EA Controls: Unknown data id ${ds.id}`;
-    break;
-  }
-
-  return _controls;
-};
-
-function ea_controls_elem(ds) {
-  const controls = elem(`
-<div id="controls-${ds.id}" class="controls">
-  <div class="controls-dataset-header" ripple></div>
-  <div class="controls-dataset-content"></div>
-</div>`);
-
-  const header = controls.querySelector('.controls-dataset-header');
-
-  const check = ea_svg_checkbox(ds.active, s => ea_controls_toggle(ds, ds.active = s));
-
-  const button = check.svg;
-
-  ds.checkbox_change = check.change;
-
-  const info = elem(`<div class="controls-dataset-info">${ea_svg_info()}</div>`);
-
-  const clicko = function(e) {
-    ds.active = !ds.active;
-
-    if (e.target.closest('div') === info) return;
-
-    if (e.target.closest('svg') !== button) {
-      let event = document.createEvent('HTMLEvents');
-      event.initEvent('click', true, true);
-
-      button.dispatchEvent(event);
-    }
-
-    ea_overlord({
-      "type": "dataset",
-      "target": ds,
-      "caller": "ea_controls_elem clicko",
-    });
-  };
-
-  const name = elem(`<div class="controls-dataset-name">${ds.name_long}</div>`);
-  header.append(button, name, info);
-  header.addEventListener('mouseup', clicko);
-
-  info.addEventListener('mouseup', _ => ea_ui_dataset_modal(ds));
-
-  return controls;
-};
-
 function ea_controls_tree(tree, list) {
   const controls_el = document.querySelector('#controls');
 
@@ -220,7 +42,7 @@ function ea_controls_tree(tree, list) {
         const ds = list.find(x => x.id === b.id);
 
         if (ds) {
-          conel.append(ea_controls(ds));
+          conel.append(ds.controls_el = new dscontrols(ds));
         }
         else {
           console.warn(`'${b.id}' dataset not found.`);
@@ -228,6 +50,45 @@ function ea_controls_tree(tree, list) {
       });
     });
   });
+};
+
+function ea_controls_checkbox(ds) {
+  const _check = ea_svg_checkbox(ds.active);
+  const checkbox = _check.svg;
+
+  const content = qs(this, 'content');
+  content.style.display = ds.active ? '' : 'none';
+
+  const activate = e => {
+    switch (e.target.closest('svg')) {
+    case this.info:
+      break;
+
+    case checkbox: {
+      content.style.display = (ds.active = !ds.active) ? '' : 'none';
+
+      ea_overlord({
+        "type": "dataset",
+        "target": ds,
+        "caller": "controls activate",
+      });
+      break;
+    }
+
+    default: {
+      let event = document.createEvent('HTMLEvents');
+      event.initEvent('click', true, true);
+      checkbox.dispatchEvent(event);
+      break;
+    }
+    };
+
+    return ds.active;
+  };
+
+  qs(this, 'header').onclick = activate;
+
+  return _check.svg;
 };
 
 function ea_controls_mutant_options(ds) {
@@ -239,7 +100,7 @@ function ea_controls_mutant_options(ds) {
     select.append(elem(`<option value=${i}>${host.name_long}</option>`));
   });
 
-  select.value = ds.configuration.mutant_targets[0];
+  select.value = ds.configuration.host;
 
   select.addEventListener('change', async function() {
     const host = DS.named(this.value);
@@ -267,8 +128,6 @@ function ea_controls_options(ds) {
   const container = elem(`<div class="control-option"></div>`);
   const select = elem('<select></select>');
 
-  // select.append(elem(`<option selected disabled>Select one...</option>`));
-
   const options = Object.keys(ds.csv.options);
 
   options.forEach(v => {
@@ -292,21 +151,7 @@ function ea_controls_options(ds) {
   return container;
 };
 
-function ea_controls_toggle(ds, status) {
-  const contel = document.querySelector(`.controls#controls-${ds.id}`);
-  if (!contel) return;
-
-  const cs = contel.querySelectorAll('.controls-dataset-content');
-
-  if (ds.checkbox_change) ds.checkbox_change(status);
-
-  cs.forEach((c,i) => {
-    if (status) c.style['display'] = '';
-    else c.style['display'] = 'none';
-  });
-};
-
-function ea_controls_range(ds, label, single, callback) {
+function ea_controls_range(ds, label, single = false) {
   const d = [ds.heatmap.domain.min, ds.heatmap.domain.max];
 
   const range_norm = d3.scaleLinear().domain([0,1]).range(d);
@@ -319,26 +164,22 @@ function ea_controls_range(ds, label, single, callback) {
     ds.tmp_domain = domain;
   };
 
-  const container = elem(`<div class="control-group"></div>`);
-
   const l = elem(`
 <div class="label">
   <span bind="v1"></span>
-  <span class="weight-label">${label}</span>
+  <span class="unit-label">${label}</span>
   <span bind="v2"></span>
 </div>`);
 
   const v1 = l.querySelector('[bind=v1]');
   const v2 = l.querySelector('[bind=v2]');
 
-  const range_control = ea_svg_interval(
+  const r = ea_svg_interval(
     single,
     (ds.init_domain ? [range_norm.invert(ds.init_domain[0]), range_norm.invert(ds.init_domain[1])] : null),
     x => update_range_value(x, 0, v1),
     x => update_range_value(x, 1, v2),
     _ => {
-      if (typeof callback === 'function') callback();
-
       ea_overlord({
         "type": "dataset",
         "target": ds,
@@ -347,11 +188,14 @@ function ea_controls_range(ds, label, single, callback) {
     }
   );
 
-  container.append(range_control.svg, l);
+  const el = ce('div');
+  el.append(r.svg, l);
 
   return {
-    elem: container,
-    range_control: range_control
+    el: el,
+    svg: r.svg,
+    change: r.change,
+    label: l,
   };
 };
 
@@ -362,16 +206,14 @@ function ea_controls_single(ds, label) {
 function ea_controls_weight(ds, init) {
   const weights = Array.apply(null, Array(5)).map((_, i) => i + 1);
 
-  const container = elem(`<div class="control-group"></div>`);
-
-  const l = elem(`
+  const label = elem(`
 <div class="label">
   <span>${weights[0]}</span>
-  <span class="weight-label">importance</span>
+  <span class="unit-label">importance</span>
   <span>${weights[weights.length - 1]}</span>
 </div>`);
 
-  const weight_control = ea_svg_range_steps(
+  const w = ea_svg_range_steps(
     weights,
     ds.weight,
     null,
@@ -386,11 +228,14 @@ function ea_controls_weight(ds, init) {
     }
   );
 
-  container.append(weight_control.svg, l);
+  const el = ce('div');
+  el.append(w.svg, label);
 
   return {
-    elem: container,
-    weight_control: weight_control
+    el: el,
+    svg: w.svg,
+    change: w.change,
+    label: label,
   };
 };
 
@@ -471,15 +316,110 @@ function ea_controls_presets_set(d, v) {
 
   if (p) {
     d.weight = p.weight;
-    if (d.weight_change) d.weight_change(p.weight);
+    // if (d.weight_change) d.weight_change(p.weight);
 
     d.init_domain = [p.min, p.max];
   } else {
     d.weight = 2;
-    if (d.weight_change) d.weight_change(2);
+    // if (d.weight_change) d.weight_change(2);
 
     d.init_domain = null;
   }
 
   return d.active;
 };
+
+class dscontrols extends HTMLElement {
+  constructor(d) {
+    if (!(d instanceof DS)) throw Error(`dscontrols: Expected a DS. Got ${d}.`);
+    super();
+
+    this.ds = d;
+    attach.call(this, tmpl('#ds-controls-template', true));
+
+    this.init();
+
+    this.render();
+
+    this.spinner = qs(this, '.loading');
+
+    return this;
+  };
+
+  init() {
+    this.checkbox = ea_controls_checkbox.call(this, this.ds);
+
+    this.info = tmpl('#svg-info');
+    this.info.onclick = _ => ea_ui_dataset_modal(this.ds);
+
+    switch (this.ds.id) {
+    case "ghi":
+    case "poverty":
+    case "population":
+    case 'windspeed':
+    case 'nighttime-lights':
+    case 'accessibility':
+      this.weight_group = ea_controls_weight(this.ds);
+      this.range_group = ea_controls_range(this.ds, (this.ds.unit || 'range'));
+      break;
+
+    case "health":
+    case "schools":
+      this.weight_group = ea_controls_weight(this.ds);
+      this.range_group = ea_controls_single(this.ds, 'proximity in km');
+      break;
+
+    case "minigrids":
+    case "mines":
+    case "hydro":
+    case "powerplants":
+    case "geothermal":
+    case "transmission-lines":
+      this.weight_group = ea_controls_weight(this.ds);
+      this.range_group = ea_controls_range(this.ds, 'proximity in km');
+      break;
+
+    case "transmission-lines-collection":
+      this.weight_group = ea_controls_weight(this.ds);
+      this.range_group = ea_controls_range(this.ds, 'proximity in km');
+      this.collection_list = ea_controls_collection_list(this.ds);
+      break;
+
+    case 'crops':
+      this.weight_group = ea_controls_weight(this.ds);
+      this.range_group = ea_controls_range(this.ds, this.ds.unit);
+      this.mutant_options = ea_controls_mutant_options(this.ds);
+      break;
+
+    case "boundaries":
+    case "transmission-lines-planned":
+    case "transmission-lines-operational":
+      break;
+
+    default:
+      throw `EA Controls: Unknown data id ${this.ds.id}. This should NOT happen!`;
+      break;
+    }
+
+    if (this.ds.multifilter) DS.list.filter(d => d.id.match(this.ds.id + "-")).forEach(d => d.controls_el = this);
+  };
+
+  render() {
+    slot_populate.call(this, this.ds, {
+      "info": this.info,
+      "checkbox": this.checkbox,
+      "collection-list": this.collection_list,
+      "mutant-options": this.mutant_options,
+      "range-slider": this.range_group && this.range_group.el,
+      "weight-slider": this.weight_group && this.weight_group.el,
+    });
+
+    return this;
+  };
+
+  loading(t) {
+    this.spinner.style.display = t ? 'block' : 'none';
+  };
+}
+
+customElements.define('ds-controls', dscontrols);

@@ -197,8 +197,10 @@ Please report this to energyaccessexplorer@wri.org.
     else {
       await b.heatmap.parse.call(b);
 
+      b.controls_el = new dscontrols(b);
+
       document.querySelector('#controls-wrapper')
-        .insertBefore(ea_controls(b), document.querySelector('#controls'));
+        .insertBefore(boundaries_controls(b), document.querySelector('#controls'));
     }
 
     const inputs = list

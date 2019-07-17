@@ -62,7 +62,6 @@ build-tool:
 		${SRC}/svg.js \
 		${SRC}/controls.js \
 		${SRC}/ui.js \
-		${SRC}/layers.js \
 		${SRC}/inputs.js \
 		${SRC}/indexes.js \
 		${SRC}/datasets.js \

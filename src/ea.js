@@ -122,7 +122,7 @@ function ea_analysis(list, type) {
  *
  * Any communication between the app's components:
  *   - controls
- *   - layers
+ *   - inputs
  *   - map
  *   - datasets
  *   ... etc. should be done via this function.
@@ -135,7 +135,7 @@ function ea_analysis(list, type) {
  *      dataset: change params or (de)activate a DS
  *      index: change the currently shown index
  *      preset: change the preset
- *      sort: sort the datasets/layers
+ *      sort: sort the selected datasets (inputs)
  *      refresh: a auxiliary to re-set the mode
  *      map: handle user-map interactions
  *
@@ -206,13 +206,17 @@ Please report this to energyaccessexplorer@wri.org.
           .map(x => x.id)
           .sort((a,b) => (state.inputs.indexOf(a) < state.inputs.indexOf(b)) ? -1 : 1);
 
+    list.forEach(d => {
+      d.input_el = new dsinput(d);
+    })
+
     if (!inputs.length) inputs.push('boundaries');
 
     state.set_inputs_param(inputs);
 
     ea_ui_views_init();
 
-    ea_layers_init();
+    ea_inputs_init();
     ea_indexes_init(state.output);
 
     ea_controls_country_setup();
@@ -253,11 +257,11 @@ Please report this to energyaccessexplorer@wri.org.
     else if (t === "inputs") {
       ea_mapbox.setLayoutProperty('canvas-layer', 'visibility', 'none');
 
-      ea_layers_inputs(state.inputs);
+      ea_inputs(state.inputs);
 
       await Promise.all(state.inputs.map(id => DS.named(id).turn(true, true)));
 
-      ea_layers_sort_inputs(state.inputs);
+      ea_inputs_sort(state.inputs);
     }
 
     else {
@@ -295,7 +299,7 @@ Please report this to energyaccessexplorer@wri.org.
     else if (state.mode === "inputs") {
       await ds.turn(ds.active, true);
 
-      ea_layers_inputs(inputs);
+      ea_inputs(inputs);
 
       if (resort) ds.raise();
 
@@ -332,7 +336,7 @@ Please report this to energyaccessexplorer@wri.org.
 
     else if (state.mode === "inputs") {
       await Promise.all(DS.list.map(d => d.turn(d.active, true)));
-      ea_layers_inputs(inputs);
+      ea_inputs(inputs);
     }
 
     state.set_preset_param(msg.target);
@@ -343,7 +347,7 @@ Please report this to energyaccessexplorer@wri.org.
 
   case "sort": {
     if (state.mode === "inputs") {
-      ea_layers_sort_inputs(msg.target);
+      ea_inputs_sort(msg.target);
       state.set_inputs_param(msg.target);
     }
 

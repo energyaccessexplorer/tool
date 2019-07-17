@@ -65,7 +65,7 @@ async function ea_indexes_graphs(raster) {
         .range(ea_default_color_stops)
         .clamp(false),
       ea_default_color_domain),
-    ea_layers_0_100());
+    tmpl("#ramp-label-0-100"));
 
   const t = await ea_indexes_analyse(raster);
 
@@ -108,7 +108,7 @@ function ea_indexes_init(o) {
     });
   });
 
-  document.querySelector('#index-graphs-info').append(elem(ea_svg_info()));
+  document.querySelector('#index-graphs-info').append(tmpl('#svg-info'));
   document.querySelector('#index-graphs-info').addEventListener('mouseup', _ => ea_indexes_modal());
 };
 

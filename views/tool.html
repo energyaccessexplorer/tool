@@ -88,8 +88,8 @@
       </div>
 
       <div id="right-pane">
-        <div id="layers-pane">
-          <ul id="layers-list"></ul>
+        <div id="inputs-pane">
+          <ul id="inputs-list"></ul>
 
           <div id="canvas-output-container">
             <select id="canvas-output-select"></select>
@@ -207,4 +207,214 @@
   </script>
 
   <script src="/javascripts/gapps.js"></script>
+  <template id="ds-input-template">
+    <style>
+      @import "./svg.css";
+
+      :host {
+        background-color: var(--the-white);
+        display: flex;
+        position: relative;
+
+        color: var(--the-gray);
+        fill: var(--the-gray);
+        padding: 0.5em;
+        line-height: 1.8em;
+
+        padding: 5px;
+
+        white-space: nowrap;
+        border-bottom: solid 1px #d9d9d9;
+      }
+
+      header {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: space-between;
+
+        flex: 1 0;
+        margin-right: 1em;
+        user-select: none;
+      }
+
+      main {
+        display: block;
+        padding: 0.5em;
+        width: 100%;
+        color: var(--the-color);
+      }
+
+      content {
+        flex: 1;
+        display: block;
+        padding: 0.5em;
+      }
+
+      [name=name_long],
+      [name=opacity] {
+        flex: 1;
+      }
+
+      [name=unit] {
+        display: inline-block;
+        font-weight: bold;
+        font-size: small;
+        color: gray;
+      }
+
+      [name=handle] {
+        display: block;
+        width: 24px;
+        margin-top: 10px;
+        margin-left: 5px;
+
+        fill: #aaa;
+        fill-opacity: 1;
+        stroke: none;
+
+        cursor: grab;
+        cursor: -webkit-grab;
+      }
+
+      .collection {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .collection div,
+      .collection svg {
+        display: inline-block;
+        vertical-align: middle;
+      }
+
+      .collection svg {
+        transform: scale(0.7);
+        margin-right: 0.7em;
+      }
+
+      .subheader {
+        font-size: 0.7em;
+      }
+    </style>
+
+    <slot name="handle"></slot>
+
+    <main>
+      <header>
+        <slot name="name_long"></slot> <slot name="unit"></slot>
+        <slot name="opacity"></slot>
+      </header>
+
+      <content>
+        <slot name="svg"></slot>
+        <slot name="ramp"></slot>
+      </content>
+    </main>
+  </template>
+
+  <template id="opacity-control">
+    <div class="opacity-root">
+      <div>
+        <svg class="icon" width="14px" height="14px" viewBox="0 0 14 14">
+          <g id="UI-Kit" transform="translate(-563.000000, -732.000000)" fill="#393F44">
+            <path d="M574,734.970107 L574,741.029893 C573.726681,741.51753 573.389413,741.962365 573,742.352242 L573,733.647758 C573.389413,734.037635 573.726681,734.48247 574,734.970107 Z M571,732.330304 L571,743.669696 C570.679203,743.796241 570.344927,743.894735 570,743.962266 L570,732.037734 C570.344927,732.105265 570.679203,732.203759 571,732.330304 Z M568,744 C565.169158,743.556854 563,741.039325 563,738 C563,734.960675 565.169158,732.443146 568,732 L568,744 Z" id="Opacity"></path>
+          </g>
+        </svg>
+
+        <div class="box"
+             style="position: absolute;
+                    top: -10px;
+                    right: 20px;
+                    display: none;
+                    background-color: white;
+                    box-shadow: 0 20px 30px 0 rgba(0,0,0,0.2);
+                    padding: 16px;
+                    padding-bottom: 4px;">
+
+          <div class="slider"></div>
+
+          <div style="display: flex;
+                      justify-content: space-between;
+                      padding-right: 0.5em;
+                      padding-left: 0.5em;
+                      font-size: 0.8em;">
+            <span>0%</span>
+            <span>Opacity</span>
+            <span>100%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="ramp-label-low-high">
+    <div style="display: flex;
+                flex-flow: row nowrap;
+                justify-content: space-between;">
+      <div>LOW</div>
+      <div>MID</div>
+      <div>HIGH</div>
+    </div>
+  </template>
+
+  <template id="ramp-label-min-max">
+    <div style="display: flex;
+                flex-flow: row nowrap;
+                justify-content: space-between;">
+      <div bind="min"></div>
+      <div bind="max"></div>
+    </div>
+  </template>
+
+  <template id="ramp-label-0-100">
+    <div style="display: flex;
+                flex-flow: row nowrap;
+                justify-content: space-between;
+                margin-right: -0.4em;
+                padding-left: 0em;">
+      <div>0</div>
+      <div style="padding-left: 0.7em">20</div>
+      <div style="padding-left: 0.7em">40</div>
+      <div style="padding-left: 0.7em">60</div>
+      <div style="padding-left: 0.7em">80</div>
+      <div>100</div>
+    </div>
+  </template>
+
+  <template id="svg-info">
+    <svg width="14px" height="14px" viewBox="0 0 14 14">
+      <g stroke="none" stroke-width="1" fill-rule="evenodd">
+        <g transform="translate(-630.000000, -731.000000)">
+          <path d="M636,737 L635,737 L635,738 L636,738 L636,741 L635,741 L635,742 L636,742 L638,742 L639,742 L639,741 L638,741 L638,737 L636,737 Z M637,745 C633.134007,745 630,741.865993 630,738 C630,734.134007 633.134007,731 637,731 C640.865993,731 644,734.134007 644,738 C644,741.865993 640.865993,745 637,745 Z M636,734 L636,736 L638,736 L638,734 L636,734 Z" id="info"></path>
+        </g>
+      </g>
+    </svg>
+  </template>
+
+  <template id="svg-handle">
+    <svg width="16" height="16" viewBox="0 0 32 32" version="1.1" style="">
+      <g>
+        <circle cx="28.063301" cy="28.25821" r="3.6749561" />
+        <circle cx="28.196936" cy="3.936680" r="3.6749561" />
+        <circle cx="28.063301" cy="16.23151" r="3.6749561" />
+        <circle cx="3.6749566" cy="28.25824" r="3.6749561" />
+        <circle cx="3.8085892" cy="3.936710" r="3.6749561" />
+        <circle cx="3.6749566" cy="16.23154" r="3.6749561" />
+        <circle cx="16.108364" cy="28.25821" r="3.6749561" />
+        <circle cx="16.241997" cy="3.936680" r="3.6749561" />
+        <circle cx="16.108364" cy="16.23151" r="3.6749561" />
+      </g>
+    </svg>
+  </template>
+
+  <template id="svg-arrow">
+    <svg width="15px" height="12px" viewBox="0 0 12 10">
+      <g stroke="none" stroke-width="1" fill-rule="evenodd">
+        <g transform="translate(-220.000000, -734.000000)" fill-rule="nonzero">
+          <path d="M227,738.12132 L227,744 L225,744 L225,738.12132 L221.707107,741.414214 L220,740 L226,734 L232,740 L230.292893,741.414214 L227,738.12132 Z" id="arrow-down" transform="translate(226.000000, 739.000000) scale(1, -1) translate(-226.000000, -739.000000) "></path>
+        </g>
+      </g>
+    </svg>
+  </template>
 </html>

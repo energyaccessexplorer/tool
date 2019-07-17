@@ -134,7 +134,7 @@ const ea_nanny_steps = [
     });
   },
   function() {
-    const marker = ea_nanny_pick_element('#layers-list', {
+    const marker = ea_nanny_pick_element('#inputs-list', {
       title: "Visualize Underlying Data",
       message: `
 <p>You can sort the elements below by dragging them and change the order of the layers on the map.</p>
@@ -144,7 +144,7 @@ const ea_nanny_steps = [
       align: "middle",
     });
 
-    ea_nanny_el_wait_action(document.querySelector('#layers-list'), 'mousedown', function() {
+    ea_nanny_el_wait_action(document.querySelector('#inputs-list'), 'mousedown', function() {
       ea_nanny_next();
       marker.remove();
     });

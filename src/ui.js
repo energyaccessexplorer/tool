@@ -69,7 +69,7 @@ function ea_ui_layout() {
   const r = p.querySelector('#right-pane');
   const o = r.querySelector('#canvas-output-container');
   const d = r.querySelector('#drawer');
-  const l = r.querySelector('#layers-list');
+  const l = r.querySelector('#inputs-list');
 
   p.style['height'] =
     c.style['height'] =
@@ -197,38 +197,6 @@ function ea_help() {
     content: hm,
     footer: null
   }).show();
-};
-
-/*
- * elem
- *
- * Create a _SINGLE_ HTMLElement from a string and return it.
- *
- * @param "str" string. The HTML.
- * @param "p" string. Wrap the HTML "str" in "p" (allows multi element "str")
- */
-
-function elem(str, p) {
-  var d = document.createElement(p ? p : 'div');
-  d.innerHTML = str;
-
-  return p ? d : d.firstElementChild;
-};
-
-/*
- * elem_empty
- *
- * Remove elements children one by one. This is supposed to be faster
- * than memory safer than `el.innerHTML = ""`.
- *
- * @param "el" HTMLElement.
- */
-
-function elem_empty(e) {
-  if (e instanceof HTMLElement)
-    while (e.lastChild) e.removeChild(e.lastChild);
-  else
-    throw "Argument: argument is not HTMLElment";
 };
 
 function elem_collapse(el, t) {

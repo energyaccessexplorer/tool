@@ -408,6 +408,83 @@ function interval_index(v, arr, clamp) {
 };
 
 function right_pane(t) {
-  document.querySelector('#layers-pane').style.display = (t === 'inputs') ? '' : 'none';
+  document.querySelector('#inputs-pane').style.display = (t === 'inputs') ? '' : 'none';
   document.querySelector('#indexes-pane').style.display = (t === 'outputs') ? '' : 'none';
+};
+
+function boundaries_controls(ds) {
+  const controls = elem(`
+<div id="controls-${ds.id}" class="controls">
+  <div class="controls-subbranch-title">
+    <span class="collapse triangle">${ea_ui_collapse_triangle(ds.active ? 's' : 'e')}</span>
+    ${ds.name_long}
+  </div>
+
+  <content></content>
+</div>`);
+
+  const content = controls.querySelector('content');
+
+  const weight_group = ea_controls_weight(ds);
+
+  let range_group;
+
+  content.style['display'] = ds.active ? '' : 'none';
+
+  if (!ds.csv) return controls;
+
+  const sbs = [];
+  let first = true;
+
+  for (let v in ds.csv.options) {
+    let d = DS.named(ds.id + "-" + v);
+    let a = true;
+
+    const check = ea_svg_checkbox(true, s => {
+      d.active_filter = a = s;
+      select();
+    });
+
+    const checkbox = check.svg;
+
+    range_group = ea_controls_range(d, (d.unit || 'percentage'), false);
+
+    let sb = elem('<div class="controls-multifilter-elem" ripple>');
+    const title = elem(`<div class="control-group">${ds.csv.options[v]}</div>`)
+
+    const g = elem('<div class="control-group">');
+    g.append(range_group.el);
+
+    sb.append(checkbox, title, g);
+    sbs.push(sb);
+
+    sb.addEventListener('mouseup', e => {
+      if (e.target.closest('svg') === range_group.svg) return;
+      if (e.target.closest('svg') !== checkbox) select();
+    });
+
+    function select() {
+      for (let s of sbs) s.classList.remove('active');
+      sb.classList.add('active');
+      ds.name_long = ds.csv.options[v];
+
+      ds.input_el.querySelector('[slot=name_long]').innerText = ds.name_long;
+
+      ea_overlord({
+        "type": "dataset",
+        "target": d,
+        "caller": "ea_controls_elem multifilter",
+      });
+    };
+
+    if (first) { sb.classList.add('active'); ds.name_long = d.csv.options[v]; first = false; }
+
+    content.append(sb);
+  }
+
+  qs(controls, '.controls-subbranch-title').onmouseup = e => {
+    elem_collapse(content, controls.querySelector('.controls-subbranch-title'));
+  };
+
+  return controls;
 };

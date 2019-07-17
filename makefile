@@ -39,6 +39,8 @@ build-tool:
 	@echo "Building tool"
 	@mkdir -p ${DIST}/tool
 	@cp ${VIEWS}/tool.html ${DIST}/tool/index.html
+	@cp ${CSS}/ripple.css ${DIST}/tool/ripple.css
+	@cp ${CSS}/svg.css ${DIST}/tool/svg.css
 
 	@cat \
 		${LIB}/d3.js \
@@ -53,6 +55,7 @@ build-tool:
 
 	@echo -n "const ea_settings = " | cat - \
 		settings.json \
+        ${SRC}/head.js \
 		${SRC}/ea.js \
 		${SRC}/auxiliary.js \
 		${SRC}/client.js \
@@ -60,6 +63,7 @@ build-tool:
 		${SRC}/controls.js \
 		${SRC}/ui.js \
 		${SRC}/layers.js \
+		${SRC}/inputs.js \
 		${SRC}/indexes.js \
 		${SRC}/datasets.js \
 		${SRC}/mapbox.js \
@@ -73,11 +77,11 @@ build-tool:
 		${CSS}/layout.css \
 		${CSS}/controls.css \
 		${CSS}/maparea.css \
-		${CSS}/layers.css \
 		${CSS}/indexes.css \
 		${CSS}/datasets.css \
 		${CSS}/views.css \
 		${CSS}/ripple.css \
+		${CSS}/svg.css \
 		> ${DIST}/tool/main.css
 
 build-countries:
@@ -94,6 +98,7 @@ build-countries:
 
 	@echo -n "const ea_settings = " | cat - \
 		settings.json \
+        ${SRC}/head.js \
 		${SRC}/svg.js \
 		${SRC}/ui.js \
 		${SRC}/countries.js \
@@ -119,6 +124,7 @@ build-select:
 
 	@echo -n "const ea_settings = " | cat - \
 		settings.json \
+        ${SRC}/head.js \
 		${SRC}/svg.js \
 		${SRC}/ui.js \
 		${SRC}/countries.js \

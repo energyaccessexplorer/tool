@@ -1,3 +1,8 @@
+#indexes-pane {
+  color: var(--the-color);
+  fill: var(--the-color);
+}
+
 #indexes-list {
   margin: 0;
   padding: 0;
@@ -10,8 +15,6 @@
   background-color: var(--the-white);
   display: flex;
 
-  color: var(--the-gray);
-  fill: var(--the-gray);
   padding: 0.5em;
   line-height: 1.8em;
 

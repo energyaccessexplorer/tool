@@ -117,6 +117,19 @@ class DS {
     }
 
     this.active = active || (!presetsempty && p);
+
+    this.datatype = this.decidedatatype();
+  };
+
+  decidedatatype() {
+    if (this.datatype) return this.datatype;
+
+    if (this.vectors) return this.vectors.shape_type;
+    else if (this.heatmap) return "raster";
+    else if (this.parent) return this.parent.datatype;
+    else if (this.mutant) return "mutant";
+
+    throw `Cannot decide datatype of ${this.id}`;
   };
 
   mutant_init() {
@@ -125,6 +138,8 @@ class DS {
     let m = DS.named(this.configuration.mutant_targets[0]);
 
     this.configuration.host = m.id;
+
+    this.raster = m.raster;
     this.vectors = m.vectors;
     this.heatmap = m.heatmap;
 
@@ -138,10 +153,6 @@ class DS {
     if (!this.configuration.mutant_targets.includes(host.id))
       throw `${this.id} is not configured to mutate into ${host.id}.`
 
-    this.raster = undefined;
-    this.vectors = undefined;
-    this.heatmap = undefined;
-
     this.configuration.host = host.id;
 
     this.color_scale_svg = host.color_scale_svg;
@@ -152,6 +163,16 @@ class DS {
     this.heatmap = host.heatmap;
     this.raster = host.raster;
     this.vectors = host.vectors;
+
+    const s = qs(DS.named(this.id).input_el, '[name=svg]');
+    elem_empty(s); s.append(host.color_scale_svg);
+
+    let src;
+    if (src = ea_mapbox.getSource(this.id)) {
+      src.canvas = ea_mapbox.getSource(host.id).canvas;
+      src.play();
+      src.pause();
+    }
 
     return this;
   };
@@ -170,14 +191,16 @@ class DS {
 
       let d = new DS({ category: cat });
 
+      d.subid = v;
+      d.parent = this;
+      d.datatype = this.datatype;
+
       d.init(false, null);
 
       d.heatmap = this.heatmap;
       d.vectors = this.vectors;
       d.csv = this.csv;
 
-      d.subid = v;
-      d.parent = this;
       d.active_filter = true;
 
       DSTable[cat.name] = d;
@@ -220,6 +243,9 @@ class DS {
       this.color_scale_svg = ea_svg_color_steps(s,d);
 
       let src; if (src = ea_mapbox.getSource(this.id)) src.setData(this.features);
+
+      const i = qs(DS.named(this.id).input_el, '[name=svg]');
+      elem_empty(i); i.append(this.color_scale_svg);
     }
   };
 
@@ -412,6 +438,9 @@ Forcing dataset's weight to 1.`);
       }));
 
     ea_ui_dataset_loading(this, false);
+    if (this.mutant) {
+      this.mutate(DS.named(this.configuration.host));
+    }
 
     if (this.collection) {
       await Promise.all(this.configuration.collection.map(i => DS.named(i).turn(v, draw)));

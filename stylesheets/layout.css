@@ -58,7 +58,7 @@ body {
 }
 
 #indexes-pane,
-#layers-pane {
+#inputs-pane {
   display: flex;
   flex-flow: column nowrap;
 
@@ -67,11 +67,16 @@ body {
 }
 
 #indexes-list,
-#layers-list {
+#inputs-list {
   z-index: 1;
 }
 
-#layers-list {
+#inputs-list {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  background-color: var(--the-white);
+  box-shadow: 3px 1px 5px rgba(0,0,0,0.3);
   overflow-y: scroll;
 }
 

@@ -205,10 +205,3 @@ aside.nanny-marker * {
     50%  { opacity: 1.0; }
     100% { opacity: 0.7; }
 }
-
-.svg-interval,
-.svg-range,
-.svg-point,
-.svg-pie {
-  filter: drop-shadow( 0px 1px 1px rgba(0, 0, 0, .3));
-}

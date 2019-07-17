@@ -10,10 +10,8 @@ function ea_nanny_el_wait_action(el, action, callback) {
   });
 };
 
-function ea_nanny_pick_element(query, opts) {
-  const el = document.querySelector(query);
-
-  if (!el) throw DOMError, `ea_nanny_pick_element: No such element found with '${query}'`;
+function ea_nanny_pick_element(el, opts) {
+  if (!el) throw DOMError, `ea_nanny_pick_element: No such element.`;
 
   const elbox = el.getBoundingClientRect();
 

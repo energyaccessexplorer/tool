@@ -28,49 +28,65 @@ const ea_nanny_steps = [
   },
   function() {
     ea_modal.hide();
+    const el = qs(document, '#controls-boundaries');
 
-    const marker = ea_nanny_pick_element('#controls-boundaries', {
+    const marker = ea_nanny_pick_element(el, {
       title: "Sub-national level data",
       message: "Select one or more. They will be used as filters to identify regions of interest.",
       position: "E",
       align: "middle"
     });
 
-    ea_nanny_el_wait_action(document.querySelector('#controls-boundaries'), 'mouseup', function() {
+    ea_nanny_el_wait_action(el, 'click', function() {
       ea_nanny_next();
       marker.remove();
     });
   },
   function() {
-    const marker = ea_nanny_pick_element('#controls-population', {
+    const ds = DS.named('population');
+    const el = ds.controls_el;
+
+    const marker = ea_nanny_pick_element(el, {
       title: "Granular Demand Data (1/3)",
       message: "Select one or more datasets on <strong>Demographics</strong> and <strong>Social and Productive Uses</strong> to visualize and analyze current or potential demand for energy.",
       position: "E",
       align: "middle",
     });
 
-    ea_nanny_el_wait_action(document.querySelector('#controls-population .controls-dataset-header'), 'mouseup', function() {
-      if (DSTable['population'].active) ea_nanny_next();
-      marker.remove();
+    ea_nanny_el_wait_action(qs(el, 'header'), 'click', function() {
+      console.log("click");
+
+      if (ds.active) {
+        ea_nanny_next();
+        marker.remove();
+      }
     });
   },
   function() {
-    const marker = ea_nanny_pick_element('#controls-schools', {
+    const ds = DS.named('schools');
+    const el = ds.controls_el;
+
+    const marker = ea_nanny_pick_element(el, {
       title: "Granular Demand Data (2/3)",
       message: "Select another one...",
       position: "E",
       align: "middle",
     });
 
-    ea_nanny_el_wait_action(document.querySelector('#controls-schools .controls-dataset-header'), 'mouseup', function() {
-      if (DSTable['schools'].active) ea_nanny_next();
-      marker.remove();
+    ea_nanny_el_wait_action(qs(el, 'header'), 'click', function() {
+      if (ds.active) {
+        ea_nanny_next();
+        marker.remove();
+      }
     });
   },
   async function() {
+    const ds = DS.named('schools');
+    const el = ds.controls_el;
+
     await new Promise(_ => setTimeout(_, 1000));
 
-    const marker = ea_nanny_pick_element('#controls-schools .control-group:nth-child(1) .svg-interval', {
+    const marker = ea_nanny_pick_element(qs(el, '[name=range-slider] .svg-interval'), {
       title: "Granular Demand Data (3/3)",
       message: `
 <p>Apply filters to identify specific areas of interest</p>
@@ -82,22 +98,20 @@ const ea_nanny_steps = [
 
     let i;
     i = setInterval(function() {
-      if (DSTable['schools'].tmp_domain[1] !== DSTable['schools'].heatmap.domain['max']) {
+      if (ds.tmp_domain[1] !== ds.heatmap.domain['max']) {
         clearInterval(i);
         marker.remove();
         ea_nanny_next();
       }
     }, 1000);
-
-
-    ea_nanny_el_wait_action(document.querySelector('#controls-health .controls-dataset-header'), 'mouseup', function() {
-      marker.remove();
-    });
   },
   async function() {
+    const ds = DS.named('schools');
+    const el = ds.controls_el;
+
     await new Promise(_ => setTimeout(_, 1000));
 
-    const marker = ea_nanny_pick_element('#controls-schools .control-group:nth-child(2) .svg-range', {
+    const marker = ea_nanny_pick_element(qs(el, '[name=weight-slider] .svg-range'), {
       title: "Granular Demand Data (3/3)",
       message: `
 <p>Weigh the importance</p>
@@ -108,33 +122,35 @@ const ea_nanny_steps = [
 
     let i;
     i = setInterval(function() {
-      if (DSTable['schools'].weight !== 2) {
+      if (ds.weight !== 2) {
         clearInterval(i);
         marker.remove();
         ea_nanny_next();
       }
     }, 1000);
-
-
-    ea_nanny_el_wait_action(document.querySelector('#controls-health .controls-dataset-header'), 'mouseup', function() {
-      marker.remove();
-    });
   },
   function() {
-    const marker = ea_nanny_pick_element('#controls-ghi', {
+    const ds = DS.named('ghi');
+    const el = ds.controls_el;
+
+    const marker = ea_nanny_pick_element(el, {
       title: "Granular Supply Data",
       message: "Similarly, select and customize one or more data on <strong>Resource Availability</strong> and <strong>Infrastructure</strong>.",
       position: "E",
       align: "middle",
     });
 
-    ea_nanny_el_wait_action(document.querySelector('#supply'), 'mouseup', function() {
-      if (DSTable['ghi'].active) ea_nanny_next();
-      marker.remove();
+    ea_nanny_el_wait_action(document.querySelector('#supply'), 'click', function() {
+      if (ds.active) {
+        ea_nanny_next();
+        marker.remove();
+      }
     });
   },
   function() {
-    const marker = ea_nanny_pick_element('#inputs-list', {
+    const el = qs(document, '#inputs-list');
+
+    const marker = ea_nanny_pick_element(el, {
       title: "Visualize Underlying Data",
       message: `
 <p>You can sort the elements below by dragging them and change the order of the layers on the map.</p>
@@ -144,28 +160,32 @@ const ea_nanny_steps = [
       align: "middle",
     });
 
-    ea_nanny_el_wait_action(document.querySelector('#inputs-list'), 'mousedown', function() {
+    ea_nanny_el_wait_action(el, 'mousedown', function() {
       ea_nanny_next();
       marker.remove();
     });
   },
   function() {
-    const marker = ea_nanny_pick_element('#views .view:nth-child(2)', {
+    const el = qs(document, '#views .view:nth-child(2)');
+
+    const marker = ea_nanny_pick_element(el, {
       title: "Analytical Outputs",
       message: `You can change the view to see the different available indexes.`,
       position: "S",
       align: "middle",
     });
 
-    ea_nanny_el_wait_action(document.querySelector('#views'), 'mouseup', function() {
+    ea_nanny_el_wait_action(el, 'click', function() {
       ea_nanny_next();
       marker.remove();
     });
   },
   async function() {
+    const el = document.querySelector('#indexes-list');
+
     await new Promise(_ => setTimeout(_, 1000));
 
-    const marker = ea_nanny_pick_element('#indexes-list', {
+    const marker = ea_nanny_pick_element(el, {
       title: "Analytical Outputs",
       message: `
 <p>These elements represent the different indexes. Each index is a specialized aggregate of the dataset you selected previously.</p>
@@ -175,32 +195,35 @@ const ea_nanny_steps = [
       align: "middle",
     });
 
-    ea_nanny_el_wait_action(document.querySelector('#indexes-list'), 'mouseup', function() {
+    ea_nanny_el_wait_action(el, 'click', function() {
       ea_nanny_next();
       marker.remove();
     });
   },
   function() {
-    const marker = ea_nanny_pick_element('#index-graphs-info', {
+    const info = qs(document, '#index-graphs-info');
+    const g = qs(document, '#index-graphs');
+
+    const marker = ea_nanny_pick_element(info, {
       title: "Information about Analytical Outputs",
       message: `Click here to see a more detailed explanation about the Index`,
       position: "W",
       align: "middle",
     });
 
-    ea_nanny_el_wait_action(document.querySelector('#index-graphs'), 'mouseup', function() {
+    ea_nanny_el_wait_action(g, 'click', function() {
       ea_nanny_next();
       marker.remove();
     });
   },
   function() {
-    const marker = ea_nanny_pick_element('body', {
+    const marker = ea_nanny_pick_element(document.body, {
       title: "That's it!",
       message: "There are more features for you to find... go!",
       position: "C"
     });
 
-    ea_nanny_el_wait_action(document.querySelector('body'), 'mousedown', function() {
+    ea_nanny_el_wait_action(document.body, 'mousedown', function() {
       ea_nanny_next();
       marker.remove();
     });

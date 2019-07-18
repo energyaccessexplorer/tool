@@ -11,5 +11,6 @@ countries.json	https://raw.githubusercontent.com/mledoze/countries/master/dist/c
 location.js	https://gitlab.com/fabbe/web-toolbelt/raw/master/location.js
 flash.js	https://gitlab.com/fabbe/web-toolbelt/raw/master/flash.js
 modal.js	https://gitlab.com/fabbe/web-toolbelt/raw/master/modal.js
+nanny.js	https://gitlab.com/fabbe/web-toolbelt/raw/master/nanny.js
 jspdf.js	https://unpkg.com/jspdf@latest/dist/jspdf.min.js
 jspdf-autotable.js	https://unpkg.com/jspdf-autotable@latest/dist/jspdf.plugin.autotable.js

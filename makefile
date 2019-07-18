@@ -51,6 +51,7 @@ build-tool:
 		${LIB}/modal.js \
 		${LIB}/location.js \
 		${LIB}/htmlsortable.js \
+		${LIB}/nanny.js \
 		> ${DIST}/tool/libs.js
 
 	@echo -n "const ea_settings = " | cat - \
@@ -66,7 +67,6 @@ build-tool:
 		${SRC}/indexes.js \
 		${SRC}/datasets.js \
 		${SRC}/mapbox.js \
-		${SRC}/nanny.js \
 		${SRC}/nanny-steps.js \
 		${SRC}/report.js \
 		${SRC}/countries.js \

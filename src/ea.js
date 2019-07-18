@@ -234,7 +234,16 @@ Please report this to energyaccessexplorer@wri.org.
 
     ea_ui_app_loading(false);
 
-    ea_nanny_start();
+    (function() {
+      window.ea_nanny = new nanny(ea_nanny_steps);
+
+      if (state.inputs.length > 1) return;
+      if (state.mode !== "inputs") return;
+
+      const w = localStorage.getItem('needs-nanny');
+
+      if (!w || !w.match(/false/)) ea_nanny.start();
+    })();
 
     break;
   }

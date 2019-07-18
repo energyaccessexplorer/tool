@@ -83,6 +83,8 @@ build-tool:
 		${CSS}/svg.css \
 		> ${DIST}/tool/main.css
 
+	@cp ${SRC}/browser.js ${DIST}/tool/
+
 build-countries:
 	@echo "Building countries"
 	@mkdir -p ${DIST}/countries
@@ -136,6 +138,8 @@ build-select:
 		${CSS}/views.css \
 		${CSS}/ripple.css \
 		> ${DIST}/select/main.css
+
+	@cp ${SRC}/browser.js ${DIST}/select/
 
 synced:
 	@rsync -OPrv \

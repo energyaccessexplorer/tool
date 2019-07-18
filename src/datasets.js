@@ -412,19 +412,27 @@ Forcing dataset's weight to 1.`);
   };
 
   async show() {
-    if (this.collection)
+    if (this.collection) {
       await Promise.all(this.configuration.collection.map(i => DS.named(i).show()));
+      return;
+    }
 
-    else if (ea_mapbox.getLayer(this.id))
+    if (ea_mapbox.getLayer(this.id))
       ea_mapbox.setLayoutProperty(this.id, 'visibility', 'visible');
+
+    if (this.controls_el) this.controls_el.turn(true);
   };
 
   async hide() {
-    if (this.collection)
+    if (this.collection) {
       await Promise.all(this.configuration.collection.map(i => DS.named(i).hide()));
+      return;
+    }
 
-    else if (ea_mapbox.getSource(this.id))
+    if (ea_mapbox.getSource(this.id))
       ea_mapbox.setLayoutProperty(this.id, 'visibility', 'none');
+
+    if (this.controls_el) this.controls_el.turn(false);
   };
 
   async turn(v, draw) {

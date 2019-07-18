@@ -53,19 +53,16 @@ function ea_controls_tree(tree, list) {
 };
 
 function ea_controls_checkbox(ds) {
-  const _check = ea_svg_checkbox(ds.active);
-  const checkbox = _check.svg;
-
-  const content = qs(this, 'content');
-  content.style.display = ds.active ? '' : 'none';
+  const checkbox = ea_svg_checkbox(ds.active);
+  const svg = checkbox.svg;
 
   const activate = e => {
     switch (e.target.closest('svg')) {
     case this.info:
       break;
 
-    case checkbox: {
-      content.style.display = (ds.active = !ds.active) ? '' : 'none';
+    case svg: {
+      this.turn(ds.active = !ds.active);
 
       ea_overlord({
         "type": "dataset",
@@ -78,7 +75,7 @@ function ea_controls_checkbox(ds) {
     default: {
       let event = document.createEvent('HTMLEvents');
       event.initEvent('click', true, true);
-      checkbox.dispatchEvent(event);
+      svg.dispatchEvent(event);
       break;
     }
     };
@@ -88,7 +85,7 @@ function ea_controls_checkbox(ds) {
 
   qs(this, 'header').onclick = activate;
 
-  return _check.svg;
+  return checkbox;
 };
 
 function ea_controls_mutant_options(ds) {
@@ -337,11 +334,12 @@ class dscontrols extends HTMLElement {
     this.ds = d;
     attach.call(this, tmpl('#ds-controls-template', true));
 
+    this.content = qs(this, 'content');
+    this.spinner = qs(this, '.loading');
+
     this.init();
 
     this.render();
-
-    this.spinner = qs(this, '.loading');
 
     return this;
   };
@@ -405,9 +403,11 @@ class dscontrols extends HTMLElement {
   };
 
   render() {
+    this.content.style.display = this.ds.active ? '' : 'none';
+
     slot_populate.call(this, this.ds, {
       "info": this.info,
-      "checkbox": this.checkbox,
+      "checkbox": this.checkbox.svg,
       "collection-list": this.collection_list,
       "mutant-options": this.mutant_options,
       "range-slider": this.range_group && this.range_group.el,
@@ -419,6 +419,11 @@ class dscontrols extends HTMLElement {
 
   loading(t) {
     this.spinner.style.display = t ? 'block' : 'none';
+  };
+
+  turn(t) {
+    this.content.style.display = t ? '' : 'none';
+    this.checkbox.change(t);
   };
 }
 

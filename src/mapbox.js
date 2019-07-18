@@ -205,7 +205,7 @@ padding: 16px;`;
   p.style.left = x + "px";
   p.style.top  = y + "px";
 
-  if (content instanceof HTMLElement)
+  if (content instanceof Element)
     p.append(content);
   else
     p.innerHTML = content;

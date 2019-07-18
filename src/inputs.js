@@ -149,7 +149,7 @@ class dsinput extends HTMLElement {
     if (d.collection) return;
 
     if (!d.vectors && d.heatmap) {
-      el = qs(document, "#ramp-label-min-max").content.cloneNode(true).firstElementChild;
+      el = tmpl("#ramp-label-min-max");
 
       qs(el, '[bind=min]').innerText = d.heatmap.domain.min * d.heatmap.factor;
       qs(el, '[bind=max]').innerText = d.heatmap.domain.max * d.heatmap.factor;

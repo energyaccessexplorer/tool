@@ -1,5 +1,6 @@
 function qs(el, str) {
-  if (!el) throw Error(`qs: got ${el}. Expected an HTMLElement.`);
+  if (!(el instanceof Node))
+    throw Error(`qs: Expected a Node. got ${el}.`);
 
   return (el.shadowRoot) ?
     el.shadowRoot.querySelector(str) :
@@ -27,14 +28,14 @@ function elem(str, p) {
 };
 
 function elem_empty(e) {
-  if (e instanceof HTMLElement)
+  if (e instanceof Node)
     while (e.lastChild) e.removeChild(e.lastChild);
   else
-    throw "Argument: argument is not HTMLElment";
+    throw "Argument: argument is not a Node";
 };
 
 function attach(el) {
-  const shadow = this.attachShadow({ mode: 'open' })
+  const shadow = this.attachShadow({ mode: 'open' });
   shadow.append(el);
 
   return shadow;
@@ -44,11 +45,10 @@ function slot(name, content) {
   let el = document.createElement('span');
   el.setAttribute('slot', name);
 
-  if (content instanceof HTMLElement
-      || content instanceof SVGSVGElement)
+  if (content instanceof Element)
     el.append(content);
   else if (typeof content === 'object')
-    throw Error(`slot: Expected a HTMLElement or something stringy. Got an 'object'`);
+    throw Error(`slot: Expected an Element or something stringy. Got an ${content}`);
   else
     el.innerHTML = content;
 

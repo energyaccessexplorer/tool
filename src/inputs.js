@@ -48,7 +48,7 @@ class dsinput extends HTMLElement {
     super();
 
     this.ds = d;
-    attach.call(this, tmpl('#ds-input-template', true));
+    attach.call(this, shadow_tmpl('#ds-input-template'));
 
     this.render();
 
@@ -124,14 +124,13 @@ class dsinput extends HTMLElement {
     else if (!d.vectors && d.heatmap) e = d.color_scale_svg;
 
     if (d.collection) {
-      const el = elem('<ul class="collection">');
+      const el = ce('ul', null, { class: 'collection' });
 
       for (let i of d.configuration.collection) {
         let x = DS.named(i);
         let li = ce('li');
 
-        li.append(x.input_el.svg(), elem(`<div class="subheader">${x.name_long}</div>`));
-
+        li.append(x.input_el.svg(), ce('div', x.name_long, { class: 'subheader' }));
         el.append(li);
       }
 

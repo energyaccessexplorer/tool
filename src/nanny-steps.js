@@ -1,20 +1,20 @@
 const ea_nanny_steps = [
   {
     init: function() {
-      const content = elem('<p>Would you like us to guide you through the basics?</p>', 'div');
+      const content = ce('div', ce('p', 'Would you like us to guide you through the basics?'));
 
       const footer = ce('div');
 
-      const yes = elem("Yes, let's do this!", 'button');
+      const yes = ce('button', "Yes, let's do this!");
       yes.addEventListener('mouseup', _ => {
         ea_modal.hide();
         ea_nanny.next();
       });
 
-      const no = elem("No. Ask me later.", 'button');
+      const no = ce('button', "No. Ask me later.");
       no.addEventListener('mouseup', _ => ea_modal.hide());
 
-      const never = elem("No, don't ask me again.", 'button');
+      const never = ce('button', "No, don't ask me again.");
       never.addEventListener('mouseup', _ => {
         localStorage.setItem('needs-nanny', false);
         ea_modal.hide();

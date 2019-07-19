@@ -35,13 +35,7 @@ class MapboxThemeControl {
     this._container.className = 'mapboxgl-ctrl';
     this._container.classList.add('mapboxgl-ctrl-group');
 
-    let button = elem(`
-<button class="mapboxgl-ctrl-icon" type="button">
-  <div style="transform: scale(0.75);">
-    <svg width="24" height="24" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M11.99 18.54l-7.37-5.73L3 14.07l9 7 9-7-1.63-1.27-7.38 5.74zM12 16l7.36-5.73L21 9l-9-7-9 7 1.63 1.27L12 16z"/></svg>
-  <div>
-</button>
-`);
+    let button = ce('button', ce('div', tmpl('#svg-layers'), { style: "transform: scale(0.75)" }), { type: 'button', class: 'mapboxgl-ctrl-icon'});
 
     this._container.append(button);
 
@@ -57,11 +51,23 @@ class MapboxThemeControl {
 };
 
 function mapbox_theme_control_popup(btn) {
-  let x = elem('<div id="mapbox-theme-control-popup">');
-  let radios = elem(`<div>`);
+  let x = ce('div', null, { id: 'mapbox-theme-control-popup' });
+  let radios = ce('div');
 
   for (let t of mapbox_styles) {
-    radios.append(elem(`<div class="radio-group"><input id="mapbox_theme_${t.value}" type="radio" name="mapbox_theme" value="${t.value}" /> <label for="mapbox_theme_${t.value}">${t.name}</label></div>`));
+    let e = ce('div', null, { class: 'radio-group' });
+
+    e.append(
+      ce('input', null, {
+        id: `mapbox_theme_${t.value}`,
+        type: "radio",
+        name: "mapbox_theme",
+        value: t.value
+      }),
+      ce('label', t.name, { for: `mapbox_theme_${t.value}` })
+    );
+
+    radios.append(e);
   }
 
   let current = radios.querySelector(`input[value="${ea_settings.mapbox_theme}"]`)
@@ -199,22 +205,18 @@ function mapbox_pointer(content, x, y) {
   let p = document.querySelector('#mapbox-pointer');
 
   if (!p) {
-    p = elem('<div id="mapbox-pointer">');
-    p.style = `
+    p = ce('div', content, {
+      id: "mapbox-pointer",
+      style: `
 position: absolute;
+left: ${x}px;
+top: ${y}px;
 background-color: white;
 box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
 border-radius: 0 4px 4px 4px;
-padding: 16px;`;
+padding: 16px;`
+    });
   }
-
-  p.style.left = x + "px";
-  p.style.top  = y + "px";
-
-  if (content instanceof Element)
-    p.append(content);
-  else
-    p.innerHTML = content;
 
   document.body.append(p);
 

@@ -56,7 +56,7 @@ async function ea_indexes_graphs(raster) {
   const index_graphs = document.querySelector('#index-graphs-container');
   elem_empty(index_graphs);
 
-  const scale = elem('<div>');
+  const scale = ce('div');
 
   scale.append(
     ea_svg_color_steps(
@@ -77,15 +77,8 @@ async function ea_indexes_graphs(raster) {
   ppie.change(0);
   apie.change(0);
 
-  let pe = elem(`
-<div class="index-graphs-group">
-  <div>Population share</div>
-</div>`);
-
-  let ae = elem(`
-<div class="index-graphs-group">
-  <div>Area share</div>
-</div>`);
+  let pe = ce('div', ce('div', "Population share"), { class: 'index-graphs-group' });
+  let ae = ce('div', ce('div', "Area share"), { class: 'index-graphs-group' });
 
   pe.append(ppie.svg);
   ae.append(apie.svg);
@@ -96,7 +89,7 @@ async function ea_indexes_graphs(raster) {
 function ea_indexes_init(o) {
   const cos = document.querySelector('#canvas-output-select');
   for (let i in ea_indexes)
-    cos.append(elem(`<option value="${i}">${ea_indexes[i]}</option>`))
+    cos.append(ce('option', ea_indexes[i], { value: i }));
 
   cos.value = o;
 
@@ -119,12 +112,11 @@ function ea_indexes_list(target) {
   elem_empty(indexes_list);
 
   function i_elem(t, v, x) {
-    const d = elem(`
-<li bind="${t}" ripple
-    class="element">
-  <div class="radio"></div>
-  <span>${v}</span>
-</li>`);
+    const d = ce('li',  null, { bind: t, class: 'element', ripple: "" });
+    d.append(
+      ce('div', null, { class: 'radio' }),
+      ce('span', v)
+    );
 
     return d;
   };
@@ -159,14 +151,15 @@ function ea_indexes_list(target) {
 };
 
 function ea_indexes_modal() {
-  const c = elem(`<div>`);
+  const c = ce('div');
 
   for (let i in ea_indexes) {
-    const s = elem(`<section>`);
+    const s = ce('section');
 
     c.append(
-      elem(ea_indexes[i], 'h3'),
-      elem(ea_indexes_infos[i], 'p'));
+      ce('h3', ea_indexes[i]),
+      ce('p', ea_indexes_infos[i])
+    );
   }
 
   ea_modal.set({

@@ -459,6 +459,58 @@
     </main>
   </template>
 
+  <template id="ds-info-modal">
+    <div style="display:flex; flex-flow: row nowrap;">
+      <div class="left" style="flex: 1;">
+        <section>
+          <h3>Description</h3><pre class="description-text" bind="description"></pre>
+        </section>
+
+        <section>
+          <h3>Why is this dataset used?</h3><pre bind="why"></pre>
+        </section>
+
+        <section>
+          <h3>Suggested Citation</h3><pre class="description-text" bind="suggested_citation"></pre>
+        </section>
+
+        <section>
+          <h3>Cautions</h3><pre class="description-text" bind="cautions"></pre>
+        </section>
+      </div>
+
+      <div class="right" style="flex: 0 300px; padding-left: 3em;">
+        <section>
+          <a class="download-link" id="metadata-sources" target="_blank">Download from Source</a>
+        </section>
+
+        <section>
+          <a class="download-link" id="learn-more" target="_blank">Learn More</a>
+        </section>
+
+        <section>
+          <h3>Sources</h3>
+          <pre class="description-text" bind="sources"></pre>
+        </section>
+
+        <section>
+          <h3>Spatial Resolution</h3>
+          <span bind="spatial_resolution"></span>
+        </section>
+
+        <section>
+          <h3>License</h3>
+          <span bind="license"></span>
+        </section>
+
+        <section>
+          <h3>Date of Content</h3>
+          <span bind="content_date"></span>
+        </section>
+      </div>
+    </div>
+  </template>
+
   <template id="opacity-control">
     <div class="opacity-root">
       <div>
@@ -561,6 +613,12 @@
           <path d="M227,738.12132 L227,744 L225,744 L225,738.12132 L221.707107,741.414214 L220,740 L226,734 L232,740 L230.292893,741.414214 L227,738.12132 Z" id="arrow-down" transform="translate(226.000000, 739.000000) scale(1, -1) translate(-226.000000, -739.000000) "></path>
         </g>
       </g>
+    </svg>
+  </template>
+
+  <template id="svg-layers">
+    <svg width="24" height="24" viewBox="0 0 24 24">
+      <path d="M0 0h24v24H0z" fill="none"/><path d="M11.99 18.54l-7.37-5.73L3 14.07l9 7 9-7-1.63-1.27-7.38 5.74zM12 16l7.36-5.73L21 9l-9-7-9 7 1.63 1.27L12 16z"/>
     </svg>
   </template>
 </html>

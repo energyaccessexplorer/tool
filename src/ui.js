@@ -62,11 +62,7 @@ function ea_ui_views_init() {
   const el = document.querySelector('#views');
 
   Object.keys(ea_views).forEach(v => {
-    const btn = elem(`
-<div class="view" ripple>
-  <div class="view-name">${ea_views[v]['name']}</div>
-</div>
-`);
+    const btn = ce('div', ce('div', ea_views[v]['name'], { class: 'view-name' }), { class: 'view' });
 
     btn.addEventListener('mouseup', function(e) {
       el.querySelectorAll('.view').forEach(e => e.classList.remove('active'));
@@ -89,62 +85,12 @@ function ea_ui_views_init() {
 };
 
 function ea_ui_dataset_modal(ds) {
-  let content = elem('<div style="display:flex; flex-flow: row nowrap;">');
+  const b = ds.metadata;
+  b['why'] = ds['why'];
 
-  let left = elem('<div class="left" style="flex: 1;">')
-  let right = elem('<div class="right" style="flex: 0 300px; padding-left: 3em;">')
-
-  content.append(left, right);
-
-  if (ds.metadata.description)
-    left.append(elem(`<section>
-<h3>Description</h3><pre class="description-text">${ds.metadata.description}</pre>
-</section>`));
-
-  if (ds.why)
-    left.append(elem(`<section>
-<h3>Why is this dataset used?</h3><pre>${ds.why}</pre>
-</section>`));
-
-  if (ds.metadata.suggested_citation)
-    left.append(elem(`<section>
-<h3>Suggested Citation</h3><pre class="description-text">${ds.metadata.suggested_citation}</pre>
-</section>`));
-
-  if (ds.metadata.cautions)
-    left.append(elem(`<section>
-<h3>Cautions</h3><pre class="description-text">${ds.metadata.cautions}</pre>
-</section>`));
-
-  if (ds.metadata.download_original_url)
-    right.append(elem(`<section>
-<a class="download-link" target="_blank" href="${ds.metadata.download_original_url}">Download from Source</a>
-</section>`));
-
-  if (ds.metadata.learn_more_url)
-    right.append(elem(`<section>
-<a class="download-link" target="_blank" href="${ds.metadata.learn_more_url}">Learn More</a>
-</section>`));
-
-  if (ds.metadata.sources)
-    right.append(elem(`<section>
-<h3>Sources</h3><pre class="description-text">${ds.metadata.sources}</pre>
-</section>`));
-
-  if (ds.metadata.spatial_resolution)
-    right.append(elem(`<section>
-<h3>Spatial Resolution</h3>${ds.metadata.spatial_resolution}
-</section>`));
-
-  if (ds.metadata.license)
-    right.append(elem(`<section>
-<h3>License</h3>${ds.metadata.license}
-</section>`));
-
-  if (ds.metadata.content_date)
-    right.append(elem(`<section>
-<h3>Date of Content</h3>${ds.metadata.content_date}
-</section>`));
+  const content = tmpl('#ds-info-modal', b);
+  qs(content, '#metadata-sources').href = ds.metadata.download_original_url;
+  qs(content, '#learn-more').href = ds.metadata.learn_more_url;
 
   ea_modal.set({
     header: ds.name_long,

@@ -13,30 +13,28 @@ function ea_controls_tree(tree, list) {
   })));
 
   tree.forEach(a => {
-    controls_el.append(elem(`
-<div id=${a.name} class="controls-branch">
-  <div class="controls-branch-title">${a.name}</div>
-  <div class="controls-subbranches"></div>
-</div>`));
+    const branch_el = ce('div', null, { id: a.name, class: 'controls-branch' });
+    controls_el.append(branch_el);
 
-    const branch_el = controls_el.querySelector(`#${a.name}`);
+    let title, subbranches;
+    branch_el.append(
+      title = ce('div', a.name, { class: 'controls-branch-title' }),
+      subbranches = ce('div', null, { class: 'controls-subbranches' })
+    );
 
     a.subbranches.forEach(b => {
-      branch_el.querySelector('.controls-subbranches')
-        .append(elem(`
-<div id=${b.name} class="controls-subbranches">
-  <div class="controls-subbranch-title">
-    <span class="collapse triangle">${ea_ui_collapse_triangle('s')}</span>
-    ${ea_branch_dict[b.name]}
-  </div>
-  <div class="controls-container"></div>
-</div>`));
+      let subel, conel, title;
+      subbranches.append(
+        subel = ce('div', null, { id: b.name, class: 'controls-subbranches' })
+      );
 
-      const subel = branch_el.querySelector(`#${b.name}`);
-      const conel = subel.querySelector('.controls-container');
+      subel.append(
+        title = ce('div', ea_branch_dict[b.name], { class: 'controls-subbranch-title' }),
+        conel = ce('div', null, { class: 'controls-container' })
+      );
 
-      subel.querySelector('.controls-subbranch-title')
-        .addEventListener('mouseup', e => elem_collapse(conel, subel));
+      title.prepend(ce('span', ea_ui_collapse_triangle('s'), { class: 'collapse triangle' }));
+      title.addEventListener('mouseup', e => elem_collapse(conel, subel));
 
       b.datasets.forEach(b => {
         const ds = list.find(x => x.id === b.id);
@@ -89,12 +87,12 @@ function ea_controls_checkbox(ds) {
 };
 
 function ea_controls_mutant_options(ds) {
-  const container = elem(`<div class="control-option"></div>`);
-  const select = elem('<select></select>');
+  const container = ce('div', null, { class: 'control-option' })
+  const select = ce('select');
 
   ds.configuration.mutant_targets.forEach(i => {
     const host = DS.named(i);
-    select.append(elem(`<option value=${i}>${host.name_long}</option>`));
+    select.append(ce('option', host.name_long, { value: i }));
   });
 
   select.value = ds.configuration.host;
@@ -122,14 +120,12 @@ function ea_controls_options(ds) {
     return null;
   }
 
-  const container = elem(`<div class="control-option"></div>`);
-  const select = elem('<select></select>');
+  const container = ce('div', null, { class: 'control-option' });
+  const select = ce('select>');
 
   const options = Object.keys(ds.csv.options);
 
-  options.forEach(v => {
-    select.append(elem(`<option value=${v}>${ds.csv.options[v]}</option>`));
-  });
+  options.forEach(v => select.append(ce('option', ds.csv.options[v], { value: v })));
 
   ds.filter_option = select.value = options[0];
 
@@ -239,11 +235,11 @@ function ea_controls_weight(ds, init) {
 function ea_controls_collection_list(ds) {
   if (!ds.collection) return;
 
-  const e = elem('<ul class="controls-dataset-collection">');
+  const e = ce('ul', null, { class: 'controls-dataset-collection' });
 
   for (let i of ds.configuration.collection) {
     let d = DS.named(i);
-    e.append(elem(`<li>${d.name_long}</li>`));
+    e.append(ce('li', d.name_long));
   }
 
   return e;
@@ -267,7 +263,7 @@ function ea_controls_country_setup() {
     .then(j => j.sort((a,b) => a['name'] > b['name'] ? 1 : -1))
     .then(j => {
       country_list = j;
-      j.forEach(c => datalist.append(elem(`<option value="${c.name}"></option>`)));
+      j.forEach(c => datalist.append(ce('option', null, { value: c.name })));
       set_default();
     });
 
@@ -285,7 +281,7 @@ function ea_controls_country_setup() {
 function ea_controls_presets_init(v) {
   const el = document.querySelector('#controls-preset');
 
-  Object.keys(ea_presets).forEach(k => el.append(elem(`<option value="${k}">${ea_presets[k]}</option>`)));
+  Object.keys(ea_presets).forEach(k => el.append(ce('option', ea_presets[k], { value: k })));
 
   el.value = v || "custom";
   el.querySelector('option[value="custom"]').innerText = "Custom Analysis";
@@ -332,7 +328,7 @@ class dscontrols extends HTMLElement {
     super();
 
     this.ds = d;
-    attach.call(this, tmpl('#ds-controls-template', true));
+    attach.call(this, shadow_tmpl('#ds-controls-template'));
 
     this.content = qs(this, 'content');
     this.spinner = qs(this, '.loading');

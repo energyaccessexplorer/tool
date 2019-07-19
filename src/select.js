@@ -66,12 +66,8 @@ function ea_select_setup() {
       const countries = results[1];
 
       for (let co of countries_online) {
-        let ko = countries.find(c => +c.ccn3 === co.ccn3);
-        let d = elem(`
-<div class="country-item" ripple
-     iso3="${ko.ccn3}">
-  <h2 class="country-name">${ko.name.common}</h2>
-</div>`);
+        const ko = countries.find(c => +c.ccn3 === co.ccn3);
+        const d = ce('div', ce('h2', ko.name.common, { class: 'country-name' }), { class: 'country-item', ripple: "", iso3: ko.ccn3 });
 
         d.addEventListener('mouseup', function() {
           setTimeout(_ => ea_countries_action_modal(countries.find(c => c.ccn3 === ko.ccn3)), 350);

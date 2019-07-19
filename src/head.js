@@ -7,17 +7,39 @@ function qs(el, str) {
     el.querySelector(str);
 };
 
-function ce(str) {
-  return document.createElement(str);
+function ce(str, content, attrs = {}) {
+  const el = document.createElement(str);
+  for (let o in attrs) el.setAttribute(o, attrs[o]);
+
+  if (content instanceof Element) el.append(content);
+  else if (content) el.innerHTML = content;
+
+  return el;
 };
 
-function tmpl(el, shadow = false) {
+function shadow_tmpl(el) {
+  if (typeof el === 'string') el = qs(document, el);
+
+  if (!el) throw Error(`shadow_tmpl: Expected 'el' to be a DOM Element.`);
+
+  return el.content.cloneNode(true);
+};
+
+function tmpl(el, data = null) {
   if (typeof el === 'string') el = qs(document, el);
 
   if (!el) throw Error(`tmpl: Expected 'el' to be a DOM Element.`);
 
   const r = el.content.cloneNode(true);
-  return (shadow ? r : r.firstElementChild);
+
+  if (!data) return r.firstElementChild;
+
+  for (let e of r.querySelectorAll('[bind]')) {
+    let v = e.getAttribute('bind');
+    if (data[v]) e.innerText = data[v];
+  }
+
+  return r.firstElementChild;
 };
 
 function elem(str, p) {

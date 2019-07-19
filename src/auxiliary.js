@@ -124,14 +124,20 @@ async function ea_summary() {
   await pop.load('heatmap');
   const p = pop.raster;
 
-  const content = elem(`
-<div>
-  <div style="text-transform: uppercase; margin: 0 -1.2em 1.2em -1.2em; padding-left: 1.2em; padding-bottom: 1.2em; border-bottom: 1px solid lightgray;">Share of population for each index and category<div>
-</div>`);
+  const content = ce('div');
 
-  const graphs_tab = elem(`<div class="tab"></div>`);
-  const graphs = elem(`<div id="graphs"></div>`);
-  graphs_tab.append(graphs);
+  content.append(
+    ce('div', "Share of population for each index and category", {
+      style: `
+text-transform: uppercase;
+margin: 0 -1.2em 1.2em -1.2em;
+padding-left: 1.2em;
+padding-bottom: 1.2em;
+border-bottom: 1px solid lightgray;`
+    }));
+
+  let graphs;
+  const graphs_tab = ce('div', graphs = ce('div', null, { id: "graphs" }), { class: 'tab' });
 
   const sizes = {
     "eai": 100,
@@ -185,57 +191,35 @@ async function ea_summary() {
 
     let pie = ea_svg_pie(percs.map(x => [x]), 75, 0, ea_default_color_stops, null);
 
-    let e = elem(`
-<div style="text-align: center; margin: 0 1em; max-width: 150px;">
-  <div class="pie-svg-container"></div>
-  <div class="indexname">${ea_indexes[idxn]}</div>
-</div>`);
+    let e = ce('div', null, { style: "text-align: center; margin: 0 1em; max-width: 150px;" });
+    const container = ce('div', null, { class: 'pie-svg-container' });
+    const indexname = ce('div', ea_indexes[idxn], { class: 'indexname' });
+
+    e.append(container, indexname);
 
     pie.change(0);
-    e.querySelector('.pie-svg-container').append(pie.svg);
+    container.append(pie.svg);
 
     graphs.append(e);
   });
 
   const s = ea_default_color_stops;
 
-  const legend = elem(`
-<div class="number-labels">
-  <div style="background-color: ${s[0]}">0-20</div>
-  <div style="background-color: ${s[1]}">20-40</div>
-  <div style="background-color: ${s[2]}">40-60</div>
-  <div style="background-color: ${s[3]}">60-80</div>
-  <div style="background-color: ${s[4]}">80-100</div>
-</div>`);
+  const i20 = i => (20 * i) + "-" + (20 * (i+1));
 
-  const table = elem(`
-<table class="summary tab hidden">
-<thead>
-  <tr class="number-labels-row">
-    <th></th>
-    <th style="background-color: ${s[0]}">0-20</th>
-    <th style="background-color: ${s[1]}">20-40</th>
-    <th style="background-color: ${s[2]}">40-60</th>
-    <th style="background-color: ${s[3]}">60-80</th>
-    <th style="background-color: ${s[4]}">80-100</th>
-  </tr>
-</thead>
+  const legend = ce('div', null, { class: 'number-labels' });
+  s.forEach((x,i) => legend.append(ce('div', i20(i), { style: `background-color: ${x};`})));
 
-<tbody></tbody>
-</table`);
+  const table = ce('table', null, { class: 'summary tab hidden' });
+  let thead, tbody, thr;
 
-  const tbody = table.querySelector('tbody');
+  table.append(thead = ce('thead'), tbody = ce('tbody'));
+  thead.append(thr = ce('tr', ce('th'), { class: 'number-labels-row' }));
+  s.forEach((x,i) => thr.append(ce('th', i20(i), { style: `background-color: ${x};`})));
 
-  for (var k of Object.keys(summary)) {
-    let tr = document.createElement('tr')
-
-    tr.innerHTML = `
-<td class="index-name">${ea_indexes[k]}</td>
-<td>${(summary[k][0]).toLocaleString()}</td>
-<td>${(summary[k][1]).toLocaleString()}</td>
-<td>${(summary[k][2]).toLocaleString()}</td>
-<td>${(summary[k][3]).toLocaleString()}</td>
-<td>${(summary[k][4]).toLocaleString()}</td>`;
+  for (var k in summary) {
+    let tr = ce('tr', ce('td', ea_indexes[k], { class: 'index-name' }));
+    s.forEach((x,i) => tr.append(ce('td', (summary[k][i]).toLocaleString())));
 
     tbody.append(tr);
   }
@@ -377,7 +361,11 @@ function ea_coordinates_raster(coords, bounds, raster) {
 
 function table_pointer(dict, prop, event) {
   const t = document.createElement('table');
-  dict.forEach(e => t.append(elem(`<td><strong>${e.target}</strong></td><td>${prop[e.dataset]}</td>`, 'tr')));
+  dict.forEach(e => {
+    const tr = ce('tr');
+    tr.append(ce('td', ce('strong', e.target)), ce('td', prop[e.dataset]));
+    t.append(tr);
+  });
 
   mapbox_pointer(t, event.originalEvent.pageX, event.originalEvent.pageY)
 };
@@ -413,20 +401,13 @@ function right_pane(t) {
 };
 
 function boundaries_controls(ds) {
-  const controls = elem(`
-<div id="controls-${ds.id}" class="controls">
-  <div class="controls-subbranch-title">
-    <span class="collapse triangle">${ea_ui_collapse_triangle(ds.active ? 's' : 'e')}</span>
-    ${ds.name_long}
-  </div>
-
-  <content></content>
-</div>`);
-
-  const content = controls.querySelector('content');
+  const controls = ce('div', null, { id: `controls-${ds.id}`, class: 'controls' });
+  const content = ce('content');
+  const _t = ce('div', ds.name_long, { class: 'controls-subbranch-title' });
+  _t.prepend(ce('span', ea_ui_collapse_triangle(ds.active ? 's' : 'e'), { class: 'collapse triangle' } ))
+  controls.append(_t, content);
 
   const weight_group = ea_controls_weight(ds);
-
   let range_group;
 
   content.style['display'] = ds.active ? '' : 'none';
@@ -449,10 +430,10 @@ function boundaries_controls(ds) {
 
     range_group = ea_controls_range(d, (d.unit || 'percentage'), false);
 
-    let sb = elem('<div class="controls-multifilter-elem" ripple>');
-    const title = elem(`<div class="control-group">${ds.csv.options[v]}</div>`)
+    let sb = ce('div', null, { class: 'controls-multifilter-elem', ripple: "" });
+    const title = ce('div', ds.csv.options[v], { class: 'control-group' });
 
-    const g = elem('<div class="control-group">');
+    const g = ce('div', null, { class: 'control-group' });
     g.append(range_group.el);
 
     sb.append(checkbox, title, g);

@@ -224,20 +224,23 @@ border-bottom: 1px solid lightgray;`
     tbody.append(tr);
   }
 
-  const switcho = elem(`<button class="big-green-button">Summary Table</button>`);
-  switcho.addEventListener("click", _ => {
+  let ss = true;
+
+  const switcher = ce('button', "Summary Table", { class: 'big-green-button' });
+  switcher.addEventListener("click", function() {
+    ss = !ss;
     for (let e of content.querySelectorAll('.tab'))
       e.classList.toggle('hidden');
+    this.innerText = ss ? "Summary Table" : "Summary Graphs";
   });
 
   graphs_tab.append(legend);
-
-  content.append(graphs_tab, table, switcho);
+  content.append(graphs_tab, table);
 
   ea_modal.set({
     header: "Snapshot",
     content: content,
-    footer: null
+    footer: switcher
   }).show();
 
   ea_report();

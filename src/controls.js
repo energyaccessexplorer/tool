@@ -62,7 +62,7 @@ function ea_controls_checkbox(ds) {
       break;
 
     case svg: {
-      this.turn(ds.active = !ds.active);
+      ds.active = !ds.active;
 
       ea_overlord({
         "type": "dataset",

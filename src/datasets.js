@@ -207,14 +207,14 @@ class DS {
     };
   };
 
-  filter_set(o) {
+  multifilter_set(o) {
     if (!this.table && this.features) {
       this.features.features.forEach((f,i) => f.properties.color =  d3.schemeCategory10[i%10]);
       return;
     }
 
     if (this.subid) {
-      this.parent.filter_set(o);
+      this.parent.multifilter_set(o);
       return;
     }
 
@@ -411,52 +411,35 @@ Forcing dataset's weight to 1.`);
     this.color_scale_svg = ea_svg_color_steps(this.color_scale_fn, d);
   };
 
-  async show() {
+  async visible(t) {
     if (this.collection) {
-      await Promise.all(this.configuration.collection.map(i => DS.named(i).show()));
+      await Promise.all(this.configuration.collection.map(i => DS.named(i).visible(t)));
       return;
     }
 
     if (ea_mapbox.getLayer(this.id))
-      ea_mapbox.setLayoutProperty(this.id, 'visibility', 'visible');
-
-    if (this.controls_el) this.controls_el.turn(true);
-  };
-
-  async hide() {
-    if (this.collection) {
-      await Promise.all(this.configuration.collection.map(i => DS.named(i).hide()));
-      return;
-    }
-
-    if (ea_mapbox.getSource(this.id))
-      ea_mapbox.setLayoutProperty(this.id, 'visibility', 'none');
-
-    if (this.controls_el) this.controls_el.turn(false);
-  };
+      ea_mapbox.setLayoutProperty(this.id, 'visibility', t ? 'visible' : 'none');
+  }
 
   async turn(v, draw) {
-    this.controls_el.loading(true);
+    if (v) {
+      if (this.controls_el) this.controls_el.loading(true);
+      await this.load();
+      if (this.controls_el) this.controls_el.loading(false);
+    }
 
-    await Promise.all(
-      ['vectors', 'csv', 'heatmap'].map(i => {
-        if (v && this[i]) return this.load(i);
-      }));
-
-    this.controls_el.loading(false);
+    if (this.collection) {
+      await Promise.all(this.configuration.collection.map(i => DS.named(i).turn(v, draw)));
+      return;
+    }
 
     if (this.mutant) {
       this.mutate(DS.named(this.configuration.host));
     }
 
-    if (this.collection) {
-      await Promise.all(this.configuration.collection.map(i => DS.named(i).turn(v, draw)));
-    }
+    if (this.controls_el) this.controls_el.turn(v);
 
-    else {
-      if (v && draw) this.show();
-      else this.hide();
-    }
+    this.visible(v && draw);
   };
 
   async load(arg) {
@@ -467,15 +450,14 @@ Forcing dataset's weight to 1.`);
       // having per-element rasters but a single collection raster.
       //
       if (this.heatmap) await this.heatmap.parse.call(this);
+
+      return;
     }
 
-    else {
-      if (!arg)
-        await this.turn(true, false);
-
-      else
-        if (this[arg]) await this[arg].parse.call(this);
-    }
+    if (!arg)
+      await Promise.all(['vectors', 'csv', 'heatmap'].map(i => (this[i]) ? this.load(i) : null));
+    else
+      if (this[arg]) await this[arg].parse.call(this);
   };
 
   async raise() {
@@ -627,6 +609,9 @@ async function ea_datasets_tiff() {
           "id": this.id,
           "type": 'raster',
           "source": this.id,
+          "layout": {
+            "visibility": "none",
+          },
           "paint": {
             "raster-resampling": "nearest"
           }
@@ -665,9 +650,6 @@ async function ea_datasets_tiff() {
 
       if (ea_mapbox) {
         draw.call(this, c);
-
-        if (ea_mapbox.getSource(this.id))
-          ea_mapbox.setLayoutProperty(this.id, 'visibility', 'none');
       }
     }
 
@@ -703,6 +685,9 @@ async function ea_datasets_points() {
         "id": this.id,
         "type": "circle",
         "source": this.id,
+        "layout": {
+          "visibility": "none",
+        },
         "paint": {
           "circle-radius": 3,
           "circle-opacity": this.vectors.opacity,
@@ -739,6 +724,9 @@ async function ea_datasets_lines() {
         "id": this.id,
         "type": "line",
         "source": this.id,
+        "layout": {
+          "visibility": "none",
+        },
         "paint": {
           "line-width": this.vectors.width,
           "line-color": this.vectors.stroke,
@@ -758,12 +746,15 @@ async function ea_datasets_polygons() {
     }
 
     if (!ea_mapbox.getLayer(this.id)) {
-      this.filter_set(this.subid);
+      this.multifilter_set(this.subid);
 
       ea_mapbox.addLayer({
         "id": this.id,
         "type": "fill",
         "source": this.id,
+        "layout": {
+          "visibility": "none",
+        },
         "paint": {
           "fill-color": ['get', 'color'],
           "fill-outline-color": this.vectors.stroke,

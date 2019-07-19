@@ -178,6 +178,9 @@ async function ea_overlord(msg) {
     ea_mapbox = null;
     ea_category_tree = country.category_tree;
 
+    ea_ui_layout();
+    mapbox_setup(country.bounds);
+
     const list = await ea_datasets_list_init(country.id, state.inputs, state.preset);
 
     const b = list.find(d => d.id === 'boundaries');
@@ -225,12 +228,8 @@ Please report this to energyaccessexplorer@wri.org.
     ea_controls_presets_init(state.preset);
     ea_controls_tree(country.category_tree, DS.list);
 
-    ea_ui_layout();
-    mapbox_setup(country.bounds);
-
-    await Promise.all(inputs.map(id => DS.named(id).turn(true, false)));
-
-    mapbox_change_theme(ea_settings.mapbox_theme);
+    await Promise.all(inputs.map(id => DS.named(id).load()));
+    await mapbox_change_theme(ea_settings.mapbox_theme);
 
     ea_ui_app_loading(false);
 
@@ -256,17 +255,17 @@ Please report this to energyaccessexplorer@wri.org.
     if (t === "outputs") {
       ea_indexes_list(state.output);
 
-      state.inputs.forEach(i => {
-        let x; if (x = DS.named(i)) x.hide();
-      });
-
-      ea_plot_active_analysis(state.output).then(raster => ea_indexes_graphs(raster));
-
-      ea_mapbox.setLayoutProperty('canvas-layer', 'visibility', 'visible');
+      ea_plot_active_analysis(state.output)
+        .then(raster => ea_indexes_graphs(raster))
+        .then(_ => {
+          DS.list.forEach(d => d.visible(false));
+          ea_mapbox.setLayoutProperty('output-layer', 'visibility', 'visible');
+        });
     }
 
     else if (t === "inputs") {
-      ea_mapbox.setLayoutProperty('canvas-layer', 'visibility', 'none');
+      if (ea_mapbox.getLayer('output-layer'))
+        ea_mapbox.setLayoutProperty('output-layer', 'visibility', 'none');
 
       ea_inputs(state.inputs);
 
@@ -291,7 +290,7 @@ Please report this to energyaccessexplorer@wri.org.
 
     state.set_preset_param(null);
 
-    if (ds.subid) ds.filter_set(ds.subid);
+    if (ds.subid) ds.multifilter_set(ds.subid);
     else {
       ds.active ?
         (resort && state.inputs.unshift(ds.id)) :
@@ -394,7 +393,7 @@ Please report this to energyaccessexplorer@wri.org.
 
       if (state.mode === "outputs") {
         t = {
-          raster: ea_mapbox.getSource('canvas-source').raster,
+          raster: ea_mapbox.getSource('output-source').raster,
           name_long: "Analysis"
         }
         nodata = -1;

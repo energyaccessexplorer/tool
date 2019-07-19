@@ -105,25 +105,31 @@ function mapbox_theme_pick(theme) {
 };
 
 function mapbox_canvas() {
-  ea_mapbox.addSource('canvas-source', {
-    "type": 'canvas',
-    "canvas": 'output',
-    "animate": false,
-    "coordinates": ea_mapbox.coords
-  });
+  if (!ea_mapbox.getSource('output-source'))
+    ea_mapbox.addSource('output-source', {
+      "type": 'canvas',
+      "canvas": 'output',
+      "animate": false,
+      "coordinates": ea_mapbox.coords
+    });
 
   const c = ea_mapbox.getStyle().layers.find(l => l.type === 'symbol');
 
   ea_mapbox.first_symbol = ((c && c.id) || undefined);
 
-  ea_mapbox.addLayer({
-    "id": 'canvas-layer',
-    "source": 'canvas-source',
-    "type": 'raster',
-    "paint": {
-      "raster-resampling": "nearest"
-    }
-  }, ea_mapbox.first_symbol);
+  if (!ea_mapbox.getLayer('output-layer')) {
+    ea_mapbox.addLayer({
+      "id": 'output-layer',
+      "source": 'output-source',
+      "type": 'raster',
+      "layout": {
+        "visibility": "none",
+      },
+      "paint": {
+        "raster-resampling": "nearest",
+      }
+    }, ea_mapbox.first_symbol);
+  }
 };
 
 function mapbox_setup(bounds) {
@@ -173,8 +179,8 @@ function mapbox_setup(bounds) {
   return (ea_mapbox = mapbox);
 };
 
-function mapbox_change_theme(theme, callback) {
-  const do_it = _ => {
+function mapbox_change_theme(theme) {
+  const it = _ => {
     mapbox_canvas();
 
     ea_overlord({
@@ -183,10 +189,10 @@ function mapbox_change_theme(theme, callback) {
     });
   };
 
-  ea_mapbox.once('style.load', do_it);
+  ea_mapbox.once('style.load', it);
   ea_mapbox.setStyle(mapbox_theme_pick(ea_settings.mapbox_theme = theme));
 
-  if (theme === "") do_it();
+  if (theme === "") it();
 };
 
 function mapbox_pointer(content, x, y) {

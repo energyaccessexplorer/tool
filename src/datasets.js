@@ -689,10 +689,10 @@ async function ea_datasets_points() {
           "visibility": "none",
         },
         "paint": {
-          "circle-radius": 3,
+          "circle-radius": this.vectors.width || 3,
           "circle-opacity": this.vectors.opacity,
           "circle-color": this.vectors.fill || 'cyan',
-          "circle-stroke-width": 1,
+          "circle-stroke-width": this.vectors['stroke-width'] || 1,
           "circle-stroke-color": this.vectors.stroke || 'black',
         },
       }, ea_mapbox.first_symbol);
@@ -728,7 +728,7 @@ async function ea_datasets_lines() {
           "visibility": "none",
         },
         "paint": {
-          "line-width": this.vectors.width,
+          "line-width": this.vectors.width || 1,
           "line-color": this.vectors.stroke,
           "line-dasharray": da,
         },

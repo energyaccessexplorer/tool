@@ -50,12 +50,18 @@ function ea_ui_layout() {
   const d = r.querySelector('#drawer');
   const l = r.querySelector('#inputs-list');
 
-  p.style['height'] =
-    c.style['height'] =
-    m.style['height'] =
-    window.innerHeight - n.clientHeight + "px";
+  function set_heights() {
+    p.style['height'] =
+      c.style['height'] =
+      m.style['height'] =
+      window.innerHeight - n.clientHeight + "px";
 
-  l.style['height'] = p.clientHeight - (o.clientHeight + d.clientHeight + 4) + "px";
+    l.style['height'] = p.clientHeight - (o.clientHeight + d.clientHeight + 4) + "px";
+  };
+
+  document.body.onresize = set_heights;
+
+  set_heights();
 };
 
 function ea_ui_views_init() {

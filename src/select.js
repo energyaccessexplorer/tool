@@ -4,9 +4,16 @@ function ea_select_topo_flag(c) {
   const width = 200;
   const padding = 1;
 
+  const config = c.configuration.flag || {
+    'x': 0,
+    'y': 0,
+    'height': 30,
+    'aspect-ratio': "xMidYMid slice"
+  }
+
   const svg = d3.select(document.createElementNS("http://www.w3.org/2000/svg", "svg"))
         .attr('width',  width)
-        .attr('height', width + 100);
+        .attr('height',  width);
 
   const geopath = d3.geoPath()
         .projection(d3.geoMercator());
@@ -15,14 +22,17 @@ function ea_select_topo_flag(c) {
     .append('pattern')
     .attr('id', `flag-${cca3}`)
     .attr('patternUnits', 'objectBoundingBox')
+    .attr('x', 0)
+    .attr('y', 0)
     .attr('width', 1)
     .attr('height', 1)
 
     .append('image')
     .attr('href', `../mledoze-countries/data/${cca3}.svg`)
-    .attr('height', 30)
-    .attr('width', 45)
-    .attr('preserveAspectRatio', "xMaxYMin slice")
+    .attr('x', config['x'] || 0)
+    .attr('y', config['y'] || 0)
+    .attr('width', config['width'])
+    .attr('height', config['height']);
 
   const g = svg.append('g');
 

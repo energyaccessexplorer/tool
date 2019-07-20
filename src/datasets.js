@@ -314,7 +314,7 @@ Forcing dataset's weight to 1.`);
     case 'multi-key-delta': {
       if (!this.table) return (s = x => 1);
 
-      let bs = DS.list.filter(d => d.id.match(new RegExp(`^${this.id}-`)) && d.active_filter);
+      let bs = DS.all.filter(d => d.id.match(new RegExp(`^${this.id}-`)) && d.active_filter);
 
       s = x => {
         let z = this.table[x];
@@ -470,7 +470,7 @@ Forcing dataset's weight to 1.`);
 
   // class methods
 
-  static get list() {
+  static get all() {
     return Object.keys(__dstable).map(i => __dstable[i]);
   };
 
@@ -513,11 +513,11 @@ async function ea_datasets_list_init(country_id, inputs, preset) {
   // We need all the datasets to be initialised _before_ setting
   // mutant/collection attributes (order is never guaranteed)
   //
-  DS.list.filter(d => d.mutant).forEach(d => d.mutant_init());
-  DS.list.filter(d => d.collection).forEach(d => d.collection_init());
-  DS.list.filter(d => d.multifilter).forEach(d => d.multifilter_init());
+  DS.all.filter(d => d.mutant).forEach(d => d.mutant_init());
+  DS.all.filter(d => d.collection).forEach(d => d.collection_init());
+  DS.all.filter(d => d.multifilter).forEach(d => d.multifilter_init());
 
-  return DS.list;
+  return DS.all;
 };
 
 /*

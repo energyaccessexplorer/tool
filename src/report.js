@@ -65,7 +65,7 @@ function ea_report() {
     //
     reset_font();
 
-    const dslist = DS.list.filter(d => d.active).map(d => {
+    const dslist = DS.all.filter(d => d.active).map(d => {
       let u = "";
 
       if (d.unit) u = `<code>(${d.unit})</code>`;

@@ -226,7 +226,7 @@ Please report this to energyaccessexplorer@wri.org.
 
     ea_controls_country_setup();
     ea_controls_presets_init(state.preset);
-    ea_controls_tree(country.category_tree, DS.list);
+    ea_controls_tree(country.category_tree, DS.all);
 
     await Promise.all(inputs.map(id => DS.get(id).load()));
     await mapbox_change_theme(ea_settings.mapbox_theme);
@@ -258,7 +258,7 @@ Please report this to energyaccessexplorer@wri.org.
       ea_plot_active_analysis(state.output)
         .then(raster => ea_indexes_graphs(raster))
         .then(_ => {
-          DS.list.forEach(d => d.visible(false));
+          DS.all.forEach(d => d.visible(false));
           ea_mapbox.setLayoutProperty('output-layer', 'visibility', 'visible');
         });
     }
@@ -336,16 +336,16 @@ Please report this to energyaccessexplorer@wri.org.
   case "preset": {
     if (!msg.target) throw `Argument error: Overlord: Could not set ${msg.target} preset`;
 
-    const inputs = DS.list.filter(d => ea_controls_presets_set(d, msg.target)).map(d => d.id);
+    const inputs = DS.all.filter(d => ea_controls_presets_set(d, msg.target)).map(d => d.id);
 
     if (state.mode === "outputs") {
       ea_indexes_list(state.output);
-      await Promise.all(DS.list.map(d => d.turn(d.active, false)));
+      await Promise.all(DS.all.map(d => d.turn(d.active, false)));
       ea_plot_active_analysis(state.output);
     }
 
     else if (state.mode === "inputs") {
-      await Promise.all(DS.list.map(d => d.turn(d.active, true)));
+      await Promise.all(DS.all.map(d => d.turn(d.active, true)));
       ea_inputs(inputs);
     }
 

@@ -395,7 +395,7 @@ class dscontrols extends HTMLElement {
       break;
     }
 
-    if (this.ds.multifilter) DS.list.filter(d => d.id.match(this.ds.id + "-")).forEach(d => d.controls_el = this);
+    if (this.ds.multifilter) DS.all.filter(d => d.id.match(this.ds.id + "-")).forEach(d => d.controls_el = this);
   };
 
   render() {

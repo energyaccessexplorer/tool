@@ -286,7 +286,7 @@ function ea_list_filter_type(type) {
   else
     idxn = d => d.id === type;
 
-  return DS.list.filter(d => d.active && idxn(d));
+  return DS.all.filter(d => d.active && idxn(d));
 };
 
 /*
@@ -478,7 +478,7 @@ function ea_nanny_force_start() {
   history.replaceState(null, null, location.set_query_param('output', 'eai'));
   history.replaceState(null, null, location.set_query_param('mode', 'inputs'));
 
-  DS.list.filter(d => d.active && d.id !== 'boundaries').forEach(d => d.turn(false, false));
+  DS.all.filter(d => d.active && d.id !== 'boundaries').forEach(d => d.turn(false, false));
 
   ea_overlord({
     "type": "refresh",

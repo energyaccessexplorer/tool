@@ -2,7 +2,7 @@ function ea_controls_tree(tree, list) {
   const controls_el = document.querySelector('#controls');
 
   tree.forEach(branch => branch.subbranches.forEach(sub => sub.datasets.filter(d => {
-    const ds = DS.named(d.id);
+    const ds = DS.get(d.id);
 
     if (!ds) {
       console.warn(`Dataset '${d.id}' not found:`, ds);
@@ -91,14 +91,14 @@ function ea_controls_mutant_options(ds) {
   const select = ce('select');
 
   ds.configuration.mutant_targets.forEach(i => {
-    const host = DS.named(i);
+    const host = DS.get(i);
     select.append(ce('option', host.name_long, { value: i }));
   });
 
   select.value = ds.configuration.host;
 
   select.addEventListener('change', async function() {
-    const host = DS.named(this.value);
+    const host = DS.get(this.value);
 
     await ds.mutate(host);
 
@@ -238,7 +238,7 @@ function ea_controls_collection_list(ds) {
   const e = ce('ul', null, { class: 'controls-dataset-collection' });
 
   for (let i of ds.configuration.collection) {
-    let d = DS.named(i);
+    let d = DS.get(i);
     e.append(ce('li', d.name_long));
   }
 

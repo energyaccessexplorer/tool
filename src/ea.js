@@ -228,7 +228,7 @@ Please report this to energyaccessexplorer@wri.org.
     ea_controls_presets_init(state.preset);
     ea_controls_tree(country.category_tree, DS.list);
 
-    await Promise.all(inputs.map(id => DS.named(id).load()));
+    await Promise.all(inputs.map(id => DS.get(id).load()));
     await mapbox_change_theme(ea_settings.mapbox_theme);
 
     ea_ui_app_loading(false);
@@ -269,7 +269,7 @@ Please report this to energyaccessexplorer@wri.org.
 
       ea_inputs(state.inputs);
 
-      await Promise.all(state.inputs.map(id => DS.named(id).turn(true, true)));
+      await Promise.all(state.inputs.map(id => DS.get(id).turn(true, true)));
 
       ea_inputs_sort(state.inputs);
     }
@@ -386,7 +386,7 @@ Please report this to energyaccessexplorer@wri.org.
     if (msg.target === "click") {
       const e = msg.event;
 
-      const b = DS.named('boundaries');
+      const b = DS.get('boundaries');
       let nodata = b.nodata;
 
       let t;
@@ -401,7 +401,7 @@ Please report this to energyaccessexplorer@wri.org.
 
       else {
         const i = state.inputs[0];
-        t = DS.named(i);
+        t = DS.get(i);
 
         if (t.features) {
           const et = ea_mapbox.queryRenderedFeatures(e.point)[0];

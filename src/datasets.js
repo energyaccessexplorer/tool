@@ -135,7 +135,7 @@ class DS {
   mutant_init() {
     if (!this.mutant) throw `${this.id} is not a mutant. Bye.`
 
-    let m = DS.named(this.configuration.mutant_targets[0]);
+    let m = DS.get(this.configuration.mutant_targets[0]);
 
     this.configuration.host = m.id;
 
@@ -164,7 +164,7 @@ class DS {
     this.raster = host.raster;
     this.vectors = host.vectors;
 
-    const s = qs(DS.named(this.id).input_el, '[name=svg]');
+    const s = qs(DS.get(this.id).input_el, '[name=svg]');
     elem_empty(s); s.append(host.color_scale_svg);
 
     let src;
@@ -242,7 +242,7 @@ class DS {
 
       let src; if (src = ea_mapbox.getSource(this.id)) src.setData(this.features);
 
-      const i = qs(DS.named(this.id).input_el, '[name=svg]');
+      const i = qs(DS.get(this.id).input_el, '[name=svg]');
       elem_empty(i); i.append(this.color_scale_svg);
     }
   };
@@ -411,7 +411,7 @@ Forcing dataset's weight to 1.`);
 
   async visible(t) {
     if (this.collection) {
-      await Promise.all(this.configuration.collection.map(i => DS.named(i).visible(t)));
+      await Promise.all(this.configuration.collection.map(i => DS.get(i).visible(t)));
       return;
     }
 
@@ -427,12 +427,12 @@ Forcing dataset's weight to 1.`);
     }
 
     if (this.collection) {
-      await Promise.all(this.configuration.collection.map(i => DS.named(i).turn(v, draw)));
+      await Promise.all(this.configuration.collection.map(i => DS.get(i).turn(v, draw)));
       return;
     }
 
     if (this.mutant) {
-      this.mutate(DS.named(this.configuration.host));
+      this.mutate(DS.get(this.configuration.host));
     }
 
     if (this.controls_el) this.controls_el.turn(v);
@@ -442,7 +442,7 @@ Forcing dataset's weight to 1.`);
 
   async load(arg) {
     if (this.collection) {
-      await Promise.all(this.configuration.collection.map(i => DS.named(i).load(arg)));
+      await Promise.all(this.configuration.collection.map(i => DS.get(i).load(arg)));
 
       // TODO: Remove this? It's a hack for transmission-lines-collection not
       // having per-element rasters but a single collection raster.
@@ -464,7 +464,7 @@ Forcing dataset's weight to 1.`);
 
     if (this.collection) {
       for (let i of this.configuration.collection)
-        DS.named(i).raise();
+        DS.get(i).raise();
     }
   };
 
@@ -474,7 +474,7 @@ Forcing dataset's weight to 1.`);
     return Object.keys(__dstable).map(i => __dstable[i]);
   };
 
-  static named(i) {
+  static get(i) {
     return __dstable[i];
   };
 };

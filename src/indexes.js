@@ -1,5 +1,5 @@
 async function ea_indexes_analyse(raster) {
-  const pop = DS.named('population');
+  const pop = DS.get('population');
 
   if (!pop) return null;
 

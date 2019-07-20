@@ -24,7 +24,7 @@ function ea_inputs(list) {
   const inputs = document.querySelector('#inputs-pane');
   const inputs_list = inputs.querySelector('#inputs-list');
 
-  const ldc = list.map(i => DS.named(i).input_el);
+  const ldc = list.map(i => DS.get(i).input_el);
 
   const init = inputs_list.children.length === 0;
 
@@ -39,7 +39,7 @@ function ea_inputs(list) {
 
 async function ea_inputs_sort(list) {
   for (let i of list.slice(0).reverse())
-    await DS.named(i).raise();
+    await DS.get(i).raise();
 };
 
 class dsinput extends HTMLElement {
@@ -127,7 +127,7 @@ class dsinput extends HTMLElement {
       const el = ce('ul', null, { class: 'collection' });
 
       for (let i of d.configuration.collection) {
-        let x = DS.named(i);
+        let x = DS.get(i);
         let li = ce('li');
 
         li.append(x.input_el.svg(), ce('div', x.name_long, { class: 'subheader' }));

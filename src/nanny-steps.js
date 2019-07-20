@@ -46,7 +46,7 @@ const ea_nanny_steps = [
   },
   {
     init: function() {
-      this.ds = DS.named('population');
+      this.ds = DS.get('population');
       this.el = this.ds.controls_el;
     },
     mark: {
@@ -63,7 +63,7 @@ const ea_nanny_steps = [
   },
   {
     init: function() {
-      this.ds = DS.named('schools');
+      this.ds = DS.get('schools');
       this.el = this.ds.controls_el;
     },
     mark: {
@@ -80,7 +80,7 @@ const ea_nanny_steps = [
   },
   {
     init: async function() {
-      this.ds = DS.named('schools');
+      this.ds = DS.get('schools');
       this.el = this.ds.controls_el;
 
       await new Promise(_ => setTimeout(_, 1000));
@@ -108,7 +108,7 @@ If you are interested in identifying areas that are close to social load (e.g. s
   },
   {
     init: async function() {
-      this.ds = DS.named('schools');
+      this.ds = DS.get('schools');
       this.el = this.ds.controls_el;
 
       await new Promise(_ => setTimeout(_, 1000));
@@ -135,7 +135,7 @@ You can prioritize areas of interest base on your criteria. You can set a value 
   },
   {
     init: function() {
-      this.ds = DS.named('ghi');
+      this.ds = DS.get('ghi');
       this.el = this.ds.controls_el;
     },
     mark: {

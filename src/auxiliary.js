@@ -85,7 +85,7 @@ function ea_state_sync() {
  */
 
 function ea_canvas_plot(raster, canvas, color_scale = 'ea') {
-  const A = DS.named('boundaries');
+  const A = DS.get('boundaries');
 
   if (!raster.length) {
     console.warn("ea_canvas_plot: no raster given. Filling up with a blank (transparent) one...");
@@ -120,7 +120,7 @@ function ea_canvas_plot(raster, canvas, color_scale = 'ea') {
  */
 
 async function ea_summary() {
-  const pop = DS.named('population');
+  const pop = DS.get('population');
   await pop.load('heatmap');
   const p = pop.raster;
 
@@ -421,7 +421,7 @@ function boundaries_controls(ds) {
   let first = true;
 
   for (let v in ds.csv.options) {
-    let d = DS.named(ds.id + "-" + v);
+    let d = DS.get(ds.id + "-" + v);
     let a = true;
 
     const check = ea_svg_checkbox(true, s => {

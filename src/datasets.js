@@ -1,5 +1,3 @@
-window.DSTable = {};
-
 class DS {
   constructor(e) {
     this.id = e.category.name;
@@ -104,6 +102,8 @@ class DS {
         };
       });
     }
+
+    __dstable[this.id] = this;
   };
 
   init(active, preset) {
@@ -202,8 +202,6 @@ class DS {
       d.csv = this.csv;
 
       d.active_filter = true;
-
-      DSTable[cat.name] = d;
     };
   };
 
@@ -473,21 +471,25 @@ Forcing dataset's weight to 1.`);
   // class methods
 
   static get list() {
-    return Object.keys(DSTable).map(i => DSTable[i]);
+    return Object.keys(__dstable).map(i => __dstable[i]);
   };
 
   static named(i) {
-    return DSTable[i];
+    return __dstable[i];
   };
 };
+
+/*
+ * This is a workaround for not having class variables
+ */
+window.__dstable = {};
 
 /*
  * ea_datasets_list_init
  *
  * 1. fetch the datasets list from the API
  * 2. generate DS objects
- * 3. store them in DSTable
- * 4. initialise mutants and collections
+ * 3. initialise mutants and collections
  *
  * @param "country_id"
  * @param "inputs" string[] with DS.id's
@@ -506,8 +508,6 @@ async function ea_datasets_list_init(country_id, inputs, preset) {
 
       let ds = new DS(e);
       ds.init(active, preset);
-
-      return DSTable[e.category_name] = ds;
     }));
 
   // We need all the datasets to be initialised _before_ setting

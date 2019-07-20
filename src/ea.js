@@ -386,7 +386,7 @@ Please report this to energyaccessexplorer@wri.org.
     if (msg.target === "click") {
       const e = msg.event;
 
-      const b = DSTable['boundaries'];
+      const b = DS.named('boundaries');
       let nodata = b.nodata;
 
       let t;

@@ -8,13 +8,13 @@ class DS {
       e.configuration.name_override :
       e.category.name_long;
 
-    let tmp_index = ea_category_tree.map(b => {
+    let ti = ea_category_tree.map(b => {
       return {
         "name": b.name || null,
         "datasets": b.subbranches.map(i => i.datasets.map(d=> d.id)).flat() }
     }).find(i => i.datasets.includes(this.id));
 
-    this.indexname = tmp_index ? tmp_index.name : null;
+    this.indexname = ti ? ti.name : null;
 
     this.unit = e.category.unit;
 
@@ -252,21 +252,21 @@ class DS {
    *
    * Extract the scaling function given a dataset and the current parameters.
    *
-   * @param "indexname" string.
-   *   current index being drawn and decide if the range of the function should be
-   *   inverted.
+   * @param "i" string
+   *   name of the current index being drawn and decide if the range of the
+   *   function should be inverted.
    *
    * returns function (ds domain) -> [0,1]
    */
 
-  scale_fn(indexname) {
+  scale_fn(i) {
     let s = null;
 
     const d = (this.heatmap.domain && [this.heatmap.domain.min, this.heatmap.domain.max]) || [0,1];
     const t = this.tmp_domain;
     const v = this.heatmap.scale;
     const o = this.filter_option;
-    const r = ((typeof this.invert !== 'undefined' && this.invert.includes(indexname)) ? [1,0] : [0,1]);
+    const r = ((typeof this.invert !== 'undefined' && this.invert.includes(i)) ? [1,0] : [0,1]);
 
     const lin = d3.scaleLinear()
           .domain(t || d)

@@ -193,9 +193,8 @@ border-bottom: 1px solid lightgray;`
 
     let e = ce('div', null, { style: "text-align: center; margin: 0 1em; max-width: 150px;" });
     const container = ce('div', null, { class: 'pie-svg-container' });
-    const indexname = ce('div', ea_indexes[idxn], { class: 'indexname' });
 
-    e.append(container, indexname);
+    e.append(container, ce('div', ea_indexes[idxn]));
 
     pie.change(0);
     container.append(pie.svg);

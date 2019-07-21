@@ -68,20 +68,14 @@ function ea_select_setup() {
   let curr_c = null;
 
   Promise.all([
-    d3.json(ea_settings.database + '/countries?online'),
-    d3.json('../lib/countries.json'),
+    d3.json(ea_settings.database + '/geographies?online&adm=eq.0')
   ])
     .then(results => {
       const countries_online = results[0];
-      const countries = results[1];
 
       for (let co of countries_online) {
-        const ko = countries.find(c => +c.ccn3 === co.ccn3);
-        const d = ce('div', ce('h2', ko.name.common, { class: 'country-name' }), { class: 'country-item', ripple: "", iso3: ko.ccn3 });
-
-        d.addEventListener('mouseup', function() {
-          setTimeout(_ => ea_countries_action_modal(countries.find(c => c.ccn3 === ko.ccn3)), 350);
-        });
+        const d = ce('div', ce('h2', co.name, { class: 'country-name' }), { class: 'country-item', ripple: "" });
+        d.onclick = _ => setTimeout(_ => ea_countries_action_modal(co), 350);
 
         d.append(ea_select_topo_flag(co))
         playground.append(d);

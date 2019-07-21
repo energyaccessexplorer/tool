@@ -52,7 +52,7 @@ function ea_report() {
     doc.setFont("helvetica");
     doc.setFontType('bold');
     doc.setFontSize(18);
-    doc.text(ea_country.name, lp, c);
+    doc.text(ea_geography.name, lp, c);
     c += 6;
 
     // An image...

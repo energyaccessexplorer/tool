@@ -1,3 +1,5 @@
+UUID_REGEXP = "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}";
+
 function qs(el, str) {
   if (!(el instanceof Node))
     throw Error(`qs: Expected a Node. got ${el}.`);

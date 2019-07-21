@@ -251,20 +251,18 @@ function ea_controls_country_setup() {
 
   let country_list = null;
 
-  const curr_ccn3 = +location.get_query_param('ccn3');
+  const id = location.get_query_param('id');
 
   function set_default() {
     const c = country_list.find(c => c.ccn3 === curr_ccn3);
     if (c) input.value = c.name;
   };
 
-  fetch(ea_settings.database + '/countries?select=name,cca3,ccn3&online')
+  const country_list = await fetch(ea_settings.database + '/geographies?select=id,name&online&order=name.asc')
     .then(r => r.json())
-    .then(j => j.sort((a,b) => a['name'] > b['name'] ? 1 : -1))
     .then(j => {
-      country_list = j;
-      j.forEach(c => datalist.append(ce('option', null, { value: c.name })));
-      set_default();
+      j.forEach(g => data[g.name] = g.name);
+      return j;
     });
 
   input.addEventListener('focus', function() { this.value = ""; });
@@ -272,9 +270,8 @@ function ea_controls_country_setup() {
   input.addEventListener('blur', set_default);
 
   input.addEventListener('change', function() {
-    const c = country_list.find(c => c.name === this.value);
-    if (c && curr_ccn3 !== c.ccn3)
-      location = location.search.replace(/ccn3=[0-9]{3}/, `ccn3=${c.ccn3}`);
+      const c = country_list.find(c => c.name === this.value);
+      if (c && id !== c.id) location = location.search.replace(new RegExp(`id=${UUID_REGEXP}`), `id=${c.id}`);
   });
 };
 

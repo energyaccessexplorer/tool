@@ -170,31 +170,30 @@ async function ea_overlord(msg) {
 
   switch (msg.type) {
   case "init": {
-    const ccn3 = location.get_query_param('ccn3');
-    let country; await ea_client(`${ea_settings.database}/countries?ccn3=eq.${ccn3}`, 'GET', 1, r => country = r);
+    const id = location.get_query_param('id');
+    let geography; await ea_client(`${ea_settings.database}/geographies?id=eq.${id}`, 'GET', 1, r => geography = r);
 
     /* TODO: these are the global objects. Fix it: remove. */
-    ea_country = country;
     ea_mapbox = null;
-    ea_category_tree = country.category_tree;
+    ea_category_tree = geography.category_tree;
 
     ea_ui_layout();
-    mapbox_setup(country.bounds);
+    mapbox_setup(geography.bounds);
 
-    const list = await ea_datasets_list_init(country.id, state.inputs, state.preset);
+    const list = await ea_datasets_list_init(geography.id, state.inputs, state.preset);
 
     const b = list.find(d => d.id === 'boundaries');
 
     if (!b) {
       ea_flash
         .type('error')
-        .title("Misconfigured country")
+        .title("Misconfigured geography")
         .message(`
 It's missing a 'boundaries' dataset. <b>I'm stoping here.</b>
 Please report this to energyaccessexplorer@wri.org.
 `)();
 
-      if (!b) throw `Country is missing a 'boundaries' dataset.`;
+      if (!b) throw `Geography is missing a 'boundaries' dataset.`;
     }
 
     else {

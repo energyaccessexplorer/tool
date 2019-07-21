@@ -491,18 +491,18 @@ window.__dstable = {};
  * 2. generate DS objects
  * 3. initialise mutants and collections
  *
- * @param "country_id"
+ * @param "id" uuid
  * @param "inputs" string[] with DS.id's
  * @param "preset" string ("custom", "market", "investment", "planning")
  *
  * returns DS[]
  */
 
-async function ea_datasets_list_init(country_id, inputs, preset) {
+async function ea_datasets_list_init(id, inputs, preset) {
   let attrs = '*,heatmap_file(*),vectors_file(*),csv_file(*),category(*)';
 
   await ea_client(
-    `${ea_settings.database}/datasets?country_id=eq.${country_id}&select=${attrs}`, 'GET', null,
+    `${ea_settings.database}/datasets?geography_id=eq.${id}&select=${attrs}`, 'GET', null,
     r => r.map(e => {
       let active = (inputs.includes(e.category.name));
 

@@ -52,7 +52,7 @@ function ea_countries_setup() {
   // });
 
   Promise.all([
-    d3.json(ea_settings.database + '/countries?online'),
+    d3.json(ea_settings.database + '/geographies?online'),
     d3.json('../lib/world-50m.json'),
     d3.json('../lib/countries.json'),
     d3.json('../lib/country-overviews.json')
@@ -333,7 +333,7 @@ function ea_countries_action_modal(c) {
       b.classList.add('selected');
       preset = p;
 
-      location = `/maps-and-data/tool?ccn3=${c['ccn3']}&preset=${preset}`;
+      location = `/maps-and-data/tool?id=${c['id']}&preset=${preset}`;
     });
 
     pbtns.append(b);

@@ -173,9 +173,7 @@ async function ea_overlord(msg) {
     const id = location.get_query_param('id');
     let geography; await ea_client(`${ea_settings.database}/geographies?id=eq.${id}`, 'GET', 1, r => geography = r);
 
-    /* TODO: these are the global objects. Fix it: remove. */
     ea_mapbox = null;
-    ea_category_tree = geography.category_tree;
 
     ea_ui_layout();
     mapbox_setup(geography.bounds);
@@ -226,7 +224,7 @@ Please report this to energyaccessexplorer@wri.org.
     ea_controls_selectlist();
 
     ea_controls_presets_init(state.preset);
-    ea_controls_tree(country.category_tree, DS.all);
+    ea_controls_tree();
 
     await Promise.all(inputs.map(id => DS.get(id).load()));
     await mapbox_change_theme(ea_settings.mapbox_theme);

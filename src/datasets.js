@@ -8,19 +8,15 @@ class DS {
       e.configuration.name_override :
       e.category.name_long;
 
-    let ti = ea_category_tree.map(b => {
-      return {
-        "name": b.name || null,
-        "datasets": b.subbranches.map(i => i.datasets.map(d=> d.id)).flat() }
-    }).find(i => i.datasets.includes(this.id));
-
-    this.indexname = ti ? ti.name : null;
+    this.indexname = (e.category.metadata.path && e.category.metadata.path[0]) || null;
 
     this.unit = e.category.unit;
 
     this.weight = e.category.weight || 2;
 
     this.metadata = e.metadata;
+
+    this.invert = e.category.metadata.invert;
 
     if (e.category.metadata && (e.category.metadata.why)) {
       this.why = e.category.metadata.why;

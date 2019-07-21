@@ -1,53 +1,42 @@
-function ea_controls_tree(tree, list) {
+function ea_controls_tree() {
   const controls_el = document.querySelector('#controls');
 
-  tree.forEach(branch => branch.subbranches.forEach(sub => sub.datasets.filter(d => {
-    const ds = DS.get(d.id);
-
-    if (!ds) {
-      console.warn(`Dataset '${d.id}' not found:`, ds);
-      return false;
-    }
-
-    ds.invert = d.invert;
-  })));
-
-  tree.forEach(a => {
+  ea_category_tree.forEach(a => {
     const branch_el = ce('div', null, { id: a.name, class: 'controls-branch' });
     controls_el.append(branch_el);
 
-    let title, subbranches;
+    let title, subbranches_el;
     branch_el.append(
       title = ce('div', a.name, { class: 'controls-branch-title' }),
-      subbranches = ce('div', null, { class: 'controls-subbranches' })
+      subbranches_el = ce('div', null, { class: 'controls-subbranches' })
     );
 
-    a.subbranches.forEach(b => {
+    a.children.forEach(b => {
       let subel, conel, title;
-      subbranches.append(
-        subel = ce('div', null, { id: b.name, class: 'controls-subbranches' })
+      subbranches_el.append(
+        subel = ce('div', null, { id: b, class: 'controls-subbranches' })
       );
 
       subel.append(
-        title = ce('div', ea_branch_dict[b.name], { class: 'controls-subbranch-title' }),
+        title = ce('div', ea_branch_dict[b], { class: 'controls-subbranch-title' }),
         conel = ce('div', null, { class: 'controls-container' })
       );
 
       title.prepend(ce('span', ea_ui_collapse_triangle('s'), { class: 'collapse triangle' }));
       title.addEventListener('mouseup', e => elem_collapse(conel, subel));
-
-      b.datasets.forEach(b => {
-        const ds = list.find(x => x.id === b.id);
-
-        if (ds) {
-          conel.append(ds.controls_el = new dscontrols(ds));
-        }
-        else {
-          console.warn(`'${b.id}' dataset not found.`);
-        }
-      });
     });
   });
+
+  for (let d of DS.all) {
+    let path = d.category.metadata.path;
+    if (!path.length) continue;
+
+    let el = document.querySelector(`#${path[0]} #${path[1]} .controls-container`);
+    if (el)
+      el.append(d.controls_el);
+    else
+      console.warn(d.id, path[0], path[1], "container not found...");
+  }
 };
 
 function ea_controls_checkbox(ds) {

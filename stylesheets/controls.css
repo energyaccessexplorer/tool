@@ -132,11 +132,11 @@
 
   color: var(--the-white);
   background-color: var(--the-green);
-
   padding: 10px 0;
   text-align: center;
 }
 
+.controls-select-container .selectlist-input,
 input[list="controls-country"] {
   font-size: 1.7em;
   padding: 0.5em 1em;

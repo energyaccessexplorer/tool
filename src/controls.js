@@ -245,18 +245,10 @@ function ea_controls_collection_list(ds) {
   return e;
 };
 
-function ea_controls_country_setup() {
-  const datalist = document.querySelector('datalist#controls-country');
-  const input = document.querySelector('input[list="controls-country"]');
-
-  let country_list = null;
+async function ea_controls_selectlist() {
+  let data = {};
 
   const id = location.get_query_param('id');
-
-  function set_default() {
-    const c = country_list.find(c => c.ccn3 === curr_ccn3);
-    if (c) input.value = c.name;
-  };
 
   const country_list = await fetch(ea_settings.database + '/geographies?select=id,name&online&order=name.asc')
     .then(r => r.json())
@@ -265,14 +257,23 @@ function ea_controls_country_setup() {
       return j;
     });
 
-  input.addEventListener('focus', function() { this.value = ""; });
+  function set_default(input) {
+    const g = country_list.find(x => x.id === id);
+    if (g) input.value = g.name;
 
-  input.addEventListener('blur', set_default);
+    return input;
+  };
 
-  input.addEventListener('change', function() {
+  const sl = new selectlist("controls-country", data, {
+    'change': function(e) {
       const c = country_list.find(c => c.name === this.value);
       if (c && id !== c.id) location = location.search.replace(new RegExp(`id=${UUID_REGEXP}`), `id=${c.id}`);
+    }
   });
+
+  document.querySelectorAll('.controls-select-container')[0].append(sl.el);
+
+  set_default(sl.input);
 };
 
 function ea_controls_presets_init(v) {

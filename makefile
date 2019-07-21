@@ -52,6 +52,7 @@ build-tool:
 		${LIB}/location.js \
 		${LIB}/htmlsortable.js \
 		${LIB}/nanny.js \
+		${LIB}/selectlist.js \
 		> ${DIST}/tool/libs.js
 
 	@echo -n "const ea_settings = " | cat - \

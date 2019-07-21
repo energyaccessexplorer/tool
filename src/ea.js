@@ -223,7 +223,8 @@ Please report this to energyaccessexplorer@wri.org.
     ea_inputs_init();
     ea_indexes_init(state.output);
 
-    ea_controls_country_setup();
+    ea_controls_selectlist();
+
     ea_controls_presets_init(state.preset);
     ea_controls_tree(country.category_tree, DS.all);
 

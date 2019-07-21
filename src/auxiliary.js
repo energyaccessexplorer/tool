@@ -409,9 +409,6 @@ function boundaries_controls(ds) {
   _t.prepend(ce('span', ea_ui_collapse_triangle(ds.active ? 's' : 'e'), { class: 'collapse triangle' } ))
   controls.append(_t, content);
 
-  const weight_group = ea_controls_weight(ds);
-  let range_group;
-
   content.style['display'] = ds.active ? '' : 'none';
 
   if (!ds.csv) return controls;
@@ -430,7 +427,7 @@ function boundaries_controls(ds) {
 
     const checkbox = check.svg;
 
-    range_group = ea_controls_range(d, (d.unit || 'percentage'), false);
+    const range_group = ea_controls_range.call({ ds: d }, (d.unit || 'percentage'), false);
 
     let sb = ce('div', null, { class: 'controls-multifilter-elem', ripple: "" });
     const title = ce('div', ds.csv.options[v], { class: 'control-group' });

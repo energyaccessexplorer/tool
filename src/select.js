@@ -88,6 +88,6 @@ function ea_select_setup() {
         .type('error')
         .title(error)();
 
-      console.error(error);
+      throw error;
     });
 };

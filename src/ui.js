@@ -68,7 +68,7 @@ function ea_ui_views_init() {
   const el = document.querySelector('#views');
 
   Object.keys(ea_views).forEach(v => {
-    const btn = ce('div', ce('div', ea_views[v]['name'], { class: 'view-name' }), { class: 'view' });
+    const btn = ce('div', ce('div', ea_views[v]['name'], { class: 'view-name' }), { class: 'view', ripple: "" });
 
     btn.addEventListener('mouseup', function(e) {
       el.querySelectorAll('.view').forEach(e => e.classList.remove('active'));
@@ -81,7 +81,7 @@ function ea_ui_views_init() {
         });
 
         btn.classList.add('active');
-      }, 100);
+      }, 50);
     });
 
     if (location.get_query_param('mode') === v) btn.classList.add('active');

@@ -39,7 +39,9 @@ function ea_controls_tree() {
   }
 };
 
-function ea_controls_checkbox(ds) {
+function ea_controls_checkbox() {
+  const ds = this.ds;
+
   const checkbox = ea_svg_checkbox(ds.active);
   const svg = checkbox.svg;
 
@@ -75,7 +77,9 @@ function ea_controls_checkbox(ds) {
   return checkbox;
 };
 
-function ea_controls_mutant_options(ds) {
+function ea_controls_mutant_options() {
+  const ds = this.ds;
+
   const container = ce('div', null, { class: 'control-option' })
   const select = ce('select');
 
@@ -103,7 +107,9 @@ function ea_controls_mutant_options(ds) {
   return container;
 };
 
-function ea_controls_options(ds) {
+function ea_controls_options() {
+  const ds = this.ds;
+
   if (!ds.csv) {
     console.warn(`ea_controls_options: '${ds.id}' does not have a csv_file assigned. Returning.`);
     return null;
@@ -133,7 +139,9 @@ function ea_controls_options(ds) {
   return container;
 };
 
-function ea_controls_range(ds, label, single = false) {
+function ea_controls_range(label, single = false) {
+  const ds = this.ds;
+
   const d = [ds.heatmap.domain.min, ds.heatmap.domain.max];
 
   const range_norm = d3.scaleLinear().domain([0,1]).range(d);
@@ -181,11 +189,13 @@ function ea_controls_range(ds, label, single = false) {
   };
 };
 
-function ea_controls_single(ds, label) {
-  return ea_controls_range(ds, label, true);
+function ea_controls_single(label) {
+  return ea_controls_range.call(this, label, true);
 };
 
-function ea_controls_weight(ds, init) {
+function ea_controls_weight(init) {
+  const ds = this.ds;
+
   const weights = Array.apply(null, Array(5)).map((_, i) => i + 1);
 
   const label = elem(`
@@ -221,7 +231,9 @@ function ea_controls_weight(ds, init) {
   };
 };
 
-function ea_controls_collection_list(ds) {
+function ea_controls_collection_list() {
+  const ds = this.ds;
+
   if (!ds.collection) return;
 
   const e = ce('ul', null, { class: 'controls-dataset-collection' });
@@ -328,7 +340,7 @@ class dscontrols extends HTMLElement {
   };
 
   init() {
-    this.checkbox = ea_controls_checkbox.call(this, this.ds);
+    this.checkbox = ea_controls_checkbox.call(this);
 
     this.info = tmpl('#svg-info');
     this.info.onclick = _ => ea_ui_dataset_modal(this.ds);
@@ -340,14 +352,14 @@ class dscontrols extends HTMLElement {
     case 'windspeed':
     case 'nighttime-lights':
     case 'accessibility':
-      this.weight_group = ea_controls_weight(this.ds);
-      this.range_group = ea_controls_range(this.ds, (this.ds.unit || 'range'));
+      this.weight_group = ea_controls_weight.call(this);
+      this.range_group = ea_controls_range.call(this, (this.ds.unit || 'range'));
       break;
 
     case "health":
     case "schools":
-      this.weight_group = ea_controls_weight(this.ds);
-      this.range_group = ea_controls_single(this.ds, 'proximity in km');
+      this.weight_group = ea_controls_weight.call(this);
+      this.range_group = ea_controls_single.call(this, 'proximity in km');
       break;
 
     case "minigrids":
@@ -356,29 +368,25 @@ class dscontrols extends HTMLElement {
     case "powerplants":
     case "geothermal":
     case "transmission-lines":
-      this.weight_group = ea_controls_weight(this.ds);
-      this.range_group = ea_controls_range(this.ds, 'proximity in km');
+      this.weight_group = ea_controls_weight.call(this);
+      this.range_group = ea_controls_range.call(this, 'proximity in km');
       break;
 
     case "transmission-lines-collection":
-      this.weight_group = ea_controls_weight(this.ds);
-      this.range_group = ea_controls_range(this.ds, 'proximity in km');
-      this.collection_list = ea_controls_collection_list(this.ds);
+      this.weight_group = ea_controls_weight.call(this);
+      this.range_group = ea_controls_range.call(this, 'proximity in km');
+      this.collection_list = ea_controls_collection_list.call(this);
       break;
 
     case 'crops':
-      this.weight_group = ea_controls_weight(this.ds);
-      this.range_group = ea_controls_range(this.ds, this.ds.unit);
-      this.mutant_options = ea_controls_mutant_options(this.ds);
+      this.weight_group = ea_controls_weight.call(this);
+      this.range_group = ea_controls_range.call(this, this.ds.unit);
+      this.mutant_options = ea_controls_mutant_options.call(this);
       break;
 
-    case "boundaries":
-    case "transmission-lines-planned":
-    case "transmission-lines-operational":
-      break;
 
     default:
-      throw `EA Controls: Unknown data id ${this.ds.id}. This should NOT happen!`;
+      console.warn(`EA Controls: Unknown data id ${this.ds.id}`);
       break;
     }
 

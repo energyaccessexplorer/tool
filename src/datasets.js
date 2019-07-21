@@ -513,6 +513,11 @@ async function ea_datasets_list_init(id, inputs, preset) {
   DS.all.filter(d => d.collection).forEach(d => d.collection_init());
   DS.all.filter(d => d.multifilter).forEach(d => d.multifilter_init());
 
+  DS.all.forEach(d => {
+    d.input_el = new dsinput(d);
+    d.controls_el = new dscontrols(d);
+  });
+
   return DS.all;
 };
 

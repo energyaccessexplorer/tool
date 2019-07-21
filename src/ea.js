@@ -178,9 +178,9 @@ async function ea_overlord(msg) {
     ea_ui_layout();
     mapbox_setup(geography.bounds);
 
-    const list = await ea_datasets_list_init(geography.id, state.inputs, state.preset);
+    await ea_datasets_list_init(geography.id, state.inputs, state.preset);
 
-    const b = list.find(d => d.id === 'boundaries');
+    const b = DS.get('boundaries');
 
     if (!b) {
       ea_flash
@@ -195,22 +195,16 @@ Please report this to energyaccessexplorer@wri.org.
     }
 
     else {
-      await b.heatmap.parse.call(b);
-
-      b.controls_el = new dscontrols(b);
+      await b.load('heatmap');
 
       document.querySelector('#controls-wrapper')
         .insertBefore(boundaries_controls(b), document.querySelector('#controls'));
     }
 
-    const inputs = list
+    const inputs = DS.all
           .filter(t => t.active)
           .map(x => x.id)
           .sort((a,b) => (state.inputs.indexOf(a) < state.inputs.indexOf(b)) ? -1 : 1);
-
-    list.forEach(d => {
-      d.input_el = new dsinput(d);
-    })
 
     if (!inputs.length) inputs.push('boundaries');
 

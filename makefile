@@ -155,11 +155,7 @@ synced:
 		${DIST}/ ${SRV_USER}@${SRV_SERVER}:${SRV_DEST}
 
 deploy:
-	@sed -i \
-		-e 's%"database": "${DB_SERV_DEV}",%"database": "${DB_SERV_PROD}",%' \
-		-e 's%"mapbox_theme": "",%"mapbox_theme": "${MAPBOX_DEFAULT_THEME}",%' \
-		settings.json
-
+	make reconfig env=${env}
 	make build
 
 	@rsync -OPrv \
@@ -171,9 +167,18 @@ deploy:
 		--exclude=makefile \
 		${DIST}/ ${SRV_USER}@${SRV_SERVER}:${SRV_DEST}
 
+	make reconfig env=development
+	make build
+
+reconfig:
+ifeq (${env}, production)
+	@sed -i \
+		-e 's%"database": "${DB_SERV_DEV}",%"database": "${DB_SERV_PROD}",%' \
+		-e 's%"mapbox_theme": "",%"mapbox_theme": "${MAPBOX_DEFAULT_THEME}",%' \
+		settings.json
+else
 	@sed -i \
 		-e 's%"database": "${DB_SERV_PROD}",%"database": "${DB_SERV_DEV}",%' \
 		-e 's%"mapbox_theme": "${MAPBOX_DEFAULT_THEME}",%"mapbox_theme": "",%' \
 		settings.json
-
-	make build
+endif

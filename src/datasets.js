@@ -424,6 +424,8 @@ Forcing dataset's weight to 1.`);
 
     if (this.collection) {
       await Promise.all(this.configuration.collection.map(i => DS.get(i).turn(v, draw)));
+      this.controls_el.turn(v);
+
       return;
     }
 

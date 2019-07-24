@@ -252,14 +252,17 @@
         transform: scale(0.6);
       }
 
-      [name=info] {
-        line-height: 1.5em;
-      }
-
       content {
         display: block;
         box-sizing: border-box;
         padding: 0.7em;
+      }
+
+      .advanced-controls {
+        display: none;
+        border-top: solid 1px #dfdfdf;
+        margin-top: 1em;
+        padding-top: 1em;
       }
 
       .weight-group,
@@ -335,7 +338,7 @@
       <header ripple>
         <slot name="checkbox"></slot>
         <slot name="name_long"></slot>
-        <slot name="info"></slot>
+        <slot name="dropdown"></slot>
       </header>
 
       <content>
@@ -348,8 +351,10 @@
           <slot name="range-slider"></slot>
         </div>
 
-        <div class="group weight-group">
-          <slot name="weight-slider"></slot>
+        <div class="advanced-controls">
+          <div class="group weight-group">
+            <slot name="weight-slider"></slot>
+          </div>
         </div>
       </content>
     </main>

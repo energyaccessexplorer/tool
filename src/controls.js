@@ -79,34 +79,23 @@ function ea_controls_checkbox() {
   const checkbox = ea_svg_checkbox(ds.active);
   const svg = checkbox.svg;
 
-  const activate = e => {
-    switch (e.target.closest('svg')) {
-    case this.info:
-      break;
+  const checkbox_activate = e => {
+    if (e.target.closest('svg') === svg)
+      this.activate();
 
-    case svg: {
-      ds.active = !ds.active;
+    else if (e.target.closest('.more-dropdown') === this.dropdown)
+      return;
 
-      ea_overlord({
-        "type": "dataset",
-        "target": ds,
-        "caller": "controls activate",
-      });
-      break;
-    }
-
-    default: {
+    else {
       let event = document.createEvent('HTMLEvents');
       event.initEvent('click', true, true);
       svg.dispatchEvent(event);
-      break;
     }
-    };
 
     return ds.active;
   };
 
-  qs(this, 'header').onclick = activate;
+  qs(this, 'header').onclick = checkbox_activate;
 
   return checkbox;
 };
@@ -370,6 +359,8 @@ class dscontrols extends HTMLElement {
     this.content = qs(this, 'content');
     this.spinner = qs(this, '.loading');
 
+    this.show_advanced = false;
+
     this.init();
 
     this.render();
@@ -377,11 +368,30 @@ class dscontrols extends HTMLElement {
     return this;
   };
 
+  activate() {
+    this.ds.active = !this.ds.active;
+
+    ea_overlord({
+      "type": "dataset",
+      "target": this.ds,
+      "caller": "controls activate",
+    });
+  };
+
   init() {
     this.checkbox = ea_controls_checkbox.call(this);
 
-    this.info = tmpl('#svg-info');
-    this.info.onclick = _ => ea_ui_dataset_modal(this.ds);
+    this.dropdown = new dropdown([{
+      "content": "Dataset info",
+      "action": _ => ea_ui_dataset_modal(this.ds)
+    }, {
+      "content": "Toggle advanced controls",
+      "action": _ => {
+        if (!this.ds.active) this.activate();
+
+        qs(this, '.advanced-controls').style.display = (this.show_advanced = !this.show_advanced) ? 'block' : 'none';
+      }
+    }])
 
     switch (this.ds.id) {
     case "ghi":
@@ -435,6 +445,7 @@ class dscontrols extends HTMLElement {
     this.content.style.display = this.ds.active ? '' : 'none';
 
     slot_populate.call(this, this.ds, {
+      "dropdown": this.dropdown,
       "info": this.info,
       "checkbox": this.checkbox.svg,
       "collection-list": this.collection_list,

@@ -121,18 +121,18 @@ class dsinput extends HTMLElement {
 
     if (['points', 'lines'].includes(d.datatype)) e = d.vectors.symbol_svg;
 
-    if (d.vectors && (d.vectors.color_stops && d.vectors.color_stops.length)) e = d.color_scale_svg;
+    if (d.vectors && (d.vectors.color_stops && d.vectors.color_stops.length)) e = d.color_scale_el;
 
-    else if (!d.vectors && d.heatmap) e = d.color_scale_svg;
+    else if (!d.vectors && d.heatmap) e = d.color_scale_el;
 
     if (d.collection) {
       const el = ce('ul', null, { class: 'collection' });
 
-      for (let i of d.configuration.collection) {
+      for (let i of d.config.collection) {
         let x = DS.get(i);
         let li = ce('li');
 
-        li.append(x.input_el.svg(), ce('div', x.name_long, { class: 'subheader' }));
+        li.append(x.input_el.svg(), ce('div', x.name, { class: 'subheader' }));
         el.append(li);
       }
 

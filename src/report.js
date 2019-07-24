@@ -68,13 +68,13 @@ function ea_report() {
     const dslist = DS.all.filter(d => d.active).map(d => {
       let u = "";
 
-      if (d.unit) u = `<code>(${d.unit})</code>`;
+      if (d.category.unit) u = `<code>(${d.category.unit})</code>`;
 
       // TODO: We should be showing a list of the children datasets and values
       //
-      if (d.multifilter) d.tmp_domain = [];
+      if (d.multifilter) d.domain = [];
 
-      doc.fromHTML(`<li> ${d.name_long} ${u} ${d.tmp_domain.join(' - ')}</li>`, lp, c, {});
+      doc.fromHTML(`<li> ${d.name} ${u} ${d.domain.join(' - ')}</li>`, lp, c, {});
       c += 16;
     });
 

@@ -79,29 +79,29 @@ function ea_state_sync() {
  *
  * @param "raster" []numbers
  * @param "canvas" a canvas element (if null, will default to canvas#output)
- * @param "color_scale" string. name of the color scale to draw.
+ * @param "color_theme" string. name of the color scale to draw.
  *
  * returns a plotty object.
  */
 
-function ea_canvas_plot(raster, canvas, color_scale = 'ea') {
+function ea_canvas_plot(data, canvas, color_theme = 'ea') {
   const A = DS.get('boundaries');
 
-  if (!raster.length) {
+  if (!data.length) {
     console.warn("ea_canvas_plot: no raster given. Filling up with a blank (transparent) one...");
-    raster = new Float32Array(A.raster.length).fill(-1);
+    data = new Float32Array(A.raster.data.length).fill(-1);
   };
 
   if (!canvas) canvas = document.querySelector('canvas#output');
 
   const plot = new plotty.plot({
     canvas: canvas,
-    data: raster,
-    width: A.width,
-    height: A.height,
+    data: data,
+    width: A.raster.width,
+    height: A.raster.height,
     domain: [0,1],
     noDataValue: -1,
-    colorScale: color_scale,
+    colorScale: color_theme,
   });
 
   plot.render();
@@ -153,7 +153,7 @@ border-bottom: 1px solid lightgray;`
   Object.keys(ea_indexes).forEach(idxn => {
     let raster = ea_analysis(ea_list_filter_type(idxn), idxn);
 
-    var f = d3.scaleQuantize().domain([0,1]).range(ea_default_color_domain);
+    var f = d3.scaleQuantize().domain([0,1]).range(ea_color_scale.domain);
 
     let a = new Float32Array(raster.length).fill(-1);
 
@@ -189,7 +189,7 @@ border-bottom: 1px solid lightgray;`
 
     if (percs.includes(NaN)) return;
 
-    let pie = ea_svg_pie(percs.map(x => [x]), 75, 0, ea_default_color_stops, null);
+    let pie = ea_svg_pie(percs.map(x => [x]), 75, 0, ea_color_scale.stops, null);
 
     let e = ce('div', null, { style: "text-align: center; margin: 0 1em; max-width: 150px;" });
     const container = ce('div', null, { class: 'pie-svg-container' });
@@ -202,7 +202,7 @@ border-bottom: 1px solid lightgray;`
     graphs.append(e);
   });
 
-  const s = ea_default_color_stops;
+  const s = ea_color_scale.stops;
 
   const i20 = i => (20 * i) + "-" + (20 * (i+1));
 
@@ -294,7 +294,7 @@ function ea_list_filter_type(type) {
  * Utility.
  *
  * @param "type" string. ID or indexname.
- * @param "cs" string. Default color_scale to 'ea'.
+ * @param "cs" string. Default color_theme to 'ea'.
  */
 
 async function ea_plot_active_analysis(type, cs = 'ea') {
@@ -405,7 +405,7 @@ function right_pane(t) {
 function boundaries_controls(ds) {
   const controls = ce('div', null, { id: `controls-${ds.id}`, class: 'controls' });
   const content = ce('content');
-  const _t = ce('div', ds.name_long, { class: 'controls-subbranch-title' });
+  const _t = ce('div', ds.name, { class: 'controls-subbranch-title' });
   _t.prepend(ce('span', ea_ui_collapse_triangle(ds.active ? 's' : 'e'), { class: 'collapse triangle' } ))
   controls.append(_t, content);
 
@@ -427,7 +427,7 @@ function boundaries_controls(ds) {
 
     const checkbox = check.svg;
 
-    const range_group = ea_controls_range.call({ ds: d }, (d.unit || 'percentage'), false, { width: 256 });
+    const range_group = ea_controls_range.call({ ds: d }, (d.category.unit || 'percentage'), false, { width: 256 });
 
     let sb = ce('div', null, { class: 'controls-multifilter-elem', ripple: "" });
     const title = ce('div', ds.csv.options[v], { class: 'control-group' });
@@ -446,9 +446,9 @@ function boundaries_controls(ds) {
     function select() {
       for (let s of sbs) s.classList.remove('active');
       sb.classList.add('active');
-      ds.name_long = ds.csv.options[v];
+      ds.name = ds.csv.options[v];
 
-      ds.input_el.querySelector('[slot=name_long]').innerText = ds.name_long;
+      ds.input_el.querySelector('[slot=name]').innerText = ds.name;
 
       ea_overlord({
         "type": "dataset",
@@ -457,7 +457,7 @@ function boundaries_controls(ds) {
       });
     };
 
-    if (first) { sb.classList.add('active'); ds.name_long = d.csv.options[v]; first = false; }
+    if (first) { sb.classList.add('active'); ds.name = d.csv.options[v]; first = false; }
 
     content.append(sb);
   }

@@ -92,14 +92,14 @@ function ea_ui_views_init() {
 
 function ea_ui_dataset_modal(ds) {
   const b = ds.metadata;
-  b['why'] = ds['why'];
+  b['why'] = ds.category.metadata.why;
 
   const content = tmpl('#ds-info-modal', b);
   qs(content, '#metadata-sources').href = ds.metadata.download_original_url;
   qs(content, '#learn-more').href = ds.metadata.learn_more_url;
 
   ea_modal.set({
-    header: ds.name_long,
+    header: ds.name,
     content: content,
     footer: null
   }).show();

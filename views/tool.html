@@ -164,22 +164,22 @@
     ea_indexes = {
       "eai": {
         "name": "Energy Access Potential",
-        "description": "(Current and/or potential)",
+        "description": "Current and/or potential",
         "info": "The Energy Access Potential Index indentifies areas with higher energy demand and supply which are characterized with higher index values. It is an aggregated measure of all selected data sets under both Demand and Supply categories."
       },
       "demand": {
         "name": "Demand Index",
-        "description": "(Current and/or potential)",
+        "description": "Current and/or potential",
         "info": "The Assistance Need Index identifies areas where market assistance is needed the most which are characterized with higher index values. It is an aggregated and weighted measure of selected data sets under both Demand and Supply categories indicating high energy demand, low economic activity, and low access to infrastructure and resources."
       },
       "supply": {
         "name": "Supply Index",
-        "description": "(Current and/or potential)",
+        "description": "Current and/or potential",
         "info": "The Supply Index identifies areas with higher energy supply which are characterized with higher index values. It is an aggregated and weighted measure of all selected data sets under Resource Availability and Infrastructure."
       },
       "ani": {
         "name": "Assistance Need Index",
-        "description": "(Areas where financial assistance is needed)",
+        "description": "Areas where financial assistance is needed",
         "info": "The Demand Index identifies areas with higher energy demand which are characterized with higher index values. It is an aggregated and weighted measure of all selected data sets under Demographics and Socio-economic activities."
       }
     };
@@ -194,13 +194,16 @@
       "demographics": "Demographics",
       "productive-uses": "Social and Productive Uses",
       "resources": "Resources",
-      "infrastructure": "Infrastructure",
+      "infrastructure": "Infrastructure"
     };
 
-    ea_default_color_domain = [0, 0.25, 0.5, 0.75, 1];
-    ea_default_color_stops = ["#1c4478", "#4f7a6d", "#81b062", "#b3ac48", "#e5a82e"];
-    plotty.addColorScale("ea", ea_default_color_stops, ea_default_color_domain);
-    ea_default_color_scale = "ea";
+    ea_color_scale = {
+      name: "ea",
+      stops: ["#1c4478", "#4f7a6d", "#81b062", "#b3ac48", "#e5a82e"],
+      domain: [0, 0.25, 0.5, 0.75, 1],
+    };
+
+    plotty.addColorScale(ea_color_scale.name, ea_color_scale.stops, ea_color_scale.domain);
 
     window.ea_modal = new modal("ea-modal", {});
     ea_ui_flash_setup();
@@ -236,7 +239,7 @@
         cursor: pointer;
       }
 
-      [name=name_long] {
+      [name=name] {
         flex: 1;
         display: block;
         margin: auto 0.5em;
@@ -339,7 +342,7 @@
 
       <header ripple>
         <slot name="checkbox"></slot>
-        <slot name="name_long"></slot>
+        <slot name="name"></slot>
         <slot name="dropdown"></slot>
       </header>
 
@@ -405,7 +408,7 @@
         padding: 0.5em;
       }
 
-      [name=name_long],
+      [name=name],
       [name=opacity] {
         flex: 1;
       }
@@ -457,7 +460,7 @@
 
     <main>
       <header>
-        <slot name="name_long"></slot> <slot name="unit"></slot>
+        <slot name="name"></slot> <slot name="unit"></slot>
         <slot name="opacity"></slot>
       </header>
 

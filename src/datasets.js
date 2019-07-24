@@ -4,44 +4,32 @@ class DS {
 
     this.category = e.category;
 
-    this.name_long = (e.configuration && e.configuration.name_override) ?
-      e.configuration.name_override :
-      e.category.name_long;
+    let config = e.configuration || {};
+    this.config = config;
+
+    this.name = config.name_override || e.category.name_long;
 
     this.indexname = (e.category.metadata.path && e.category.metadata.path[0]) || null;
-
-    this.unit = e.category.unit;
 
     this.weight = e.category.weight || 2;
 
     this.metadata = e.metadata;
 
-    this.invert = e.category.metadata.invert;
+    this.invert = config.invert_override || e.category.metadata.invert;
 
-    if (e.category.metadata && (e.category.metadata.why)) {
-      this.why = e.category.metadata.why;
-    }
+    this.mutant = !!config.mutant;
 
-    this.configuration = e.configuration;
-
-    this.mutant = !!(e.configuration && e.configuration.mutant);
-
-    this.collection = !!(e.configuration && e.configuration.collection);
+    this.collection = !!config.collection;
 
     if (e.heatmap_file) {
       this.heatmap = e.category.heatmap
       this.heatmap.endpoint = e.heatmap_file.endpoint;
       this.heatmap.parse = ea_datasets_tiff;
 
-      this.multifilter = !!(this.heatmap && this.heatmap.scale === 'multi-key-delta');
+      this.multifilter = (this.heatmap.scale === 'multi-key-delta');
 
       if (!this.mutant && !this.collection)
-        this.gen_color_scale();
-
-      if (this.heatmap) {
-        let hi = this.heatmap.init;
-        if (hi) this.init_domain = [hi.min, hi.max];
-      }
+        ea_datasets_color_scale.call(this);
     }
 
     if (e.vectors_file) {
@@ -70,7 +58,7 @@ class DS {
     }
 
     if (e.csv_file) {
-      this.csv = e.configuration.csv;
+      this.csv = config.csv;
       this.csv.endpoint = e.csv_file.endpoint;
       this.csv.parse = ea_datasets_csv;
 
@@ -108,50 +96,47 @@ class DS {
 
     if (!presetsempty && p) {
       this.weight = p.weight;
-      // o.init_domain = [p.min, p.max];
-      this.init_domain = null;
     }
 
     this.active = active || (!presetsempty && p);
 
-    this.datatype = this.decidedatatype();
-  };
+    this.datatype = (_ => {
+      let t = null;
 
-  decidedatatype() {
-    if (this.datatype) return this.datatype;
+      if (this.vectors) t = this.vectors.shape_type;
+      else if (this.heatmap) t = "raster";
+      else if (this.parent) t = this.parent.datatype;
+      else if (this.mutant) t = "mutant";
+      else throw `Cannot decide datatype of ${this.id}`;
 
-    if (this.vectors) return this.vectors.shape_type;
-    else if (this.heatmap) return "raster";
-    else if (this.parent) return this.parent.datatype;
-    else if (this.mutant) return "mutant";
-
-    throw `Cannot decide datatype of ${this.id}`;
+      return t;
+    })();
   };
 
   mutant_init() {
     if (!this.mutant) throw `${this.id} is not a mutant. Bye.`
 
-    let m = DS.get(this.configuration.mutant_targets[0]);
+    let m = DS.get(this.config.mutant_targets[0]);
 
-    this.configuration.host = m.id;
+    this.config.host = m.id;
 
     this.raster = m.raster;
     this.vectors = m.vectors;
     this.heatmap = m.heatmap;
 
-    this.color_scale_svg = m.color_scale_svg;
+    this.color_scale_el = m.color_scale_el;
     this.color_scale_fn = m.color_scale_fn;
   };
 
   async mutate(host) {
     if (!this.mutant) throw `${this.id} is not a mutant.`;
 
-    if (!this.configuration.mutant_targets.includes(host.id))
+    if (!this.config.mutant_targets.includes(host.id))
       throw `${this.id} is not configured to mutate into ${host.id}.`
 
-    this.configuration.host = host.id;
+    this.config.host = host.id;
 
-    this.color_scale_svg = host.color_scale_svg;
+    this.color_scale_el = host.color_scale_el;
     this.color_scale_fn = host.color_scale_fn;
 
     await host.heatmap.parse.call(host);
@@ -161,7 +146,7 @@ class DS {
     this.vectors = host.vectors;
 
     const s = qs(DS.get(this.id).input_el, '[name=svg]');
-    elem_empty(s); s.append(host.color_scale_svg);
+    elem_empty(s); s.append(host.color_scale_el);
 
     let src;
     if (src = ea_mapbox.getSource(this.id)) {
@@ -190,6 +175,7 @@ class DS {
       d.subid = v;
       d.parent = this;
       d.datatype = this.datatype;
+      d.config = {};
 
       d.init(false, null);
 
@@ -218,13 +204,13 @@ class DS {
       this.filter_option = o;
     else {
       o = Object.keys(this.csv.options)[0];
-      this.name_long = this.csv.options[o];
+      this.name = this.csv.options[o];
     }
 
     if (this.features) {
-      const cso = this.configuration.polygons[o];
+      const cso = this.config.polygons[o];
       let cs = this.vectors.color_stops;
-      if (!cs || !cs.length) cs = this.vectors.color_stops = ea_default_color_stops;
+      if (!cs || !cs.length) cs = this.vectors.color_stops = ea_color_scale.stops;
 
       const min = Math.min.apply(null, this.features.features.map(f => f.properties[cso]));
       const max = Math.max.apply(null, this.features.features.map(f => f.properties[cso]));
@@ -234,17 +220,17 @@ class DS {
       const s = d3.scaleLinear().domain(d).range(cs);
 
       this.features.features.forEach(f => f.properties.color = s(f.properties[cso]));
-      this.color_scale_svg = ea_svg_color_steps(s,d);
+      this.color_scale_el = ea_svg_color_steps(s,d);
 
       let src; if (src = ea_mapbox.getSource(this.id)) src.setData(this.features);
 
       const i = qs(DS.get(this.id).input_el, '[name=svg]');
-      elem_empty(i); i.append(this.color_scale_svg);
+      elem_empty(i); i.append(this.color_scale_el);
     }
   };
 
   /*
-   * ea_datasets_scale_fn
+   * scale_fn
    *
    * Extract the scaling function given a dataset and the current parameters.
    *
@@ -259,7 +245,7 @@ class DS {
     let s = null;
 
     const d = (this.heatmap.domain && [this.heatmap.domain.min, this.heatmap.domain.max]) || [0,1];
-    const t = this.tmp_domain;
+    const t = this.domain;
     const v = this.heatmap.scale;
     const o = this.filter_option;
     const r = ((typeof this.invert !== 'undefined' && this.invert.includes(i)) ? [1,0] : [0,1]);
@@ -283,7 +269,7 @@ class DS {
         let z = this.table[x];
         if (!z) return -1;
 
-        return (!x || x === this.nodata) ? -1 : lin.clamp(this.heatmap.clamp)(z[o]);
+        return (!x || x === this.raster.nodata) ? -1 : lin.clamp(this.heatmap.clamp)(z[o]);
       };
       break;
     }
@@ -322,7 +308,7 @@ Forcing dataset's weight to 1.`);
           if (a === -1) return a;
 
           let bo = b.subid;
-          let to = b.tmp_domain;
+          let to = b.domain;
 
           a = (z[bo] < to[0] || z[bo] > to[1]) ? -1 : 1;
         }
@@ -342,72 +328,9 @@ Forcing dataset's weight to 1.`);
     return s;
   };
 
-  gen_color_scale() {
-    let cs = this.heatmap.color_stops;
-    let c = ea_default_color_scale;
-    let d = ea_default_color_domain;
-
-    if (!cs || !cs.length)
-      this.heatmap.color_stops = cs = ea_default_color_stops;
-    else {
-      d = Array(cs.length).fill(0).map((x,i) => (0 + i * (1/(cs.length-1))));
-    }
-
-    {
-      let intervals;
-
-      if (this.heatmap.configuration && (intervals = this.heatmap.configuration.intervals)) {
-        let l = intervals.length;
-
-        let s = d3.scaleLinear()
-            .domain([0,255])
-            .range([this.heatmap.domain.min, this.heatmap.domain.max])
-            .clamp(true);
-
-        const a = new Uint8Array(1024).fill(-1);
-        for (let i = 0; i < 1024; i += 4) {
-          let j = interval_index(s(i/4), intervals, this.heatmap.clamp);
-
-          if (j === -1) {
-            a[i] = a[i+1] = a[i+2] = a[i+3] = 0;
-            continue;
-          }
-
-          let cj = cs[j];
-
-          let color = hex_to_rgba(cs[j]);
-
-          a[i] = color[0];
-          a[i+1] = color[1];
-          a[i+2] = color[2];
-          a[i+3] = color[3];
-        }
-
-        plotty.colorscales[c = this.id] = a;
-
-        this.heatmap.color_scale = c;
-
-        this.color_scale_fn = (x,i) => cs[i];
-      }
-
-      else {
-        plotty.addColorScale((c = this.id), cs, d);
-
-        this.heatmap.color_scale = c;
-
-        this.color_scale_fn = d3.scaleLinear()
-          .domain(d)
-          .range(cs)
-          .clamp(this.heatmap.clamp || false);
-      }
-    }
-
-    this.color_scale_svg = ea_svg_color_steps(this.color_scale_fn, d);
-  };
-
   async visible(t) {
     if (this.collection) {
-      await Promise.all(this.configuration.collection.map(i => DS.get(i).visible(t)));
+      await Promise.all(this.config.collection.map(i => DS.get(i).visible(t)));
       return;
     }
 
@@ -423,14 +346,14 @@ Forcing dataset's weight to 1.`);
     }
 
     if (this.collection) {
-      await Promise.all(this.configuration.collection.map(i => DS.get(i).turn(v, draw)));
+      await Promise.all(this.config.collection.map(i => DS.get(i).turn(v, draw)));
       this.controls_el.turn(v);
 
       return;
     }
 
     if (this.mutant) {
-      this.mutate(DS.get(this.configuration.host));
+      this.mutate(DS.get(this.config.host));
     }
 
     if (this.controls_el) this.controls_el.turn(v);
@@ -440,7 +363,7 @@ Forcing dataset's weight to 1.`);
 
   async load(arg) {
     if (this.collection) {
-      await Promise.all(this.configuration.collection.map(i => DS.get(i).load(arg)));
+      await Promise.all(this.config.collection.map(i => DS.get(i).load(arg)));
 
       // TODO: Remove this? It's a hack for transmission-lines-collection not
       // having per-element rasters but a single collection raster.
@@ -461,7 +384,7 @@ Forcing dataset's weight to 1.`);
       ea_mapbox.moveLayer(this.id, ea_mapbox.first_symbol);
 
     if (this.collection) {
-      for (let i of this.configuration.collection)
+      for (let i of this.config.collection)
         DS.get(i).raise();
     }
   };
@@ -521,6 +444,69 @@ async function ea_datasets_list_init(id, inputs, preset) {
   });
 
   return DS.all;
+};
+
+function ea_datasets_color_scale() {
+  let cs = this.heatmap.color_stops;
+  let c = ea_color_scale.name;
+  let d = ea_color_scale.domain;
+
+  if (!cs || !cs.length)
+    this.heatmap.color_stops = cs = ea_color_scale.stops;
+  else {
+    d = Array(cs.length).fill(0).map((x,i) => (0 + i * (1/(cs.length-1))));
+  }
+
+  {
+    let intervals;
+
+    if (this.heatmap.configuration && (intervals = this.heatmap.configuration.intervals)) {
+      let l = intervals.length;
+
+      let s = d3.scaleLinear()
+          .domain([0,255])
+          .range([this.heatmap.domain.min, this.heatmap.domain.max])
+          .clamp(true);
+
+      const a = new Uint8Array(1024).fill(-1);
+      for (let i = 0; i < 1024; i += 4) {
+        let j = interval_index(s(i/4), intervals, this.heatmap.clamp);
+
+        if (j === -1) {
+          a[i] = a[i+1] = a[i+2] = a[i+3] = 0;
+          continue;
+        }
+
+        let cj = cs[j];
+
+        let color = hex_to_rgba(cs[j]);
+
+        a[i] = color[0];
+        a[i+1] = color[1];
+        a[i+2] = color[2];
+        a[i+3] = color[3];
+      }
+
+      plotty.colorscales[c = this.id] = a;
+
+      this.color_theme = c;
+
+      this.color_scale_fn = (x,i) => cs[i];
+    }
+
+    else {
+      plotty.addColorScale((c = this.id), cs, d);
+
+      this.color_theme = c;
+
+      this.color_scale_fn = d3.scaleLinear()
+        .domain(d)
+        .range(cs)
+        .clamp(this.heatmap.clamp || false);
+    }
+  }
+
+  this.color_scale_el = ea_svg_color_steps(this.color_scale_fn, d);
 };
 
 /*
@@ -591,12 +577,12 @@ async function ea_datasets_tiff() {
       if (!ea_mapbox.getSource(this.id)) {
         (new plotty.plot({
           canvas: canvas,
-          data: this.raster,
-          width: this.width,
-          height: this.height,
+          data: this.raster.data,
+          width: this.raster.width,
+          height: this.raster.height,
           domain: [d.min, d.max],
-          noDataValue: this.nodata,
-          colorScale: this.heatmap.color_scale,
+          noDataValue: this.raster.nodata,
+          colorScale: this.color_theme,
         })).render();
 
         ea_mapbox.addSource(this.id, {
@@ -629,7 +615,7 @@ async function ea_datasets_tiff() {
       }
     };
 
-    if (this.raster) {
+    if (this.raster && this.raster.data) {
       draw.call(this, document.querySelector(`canvas#canvas-${this.id}`));
     }
 
@@ -638,12 +624,12 @@ async function ea_datasets_tiff() {
       const image = await tiff.getImage();
       const rasters = await image.readRasters();
 
-      this.raster = rasters[0];
-
-      this.width = image.getWidth();
-      this.height = image.getHeight();
-
-      this.nodata = parseFloat(tiff.fileDirectories[0][0].GDAL_NODATA);
+      this.raster = {
+        data: rasters[0],
+        width: image.getWidth(),
+        height: image.getHeight(),
+        nodata: parseFloat(tiff.fileDirectories[0][0].GDAL_NODATA)
+      };
 
       let c = document.createElement('canvas');
       c.id = `canvas-${this.id}`;
@@ -659,7 +645,7 @@ async function ea_datasets_tiff() {
     return this;
   };
 
-  if (this.raster) {
+  if (this.raster && this.raster.data) {
     run_it.call(this);
     return this;
   }

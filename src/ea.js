@@ -17,7 +17,7 @@
 function ea_analysis(list, type) {
   const t0 = performance.now();
 
-  const raster = new Float32Array(list[0] ? list[0].raster.length : 0).fill(-1);
+  const it = new Float32Array(list[0] ? list[0].raster.data.length : 0).fill(-1);
 
   // Add up how much demand and supply datasets will account for. Then, just
   // below, these values will be split into 50-50 of the total analysis.
@@ -53,9 +53,9 @@ function ea_analysis(list, type) {
   const full_weight = list
         .reduce((a,c) => ((c.heatmap.scale === "key-delta") ? a : c.weight + a), 0);
 
-  if (list.length === 1 && full_weight === 0) return raster;
+  if (list.length === 1 && full_weight === 0) return it;
 
-  for (var i = 0; i < raster.length; i++) {
+  for (var i = 0; i < it.length; i++) {
     let a = 0;
 
     for (let j = 0; j < list.length; j++) {
@@ -71,8 +71,8 @@ function ea_analysis(list, type) {
       //
       if (a === -1) continue;
 
-      const v = c.raster[i];
-      if (v === c.nodata) {
+      const v = c.raster.data[i];
+      if (v === c.raster.nodata) {
         a = -1; continue;
       }
 
@@ -100,19 +100,19 @@ function ea_analysis(list, type) {
       if (a < min) min = a;
     }
 
-    raster[i] = a;
+    it[i] = a;
   }
 
   var f = d3.scaleLinear().domain([min,max]).range([0,1]);
 
-  for (var i = 0; i < raster.length; i++) {
-    const r = raster[i];
-    raster[i] = (r === -1) ? -1 : f(r);
+  for (var i = 0; i < it.length; i++) {
+    const r = it[i];
+    it[i] = (r === -1) ? -1 : f(r);
   }
 
   console.log("Finished ea_analysis in:", performance.now() - t0, weights, tots);
 
-  return raster;
+  return it;
 };
 
 /*
@@ -379,14 +379,14 @@ Please report this to energyaccessexplorer@wri.org.
       const e = msg.event;
 
       const b = DS.get('boundaries');
-      let nodata = b.nodata;
+      let nodata = b.raster.nodata;
 
       let t;
 
       if (state.mode === "outputs") {
         t = {
           raster: ea_mapbox.getSource('output-source').raster,
-          name_long: "Analysis"
+          name: "Analysis"
         }
         nodata = -1;
       }
@@ -404,7 +404,7 @@ Please report this to energyaccessexplorer@wri.org.
           if (et.source === i) {
             let at;
 
-            if (!t.configuration || !(at = t.configuration.features_attr_map)) {
+            if (!(at = t.config.features_attr_map)) {
               console.warn("Dataset is not configured to display info. (configuration.features_attr_map)");
               return;
             }
@@ -423,9 +423,9 @@ Please report this to energyaccessexplorer@wri.org.
         [e.lngLat.lng, e.lngLat.lat],
         ea_mapbox.coords,
         {
-          array: t.raster,
-          width: b.width,
-          height: b.height,
+          array: t.raster.data,
+          width: b.raster.width,
+          height: b.raster.height,
           nodata: nodata
         }
       );
@@ -436,10 +436,10 @@ Please report this to energyaccessexplorer@wri.org.
         if (t.heatmap) v = v * t.heatmap.factor;
 
         table_pointer([{
-          "target": t.name_long,
+          "target": t.name,
           "dataset": "value"
         }], {
-          "value": `${v.toFixed(2)} <code>${t.unit || ''}</code>`
+          "value": `${v.toFixed(2)} <code>${t.category.unit || ''}</code>`
         }, e);
       }
       else {

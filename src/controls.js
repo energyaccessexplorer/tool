@@ -106,12 +106,12 @@ function ea_controls_mutant_options() {
   const container = ce('div', null, { class: 'control-option' })
   const select = ce('select');
 
-  ds.configuration.mutant_targets.forEach(i => {
+  ds.config.mutant_targets.forEach(i => {
     const host = DS.get(i);
-    select.append(ce('option', host.name_long, { value: i }));
+    select.append(ce('option', host.name, { value: i }));
   });
 
-  select.value = ds.configuration.host;
+  select.value = ds.config.host;
 
   select.addEventListener('change', async function() {
     const host = DS.get(this.value);
@@ -174,7 +174,7 @@ function ea_controls_range(label, single = false, opts = {}) {
     let v = domain[i] = range_norm(x);
     el.innerText = (v * (ds.heatmap.factor || 1)).toFixed(ds.heatmap.precision || 0);
 
-    ds.tmp_domain = domain;
+    ds.domain = domain;
   };
 
   const l = elem(`
@@ -189,7 +189,7 @@ function ea_controls_range(label, single = false, opts = {}) {
 
   const r = ea_svg_interval(
     single,
-    (ds.init_domain ? [range_norm.invert(ds.init_domain[0]), range_norm.invert(ds.init_domain[1])] : null), {
+    [range_norm.invert(ds.heatmap.init.min), range_norm.invert(ds.heatmap.init.max)], {
       width: opts.width || 320,
       callback1: x => update_range_value(x, 0, v1),
       callback2: x => update_range_value(x, 1, v2),
@@ -265,9 +265,9 @@ function ea_controls_collection_list() {
 
   const e = ce('ul', null, { class: 'controls-dataset-collection' });
 
-  for (let i of ds.configuration.collection) {
+  for (let i of ds.config.collection) {
     let d = DS.get(i);
-    e.append(ce('li', d.name_long));
+    e.append(ce('li', d.name));
   }
 
   return e;
@@ -335,14 +335,8 @@ function ea_controls_presets_set(d, v) {
 
   if (p) {
     d.weight = p.weight;
-    // if (d.weight_change) d.weight_change(p.weight);
-
-    d.init_domain = [p.min, p.max];
   } else {
     d.weight = 2;
-    // if (d.weight_change) d.weight_change(2);
-
-    d.init_domain = null;
   }
 
   return d.active;
@@ -401,7 +395,7 @@ class dscontrols extends HTMLElement {
     case 'nighttime-lights':
     case 'accessibility':
       this.weight_group = ea_controls_weight.call(this);
-      this.range_group = ea_controls_range.call(this, (this.ds.unit || 'range'));
+      this.range_group = ea_controls_range.call(this, (this.ds.category.unit || 'range'));
       break;
 
     case "health":
@@ -428,7 +422,7 @@ class dscontrols extends HTMLElement {
 
     case 'crops':
       this.weight_group = ea_controls_weight.call(this);
-      this.range_group = ea_controls_range.call(this, this.ds.unit);
+      this.range_group = ea_controls_range.call(this, this.ds.category.unit);
       this.mutant_options = ea_controls_mutant_options.call(this);
       break;
 

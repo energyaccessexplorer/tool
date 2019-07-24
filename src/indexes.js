@@ -4,12 +4,12 @@ async function ea_indexes_analyse(raster) {
   if (!pop) return null;
 
   await pop.load('heatmap');
-  const p = pop.raster;
-  const nodata = pop.nodata;
+  const p = pop.raster.data;
+  const nodata = pop.raster.nodata;
 
   let a = new Float32Array(raster.length).fill(-1);
 
-  let f = d3.scaleQuantize().domain([0,1]).range(ea_default_color_domain);
+  let f = d3.scaleQuantize().domain([0,1]).range(ea_color_scale.domain);
 
   for (var i = 0; i < raster.length; i++) {
     const r = raster[i];
@@ -73,24 +73,24 @@ async function ea_indexes_graphs(raster) {
   t['area']['distribution'].forEach((x,i) => AREA_PIE['data'][i].shift());
 };
 
-function ea_indexes_init(o) {
+function ea_indexes_init(v) {
   const index_graphs = document.querySelector('#index-graphs-container');
 
   const scale = ce('div');
   scale.append(
     ea_svg_color_steps(
       d3.scaleLinear()
-        .domain(ea_default_color_domain)
-        .range(ea_default_color_stops)
+        .domain(ea_color_scale.domain)
+        .range(ea_color_scale.stops)
         .clamp(false),
-      ea_default_color_domain),
+      ea_color_scale.domain),
     tmpl("#ramp-label-low-high"));
 
   const cos = document.querySelector('#canvas-output-select');
   for (let i in ea_indexes)
     cos.append(ce('option', ea_indexes[i]['name'], { value: i }));
 
-  cos.value = o;
+  cos.value = v;
   cos.onchange = function() {
     ea_overlord({
       "type": "index",
@@ -103,8 +103,8 @@ function ea_indexes_init(o) {
   info.append(tmpl('#svg-info'));
   info.onclick = _ => ea_indexes_modal();
 
-  window.POPULATION_PIE = ea_svg_pie([[0], [0], [0], [0], [0]], 75, 0, ea_default_color_stops, null);
-  window.AREA_PIE = ea_svg_pie([[0], [0], [0], [0], [0]], 75, 0, ea_default_color_stops, null);
+  window.POPULATION_PIE = ea_svg_pie([[0], [0], [0], [0], [0]], 75, 0, ea_color_scale.stops, null);
+  window.AREA_PIE = ea_svg_pie([[0], [0], [0], [0], [0]], 75, 0, ea_color_scale.stops, null);
 
   const pe = ce('div', ce('div', "Population share"), { class: 'index-graphs-group' });
   const ae = ce('div', ce('div', "Area share"), { class: 'index-graphs-group' });

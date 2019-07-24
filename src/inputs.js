@@ -73,34 +73,36 @@ class dsinput extends HTMLElement {
     let o = 1;
 
     const grad = ea_svg_interval(
-      true, null, null,
-      x => o = x,
-      _ => {
-        let t = null;
+      true, null, {
+        callback1: null,
+        callback2: x => o = x,
+        end_callback: _ => {
+          let t = null;
 
-        switch (this.ds.datatype) {
-        case 'points':
-          t = ['circle-opacity', 'circle-stroke-opacity'];
-          break;
+          switch (this.ds.datatype) {
+          case 'points':
+            t = ['circle-opacity', 'circle-stroke-opacity'];
+            break;
 
-        case 'lines':
-          t = ['line-opacity'];
-          break;
+          case 'lines':
+            t = ['line-opacity'];
+            break;
 
-        case 'polygons':
-          t = ['fill-opacity'];
-          break;
+          case 'polygons':
+            t = ['fill-opacity'];
+            break;
 
-        case 'raster':
-          t = ['raster-opacity'];
-          break;
+          case 'raster':
+            t = ['raster-opacity'];
+            break;
 
-        default:
-        break;
+          default:
+            break;
+          }
+
+          for (let i of t)
+            ea_mapbox.setPaintProperty(this.ds.id, i, parseFloat(o));
         }
-
-        for (let i of t)
-          ea_mapbox.setPaintProperty(this.ds.id, i, parseFloat(o));
       }
     );
 

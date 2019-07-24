@@ -427,7 +427,7 @@ function boundaries_controls(ds) {
 
     const checkbox = check.svg;
 
-    const range_group = ea_controls_range.call({ ds: d }, (d.unit || 'percentage'), false);
+    const range_group = ea_controls_range.call({ ds: d }, (d.unit || 'percentage'), false, { width: 256 });
 
     let sb = ce('div', null, { class: 'controls-multifilter-elem', ripple: "" });
     const title = ce('div', ds.csv.options[v], { class: 'control-group' });

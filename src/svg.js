@@ -101,9 +101,13 @@ function ea_svg_radio(init, callback) {
   return svg.node();
 };
 
-function ea_svg_range_steps(steps, init, drag_callback, end_callback) {
+function ea_svg_range_steps(steps, init, opts = {}) {
+  const callback1 = opts.callback1;
+  const callback2 = opts.callback2;
+  const end_callback = opts.end_callback;
+
   const radius = 5,
-        svgwidth = 256,
+        svgwidth = opts.width || 256,
         svgheight = (radius * 2) + 2,
         linewidth = radius * 2,
         svgmin = radius + 1,
@@ -289,9 +293,13 @@ function ea_svg_color_steps(color_scale, steps, height) {
   return svg.node();
 };
 
-function ea_svg_interval(single, init, callback1, callback2, end_callback) {
+function ea_svg_interval(single, init, opts = {}) {
+  const callback1 = opts.callback1;
+  const callback2 = opts.callback2;
+  const end_callback = opts.end_callback;
+
   const radius = 5,
-        svgwidth = 256,
+        svgwidth = opts.width || 256,
         svgheight = (radius * 2) + 2,
         linewidth = radius * 2,
         svgmin = radius + 1,

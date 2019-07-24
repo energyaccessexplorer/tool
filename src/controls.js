@@ -166,15 +166,17 @@ function ea_controls_range(label, single = false) {
 
   const r = ea_svg_interval(
     single,
-    (ds.init_domain ? [range_norm.invert(ds.init_domain[0]), range_norm.invert(ds.init_domain[1])] : null),
-    x => update_range_value(x, 0, v1),
-    x => update_range_value(x, 1, v2),
-    _ => {
-      ea_overlord({
-        "type": "dataset",
-        "target": ds,
-        "caller": "ea_controls_range",
-      });
+    (ds.init_domain ? [range_norm.invert(ds.init_domain[0]), range_norm.invert(ds.init_domain[1])] : null), {
+      width: opts.width || 320,
+      callback1: x => update_range_value(x, 0, v1),
+      callback2: x => update_range_value(x, 1, v2),
+      end_callback: _ => {
+        ea_overlord({
+          "type": "dataset",
+          "target": ds,
+          "caller": "ea_controls_range",
+        });
+      }
     }
   );
 
@@ -207,16 +209,18 @@ function ea_controls_weight(init) {
 
   const w = ea_svg_range_steps(
     weights,
-    ds.weight,
-    null,
-    x => {
-      ds.weight = x;
+    ds.weight, {
+      width: 320,
+      drag_callback: null,
+      end_callback: x => {
+        ds.weight = x;
 
-      ea_overlord({
-        "type": "dataset",
-        "target": ds,
-        "caller": "ea_controls_weight",
-      });
+        ea_overlord({
+          "type": "dataset",
+          "target": ds,
+          "caller": "ea_controls_weight",
+        });
+      }
     }
   );
 

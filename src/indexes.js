@@ -66,8 +66,8 @@ async function ea_indexes_graphs(raster) {
   POPULATION_PIE.change(1);
   AREA_PIE.change(1);
 
-  document.querySelector('#population-number').innerHTML = t['population']['total'] + "&nbsp;" + "people";
-  document.querySelector('#area-number').innerHTML = t['area']['total'] + "&nbsp;" + "km<sup>2</sup>";
+  document.querySelector('#population-number').innerHTML = t['population']['total'].toLocaleString() + "&nbsp;" + "people";
+  document.querySelector('#area-number').innerHTML = t['area']['total'].toLocaleString() + "&nbsp;" + "km<sup>2</sup>";
 
   t['population']['distribution'].forEach((x,i) => POPULATION_PIE['data'][i].shift());
   t['area']['distribution'].forEach((x,i) => AREA_PIE['data'][i].shift());

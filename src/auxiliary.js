@@ -352,7 +352,7 @@ function ea_coordinates_raster(coords, bounds, raster) {
       y: Math.floor((y * raster.height) / ch)
     };
 
-    let v = raster.array[(a.y * raster.width) + a.x];
+    let v = raster.data[(a.y * raster.width) + a.x];
 
     a.value = v === raster.nodata ? null : v;
   }

@@ -385,7 +385,10 @@ Please report this to energyaccessexplorer@wri.org.
 
       if (state.mode === "outputs") {
         t = {
-          raster: ea_mapbox.getSource('output-source').raster,
+          raster: {
+            data: ea_mapbox.getSource('output-source').raster
+          },
+          category: {},
           name: "Analysis"
         };
         nodata = -1;
@@ -414,7 +417,7 @@ Please report this to energyaccessexplorer@wri.org.
 
           return;
         }
-        else if (t.raster) {
+        else if (t.data) {
           // go on... next part applies to outputs.
         }
       }
@@ -423,14 +426,14 @@ Please report this to energyaccessexplorer@wri.org.
         [e.lngLat.lng, e.lngLat.lat],
         ea_mapbox.coords,
         {
-          array: t.raster.data,
+          data: t.raster.data || t.data,
           width: b.raster.width,
           height: b.raster.height,
           nodata: nodata
         }
       );
 
-      if (rc && rc.value) {
+      if (rc && rc.value !== null) {
         v = rc.value;
 
         if (t.heatmap) v = v * t.heatmap.factor;

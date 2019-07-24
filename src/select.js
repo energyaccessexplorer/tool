@@ -61,8 +61,6 @@ function ea_select_topo_flag(c) {
 };
 
 function ea_select_setup() {
-  let b = [[-180, -85], [180, 85]];
-
   const playground = document.querySelector('#playground');
 
   let curr_c = null;

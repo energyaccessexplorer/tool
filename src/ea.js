@@ -387,7 +387,7 @@ Please report this to energyaccessexplorer@wri.org.
         t = {
           raster: ea_mapbox.getSource('output-source').raster,
           name: "Analysis"
-        }
+        };
         nodata = -1;
       }
 

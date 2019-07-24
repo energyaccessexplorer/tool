@@ -346,12 +346,11 @@ function ea_coordinates_raster(coords, bounds, raster) {
   a = null;
 
   if ((x > 0 && x < cw &&
-       y > 0 && y < ch ))
-  {
+       y > 0 && y < ch )) {
     a = {
       x: Math.floor((x * raster.width) / cw),
       y: Math.floor((y * raster.height) / ch)
-    }
+    };
 
     let v = raster.array[(a.y * raster.width) + a.x];
 

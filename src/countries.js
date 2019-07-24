@@ -56,8 +56,7 @@ function ea_countries_setup() {
     d3.json('../lib/world-50m.json'),
     d3.json('../lib/countries.json'),
     d3.json('../lib/country-overviews.json')
-  ])
-    .then(results => {
+  ]).then(results => {
       let geo = results[1];
 
       window.countries_online = results[0];

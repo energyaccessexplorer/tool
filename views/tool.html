@@ -162,25 +162,27 @@
     };
 
     ea_indexes = {
-      "eai": "Energy Access Potential",
-      "demand": "Demand Index",
-      "supply": "Supply Index",
-      "ani": "Assistance Need Index",
+      "eai": {
+        "name": "Energy Access Potential",
+        "description": "(Current and/or potential)",
+        "info": "The Energy Access Potential Index indentifies areas with higher energy demand and supply which are characterized with higher index values. It is an aggregated measure of all selected data sets under both Demand and Supply categories."
+      },
+      "demand": {
+        "name": "Demand Index",
+        "description": "(Current and/or potential)",
+        "info": "The Assistance Need Index identifies areas where market assistance is needed the most which are characterized with higher index values. It is an aggregated and weighted measure of selected data sets under both Demand and Supply categories indicating high energy demand, low economic activity, and low access to infrastructure and resources."
+      },
+      "supply": {
+        "name": "Supply Index",
+        "description": "(Current and/or potential)",
+        "info": "The Supply Index identifies areas with higher energy supply which are characterized with higher index values. It is an aggregated and weighted measure of all selected data sets under Resource Availability and Infrastructure."
+      },
+      "ani": {
+        "name": "Assistance Need Index",
+        "description": "(Areas where financial assistance is needed)",
+        "info": "The Demand Index identifies areas with higher energy demand which are characterized with higher index values. It is an aggregated and weighted measure of all selected data sets under Demographics and Socio-economic activities."
+      }
     };
-
-    ea_indexes_descriptions = {
-      "eai": "(Current and/or potential)",
-      "demand": "(Current and/or potential)",
-      "supply": "(Current and/or potential)",
-      "ani": "(Areas where financial assistance is needed)",
-    };
-
-    ea_indexes_infos = {
-      "eai": "The Energy Access Potential Index indentifies areas with higher energy demand and supply which are characterized with higher index values. It is an aggregated measure of all selected data sets under both Demand and Supply categories.",
-      "ani": "The Assistance Need Index identifies areas where market assistance is needed the most which are characterized with higher index values. It is an aggregated and weighted measure of selected data sets under both Demand and Supply categories indicating high energy demand, low economic activity, and low access to infrastructure and resources.",
-      "supply": "The Supply Index identifies areas with higher energy supply which are characterized with higher index values. It is an aggregated and weighted measure of all selected data sets under Resource Availability and Infrastructure.",
-      "demand": "The Demand Index identifies areas with higher energy demand which are characterized with higher index values. It is an aggregated and weighted measure of all selected data sets under Demographics and Socio-economic activities."
-    }
 
     ea_presets = {
       "market": "Exploring new energy markets",

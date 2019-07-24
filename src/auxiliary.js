@@ -194,7 +194,7 @@ border-bottom: 1px solid lightgray;`
     let e = ce('div', null, { style: "text-align: center; margin: 0 1em; max-width: 150px;" });
     const container = ce('div', null, { class: 'pie-svg-container' });
 
-    e.append(container, ce('div', ea_indexes[idxn]));
+    e.append(container, ce('div', ea_indexes[idxn]['name']));
 
     pie.change(0);
     container.append(pie.svg);
@@ -217,7 +217,7 @@ border-bottom: 1px solid lightgray;`
   s.forEach((x,i) => thr.append(ce('th', i20(i), { style: `background-color: ${x};`})));
 
   for (var k in summary) {
-    let tr = ce('tr', ce('td', ea_indexes[k], { class: 'index-name' }));
+    let tr = ce('tr', ce('td', ea_indexes[k]['name'], { class: 'index-name' }));
     s.forEach((x,i) => tr.append(ce('td', (summary[k][i]).toLocaleString())));
 
     tbody.append(tr);
@@ -304,8 +304,8 @@ async function ea_plot_active_analysis(type, cs = 'ea') {
   ea_canvas_plot(raster);
 
   document.querySelector('#canvas-output-select').value = type;
-  document.querySelector('#index-graphs-title').innerText = ea_indexes[type];
-  document.querySelector('#index-graphs-description').innerText = ea_indexes_descriptions[type];
+  document.querySelector('#index-graphs-title').innerText = ea_indexes[type]['name'];
+  document.querySelector('#index-graphs-description').innerText = ea_indexes[type]['description'];
 
   // 'animate' is set to false on mapbox's configuration, since we don't want
   // mapbox eating the CPU at 60FPS for nothing.

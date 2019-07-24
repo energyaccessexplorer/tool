@@ -89,7 +89,7 @@ async function ea_indexes_graphs(raster) {
 function ea_indexes_init(o) {
   const cos = document.querySelector('#canvas-output-select');
   for (let i in ea_indexes)
-    cos.append(ce('option', ea_indexes[i], { value: i }));
+    cos.append(ce('option', ea_indexes[i]['name'], { value: i }));
 
   cos.value = o;
 
@@ -137,7 +137,7 @@ function ea_indexes_list(target) {
   };
 
   nodes = Object.keys(ea_indexes).map((t,i) => {
-    let node = i_elem(t, ea_indexes[t], ea_indexes_descriptions[t]);
+    let node = i_elem(t, ea_indexes[t]['name'], ea_indexes[t]['description']);
 
     let ler = node.querySelector('.radio');
     ler.append(ea_svg_radio(t === target));
@@ -157,8 +157,8 @@ function ea_indexes_modal() {
     const s = ce('section');
 
     c.append(
-      ce('h3', ea_indexes[i]),
-      ce('p', ea_indexes_infos[i])
+      ce('h3', ea_indexes[i]['name']),
+      ce('p', ea_indexes[i]['info'])
     );
   }
 

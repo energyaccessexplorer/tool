@@ -128,6 +128,7 @@ build-select:
 	@echo -n "const ea_settings = " | cat - \
 		settings.json \
         ${SRC}/head.js \
+        ${SRC}/client.js \
 		${SRC}/svg.js \
 		${SRC}/ui.js \
 		${SRC}/countries.js \

@@ -67,12 +67,8 @@ function ea_select_setup() {
 
   let curr_c = null;
 
-  Promise.all([
-    d3.json(ea_settings.database + '/geographies?online&adm=eq.0')
-  ])
-    .then(results => {
-      const countries_online = results[0];
-
+  ea_client(ea_settings.database + '/geographies?online&adm=eq.0')
+    .then(countries_online => {
       for (let co of countries_online) {
         const d = ce('div', ce('h2', co.name, { class: 'country-name' }), { class: 'country-item', ripple: "" });
         d.onclick = _ => setTimeout(_ => ea_countries_action_modal(co), 350);

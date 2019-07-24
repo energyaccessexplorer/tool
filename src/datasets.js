@@ -422,9 +422,8 @@ window.__dstable = {};
 async function ea_datasets_list_init(id, inputs, preset) {
   let attrs = '*,heatmap_file(*),vectors_file(*),csv_file(*),category(*)';
 
-  await ea_client(
-    `${ea_settings.database}/datasets?geography_id=eq.${id}&select=${attrs}`, 'GET', null,
-    r => r.map(e => {
+  await ea_client(`${ea_settings.database}/datasets?geography_id=eq.${id}&select=${attrs}`)
+    .then(r => r.map(e => {
       let active = (inputs.includes(e.category.name));
 
       let ds = new DS(e);
@@ -525,13 +524,11 @@ async function ea_datasets_geojson(callback) {
       return this;
     }
 
-    await ea_client(
-      endpoint, 'GET', null,
-      async r => {
+    await ea_client(endpoint)
+      .then(async r => {
         this.features = r;
         callback();
-      }
-    );
+      });
   }
 
   return this;

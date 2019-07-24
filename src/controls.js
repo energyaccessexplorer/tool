@@ -278,8 +278,7 @@ async function ea_controls_selectlist() {
 
   const id = location.get_query_param('id');
 
-  const country_list = await fetch(ea_settings.database + '/geographies?select=id,name&online&order=name.asc')
-    .then(r => r.json())
+  const country_list = await ea_client(ea_settings.database + '/geographies?select=id,name&online&order=name.asc')
     .then(j => {
       j.forEach(g => data[g.name] = g.name);
       return j;

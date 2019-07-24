@@ -9,7 +9,7 @@ function ea_client_check(response) {
   throw Error(response.statusText);
 };
 
-async function ea_client(endpoint, method, payload, callback) {
+async function ea_client(endpoint, method = 'GET', payload = null) {
   const options = {
     headers: { "Accept": "application/json", "Content-Type": "application/json" },
   };
@@ -21,8 +21,7 @@ async function ea_client(endpoint, method, payload, callback) {
 
     return fetch(endpoint, options)
       .then(ea_client_check)
-      .then(r => r.json())
-      .then(j => callback(j));
+      .then(r => r.json());
 
     break;
   }
@@ -32,8 +31,7 @@ async function ea_client(endpoint, method, payload, callback) {
 
     return fetch(endpoint, options)
       .then(ea_client_check)
-      .then(r => r.json())
-      .then(j => callback(j))
+      .then(r => r.json());
 
     break;
   }

@@ -171,7 +171,7 @@ async function ea_overlord(msg) {
   switch (msg.type) {
   case "init": {
     const id = location.get_query_param('id');
-    let geography; await ea_client(`${ea_settings.database}/geographies?id=eq.${id}`, 'GET', 1, r => geography = r);
+    let geography; await ea_client(`${ea_settings.database}/geographies?id=eq.${id}`, 'GET', 1).then(r => geography = r);
 
     ea_mapbox = null;
 

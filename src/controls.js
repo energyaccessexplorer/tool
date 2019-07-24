@@ -173,7 +173,7 @@ function ea_controls_options() {
   return container;
 };
 
-function ea_controls_range(label, single = false) {
+function ea_controls_range(label, single = false, opts = {}) {
   const ds = this.ds;
 
   const d = [ds.heatmap.domain.min, ds.heatmap.domain.max];

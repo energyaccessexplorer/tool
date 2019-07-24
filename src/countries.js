@@ -74,7 +74,7 @@ function ea_countries_setup() {
 
         let e = elem(`
 <div class="country-dropdown-element" bind="${cc.ccn3}">
-  <div class="country-dropdown-name">${cc.name.common}</div>
+  <div class="country-dropdown-name">${cc.name}</div>
 </div>`);
 
         e.addEventListener(
@@ -206,7 +206,7 @@ function ea_countries_overview(c, list, online) {
   if (r) {
     co = elem('<div class="country-overview">');
 
-    co.append(elem(`<h2>${c.name.common}</h2>`));
+    co.append(elem(`<h2>${c.name}</h2>`));
 
     if (+r['population'] > 0)
       pop = ovline("Population", `${(+r['population']).toLocaleString()} Million`);
@@ -301,7 +301,7 @@ function ea_countries_overview(c, list, online) {
     ea_flash
       .type(null)
       .timeout(2000)
-      .title(c.name.common)
+      .title(c.name)
       .message("Is not included in the project")();
   }
 };
@@ -342,7 +342,7 @@ function ea_countries_action_modal(c) {
   content.append(pbtns);
 
   ea_modal.set({
-    header: elem(`<div style="text-transform: uppercase; color: var(--the-white)">${c['name']['common']}</div>`),
+    header: elem(`<div style="text-transform: uppercase; color: var(--the-white)">${c['name']}</div>`),
     content: content,
     footer: null
   }).show();

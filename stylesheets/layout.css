@@ -15,7 +15,7 @@ body {
 }
 
 #controls-wrapper {
-  min-width: 42em;
+  min-width: 35em;
   display: flex;
   flex-flow: column nowrap;
   flex: 0;

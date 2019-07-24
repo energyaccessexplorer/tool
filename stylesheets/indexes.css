@@ -23,6 +23,16 @@
   white-space: nowrap;
 }
 
+#indexes-list .element[disabled] {
+  color: #ababab;
+}
+
+#indexes-list .element[disabled] span::after {
+  content: '(no datasets selected)';
+  font-size: smaller;
+  margin-left: 3em;
+}
+
 #indexes-list .element span {
   padding: 0.5em;
 }
@@ -58,6 +68,11 @@
 
 .index-graphs-group div {
   margin: 1em auto;
+}
+
+.indexes-pie-label {
+  font-size: small;
+  color: #919191;
 }
 
 #index-graphs-description {

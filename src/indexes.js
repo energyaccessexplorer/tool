@@ -53,11 +53,30 @@ async function ea_indexes_analyse(raster) {
 };
 
 async function ea_indexes_graphs(raster) {
+  const t = await ea_indexes_analyse(raster);
+
+  if (!t) return;
+
+  t['population']['distribution']
+    .forEach((x,i) => POPULATION_PIE['data'][i].push(x));
+
+  t['area']['distribution']
+    .forEach((x,i) => AREA_PIE['data'][i].push(x));
+
+  POPULATION_PIE.change(1);
+  AREA_PIE.change(1);
+
+  document.querySelector('#population-number').innerHTML = t['population']['total'] + "&nbsp;" + "people";
+  document.querySelector('#area-number').innerHTML = t['area']['total'] + "&nbsp;" + "km<sup>2</sup>";
+
+  t['population']['distribution'].forEach((x,i) => POPULATION_PIE['data'][i].shift());
+  t['area']['distribution'].forEach((x,i) => AREA_PIE['data'][i].shift());
+};
+
+function ea_indexes_init(o) {
   const index_graphs = document.querySelector('#index-graphs-container');
-  elem_empty(index_graphs);
 
   const scale = ce('div');
-
   scale.append(
     ea_svg_color_steps(
       d3.scaleLinear()
@@ -65,48 +84,58 @@ async function ea_indexes_graphs(raster) {
         .range(ea_default_color_stops)
         .clamp(false),
       ea_default_color_domain),
-    tmpl("#ramp-label-0-100"));
+    tmpl("#ramp-label-low-high"));
 
-  const t = await ea_indexes_analyse(raster);
-
-  if (!t) return;
-
-  const ppie = ea_svg_pie(t['population']['distribution'].map(x => [x]), 75, 0, ea_default_color_stops, null);
-  const apie = ea_svg_pie(t['area']['distribution'].map(x => [x]), 75, 0, ea_default_color_stops, null);
-
-  ppie.change(0);
-  apie.change(0);
-
-  let pe = ce('div', ce('div', "Population share"), { class: 'index-graphs-group' });
-  let ae = ce('div', ce('div', "Area share"), { class: 'index-graphs-group' });
-
-  pe.append(ppie.svg);
-  ae.append(apie.svg);
-
-  index_graphs.append(ae, pe, scale);
-};
-
-function ea_indexes_init(o) {
   const cos = document.querySelector('#canvas-output-select');
   for (let i in ea_indexes)
     cos.append(ce('option', ea_indexes[i]['name'], { value: i }));
 
   cos.value = o;
-
-  cos.addEventListener('change', function() {
+  cos.onchange = function() {
     ea_overlord({
       "type": "index",
       "target": this.value,
       "caller": "ea_indexes_init select"
     });
-  });
+  };
 
-  document.querySelector('#index-graphs-info').append(tmpl('#svg-info'));
-  document.querySelector('#index-graphs-info').addEventListener('mouseup', _ => ea_indexes_modal());
+  const info = document.querySelector('#index-graphs-info');
+  info.append(tmpl('#svg-info'));
+  info.onclick = _ => ea_indexes_modal();
+
+  window.POPULATION_PIE = ea_svg_pie([[0], [0], [0], [0], [0]], 75, 0, ea_default_color_stops, null);
+  window.AREA_PIE = ea_svg_pie([[0], [0], [0], [0], [0]], 75, 0, ea_default_color_stops, null);
+
+  const pe = ce('div', ce('div', "Population share"), { class: 'index-graphs-group' });
+  const ae = ce('div', ce('div', "Area share"), { class: 'index-graphs-group' });
+
+  pe.append(ce('div', null, { id: 'population-number', class: 'indexes-pie-label' }), POPULATION_PIE.svg);
+  ae.append(ce('div', null, { id: 'area-number', class: 'indexes-pie-label' }), AREA_PIE.svg);
+
+  index_graphs.append(ae, pe, scale);
 };
 
-function ea_indexes_list(target) {
-  let nodes;
+function ea_index_drawable(inputs, target) {
+  const counts = {};
+
+  for (let i in ea_indexes) counts[i] = 0;
+
+  for (let i of inputs) {
+    if (i === 'boundaries') continue;
+
+    let n = DS.get(i).indexname;
+    counts[n] += 1;
+
+    counts['ani'] += 1;
+    counts['eai'] += 1;
+  }
+
+  return counts[target] > 0;
+};
+
+function ea_indexes_list(state) {
+  const target = state.output;
+  const nodes = [];
 
   const indexes_list = document.querySelector('#indexes-list');
   elem_empty(indexes_list);
@@ -118,10 +147,15 @@ function ea_indexes_list(target) {
       ce('span', v)
     );
 
+    if (!ea_index_drawable(state.inputs, t))
+      d.setAttribute('disabled', "");
+
     return d;
   };
 
   function trigger_this() {
+    if (this.hasAttribute('disabled')) return false;
+
     let e = document.createEvent('HTMLEvents');
 
     for (n of nodes) {
@@ -136,7 +170,7 @@ function ea_indexes_list(target) {
     });
   };
 
-  nodes = Object.keys(ea_indexes).map((t,i) => {
+  for (let t in ea_indexes) {
     let node = i_elem(t, ea_indexes[t]['name'], ea_indexes[t]['description']);
 
     let ler = node.querySelector('.radio');
@@ -146,8 +180,8 @@ function ea_indexes_list(target) {
 
     indexes_list.append(node);
 
-    return node;
-  });
+    nodes.push(node);
+  }
 };
 
 function ea_indexes_modal() {

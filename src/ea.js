@@ -245,7 +245,7 @@ Please report this to energyaccessexplorer@wri.org.
     state.set_mode_param(t);
 
     if (t === "outputs") {
-      ea_indexes_list(state.output);
+      ea_indexes_list(state);
 
       ea_plot_active_analysis(state.output)
         .then(raster => ea_indexes_graphs(raster))
@@ -294,7 +294,7 @@ Please report this to energyaccessexplorer@wri.org.
     if (state.mode === "outputs") {
       await ds.turn(ds.active, false);
 
-      ea_indexes_list(state.output);
+      ea_indexes_list(state);
       ea_plot_active_analysis(state.output).then(raster => ea_indexes_graphs(raster));
     }
 
@@ -331,7 +331,7 @@ Please report this to energyaccessexplorer@wri.org.
     const inputs = DS.all.filter(d => ea_controls_presets_set(d, msg.target)).map(d => d.id);
 
     if (state.mode === "outputs") {
-      ea_indexes_list(state.output);
+      ea_indexes_list(state);
       await Promise.all(DS.all.map(d => d.turn(d.active, false)));
       ea_plot_active_analysis(state.output);
     }

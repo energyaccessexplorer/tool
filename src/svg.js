@@ -262,6 +262,7 @@ function ea_svg_pie(data, outer, inner, colors, inner_text) {
   };
 
   return {
+    data: data,
     change: change,
     tween: tween,
     path: path,

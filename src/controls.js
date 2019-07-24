@@ -1,42 +1,76 @@
 function ea_controls_tree() {
-  const controls_el = document.querySelector('#controls');
+  const controls_el = qs(document, '#controls-contents');
+  const controls_tabs_el = qs(document, '#controls-tabs');
 
-  ea_category_tree.forEach(a => {
-    const branch_el = ce('div', null, { id: a.name, class: 'controls-branch' });
-    controls_el.append(branch_el);
+  function create_branch(name) {
+    const el = ce('div', null, { id: name, class: 'controls-branch' });
+    return el;
+  };
 
-    let title, subbranches_el;
-    branch_el.append(
-      title = ce('div', a.name, { class: 'controls-branch-title' }),
-      subbranches_el = ce('div', null, { class: 'controls-subbranches' })
+  function create_subbranch(name) {
+    let conel, title;
+    const el = ce('div', null, { id: name, class: 'controls-subbranch' });
+
+    el.append(
+      title = ce('div', (ea_branch_dict[name] || name), { class: 'controls-subbranch-title' }),
+      conel = ce('div', null, { class: 'controls-container' })
     );
 
-    a.children.forEach(b => {
-      let subel, conel, title;
-      subbranches_el.append(
-        subel = ce('div', null, { id: b, class: 'controls-subbranches' })
-      );
+    title.prepend(ce('span', ea_ui_collapse_triangle('s'), { class: 'collapse triangle' }));
+    title.addEventListener('mouseup', e => elem_collapse(conel, el));
 
-      subel.append(
-        title = ce('div', ea_branch_dict[b], { class: 'controls-subbranch-title' }),
-        conel = ce('div', null, { class: 'controls-container' })
-      );
+    return el;
+  };
 
-      title.prepend(ce('span', ea_ui_collapse_triangle('s'), { class: 'collapse triangle' }));
-      title.addEventListener('mouseup', e => elem_collapse(conel, subel));
-    });
-  });
+  const tree = [{ "name": "all", "children": [] }];
 
   for (let d of DS.all) {
     let path = d.category.metadata.path;
     if (!path.length) continue;
 
-    let el = document.querySelector(`#${path[0]} #${path[1]} .controls-container`);
-    if (el)
-      el.append(d.controls_el);
-    else
-      console.warn(d.id, path[0], path[1], "container not found...");
+    let b = qs(controls_el, `#${path[0]}.controls-branch`);
+    if (!b) {
+      b = create_branch(path[0]);
+      tree.push({ "name": path[0], "children": [] });
+    }
+    controls_el.append(b);
+
+    let sb = qs(b, `#${path[1]}.controls-subbranch`);
+    if (!sb) {
+      sb = create_subbranch(path[1]);
+      tree.find(t => t.name === path[0])['children'].push(path[1]);
+    }
+    b.append(sb);
+
+    const container = qs(sb, '.controls-container');
+    if (container) container.append(d.controls_el);
   }
+
+  tree.forEach(a => {
+    const tab = ce('div', a.name, { class: 'controls-branch-title' });
+    controls_tabs_el.append(tab);
+
+    tab.onclick = function() {
+      for (let e of document.querySelectorAll('#controls .controls-branch-title')) {
+        e.classList.remove('active');
+      }
+
+      for (let e of controls_el.querySelectorAll('.controls-branch')) {
+        let all = (a.name === 'all');
+        e.style.display = all ? '' : 'none';
+      }
+
+      tab.classList.add('active');
+
+      const b = qs(controls_el, '#' + a.name);
+      if (b) b.style.display = 'block';
+    };
+
+    if (a.name === 'all') {
+      tab.classList.add('active');
+      controls_tabs_el.prepend(tab);
+    }
+  });
 };
 
 function ea_controls_checkbox() {

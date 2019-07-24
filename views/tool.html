@@ -76,7 +76,10 @@
           </select>
         </div>
 
-        <div id="controls"></div>
+        <div id="controls">
+          <div id="controls-tabs"></div>
+          <div id="controls-contents"></div>
+        </div>
       </div>
 
       <div id="visual">
@@ -147,14 +150,6 @@
   </body>
 
   <script>
-    ea_category_tree = [{
-      "name": "demand",
-      "children": ["demographics", "productive-uses"],
-    }, {
-      "name": "supply",
-      "children": ["resources", "infrastructure"]
-    }];
-
     ea_views = {
       "inputs": {
         "name": "Data",

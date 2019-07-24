@@ -2,31 +2,46 @@
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  display: flex;
+  flex-flow: row nowrap;
+  border-top: solid 1px #d9d9d9;
 }
 
-.controls-branch {
-  flex: 1 50%;
+#controls-tabs {
+  height: 100%;
+  z-index: 0;
+}
+
+#controls-contents {
+  flex: 1;
+  height: 100%;
+  border-left: solid 1px #d9d9d9;
+  z-index: 1;
 
   overflow-y: scroll;
   overflow-x: hidden;
 }
 
 .controls-branch-title {
-  font-size: 1.2em;
-  font-weight: lighter;
+  font-size: 1.14em;
   line-height: 2em;
-  padding: 0.4em;
-  padding-left: 2em;
+  padding: 0.4em 2em;
   white-space: nowrap;
   text-transform: uppercase;
   text-align: left;
-  background-color: var(--the-green);
-  color: var(--the-white);
-  fill: var(--the-white);
+  background-color: var(--the-white);
+  color: var(--the-green);
+  fill: var(--the-green);
 
   position: sticky;
   top: 0;
   z-index: 10;
+}
+
+.controls-branch-title.active {
+  background-color: var(--the-green) !important;
+  color: var(--the-white) !important;
+  fill: var(--the-white) !important;
 }
 
 .controls-subbranch-title {
@@ -42,7 +57,7 @@
   cursor: pointer;
 
   position: sticky;
-  top: 41px;
+  top: 0;
   z-index: 9;
 }
 
@@ -70,7 +85,7 @@
   display: flex;
   justify-content: space-between;
   margin: 0;
-  padding: 1em 2em;
+  padding: 1.2em;
 }
 
 .controls-multifilter-elem.active {
@@ -97,9 +112,10 @@
 }
 
 #controls-boundaries .control-group {
-  flex: 0;
-  text-align: center;
+  flex: 1;
+  text-align: left;
   margin-bottom: unset;
+  margin-left: 2em;
 }
 
 #controls-boundaries .control-group .label {
@@ -174,8 +190,4 @@ select#controls-preset {
 select#controls-preset option {
   background-color: var(--the-white);
   color: var(--the-color);
-}
-
-#supply, #demand {
-  flex: 1 50%;
 }

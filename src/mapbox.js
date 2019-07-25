@@ -211,7 +211,12 @@ padding: 16px;`
 };
 
 function mapbox_fit(bounds) {
-  ea_mapbox.fitBounds(bounds, { animate: false });
+  const rect = document.querySelector('#maparea').getBoundingClientRect();
+
+  const hp = (rect.width > rect.height) ? 0 : (rect.width * 0.1);
+  const vp = (rect.height > rect.width) ? 0 : (rect.height * 0.1);
+
+  ea_mapbox.fitBounds(bounds, { animate: false, padding: { top: vp, bottom: vp, left: hp, right: hp } });
 
   const b = bounds;
 

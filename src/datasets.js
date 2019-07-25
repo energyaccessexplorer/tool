@@ -200,8 +200,7 @@ class DS {
 
     if (o === this.filter_option) return;
 
-    if (o)
-      this.filter_option = o;
+    if (o) this.filter_option = o;
     else {
       o = Object.keys(this.csv.options)[0];
       this.name = this.csv.options[o];
@@ -745,6 +744,7 @@ async function ea_datasets_polygons() {
         "paint": {
           "fill-color": this.multifilter ? ['get', 'color'] : this.vectors.fill,
           "fill-outline-color": this.vectors.stroke,
+          "fill-opacity": this.vectors.opacity,
         },
       }, ea_mapbox.first_symbol);
     }

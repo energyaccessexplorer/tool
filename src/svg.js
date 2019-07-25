@@ -470,7 +470,7 @@ function ea_svg_polygons_symbol() {
 
   container
     .append('path')
-    .attr('d', 'M 3.3615425,10.115331 22.909683,0.94439892 27.851628,19.286265 0.83565943,23.350655 Z')
+    .attr('d', "M 5.5532202,7.3474994 24.062506,2.1642083 26.51526,25.827 1.3896115,25.827438 Z")
     .attr('fill', this.vectors.fill)
     .attr('fill-opacity', this.vectors.opacity)
     .attr('stroke', this.vectors.stroke)

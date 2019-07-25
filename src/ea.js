@@ -176,65 +176,31 @@ async function ea_overlord(msg) {
     ea_mapbox = null;
 
     ea_ui_layout();
+    ea_ui_views_init();
     mapbox_setup(geography.bounds);
 
     await ea_datasets_list_init(geography.id, state.inputs, state.preset);
 
-    const b = DS.get('boundaries');
-
-    if (!b) {
-      ea_flash
-        .type('error')
-        .title("Misconfigured geography")
-        .message(`
-It's missing a 'boundaries' dataset. <b>I'm stoping here.</b>
-Please report this to energyaccessexplorer@wri.org.
-`)();
-
-      if (!b) throw `Geography is missing a 'boundaries' dataset.`;
-    }
-
-    else {
-      await b.load('heatmap');
-
-      document.querySelector('#controls-wrapper')
-        .insertBefore(boundaries_controls(b), document.querySelector('#controls'));
-    }
-
-    const inputs = DS.all
+    const a = DS.all
           .filter(t => t.active)
           .map(x => x.id)
           .sort((a,b) => (state.inputs.indexOf(a) < state.inputs.indexOf(b)) ? -1 : 1);
 
-    if (!inputs.length) inputs.push('boundaries');
+    if (!a.length) a.push('boundaries');
 
-    state.set_inputs_param(inputs);
+    state.set_inputs_param(a);
 
-    ea_ui_views_init();
+    await ea_boundaries_init();
 
     ea_inputs_init();
-    ea_indexes_init(state.output);
+    ea_indexes_init(state);
+    ea_controls_init(state);
+    ea_nanny_init(state);
 
-    ea_controls_selectlist();
-
-    ea_controls_presets_init(state.preset);
-    ea_controls_tree();
-
-    await Promise.all(inputs.map(id => DS.get(id).load()));
-    await mapbox_change_theme(ea_settings.mapbox_theme);
+    await Promise.all(a.map(i => DS.get(i).load()));
+    mapbox_change_theme(ea_settings.mapbox_theme);
 
     ea_ui_app_loading(false);
-
-    (function() {
-      window.ea_nanny = new nanny(ea_nanny_steps);
-
-      if (state.inputs.length > 1) return;
-      if (state.mode !== "inputs") return;
-
-      const w = localStorage.getItem('needs-nanny');
-
-      if (!w || !w.match(/false/)) ea_nanny.start();
-    })();
 
     break;
   }

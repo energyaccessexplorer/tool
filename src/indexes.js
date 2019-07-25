@@ -73,7 +73,7 @@ async function ea_indexes_graphs(raster) {
   t['area']['distribution'].forEach((x,i) => AREA_PIE['data'][i].shift());
 };
 
-function ea_indexes_init(v) {
+function ea_indexes_init(state) {
   const index_graphs = document.querySelector('#index-graphs-container');
 
   const scale = ce('div');
@@ -90,7 +90,7 @@ function ea_indexes_init(v) {
   for (let i in ea_indexes)
     cos.append(ce('option', ea_indexes[i]['name'], { value: i }));
 
-  cos.value = v;
+  cos.value = state.output;
   cos.onchange = function() {
     ea_overlord({
       "type": "index",

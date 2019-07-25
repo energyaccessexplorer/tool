@@ -1,3 +1,9 @@
+function ea_controls_init(state) {
+  ea_controls_selectlist();
+  ea_controls_presets_init(state.preset);
+  ea_controls_tree();
+};
+
 function ea_controls_tree() {
   const controls_el = qs(document, '#controls-contents');
   const controls_tabs_el = qs(document, '#controls-tabs');

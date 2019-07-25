@@ -226,12 +226,12 @@ border-bottom: 1px solid lightgray;`
   let ss = true;
 
   const switcher = ce('button', "Summary Table", { class: 'big-green-button' });
-  switcher.addEventListener("click", function() {
+  switcher.onclick = function() {
     ss = !ss;
     for (let e of content.querySelectorAll('.tab'))
       e.classList.toggle('hidden');
     this.innerText = ss ? "Summary Table" : "Summary Graphs";
-  });
+  };
 
   graphs_tab.append(legend);
   content.append(graphs_tab, table);
@@ -401,71 +401,15 @@ function right_pane(t) {
   document.querySelector('#indexes-pane').style.display = (t === 'outputs') ? '' : 'none';
 };
 
-function boundaries_controls(ds) {
-  const controls = ce('div', null, { id: `controls-${ds.id}`, class: 'controls' });
-  const content = ce('content');
-  const _t = ce('div', ds.name, { class: 'controls-subbranch-title' });
-  _t.prepend(ce('span', ea_ui_collapse_triangle(ds.active ? 's' : 'e'), { class: 'collapse triangle' } ))
-  controls.append(_t, content);
+function ea_nanny_init(state) {
+  window.ea_nanny = new nanny(ea_nanny_steps);
 
-  content.style['display'] = ds.active ? '' : 'none';
+  if (state.inputs.length > 1) return;
+  if (state.mode !== "inputs") return;
 
-  if (!ds.csv) return controls;
+  const w = localStorage.getItem('needs-nanny');
 
-  const sbs = [];
-  let first = true;
-
-  for (let v in ds.csv.options) {
-    let d = DS.get(ds.id + "-" + v);
-    let a = true;
-
-    const check = ea_svg_checkbox(true, s => {
-      d.active_filter = a = s;
-      select();
-    });
-
-    const checkbox = check.svg;
-
-    const range_group = ea_controls_range.call({ ds: d }, (d.category.unit || 'percentage'), false, { width: 256 });
-
-    let sb = ce('div', null, { class: 'controls-multifilter-elem', ripple: "" });
-    const title = ce('div', ds.csv.options[v], { class: 'control-group' });
-
-    const g = ce('div', null, { class: 'control-group' });
-    g.append(range_group.el);
-
-    sb.append(checkbox, title, g);
-    sbs.push(sb);
-
-    sb.addEventListener('mouseup', e => {
-      if (e.target.closest('svg') === range_group.svg) return;
-      if (e.target.closest('svg') !== checkbox) select();
-    });
-
-    function select() {
-      for (let s of sbs) s.classList.remove('active');
-      sb.classList.add('active');
-      ds.name = ds.csv.options[v];
-
-      ds.input_el.querySelector('[slot=name]').innerText = ds.name;
-
-      ea_overlord({
-        "type": "dataset",
-        "target": d,
-        "caller": "ea_controls_elem multifilter",
-      });
-    };
-
-    if (first) { sb.classList.add('active'); ds.name = d.csv.options[v]; first = false; }
-
-    content.append(sb);
-  }
-
-  qs(controls, '.controls-subbranch-title').onmouseup = e => {
-    elem_collapse(content, controls.querySelector('.controls-subbranch-title'));
-  };
-
-  return controls;
+  if (!w || !w.match(/false/)) ea_nanny.start();
 };
 
 function ea_nanny_force_start() {
@@ -482,4 +426,96 @@ function ea_nanny_force_start() {
   });
 
   ea_nanny.start();
+};
+
+async function ea_boundaries_init() {
+  const b = DS.get('boundaries');
+
+  if (!b) {
+    ea_flash
+      .type('error')
+      .title("Misconfigured geography")
+      .message(`
+It's missing a 'boundaries' dataset. <b>I'm stoping here.</b>
+Please report this to energyaccessexplorer@wri.org.
+`)();
+
+    throw `Geography is missing a 'boundaries' dataset.`;
+  }
+
+  function controls() {
+    const controls = ce('div', null, { id: `controls-boundaries`, class: 'controls' });
+    const content = ce('content');
+    const _t = ce('div', this.name, { class: 'controls-subbranch-title' });
+    _t.prepend(ce('span', ea_ui_collapse_triangle(this.active ? 's' : 'e'), { class: 'collapse triangle' } ))
+    controls.append(_t, content);
+
+    content.style['display'] = this.active ? '' : 'none';
+
+    if (!this.csv) return controls;
+
+    const sbs = [];
+    let first = true;
+
+    for (let v in this.csv.options) {
+      let d = DS.get("boundaries-" + v);
+      let a = true;
+
+      const check = ea_svg_checkbox(true, s => {
+        d.active_filter = a = s;
+        select();
+      });
+
+      const checkbox = check.svg;
+
+      const range_group = ea_controls_range.call({ ds: d }, (d.category.unit || 'percentage'), false, { width: 256 });
+
+      let sb = ce('div', null, { class: 'controls-multifilter-elem', ripple: "" });
+      const title = ce('div', this.csv.options[v], { class: 'control-group' });
+
+      const g = ce('div', null, { class: 'control-group' });
+      g.append(range_group.el);
+
+      sb.append(checkbox, title, g);
+      sbs.push(sb);
+
+      let select = _ => {
+        for (let s of sbs) s.classList.remove('active');
+        sb.classList.add('active');
+        this.name = this.csv.options[v];
+
+        this.input_el.querySelector('[slot=name]').innerText = this.name;
+
+        ea_overlord({
+          "type": "dataset",
+          "target": d,
+          "caller": "ea_controls_elem multifilter",
+        });
+      };
+
+      sb.onclick = e => {
+        if (e.target.closest('svg') === range_group.svg) return;
+        if (e.target.closest('svg') !== checkbox) select();
+      };
+
+      if (first) { sb.classList.add('active'); this.name = d.csv.options[v]; first = false; }
+
+      content.append(sb);
+    }
+
+    qs(controls, '.controls-subbranch-title').onclick = e => {
+      elem_collapse(content, controls.querySelector('.controls-subbranch-title'));
+    };
+
+    return controls;
+  };
+
+  b.active = true;
+
+  await b.load('heatmap');
+
+  document.querySelector('#controls-wrapper')
+    .insertBefore(controls.call(b), document.querySelector('#controls'));
+
+  return true;
 };

@@ -148,27 +148,9 @@ function mapbox_setup(bounds) {
     "style": mapbox_theme_pick("")
   });
 
-  mapbox.fitBounds(bounds, { animate: false });
-
-  const b = bounds;
-
-  const r = b[0][0];
-  const l = b[1][0];
-  const u = b[1][1];
-  const d = b[0][1];
-
-  const coords = [
-    [r, u],
-    [l, u],
-    [l, d],
-    [r, d]
-  ];
-
   mapbox.addControl(new mapboxgl.NavigationControl({ showCompass: false }));
 
   mapbox.addControl((new MapboxThemeControl()), 'top-right');
-
-  mapbox.coords = coords;
 
   mapbox.zoomTo(mapbox.getZoom() * 0.95, {duration: 0});
 
@@ -227,3 +209,16 @@ padding: 16px;`
     document.removeEventListener('mousemove', l);
   }));
 };
+
+function mapbox_fit(bounds) {
+  ea_mapbox.fitBounds(bounds, { animate: false });
+
+  const b = bounds;
+
+  const l = b[0];
+  const r = b[2];
+  const d = b[1];
+  const u = b[3];
+
+  ea_mapbox.coords = [[l,u], [r,u], [r,d], [l,d]];
+}

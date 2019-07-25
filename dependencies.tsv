@@ -4,6 +4,7 @@ geotiff.js	https://github.com/geotiffjs/geotiff.js/releases/download/v1.0.0-beta
 plotty.js	https://raw.githubusercontent.com/santilland/plotty/master/dist/plotty.min.js
 mapbox-gl.js	https://api.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.js
 mapbox-gl.css	https://api.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.css
+geojson-extent.js	https://raw.githubusercontent.com/mapbox/geojson-extent/master/geojson-extent.js
 htmlsortable.js	https://raw.githubusercontent.com/lukasoppermann/html5sortable/master/dist/html5sortable.min.js
 world-50m.json	https://unpkg.com/world-atlas/world/50m.json
 world-110m.json	https://unpkg.com/world-atlas/world/110m.json

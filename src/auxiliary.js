@@ -513,9 +513,12 @@ Please report this to energyaccessexplorer@wri.org.
   b.active = true;
 
   await b.load('heatmap');
+  await b.load('vectors');
 
   document.querySelector('#controls-wrapper')
     .insertBefore(controls.call(b), document.querySelector('#controls'));
+
+  mapbox_fit(DS.get('boundaries').vectors.bounds);
 
   return true;
 };

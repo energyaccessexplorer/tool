@@ -177,7 +177,7 @@ async function ea_overlord(msg) {
 
     ea_ui_layout();
     ea_ui_views_init();
-    mapbox_setup(geography.bounds);
+    mapbox_setup();
 
     await ea_datasets_list_init(geography.id, state.inputs, state.preset);
 

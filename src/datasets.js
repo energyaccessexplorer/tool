@@ -527,6 +527,7 @@ async function ea_datasets_geojson(callback) {
     await ea_client(endpoint)
       .then(async r => {
         this.features = r;
+        this.vectors.bounds = geojsonExtent(r);
         callback();
       });
   }

@@ -119,11 +119,24 @@ class dsinput extends HTMLElement {
     const d = this.ds;
     let e;
 
-    if (['points', 'lines'].includes(d.datatype)) e = d.vectors.symbol_svg;
+    switch (d.datatype) {
+    case 'points':
+    case 'lines':
+      e = d.vectors.symbol_svg;
+      break;
 
-    if (d.vectors && (d.vectors.color_stops && d.vectors.color_stops.length)) e = d.color_scale_el;
+    case 'polygons':
+      if (d.vectors.color_stops && d.vectors.color_stops.length) e = d.color_scale_el;
+      else e = d.vectors.symbol_svg;
+      break;
 
-    else if (!d.vectors && d.heatmap) e = d.color_scale_el;
+    case 'raster':
+      e = d.color_scale_el;
+      break;
+
+    default:
+      break;
+    }
 
     if (d.collection) {
       const el = ce('ul', null, { class: 'collection' });

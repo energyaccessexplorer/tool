@@ -733,7 +733,7 @@ async function ea_datasets_polygons() {
     }
 
     if (!ea_mapbox.getLayer(this.id)) {
-      this.multifilter_set(this.subid);
+      if (this.multifilter) this.multifilter_set(this.subid);
 
       ea_mapbox.addLayer({
         "id": this.id,
@@ -743,7 +743,7 @@ async function ea_datasets_polygons() {
           "visibility": "none",
         },
         "paint": {
-          "fill-color": ['get', 'color'],
+          "fill-color": this.multifilter ? ['get', 'color'] : this.vectors.fill,
           "fill-outline-color": this.vectors.stroke,
         },
       }, ea_mapbox.first_symbol);

@@ -57,11 +57,11 @@ function ea_controls_tree() {
     controls_tabs_el.append(tab);
 
     tab.onclick = function() {
-      for (let e of document.querySelectorAll('#controls .controls-branch-title')) {
+      for (let e of qsa('.controls-branch-title', controls_tabs_el)) {
         e.classList.remove('active');
       }
 
-      for (let e of controls_el.querySelectorAll('.controls-branch')) {
+      for (let e of qsa('.controls-branch', controls_el)) {
         let all = (a.name === 'all');
         e.style.display = all ? '' : 'none';
       }
@@ -305,7 +305,7 @@ async function ea_controls_selectlist() {
     }
   });
 
-  document.querySelectorAll('.controls-select-container')[0].append(sl.el);
+  qsa('.controls-select-container')[0].append(sl.el);
 
   set_default(sl.input);
 };

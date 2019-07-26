@@ -228,7 +228,7 @@ border-bottom: 1px solid lightgray;`
   const switcher = ce('button', "Summary Table", { class: 'big-green-button' });
   switcher.onclick = function() {
     ss = !ss;
-    for (let e of content.querySelectorAll('.tab'))
+    for (let e of qsa('.tab', content))
       e.classList.toggle('hidden');
     this.innerText = ss ? "Summary Table" : "Summary Graphs";
   };

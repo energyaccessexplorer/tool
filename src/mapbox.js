@@ -73,7 +73,7 @@ function mapbox_theme_control_popup(btn) {
   let current = qs(`input[value="${ea_settings.mapbox_theme}"]`, radios);
   if (current) current.setAttribute('checked', true);
 
-  radios.querySelectorAll('input[name="mapbox_theme"]')
+  qsa('input[name="mapbox_theme"]', radios)
     .forEach(e => e.addEventListener('change', _ => mapbox_change_theme(e.value)));
 
   x.addEventListener('mouseleave', _ => x.remove());

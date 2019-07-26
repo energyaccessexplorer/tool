@@ -71,7 +71,7 @@ function ea_ui_views_init() {
     const btn = ce('div', ce('div', ea_views[v]['name'], { class: 'view-name' }), { class: 'view', ripple: "" });
 
     btn.addEventListener('mouseup', function(e) {
-      el.querySelectorAll('.view').forEach(e => e.classList.remove('active'));
+      qsa('.view', el).forEach(e => e.classList.remove('active'));
 
       setTimeout(_ => {
         ea_overlord({

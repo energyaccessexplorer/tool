@@ -98,7 +98,7 @@ function ea_report() {
 
     reset_font();
 
-    const pies = document.querySelectorAll('.pie-svg-container svg');
+    const pies = qsa('.pie-svg-container svg');
 
     let w = 120;
     let h = 120;

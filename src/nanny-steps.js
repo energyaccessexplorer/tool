@@ -164,7 +164,7 @@ Try it!`,
       align: "middle"
     },
     run: function(fn) {
-      const inputs = this.el.querySelectorAll('ds-input');
+      const inputs = qsa('ds-input', this.el);
 
       let l = _ => {
         for (let i of inputs) i.removeEventListener('dragend', l);

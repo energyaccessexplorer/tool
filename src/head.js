@@ -10,6 +10,24 @@ function qs(str, el) {
     el.querySelector(str);
 };
 
+function qsa(str, el, array = false) {
+  if (!el) el = document;
+  else if (!(el instanceof Node))
+    throw Error(`qs: Expected a Node. got ${el}.`);
+
+  const r = (el.shadowRoot) ?
+    el.shadowRoot.querySelectorAll(str) :
+        el.querySelectorAll(str);
+
+  if (array) {
+    const a = [];
+    for (let i = r.length; i--; a.unshift(r[i]));
+    return a;
+  }
+
+  return r;
+};
+
 function ce(str, content, attrs = {}) {
   const el = document.createElement(str);
   for (let o in attrs) el.setAttribute(o, attrs[o]);

@@ -105,7 +105,7 @@ function ea_countries_setup() {
         dropdown.style.display = 'none';
       });
 
-      const elements = dropdown.querySelectorAll('.country-dropdown-element');
+      const elements = qsa('.country-dropdown-element');
 
       input.addEventListener('keyup', e => {
         dropdown.style.display = 'block';
@@ -326,7 +326,7 @@ function ea_countries_action_modal(c) {
 `);
 
     b.addEventListener("click", async _ => {
-      for (let x of pbtns.querySelectorAll('.thumbnail'))
+      for (let x of qsa('.thumbnail', pbtns))
         await x.classList.remove('selected');
 
       b.classList.add('selected');

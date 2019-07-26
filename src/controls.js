@@ -5,8 +5,8 @@ function ea_controls_init(state) {
 };
 
 function ea_controls_tree() {
-  const controls_el = qs(document, '#controls-contents');
-  const controls_tabs_el = qs(document, '#controls-tabs');
+  const controls_el = qs('#controls-contents');
+  const controls_tabs_el = qs('#controls-tabs');
 
   function create_branch(name) {
     const el = ce('div', null, { id: name, class: 'controls-branch' });
@@ -34,21 +34,21 @@ function ea_controls_tree() {
     let path = d.category.configuration.path;
     if (!path.length) continue;
 
-    let b = qs(controls_el, `#${path[0]}.controls-branch`);
+    let b = qs(`#${path[0]}.controls-branch`, controls_el);
     if (!b) {
       b = create_branch(path[0]);
       tree.push({ "name": path[0], "children": [] });
     }
     controls_el.append(b);
 
-    let sb = qs(b, `#${path[1]}.controls-subbranch`);
+    let sb = qs(`#${path[1]}.controls-subbranch`, b);
     if (!sb) {
       sb = create_subbranch(path[1]);
       tree.find(t => t.name === path[0])['children'].push(path[1]);
     }
     b.append(sb);
 
-    const container = qs(sb, '.controls-container');
+    const container = qs('.controls-container', sb);
     if (container) container.append(d.controls_el);
   }
 
@@ -68,7 +68,7 @@ function ea_controls_tree() {
 
       tab.classList.add('active');
 
-      const b = qs(controls_el, '#' + a.name);
+      const b = qs('#' + a.name, controls_el);
       if (b) b.style.display = 'block';
     };
 
@@ -101,7 +101,7 @@ function ea_controls_checkbox() {
     return ds.active;
   };
 
-  qs(this, 'header').onclick = checkbox_activate;
+  qs('header', this).onclick = checkbox_activate;
 
   return checkbox;
 };
@@ -356,8 +356,8 @@ class dscontrols extends HTMLElement {
     this.ds = d;
     attach.call(this, shadow_tmpl('#ds-controls-template'));
 
-    this.content = qs(this, 'content');
-    this.spinner = qs(this, '.loading');
+    this.content = qs('content', this);
+    this.spinner = qs('.loading', this);
 
     this.show_advanced = false;
 
@@ -389,7 +389,7 @@ class dscontrols extends HTMLElement {
       "action": _ => {
         if (!this.ds.active) this.activate();
 
-        qs(this, '.advanced-controls').style.display = (this.show_advanced = !this.show_advanced) ? 'block' : 'none';
+        qs('.advanced-controls', this).style.display = (this.show_advanced = !this.show_advanced) ? 'block' : 'none';
       }
     }])
 

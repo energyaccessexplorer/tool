@@ -145,7 +145,7 @@ class DS {
     this.raster = host.raster;
     this.vectors = host.vectors;
 
-    const s = qs(DS.get(this.id).input_el, '[name=svg]');
+    const s = qs('[name=svg]', DS.get(this.id).input_el);
     elem_empty(s); s.append(host.color_scale_el);
 
     let src;
@@ -223,7 +223,7 @@ class DS {
 
       let src; if (src = ea_mapbox.getSource(this.id)) src.setData(this.features);
 
-      const i = qs(DS.get(this.id).input_el, '[name=svg]');
+      const i = qs('[name=svg]', DS.get(this.id).input_el);
       elem_empty(i); i.append(this.color_scale_el);
     }
   };

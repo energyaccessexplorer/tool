@@ -1,7 +1,8 @@
 UUID_REGEXP = "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}";
 
-function qs(el, str) {
-  if (!(el instanceof Node))
+function qs(str, el) {
+  if (!el) el = document;
+  else if (!(el instanceof Node))
     throw Error(`qs: Expected a Node. got ${el}.`);
 
   return (el.shadowRoot) ?
@@ -20,7 +21,7 @@ function ce(str, content, attrs = {}) {
 };
 
 function shadow_tmpl(el) {
-  if (typeof el === 'string') el = qs(document, el);
+  if (typeof el === 'string') el = qs(el);
 
   if (!el) throw Error(`shadow_tmpl: Expected 'el' to be a DOM Element.`);
 
@@ -28,7 +29,7 @@ function shadow_tmpl(el) {
 };
 
 function tmpl(el, data = null) {
-  if (typeof el === 'string') el = qs(document, el);
+  if (typeof el === 'string') el = qs(el);
 
   if (!el) throw Error(`tmpl: Expected 'el' to be a DOM Element.`);
 
@@ -82,7 +83,7 @@ function slot(name, content) {
 function slot_populate(data, extra = {}) {
   for (let k in data) {
     if (typeof data[k] === 'object') continue;
-    let s = qs(this, `slot[name=${k}]`);
+    let s = qs(`slot[name=${k}]`, this);
     if (s) this.append(slot(k, data[k]));
   }
 
@@ -91,6 +92,6 @@ function slot_populate(data, extra = {}) {
   for (let k in extra) {
     if (!extra[k]) continue;
     // this.append(slot(k, extra[k]));
-    qs(this, `[name=${k}]`).append(slot(k, extra[k]));
+    qs(`[name=${k}]`, this).append(slot(k, extra[k]));
   }
 };

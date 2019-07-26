@@ -106,10 +106,10 @@ class dsinput extends HTMLElement {
       }
     );
 
-    const b = qs(e, '.box');
+    const b = qs('.box', e);
 
-    qs(e, '.slider').append(grad.svg);
-    qs(e, '.icon').onclick = _ => b.style.display = 'block';
+    qs('.slider', e).append(grad.svg);
+    qs('.icon', e).onclick = _ => b.style.display = 'block';
     b.onmouseleave = _ => b.style.display = 'none';
 
     return e;
@@ -165,8 +165,8 @@ class dsinput extends HTMLElement {
     if (!d.vectors && d.heatmap) {
       el = tmpl("#ramp-label-min-max");
 
-      qs(el, '[bind=min]').innerText = d.heatmap.domain.min * d.heatmap.factor;
-      qs(el, '[bind=max]').innerText = d.heatmap.domain.max * d.heatmap.factor;
+      qs('[bind=min]', el).innerText = d.heatmap.domain.min * d.heatmap.factor;
+      qs('[bind=max]', el).innerText = d.heatmap.domain.max * d.heatmap.factor;
     }
 
     if (d.vectors && (d.vectors.color_stops && d.vectors.color_stops.length))

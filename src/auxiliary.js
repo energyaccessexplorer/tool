@@ -501,7 +501,7 @@ Please report this to energyaccessexplorer@wri.org.
       content.append(sb);
     }
 
-    qs(controls, '.controls-subbranch-title').onclick = e => {
+    qs('.controls-subbranch-title', controls).onclick = e => {
       elem_collapse(content, controls.querySelector('.controls-subbranch-title'));
     };
 

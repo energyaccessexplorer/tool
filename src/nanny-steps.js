@@ -32,7 +32,7 @@ const ea_nanny_steps = [
   {
     init: function() {
       ea_modal.hide();
-      this.el = qs(document, '#controls-boundaries');
+      this.el = qs('#controls-boundaries');
     },
     mark: {
       title: "Sub-national level data",
@@ -56,7 +56,7 @@ const ea_nanny_steps = [
       align: "middle",
     },
     wait: {
-      el: s => qs(s.el, 'header'),
+      el: s => qs('header', s.el),
       action: 'click',
       f: function(fn) { this.ds.active ? fn() : null; }
     }
@@ -73,7 +73,7 @@ const ea_nanny_steps = [
       align: "middle",
     },
     wait: {
-      el: s => qs(s.el, 'header'),
+      el: s => qs('header', s.el),
       action: 'click',
       f: function(fn) { this.ds.active ? fn() : null; }
     }
@@ -86,7 +86,7 @@ const ea_nanny_steps = [
       await new Promise(_ => setTimeout(_, 1000));
     },
     mark: {
-      el: s => qs(s.el, '[name=range-slider] .svg-interval'),
+      el: s => qs('[name=range-slider] .svg-interval', s.el),
       title: "Granular Demand Data (3/3)",
       message: `
 Apply filters to identify specific areas of interest.
@@ -114,7 +114,7 @@ If you are interested in identifying areas that are close to social load (e.g. s
       await new Promise(_ => setTimeout(_, 1000));
     },
     mark: {
-      el: s => qs(s.el, '[name=weight-slider] .svg-range'),
+      el: s => qs('[name=weight-slider] .svg-range', s.el),
       title: "Granular Demand Data (3/3)",
       message: `
 Weigh the importance.
@@ -152,7 +152,7 @@ You can prioritize areas of interest base on your criteria. You can set a value 
   },
   {
     init: function() {
-      this.el = qs(document, '#inputs-list');
+      this.el = qs('#inputs-list');
     },
     mark: {
       title: "Visualize Underlying Data",
@@ -176,7 +176,7 @@ Try it!`,
   },
   {
     init: function() {
-      this.el = qs(document, '#views .view:nth-child(2)');
+      this.el = qs('#views .view:nth-child(2)');
     },
     mark: {
       title: "Analytical Outputs",
@@ -208,7 +208,7 @@ Change the index by clicking on it.`,
   },
   {
     init: function() {
-      this.el = qs(document, '#index-graphs-info');
+      this.el = qs('#index-graphs-info');
     },
     mark: {
       title: "Information about Analytical Outputs",

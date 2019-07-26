@@ -190,7 +190,7 @@ async function ea_overlord(msg) {
 
     state.set_inputs_param(a);
 
-    await ea_boundaries_init();
+    await ea_boundaries_init.call(DS.get('boundaries'));
 
     ea_inputs_init();
     ea_indexes_init(state);

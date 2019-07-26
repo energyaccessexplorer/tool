@@ -429,9 +429,7 @@ function ea_nanny_force_start() {
 };
 
 async function ea_boundaries_init() {
-  const b = DS.get('boundaries');
-
-  if (!b) {
+  if (!this) {
     ea_flash
       .type('error')
       .title("Misconfigured geography")
@@ -512,11 +510,11 @@ Please report this to energyaccessexplorer@wri.org.
 
   b.active = true;
 
-  await b.load('heatmap');
-  await b.load('vectors');
+  await this.load('vectors');
+  await this.load('heatmap');
 
   document.querySelector('#controls-wrapper')
-    .insertBefore(controls.call(b), document.querySelector('#controls'));
+    .insertBefore(controls.call(this), document.querySelector('#controls'));
 
   mapbox_fit(DS.get('boundaries').vectors.bounds);
 

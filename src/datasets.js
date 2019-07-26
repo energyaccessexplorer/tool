@@ -1,29 +1,29 @@
 class DS {
-  constructor(e) {
-    this.id = e.category.name;
+  constructor(o) {
+    this.id = o.category.name;
 
-    this.category = e.category;
+    this.category = o.category;
 
-    let config = e.configuration || {};
+    let config = o.configuration || {};
     this.config = config;
 
-    this.name = config.name_override || e.category.name_long;
+    this.name = config.name_override || o.category.name_long;
 
-    this.indexname = (e.category.metadata.path && e.category.metadata.path[0]) || null;
+    this.indexname = (o.category.metadata.path && o.category.metadata.path[0]) || null;
 
-    this.weight = e.category.weight || 2;
+    this.weight = o.category.weight || 2;
 
-    this.metadata = e.metadata;
+    this.metadata = o.metadata;
 
-    this.invert = config.invert_override || e.category.metadata.invert;
+    this.invert = config.invert_override || o.category.metadata.invert;
 
     this.mutant = !!config.mutant;
 
     this.collection = !!config.collection;
 
-    if (e.heatmap_file) {
-      this.heatmap = e.category.heatmap
-      this.heatmap.endpoint = e.heatmap_file.endpoint;
+    if (o.heatmap_file) {
+      this.heatmap = o.category.heatmap
+      this.heatmap.endpoint = o.heatmap_file.endpoint;
       this.heatmap.parse = ea_datasets_tiff;
 
       this.multifilter = (this.heatmap.scale === 'multi-key-delta');
@@ -32,9 +32,9 @@ class DS {
         ea_datasets_color_scale.call(this);
     }
 
-    if (e.vectors_file) {
-      this.vectors = e.category.vectors;
-      this.vectors.endpoint = e.vectors_file.endpoint;
+    if (o.vectors_file) {
+      this.vectors = o.category.vectors;
+      this.vectors.endpoint = o.vectors_file.endpoint;
 
       switch (this.vectors.shape_type) {
       case "points": {
@@ -57,9 +57,9 @@ class DS {
       }
     }
 
-    if (e.csv_file) {
+    if (o.csv_file) {
       this.csv = config.csv;
-      this.csv.endpoint = e.csv_file.endpoint;
+      this.csv.endpoint = o.csv_file.endpoint;
       this.csv.parse = ea_datasets_csv;
 
       if (this.csv.options) this.filter_option = Object.keys(this.csv.options)[0];
@@ -67,8 +67,8 @@ class DS {
 
     this.presets = {};
 
-    if (e.presets && e.presets.length) {
-      e.presets.forEach(p => {
+    if (o.presets && o.presets.length) {
+      o.presets.forEach(p => {
         return this.presets[p.name] = {
           "weight": p.weight,
           "min": p.min,
@@ -77,8 +77,8 @@ class DS {
       });
     }
 
-    else if (e.category.presets && e.category.presets.length) {
-      e.category.presets.forEach(p => {
+    else if (o.category.presets && o.category.presets.length) {
+      o.category.presets.forEach(p => {
         return this.presets[p.name] = {
           "weight": p.weight,
           "min": p.min,

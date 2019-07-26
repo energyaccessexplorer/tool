@@ -285,14 +285,14 @@ async function ea_controls_selectlist() {
   const id = location.get_query_param('id');
 
   const pidq = ea_geography.parent_id ? `eq.${ea_geography.parent_id}` : "is.null";
-  const country_list = await ea_client(ea_settings.database + `/geographies?select=id,name&online=eq.true&datasets_count=gt.0&parent_id=${pidq}&order=name.asc`)
+  const list = await ea_client(ea_settings.database + `/geographies?select=id,name&online=eq.true&datasets_count=gt.0&parent_id=${pidq}&order=name.asc`)
     .then(j => {
       j.forEach(g => data[g.name] = g.name);
       return j;
     });
 
   function set_default(input) {
-    const g = country_list.find(x => x.id === id);
+    const g = list.find(x => x.id === id);
     if (g) input.value = g.name;
 
     return input;
@@ -300,7 +300,7 @@ async function ea_controls_selectlist() {
 
   const sl = new selectlist("controls-country", data, {
     'change': function(e) {
-      const c = country_list.find(c => c.name === this.value);
+      const c = list.find(c => c.name === this.value);
       if (c && id !== c.id) location = location.search.replace(new RegExp(`id=${UUID_REGEXP}`), `id=${c.id}`);
     }
   });

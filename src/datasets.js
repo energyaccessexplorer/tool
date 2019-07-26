@@ -9,13 +9,13 @@ class DS {
 
     this.name = config.name_override || o.category.name_long;
 
-    this.indexname = (o.category.metadata.path && o.category.metadata.path[0]) || null;
+    this.indexname = (o.category.configuration.path && o.category.configuration.path[0]) || null;
 
     this.weight = o.category.weight || 2;
 
     this.metadata = o.metadata;
 
-    this.invert = config.invert_override || o.category.metadata.invert;
+    this.invert = config.invert_override || o.category.configuration.invert;
 
     this.mutant = !!config.mutant;
 

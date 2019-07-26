@@ -31,7 +31,7 @@ function ea_controls_tree() {
   const tree = [{ "name": "all", "children": [] }];
 
   for (let d of DS.all) {
-    let path = d.category.metadata.path;
+    let path = d.category.configuration.path;
     if (!path.length) continue;
 
     let b = qs(controls_el, `#${path[0]}.controls-branch`);

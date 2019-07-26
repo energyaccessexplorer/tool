@@ -524,9 +524,18 @@ async function ea_datasets_geojson(callback) {
     }
 
     await ea_client(endpoint)
-      .then(async r => {
+      .then(r => {
         this.features = r;
-        this.vectors.bounds = geojsonExtent(r);
+
+        try {
+          this.vectors.bounds = geojsonExtent(r);
+        }
+        catch (err) {
+          if (this.id === 'boundaries') throw err;
+
+          console.warn(`geojsonExtent failed for '${this.id}'. This is not fatal. Here's the error:`, r);
+          console.warn(err);
+        }
         callback();
       });
   }

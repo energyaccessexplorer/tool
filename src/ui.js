@@ -37,18 +37,18 @@ function ea_ui_collapse_triangle(d) {
 };
 
 function ea_ui_app_loading(bool) {
-  document.querySelector('#app-loading').style['display'] = bool ? 'block' : 'none';
+  qs('#app-loading').style['display'] = bool ? 'block' : 'none';
 };
 
 function ea_ui_layout() {
-  const n = document.querySelector('nav');
-  const p = document.querySelector('#playground');
-  const m = p.querySelector('#maparea');
-  const c = p.querySelector('#controls-wrapper');
-  const r = p.querySelector('#right-pane');
-  const o = r.querySelector('#canvas-output-container');
-  const d = r.querySelector('#drawer');
-  const l = r.querySelector('#inputs-list');
+  const n = qs('nav');
+  const p = qs('#playground');
+  const m = qs('#maparea', p);
+  const c = qs('#controls-wrapper', p);
+  const r = qs('#right-pane', p);
+  const o = qs('#canvas-output-container', r);
+  const d = qs('#drawer', r);
+  const l = qs('#inputs-list', r);
 
   function set_heights() {
     p.style['height'] =
@@ -65,7 +65,7 @@ function ea_ui_layout() {
 };
 
 function ea_ui_views_init() {
-  const el = document.querySelector('#views');
+  const el = qs('#views');
 
   Object.keys(ea_views).forEach(v => {
     const btn = ce('div', ce('div', ea_views[v]['name'], { class: 'view-name' }), { class: 'view', ripple: "" });
@@ -120,7 +120,7 @@ border: 1px solid white;
 };
 
 function ea_help() {
-  const hm = document.querySelector('[bind=help-message]').cloneNode(true);
+  const hm = qs('[bind=help-message]').cloneNode(true);
   hm.style.display = 'block';
 
   ea_modal.set({
@@ -132,7 +132,7 @@ function ea_help() {
 
 function elem_collapse(el, t) {
   const d = el.style['display'];
-  const c = t.querySelector('.collapse');
+  const c = qs('.collapse', t);
 
   if (d === "none") {
     el.style['display'] = 'block';

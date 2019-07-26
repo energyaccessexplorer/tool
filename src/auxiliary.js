@@ -27,7 +27,7 @@ function ea_state_sync() {
   };
 
   function set_preset_param(p) {
-    document.querySelector('#controls-preset').value = (p || 'custom');
+    qs('#controls-preset').value = (p || 'custom');
     history.replaceState(null, null, location.set_query_param('preset', (p || 'custom')));
   };
 
@@ -92,7 +92,7 @@ function ea_canvas_plot(data, canvas, color_theme = 'ea') {
     data = new Float32Array(A.raster.data.length).fill(-1);
   };
 
-  if (!canvas) canvas = document.querySelector('canvas#output');
+  if (!canvas) canvas = qs('canvas#output');
 
   const plot = new plotty.plot({
     canvas: canvas,
@@ -303,9 +303,9 @@ async function ea_plot_active_analysis(type, cs = 'ea') {
   const raster = await ea_analysis(list, type);
   ea_canvas_plot(raster);
 
-  document.querySelector('#canvas-output-select').value = type;
-  document.querySelector('#index-graphs-title').innerText = ea_indexes[type]['name'];
-  document.querySelector('#index-graphs-description').innerText = ea_indexes[type]['description'];
+  qs('#canvas-output-select').value = type;
+  qs('#index-graphs-title').innerText = ea_indexes[type]['name'];
+  qs('#index-graphs-description').innerText = ea_indexes[type]['description'];
 
   // 'animate' is set to false on mapbox's configuration, since we don't want
   // mapbox eating the CPU at 60FPS for nothing.
@@ -397,8 +397,8 @@ function interval_index(v, arr, clamp) {
 };
 
 function right_pane(t) {
-  document.querySelector('#inputs-pane').style.display = (t === 'inputs') ? '' : 'none';
-  document.querySelector('#indexes-pane').style.display = (t === 'outputs') ? '' : 'none';
+  qs('#inputs-pane').style.display = (t === 'inputs') ? '' : 'none';
+  qs('#indexes-pane').style.display = (t === 'outputs') ? '' : 'none';
 };
 
 function ea_nanny_init(state) {
@@ -482,7 +482,7 @@ Please report this to energyaccessexplorer@wri.org.
         sb.classList.add('active');
         this.name = this.csv.options[v];
 
-        this.input_el.querySelector('[slot=name]').innerText = this.name;
+        qs('[slot=name]', this.input_el).innerText = this.name;
 
         ea_overlord({
           "type": "dataset",
@@ -502,7 +502,7 @@ Please report this to energyaccessexplorer@wri.org.
     }
 
     qs('.controls-subbranch-title', controls).onclick = e => {
-      elem_collapse(content, controls.querySelector('.controls-subbranch-title'));
+      elem_collapse(content, qs('.controls-subbranch-title', controls));
     };
 
     return controls;
@@ -513,8 +513,8 @@ Please report this to energyaccessexplorer@wri.org.
   await this.load('vectors');
   await this.load('heatmap');
 
-  document.querySelector('#controls-wrapper')
-    .insertBefore(controls.call(this), document.querySelector('#controls'));
+  qs('#controls-wrapper')
+    .insertBefore(controls.call(this), qs('#controls'));
 
   mapbox_fit(DS.get('boundaries').vectors.bounds);
 

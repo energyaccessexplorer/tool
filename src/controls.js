@@ -190,8 +190,8 @@ function ea_controls_range(label, single = false, opts = {}) {
   <span bind="v2"></span>
 </div>`);
 
-  const v1 = l.querySelector('[bind=v1]');
-  const v2 = l.querySelector('[bind=v2]');
+  const v1 = qs('[bind=v1]', l);
+  const v2 = qs('[bind=v2]', l);
 
   const r = ea_svg_interval(
     single,
@@ -311,12 +311,12 @@ async function ea_controls_selectlist() {
 };
 
 function ea_controls_presets_init(v) {
-  const el = document.querySelector('#controls-preset');
+  const el = qs('#controls-preset');
 
   Object.keys(ea_presets).forEach(k => el.append(ce('option', ea_presets[k], { value: k })));
 
   el.value = v || "custom";
-  el.querySelector('option[value="custom"]').innerText = "Custom Analysis";
+  qs('option[value="custom"]', el).innerText = "Custom Analysis";
 
   el.addEventListener('change', function(e) {
     ea_overlord({

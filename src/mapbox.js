@@ -70,7 +70,7 @@ function mapbox_theme_control_popup(btn) {
     radios.append(e);
   }
 
-  let current = radios.querySelector(`input[value="${ea_settings.mapbox_theme}"]`)
+  let current = qs(`input[value="${ea_settings.mapbox_theme}"]`, radios);
   if (current) current.setAttribute('checked', true);
 
   radios.querySelectorAll('input[name="mapbox_theme"]')
@@ -91,7 +91,7 @@ box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
 border-radius: 4px;
 padding: 16px;`;
 
-  document.querySelector('#playground #visual').append(x);
+  qs('#playground #visual').append(x);
 };
 
 function mapbox_theme_pick(theme) {
@@ -184,7 +184,7 @@ function mapbox_change_theme(theme) {
 };
 
 function mapbox_pointer(content, x, y) {
-  let p = document.querySelector('#mapbox-pointer');
+  let p = qs('#mapbox-pointer');
 
   if (!p) {
     p = ce('div', content, {
@@ -211,7 +211,7 @@ padding: 16px;`
 };
 
 function mapbox_fit(bounds) {
-  const rect = document.querySelector('#maparea').getBoundingClientRect();
+  const rect = qs('#maparea').getBoundingClientRect();
 
   const hp = (rect.width > rect.height) ? 0 : (rect.width * 0.1);
   const vp = (rect.height > rect.width) ? 0 : (rect.height * 0.1);

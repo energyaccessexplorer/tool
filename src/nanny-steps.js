@@ -145,7 +145,7 @@ You can prioritize areas of interest base on your criteria. You can set a value 
       align: "middle"
     },
     wait: {
-      el: _ => document.querySelector('#supply'),
+      el: _ => qs('#supply'),
       action: 'click',
       f: function(fn) { this.ds.active ? fn() : null; }
     }
@@ -190,7 +190,7 @@ Try it!`,
   },
   {
     init: async function() {
-      this.el = document.querySelector('#indexes-list');
+      this.el = qs('#indexes-list');
       await new Promise(_ => setTimeout(_, 1000));
     },
     mark: {

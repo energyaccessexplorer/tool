@@ -66,15 +66,15 @@ async function ea_indexes_graphs(raster) {
   POPULATION_PIE.change(1);
   AREA_PIE.change(1);
 
-  document.querySelector('#population-number').innerHTML = t['population']['total'].toLocaleString() + "&nbsp;" + "people";
-  document.querySelector('#area-number').innerHTML = t['area']['total'].toLocaleString() + "&nbsp;" + "km<sup>2</sup>";
+  qs('#population-number').innerHTML = t['population']['total'].toLocaleString() + "&nbsp;" + "people";
+  qs('#area-number').innerHTML = t['area']['total'].toLocaleString() + "&nbsp;" + "km<sup>2</sup>";
 
   t['population']['distribution'].forEach((x,i) => POPULATION_PIE['data'][i].shift());
   t['area']['distribution'].forEach((x,i) => AREA_PIE['data'][i].shift());
 };
 
 function ea_indexes_init(state) {
-  const index_graphs = document.querySelector('#index-graphs-container');
+  const index_graphs = qs('#index-graphs-container');
 
   const scale = ce('div');
   scale.append(
@@ -86,7 +86,7 @@ function ea_indexes_init(state) {
       ea_color_scale.domain),
     tmpl("#ramp-label-low-high"));
 
-  const cos = document.querySelector('#canvas-output-select');
+  const cos = qs('#canvas-output-select');
   for (let i in ea_indexes)
     cos.append(ce('option', ea_indexes[i]['name'], { value: i }));
 
@@ -99,7 +99,7 @@ function ea_indexes_init(state) {
     });
   };
 
-  const info = document.querySelector('#index-graphs-info');
+  const info = qs('#index-graphs-info');
   info.append(tmpl('#svg-info'));
   info.onclick = _ => ea_indexes_modal();
 
@@ -137,7 +137,7 @@ function ea_indexes_list(state) {
   const target = state.output;
   const nodes = [];
 
-  const indexes_list = document.querySelector('#indexes-list');
+  const indexes_list = qs('#indexes-list');
   elem_empty(indexes_list);
 
   function i_elem(t, v, x) {
@@ -160,7 +160,7 @@ function ea_indexes_list(state) {
 
     for (n of nodes) {
       e.initEvent((this === n) ? "select" : "unselect", true, true);
-      n.querySelector('.radio svg').dispatchEvent(e);
+      qs('.radio svg', n).dispatchEvent(e);
     }
 
     ea_overlord({
@@ -173,7 +173,7 @@ function ea_indexes_list(state) {
   for (let t in ea_indexes) {
     let node = i_elem(t, ea_indexes[t]['name'], ea_indexes[t]['description']);
 
-    let ler = node.querySelector('.radio');
+    let ler = qs('.radio', node);
     ler.append(ea_svg_radio(t === target));
 
     node.addEventListener('mouseup', _ => setTimeout(_ => trigger_this.call(node), 10));

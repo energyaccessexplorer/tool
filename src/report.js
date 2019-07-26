@@ -85,7 +85,7 @@ function ea_report() {
     doc.setFont("courier");
     doc.setFontSize(10);
 
-    const table = document.querySelector('table.summary.tab');
+    const table = qs('table.summary.tab');
     if (table) doc.autoTable({
       html: 'table.summary.tab',
       startY: c,

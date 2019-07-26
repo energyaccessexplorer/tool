@@ -94,7 +94,7 @@ async function ea_select_geography(c) {
 };
 
 function ea_select_setup() {
-  const playground = document.querySelector('#playground');
+  const playground = qs('#playground');
 
   let curr_c = null;
 

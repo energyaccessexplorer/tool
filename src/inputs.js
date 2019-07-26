@@ -1,6 +1,6 @@
 function ea_inputs_init() {
-  const inputs = document.querySelector('#inputs-pane');
-  const list = inputs.querySelector('#inputs-list');
+  const inputs = qs('#inputs-pane');
+  const list = qs('#inputs-list', inputs);
 
   sortable('#inputs-list', {
     "items": 'ds-input',
@@ -21,8 +21,8 @@ function ea_inputs_init() {
 function ea_inputs(list) {
   sortable('#inputs-list', 'disable');
 
-  const inputs = document.querySelector('#inputs-pane');
-  const inputs_list = inputs.querySelector('#inputs-list');
+  const inputs = qs('#inputs-pane');
+  const inputs_list = qs('#inputs-list', inputs);
 
   const ldc = list.map(i => DS.get(i).input_el);
 

@@ -613,7 +613,7 @@ async function ea_datasets_tiff() {
     };
 
     if (this.raster && this.raster.data) {
-      draw.call(this, document.querySelector(`canvas#canvas-${this.id}`));
+      draw.call(this, qs(`canvas#canvas-${this.id}`));
     }
 
     else {

@@ -65,7 +65,7 @@ function ea_select_setup() {
 
   let curr_c = null;
 
-  ea_client(ea_settings.database + '/geographies?online&adm=eq.0')
+  ea_client(ea_settings.database + '/geographies?online=eq.true&adm=eq.0')
     .then(countries_online => {
       for (let co of countries_online) {
         const d = ce('div', ce('h2', co.name, { class: 'country-name' }), { class: 'country-item', ripple: "" });

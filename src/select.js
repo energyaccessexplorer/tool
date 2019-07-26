@@ -60,6 +60,39 @@ function ea_select_topo_flag(c) {
   return svg.node();
 };
 
+async function ea_select_geography(c) {
+  const coll = await ea_client(ea_settings.database + `/geographies?online=eq.true&datasets_count=gt.0&parent_id=eq.${c.id}`);
+
+  const data = {};
+  for (let x of coll) data[x.name] = x.name;
+
+  const sl = new selectlist(`geographies-select-` + c.id, data, {
+    'change': function(e) {
+      const x = coll.find(x => x.name === this.value);
+      if (x) location = location = `/maps-and-data/tool?id=${x.id}`;
+    }
+  });
+
+  if (coll.length === 0) {
+    location = `/maps-and-data/tool?id=${c.id}`;
+    return;
+  }
+
+  let content = ce('div');
+  content.append(
+    ce('p', `We have several geographies for ${c.name}. Please do select one.`),
+    sl.el
+  );
+
+  ea_modal.set({
+    header: c.name,
+    content: content,
+    footer: null
+  }).show();
+
+  sl.input.focus();
+};
+
 function ea_select_setup() {
   const playground = document.querySelector('#playground');
 
@@ -69,7 +102,7 @@ function ea_select_setup() {
     .then(countries_online => {
       for (let co of countries_online) {
         const d = ce('div', ce('h2', co.name, { class: 'country-name' }), { class: 'country-item', ripple: "" });
-        d.onclick = _ => setTimeout(_ => ea_countries_action_modal(co), 350);
+        d.onclick = _ => setTimeout(_ => ea_select_geography(co), 350);
 
         d.append(ea_select_topo_flag(co))
         playground.append(d);

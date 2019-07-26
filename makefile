@@ -124,6 +124,7 @@ build-select:
 		${LIB}/topojson.js \
 		${LIB}/flash.js \
 		${LIB}/modal.js \
+		${LIB}/selectlist.js \
 		> ${DIST}/select/libs.js
 
 	@echo -n "const ea_settings = " | cat - \
@@ -132,7 +133,6 @@ build-select:
         ${SRC}/client.js \
 		${SRC}/svg.js \
 		${SRC}/ui.js \
-		${SRC}/countries.js \
 		${SRC}/select.js \
 		> ${DIST}/select/main.js
 

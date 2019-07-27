@@ -162,13 +162,33 @@ class DS {
     if (!this.collection) throw `${this.id} is not a collection. Bye.`
   };
 
-  multifilter_init() {
+  async multifilter_init() {
     if (!this.csv) return;
+
+    await this.csv.parse.call(this);
+    await this.heatmap.parse.call(this);
+    await this.vectors.parse.call(this);
+
+    const cso = this.config.polygons[Object.keys(this.csv.options)[0]];
+
+    let cs = this.vectors.color_stops;
+    if (!cs || !cs.length) cs = this.vectors.color_stops = ea_color_scale.stops;
+
+    const min = Math.min.apply(null, this.features.features.map(f => f.properties[cso]));
+    const max = Math.max.apply(null, this.features.features.map(f => f.properties[cso]));
+
+    const f = max <= 1 ? 1 : 100;
+    const d = Array(cs.length).fill(0).map((x,i) => (0 + i * (f/(cs.length-1))));
+    const s = d3.scaleLinear().domain(d).range(cs);
+
+    this.color_scale_fn = s;
+    this.color_scale_el = ea_svg_color_steps(s,d);
 
     for (let v in this.csv.options) {
       // we can do this because category is plain JSON, not javascript.
-      const cat = JSON.parse(JSON.stringify(this.category));
+      let cat = JSON.parse(JSON.stringify(this.category));
       cat.name = this.id + "-" + v;
+      cat.name_long = this.csv.options[v];
 
       let d = new DS({ category: cat });
 
@@ -177,54 +197,23 @@ class DS {
       d.datatype = this.datatype;
       d.config = {};
 
-      d.init(false, null);
+      Object.assign(d.heatmap = {}, this.heatmap);
+      Object.assign(d.raster = {}, this.raster);
 
-      d.heatmap = this.heatmap;
-      d.vectors = this.vectors;
-      d.csv = this.csv;
+      Object.assign(d.vectors = {}, this.vectors);
+      Object.assign(d.features = {}, this.features);
 
-      d.active_filter = true;
-    };
-  };
+      Object.assign(d.csv = {}, this.csv);
+      Object.assign(d.table = {}, this.table);
 
-  multifilter_set(o) {
-    if (!this.table && this.features) {
-      this.features.features.forEach((f,i) => f.properties.color =  d3.schemeCategory10[i%10]);
-      return;
-    }
+      d.init(this.active, null);
 
-    if (this.subid) {
-      this.parent.multifilter_set(o);
-      return;
-    }
+      d.color_scale_el = this.color_scale_el.cloneNode(true);
 
-    if (o === this.filter_option) return;
+      d.input_el = new dsinput(d);
+      d.controls_el = new dscontrols(d);
 
-    if (o) this.filter_option = o;
-    else {
-      o = Object.keys(this.csv.options)[0];
-      this.name = this.csv.options[o];
-    }
-
-    if (this.features) {
-      const cso = this.config.polygons[o];
-      let cs = this.vectors.color_stops;
-      if (!cs || !cs.length) cs = this.vectors.color_stops = ea_color_scale.stops;
-
-      const min = Math.min.apply(null, this.features.features.map(f => f.properties[cso]));
-      const max = Math.max.apply(null, this.features.features.map(f => f.properties[cso]));
-
-      const f = max <= 1 ? 1 : 100;
-      const d = Array(cs.length).fill(0).map((x,i) => (0 + i * (f/(cs.length-1))));
-      const s = d3.scaleLinear().domain(d).range(cs);
-
-      this.features.features.forEach(f => f.properties.color = s(f.properties[cso]));
-      this.color_scale_el = ea_svg_color_steps(s,d);
-
-      let src; if (src = ea_mapbox.getSource(this.id)) src.setData(this.features);
-
-      const i = qs('[name=svg]', DS.get(this.id).input_el);
-      elem_empty(i); i.append(this.color_scale_el);
+      let src; if (src = ea_mapbox.getSource(d.id)) { src.setData(d.features); }
     }
   };
 
@@ -295,7 +284,7 @@ Forcing dataset's weight to 1.`);
     case 'multi-key-delta': {
       if (!this.table) return (s = x => 1);
 
-      let bs = DS.all.filter(d => d.id.match(new RegExp(`^${this.id}-`)) && d.active_filter);
+      let bs = DS.all.filter(d => (d.parent === this) && d.active);
 
       s = x => {
         let z = this.table[x];
@@ -335,7 +324,7 @@ Forcing dataset's weight to 1.`);
 
     if (ea_mapbox.getLayer(this.id))
       ea_mapbox.setLayoutProperty(this.id, 'visibility', t ? 'visible' : 'none');
-  }
+  };
 
   async turn(v, draw) {
     if (v) {
@@ -451,9 +440,8 @@ function ea_datasets_color_scale() {
 
   if (!cs || !cs.length)
     this.heatmap.color_stops = cs = ea_color_scale.stops;
-  else {
+  else
     d = Array(cs.length).fill(0).map((x,i) => (0 + i * (1/(cs.length-1))));
-  }
 
   {
     let intervals;
@@ -734,6 +722,11 @@ async function ea_datasets_lines() {
 async function ea_datasets_polygons() {
   return ea_datasets_geojson.call(this, _ => {
     if (!ea_mapbox.getSource(this.id)) {
+      if (this.parent) {
+        const p = this.parent.config.polygons[this.subid];
+        this.features.features.forEach(f => f.properties.color = this.parent.color_scale_fn(f.properties[p]));
+      }
+
       ea_mapbox.addSource(this.id, {
         "type": "geojson",
         "data": this.features
@@ -741,8 +734,6 @@ async function ea_datasets_polygons() {
     }
 
     if (!ea_mapbox.getLayer(this.id)) {
-      if (this.multifilter) this.multifilter_set(this.subid);
-
       ea_mapbox.addLayer({
         "id": this.id,
         "type": "fill",
@@ -751,7 +742,7 @@ async function ea_datasets_polygons() {
           "visibility": "none",
         },
         "paint": {
-          "fill-color": this.multifilter ? ['get', 'color'] : this.vectors.fill,
+          "fill-color": this.subid ? ['get', 'color'] : this.vectors.fill,
           "fill-outline-color": this.vectors.stroke,
           "fill-opacity": this.vectors.opacity,
         },

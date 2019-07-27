@@ -441,80 +441,8 @@ Please report this to energyaccessexplorer@wri.org.
     throw `Geography is missing a 'boundaries' dataset.`;
   }
 
-  function controls() {
-    const controls = ce('div', null, { id: `controls-boundaries`, class: 'controls' });
-    const content = ce('content');
-    const _t = ce('div', this.name, { class: 'controls-subbranch-title' });
-    _t.prepend(ce('span', ea_ui_collapse_triangle(this.active ? 's' : 'e'), { class: 'collapse triangle' } ))
-    controls.append(_t, content);
-
-    content.style['display'] = this.active ? '' : 'none';
-
-    if (!this.csv) return controls;
-
-    const sbs = [];
-    let first = true;
-
-    for (let v in this.csv.options) {
-      let d = DS.get("boundaries-" + v);
-      let a = true;
-
-      const check = ea_svg_checkbox(true, s => {
-        d.active_filter = a = s;
-        select();
-      });
-
-      const checkbox = check.svg;
-
-      const range_group = ea_controls_range.call({ ds: d }, (d.category.unit || 'percentage'), false, { width: 256 });
-
-      let sb = ce('div', null, { class: 'controls-multifilter-elem', ripple: "" });
-      const title = ce('div', this.csv.options[v], { class: 'control-group' });
-
-      const g = ce('div', null, { class: 'control-group' });
-      g.append(range_group.el);
-
-      sb.append(checkbox, title, g);
-      sbs.push(sb);
-
-      let select = _ => {
-        for (let s of sbs) s.classList.remove('active');
-        sb.classList.add('active');
-        this.name = this.csv.options[v];
-
-        qs('[slot=name]', this.input_el).innerText = this.name;
-
-        ea_overlord({
-          "type": "dataset",
-          "target": d,
-          "caller": "ea_controls_elem multifilter",
-        });
-      };
-
-      sb.onclick = e => {
-        if (e.target.closest('svg') === range_group.svg) return;
-        if (e.target.closest('svg') !== checkbox) select();
-      };
-
-      if (first) { sb.classList.add('active'); this.name = d.csv.options[v]; first = false; }
-
-      content.append(sb);
-    }
-
-    qs('.controls-subbranch-title', controls).onclick = e => {
-      elem_collapse(content, qs('.controls-subbranch-title', controls));
-    };
-
-    return controls;
-  };
-
-  b.active = true;
-
   await this.load('vectors');
   await this.load('heatmap');
-
-  qs('#controls-wrapper')
-    .insertBefore(controls.call(this), qs('#controls'));
 
   mapbox_fit(DS.get('boundaries').vectors.bounds);
 

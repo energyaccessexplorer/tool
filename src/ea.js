@@ -181,6 +181,8 @@ async function ea_overlord(msg) {
 
     await ea_datasets_list_init(geography.id, state.inputs, state.preset);
 
+    await ea_boundaries_init.call(DS.get('boundaries'));
+
     const a = DS.all
           .filter(t => t.active)
           .map(x => x.id)
@@ -189,8 +191,6 @@ async function ea_overlord(msg) {
     if (!a.length) a.push('boundaries');
 
     state.set_inputs_param(a);
-
-    await ea_boundaries_init.call(DS.get('boundaries'));
 
     ea_inputs_init();
     ea_indexes_init(state);
@@ -248,12 +248,9 @@ async function ea_overlord(msg) {
 
     state.set_preset_param(null);
 
-    if (ds.subid) ds.multifilter_set(ds.subid);
-    else {
-      ds.active ?
-        (resort && state.inputs.unshift(ds.id)) :
-        state.inputs.splice(state.inputs.indexOf(ds.id), 1); // REMOVE()
-    }
+    ds.active ?
+      (resort && state.inputs.unshift(ds.id)) :
+      state.inputs.splice(state.inputs.indexOf(ds.id), 1); // REMOVE()
 
     const inputs = [...new Set(state.inputs)]; // UNIQUE()
 

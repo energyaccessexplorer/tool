@@ -33,6 +33,7 @@ function ea_controls_tree() {
   for (let d of DS.all) {
     let path = d.category.configuration.path;
     if (!path.length) continue;
+    if (d.multifilter) continue;
 
     let b = qs(`#${path[0]}.controls-branch`, controls_el);
     if (!b) {
@@ -434,11 +435,12 @@ class dscontrols extends HTMLElement {
 
 
     default:
-      console.warn(`EA Controls: Unknown data id ${this.ds.id}`);
+      if (!this.ds.parent) console.warn(`dscontrols.init: Unknown data id ${this.ds.id}`);
       break;
     }
 
-    if (this.ds.multifilter) DS.all.filter(d => d.id.match(this.ds.id + "-")).forEach(d => d.controls_el = this);
+    if (this.ds.parent)
+      this.range_group = ea_controls_range.call(this, (this.ds.parent.category.unit || 'percentage'));
   };
 
   render() {

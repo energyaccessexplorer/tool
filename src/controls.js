@@ -118,7 +118,7 @@ function ea_controls_mutant_options() {
     select.append(ce('option', host.name, { value: i }));
   });
 
-  select.value = ds.config.host;
+  select.value = ds.host.id;
 
   select.addEventListener('change', async function() {
     const host = DS.get(this.value);

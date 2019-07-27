@@ -115,7 +115,9 @@ class DS {
 
     let m = DS.get(this.config.mutant_targets[0]);
 
-    this.config.host = m.id;
+    this.host = m;
+
+    this.datatype = m.datatype;
 
     this.raster = m.raster;
     this.vectors = m.vectors;
@@ -131,10 +133,11 @@ class DS {
     if (!this.config.mutant_targets.includes(host.id))
       throw `${this.id} is not configured to mutate into ${host.id}.`
 
-    this.config.host = host.id;
-
+    this.host = host;
 
     await host.heatmap.parse.call(host);
+
+    this.datatype = host.datatype;
 
     this.heatmap = host.heatmap;
     this.raster = host.raster;
@@ -335,9 +338,7 @@ Forcing dataset's weight to 1.`);
       return;
     }
 
-    if (this.mutant) {
-      this.mutate(DS.get(this.config.host));
-    }
+    if (this.mutant) this.mutate(this.host);
 
     if (this.controls_el) this.controls_el.turn(v);
 

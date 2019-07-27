@@ -50,6 +50,9 @@ class dsinput extends HTMLElement {
     this.ds = d;
     attach.call(this, shadow_tmpl('#ds-input-template'));
 
+    this.svg_el = this.svg();
+    this.ramp_el = this.ramp();
+
     this.render();
 
     return this;
@@ -59,13 +62,19 @@ class dsinput extends HTMLElement {
     this.setAttribute('bind', this.ds.id);
 
     slot_populate.call(this, this.ds, {
-      "svg": this.svg(),
-      "ramp": this.ramp(),
+      "svg": this.svg_el,
+      "ramp": this.ramp_el,
       "opacity": this.opacity(),
       "handle": tmpl("#svg-handle"),
     });
 
     return this;
+  };
+
+  refresh() {
+    const tmp = this.svg();
+    qs('[slot=svg]', this).replaceChild(tmp, this.svg_el);
+    this.svg_el = tmp;
   };
 
   opacity() {
@@ -117,24 +126,38 @@ class dsinput extends HTMLElement {
 
   svg() {
     const d = this.ds;
-    let e;
+    let e, cs;
+
+    if (d.scale_stops)
+      cs = ea_svg_color_steps(d.color_scale_fn, d.scale_stops);
+    else {
+      if (d.parent)
+        cs = ea_svg_color_steps(d.parent.color_scale_fn, d.parent.scale_stops);
+    }
+
+    if (!cs) console.log("No color_scale_svg for", d.id);
 
     switch (d.datatype) {
     case 'points':
+      e = ea_svg_points_symbol.call(d);
+      break;
+
     case 'lines':
-      e = d.vectors.symbol_svg;
+      e = ea_svg_lines_symbol.call(d);
       break;
 
     case 'polygons':
-      if (d.vectors.color_stops && d.vectors.color_stops.length) e = d.color_scale_el;
-      else e = d.vectors.symbol_svg;
+      e = (d.vectors.color_stops && d.vectors.color_stops.length && d.parent) ?
+        cs :
+        ea_svg_polygons_symbol.call(d);
       break;
 
     case 'raster':
-      e = d.color_scale_el;
+      e = cs;
       break;
 
     default:
+      console.warn("dsinput.svg could not be set.", d.id);
       break;
     }
 

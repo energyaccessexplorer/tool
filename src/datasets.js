@@ -38,19 +38,16 @@ class DS {
 
       switch (this.vectors.shape_type) {
       case "points": {
-        this.vectors.symbol_svg = ea_svg_points_symbol.call(this);
         this.vectors.parse = ea_datasets_points;
         break;
       }
 
       case "polygons": {
-        this.vectors.symbol_svg = ea_svg_polygons_symbol.call(this);
         this.vectors.parse = ea_datasets_polygons;
         break;
       }
 
       case "lines": {
-        this.vectors.symbol_svg = ea_svg_lines_symbol.call(this);
         this.vectors.parse = ea_datasets_lines;
         break;
       }
@@ -124,8 +121,8 @@ class DS {
     this.vectors = m.vectors;
     this.heatmap = m.heatmap;
 
-    this.color_scale_el = m.color_scale_el;
     this.color_scale_fn = m.color_scale_fn;
+    this.scale_stops = m.scale_stops;
   };
 
   async mutate(host) {
@@ -136,8 +133,6 @@ class DS {
 
     this.config.host = host.id;
 
-    this.color_scale_el = host.color_scale_el;
-    this.color_scale_fn = host.color_scale_fn;
 
     await host.heatmap.parse.call(host);
 
@@ -145,8 +140,10 @@ class DS {
     this.raster = host.raster;
     this.vectors = host.vectors;
 
-    const s = qs('[name=svg]', DS.get(this.id).input_el);
-    elem_empty(s); s.append(host.color_scale_el);
+    this.color_scale_fn = host.color_scale_fn;
+    this.scale_stops = host.scale_stops;
+
+    this.input_el.refresh();
 
     let src;
     if (src = ea_mapbox.getSource(this.id)) {
@@ -182,7 +179,7 @@ class DS {
     const s = d3.scaleLinear().domain(d).range(cs);
 
     this.color_scale_fn = s;
-    this.color_scale_el = ea_svg_color_steps(s,d);
+    this.scale_stops = d;
 
     for (let v in this.csv.options) {
       // we can do this because category is plain JSON, not javascript.
@@ -207,8 +204,6 @@ class DS {
       Object.assign(d.table = {}, this.table);
 
       d.init(this.active, null);
-
-      d.color_scale_el = this.color_scale_el.cloneNode(true);
 
       d.input_el = new dsinput(d);
       d.controls_el = new dscontrols(d);
@@ -443,6 +438,8 @@ function ea_datasets_color_scale() {
   else
     d = Array(cs.length).fill(0).map((x,i) => (0 + i * (1/(cs.length-1))));
 
+  this.scale_stops = d;
+
   {
     let intervals;
 
@@ -491,8 +488,6 @@ function ea_datasets_color_scale() {
         .clamp(this.heatmap.clamp || false);
     }
   }
-
-  this.color_scale_el = ea_svg_color_steps(this.color_scale_fn, d);
 };
 
 /*

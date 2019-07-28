@@ -192,19 +192,20 @@ class DS {
 
       let d = new DS({ category: cat });
 
-      d.subid = v;
+      d.child_id = v;
       d.parent = this;
-      d.datatype = this.datatype;
       d.config = {};
 
       Object.assign(d.heatmap = {}, this.heatmap);
+      d.heatmap.scale = "key-delta";
+
       Object.assign(d.raster = {}, this.raster);
 
       Object.assign(d.vectors = {}, this.vectors);
       Object.assign(d.features = {}, this.features);
 
       Object.assign(d.csv = {}, this.csv);
-      Object.assign(d.table = {}, this.table);
+      d.table = this.table.map(r => r[v]);
 
       d.init(this.active, null);
 
@@ -719,7 +720,7 @@ async function ea_datasets_polygons() {
   return ea_datasets_geojson.call(this, _ => {
     if (!ea_mapbox.getSource(this.id)) {
       if (this.parent) {
-        const p = this.parent.config.polygons[this.subid];
+        const p = this.parent.config.polygons[this.child_id];
         this.features.features.forEach(f => f.properties.color = this.parent.color_scale_fn(f.properties[p]));
       }
 

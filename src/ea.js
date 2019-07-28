@@ -19,6 +19,8 @@ function ea_analysis(list, type) {
 
   const it = new Float32Array(list[0] ? list[0].raster.data.length : 0).fill(-1);
 
+  list = list.filter(d => typeof d.scale_fn(type) === 'function');
+
   // Add up how much demand and supply datasets will account for. Then, just
   // below, these values will be split into 50-50 of the total analysis.
   //
@@ -187,8 +189,6 @@ async function ea_overlord(msg) {
           .filter(t => t.active)
           .map(x => x.id)
           .sort((a,b) => (state.inputs.indexOf(a) < state.inputs.indexOf(b)) ? -1 : 1);
-
-    if (!a.length) a.push('boundaries');
 
     state.set_inputs_param(a);
 

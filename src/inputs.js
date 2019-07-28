@@ -185,15 +185,22 @@ class dsinput extends HTMLElement {
 
     if (d.collection) return;
 
-    if (!d.vectors && d.heatmap) {
+    switch (d.datatype) {
+    case "raster":
       el = tmpl("#ramp-label-min-max");
-
       qs('[bind=min]', el).innerText = d.heatmap.domain.min * d.heatmap.factor;
       qs('[bind=max]', el).innerText = d.heatmap.domain.max * d.heatmap.factor;
-    }
+      break;
 
-    if (d.vectors && (d.vectors.color_stops && d.vectors.color_stops.length))
-      el = tmpl("#ramp-label-0-100");
+    case "polygons":
+      el = (d.vectors.color_stops && d.vectors.color_stops.length && d.parent) ?
+        tmpl("#ramp-label-0-100") :
+        null;
+      break;
+
+    default:
+      break;
+    }
 
     return el;
   };

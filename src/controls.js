@@ -430,6 +430,8 @@ class dscontrols extends HTMLElement {
       "weight-slider": this.weight_group && this.weight_group.el,
     });
 
+    if (!this.weight_group && !this.range_group) this.content.remove();
+
     return this;
   };
 

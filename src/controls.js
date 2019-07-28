@@ -137,38 +137,6 @@ function ea_controls_mutant_options() {
   return container;
 };
 
-function ea_controls_options() {
-  const ds = this.ds;
-
-  if (!ds.csv) {
-    console.warn(`ea_controls_options: '${ds.id}' does not have a csv_file assigned. Returning.`);
-    return null;
-  }
-
-  const container = ce('div', null, { class: 'control-option' });
-  const select = ce('select>');
-
-  const options = Object.keys(ds.csv.options);
-
-  options.forEach(v => select.append(ce('option', ds.csv.options[v], { value: v })));
-
-  ds.filter_option = select.value = options[0];
-
-  select.addEventListener('change', function() {
-    ds.filter_option = this.value;
-
-    ea_overlord({
-      "type": "dataset",
-      "target": ds,
-      "caller": "ea_controls_options",
-    });
-  });
-
-  container.append(select);
-
-  return container;
-};
-
 function ea_controls_range(label, single = false, opts = {}) {
   const ds = this.ds;
 

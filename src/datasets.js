@@ -58,8 +58,6 @@ class DS {
       this.csv = config.csv;
       this.csv.endpoint = o.csv_file.endpoint;
       this.csv.parse = ea_datasets_csv;
-
-      if (this.csv.options) this.filter_option = Object.keys(this.csv.options)[0];
     }
 
     this.presets = {};
@@ -234,79 +232,30 @@ class DS {
     const d = (this.heatmap.domain && [this.heatmap.domain.min, this.heatmap.domain.max]) || [0,1];
     const t = this.domain;
     const v = this.heatmap.scale;
-    const o = this.filter_option;
     const r = ((typeof this.invert !== 'undefined' && this.invert.includes(i)) ? [1,0] : [0,1]);
 
-    const lin = d3.scaleLinear()
-          .domain(t || d)
-          .range(r)
-
     switch (v) {
-    case 'identity': {
-      s = d3.scaleIdentity()
-        .domain(t || d)
-        .range(r);
+    case 'multi-key-delta':
       break;
-    }
-
-    case 'key-linear': {
-      if (!this.table) return (s = x => 1);
-
-      s = x => {
-        let z = this.table[x];
-        if (!z) return -1;
-
-        return (!x || x === this.raster.nodata) ? -1 : lin.clamp(this.heatmap.clamp)(z[o]);
-      };
-      break;
-    }
 
     case 'key-delta': {
       if (!this.table) return (s = x => 1);
 
-      if (this.weight !== 1) {
-        console.warn(`${this.id} is 'key-delta' but has weight ${this.weight}.
-key-delta functions are meant to be filters.
-Forcing dataset's weight to 1.`);
-        this.weight = 1;
-      }
-
       s = x => {
         let z = this.table[x];
         if (!z) return -1;
 
-        return (z[o] < t[0] || z[o] > t[1]) ? -1 : 1;
-      };
-      break;
-    }
-
-    case 'multi-key-delta': {
-      if (!this.table) return (s = x => 1);
-
-      let bs = DS.all.filter(d => (d.parent === this) && d.active);
-
-      s = x => {
-        let z = this.table[x];
-        if (!z) return -1;
-
-        let a = 0;
-
-        for (let b of bs) {
-          if (a === -1) return a;
-
-          let bo = b.subid;
-          let to = b.domain;
-
-          a = (z[bo] < to[0] || z[bo] > to[1]) ? -1 : 1;
-        }
-
-        return a;
+        return (z < t[0] || z > t[1]) ? -1 : 1;
       };
       break;
     }
 
     case 'linear':
     default: {
+      const lin = d3.scaleLinear()
+            .domain(t || d)
+            .range(r)
+
       s = lin.clamp(this.heatmap.clamp);
       break;
     }
@@ -541,7 +490,7 @@ async function ea_datasets_csv(callback) {
 
     d3.csv(endpoint, d => {
       const o = { oid: +d[this.csv.oid] };
-      Object.keys(this.csv.options).forEach(k => o[k] = +d[k] || d[k]);
+      Object.keys(this.csv.options).forEach(k => o[k] = +d[k]);
       return o;
     })
       .then(data => {
@@ -721,7 +670,7 @@ async function ea_datasets_polygons() {
     if (!ea_mapbox.getSource(this.id)) {
       if (this.parent) {
         const p = this.parent.config.polygons[this.child_id];
-        this.features.features.forEach(f => f.properties.color = this.parent.color_scale_fn(f.properties[p]));
+        this.features.features.forEach(f => f.properties.__color = this.parent.color_scale_fn(f.properties[p]));
       }
 
       ea_mapbox.addSource(this.id, {
@@ -739,7 +688,7 @@ async function ea_datasets_polygons() {
           "visibility": "none",
         },
         "paint": {
-          "fill-color": this.subid ? ['get', 'color'] : this.vectors.fill,
+          "fill-color": this.parent ? ['get', '__color'] : this.vectors.fill,
           "fill-outline-color": this.vectors.stroke,
           "fill-opacity": this.vectors.opacity,
         },

@@ -188,7 +188,7 @@ async function ea_overlord(msg) {
     const a = DS.all
           .filter(t => t.active)
           .map(x => x.id)
-          .sort((a,b) => (state.inputs.indexOf(a) < state.inputs.indexOf(b)) ? -1 : 1);
+          .sort((x,y) => (state.inputs.indexOf(x) < state.inputs.indexOf(y)) ? -1 : 1);
 
     state.set_inputs_param(a);
 

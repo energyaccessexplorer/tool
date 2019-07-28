@@ -8,7 +8,7 @@ a {
 
 #views {
   position: absolute;
-  width: 100%;
+  width: calc(100% - 3em);
   top: 20px;
   display: flex;
   justify-content: center;

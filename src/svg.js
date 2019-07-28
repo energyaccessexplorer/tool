@@ -465,6 +465,7 @@ function ea_svg_polygons_symbol() {
   const size = 28;
 
   const container = d3.select(document.createElementNS(d3.namespaces.svg, "svg"))
+        .attr("class", 'svg-polygon')
         .attr("width", size)
         .attr("height", size);
 
@@ -474,7 +475,7 @@ function ea_svg_polygons_symbol() {
     .attr('fill', this.vectors.fill)
     .attr('fill-opacity', this.vectors.opacity)
     .attr('stroke', this.vectors.stroke)
-    .attr('stroke-width', this.vectors.width * 2);
+    .attr('stroke-width', this.vectors.width);
 
   return container.node();
 };

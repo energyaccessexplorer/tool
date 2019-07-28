@@ -188,15 +188,15 @@ async function ea_overlord(msg) {
   switch (msg.type) {
   case "init": {
     const id = location.get_query_param('id');
-    let geography; await ea_client(`${ea_settings.database}/geographies?id=eq.${id}`, 'GET', 1).then(r => geography = r);
 
-    ea_mapbox = null;
+    GEOGRAPHY = await ea_client(`${ea_settings.database}/geographies?id=eq.${id}`, 'GET', 1);
+    MAPBOX = null;
 
     ea_ui_layout();
     ea_ui_views_init();
     mapbox_setup();
 
-    await ea_datasets_list_init(geography.id, state.inputs, state.preset);
+    await ea_datasets_list_init(GEOGRAPHY.id, state.inputs, state.preset);
 
     await ea_boundaries_init.call(DS.get('boundaries'));
 
@@ -232,13 +232,13 @@ async function ea_overlord(msg) {
         .then(raster => ea_indexes_graphs(raster))
         .then(_ => {
           DS.all.forEach(d => d.visible(false));
-          ea_mapbox.setLayoutProperty('output-layer', 'visibility', 'visible');
+          MAPBOX.setLayoutProperty('output-layer', 'visibility', 'visible');
         });
     }
 
     else if (t === "inputs") {
-      if (ea_mapbox.getLayer('output-layer'))
-        ea_mapbox.setLayoutProperty('output-layer', 'visibility', 'none');
+      if (MAPBOX.getLayer('output-layer'))
+        MAPBOX.setLayoutProperty('output-layer', 'visibility', 'none');
 
       ea_inputs(state.inputs);
 
@@ -364,7 +364,7 @@ async function ea_overlord(msg) {
       if (state.mode === "outputs") {
         t = {
           raster: {
-            data: ea_mapbox.getSource('output-source').raster
+            data: MAPBOX.getSource('output-source').raster
           },
           category: {},
           name: "Analysis"
@@ -377,7 +377,7 @@ async function ea_overlord(msg) {
         t = DS.get(i);
 
         if (t.features) {
-          const et = ea_mapbox.queryRenderedFeatures(e.point)[0];
+          const et = MAPBOX.queryRenderedFeatures(e.point)[0];
           if (!et) return;
 
           console.info("Feature Properties:", et.properties);
@@ -402,7 +402,7 @@ async function ea_overlord(msg) {
 
       const rc = ea_coordinates_raster(
         [e.lngLat.lng, e.lngLat.lat],
-        ea_mapbox.coords,
+        MAPBOX.coords,
         {
           data: t.raster.data || t.data,
           width: b.raster.width,

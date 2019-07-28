@@ -310,7 +310,7 @@ async function ea_plot_active_analysis(type, cs = 'ea') {
   // 'animate' is set to false on mapbox's configuration, since we don't want
   // mapbox eating the CPU at 60FPS for nothing.
   //
-  let canvas_source = ea_mapbox.getSource('output-source');
+  let canvas_source = MAPBOX.getSource('output-source');
   if (canvas_source) {
     canvas_source.raster = raster;
 

@@ -147,8 +147,8 @@ class DS {
     this.input_el.refresh();
 
     let src;
-    if (src = ea_mapbox.getSource(this.id)) {
-      src.canvas = ea_mapbox.getSource(host.id).canvas;
+    if (src = MAPBOX.getSource(this.id)) {
+      src.canvas = MAPBOX.getSource(host.id).canvas;
       src.play();
       src.pause();
     }
@@ -210,7 +210,7 @@ class DS {
       d.input_el = new dsinput(d);
       d.controls_el = new dscontrols(d);
 
-      let src; if (src = ea_mapbox.getSource(d.id)) { src.setData(d.features); }
+      let src; if (src = MAPBOX.getSource(d.id)) { src.setData(d.features); }
     }
   };
 
@@ -270,8 +270,8 @@ class DS {
       return;
     }
 
-    if (ea_mapbox.getLayer(this.id))
-      ea_mapbox.setLayoutProperty(this.id, 'visibility', t ? 'visible' : 'none');
+    if (MAPBOX.getLayer(this.id))
+      MAPBOX.setLayoutProperty(this.id, 'visibility', t ? 'visible' : 'none');
   };
 
   async turn(v, draw) {
@@ -314,8 +314,8 @@ class DS {
   };
 
   async raise() {
-    if (ea_mapbox.getLayer(this.id))
-      ea_mapbox.moveLayer(this.id, ea_mapbox.first_symbol);
+    if (MAPBOX.getLayer(this.id))
+      MAPBOX.moveLayer(this.id, MAPBOX.first_symbol);
 
     if (this.collection) {
       for (let i of this.config.collection)
@@ -514,7 +514,7 @@ async function ea_datasets_tiff() {
 
       let d = this.heatmap.domain;
 
-      if (!ea_mapbox.getSource(this.id)) {
+      if (!MAPBOX.getSource(this.id)) {
         (new plotty.plot({
           canvas: canvas,
           data: this.raster.data,
@@ -525,16 +525,16 @@ async function ea_datasets_tiff() {
           colorScale: this.color_theme,
         })).render();
 
-        ea_mapbox.addSource(this.id, {
+        MAPBOX.addSource(this.id, {
           "type": "canvas",
           "canvas": `canvas-${this.id}`,
           "animate": false,
-          "coordinates": ea_mapbox.coords
+          "coordinates": MAPBOX.coords
         });
       }
 
-      if (!ea_mapbox.getLayer(this.id)) {
-        ea_mapbox.addLayer({
+      if (!MAPBOX.getLayer(this.id)) {
+        MAPBOX.addLayer({
           "id": this.id,
           "type": 'raster',
           "source": this.id,
@@ -544,14 +544,14 @@ async function ea_datasets_tiff() {
           "paint": {
             "raster-resampling": "nearest"
           }
-        }, ea_mapbox.first_symbol);
+        }, MAPBOX.first_symbol);
       }
 
       // TODO: Remove this? It's a hack for transmission-lines-collection not
       // having per-element rasters but a single collection raster.
       //
       if (this.id === 'transmission-lines-collection') {
-        ea_mapbox.setLayoutProperty(this.id, 'visibility', 'none');
+        MAPBOX.setLayoutProperty(this.id, 'visibility', 'none');
       }
     };
 
@@ -577,7 +577,7 @@ async function ea_datasets_tiff() {
 
       document.body.append(c);
 
-      if (ea_mapbox) {
+      if (MAPBOX) {
         draw.call(this, c);
       }
     }
@@ -602,15 +602,15 @@ async function ea_datasets_tiff() {
 
 async function ea_datasets_points() {
   return ea_datasets_geojson.call(this, _ => {
-    if (typeof ea_mapbox.getSource(this.id) === 'undefined') {
-      ea_mapbox.addSource(this.id, {
+    if (typeof MAPBOX.getSource(this.id) === 'undefined') {
+      MAPBOX.addSource(this.id, {
         "type": "geojson",
         "data": this.features
       });
     }
 
-    if (typeof ea_mapbox.getLayer(this.id) === 'undefined') {
-      ea_mapbox.addLayer({
+    if (typeof MAPBOX.getLayer(this.id) === 'undefined') {
+      MAPBOX.addLayer({
         "id": this.id,
         "type": "circle",
         "source": this.id,
@@ -624,15 +624,15 @@ async function ea_datasets_points() {
           "circle-stroke-width": this.vectors['stroke-width'] || 1,
           "circle-stroke-color": this.vectors.stroke || 'black',
         },
-      }, ea_mapbox.first_symbol);
+      }, MAPBOX.first_symbol);
     }
   });
 };
 
 async function ea_datasets_lines() {
   return ea_datasets_geojson.call(this, _ => {
-    if (!ea_mapbox.getSource(this.id))
-      ea_mapbox.addSource(this.id, {
+    if (!MAPBOX.getSource(this.id))
+      MAPBOX.addSource(this.id, {
         "type": "geojson",
         "data": this.features
       });
@@ -648,8 +648,8 @@ async function ea_datasets_lines() {
         da = [da[0], da[0]];
     }
 
-    if (!ea_mapbox.getLayer(this.id))
-      ea_mapbox.addLayer({
+    if (!MAPBOX.getLayer(this.id))
+      MAPBOX.addLayer({
         "id": this.id,
         "type": "line",
         "source": this.id,
@@ -661,26 +661,26 @@ async function ea_datasets_lines() {
           "line-color": this.vectors.stroke,
           "line-dasharray": da,
         },
-      }, ea_mapbox.first_symbol);
+      }, MAPBOX.first_symbol);
   });
 };
 
 async function ea_datasets_polygons() {
   return ea_datasets_geojson.call(this, _ => {
-    if (!ea_mapbox.getSource(this.id)) {
+    if (!MAPBOX.getSource(this.id)) {
       if (this.parent) {
         const p = this.parent.config.polygons[this.child_id];
         this.features.features.forEach(f => f.properties.__color = this.parent.color_scale_fn(f.properties[p]));
       }
 
-      ea_mapbox.addSource(this.id, {
+      MAPBOX.addSource(this.id, {
         "type": "geojson",
         "data": this.features
       });
     }
 
-    if (!ea_mapbox.getLayer(this.id)) {
-      ea_mapbox.addLayer({
+    if (!MAPBOX.getLayer(this.id)) {
+      MAPBOX.addLayer({
         "id": this.id,
         "type": "fill",
         "source": this.id,
@@ -692,7 +692,7 @@ async function ea_datasets_polygons() {
           "fill-outline-color": this.vectors.stroke,
           "fill-opacity": this.vectors.opacity,
         },
-      }, ea_mapbox.first_symbol);
+      }, MAPBOX.first_symbol);
     }
   });
 };

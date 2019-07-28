@@ -110,7 +110,7 @@ class dsinput extends HTMLElement {
           }
 
           for (let i of t)
-            ea_mapbox.setPaintProperty(this.ds.id, i, parseFloat(o));
+            MAPBOX.setPaintProperty(this.ds.id, i, parseFloat(o));
         }
       }
     );

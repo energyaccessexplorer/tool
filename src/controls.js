@@ -253,7 +253,7 @@ async function ea_controls_selectlist() {
 
   const id = location.get_query_param('id');
 
-  const pidq = ea_geography.parent_id ? `eq.${ea_geography.parent_id}` : "is.null";
+  const pidq = GEOGRAPHY.parent_id ? `eq.${GEOGRAPHY.parent_id}` : "is.null";
   const list = await ea_client(ea_settings.database + `/geographies?select=id,name&online=eq.true&datasets_count=gt.0&parent_id=${pidq}&order=name.asc`)
     .then(j => {
       j.forEach(g => data[g.name] = g.name);

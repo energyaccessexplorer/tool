@@ -1,5 +1,5 @@
 function ea_report() {
-  const canvas = ea_mapbox.getCanvas();
+  const canvas = MAPBOX.getCanvas();
   const r = canvas.width/canvas.height;
 
   async function svg_canvas_data(svg, width, height) {
@@ -52,7 +52,7 @@ function ea_report() {
     doc.setFont("helvetica");
     doc.setFontType('bold');
     doc.setFontSize(18);
-    doc.text(ea_geography.name, lp, c);
+    doc.text(GEOGRAPHY.name, lp, c);
     c += 6;
 
     // An image...

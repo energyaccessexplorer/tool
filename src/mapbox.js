@@ -111,20 +111,20 @@ function mapbox_theme_pick(theme) {
 };
 
 function mapbox_canvas() {
-  if (!ea_mapbox.getSource('output-source'))
-    ea_mapbox.addSource('output-source', {
+  if (!MAPBOX.getSource('output-source'))
+    MAPBOX.addSource('output-source', {
       "type": 'canvas',
       "canvas": 'output',
       "animate": false,
-      "coordinates": ea_mapbox.coords
+      "coordinates": MAPBOX.coords
     });
 
-  const c = ea_mapbox.getStyle().layers.find(l => l.type === 'symbol');
+  const c = MAPBOX.getStyle().layers.find(l => l.type === 'symbol');
 
-  ea_mapbox.first_symbol = ((c && c.id) || undefined);
+  MAPBOX.first_symbol = ((c && c.id) || undefined);
 
-  if (!ea_mapbox.getLayer('output-layer')) {
-    ea_mapbox.addLayer({
+  if (!MAPBOX.getLayer('output-layer')) {
+    MAPBOX.addLayer({
       "id": 'output-layer',
       "source": 'output-source',
       "type": 'raster',
@@ -134,37 +134,37 @@ function mapbox_canvas() {
       "paint": {
         "raster-resampling": "nearest",
       }
-    }, ea_mapbox.first_symbol);
+    }, MAPBOX.first_symbol);
   }
 };
 
 function mapbox_setup(bounds) {
   mapboxgl.accessToken = ea_settings.mapbox_token;
 
-  const mapbox = new mapboxgl.Map({
+  const mb = new mapboxgl.Map({
     "container": 'mapbox-container',
     "trackResize": true,
     "preserveDrawingBuffer": true, // this allows us to get canvas.toDataURL()
     "style": mapbox_theme_pick("")
   });
 
-  mapbox.addControl(new mapboxgl.NavigationControl({ showCompass: false }));
+  mb.addControl(new mapboxgl.NavigationControl({ showCompass: false }));
 
-  mapbox.addControl((new MapboxThemeControl()), 'top-right');
+  mb.addControl((new MapboxThemeControl()), 'top-right');
 
-  mapbox.zoomTo(mapbox.getZoom() * 0.95, {duration: 0});
+  mb.zoomTo(mb.getZoom() * 0.95, {duration: 0});
 
-  mapbox.dragRotate.disable();
-  mapbox.touchZoomRotate.disableRotation();
+  mb.dragRotate.disable();
+  mb.touchZoomRotate.disableRotation();
 
-  mapbox.on('mouseup', e => ea_overlord({
+  mb.on('mouseup', e => ea_overlord({
     type: "map",
     target: "click",
     event: e,
     caller: "mapbox mouseup"
   }));
 
-  return (ea_mapbox = mapbox);
+  return (MAPBOX = mb);
 };
 
 function mapbox_change_theme(theme) {
@@ -177,8 +177,8 @@ function mapbox_change_theme(theme) {
     });
   };
 
-  ea_mapbox.once('style.load', it);
-  ea_mapbox.setStyle(mapbox_theme_pick(ea_settings.mapbox_theme = theme));
+  MAPBOX.once('style.load', it);
+  MAPBOX.setStyle(mapbox_theme_pick(ea_settings.mapbox_theme = theme));
 
   if (theme === "") it();
 };
@@ -216,7 +216,7 @@ function mapbox_fit(bounds) {
   const hp = (rect.width > rect.height) ? 0 : (rect.width * 0.1);
   const vp = (rect.height > rect.width) ? 0 : (rect.height * 0.1);
 
-  ea_mapbox.fitBounds(bounds, { animate: false, padding: { top: vp, bottom: vp, left: hp, right: hp } });
+  MAPBOX.fitBounds(bounds, { animate: false, padding: { top: vp, bottom: vp, left: hp, right: hp } });
 
   const b = bounds;
 
@@ -225,5 +225,5 @@ function mapbox_fit(bounds) {
   const d = b[1];
   const u = b[3];
 
-  ea_mapbox.coords = [[l,u], [r,u], [r,d], [l,d]];
+  MAPBOX.coords = [[l,u], [r,u], [r,d], [l,d]];
 }

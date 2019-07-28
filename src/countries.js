@@ -461,8 +461,8 @@ function ea_countries_map_svg(svg, topofile, name, options) {
       const nw = projection.invert(et.invert([0,0]));
       const se = projection.invert(et.invert([width, height]));
 
-      if (typeof ea_mapbox !== 'undefined' && ea_mapbox !== null)
-        ea_mapbox.fitBounds([[nw[0], se[1]], [se[0], nw[1]]], { animate: false });
+      if (typeof MAPBOX !== 'undefined' && MAPBOX !== null)
+        MAPBOX.fitBounds([[nw[0], se[1]], [se[0], nw[1]]], { animate: false });
 
       map.attr("transform", et);
       mask.attr("transform", et);

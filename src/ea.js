@@ -19,7 +19,22 @@ function ea_analysis(list, type) {
 
   const it = new Float32Array(list[0] ? list[0].raster.data.length : 0).fill(-1);
 
-  list = list.filter(d => typeof d.scale_fn(type) === 'function');
+  // Get smart on the filters:
+  //
+  // - Disregard datasets which have no scale_fn (eg. boundaries).
+  // - Disregard datasets which are filters and use the entire domain (useless).
+  // - Place the filters first. This will return -1's sooner and make our loops faster.
+  //
+  list = list
+    .filter(d => {
+      if (typeof d.scale_fn(type) !== 'function') return false;
+
+      if (d.heatmap.scale === 'key-delta' &&
+          (d.domain[0] === d.heatmap.domain.min && d.domain[1] === d.heatmap.domain.max)) return false;
+
+      return true;
+    })
+    .sort((x,y) => x.heatmap.scale === "key-delta" ? -1 : 1);
 
   // Add up how much demand and supply datasets will account for. Then, just
   // below, these values will be split into 50-50 of the total analysis.

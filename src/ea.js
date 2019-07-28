@@ -72,10 +72,10 @@ function ea_analysis(list, type) {
 
   if (list.length === 1 && full_weight === 0) return it;
 
-  for (var i = 0; i < it.length; i++) {
+  for (var i = 0; i < it.length; i += 1) {
     let a = 0;
 
-    for (let j = 0; j < list.length; j++) {
+    for (let j = 0; j < list.length; j += 1) {
       let c = list[j];
 
       // For the rest of the datasets, we 'annihilate' points that are already
@@ -122,7 +122,7 @@ function ea_analysis(list, type) {
 
   var f = d3.scaleLinear().domain([min,max]).range([0,1]);
 
-  for (var i = 0; i < it.length; i++) {
+  for (var i = 0; i < it.length; i += 1) {
     const r = it[i];
     it[i] = (r === -1) ? -1 : f(r);
   }

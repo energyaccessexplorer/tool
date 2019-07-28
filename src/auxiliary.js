@@ -157,14 +157,14 @@ border-bottom: 1px solid lightgray;`
 
     let a = new Float32Array(raster.length).fill(-1);
 
-    for (var i = 0; i < raster.length; i++) {
+    for (var i = 0; i < raster.length; i += 1) {
       const r = raster[i];
       a[i] = (r === -1) ? -1 : f(r);
     }
 
     let groups = [0, 0, 0, 0, 0];
 
-    for (let i = 0; i < a.length; i++) {
+    for (let i = 0; i < a.length; i += 1) {
       let x = a[i];
       let v = p[i];
       let t = 0;
@@ -389,7 +389,7 @@ function hex_to_rgba(str) {
 function interval_index(v, arr, clamp) {
   // TODO: implement non-clamp?
   //
-  for (let i = 0; i < arr.length-1; i++) {
+  for (let i = 0; i < arr.length-1; i += 1) {
     if (v >= arr[i] && v <= arr[i+1]) return i;
   }
 

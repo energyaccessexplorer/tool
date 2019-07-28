@@ -11,7 +11,7 @@ async function ea_indexes_analyse(raster) {
 
   let f = d3.scaleQuantize().domain([0,1]).range(ea_color_scale.domain);
 
-  for (var i = 0; i < raster.length; i++) {
+  for (var i = 0; i < raster.length; i += 1) {
     const r = raster[i];
     a[i] = (r === -1) ? -1 : f(r);
   }
@@ -19,7 +19,7 @@ async function ea_indexes_analyse(raster) {
   let population_groups = [0, 0, 0, 0, 0];
   let area_groups = [0, 0, 0, 0, 0];
 
-  for (let i = 0; i < a.length; i++) {
+  for (let i = 0; i < a.length; i += 1) {
     let x = a[i];
     let v = p[i];
     let t = 0;

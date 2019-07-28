@@ -350,18 +350,6 @@ class dscontrols extends HTMLElement {
   init() {
     this.checkbox = ea_controls_checkbox.call(this);
 
-    this.dropdown = new dropdown([{
-      "content": "Dataset info",
-      "action": _ => ea_ui_dataset_modal(this.ds)
-    }, {
-      "content": "Toggle advanced controls",
-      "action": _ => {
-        if (!this.ds.active) this.activate();
-
-        qs('.advanced-controls', this).style.display = (this.show_advanced = !this.show_advanced) ? 'block' : 'none';
-      }
-    }])
-
     switch (this.ds.id) {
     case "ghi":
     case "poverty":
@@ -409,6 +397,24 @@ class dscontrols extends HTMLElement {
 
     if (this.ds.parent)
       this.range_group = ea_controls_range.call(this, (this.ds.parent.category.unit || 'percentage'));
+
+    const dropdownlist = [{
+      "content": "Dataset info",
+      "action": _ => ea_ui_dataset_modal(this.ds)
+    }];
+
+    if (this.weight_group) {
+      dropdownlist.push({
+        "content": "Toggle advanced controls",
+        "action": _ => {
+          if (!this.ds.active) this.activate();
+
+          qs('.advanced-controls', this).style.display = (this.show_advanced = !this.show_advanced) ? 'block' : 'none';
+        }
+      });
+    }
+
+    this.dropdown = new dropdown(dropdownlist)
   };
 
   render() {

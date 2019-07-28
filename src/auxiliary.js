@@ -122,7 +122,7 @@ function ea_canvas_plot(data, canvas, color_theme = 'ea') {
 async function ea_summary() {
   const pop = DS.get('population');
   await pop.load('heatmap');
-  const p = pop.raster;
+  const p = pop.raster.data;
 
   const content = ce('div');
 

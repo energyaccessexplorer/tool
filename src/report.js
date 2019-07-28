@@ -106,6 +106,8 @@ function ea_report() {
     await Promise.all(
       Object.keys(ea_indexes)
         .map(async (x,i) => {
+          if (!pies[i]) return;
+
           let t = await svg_canvas_data(pies[i], w, h);
           doc.addImage(t, "PNG", (i * (w + 10)) + lp, c, w, h);
         })

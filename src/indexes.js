@@ -45,10 +45,12 @@ async function ea_indexes_analyse(raster) {
   return {
     population: {
       total: ptotal,
+      amounts: population_groups,
       distribution: population_groups.reduce((a,b) => { a.push(b/ptotal); return a; }, [])
     },
     area: {
       total: atotal,
+      amounts: area_groups,
       distribution: area_groups.reduce((a,b) => { a.push(b/atotal); return a; }, [])
     }
   };

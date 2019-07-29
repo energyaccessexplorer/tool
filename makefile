@@ -73,6 +73,7 @@ build-tool:
 		${SRC}/nanny-steps.js \
 		${SRC}/report.js \
 		${SRC}/countries.js \
+		${SRC}/summary.js \
 		> ${DIST}/tool/main.js
 
 	@cat \

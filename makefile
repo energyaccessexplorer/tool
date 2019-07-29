@@ -24,7 +24,7 @@ LIB = ${DIST}/lib
 
 default: build
 
-build: build-tool build-countries build-select
+build: build-tool build-select
 
 start:
 	(cd ${DIST} && ${STATIC_SERVER}) &
@@ -72,7 +72,6 @@ build-tool:
 		${SRC}/mapbox.js \
 		${SRC}/nanny-steps.js \
 		${SRC}/report.js \
-		${SRC}/countries.js \
 		${SRC}/summary.js \
 		> ${DIST}/tool/main.js
 
@@ -88,32 +87,6 @@ build-tool:
 		> ${DIST}/tool/main.css
 
 	@cp ${SRC}/browser.js ${DIST}/tool/
-
-build-countries:
-	@echo "Building countries"
-	@mkdir -p ${DIST}/countries
-	@cp ${VIEWS}/countries.html ${DIST}/countries/index.html
-
-	@cat \
-		${LIB}/d3.js \
-		${LIB}/topojson.js \
-		${LIB}/flash.js \
-		${LIB}/modal.js \
-		> ${DIST}/countries/libs.js
-
-	@echo -n "const ea_settings = " | cat - \
-		settings.json \
-        ${SRC}/head.js \
-		${SRC}/svg.js \
-		${SRC}/ui.js \
-		${SRC}/countries.js \
-		> ${DIST}/countries/main.js
-
-	@cat \
-		${CSS}/countries.css \
-		${CSS}/maparea.css \
-		${CSS}/views.css \
-		> ${DIST}/countries/main.css
 
 build-select:
 	@echo "Building select"

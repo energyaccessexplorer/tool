@@ -206,6 +206,8 @@ function ea_svg_pie(data, outer, inner, colors, inner_text) {
   let g = svg.append("g")
       .attr("transform", `translate(${ svg.attr('width') / 2 }, ${ svg.attr('height') / 2 })`);
 
+  let n;
+
   let path = g
       .datum(data)
       .selectAll("path")
@@ -213,12 +215,9 @@ function ea_svg_pie(data, outer, inner, colors, inner_text) {
       .append("path")
       .attr("fill", (d,i) => colors[i])
       .attr("d", arc)
+      .on("mouseenter", function(d) { n = nanny.pick_element(this, { "title": (d.value * 100).toFixed(2) + "%", "message": "", "position": "W" }); })
+      .on("mouseleave", function(d) { if (n) n.remove(); })
       .each(function(d) { this._current = d });
-
-  const text = svg.append("text")
-        .attr("dy", ".35em")
-        .attr("font-size", `${ outer / 47 }em`)
-        .attr("class", "pie-center");
 
   function change(v) {
     let t = "";
@@ -230,29 +229,6 @@ function ea_svg_pie(data, outer, inner, colors, inner_text) {
       .transition()
       .duration(750)
       .attrTween("d", tween);
-
-    if (typeof inner_text === "string")
-      text.text(inner_text);
-
-    else if (typeof inner_text === "function")
-      text.text(inner_text(data, v));
-
-    else
-      text.text("");
-
-    try {
-      const box = text.node().getBBox();
-
-      const x = (outer - (box['width']  / 2));
-      const y = (outer + (box['height'] / 10));
-
-      text
-        .attr('transform', `translate(${ x }, ${ y })`);
-
-    } catch (e) {
-      console.log('due to a bug in FF... return.')
-      return;
-    }
   };
 
   function tween(a) {

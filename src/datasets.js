@@ -193,6 +193,7 @@ class DS {
       d.child_id = v;
       d.parent = this;
       d.config = {};
+      d.metadata = this.metadata;
 
       Object.assign(d.heatmap = {}, this.heatmap);
       d.heatmap.scale = "key-delta";

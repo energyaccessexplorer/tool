@@ -24,6 +24,8 @@ async function ea_indexes_analyse(raster) {
     let v = p[i];
     let t = 0;
 
+    if (v == nodata) continue;
+
     if (x >= 0   && x < 0.2) t = 0;
     else if (x >= 0.2 && x < 0.4) t = 1;
     else if (x >= 0.4 && x < 0.6) t = 2;

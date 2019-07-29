@@ -8,6 +8,10 @@ function ea_controls_tree() {
   const controls_el = qs('#controls-contents');
   const controls_tabs_el = qs('#controls-tabs');
 
+  let tab_all = null;
+  let tab_other = null;
+  let tab_filters = null;
+
   function create_branch(name) {
     const el = ce('div', null, { id: name, class: 'controls-branch' });
     return el;
@@ -26,6 +30,22 @@ function ea_controls_tree() {
     title.addEventListener('mouseup', e => elem_collapse(conel, el));
 
     return el;
+  };
+
+  function select_tab(tab, name) {
+    for (let e of qsa('.controls-branch-title', controls_tabs_el)) {
+      e.classList.remove('active');
+    }
+
+    for (let e of qsa('.controls-branch', controls_el)) {
+      let all = (name === 'all');
+      e.style.display = all ? '' : 'none';
+    }
+
+    tab.classList.add('active');
+
+    const b = qs('#' + name, controls_el);
+    if (b) b.style.display = 'block';
   };
 
   const tree = [{ "name": "all", "children": [] }];
@@ -55,29 +75,39 @@ function ea_controls_tree() {
 
   tree.forEach(a => {
     const tab = ce('div', a.name, { class: 'controls-branch-title' });
-    controls_tabs_el.append(tab);
 
-    tab.onclick = function() {
-      for (let e of qsa('.controls-branch-title', controls_tabs_el)) {
-        e.classList.remove('active');
-      }
+    tab.onclick = _ => select_tab(tab, a.name);
 
-      for (let e of qsa('.controls-branch', controls_el)) {
-        let all = (a.name === 'all');
-        e.style.display = all ? '' : 'none';
-      }
+    switch (a.name) {
+    case 'all':
+      tab_all = tab;
+      break;
 
-      tab.classList.add('active');
+    case 'filters':
+      tab_filters = tab;
+      break;
 
-      const b = qs('#' + a.name, controls_el);
-      if (b) b.style.display = 'block';
-    };
+    case 'other':
+      tab_other = tab;
+      break;
 
-    if (a.name === 'all') {
-      tab.classList.add('active');
-      controls_tabs_el.prepend(tab);
+    default:
+      controls_tabs_el.append(tab);
+      break;
     }
   });
+
+  // "filters" on top and activated.
+  //
+  if (tab_filters) {
+    controls_tabs_el.prepend(tab_filters);
+    select_tab(tab_filters, "filters");
+  }
+
+  // "all" and "other" at the bottom.
+  //
+  if (tab_other) controls_tabs_el.append(tab_other);
+  if (tab_all) controls_tabs_el.append(tab_all);
 };
 
 function ea_controls_checkbox() {

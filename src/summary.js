@@ -149,11 +149,10 @@ async function ea_summary_analyse(raster) {
     else if (x >= 0.6 && x < 0.8) t = 3;
     else if (x >= 0.8 && x <= 1)  t = 4;
 
-    if (v !== nodata)
-      population_groups[t] += v;
-
-    if (x !== -1)
+    if (x !== -1) {
       area_groups[t] += 1;
+      population_groups[t] += v;
+    }
   }
 
   const ptotal = population_groups.reduce((a,b) => a + b, 0)

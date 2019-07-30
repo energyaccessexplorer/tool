@@ -1,13 +1,145 @@
 function ea_report() {
-  const canvas = MAPBOX.getCanvas();
-  const r = canvas.width/canvas.height;
+  const canvas = qs('canvas#canvas-population');
+  const canvas_ratio = canvas.width/canvas.height;
 
-  async function svg_canvas_data(svg, width, height) {
-    let tmp_canvas = document.createElement('canvas');
-    tmp_canvas.width = width;
-    tmp_canvas.height = height;
+  let doc;
+  let page = {
+    padding: [50, 50, 30, 50],
+    width: 0,
+    height: 0,
+  };
 
-    let context = tmp_canvas.getContext("2d");
+  let lpad = page.padding[3];
+  let c;
+
+  const map_height = 100;
+  const pie_size = 90;
+  const font_size = 12;
+
+  const block_height = map_height + pie_size + (30 * 2) + 20 + 40;
+  let block_width;
+  let hhalf;
+
+  function reset_font() {
+    doc.setFont("helvetica");
+    doc.setFontType('normal');
+    doc.setFontSize(font_size);
+    doc.setTextColor("#393f44");
+  };
+
+  function add_page() {
+    doc.addPage();
+    c = page.padding[0];
+  };
+
+  function add_title(text, size) {
+    size = size || font_size + 2;
+
+    doc.setFont("helvetica");
+    doc.setFontType('normal');
+    doc.setTextColor("#00794C");
+    doc.setFontSize(size);
+
+    c += size + (size / 2);
+
+    doc.text(text, lpad, c);
+
+    c += size + (size / 2);
+
+    reset_font();
+  };
+
+  function add_right_title() {
+    doc.setFont("helvetica");
+    doc.setFontType('normal');
+    doc.setTextColor("#00794C");
+    doc.setFontSize(16);
+
+    doc.text("Energy Access Explorer", hhalf + 80, c);
+  };
+
+  function add_about() {
+    add_title("About");
+
+    doc.text(`
+Energy Access Explorer is a research initiative led by World Resources Institute.
+Partners and local stakeholders contribute to the development and update of
+the platform. To learn more about Energy Access Explorer or provide feedback,
+contact our team at energyaccessexplorer@wri.org.`, lpad, c);
+  };
+
+  function add_tables() {
+    const names = ['area', 'population'];
+    const tables = qsa('table.summary');
+
+    for (let i = 0; i < tables.length; i += 1) {
+      add_title(`Share of ${names[i]} for each category`);
+
+      if (tables[i]) doc.autoTable({
+        html: tables[i],
+        startY: c,
+        styles: { halign: "right" },
+        columnStyles: { 0: { halign: "left" } },
+        theme: "plain"
+      });
+
+      c += 120;
+    }
+
+    c += font_size * 2;
+  };
+
+  function add_indexes_infos() {
+    add_title("Geospatial Analytical Outputs");
+
+    for (let i in ea_indexes) {
+      let info = ea_indexes[i]['info'];
+      doc.text(info, lpad, c);
+      c += (info.split('\n').length * font_size) + font_size;
+    }
+
+    c += font_size;
+  };
+
+  function add_selected_datasets() {
+    add_title("Selected Datasets");
+
+    const dslist = DS.all.filter(d => d.active).map(d => {
+      let u = "";
+
+      if (d.category.unit) u = `<code>(${d.category.unit})</code>`;
+
+      if (d.multifilter) d.domain = [];
+
+      doc.fromHTML(`<li>${d.name} ${u} ${d.domain.join(' - ')} - Importance ${ d.weight }</li>`, lpad, c);
+      c += 16;
+    });
+
+    c += 10;
+  };
+
+  async function add_indexes_graphs() {
+    await add_title("Geospatial Analytical Outputs");
+
+    c += font_size;
+
+    const pies = qsa('#summary-graphs .index-graphs-container svg');
+
+    await images_block("eai", lpad, c, pies[0], pies[1]);
+    await images_block("ani", hhalf, c, pies[2], pies[3]);
+
+    c += font_size * 2;
+
+    await images_block("supply", lpad, c + block_height, pies[4], pies[5]);
+    await images_block("demand", hhalf, c + block_height, pies[6], pies[7]);
+  };
+
+  async function svg_png(svg, width, height) {
+    let tc = document.createElement('canvas');
+    tc.width = width;
+    tc.height = height;
+
+    let context = tc.getContext("2d");
     let i = 0;
 
     svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
@@ -26,92 +158,87 @@ function ea_report() {
     await load_image(url);
 
     context.drawImage(img, 0, 0, width, height);
-    const du = tmp_canvas.toDataURL("image/png");
+    const du = tc.toDataURL("image/png");
 
     URL.revokeObjectURL(url);
-    tmp_canvas.remove();
+    tc.remove();
 
     return du;
   };
 
-  async function gen_pdf() {
-    const doc = new jsPDF('p', 'pt', 'a4');
-    const lp = 10;
-    let c = 24;
-
-    function reset_font() {
-      doc.setFont("times");
-      doc.setFontType('normal');
-      doc.setFontSize(12);
-    };
-
-    reset_font();
-
-    // Title
-    //
+  async function images_block(indexname, x, y, p0, p1) {
     doc.setFont("helvetica");
-    doc.setFontType('bold');
-    doc.setFontSize(18);
-    doc.text(GEOGRAPHY.name, lp, c);
-    c += 6;
+    doc.setFontSize(font_size);
+    doc.setTextColor("#00794C");
 
-    // An image...
-    //
-    let s = 150;
-    doc.addImage(canvas.toDataURL("image/jpeg"), "JPEG", lp, c, s, s/r);
-    c += s/r;
+    doc.text(ea_indexes[indexname]['name'], x, y);
 
-    // List of datasets
-    //
-    reset_font();
+    const image_width = map_height * canvas_ratio;
 
-    const dslist = DS.all.filter(d => d.active).map(d => {
-      let u = "";
+    doc.addImage(qs('#canvas-' + indexname).toDataURL("image/jpeg"),
+                 "JPEG",
+                 x + (block_width/2) - (image_width/2),
+                 y += 20,
+                 image_width,
+                 map_height);
 
-      if (d.category.unit) u = `<code>(${d.category.unit})</code>`;
+    y += (map_height + 30) + 20;
 
-      // TODO: We should be showing a list of the children datasets and values
-      //
-      if (d.multifilter) d.domain = [];
+    await doc.addImage((await svg_png(p0, pie_size, pie_size)),
+                       "PNG",
+                       x + (block_width/4) - (pie_size/2),
+                       y,
+                       pie_size,
+                       pie_size);
 
-      doc.fromHTML(`<li> ${d.name} ${u} ${d.domain.join(' - ')}</li>`, lp, c, {});
-      c += 16;
-    });
+    await doc.addImage((await svg_png(p1, pie_size, pie_size)),
+                       "PNG",
+                       x + (3*block_width/4) - (pie_size/2),
+                       y,
+                       pie_size,
+                       pie_size);
 
-    c += 10;
+    y += pie_size + font_size;
 
-    // an HTML Table
-    //
-    doc.setFont("courier");
-    doc.setFontSize(10);
+    doc.setFontSize(font_size * (3/4));
+    doc.setTextColor("#919191");
 
-    const table = qs('table.summary.tab');
-    if (table) doc.autoTable({
-      html: 'table.summary.tab',
-      startY: c,
-      styles: {
-        cellPadding: 0.5,
-        fontSize: 8
-      }
-    });
-    c += 100;
+    doc.text("Population share", x, y);
+    doc.text("Area share", x + (block_width/2), y);
 
     reset_font();
+  };
 
-    const pies = qsa('.pie-svg-container svg');
+  async function gen_pdf() {
+    doc = new jsPDF('p', 'pt', 'a4');
+    c = page.padding[0];
 
-    let w = 120;
-    let h = 120;
+    const _page = jsPDF.getPageSize('p', 'pt', 'a4');
+    page.width = _page.width - (page.padding[1] + page.padding[3]);
+    page.height = _page.height - (page.padding[0] + page.padding[2]);
 
-    await Promise.all(
-      Object.keys(ea_indexes)
-        .map(async (x,i) => {
-          if (!pies[i]) return;
+    block_width = page.width / 2;
+    hhalf = (page.width/2) + page.padding[3]; // NOT _page.width/2, thinkg uneven paddings.
 
-          let t = await svg_canvas_data(pies[i], w, h);
-          doc.addImage(t, "PNG", (i * (w + 10)) + lp, c, w, h);
-        })
-    );
+    // START!
+
+    add_right_title();
+
+    add_title(GEOGRAPHY.name, 18);
+
+    await add_indexes_infos();
+
+    add_selected_datasets();
+
+    add_page();
+
+    await add_indexes_graphs();
+
+    add_page();
+
+    add_tables();
+
+    add_about();
 
     doc.save("report.pdf");
   };

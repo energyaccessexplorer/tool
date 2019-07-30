@@ -120,9 +120,12 @@ async function ea_summary() {
     this.innerText = ss ? "Summary Table" : "Summary Graphs";
   };
 
+  const report = ce('button', "Export PDF Report", { class: 'big-green-button' });
+  report.onclick = ea_report;
+
   content.append(graphs_tab, tables_tab);
 
-  const footer = ce('div', [switcher], { style: "text-align: center;" });
+  const footer = ce('div', [switcher, report], { style: "text-align: center;" });
 
   ea_modal.set({
     header: "Snapshot",

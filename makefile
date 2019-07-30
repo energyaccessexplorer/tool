@@ -84,6 +84,7 @@ build-tool:
 		${CSS}/views.css \
 		${CSS}/ripple.css \
 		${CSS}/svg.css \
+		${CSS}/summary.css \
 		> ${DIST}/tool/main.css
 
 	@cp ${SRC}/browser.js ${DIST}/tool/

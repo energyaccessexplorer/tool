@@ -208,6 +208,17 @@ function ea_svg_pie(data, outer, inner, colors, inner_text) {
 
   let n;
 
+  let outline;
+  if (data.every(a => isNaN(a[0]))) {
+    outline = svg.append('circle')
+      .attr('cx', width / 2)
+      .attr('cy', height / 2)
+      .attr('r', outer - (outer/15) - 1)
+      .attr('stroke', 'gray')
+      .attr('stroke-width', 1)
+      .attr('fill', 'none');
+  }
+
   let path = g
       .datum(data)
       .selectAll("path")

@@ -1,0 +1,40 @@
+#summary-button {
+  text-align: center;
+  font-size: 1.2em;
+  font-weight: bold;
+  text-transform: uppercase;
+  display: block;
+  white-space: nowrap;
+  padding: 0.7em 1em;
+  color: var(--the-green);
+  cursor: pointer;
+  background-color: var(--the-white);
+  border-top: 1px solid lightgray;
+  border-bottom: 1px solid lightgray;
+}
+
+#summary-graphs {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-around;
+  max-width: 800px;
+  color: var(--the-color);
+}
+
+.tab.hidden {
+  display: none !important;
+}
+
+table.summary td {
+  text-align: right;
+  padding: 3px 5px;
+}
+
+table.summary .index-name {
+  text-align: left;
+  font-family: without-serif, sans-serif;
+}
+
+#summary-graphs .index-group {
+  margin: 2em 0;
+}

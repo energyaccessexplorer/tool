@@ -64,7 +64,8 @@ async function ea_summary() {
             ]
           ]
         ]
-        ]
+        ],
+        [ ce('div', (summary[idxn]['area']['total'] === 0) ? "<code>(No datasets selected)</code>" : null, { style: "text-align: center; font-size: smaller;" }) ]
       ]]));
 
     ppie.change(0);

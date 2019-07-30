@@ -33,7 +33,8 @@ function ce(str, content, attrs = {}) {
   for (let o in attrs) el.setAttribute(o, attrs[o]);
 
   if (content instanceof Element) el.append(content);
-  else if (content) el.innerHTML = content;
+  else if (typeof content === 'string') el.innerHTML = content;
+  else if (Array.isArray(content) && content.every(x => x instanceof Element)) el.append(...content);
 
   return el;
 };

@@ -204,7 +204,7 @@ function ea_svg_pie(data, outer, inner, colors, inner_text) {
       .attr("height", height);
 
   let g = svg.append("g")
-      .attr("transform", `translate(${ svg.attr('width') / 2 }, ${ svg.attr('height') / 2 })`);
+      .attr("transform", `translate(${ width / 2 }, ${ height / 2 })`);
 
   let n;
 

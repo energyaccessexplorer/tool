@@ -79,11 +79,10 @@ a {
 
 .big-green-button {
   text-align: center;
-  margin: 1em auto;
+  margin: 1em;
   background-color: var(--the-green);
   color: white !important;
   text-decoration: none;
-  display: block;
   padding: 0.9em 1.3em;
 }
 
@@ -95,14 +94,13 @@ dialog main {
   height: fit-content;
   width: -webkit-fit-content;
   width: -moz-fit-content;
-  font-size: 1.2em;
   margin-top: 80px !important;
 }
 
 dialog header {
   padding: 1em;
   padding-left: 1.3em;
-  font-size: 1.1em;
+  font-size: 1.2em;
   background-color: var(--the-green);
   color: var(--the-white);
   position: relative;
@@ -157,9 +155,9 @@ aside.nanny-marker header {
 }
 
 @keyframes pulse {
-    0%   { opacity: 0.7; }
-    50%  { opacity: 1.0; }
-    100% { opacity: 0.7; }
+  0%   { opacity: 0.7; }
+  50%  { opacity: 1.0; }
+  100% { opacity: 0.7; }
 }
 
 .more-dropdown-ul {

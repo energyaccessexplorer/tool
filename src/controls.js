@@ -8,9 +8,8 @@ function ea_controls_tree() {
   const controls_el = qs('#controls-contents');
   const controls_tabs_el = qs('#controls-tabs');
 
-  let tab_all = null;
-  let tab_other = null;
   let tab_filters = null;
+  let tab_all = null;
 
   function create_branch(name) {
     const el = ce('div', null, { id: name, class: 'controls-branch' });
@@ -74,40 +73,28 @@ function ea_controls_tree() {
   }
 
   tree.forEach(a => {
-    const tab = ce('div', a.name, { class: 'controls-branch-title' });
+    const tab = ce('div', a.name, { id: 'controls-tab-' + a.name, class: 'controls-branch-title' });
 
     tab.onclick = _ => select_tab(tab, a.name);
 
-    switch (a.name) {
-    case 'all':
-      tab_all = tab;
-      break;
+    if (a.name === 'filters') tab_filters = tab;
+    else if (a.name === 'all') tab_all = tab;
 
-    case 'filters':
-      tab_filters = tab;
-      break;
-
-    case 'other':
-      tab_other = tab;
-      break;
-
-    default:
-      controls_tabs_el.append(tab);
-      break;
-    }
+    controls_tabs_el.append(tab);
   });
 
-  // "filters" on top and activated.
-  //
-  if (tab_filters) {
-    controls_tabs_el.prepend(tab_filters);
-    select_tab(tab_filters, "filters");
+  for (let t of ['filters', 'demand', 'supply'].reverse()) {
+    const tab = qs(`#controls-tab-${t}`, controls_tabs_el);
+    if (tab) controls_tabs_el.prepend(tab);
   }
 
-  // "all" and "other" at the bottom.
-  //
-  if (tab_other) controls_tabs_el.append(tab_other);
-  if (tab_all) controls_tabs_el.append(tab_all);
+  for (let t of ['other', 'all']) {
+    const tab = qs(`#controls-tab-${t}`, controls_tabs_el);
+    if (tab) controls_tabs_el.append(tab);
+  }
+
+  if (tab_filters) select_tab(tab_filters, "filters");
+  else if (tab_all) select_tab(tab_all, "all");
 };
 
 function ea_controls_checkbox() {

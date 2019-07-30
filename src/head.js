@@ -85,6 +85,45 @@ function attach(el) {
   return shadow;
 };
 
+function is_tree(t) {
+  return (t[0] instanceof Element) &&
+    (!t[1] || t[1] instanceof Array)
+};
+
+function el_tree(t) {
+  const head = t[0];
+  const tail = t[1];
+
+  if (t instanceof Element) return t;
+
+  if (!(head instanceof Element))
+    throw 'el_tree: head is not a Element.';
+
+  if (tail instanceof NodeList) {
+    head.append(...tail);
+    return head;
+  }
+
+  else if (tail instanceof Array) {
+    if (tail.every(e => e instanceof Element)) // allows [p, [c1, c2, c3]]
+      head.append(...tail);
+
+    else if (is_tree(tail))        // allows [p, [c, []]]
+      head.append(el_tree(tail));  //            ^---- a tree, not array of trees (the default)
+
+    else                           // asume array of trees. [p, [[c1, []], [c2, []]]]
+      tail.forEach(e => head.append(el_tree(e)));
+  }
+
+  else if (!t[1]) { }
+
+  else {
+    throw `el_tree: don't know what to do with ${typeof t[1]}, ${t[1]}`;
+  }
+
+  return t[0];
+};
+
 function slot(name, content) {
   let el = document.createElement('span');
   el.setAttribute('slot', name);

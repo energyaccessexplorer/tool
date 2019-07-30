@@ -3,3 +3,4 @@
 /dist
 /settings.json
 /postgrest.conf
+/extras.mk

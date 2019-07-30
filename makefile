@@ -159,3 +159,5 @@ else
 		-e 's%"mapbox_theme": "${MAPBOX_DEFAULT_THEME}",%"mapbox_theme": "",%' \
 		settings.json
 endif
+
+include extras.mk

@@ -462,7 +462,7 @@ function ea_svg_polygons_symbol() {
     .attr('fill', this.vectors.fill)
     .attr('fill-opacity', this.vectors.opacity)
     .attr('stroke', this.vectors.stroke)
-    .attr('stroke-width', this.vectors.width);
+    .attr('stroke-width', this.vectors.width - 1 || 1);
 
   return container.node();
 };

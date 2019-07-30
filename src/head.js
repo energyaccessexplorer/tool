@@ -153,3 +153,11 @@ function slot_populate(data, extra = {}) {
     qs(`[name=${k}]`, this).append(slot(k, extra[k]));
   }
 };
+
+function log() {
+  return console.log.apply(console, arguments);
+};
+
+function warn() {
+  return console.warn.apply(console, arguments);
+};

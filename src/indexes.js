@@ -20,9 +20,6 @@ async function ea_indexes_graphs(raster) {
 };
 
 function ea_indexes_init(state) {
-  const index_graphs = qs('#index-graphs');
-  const container = qs('.index-graphs-container', index_graphs);
-
   const scale = ce('div', null, { class: 'index-graphs-scale' });
   scale.append(
     ea_svg_color_steps(
@@ -53,14 +50,24 @@ function ea_indexes_init(state) {
   window.POPULATION_PIE = ea_svg_pie([[0], [0], [0], [0], [0]], 75, 0, ea_color_scale.stops, null);
   window.AREA_PIE = ea_svg_pie([[0], [0], [0], [0], [0]], 75, 0, ea_color_scale.stops, null);
 
-  const pe = ce('div', ce('div', "Population share"), { class: 'index-graphs-group' });
-  const ae = ce('div', ce('div', "Area share"), { class: 'index-graphs-group' });
-
-  pe.append(ce('div', null, { id: 'population-number', class: 'indexes-pie-label' }), POPULATION_PIE.svg);
-  ae.append(ce('div', null, { id: 'area-number', class: 'indexes-pie-label' }), AREA_PIE.svg);
-
-  container.append(ae, pe);
-  index_graphs.append(scale);
+  qs('#index-graphs').append(el_tree(
+    [ ce('div', null, { class: 'index-graphs-container' }), [
+      [ ce('div', ce('div', "Area share"), { class: 'index-graphs-group' }),
+        [
+          ce('div', null, { id: 'area-number', class: 'indexes-pie-label' }),
+          AREA_PIE.svg
+        ]
+      ],
+      [ ce('div', ce('div', "Population share"), { class: 'index-graphs-group' }),
+        [
+          ce('div', null, { id: 'population-number', class: 'indexes-pie-label' }),
+          POPULATION_PIE.svg
+        ]
+      ]
+    ],
+      scale
+    ]
+  ));
 };
 
 function ea_index_drawable(inputs, target) {

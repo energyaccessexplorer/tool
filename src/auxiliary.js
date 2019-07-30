@@ -207,9 +207,12 @@ function ea_coordinates_raster(coords, bounds, raster) {
 function table_pointer(dict, prop, event) {
   const t = document.createElement('table');
   dict.forEach(e => {
-    const tr = ce('tr');
-    tr.append(ce('td', ce('strong', e.target)), ce('td', prop[e.dataset]));
-    t.append(tr);
+    t.append(el_tree([
+      ce('tr'), [
+        ce('td', ce('strong', e.target)),
+        ce('td', prop[e.dataset])
+      ]
+    ]));
   });
 
   mapbox_pointer(t, event.originalEvent.pageX, event.originalEvent.pageY)

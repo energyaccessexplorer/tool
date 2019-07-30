@@ -56,9 +56,14 @@
   background-color: white;
 }
 
-#index-graphs-container {
+#indexes-pane .index-graphs-title {
+  padding: 0.7em 1em;
+  text-align: left;
+}
+
+.index-graphs-container {
   display: flex;
-  flex-flow: row wrap;
+  flex-flow: row nowrap;
   justify-content: space-around;
   text-align: center;
 }
@@ -76,12 +81,13 @@
   color: #919191;
 }
 
-#index-graphs-description {
-  font-size: 0.8em;
-  font-style: italic;
+.index-graphs-scale {
+  margin: 1em 2em;
 }
 
 #index-graphs-description {
+  font-size: 0.8em;
+  font-style: italic;
   text-align: center;
   padding: 1em 2em;
 }

@@ -24,7 +24,7 @@ a {
   background-color: var(--the-white) !important;
 }
 
-#index-graphs-title,
+.index-graphs-title,
 #views .view-name {
   font-weight: bold;
   text-transform: uppercase;
@@ -60,35 +60,6 @@ a {
   white-space: pre-line;
 }
 
-#summary-button {
-  text-align: center;
-  font-size: 1.2em;
-  font-weight: bold;
-  text-transform: uppercase;
-  display: block;
-  white-space: nowrap;
-  padding: 0.7em 1em;
-  color: var(--the-green);
-  cursor: pointer;
-  background-color: var(--the-white);
-  border-top: 1px solid lightgray;
-  border-bottom: 1px solid lightgray;
-}
-
-table.summary {
-  font-family: monospace;
-}
-
-table.summary td {
-  text-align: right;
-  padding: 3px 5px;
-}
-
-table.summary .index-name {
-  text-align: left;
-  font-family: without-serif, sans-serif;
-}
-
 .number-labels {
   display: flex;
   flex-flow: row nowrap;
@@ -104,16 +75,6 @@ table.summary .index-name {
 .number-labels > div {
   color: white;
   padding: 5px 7px;
-}
-
-#graphs {
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: center;
-}
-
-.tab.hidden {
-  display: none !important;
 }
 
 .big-green-button {

@@ -20,9 +20,10 @@ async function ea_indexes_graphs(raster) {
 };
 
 function ea_indexes_init(state) {
-  const index_graphs = qs('#index-graphs-container');
+  const index_graphs = qs('#index-graphs');
+  const container = qs('.index-graphs-container', index_graphs);
 
-  const scale = ce('div');
+  const scale = ce('div', null, { class: 'index-graphs-scale' });
   scale.append(
     ea_svg_color_steps(
       d3.scaleLinear()
@@ -58,7 +59,8 @@ function ea_indexes_init(state) {
   pe.append(ce('div', null, { id: 'population-number', class: 'indexes-pie-label' }), POPULATION_PIE.svg);
   ae.append(ce('div', null, { id: 'area-number', class: 'indexes-pie-label' }), AREA_PIE.svg);
 
-  index_graphs.append(ae, pe, scale);
+  container.append(ae, pe);
+  index_graphs.append(scale);
 };
 
 function ea_index_drawable(inputs, target) {

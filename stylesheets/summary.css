@@ -25,6 +25,11 @@
   display: none !important;
 }
 
+table.summary {
+  width: 100%;
+  margin: 1em auto 2em;
+}
+
 table.summary td {
   text-align: right;
   padding: 3px 5px;

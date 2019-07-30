@@ -15,18 +15,8 @@ async function ea_summary() {
 
   const content = ce('div');
 
-  content.append(
-    ce('div', "Share of population for each index and category", {
-      style: `
-text-transform: uppercase;
-margin: 0 -1.2em 1.2em -1.2em;
-padding-left: 1.2em;
-padding-bottom: 1.2em;
-border-bottom: 1px solid lightgray;`
-    }));
-
   let graphs;
-  const graphs_tab = ce('div', graphs = ce('div', null, { id: "graphs" }), { class: 'tab' });
+  const graphs_tab = ce('div', graphs = ce('div', null, { id: "summary-graphs" }), { class: 'tab' });
 
   const sizes = {
     "eai": 100,
@@ -39,6 +29,16 @@ border-bottom: 1px solid lightgray;`
 
   const nodata = pop.nodata;
 
+  const scale = ce('div');
+  scale.append(
+    ea_svg_color_steps(
+      d3.scaleLinear()
+        .domain(ea_color_scale.domain)
+        .range(ea_color_scale.stops)
+        .clamp(false),
+      ea_color_scale.domain),
+    tmpl("#ramp-label-low-high"));
+
   async function get_summaries(idxn) {
     let raster = ea_analysis(ea_list_filter_type(idxn), idxn);
 
@@ -47,17 +47,28 @@ border-bottom: 1px solid lightgray;`
     let ppie = ea_svg_pie(summary[idxn]['population']['distribution'].map(x => [x]), 75, 0, ea_color_scale.stops, null);
     let apie = ea_svg_pie(summary[idxn]['area']['distribution'].map(x => [x]), 75, 0, ea_color_scale.stops, null);
 
-    let e = ce('div', null, { style: "text-align: center; margin: 0 1em;" });
-    const container = ce('div', null, { class: 'pie-svg-container' });
-
-    e.append(container, ce('div', ea_indexes[idxn]['name']));
+    graphs.append(el_tree(
+      [ ce('div', null, { class: 'index-group' }), [
+        [ ce('div', ea_indexes[idxn]['name'], { class: 'index-graphs-title' }) ],
+        [ ce('div', null, { class: 'index-graphs-container' }), [
+          [ ce('div', null, { class: 'index-graphs-group' }),
+            [
+              ce('div', "Area share"),
+              apie.svg
+            ]
+          ],
+          [ ce('div', null, { class: 'index-graphs-group' }),
+            [
+              ce('div', "Population share"),
+              ppie.svg
+            ]
+          ]
+        ]
+        ]
+      ]]));
 
     ppie.change(0);
     apie.change(0);
-
-    container.append(ppie.svg, apie.svg);
-
-    graphs.append(e);
 
     const c = qs('#canvas-' + idxn) || ce('canvas', null, { id: 'canvas-' + idxn});
     c.style.display = 'none';
@@ -68,27 +79,32 @@ border-bottom: 1px solid lightgray;`
 
   await Promise.all(Object.keys(ea_indexes).map(i => get_summaries(i)));
 
-  console.log(summary);
+  graphs.append(ce('div', scale.cloneNode(true), { class: "index-graphs-scale" }));
 
   const s = ea_color_scale.stops;
 
   const i20 = i => (20 * i) + "-" + (20 * (i+1));
 
-  const legend = ce('div', null, { class: 'number-labels' });
-  s.forEach((x,i) => legend.append(ce('div', i20(i), { style: `background-color: ${x};`})));
+  const tables_tab = ce('div', null, { class: 'tab hidden' });
 
-  const table = ce('table', null, { class: 'summary tab hidden' });
-  let thead, tbody, thr;
+  for (let j of ['area', 'population']) {
+    const table = ce('table', null, { class: 'summary' });
+    let thead, tbody, thr;
 
-  table.append(thead = ce('thead'), tbody = ce('tbody'));
-  thead.append(thr = ce('tr', ce('th'), { class: 'number-labels-row' }));
-  s.forEach((x,i) => thr.append(ce('th', i20(i), { style: `background-color: ${x};`})));
+    const title = ce('div', `${j} share`, { class: 'index-graphs-title' });
 
-  for (var k in summary) {
-    let tr = ce('tr', ce('td', ea_indexes[k]['name'], { class: 'index-name' }));
-    s.forEach((x,i) => tr.append(ce('td', (summary[k]['population']['amounts'][i]).toLocaleString())));
+    table.append(thead = ce('thead'), tbody = ce('tbody'));
+    thead.append(thr = ce('tr', ce('th'), { class: 'number-labels-row' }));
+    s.forEach((x,i) => thr.append(ce('th', i20(i), { style: `background-color: ${x};`})));
 
-    tbody.append(tr);
+    for (var k in summary) {
+      let tr = ce('tr', ce('td', ea_indexes[k]['name'], { class: 'index-name' }));
+      s.forEach((x,i) => tr.append(ce('td', (summary[k][j]['amounts'][i]).toLocaleString())));
+
+      tbody.append(tr);
+    }
+
+    tables_tab.append(title, table);
   }
 
   let ss = true;
@@ -96,21 +112,22 @@ border-bottom: 1px solid lightgray;`
   const switcher = ce('button', "Summary Table", { class: 'big-green-button' });
   switcher.onclick = function() {
     ss = !ss;
-    for (let e of qsa('.tab', content))
-      e.classList.toggle('hidden');
+
+    graphs_tab.classList.toggle('hidden');
+    tables_tab.classList.toggle('hidden');
+
     this.innerText = ss ? "Summary Table" : "Summary Graphs";
   };
 
-  graphs_tab.append(legend);
-  content.append(graphs_tab, table);
+  content.append(graphs_tab, tables_tab);
+
+  const footer = ce('div', [switcher], { style: "text-align: center;" });
 
   ea_modal.set({
     header: "Snapshot",
     content: content,
-    footer: switcher
+    footer: footer
   }).show();
-
-  ea_report();
 
   return content;
 };

@@ -150,11 +150,6 @@ svg#svg-map {
   z-index: 0;
 }
 
-#index-graphs-title {
-  padding: 0.7em 1em;
-  text-align: left;
-}
-
 #canvas-output-select {
   display: block;
   padding: 0.7em 1em;

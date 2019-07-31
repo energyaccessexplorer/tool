@@ -110,35 +110,7 @@ function mapbox_theme_pick(theme) {
   });
 };
 
-function mapbox_canvas() {
-  if (!MAPBOX.getSource('output-source'))
-    MAPBOX.addSource('output-source', {
-      "type": 'canvas',
-      "canvas": 'output',
-      "animate": false,
-      "coordinates": MAPBOX.coords
-    });
-
-  const c = MAPBOX.getStyle().layers.find(l => l.type === 'symbol');
-
-  MAPBOX.first_symbol = ((c && c.id) || undefined);
-
-  if (!MAPBOX.getLayer('output-layer')) {
-    MAPBOX.addLayer({
-      "id": 'output-layer',
-      "source": 'output-source',
-      "type": 'raster',
-      "layout": {
-        "visibility": "none",
-      },
-      "paint": {
-        "raster-resampling": "nearest",
-      }
-    }, MAPBOX.first_symbol);
-  }
-};
-
-function mapbox_setup(bounds) {
+function mapbox_setup() {
   mapboxgl.accessToken = ea_settings.mapbox_token;
 
   const mb = new mapboxgl.Map({
@@ -164,12 +136,37 @@ function mapbox_setup(bounds) {
     caller: "mapbox mouseup"
   }));
 
-  return (MAPBOX = mb);
+  return mb;
 };
 
 function mapbox_change_theme(theme) {
-  const it = _ => {
-    mapbox_canvas();
+  const set_output = _ => {
+    if (!MAPBOX.getSource('output-source')) {
+      MAPBOX.addSource('output-source', {
+        "type": 'canvas',
+        "canvas": 'output',
+        "animate": false,
+        "coordinates": MAPBOX.coords
+      });
+    }
+
+    const c = MAPBOX.getStyle().layers.find(l => l.type === 'symbol');
+
+    MAPBOX.first_symbol = ((c && c.id) || undefined);
+
+    if (!MAPBOX.getLayer('output-layer')) {
+      MAPBOX.addLayer({
+        "id": 'output-layer',
+        "source": 'output-source',
+        "type": 'raster',
+        "layout": {
+          "visibility": "none",
+        },
+        "paint": {
+          "raster-resampling": "nearest",
+        }
+      }, MAPBOX.first_symbol);
+    }
 
     ea_overlord({
       type: "refresh",
@@ -177,10 +174,10 @@ function mapbox_change_theme(theme) {
     });
   };
 
-  MAPBOX.once('style.load', it);
+  MAPBOX.once('style.load', set_output);
   MAPBOX.setStyle(mapbox_theme_pick(ea_settings.mapbox_theme = theme));
 
-  if (theme === "") it();
+  if (theme === "") set_output();
 };
 
 function mapbox_pointer(content, x, y) {
@@ -226,4 +223,4 @@ function mapbox_fit(bounds) {
   const u = b[3];
 
   MAPBOX.coords = [[l,u], [r,u], [r,d], [l,d]];
-}
+};

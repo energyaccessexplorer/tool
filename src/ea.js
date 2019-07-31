@@ -189,30 +189,31 @@ async function ea_overlord(msg) {
   case "init": {
     const id = location.get_query_param('id');
 
-    GEOGRAPHY = await ea_client(`${ea_settings.database}/geographies?id=eq.${id}`, 'GET', 1);
-    MAPBOX = null;
-
     ea_ui_layout();
-    ea_ui_views_init();
-    mapbox_setup();
 
-    await ea_datasets_list_init(GEOGRAPHY.id, state.inputs, state.preset);
+    GEOGRAPHY = await ea_client(`${ea_settings.database}/geographies?id=eq.${id}`, 'GET', 1);
+    MAPBOX = mapbox_setup();
 
-    await ea_boundaries_init.call(DS.get('boundaries'));
+    await ea_datasets_list_init(GEOGRAPHY.id, state.inputs, state.preset, bounds => mapbox_fit(bounds));
 
     const a = DS.all
-          .filter(t => t.active)
-          .map(x => x.id)
+          .map(d => {
+            d.input_el = new dsinput(d);
+            d.controls_el = new dscontrols(d);
+            return d;
+          })
+          .filter(d => d.active)
+          .map(d => d.id)
           .sort((x,y) => (state.inputs.indexOf(x) < state.inputs.indexOf(y)) ? -1 : 1);
 
     state.set_inputs_param(a);
 
+    ea_ui_views_init();
     ea_inputs_init();
     ea_indexes_init(state);
     ea_controls_init(state);
     ea_nanny_init(state);
 
-    await Promise.all(a.map(i => DS.get(i).load()));
     mapbox_change_theme(ea_settings.mapbox_theme);
 
     ea_ui_app_loading(false);
@@ -225,15 +226,14 @@ async function ea_overlord(msg) {
 
     state.set_mode_param(t);
 
+    await Promise.all(state.inputs.map(id => DS.get(id).turn(true, (t === 'inputs'))));
+
     if (t === "outputs") {
       ea_indexes_list(state);
 
       ea_plot_active_analysis(state.output)
         .then(raster => ea_indexes_graphs(raster))
-        .then(_ => {
-          DS.all.forEach(d => d.visible(false));
-          MAPBOX.setLayoutProperty('output-layer', 'visibility', 'visible');
-        });
+        .then(_ => MAPBOX.setLayoutProperty('output-layer', 'visibility', 'visible'));
     }
 
     else if (t === "inputs") {
@@ -241,8 +241,6 @@ async function ea_overlord(msg) {
         MAPBOX.setLayoutProperty('output-layer', 'visibility', 'none');
 
       ea_inputs(state.inputs);
-
-      await Promise.all(state.inputs.map(id => DS.get(id).turn(true, true)));
 
       ea_inputs_sort(state.inputs);
     }

@@ -160,27 +160,13 @@ class DS {
     if (!this.collection) throw `${this.id} is not a collection. Bye.`
   };
 
-  async multifilter_init() {
+  async multifilter_init(inputs) {
     if (!this.csv) return;
 
     await this.csv.parse.call(this);
     await this.heatmap.parse.call(this);
     await this.vectors.parse.call(this);
 
-    const cso = this.config.polygons[Object.keys(this.csv.options)[0]];
-
-    let cs = this.vectors.color_stops;
-    if (!cs || !cs.length) cs = this.vectors.color_stops = ea_color_scale.stops;
-
-    const min = Math.min.apply(null, this.features.features.map(f => f.properties[cso]));
-    const max = Math.max.apply(null, this.features.features.map(f => f.properties[cso]));
-
-    const f = max <= 1 ? 1 : 100;
-    const d = Array(cs.length).fill(0).map((x,i) => (0 + i * (f/(cs.length-1))));
-    const s = d3.scaleLinear().domain(d).range(cs);
-
-    this.color_scale_fn = s;
-    this.scale_stops = d;
     const features_json = JSON.stringify(this.features);
 
     for (let v in this.csv.options) {
@@ -204,15 +190,33 @@ class DS {
       Object.assign(d.features = {}, JSON.parse(features_json));
 
       Object.assign(d.csv = {}, this.csv);
-      d.table = this.table.map(r => r[v]);
 
-      d.init(this.active, null);
+      await d.init(inputs.includes(d.id), null);
 
-      d.input_el = new dsinput(d);
-      d.controls_el = new dscontrols(d);
-
-      let src; if (src = MAPBOX.getSource(d.id)) { src.setData(d.features); }
+      d.singlefilter_init();
     }
+  };
+
+  async singlefilter_init() {
+    let o = this.parent.config.polygons[this.child_id];
+    let cs = this.vectors.color_stops;
+
+    let max = Math.max.apply(null, this.features.features.map(f => f.properties[o]));
+    max = (max <= 1) ? 1 : 100;
+
+    const d = Array(cs.length).fill(0).map((x,i) => (0 + i * (max/(cs.length-1))));
+    const s = d3.scaleLinear().domain(d).range(cs);
+
+    this.color_scale_fn = s;
+    this.scale_stops = d;
+
+    const fs = this.features.features;
+    for (let i = 0; i < fs.length; i += 1)
+      fs[i].properties.__color = s(fs[i].properties[o])
+
+    this.table = this.parent.table.map(r => r[this.child_id]);
+
+    let src; if (src = MAPBOX.getSource(this.id)) { src.setData(this.features); }
   };
 
   /*
@@ -354,14 +358,27 @@ window.__dstable = {};
  * returns DS[]
  */
 
-async function ea_datasets_list_init(id, inputs, preset) {
+async function ea_datasets_list_init(id, inputs, preset, callback) {
   let attrs = '*,heatmap_file(*),vectors_file(*),csv_file(*),category(*)';
+
+  let boundaries;
 
   await ea_client(`${ea_settings.database}/datasets?geography_id=eq.${id}&select=${attrs}`)
     .then(r => r.map(e => {
       let active = (inputs.includes(e.category.name));
-
       let ds = new DS(e);
+
+      if (ds.id === 'boundaries') (async _ => {
+        boundaries = ds;
+
+        ds.active = true;
+
+        await ds.load('vectors');
+        await ds.load('heatmap');
+
+        bounds = ds.vectors.bounds;
+      })();
+
       ds.init(active, preset);
     }));
 
@@ -370,14 +387,10 @@ async function ea_datasets_list_init(id, inputs, preset) {
   //
   DS.all.filter(d => d.mutant).forEach(d => d.mutant_init());
   DS.all.filter(d => d.collection).forEach(d => d.collection_init());
-  DS.all.filter(d => d.multifilter).forEach(d => d.multifilter_init());
 
-  DS.all.forEach(d => {
-    d.input_el = new dsinput(d);
-    d.controls_el = new dscontrols(d);
-  });
+  await Promise.all(DS.all.filter(d => d.multifilter).map(d => d.multifilter_init(inputs)));
 
-  return DS.all;
+  callback(boundaries.vectors.bounds);
 };
 
 function ea_datasets_color_scale() {
@@ -668,11 +681,6 @@ async function ea_datasets_lines() {
 async function ea_datasets_polygons() {
   return ea_datasets_geojson.call(this, _ => {
     if (!MAPBOX.getSource(this.id)) {
-      if (this.parent) {
-        const p = this.parent.config.polygons[this.child_id];
-        this.features.features.forEach(f => f.properties.__color = this.parent.color_scale_fn(f.properties[p]));
-      }
-
       MAPBOX.addSource(this.id, {
         "type": "geojson",
         "data": this.features

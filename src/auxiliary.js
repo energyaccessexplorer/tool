@@ -288,12 +288,5 @@ Please report this to energyaccessexplorer@wri.org.
     throw `Geography is missing a 'boundaries' dataset.`;
   }
 
-  this.active = true;
-
-  await this.load('vectors');
-  await this.load('heatmap');
-
-  mapbox_fit(DS.get('boundaries').vectors.bounds);
-
   return true;
 };

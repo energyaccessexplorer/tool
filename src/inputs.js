@@ -135,8 +135,6 @@ class dsinput extends HTMLElement {
         cs = ea_svg_color_steps(d.parent.color_scale_fn, d.parent.scale_stops);
     }
 
-    if (!cs) console.log("No color_scale_svg for", d.id);
-
     switch (d.datatype) {
     case 'points':
       e = ea_svg_points_symbol.call(d);

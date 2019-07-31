@@ -181,6 +181,7 @@ class DS {
 
     this.color_scale_fn = s;
     this.scale_stops = d;
+    const features_json = JSON.stringify(this.features);
 
     for (let v in this.csv.options) {
       // we can do this because category is plain JSON, not javascript.
@@ -199,9 +200,8 @@ class DS {
       d.heatmap.scale = "key-delta";
 
       Object.assign(d.raster = {}, this.raster);
-
       Object.assign(d.vectors = {}, this.vectors);
-      Object.assign(d.features = {}, this.features);
+      Object.assign(d.features = {}, JSON.parse(features_json));
 
       Object.assign(d.csv = {}, this.csv);
       d.table = this.table.map(r => r[v]);
@@ -572,14 +572,13 @@ async function ea_datasets_tiff() {
         nodata: parseFloat(tiff.fileDirectories[0][0].GDAL_NODATA)
       };
 
-      let c = document.createElement('canvas');
-      c.id = `canvas-${this.id}`;
-      c.style.display = 'none';
+      let canvas = qs(`#canvas-${this.id}`) ||
+          ce('canvas', null, { id: `canvas-${this.id}`, style: "display: none;" });
 
-      document.body.append(c);
+      document.body.append(canvas);
 
       if (MAPBOX) {
-        draw.call(this, c);
+        draw.call(this, canvas);
       }
     }
 

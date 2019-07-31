@@ -376,6 +376,8 @@ async function ea_overlord(msg) {
         const i = state.inputs[0];
         t = DS.get(i);
 
+        if (!t) return;
+
         if (t.features) {
           const et = MAPBOX.queryRenderedFeatures(e.point)[0];
           if (!et) return;

@@ -1,100 +1,44 @@
 function ea_controls_init(state) {
   ea_controls_selectlist();
   ea_controls_presets_init(state.preset);
-  ea_controls_tree();
-};
 
-function ea_controls_tree() {
   const controls_el = qs('#controls-contents');
   const controls_tabs_el = qs('#controls-tabs');
+  const tab_all = ce('div', "all", { id: 'controls-tab-all', class: 'controls-branch-title' });
 
-  let tab_filters = null;
-  let tab_all = null;
+  controls_tabs_el.append(tab_all);
 
-  function create_branch(name) {
-    const el = ce('div', null, { id: name, class: 'controls-branch' });
-    return el;
-  };
-
-  function create_subbranch(name) {
-    let conel, title;
-    const el = ce('div', null, { id: name, class: 'controls-subbranch' });
-
-    el.append(
-      title = ce('div', (ea_branch_dict[name] || name), { class: 'controls-subbranch-title' }),
-      conel = ce('div', null, { class: 'controls-container' })
-    );
-
-    title.prepend(ce('span', ea_ui_collapse_triangle('s'), { class: 'collapse triangle' }));
-    title.addEventListener('mouseup', e => elem_collapse(conel, el));
-
-    return el;
-  };
-
-  function select_tab(tab, name) {
-    for (let e of qsa('.controls-branch-title', controls_tabs_el)) {
+  tab_all.onclick = function() {
+    for (let e of qsa('.controls-branch-title', controls_tabs_el))
       e.classList.remove('active');
-    }
 
-    for (let e of qsa('.controls-branch', controls_el)) {
-      let all = (name === 'all');
-      e.style.display = all ? '' : 'none';
-    }
+    for (let e of qsa('.controls-branch', controls_el))
+      e.style.display = '';
 
-    tab.classList.add('active');
-
-    const b = qs('#' + name, controls_el);
-    if (b) b.style.display = 'block';
+    tab_all.classList.add('active');
   };
 
-  const tree = [{ "name": "all", "children": [] }];
+  const tab_filters = qs('#controls-tab-filters', controls_tabs_el);
+  if (tab_filters) ea_controls_select_tab(tab_filters, "filters");
+  else ea_controls_select_tab(tab_all, "all");
+};
 
-  for (let d of DS.all) {
-    let path = d.category.configuration.path;
-    if (!path.length) continue;
-    if (d.multifilter) continue;
+function ea_controls_select_tab(tab, name) {
+  const controls_tabs_el = qs('#controls-tabs');
+  const controls_el = qs('#controls-contents');
 
-    let b = qs(`#${path[0]}.controls-branch`, controls_el);
-    if (!b) {
-      b = create_branch(path[0]);
-      tree.push({ "name": path[0], "children": [] });
-    }
-    controls_el.append(b);
+  for (let e of qsa('.controls-branch-title', controls_tabs_el))
+    e.classList.remove('active');
 
-    let sb = qs(`#${path[1]}.controls-subbranch`, b);
-    if (!sb) {
-      sb = create_subbranch(path[1]);
-      tree.find(t => t.name === path[0])['children'].push(path[1]);
-    }
-    b.append(sb);
-
-    const container = qs('.controls-container', sb);
-    if (container) container.append(d.controls_el);
+  for (let e of qsa('.controls-branch', controls_el)) {
+    let all = (name === 'all');
+    e.style.display = all ? '' : 'none';
   }
 
-  tree.forEach(a => {
-    const tab = ce('div', a.name, { id: 'controls-tab-' + a.name, class: 'controls-branch-title' });
+  tab.classList.add('active');
 
-    tab.onclick = _ => select_tab(tab, a.name);
-
-    if (a.name === 'filters') tab_filters = tab;
-    else if (a.name === 'all') tab_all = tab;
-
-    controls_tabs_el.append(tab);
-  });
-
-  for (let t of ['filters', 'demand', 'supply'].reverse()) {
-    const tab = qs(`#controls-tab-${t}`, controls_tabs_el);
-    if (tab) controls_tabs_el.prepend(tab);
-  }
-
-  for (let t of ['other', 'all']) {
-    const tab = qs(`#controls-tab-${t}`, controls_tabs_el);
-    if (tab) controls_tabs_el.append(tab);
-  }
-
-  if (tab_filters) select_tab(tab_filters, "filters");
-  else if (tab_all) select_tab(tab_all, "all");
+  const b = qs('#' + name, controls_el);
+  if (b) b.style.display = 'block';
 };
 
 function ea_controls_checkbox() {
@@ -449,6 +393,8 @@ class dscontrols extends HTMLElement {
 
     if (!this.weight_group && !this.range_group) this.content.remove();
 
+    this.inject();
+
     return this;
   };
 
@@ -459,6 +405,58 @@ class dscontrols extends HTMLElement {
   turn(t) {
     this.content.style.display = t ? '' : 'none';
     this.checkbox.change(t);
+  };
+
+  inject() {
+    const ds = this.ds;
+    const path = ds.category.configuration.path;
+
+    if (!path.length) return;
+    if (ds.multifilter) return;
+
+    const controls_el = qs('#controls-contents');
+    const controls_tabs_el = qs('#controls-tabs');
+
+    function create_tab(name) {
+      return ce('div', name, { id: 'controls-tab-' + name, class: 'controls-branch-title' });
+    };
+
+    function create_branch(name) {
+      return ce('div', null, { id: name, class: 'controls-branch' });
+    };
+
+    function create_subbranch(name) {
+      let conel, title;
+      const el = ce('div', null, { id: name, class: 'controls-subbranch' });
+
+      el.append(
+        title = ce('div', (ea_branch_dict[name] || name), { class: 'controls-subbranch-title' }),
+        conel = ce('div', null, { class: 'controls-container' })
+      );
+
+      title.prepend(ce('span', ea_ui_collapse_triangle('s'), { class: 'collapse triangle' }));
+      title.addEventListener('mouseup', e => elem_collapse(conel, el));
+
+      return el;
+    };
+
+    let t = qs(`#controls-tab-${path[0]}.controls-branch-title`);
+    if (!t) {
+      t = create_tab(path[0]);
+      t.onclick = _ => ea_controls_select_tab(t, path[0]);
+      controls_tabs_el.append(t);
+    }
+
+    let b = qs(`#${path[0]}.controls-branch`, controls_el);
+    if (!b) b = create_branch(path[0]);
+    controls_el.append(b);
+
+    let sb = qs(`#${path[1]}.controls-subbranch`, b);
+    if (!sb) sb = create_subbranch(path[1]);
+    b.append(sb);
+
+    const container = qs('.controls-container', sb);
+    if (container) container.append(this);
   };
 }
 

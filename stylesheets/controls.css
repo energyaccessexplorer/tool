@@ -10,6 +10,8 @@
 #controls-tabs {
   height: 100%;
   z-index: 0;
+  display: flex;
+  flex-flow: column nowrap;
 }
 
 #controls-contents {
@@ -190,4 +192,24 @@ select#controls-preset {
 select#controls-preset option {
   background-color: var(--the-white);
   color: var(--the-color);
+}
+
+#controls-tab-filters {
+  order: 1;
+}
+
+#controls-tab-demand {
+  order: 2;
+}
+
+#controls-tab-supply {
+  order: 4;
+}
+
+#controls-tab-other {
+  order: 32;
+}
+
+#controls-tab-all {
+  order: 32;
 }

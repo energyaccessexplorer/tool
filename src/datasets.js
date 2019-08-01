@@ -345,7 +345,7 @@ class DS {
 window.__dstable = {};
 
 /*
- * ea_datasets_list_init
+ * ea_datasets_init
  *
  * 1. fetch the datasets list from the API
  * 2. generate DS objects
@@ -358,7 +358,7 @@ window.__dstable = {};
  * returns DS[]
  */
 
-async function ea_datasets_list_init(id, inputs, preset, callback) {
+async function ea_datasets_init(id, inputs, preset, callback) {
   let attrs = '*,heatmap_file(*),vectors_file(*),csv_file(*),category(*)';
 
   let boundaries;
@@ -376,7 +376,7 @@ async function ea_datasets_list_init(id, inputs, preset, callback) {
         await ds.load('vectors');
         await ds.load('heatmap');
 
-        bounds = ds.vectors.bounds;
+        callback(ds.vectors.bounds);
       })();
 
       ds.init(active, preset);
@@ -388,9 +388,10 @@ async function ea_datasets_list_init(id, inputs, preset, callback) {
   DS.all.filter(d => d.mutant).forEach(d => d.mutant_init());
   DS.all.filter(d => d.collection).forEach(d => d.collection_init());
 
+  // multifilters generate new datasets. We need to wait for these sinces
+  // the next step is to syncronise the entire thing.
+  //
   await Promise.all(DS.all.filter(d => d.multifilter).map(d => d.multifilter_init(inputs)));
-
-  callback(boundaries.vectors.bounds);
 };
 
 function ea_datasets_color_scale() {
@@ -484,8 +485,9 @@ async function ea_datasets_geojson(callback) {
           console.warn(`geojsonExtent failed for '${this.id}'. This is not fatal. Here's the error:`, r);
           console.warn(err);
         }
-        callback();
       });
+
+    callback();
   }
 
   return this;

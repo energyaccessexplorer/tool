@@ -194,7 +194,10 @@ async function ea_overlord(msg) {
     GEOGRAPHY = await ea_client(`${ea_settings.database}/geographies?id=eq.${id}`, 'GET', 1);
     MAPBOX = mapbox_setup();
 
-    await ea_datasets_list_init(GEOGRAPHY.id, state.inputs, state.preset, bounds => mapbox_fit(bounds));
+    await ea_datasets_init(GEOGRAPHY.id, state.inputs, state.preset, bounds => {
+      mapbox_fit(bounds);
+      mapbox_change_theme(ea_settings.mapbox_theme);
+    });
 
     const a = DS.all
           .map(d => {
@@ -213,8 +216,6 @@ async function ea_overlord(msg) {
     ea_indexes_init(state);
     ea_controls_init(state);
     ea_nanny_init(state);
-
-    mapbox_change_theme(ea_settings.mapbox_theme);
 
     ea_ui_app_loading(false);
 

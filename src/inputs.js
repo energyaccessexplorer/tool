@@ -166,7 +166,7 @@ class dsinput extends HTMLElement {
         let x = DS.get(i);
         let li = ce('li');
 
-        li.append(x.input_el.svg(), ce('div', x.name, { class: 'subheader' }));
+        li.append(x.input_el.svg_el, ce('div', x.name, { class: 'subheader' }));
         el.append(li);
       }
 

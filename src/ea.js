@@ -201,8 +201,10 @@ async function ea_overlord(msg) {
 
     const a = DS.all
           .map(d => {
-            d.input_el = new dsinput(d);
-            d.controls_el = new dscontrols(d);
+            // dsinput and dscontrols might have already been created by collection_init
+            //
+            d.input_el = d.input_el || new dsinput(d);
+            d.controls_el = d.controls_el || new dscontrols(d);
             return d;
           })
           .filter(d => d.active)

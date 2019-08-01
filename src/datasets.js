@@ -157,7 +157,10 @@ class DS {
   };
 
   collection_init() {
-    if (!this.collection) throw `${this.id} is not a collection. Bye.`
+    for (let i of this.config.collection) {
+      const d = DS.get(i);
+      d.input_el = d.input_el || new dsinput(d);
+    }
   };
 
   async multifilter_init(inputs) {

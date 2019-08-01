@@ -87,7 +87,7 @@ class DS {
 
   init(active, preset) {
     let presetsempty = Object.keys(this.presets).length === 0;
-    let p = this.presets[preset]
+    let p = this.presets[preset];
 
     if (!presetsempty && p) {
       this.weight = p.weight;
@@ -98,10 +98,10 @@ class DS {
     this.datatype = (_ => {
       let t = null;
 
-      if (this.vectors) t = this.vectors.shape_type;
-      else if (this.heatmap) t = "raster";
+      if (this.mutant) t = null;
+      else if (this.vectors) t = this.vectors.shape_type;
       else if (this.parent) t = this.parent.datatype;
-      else if (this.mutant) t = "mutant";
+      else if (this.heatmap) t = "raster";
       else throw `Cannot decide datatype of ${this.id}`;
 
       return t;
@@ -309,7 +309,7 @@ class DS {
     if (this.collection) {
       await Promise.all(this.config.collection.map(i => DS.get(i).load(arg)));
 
-      // TODO: Remove this? It's a hack for transmission-lines-collection not
+      // TODO: Remove this. It's a hack for transmission-lines-collection not
       // having per-element rasters but a single collection raster.
       //
       if (this.heatmap) await this.heatmap.parse.call(this);
@@ -568,7 +568,7 @@ async function ea_datasets_tiff() {
         }, MAPBOX.first_symbol);
       }
 
-      // TODO: Remove this? It's a hack for transmission-lines-collection not
+      // TODO: Remove this. It's a hack for transmission-lines-collection not
       // having per-element rasters but a single collection raster.
       //
       if (this.id === 'transmission-lines-collection') {

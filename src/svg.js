@@ -386,8 +386,11 @@ function ea_svg_interval(single, init, opts = {}) {
   );
 
   function change(a,b) {
-    // TODO: set the values from the outer world (preset/settings)
-    console.log(a,b);
+    const i0 = norm.invert(a);
+    const i1 = norm.invert(b);
+
+    drag_callback(c1, i0, i0, i1 - i0, callback1);
+    drag_callback(c2, i1, i0, i1 - i0, callback2);
   };
 
   const i0 = (init ? norm.invert(init[0]) : svgmin);

@@ -123,6 +123,10 @@ function ea_controls_range(label, single = false, opts = {}) {
   const v1 = qs('[bind=v1]', l);
   const v2 = qs('[bind=v2]', l);
 
+  function c(a,b) {
+    return r.change(range_norm.invert(a), range_norm.invert(b));
+  };
+
   const r = ea_svg_interval(
     single,
     [range_norm.invert(ds.heatmap.init.min), range_norm.invert(ds.heatmap.init.max)], {
@@ -145,8 +149,8 @@ function ea_controls_range(label, single = false, opts = {}) {
   return {
     el: el,
     svg: r.svg,
-    change: r.change,
-    label: l,
+    change: c,
+    label: l
   };
 };
 
@@ -375,6 +379,11 @@ class dscontrols extends HTMLElement {
       });
     }
 
+    dropdownlist.push({
+      "content": "Reset default values",
+      "action": _ => this.reset_defaults()
+    });
+
     this.dropdown = new dropdown(dropdownlist)
   };
 
@@ -457,6 +466,23 @@ class dscontrols extends HTMLElement {
 
     const container = qs('.controls-container', sb);
     if (container) container.append(this);
+  };
+
+  reset_defaults() {
+    if (this.weight_group) {
+      this.weight_group.change(this.ds.weight = 2);
+    }
+
+    if (this.range_group) {
+      const d = this.ds.category.heatmap.init;
+      this.range_group.change(d.min, d.max);
+    }
+
+    ea_overlord({
+      "type": "dataset",
+      "target": this.ds,
+      "caller": "dscontrols restore defaults"
+    });
   };
 }
 

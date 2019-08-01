@@ -332,6 +332,11 @@ class dscontrols extends HTMLElement {
       this.range_group = ea_controls_single.call(this, 'proximity in km');
       break;
 
+    case "protected-areas":
+      this.weight_group = ea_controls_weight.call(this);
+      this.range_group = ea_controls_single.call(this, 'exclusion zone in km');
+      break;
+
     case "minigrids":
     case "mines":
     case "hydro":

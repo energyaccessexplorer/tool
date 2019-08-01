@@ -255,6 +255,11 @@ class DS {
       break;
     }
 
+    case 'exclusion-buffer': {
+      s = x => (x < t[0] || x > t[1]) ? 1 : -1;
+      break;
+    }
+
     case 'linear':
     default: {
       const lin = d3.scaleLinear()

@@ -313,60 +313,35 @@ class dscontrols extends HTMLElement {
   };
 
   init() {
-    this.checkbox = ea_controls_checkbox.call(this);
-
-    switch (this.ds.id) {
-    case "ghi":
-    case "poverty":
-    case "population":
-    case 'windspeed':
-    case 'nighttime-lights':
-    case 'accessibility':
-      this.weight_group = ea_controls_weight.call(this);
-      this.range_group = ea_controls_range.call(this, (this.ds.category.unit || 'range'));
-      break;
-
-    case "health":
-    case "schools":
-      this.weight_group = ea_controls_weight.call(this);
-      this.range_group = ea_controls_single.call(this, 'proximity in km');
-      break;
-
-    case "protected-areas":
-      this.weight_group = ea_controls_weight.call(this);
-      this.range_group = ea_controls_single.call(this, 'exclusion zone in km');
-      break;
-
-    case "minigrids":
-    case "mines":
-    case "hydro":
-    case "powerplants":
-    case "geothermal":
-    case "transmission-lines":
-      this.weight_group = ea_controls_weight.call(this);
-      this.range_group = ea_controls_range.call(this, 'proximity in km');
-      break;
-
-    case "transmission-lines-collection":
-      this.weight_group = ea_controls_weight.call(this);
-      this.range_group = ea_controls_range.call(this, 'proximity in km');
-      this.collection_list = ea_controls_collection_list.call(this);
-      break;
-
-    case 'crops':
-      this.weight_group = ea_controls_weight.call(this);
-      this.range_group = ea_controls_range.call(this, this.ds.category.unit);
-      this.mutant_options = ea_controls_mutant_options.call(this);
-      break;
-
-
-    default:
-      if (!this.ds.parent) console.warn(`dscontrols.init: Unknown data id ${this.ds.id}`);
-      break;
+    // TODO: Remove this. We should check somehow else for elements of a collection.
+    //
+    if (['transmission-lines-operational', 'transmission-lines-planned'].includes(this.ds.id)) {
+      this.renderable = false;
+      return;
     }
 
-    if (this.ds.parent)
-      this.range_group = ea_controls_range.call(this, (this.ds.parent.category.unit || 'percentage'));
+    this.renderable = true;
+
+    this.checkbox = ea_controls_checkbox.call(this);
+
+    const cat = this.ds.category;
+    const c = cat.configuration.controls;
+
+    if (c.weight)
+      this.weight_group = ea_controls_weight.call(this);
+
+    const lr = c.range_label || cat.unit || 'range';
+
+    if (c.range === 'double')
+      this.range_group = ea_controls_range.call(this, lr);
+    else if (c.range === 'single')
+      this.range_group = ea_controls_single.call(this, lr);
+
+    if (this.ds.dataype === 'collection')
+      this.collection_list = ea_controls_collection_list.call(this);
+
+    if (this.ds.mutant)
+      this.mutant_options = ea_controls_mutant_options.call(this);
 
     const dropdownlist = [{
       "content": "Dataset info",
@@ -393,6 +368,8 @@ class dscontrols extends HTMLElement {
   };
 
   render() {
+    if (!this.renderable) return this;
+
     this.content.style.display = this.ds.active ? '' : 'none';
 
     slot_populate.call(this, this.ds, {
@@ -418,7 +395,7 @@ class dscontrols extends HTMLElement {
 
   turn(t) {
     this.content.style.display = t ? '' : 'none';
-    this.checkbox.change(t);
+    if (this.checkbox) this.checkbox.change(t);
   };
 
   inject() {

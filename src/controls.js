@@ -219,11 +219,12 @@ async function ea_controls_selectlist() {
   const id = location.get_query_param('id');
 
   const pidq = GEOGRAPHY.parent_id ? `eq.${GEOGRAPHY.parent_id}` : "is.null";
-  const list = await ea_client(ea_settings.database + `/geographies?select=id,name&online=eq.true&datasets_count=gt.0&parent_id=${pidq}&order=name.asc`)
-    .then(j => {
-      j.forEach(g => data[g.name] = g.name);
-      return j;
-    });
+  const list = await fetch(ea_settings.database + `/geographies?select=id,name&online=eq.true&datasets_count=gt.0&parent_id=${pidq}&order=name.asc`)
+        .then(r => r.json())
+        .then(j => {
+          j.forEach(g => data[g.name] = g.name);
+          return j;
+        });
 
   function set_default(input) {
     const g = list.find(x => x.id === id);

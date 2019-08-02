@@ -57,7 +57,7 @@ async function ea_overlord(msg) {
 
     ea_layout_init();
 
-    GEOGRAPHY = await ea_client(`${ea_settings.database}/geographies?id=eq.${id}`, 'GET', 1);
+    GEOGRAPHY = (await fetch(`${ea_settings.database}/geographies?id=eq.${id}`).then(r => r.json()))[0];
     MAPBOX = mapbox_setup();
 
     await ea_datasets_init(GEOGRAPHY.id, state.inputs, state.preset, bounds => {

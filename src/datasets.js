@@ -371,7 +371,8 @@ async function ea_datasets_init(id, inputs, preset, callback) {
 
   let boundaries;
 
-  await ea_client(`${ea_settings.database}/datasets?geography_id=eq.${id}&select=${attrs}`)
+  await fetch(`${ea_settings.database}/datasets?geography_id=eq.${id}&select=${attrs}`)
+    .then(r => r.json())
     .then(r => r.map(e => {
       let active = (inputs.includes(e.category.name));
       let ds = new DS(e);
@@ -480,7 +481,8 @@ async function ea_datasets_geojson(callback) {
       return this;
     }
 
-    await ea_client(endpoint)
+    await fetch(endpoint)
+      .then(r => r.json())
       .then(r => {
         this.features = r;
 
@@ -616,7 +618,6 @@ async function ea_datasets_tiff() {
   const endpoint = this.heatmap.endpoint;
 
   await fetch(endpoint)
-    .then(ea_client_check)
     .then(r => r.blob())
     .then(b => run_it.call(this, b));
 

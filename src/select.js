@@ -61,7 +61,7 @@ function ea_select_topo_flag(c) {
 };
 
 async function ea_select_geography(c) {
-  const coll = await ea_client(ea_settings.database + `/geographies?online=eq.true&datasets_count=gt.0&parent_id=eq.${c.id}`);
+  const coll = await fetch(ea_settings.database + `/geographies?online=eq.true&datasets_count=gt.0&parent_id=eq.${c.id}`).then(r => r.json());
 
   const data = {};
   for (let x of coll) data[x.name] = x.name;
@@ -98,7 +98,8 @@ function ea_select_setup() {
 
   let curr_c = null;
 
-  ea_client(ea_settings.database + '/geographies?online=eq.true&adm=eq.0')
+  fetch(ea_settings.database + '/geographies?online=eq.true&adm=eq.0')
+    .then(r => r.json())
     .then(countries_online => {
       for (let co of countries_online) {
         const d = ce('div', ce('h2', co.name, { class: 'country-name' }), { class: 'country-item', ripple: "" });
@@ -113,7 +114,7 @@ function ea_select_setup() {
     .catch(error => {
       ea_flash.push({
         type: 'error',
-        title:, "Fetch error",
+        title: "Fetch error",
         message: error
       });
 

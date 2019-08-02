@@ -63,7 +63,6 @@ build-tool:
 		${SRC}/analysis.js \
 		${SRC}/overlord.js \
 		${SRC}/tool.js \
-		${SRC}/client.js \
 		${SRC}/svg.js \
 		${SRC}/controls.js \
 		${SRC}/ui.js \
@@ -106,7 +105,6 @@ build-select:
 	@echo -n "const ea_settings = " | cat - \
 		settings.json \
         ${SRC}/head.js \
-        ${SRC}/client.js \
 		${SRC}/svg.js \
 		${SRC}/ui.js \
 		${SRC}/select.js \

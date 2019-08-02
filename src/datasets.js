@@ -573,14 +573,14 @@ async function ea_datasets_csv(callback) {
 
 async function ea_datasets_tiff() {
   async function run_it(blob) {
-    function draw(canvas) {
+    function draw() {
       if (this.vectors) return;
 
       let d = this.heatmap.domain;
 
       if (!MAPBOX.getSource(this.id)) {
         (new plotty.plot({
-          canvas: canvas,
+          canvas: this.canvas,
           data: this.raster.data,
           width: this.raster.width,
           height: this.raster.height,
@@ -591,7 +591,7 @@ async function ea_datasets_tiff() {
 
         MAPBOX.addSource(this.id, {
           "type": "canvas",
-          "canvas": `canvas-${this.id}`,
+          "canvas": this.canvas,
           "animate": false,
           "coordinates": MAPBOX.coords
         });
@@ -620,7 +620,7 @@ async function ea_datasets_tiff() {
     };
 
     if (this.raster && this.raster.data) {
-      draw.call(this, qs(`canvas#canvas-${this.id}`));
+      draw.call(this);
     }
 
     else {
@@ -635,13 +635,10 @@ async function ea_datasets_tiff() {
         nodata: parseFloat(tiff.fileDirectories[0][0].GDAL_NODATA)
       };
 
-      let canvas = qs(`#canvas-${this.id}`) ||
-          ce('canvas', null, { id: `canvas-${this.id}`, style: "display: none;" });
-
-      document.body.append(canvas);
+      if (!this.canvas) this.canvas = ce('canvas');
 
       if (MAPBOX) {
-        draw.call(this, canvas);
+        draw.call(this);
       }
     }
 

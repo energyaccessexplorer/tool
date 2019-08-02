@@ -108,6 +108,28 @@ class DS {
     })();
   };
 
+  disable() {
+    this.active = false;
+    this.disabled = true;
+
+    if (this.controls_el) this.controls_el.disable();
+    if (this.input_el) this.input_el.disable();
+
+    if (this.collection) {
+      for (let i of this.config.collection) { DS.get(i).disable(); log(i); }
+    }
+
+    if (this.collection_parent) {
+      if (!this.collection_parent.disabled) this.collection_parent.disable();
+    }
+
+    ea_overlord({
+      "type": "dataset",
+      "target": this,
+      "caller": "dataset disable"
+    });
+  };
+
   mutant_init() {
     if (!this.mutant) throw `${this.id} is not a mutant. Bye.`
 
@@ -160,6 +182,7 @@ class DS {
     for (let i of this.config.collection) {
       const d = DS.get(i);
       d.input_el = d.input_el || new dsinput(d);
+      d.collection_parent = this;
     }
   };
 
@@ -470,6 +493,21 @@ function ea_datasets_color_scale() {
  * datasets geojsons (points, lines or polygons), CSV's or rasters.
  */
 
+function ea_datasets_fail(format) {
+  ea_flash.push({
+    type: 'error',
+    timeout: 5000,
+    title: "Network error",
+    message: `
+Failed to process the ${format} for '${this.name}'.
+This is not fatal. Dataset disabled.`
+  });
+
+  this.disable();
+
+  throw Error(`"Dataset '${this.name}' disabled`);
+};
+
 async function ea_datasets_geojson(callback) {
   if (this.features) callback();
 
@@ -483,6 +521,7 @@ async function ea_datasets_geojson(callback) {
 
     await fetch(endpoint)
       .then(r => r.json())
+      .catch(err => ea_datasets_fail.call(this, "GEOJSON"))
       .then(r => {
         this.features = r;
 
@@ -618,6 +657,10 @@ async function ea_datasets_tiff() {
   const endpoint = this.heatmap.endpoint;
 
   await fetch(endpoint)
+    .then(r => {
+      if (!(r.ok && r.status < 400)) ea_datasets_fail.call(this, "TIFF");
+      else return r;
+    })
     .then(r => r.blob())
     .then(b => run_it.call(this, b));
 

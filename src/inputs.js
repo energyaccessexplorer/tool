@@ -48,6 +48,9 @@ class dsinput extends HTMLElement {
     super();
 
     this.ds = d;
+
+    if (d.disabled) return undefined;
+
     attach.call(this, shadow_tmpl('#ds-input-template'));
 
     this.svg_el = this.svg();
@@ -69,6 +72,10 @@ class dsinput extends HTMLElement {
     });
 
     return this;
+  };
+
+  disable() {
+    this.remove();
   };
 
   refresh() {

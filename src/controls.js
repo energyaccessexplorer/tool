@@ -456,6 +456,17 @@ class dscontrols extends HTMLElement {
     if (container) container.append(this);
   };
 
+  disable() {
+    qs('main', this).classList.add('disabled');
+
+    this.loading(true);
+
+    this.spinner.remove();
+    this.content.remove();
+
+    if (this.checkbox) this.checkbox.svg.remove();
+  };
+
   reset_defaults() {
     if (this.weight_group) {
       this.weight_group.change(this.ds.weight = 2);

@@ -320,6 +320,11 @@ class dscontrols extends HTMLElement {
       return;
     }
 
+    // TODO: Remove this. We should check somehow else for children of a multifilter.
+    //
+    if (this.ds.parent)
+      this.range_group = ea_controls_range.call(this, (this.ds.parent.category.unit || 'percentage'));
+
     this.renderable = true;
 
     this.checkbox = ea_controls_checkbox.call(this);

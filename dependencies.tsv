@@ -1,13 +1,11 @@
 d3.js	https://d3js.org/d3.v5.min.js
 topojson.js	https://unpkg.com/topojson/dist/topojson
 geotiff.js	https://github.com/geotiffjs/geotiff.js/releases/download/v1.0.0-beta.1/geotiff.bundle.min.js
-plotty.js	https://raw.githubusercontent.com/santilland/plotty/master/dist/plotty.min.js
-mapbox-gl.js	https://api.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.js
-mapbox-gl.css	https://api.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.css
+plotty.js	https://unpkg.com/plotty@0.3.1/dist/plotty.min.js
+mapbox-gl.js	https://api.mapbox.com/mapbox-gl-js/v1.2.0/mapbox-gl.js
+mapbox-gl.css	https://api.mapbox.com/mapbox-gl-js/v1.2.0/mapbox-gl.css
 geojson-extent.js	https://raw.githubusercontent.com/mapbox/geojson-extent/master/geojson-extent.js
 htmlsortable.js	https://raw.githubusercontent.com/lukasoppermann/html5sortable/master/dist/html5sortable.min.js
-world-50m.json	https://unpkg.com/world-atlas/world/50m.json
-world-110m.json	https://unpkg.com/world-atlas/world/110m.json
 countries.json	https://raw.githubusercontent.com/mledoze/countries/master/dist/countries.json
 location.js	https://gitlab.com/fabbe/web-toolbelt/raw/master/location.js
 flash.js	https://gitlab.com/fabbe/web-toolbelt/raw/master/flash.js

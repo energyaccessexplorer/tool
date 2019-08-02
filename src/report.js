@@ -61,11 +61,19 @@ function ea_report() {
   function add_about() {
     add_title("About");
 
-    doc.text(`
+    const about = `
 Energy Access Explorer is a research initiative led by World Resources Institute.
 Partners and local stakeholders contribute to the development and update of
 the platform. To learn more about Energy Access Explorer or provide feedback,
-contact our team at energyaccessexplorer@wri.org.`, lpad, c);
+contact our team at`;
+
+    doc.text(about, lpad, c);
+
+    c += (about.split('\n').length * font_size) + font_size;
+
+    doc.setTextColor("#00794C");
+    doc.textWithLink("energyaccessexplorer@wri.org", lpad, c, { url: "mailto:energyaccessexplorer@wri.org"});
+    reset_font();
   };
 
   function add_tables() {
@@ -104,15 +112,14 @@ contact our team at energyaccessexplorer@wri.org.`, lpad, c);
   function add_selected_datasets() {
     add_title("Selected Datasets");
 
-    const dslist = DS.all.filter(d => d.active).map(d => {
-      let u = "";
+    const body = DS.all.filter(d => d.active).map(d => [d.name, d.category.unit, (d.domain || []).join(' - '), d.weight]);
 
-      if (d.category.unit) u = `<code>(${d.category.unit})</code>`;
-
-      if (d.multifilter) d.domain = [];
-
-      doc.fromHTML(`<li>${d.name} ${u} ${d.domain.join(' - ')} - Importance ${ d.weight }</li>`, lpad, c);
-      c += 16;
+    doc.autoTable({
+      head: [['Dataset', 'Unit', 'Range', 'Importance']],
+      body: body,
+      startY: c,
+      styles: { halign: "center" },
+      theme: "plain"
     });
 
     c += 10;
@@ -121,17 +128,29 @@ contact our team at energyaccessexplorer@wri.org.`, lpad, c);
   async function add_indexes_graphs() {
     await add_title("Geospatial Analytical Outputs");
 
-    c += font_size;
+    const w = 300;
+    const h = 10;
+
+    await doc.addImage((await svg_png(qs('#summary-graphs .svg-interval'), w, h)),
+                       "PNG", hhalf - (w/2), c, w, h);
+
+    c += (h * 2) + 5;
+
+    doc.text('MIN', hhalf - (w/2), c);
+    doc.text('MID', hhalf - 10, c);
+    doc.text('MAX', hhalf + (w/2) - 26, c);
+
+    c += font_size * 3;
 
     const pies = qsa('#summary-graphs .index-graphs-container svg');
 
     await images_block("eai", lpad, c, pies[0], pies[1]);
-    await images_block("ani", hhalf, c, pies[2], pies[3]);
+    await images_block("ani", hhalf, c, pies[6], pies[7]);
 
     c += font_size * 2;
 
-    await images_block("supply", lpad, c + block_height, pies[4], pies[5]);
-    await images_block("demand", hhalf, c + block_height, pies[6], pies[7]);
+    await images_block("demand", lpad, c + block_height, pies[2], pies[3]);
+    await images_block("supply", hhalf, c + block_height, pies[4], pies[5]);
   };
 
   async function svg_png(svg, width, height) {
@@ -171,27 +190,37 @@ contact our team at energyaccessexplorer@wri.org.`, lpad, c);
     doc.setFontSize(font_size);
     doc.setTextColor("#00794C");
 
-    doc.text(ea_indexes[indexname]['name'], x, y);
+    doc.text(ea_indexes[indexname]['name'].toUpperCase(), x, y);
 
     const image_width = map_height * canvas_ratio;
 
-    doc.addImage(qs('#canvas-' + indexname).toDataURL("image/jpeg"),
-                 "JPEG",
+    doc.addImage(qs('#canvas-' + indexname).toDataURL("image/png"),
+                 "PNG",
                  x + (block_width/2) - (image_width/2),
                  y += 20,
                  image_width,
                  map_height);
 
-    y += (map_height + 30) + 20;
+    y += (map_height + 30) + 10;
 
-    await doc.addImage((await svg_png(p0, pie_size, pie_size)),
+    reset_font();
+
+    doc.setFontSize(font_size * (3/4));
+    doc.text("Population share", x + 28, y);
+    doc.text("Area share", x + (block_width/2) + 40, y);
+
+    y += 10;
+
+    const s = pie_size * 8;
+
+    await doc.addImage((await svg_png(p0, s, s)),
                        "PNG",
                        x + (block_width/4) - (pie_size/2),
                        y,
                        pie_size,
                        pie_size);
 
-    await doc.addImage((await svg_png(p1, pie_size, pie_size)),
+    await doc.addImage((await svg_png(p1, s, s)),
                        "PNG",
                        x + (3*block_width/4) - (pie_size/2),
                        y,
@@ -199,14 +228,6 @@ contact our team at energyaccessexplorer@wri.org.`, lpad, c);
                        pie_size);
 
     y += pie_size + font_size;
-
-    doc.setFontSize(font_size * (3/4));
-    doc.setTextColor("#919191");
-
-    doc.text("Population share", x, y);
-    doc.text("Area share", x + (block_width/2), y);
-
-    reset_font();
   };
 
   async function gen_pdf() {

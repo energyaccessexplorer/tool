@@ -350,7 +350,7 @@ class dscontrols extends HTMLElement {
 
     const dropdownlist = [{
       "content": "Dataset info",
-      "action": _ => ea_ui_dataset_modal(this.ds)
+      "action": _ => ea_dataset_modal(this.ds)
     }];
 
     if (this.weight_group) {
@@ -430,7 +430,7 @@ class dscontrols extends HTMLElement {
         conel = ce('div', null, { class: 'controls-container' })
       );
 
-      title.prepend(ce('span', ea_ui_collapse_triangle('s'), { class: 'collapse triangle' }));
+      title.prepend(ce('span', collapse_triangle('s'), { class: 'collapse triangle' }));
       title.addEventListener('mouseup', e => elem_collapse(conel, el));
 
       return el;

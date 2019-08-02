@@ -196,17 +196,17 @@ async function ea_summary_analyse(raster) {
 /*
  * ea_summary_wrapper
  *
- * A hack. For javascript reasons, ea_ui_app_loading does not get executed in a
+ * A hack. For javascript reasons, ea_loading does not get executed in a
  * blocking manner.
  */
 
 function ea_summary_wrapper() {
   const prom = new Promise((resolve, rej) => {
-    ea_ui_app_loading(true);
+    ea_loading(true);
     setTimeout(_ => resolve("Success!"), 100);
   });
 
   prom
     .then(ea_summary)
-    .then(_ => ea_ui_app_loading(false));
+    .then(_ => ea_loading(false));
 };

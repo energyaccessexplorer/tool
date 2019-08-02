@@ -60,8 +60,9 @@ build-tool:
 	@echo -n "const ea_settings = " | cat - \
 		settings.json \
         ${SRC}/head.js \
-		${SRC}/ea.js \
-		${SRC}/auxiliary.js \
+		${SRC}/analysis.js \
+		${SRC}/overlord.js \
+		${SRC}/tool.js \
 		${SRC}/client.js \
 		${SRC}/svg.js \
 		${SRC}/controls.js \

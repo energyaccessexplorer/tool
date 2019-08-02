@@ -108,7 +108,7 @@ function ea_select_setup() {
         playground.append(d);
       }
 
-      ea_ui_app_loading(false);
+      ea_loading(false);
     })
     .catch(error => {
       ea_flash

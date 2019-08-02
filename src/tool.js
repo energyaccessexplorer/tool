@@ -1,77 +1,4 @@
 /*
- * ea_state_sync
- *
- * Gather the parameters from the current URL, clean them up, set the defaults
- *
- * returns an Object with the handled params and their set_ methods.
- */
-
-function ea_state_sync() {
-  let mode, output, inputs, preset;
-
-  let mode_param = location.get_query_param('mode');
-  let output_param = location.get_query_param('output');
-  let inputs_param = location.get_query_param('inputs');
-  let preset_param = location.get_query_param('preset');
-
-  function set_mode_param(m) {
-    history.replaceState(null, null, location.set_query_param('mode', (m || mode)));
-  };
-
-  function set_output_param(o) {
-    history.replaceState(null, null, location.set_query_param('output', (o || output)));
-  };
-
-  function set_inputs_param(i) {
-    history.replaceState(null, null, location.set_query_param('inputs', (i || inputs).toString()));
-  };
-
-  function set_preset_param(p) {
-    qs('#controls-preset').value = (p || 'custom');
-    history.replaceState(null, null, location.set_query_param('preset', (p || 'custom')));
-  };
-
-  if (Object.keys(ea_indexes).includes(output_param)) {
-    output = output_param;
-  } else {
-    output = "eai";
-    set_output_param();
-  }
-
-  if (!inputs_param) {
-    inputs = [];
-    set_inputs_param();
-  } else {
-    inputs = inputs_param.split(',');
-  }
-
-  if (Object.keys(ea_views).includes(mode_param)) {
-    mode = mode_param;
-  } else {
-    mode = 'outputs';
-    set_mode_param();
-  }
-
-  if (['market','planning', 'investment', 'custom'].includes(preset_param)) {
-    preset = preset_param;
-  } else {
-    preset = 'custom';
-    set_preset_param();
-  }
-
-  return {
-    mode: mode,
-    set_mode_param: set_mode_param,
-    output: output,
-    set_output_param: set_output_param,
-    inputs: inputs,
-    set_inputs_param: set_inputs_param,
-    preset: preset,
-    set_preset_param: set_preset_param,
-  };
-};
-
-/*
  * ea_canvas_plot
  *
  * Just a shorthand to plotty.plot
@@ -133,39 +60,6 @@ function ea_list_filter_type(type) {
 };
 
 /*
- * ea_plot_active_analysis
- *
- * Utility.
- *
- * @param "type" string. ID or indexname.
- * @param "cs" string. Default color_theme to 'ea'.
- */
-
-async function ea_plot_active_analysis(type, cs = 'ea') {
-  const list = ea_list_filter_type(type);
-
-  const raster = await ea_analysis(list, type);
-  ea_canvas_plot(raster);
-
-  qs('#canvas-output-select').value = type;
-  qs('#indexes-pane .index-graphs-title').innerText = ea_indexes[type]['name'];
-  qs('#index-graphs-description').innerText = ea_indexes[type]['description'];
-
-  // 'animate' is set to false on mapbox's configuration, since we don't want
-  // mapbox eating the CPU at 60FPS for nothing.
-  //
-  let canvas_source = MAPBOX.getSource('output-source');
-  if (canvas_source) {
-    canvas_source.raster = raster;
-
-    canvas_source.play();
-    canvas_source.pause();
-  }
-
-  return raster;
-};
-
-/*
  * ea_coordinates_raster
  *
  * Transform a set of coordinates to the "relative position" inside a raster
@@ -177,7 +71,7 @@ async function ea_plot_active_analysis(type, cs = 'ea') {
  *        full description.
  */
 
-function ea_coordinates_raster(coords, bounds, raster) {
+function ea_coordinates_in_raster(coords, bounds, raster) {
   if (coords.length !== 2)
     throw Error(`ea_coordinates_raster: expected and array of length 2. Got ${coords}`);
 
@@ -275,18 +169,78 @@ function ea_nanny_force_start() {
   ea_nanny.start();
 };
 
-async function ea_boundaries_init() {
-  if (!this) {
-    ea_flash
-      .type('error')
-      .title("Misconfigured geography")
-      .message(`
-It's missing a 'boundaries' dataset. <b>I'm stoping here.</b>
-Please report this to energyaccessexplorer@wri.org.
-`)();
+function ea_dataset_modal(ds) {
+  const b = ds.metadata;
+  b['why'] = ds.category.metadata.why;
 
-    throw `Geography is missing a 'boundaries' dataset.`;
-  }
+  const content = tmpl('#ds-info-modal', b);
+  qs('#metadata-sources', content).href = ds.metadata.download_original_url;
+  qs('#learn-more', content).href = ds.metadata.learn_more_url;
 
-  return true;
+  ea_modal.set({
+    header: ds.name,
+    content: content,
+    footer: null
+  }).show();
+};
+
+function ea_layout_init() {
+  const n = qs('nav');
+  const p = qs('#playground');
+  const m = qs('#maparea', p);
+  const c = qs('#controls-wrapper', p);
+  const r = qs('#right-pane', p);
+  const o = qs('#canvas-output-container', r);
+  const d = qs('#drawer', r);
+  const l = qs('#inputs-list', r);
+
+  function set_heights() {
+    p.style['height'] =
+      c.style['height'] =
+      m.style['height'] =
+      window.innerHeight - n.clientHeight + "px";
+
+    l.style['height'] = p.clientHeight - (o.clientHeight + d.clientHeight + 4) + "px";
+  };
+
+  document.body.onresize = set_heights;
+
+  set_heights();
+};
+
+function ea_views_init() {
+  const el = qs('#views');
+
+  Object.keys(ea_views).forEach(v => {
+    const btn = ce('div', ce('div', ea_views[v]['name'], { class: 'view-name' }), { class: 'view', ripple: "" });
+
+    btn.addEventListener('mouseup', function(e) {
+      qsa('.view', el).forEach(e => e.classList.remove('active'));
+
+      setTimeout(_ => {
+        ea_overlord({
+          "type": "mode",
+          "target": v,
+          "caller": "ea_views_init",
+        });
+
+        btn.classList.add('active');
+      }, 50);
+    });
+
+    if (location.get_query_param('mode') === v) btn.classList.add('active');
+
+    el.append(btn);
+  });
+};
+
+function ea_help() {
+  const hm = qs('[bind=help-message]').cloneNode(true);
+  hm.style.display = 'block';
+
+  ea_modal.set({
+    header: "Help",
+    content: hm,
+    footer: null
+  }).show();
 };

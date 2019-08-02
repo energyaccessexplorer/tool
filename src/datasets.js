@@ -509,35 +509,36 @@ This is not fatal. Dataset disabled.`
 };
 
 async function ea_datasets_geojson(callback) {
-  if (this.features) callback();
-
-  else {
-    const endpoint = this.vectors.endpoint;
-
-    if (!endpoint) {
-      warn(`Dataset '${this.id}' should have a vectors (maybe a file-association missing). Endpoint is: `, endpoint);
-      return this;
-    }
-
-    await fetch(endpoint)
-      .then(r => r.json())
-      .catch(err => ea_datasets_fail.call(this, "GEOJSON"))
-      .then(r => {
-        this.features = r;
-
-        try {
-          this.vectors.bounds = geojsonExtent(r);
-        }
-        catch (err) {
-          if (this.id === 'boundaries') throw err;
-
-          warn(`geojsonExtent failed for '${this.id}'. This is not fatal. Here's the error:`, r);
-          log(err);
-        }
-      });
-
+  if (this.features) {
     callback();
+    return this;
   }
+
+  const endpoint = this.vectors.endpoint;
+
+  if (!endpoint) {
+    warn(`Dataset '${this.id}' should have a vectors (maybe a file-association missing). Endpoint is: `, endpoint);
+    return this;
+  }
+
+  await fetch(endpoint)
+    .then(r => r.json())
+    .catch(err => ea_datasets_fail.call(this, "GEOJSON"))
+    .then(r => {
+      this.features = r;
+
+      try {
+        this.vectors.bounds = geojsonExtent(r);
+      }
+      catch (err) {
+        if (this.id === 'boundaries') throw err;
+
+        warn(`geojsonExtent failed for '${this.id}'. This is not fatal. Here's the error:`, r);
+        log(err);
+      }
+    });
+
+  callback();
 
   return this;
 };
@@ -545,31 +546,29 @@ async function ea_datasets_geojson(callback) {
 async function ea_datasets_csv(callback) {
   if (this.table) return;
 
-  else {
-    const endpoint = this.csv.endpoint;
+  const endpoint = this.csv.endpoint;
 
-    if (!endpoint) {
-      warn(`Dataset '${this.id}' should have a csv (maybe a file-association missing). Endpoint is: `, endpoint);
-      return this;
-    }
+  if (!endpoint) {
+    warn(`Dataset '${this.id}' should have a csv (maybe a file-association missing). Endpoint is: `, endpoint);
+    return this;
+  }
 
-    d3.csv(endpoint, d => {
+  await fetch(endpoint)
+    .then(r => r.text())
+    .then(t => d3.csvParse(t, d => {
       const o = { oid: +d[this.csv.oid] };
       Object.keys(this.csv.options).forEach(k => o[k] = +d[k]);
       return o;
-    })
-      .then(data => {
-        // HACK: so we can access them by oid (as an array, they are
-        // generally a sequence starting at 1)
-        //
-        if (data[0]['oid'] === 1) data.unshift({ oid: 0 });
+    }))
+    .then(data => {
+      // HACK: so we can access them by oid (as an array, they are
+      // generally a sequence starting at 1)
+      //
+      if (data[0]['oid'] === 1) data.unshift({ oid: 0 });
 
-        this.table = data;
-      })
-      .catch(e => {
-        warn(`${endpoint} raised an error and several datasets might depend on this. Bye!`);
-      });
-  }
+      this.table = data;
+    })
+    .catch(e => warn(`${endpoint} raised an error and several datasets might depend on this. Bye!`));
 };
 
 async function ea_datasets_tiff() {

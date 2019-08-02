@@ -52,6 +52,9 @@ function ea_analysis(list, type) {
       weights[d.id] = d.weight / (tots[d.indexname] * 2);
   });
 
+  const sum = Object.keys(weights).reduce((acc, curr) => (weights[curr] || 0) + acc, 0);
+  if (sum === 0) return it;
+
   // Each dataset has a different scaling function. We cache these to optimise
   // the huge loop we are about to do.
   //

@@ -88,7 +88,7 @@ function ea_canvas_plot(data, canvas, color_theme = 'ea') {
   const A = DS.get('boundaries');
 
   if (!data.length) {
-    console.warn("ea_canvas_plot: no raster given. Filling up with a blank (transparent) one...");
+    warn("ea_canvas_plot: no raster given. Filling up with a blank (transparent) one...");
     data = new Float32Array(A.raster.data.length).fill(-1);
   };
 

@@ -127,7 +127,7 @@ function ea_analysis(list, type) {
     it[i] = (r === -1) ? -1 : f(r);
   }
 
-  console.log("Finished ea_analysis in:", performance.now() - t0, weights, tots);
+  log("Finished ea_analysis in:", performance.now() - t0, weights, tots);
 
   return it;
 };
@@ -333,7 +333,7 @@ async function ea_overlord(msg) {
     }
 
     else if (state.mode === "outputs") {
-      console.info("Overlord: Sorting in outputs mode has no efect... OK.");
+      log("Overlord: Sorting in outputs mode has no efect... OK.");
     }
 
     else {
@@ -383,13 +383,13 @@ async function ea_overlord(msg) {
           const et = MAPBOX.queryRenderedFeatures(e.point)[0];
           if (!et) return;
 
-          console.info("Feature Properties:", et.properties);
+          log("Feature Properties:", et.properties);
 
           if (et.source === i) {
             let at;
 
             if (!(at = t.config.features_attr_map)) {
-              console.warn("Dataset is not configured to display info. (configuration.features_attr_map)");
+              warn("Dataset is not configured to display info. (configuration.features_attr_map)");
               return;
             }
 
@@ -427,7 +427,7 @@ async function ea_overlord(msg) {
         }, e);
       }
       else {
-        console.info("No value on raster.", rc);
+        log("No value on raster.", rc);
       }
 
       break;

@@ -476,7 +476,7 @@ async function ea_datasets_geojson(callback) {
     const endpoint = this.vectors.endpoint;
 
     if (!endpoint) {
-      console.warn(`Dataset '${this.id}' should have a vectors (maybe a file-association missing). Endpoint is: `, endpoint);
+      warn(`Dataset '${this.id}' should have a vectors (maybe a file-association missing). Endpoint is: `, endpoint);
       return this;
     }
 
@@ -490,8 +490,8 @@ async function ea_datasets_geojson(callback) {
         catch (err) {
           if (this.id === 'boundaries') throw err;
 
-          console.warn(`geojsonExtent failed for '${this.id}'. This is not fatal. Here's the error:`, r);
-          console.warn(err);
+          warn(`geojsonExtent failed for '${this.id}'. This is not fatal. Here's the error:`, r);
+          log(err);
         }
       });
 
@@ -508,7 +508,7 @@ async function ea_datasets_csv(callback) {
     const endpoint = this.csv.endpoint;
 
     if (!endpoint) {
-      console.warn(`Dataset '${this.id}' should have a csv (maybe a file-association missing). Endpoint is: `, endpoint);
+      warn(`Dataset '${this.id}' should have a csv (maybe a file-association missing). Endpoint is: `, endpoint);
       return this;
     }
 
@@ -526,7 +526,7 @@ async function ea_datasets_csv(callback) {
         this.table = data;
       })
       .catch(e => {
-        console.warn(`${endpoint} raised an error and several datasets might depend on this. Bye!`);
+        warn(`${endpoint} raised an error and several datasets might depend on this. Bye!`);
       });
   }
 };

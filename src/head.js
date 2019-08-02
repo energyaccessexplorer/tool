@@ -158,6 +158,10 @@ function log() {
   return console.log.apply(console, arguments);
 };
 
+function debug() {
+  return console.trace.apply(console, arguments);
+};
+
 function warn() {
   return console.warn.apply(console, arguments);
 };

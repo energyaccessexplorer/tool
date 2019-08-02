@@ -155,7 +155,7 @@ class dsinput extends HTMLElement {
       break;
 
     default:
-      console.warn("dsinput.svg could not be set.", d.id);
+      warn("dsinput.svg could not be set.", d.id);
       break;
     }
 

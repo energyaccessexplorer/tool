@@ -130,6 +130,21 @@ class DS {
     });
   };
 
+  add_source(opts) {
+    if (this.source) return;
+
+    this.source = MAPBOX.addSource(this.id, opts);
+  };
+
+  add_layer(opts) {
+    if (this.layer) return;
+
+    opts['id'] = this.id;
+    opts['source'] = this.id;
+
+    this.layer = MAPBOX.addLayer(opts, MAPBOX.first_symbol);
+  };
+
   mutant_init() {
     if (!this.mutant) throw `${this.id} is not a mutant. Bye.`
 
@@ -189,9 +204,11 @@ class DS {
   async multifilter_init(inputs) {
     if (!this.csv) return;
 
-    await this.csv.parse.call(this);
-    await this.heatmap.parse.call(this);
-    await this.vectors.parse.call(this);
+    await Promise.all([
+      this.csv.parse.call(this),
+      this.heatmap.parse.call(this),
+      this.vectors.parse.call(this),
+    ]);
 
     const features_json = JSON.stringify(this.features);
 
@@ -306,7 +323,7 @@ class DS {
       return;
     }
 
-    if (MAPBOX.getLayer(this.id))
+    if (this.layer)
       MAPBOX.setLayoutProperty(this.id, 'visibility', t ? 'visible' : 'none');
   };
 
@@ -350,7 +367,7 @@ class DS {
   };
 
   async raise() {
-    if (MAPBOX.getLayer(this.id))
+    if (this.layer)
       MAPBOX.moveLayer(this.id, MAPBOX.first_symbol);
 
     if (this.collection) {
@@ -508,52 +525,10 @@ This is not fatal. Dataset disabled.`
   throw Error(`"Dataset '${this.name}' disabled`);
 };
 
-async function ea_datasets_geojson(callback) {
-  if (this.features) {
-    callback();
-    return this;
-  }
-
-  const endpoint = this.vectors.endpoint;
-
-  if (!endpoint) {
-    warn(`Dataset '${this.id}' should have a vectors (maybe a file-association missing). Endpoint is: `, endpoint);
-    return this;
-  }
-
-  await fetch(endpoint)
-    .then(r => r.json())
-    .catch(err => ea_datasets_fail.call(this, "GEOJSON"))
-    .then(r => {
-      this.features = r;
-
-      try {
-        this.vectors.bounds = geojsonExtent(r);
-      }
-      catch (err) {
-        if (this.id === 'boundaries') throw err;
-
-        warn(`geojsonExtent failed for '${this.id}'. This is not fatal. Here's the error:`, r);
-        log(err);
-      }
-    });
-
-  callback();
-
-  return this;
-};
-
-async function ea_datasets_csv(callback) {
+function ea_datasets_csv() {
   if (this.table) return;
 
-  const endpoint = this.csv.endpoint;
-
-  if (!endpoint) {
-    warn(`Dataset '${this.id}' should have a csv (maybe a file-association missing). Endpoint is: `, endpoint);
-    return this;
-  }
-
-  await fetch(endpoint)
+  fetch(this.csv.endpoint)
     .then(r => r.text())
     .then(t => d3.csvParse(t, d => {
       const o = { oid: +d[this.csv.oid] };
@@ -568,17 +543,17 @@ async function ea_datasets_csv(callback) {
 
       this.table = data;
     })
-    .catch(e => warn(`${endpoint} raised an error and several datasets might depend on this. Bye!`));
+    .catch(e => warn(`'${this.id}' raised an error and several datasets might depend on this. Bye!`));
 };
 
-async function ea_datasets_tiff() {
+function ea_datasets_tiff() {
   async function run_it(blob) {
     function draw() {
       if (this.vectors) return;
 
       let d = this.heatmap.domain;
 
-      if (!MAPBOX.getSource(this.id)) {
+      if (!this.source) {
         (new plotty.plot({
           canvas: this.canvas,
           data: this.raster.data,
@@ -589,7 +564,7 @@ async function ea_datasets_tiff() {
           colorScale: this.color_theme,
         })).render();
 
-        MAPBOX.addSource(this.id, {
+        this.add_source({
           "type": "canvas",
           "canvas": this.canvas,
           "animate": false,
@@ -597,19 +572,15 @@ async function ea_datasets_tiff() {
         });
       }
 
-      if (!MAPBOX.getLayer(this.id)) {
-        MAPBOX.addLayer({
-          "id": this.id,
-          "type": 'raster',
-          "source": this.id,
-          "layout": {
-            "visibility": "none",
-          },
-          "paint": {
-            "raster-resampling": "nearest"
-          }
-        }, MAPBOX.first_symbol);
-      }
+      this.add_layer({
+        "type": 'raster',
+        "layout": {
+          "visibility": "none",
+        },
+        "paint": {
+          "raster-resampling": "nearest"
+        }
+      });
 
       // TODO: Remove this. It's a hack for transmission-lines-collection not
       // having per-element rasters but a single collection raster.
@@ -642,41 +613,58 @@ async function ea_datasets_tiff() {
       }
     }
 
-    return this;
+    return;
   };
 
   if (this.raster && this.raster.data) {
     run_it.call(this);
-    return this;
+    return;
   }
 
-  const endpoint = this.heatmap.endpoint;
-
-  await fetch(endpoint)
+  return fetch(this.heatmap.endpoint)
     .then(r => {
       if (!(r.ok && r.status < 400)) ea_datasets_fail.call(this, "TIFF");
       else return r;
     })
     .then(r => r.blob())
     .then(b => run_it.call(this, b));
-
-  return this;
 };
 
-async function ea_datasets_points() {
-  return ea_datasets_geojson.call(this, _ => {
-    if (typeof MAPBOX.getSource(this.id) === 'undefined') {
-      MAPBOX.addSource(this.id, {
-        "type": "geojson",
-        "data": this.features
-      });
-    }
+function ea_datasets_geojson() {
+  const source = _ => {
+    this.add_source({
+      "type": "geojson",
+      "data": this.features
+    });
+  };
 
-    if (typeof MAPBOX.getLayer(this.id) === 'undefined') {
-      MAPBOX.addLayer({
-        "id": this.id,
+  if (this.features)
+    return new Promise((res, rej) => { source(); res(); });
+
+  return fetch(this.vectors.endpoint)
+    .then(r => r.json())
+    .catch(err => ea_datasets_fail.call(this, "GEOJSON"))
+    .then(r => {
+      this.features = r;
+
+      try {
+        this.vectors.bounds = geojsonExtent(r);
+      }
+      catch (err) {
+        if (this.id === 'boundaries') throw err;
+
+        warn(`geojsonExtent failed for '${this.id}'. This is not fatal. Here's the error:`, r);
+        log(err);
+      }
+    })
+    .then(r => source());
+};
+
+function ea_datasets_points() {
+  return ea_datasets_geojson.call(this)
+    .then(_ => {
+      this.add_layer({
         "type": "circle",
-        "source": this.id,
         "layout": {
           "visibility": "none",
         },
@@ -687,35 +675,26 @@ async function ea_datasets_points() {
           "circle-stroke-width": this.vectors['stroke-width'] || 1,
           "circle-stroke-color": this.vectors.stroke || 'black',
         },
-      }, MAPBOX.first_symbol);
-    }
-  });
+      });
+    });
 };
 
-async function ea_datasets_lines() {
-  return ea_datasets_geojson.call(this, _ => {
-    if (!MAPBOX.getSource(this.id))
-      MAPBOX.addSource(this.id, {
-        "type": "geojson",
-        "data": this.features
-      });
+function ea_datasets_lines() {
+  return ea_datasets_geojson.call(this)
+    .then(_ => {
+      let da = this.vectors.dasharray.split(' ').map(x => +x);
 
-    let da = this.vectors.dasharray.split(' ').map(x => +x);
+      // mapbox-gl does not follow SVG's stroke-dasharray convention when it comes
+      // to single numbered arrays.
+      //
+      if (da.length === 1) {
+        (da[0] === 0) ?
+          da = [1] :
+          da = [da[0], da[0]];
+      }
 
-    // mapbox-gl does not follow SVG's stroke-dasharray convention when it comes
-    // to single numbered arrays.
-    //
-    if (da.length === 1) {
-      (da[0] === 0) ?
-        da = [1] :
-        da = [da[0], da[0]];
-    }
-
-    if (!MAPBOX.getLayer(this.id))
-      MAPBOX.addLayer({
-        "id": this.id,
+      this.add_layer({
         "type": "line",
-        "source": this.id,
         "layout": {
           "visibility": "none",
         },
@@ -724,24 +703,15 @@ async function ea_datasets_lines() {
           "line-color": this.vectors.stroke,
           "line-dasharray": da,
         },
-      }, MAPBOX.first_symbol);
-  });
+      });
+    });
 };
 
-async function ea_datasets_polygons() {
-  return ea_datasets_geojson.call(this, _ => {
-    if (!MAPBOX.getSource(this.id)) {
-      MAPBOX.addSource(this.id, {
-        "type": "geojson",
-        "data": this.features
-      });
-    }
-
-    if (!MAPBOX.getLayer(this.id)) {
-      MAPBOX.addLayer({
-        "id": this.id,
+function ea_datasets_polygons() {
+  return ea_datasets_geojson.call(this)
+    .then(_ => {
+      this.add_layer({
         "type": "fill",
-        "source": this.id,
         "layout": {
           "visibility": "none",
         },
@@ -750,7 +720,6 @@ async function ea_datasets_polygons() {
           "fill-outline-color": this.vectors.stroke,
           "fill-opacity": this.vectors.opacity,
         },
-      }, MAPBOX.first_symbol);
-    }
-  });
+      });
+    });
 };

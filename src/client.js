@@ -1,11 +1,6 @@
 function ea_client_check(response) {
   if (response.ok) return response;
 
-  ea_flash
-    .type('error')
-    .title(`${response.status}: ${response.statusText}`)
-    .message(response.url)();
-
   throw Error(response.statusText);
 };
 

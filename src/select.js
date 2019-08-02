@@ -111,9 +111,11 @@ function ea_select_setup() {
       ea_loading(false);
     })
     .catch(error => {
-      ea_flash
-        .type('error')
-        .title(error)();
+      ea_flash.push({
+        type: 'error',
+        title:, "Fetch error",
+        message: error
+      });
 
       throw error;
     });

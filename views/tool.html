@@ -219,7 +219,7 @@ energy demand, low economic activity, and low access to infrastructure and resou
     plotty.addColorScale(ea_color_scale.name, ea_color_scale.stops, ea_color_scale.domain);
 
     window.ea_modal = new modal("ea-modal", {});
-    ea_ui_flash_setup();
+    window.ea_flash = new flash();
 
     ea_overlord({
       "type": 'init',

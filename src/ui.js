@@ -54,17 +54,3 @@ function elem_collapse(el, t) {
 function ea_loading(bool) {
   qs('#app-loading').style['display'] = bool ? 'block' : 'none';
 };
-
-function ea_ui_flash_setup() {
-  window.ea_flash = flash()
-    .style(`
-color: white !important;
-position: fixed;
-top: 7px;
-left: 7px;
-z-index: 9999;
-display: none;
-padding: 10px 20px;
-border: 1px solid white;
-`);
-};

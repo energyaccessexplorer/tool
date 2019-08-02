@@ -1,0 +1,66 @@
+.number-labels {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-around;
+  width: 400px;
+  padding: 1em;
+  border: 1px solid darkgrey;
+  margin: auto;
+  margin-top: 2em;
+}
+
+.number-labels-row > th,
+.number-labels > div {
+  color: white;
+  padding: 5px 7px;
+}
+
+.download-link {
+  display: block;
+  padding: 0.5em 1em;
+  max-width: 15em;
+  text-decoration: none;
+  color: var(--the-blue);
+  clear: both;
+}
+
+.download-link:after {
+  margin-left: 1em;
+  content: '\21F2';
+}
+
+.description-text {
+  font-family: without-serif, sans-serif;
+  white-space: pre-line;
+}
+
+aside.nanny-marker {
+  background-color: rgba(0,0,0,1);
+  border-radius: 3px;
+  padding: 1em;
+  box-shadow: 0 20px 30px 0 rgba(0,0,0,0.2);
+
+  max-width: 400px;
+
+  animation: pulse 3s ease-out;
+  animation-iteration-count: infinite;
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+aside.nanny-marker * {
+  color: white;
+}
+
+aside.nanny-marker header {
+  font-weight: bold;
+  font-size: 1.05em;
+  margin-bottom: 0.7em;
+}
+
+@keyframes pulse {
+  0%   { opacity: 0.7; }
+  50%  { opacity: 1.0; }
+  100% { opacity: 0.7; }
+}

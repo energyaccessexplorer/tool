@@ -151,7 +151,7 @@ async function ea_plot_active_analysis(type, cs = 'ea') {
   ea_canvas_plot(raster);
 
   qs('#canvas-output-select').value = type;
-  qs('#indexes-pane .index-graphs-title').innerText = ea_indexes[type]['name'];
+  qs('#index-graphs-title').innerText = ea_indexes[type]['name'];
   qs('#index-graphs-description').innerText = ea_indexes[type]['description'];
 
   // 'animate' is set to false on mapbox's configuration, since we don't want

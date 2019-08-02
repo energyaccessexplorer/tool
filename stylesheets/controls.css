@@ -24,26 +24,17 @@
   overflow-x: hidden;
 }
 
-.controls-branch-title {
+.controls-branch-tab {
   font-size: 1.14em;
   line-height: 2em;
   padding: 0.4em 2em;
   white-space: nowrap;
-  text-transform: uppercase;
   text-align: left;
-  background-color: var(--the-white);
-  color: var(--the-green);
-  fill: var(--the-green);
+  font-weight: normal;
 
   position: sticky;
   top: 0;
   z-index: 10;
-}
-
-.controls-branch-title.active {
-  background-color: var(--the-green) !important;
-  color: var(--the-white) !important;
-  fill: var(--the-white) !important;
 }
 
 .controls-subbranch-title {

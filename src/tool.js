@@ -212,10 +212,10 @@ function ea_views_init() {
   const el = qs('#views');
 
   Object.keys(ea_views).forEach(v => {
-    const btn = ce('div', ce('div', ea_views[v]['name'], { class: 'view-name' }), { class: 'view', ripple: "" });
+    const btn = ce('div', ea_views[v]['name'], { class: 'view up-title', ripple: '' });
 
     btn.addEventListener('mouseup', function(e) {
-      qsa('.view', el).forEach(e => e.classList.remove('active'));
+      qsa('#views .up-title', el).forEach(e => e.classList.remove('active'));
 
       setTimeout(_ => {
         ea_overlord({

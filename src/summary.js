@@ -49,7 +49,7 @@ async function ea_summary() {
 
     graphs.append(el_tree(
       [ ce('div', null, { class: 'index-group' }), [
-        [ ce('div', ea_indexes[idxn]['name'], { class: 'index-graphs-title' }) ],
+        [ ce('div', ea_indexes[idxn]['name'], { class: 'up-title' }) ],
         [ ce('div', null, { class: 'index-graphs-container' }), [
           [ ce('div', null, { class: 'index-graphs-group' }),
             [
@@ -92,7 +92,7 @@ async function ea_summary() {
     const table = ce('table', null, { class: 'summary' });
     let thead, tbody, thr;
 
-    const title = ce('div', `${j} share`, { class: 'index-graphs-title' });
+    const title = ce('div', `${j} share`, { class: 'up-title' });
 
     table.append(thead = ce('thead'), tbody = ce('tbody'));
     thead.append(thr = ce('tr', ce('th'), { class: 'number-labels-row' }));

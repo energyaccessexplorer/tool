@@ -1,0 +1,103 @@
+h1, h2, h3 {
+  color: var(--the-green);
+}
+
+a {
+  cursor: pointer;
+}
+
+.big-green-button {
+  text-align: center;
+  margin: 1em;
+  background-color: var(--the-green);
+  color: white !important;
+  text-decoration: none;
+  padding: 0.9em 1.3em;
+}
+
+.up-title {
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 1.2em;
+  color: var(--the-green);
+  fill: var(--the-green);
+  margin-bottom: 5px;
+}
+
+.up-title.active {
+  background-color: var(--the-green) !important;
+  color: var(--the-white) !important;
+  fill: var(--the-white) !important;
+}
+
+dialog main {
+  background-color: white;
+  margin: auto;
+  max-width: 1200px;
+  width: fit-content;
+  height: fit-content;
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  margin-top: 80px !important;
+}
+
+dialog header {
+  padding: 1em;
+  padding-left: 1.3em;
+  font-size: 1.2em;
+  background-color: var(--the-green);
+  color: var(--the-white);
+  position: relative;
+}
+
+dialog .close {
+  position: absolute;
+  top: 0.5em;
+  right: 0.5em;
+  text-decoration: none;
+  font-size: 1.4em;
+  line-height: 1em;
+  width: 1em;
+  display: block;
+  text-align: center;
+  vertical-align: middle;
+  color: var(--the-white);
+}
+
+dialog content {
+  padding: 1.7em !important;
+}
+
+dialog pre {
+  max-width: 850px;
+  white-space: pre-line;
+}
+
+.more-dropdown-ul {
+  width: fit-content;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  background-color: white;
+  position: absolute;
+  right: -25px;
+  top: 30px;
+  padding: 8px 0;
+  border-radius: 5px;
+  box-shadow: 0 3px 5px 0 rgba(0,0,0,0.2);
+  z-index: 9999;
+}
+
+.more-dropdown-li {
+  padding: 7px 15px;
+  font-size: 0.9em;
+  color: var(--the-color);
+}
+
+.more-dropdown-li:hover {
+  background-color: #e7e9ec;
+}
+
+.more-dropdown-li:hover:active {
+  background-color: #cecece
+}

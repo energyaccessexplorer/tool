@@ -4,12 +4,12 @@ function ea_controls_init(state) {
 
   const controls_el = qs('#controls-contents');
   const controls_tabs_el = qs('#controls-tabs');
-  const tab_all = ce('div', "all", { id: 'controls-tab-all', class: 'controls-branch-title' });
+  const tab_all = ce('div', "all", { id: 'controls-tab-all', class: 'controls-branch-tab up-title' });
 
   controls_tabs_el.append(tab_all);
 
   tab_all.onclick = function() {
-    for (let e of qsa('.controls-branch-title', controls_tabs_el))
+    for (let e of qsa('.controls-branch-tab', controls_tabs_el))
       e.classList.remove('active');
 
     for (let e of qsa('.controls-branch', controls_el))
@@ -27,7 +27,7 @@ function ea_controls_select_tab(tab, name) {
   const controls_tabs_el = qs('#controls-tabs');
   const controls_el = qs('#controls-contents');
 
-  for (let e of qsa('.controls-branch-title', controls_tabs_el))
+  for (let e of qsa('.controls-branch-tab', controls_tabs_el))
     e.classList.remove('active');
 
   for (let e of qsa('.controls-branch', controls_el)) {
@@ -415,7 +415,7 @@ class dscontrols extends HTMLElement {
     const controls_tabs_el = qs('#controls-tabs');
 
     function create_tab(name) {
-      return ce('div', name, { id: 'controls-tab-' + name, class: 'controls-branch-title' });
+      return ce('div', name, { id: 'controls-tab-' + name, class: 'controls-branch-tab up-title' });
     };
 
     function create_branch(name) {
@@ -437,7 +437,7 @@ class dscontrols extends HTMLElement {
       return el;
     };
 
-    let t = qs(`#controls-tab-${path[0]}.controls-branch-title`);
+    let t = qs(`#controls-tab-${path[0]}.controls-branch-tab`);
     if (!t) {
       t = create_tab(path[0]);
       t.onclick = _ => ea_controls_select_tab(t, path[0]);

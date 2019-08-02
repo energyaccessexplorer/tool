@@ -76,11 +76,12 @@ build-tool:
 		> ${DIST}/tool/main.js
 
 	@cat \
+		${CSS}/general.css \
+		${CSS}/tool.css \
 		${CSS}/layout.css \
 		${CSS}/controls.css \
 		${CSS}/maparea.css \
 		${CSS}/indexes.css \
-		${CSS}/datasets.css \
 		${CSS}/views.css \
 		${CSS}/ripple.css \
 		${CSS}/svg.css \
@@ -111,6 +112,7 @@ build-select:
 		> ${DIST}/select/main.js
 
 	@cat \
+		${CSS}/general.css \
 		${CSS}/select.css \
 		${CSS}/maparea.css \
 		${CSS}/views.css \

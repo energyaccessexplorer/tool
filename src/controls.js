@@ -201,14 +201,12 @@ function ea_controls_weight(init) {
 function ea_controls_collection_list() {
   const ds = this.ds;
 
-  if (!ds.collection) return;
+  if (!ds.items) return;
 
   const e = ce('ul', null, { class: 'controls-dataset-collection' });
 
-  for (let i of ds.config.collection) {
-    let d = DS.get(i);
+  for (let d of ds.items)
     e.append(ce('li', d.name));
-  }
 
   return e;
 };
@@ -321,8 +319,6 @@ class dscontrols extends HTMLElement {
       return;
     }
 
-    // TODO: Remove this. We should check somehow else for children of a multifilter.
-    //
     if (this.ds.parent)
       this.range_group = ea_controls_range.call(this, (this.ds.parent.category.unit || 'percentage'));
 
@@ -409,7 +405,7 @@ class dscontrols extends HTMLElement {
     const path = ds.category.configuration.path;
 
     if (!path.length) return;
-    if (ds.multifilter) return;
+    if (ds.children) return;
 
     const controls_el = qs('#controls-contents');
     const controls_tabs_el = qs('#controls-tabs');

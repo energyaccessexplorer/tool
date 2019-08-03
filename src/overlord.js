@@ -67,7 +67,7 @@ async function ea_overlord(msg) {
 
     const a = DS.all
           .map(d => {
-            // dsinput and dscontrols might have already been created by collection_init
+            // dsinput and dscontrols might have already been created by items_init
             //
             d.input_el = d.input_el || new dsinput(d);
             d.controls_el = d.controls_el || new dscontrols(d);

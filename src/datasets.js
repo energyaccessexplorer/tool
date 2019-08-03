@@ -19,16 +19,17 @@ class DS {
 
     this.mutant = !!config.mutant;
 
-    this.collection = !!config.collection;
+    this.items = !!config.collection ? [] : undefined;
 
     if (o.heatmap_file) {
       this.heatmap = o.category.heatmap
       this.heatmap.endpoint = o.heatmap_file.endpoint;
       this.heatmap.parse = ea_datasets_tiff;
 
-      this.multifilter = (this.heatmap.scale === 'multi-key-delta');
+      if (this.heatmap.scale === 'multi-key-delta')
+        this.children = [];
 
-      if (!this.mutant && !this.collection)
+      if (!this.mutant && !this.items)
         ea_datasets_color_scale.call(this);
     }
 
@@ -115,12 +116,12 @@ class DS {
     if (this.controls_el) this.controls_el.disable();
     if (this.input_el) this.input_el.disable();
 
-    if (this.collection) {
-      for (let i of this.config.collection) { DS.get(i).disable(); log(i); }
+    if (this.items) {
+      for (let d of this.items) { d.disable(); }
     }
 
-    if (this.collection_parent) {
-      if (!this.collection_parent.disabled) this.collection_parent.disable();
+    if (this.collection) {
+      if (!this.collection.disabled) this.collection.disable();
     }
 
     ea_overlord({
@@ -193,15 +194,17 @@ class DS {
     return this;
   };
 
-  collection_init() {
+  items_init() {
     for (let i of this.config.collection) {
       const d = DS.get(i);
       d.input_el = d.input_el || new dsinput(d);
-      d.collection_parent = this;
+      d.collection = this;
+
+      this.items.push(d);
     }
   };
 
-  async multifilter_init(inputs) {
+  async children_init(inputs) {
     if (!this.csv) return;
 
     await Promise.all([
@@ -235,6 +238,8 @@ class DS {
       Object.assign(d.csv = {}, this.csv);
 
       await d.init(inputs.includes(d.id), null);
+
+      this.children.push(d);
 
       d.singlefilter_init();
     }
@@ -318,8 +323,8 @@ class DS {
   };
 
   async visible(t) {
-    if (this.collection) {
-      await Promise.all(this.config.collection.map(i => DS.get(i).visible(t)));
+    if (this.items) {
+      await Promise.all(this.items.map(d => d.visible(t)));
       return;
     }
 
@@ -334,8 +339,8 @@ class DS {
       if (this.controls_el) this.controls_el.loading(false);
     }
 
-    if (this.collection) {
-      await Promise.all(this.config.collection.map(i => DS.get(i).turn(v, draw)));
+    if (this.items) {
+      await Promise.all(this.items.map(d => d.turn(v, draw)));
       this.controls_el.turn(v);
 
       return;
@@ -349,8 +354,8 @@ class DS {
   };
 
   async load(arg) {
-    if (this.collection) {
-      await Promise.all(this.config.collection.map(i => DS.get(i).load(arg)));
+    if (this.items) {
+      await Promise.all(this.items.map(d => d.load(arg)));
 
       // TODO: Remove this. It's a hack for transmission-lines-collection not
       // having per-element rasters but a single collection raster.
@@ -370,9 +375,8 @@ class DS {
     if (this.layer)
       MAPBOX.moveLayer(this.id, MAPBOX.first_symbol);
 
-    if (this.collection) {
-      for (let i of this.config.collection)
-        DS.get(i).raise();
+    if (this.items) {
+      for (let d of this.items) d.raise();
     }
   };
 
@@ -435,12 +439,12 @@ async function ea_datasets_init(id, inputs, preset, callback) {
   // mutant/collection attributes (order is never guaranteed)
   //
   DS.all.filter(d => d.mutant).forEach(d => d.mutant_init());
-  DS.all.filter(d => d.collection).forEach(d => d.collection_init());
+  DS.all.filter(d => d.items).forEach(d => d.items_init());
 
-  // multifilters generate new datasets. We need to wait for these sinces
+  // parents generate new children datasets. We need to wait for these since
   // the next step is to syncronise the entire thing.
   //
-  await Promise.all(DS.all.filter(d => d.multifilter).map(d => d.multifilter_init(inputs)));
+  await Promise.all(DS.all.filter(d => d.children).map(d => d.children_init(inputs)));
 };
 
 function ea_datasets_color_scale() {

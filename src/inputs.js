@@ -132,29 +132,30 @@ class dsinput extends HTMLElement {
   };
 
   svg() {
-    const d = this.ds;
+    const ds = this.ds;
     let e, cs;
 
-    if (d.scale_stops)
-      cs = ea_svg_color_steps(d.color_scale_fn, d.scale_stops);
+    if (ds.scale_stops) {
+      cs = ea_svg_color_steps(ds.color_scale_fn, ds.scale_stops);
+    }
     else {
-      if (d.parent)
-        cs = ea_svg_color_steps(d.parent.color_scale_fn, d.parent.scale_stops);
+      if (ds.parent)
+        cs = ea_svg_color_steps(ds.parent.color_scale_fn, ds.parent.scale_stops);
     }
 
-    switch (d.datatype) {
+    switch (ds.datatype) {
     case 'points':
-      e = ea_svg_points_symbol.call(d);
+      e = ea_svg_points_symbol.call(ds);
       break;
 
     case 'lines':
-      e = ea_svg_lines_symbol.call(d);
+      e = ea_svg_lines_symbol.call(ds);
       break;
 
     case 'polygons':
-      e = (d.vectors.color_stops && d.vectors.color_stops.length && d.parent) ?
+      e = (ds.vectors.color_stops && ds.vectors.color_stops.length && ds.parent) ?
         cs :
-        ea_svg_polygons_symbol.call(d);
+        ea_svg_polygons_symbol.call(ds);
       break;
 
     case 'raster':
@@ -162,18 +163,17 @@ class dsinput extends HTMLElement {
       break;
 
     default:
-      warn("dsinput.svg could not be set.", d.id);
+      warn("dsinput.svg could not be set.", ds.id);
       break;
     }
 
-    if (d.collection) {
+    if (ds.items) {
       const el = ce('ul', null, { class: 'collection' });
 
-      for (let i of d.config.collection) {
-        let x = DS.get(i);
+      for (let d of ds.items) {
         let li = ce('li');
 
-        li.append(x.input_el.svg_el, ce('div', x.name, { class: 'subheader' }));
+        li.append(d.input_el.svg_el, ce('div', d.name, { class: 'subheader' }));
         el.append(li);
       }
 
@@ -188,7 +188,7 @@ class dsinput extends HTMLElement {
     let t = null;
     let el = null;
 
-    if (d.collection) return;
+    if (d.items) return;
 
     switch (d.datatype) {
     case "raster":

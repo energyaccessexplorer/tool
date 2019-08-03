@@ -64,61 +64,12 @@
   cursor: pointer;
 }
 
-.controls-multifilter-elem {
-  display: flex;
-  justify-content: space-between;
-  margin: 0;
-  padding: 1.2em;
-}
-
-.controls-multifilter-elem.active {
-  background-color: #e4e4e4;
-}
-
 #controls-wrapper select {
   border: none;
   width: 100%;
 
   padding: 0.65em;
   background-color: white;
-}
-
-#controls-boundaries {
-  width: 100%;
-  flex: 0 0 auto;
-  color: var(--the-color);
-  white-space: nowrap;
-}
-
-#controls-boundaries content {
-  padding: 0;
-}
-
-#controls-boundaries .control-group {
-  flex: 1;
-  text-align: left;
-  margin-bottom: unset;
-  margin-left: 2em;
-}
-
-#controls-boundaries .control-group .label {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.8em;
-
-  width: 258px;
-  margin: auto;
-}
-
-#controls-boundaries .control-group .label .unit-label {
-  font-weight: bold;
-  color: darkgray;
-}
-
-#controls-boundaries .svg-checkbox {
-  margin-bottom: -4px;
-  fill: var(--the-blue);
-  transform: scale(0.7);
 }
 
 .controls-select-container {

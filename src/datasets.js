@@ -22,7 +22,7 @@ class DS {
     this.items = !!config.collection ? [] : undefined;
 
     if (o.heatmap_file) {
-      this.heatmap = o.category.heatmap
+      this.heatmap = o.category.heatmap;
       this.heatmap.endpoint = o.heatmap_file.endpoint;
       this.heatmap.parse = ea_datasets_tiff;
 

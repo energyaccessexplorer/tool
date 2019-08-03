@@ -14,22 +14,22 @@
  *
  *   type (required)
  *      init: init the app. doh!
- *      mode: set the entire app between {outputs, inputs} mode
+ *      view: set the entire app between {outputs, inputs} views
  *      dataset: change params or (de)activate a DS
  *      index: change the currently shown index
  *      preset: change the preset
  *      sort: sort the selected datasets (inputs)
- *      refresh: a auxiliary to re-set the mode
+ *      refresh: a auxiliary to re-set the view
  *      map: handle user-map interactions
  *
- *      Each type might (and will) do different things depending on the current
- *      mode.
+ *      Each type might (and will) do different things depending on the
+ *      current view.
  *
  *   target
  *      Is context specific to the type. They are obvious:
  *
  *      init: null
- *      mode: "inputs" or "outputs"
+ *      view: "inputs" or "outputs"
  *      dataset: a DS object
  *      index: "demand", "supply", "eai" or "ani"
  *      preset: "market", "planning", "investment", or "custom"
@@ -90,10 +90,10 @@ async function ea_overlord(msg) {
     break;
   }
 
-  case "mode": {
+  case "view": {
     let t = msg.target;
 
-    state.set_mode_param(t);
+    state.set_view_param(t);
 
     await Promise.all(state.inputs.map(id => DS.get(id).turn(true, (t === 'inputs'))));
 
@@ -115,7 +115,7 @@ async function ea_overlord(msg) {
     }
 
     else {
-      throw `Argument Error: Overlord: Could not set/find the mode '${state.mode}'.`;
+      throw `Argument Error: Overlord: Could not set/find the view '${state.view}'.`;
     }
 
     right_pane(t);
@@ -136,14 +136,14 @@ async function ea_overlord(msg) {
 
     const inputs = [...new Set(state.inputs)]; // UNIQUE()
 
-    if (state.mode === "outputs") {
+    if (state.view === "outputs") {
       await ds.turn(ds.active, false);
 
       ea_indexes_list(state);
       ea_plot_active_analysis(state.output).then(raster => ea_indexes_graphs(raster));
     }
 
-    else if (state.mode === "inputs") {
+    else if (state.view === "inputs") {
       await ds.turn(ds.active, true);
 
       ea_inputs(inputs);
@@ -154,7 +154,7 @@ async function ea_overlord(msg) {
     }
 
     else {
-      throw `Argument Error: Overlord: Could not set the mode ${state.mode}`;
+      throw `Argument Error: Overlord: Could not set the view ${state.view}`;
     }
 
     state.set_output_param();
@@ -175,13 +175,13 @@ async function ea_overlord(msg) {
 
     const inputs = DS.all.filter(d => ea_controls_presets_set(d, msg.target)).map(d => d.id);
 
-    if (state.mode === "outputs") {
+    if (state.view === "outputs") {
       ea_indexes_list(state);
       await Promise.all(DS.all.map(d => d.turn(d.active, false)));
       ea_plot_active_analysis(state.output);
     }
 
-    else if (state.mode === "inputs") {
+    else if (state.view === "inputs") {
       await Promise.all(DS.all.map(d => d.turn(d.active, true)));
       ea_inputs(inputs);
     }
@@ -193,17 +193,17 @@ async function ea_overlord(msg) {
   }
 
   case "sort": {
-    if (state.mode === "inputs") {
+    if (state.view === "inputs") {
       ea_inputs_sort(msg.target);
       state.set_inputs_param(msg.target);
     }
 
-    else if (state.mode === "outputs") {
-      log("Overlord: Sorting in outputs mode has no efect... OK.");
+    else if (state.view === "outputs") {
+      log("Overlord: Sorting in outputs view has no efect... OK.");
     }
 
     else {
-      throw `Argument Error: Overlord: Could set the mode ${state.mode}`;
+      throw `Argument Error: Overlord: Could set the view ${state.view}`;
     }
 
     break;
@@ -211,8 +211,8 @@ async function ea_overlord(msg) {
 
   case "refresh": {
     ea_overlord({
-      "type": "mode",
-      "target": state.mode,
+      "type": "view",
+      "target": state.view,
       "caller": "ea_overlord refresh"
     });
 
@@ -228,7 +228,7 @@ async function ea_overlord(msg) {
 
       let t;
 
-      if (state.mode === "outputs") {
+      if (state.view === "outputs") {
         t = {
           raster: {
             data: MAPBOX.getSource('output-source').raster
@@ -316,15 +316,15 @@ async function ea_overlord(msg) {
  */
 
 function ea_state_sync() {
-  let mode, output, inputs, preset;
+  let view, output, inputs, preset;
 
-  let mode_param = location.get_query_param('mode');
+  let view_param = location.get_query_param('view');
   let output_param = location.get_query_param('output');
   let inputs_param = location.get_query_param('inputs');
   let preset_param = location.get_query_param('preset');
 
-  function set_mode_param(m) {
-    history.replaceState(null, null, location.set_query_param('mode', (m || mode)));
+  function set_view_param(m) {
+    history.replaceState(null, null, location.set_query_param('view', (m || view)));
   };
 
   function set_output_param(o) {
@@ -354,11 +354,11 @@ function ea_state_sync() {
     inputs = inputs_param.split(',');
   }
 
-  if (Object.keys(ea_views).includes(mode_param)) {
-    mode = mode_param;
+  if (Object.keys(ea_views).includes(view_param)) {
+    view = view_param;
   } else {
-    mode = 'outputs';
-    set_mode_param();
+    view = 'outputs';
+    set_view_param();
   }
 
   if (['market','planning', 'investment', 'custom'].includes(preset_param)) {
@@ -369,8 +369,8 @@ function ea_state_sync() {
   }
 
   return {
-    mode: mode,
-    set_mode_param: set_mode_param,
+    view: view,
+    set_view_param: set_view_param,
     output: output,
     set_output_param: set_output_param,
     inputs: inputs,

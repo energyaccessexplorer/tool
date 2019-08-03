@@ -146,7 +146,7 @@ function ea_nanny_init(state) {
   window.ea_nanny = new nanny(ea_nanny_steps);
 
   if (state.inputs.length > 1) return;
-  if (state.mode !== "inputs") return;
+  if (state.view !== "inputs") return;
 
   const w = localStorage.getItem('needs-nanny');
 
@@ -156,7 +156,7 @@ function ea_nanny_init(state) {
 function ea_nanny_force_start() {
   history.replaceState(null, null, location.set_query_param('inputs', 'boundaries'));
   history.replaceState(null, null, location.set_query_param('output', 'eai'));
-  history.replaceState(null, null, location.set_query_param('mode', 'inputs'));
+  history.replaceState(null, null, location.set_query_param('view', 'inputs'));
 
   DS.all.filter(d => d.active && d.id !== 'boundaries').forEach(d => d.turn(false, false));
 
@@ -219,7 +219,7 @@ function ea_views_init() {
 
       setTimeout(_ => {
         ea_overlord({
-          "type": "mode",
+          "type": "view",
           "target": v,
           "caller": "ea_views_init",
         });
@@ -228,7 +228,7 @@ function ea_views_init() {
       }, 50);
     });
 
-    if (location.get_query_param('mode') === v) btn.classList.add('active');
+    if (location.get_query_param('view') === v) btn.classList.add('active');
 
     el.append(btn);
   });

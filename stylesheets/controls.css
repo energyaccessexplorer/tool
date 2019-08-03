@@ -60,16 +60,6 @@
   margin-right: 1em;
 }
 
-.controls-dataset-collection {
-  font-size: 0.85em;
-  margin-bottom: 1em;
-  margin-top: 0;
-}
-
-.controls-dataset-collection * {
-  color: #666;
-}
-
 .collapse {
   cursor: pointer;
 }

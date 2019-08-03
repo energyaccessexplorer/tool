@@ -355,12 +355,11 @@ class DS {
 
   async load(arg) {
     if (this.items) {
-      await Promise.all(this.items.map(d => d.load(arg)));
-
-      // TODO: Remove this. It's a hack for transmission-lines-collection not
-      // having per-element rasters but a single collection raster.
+      // Collections will (as of now) always share heatmaps.
       //
-      if (this.heatmap) await this.heatmap.parse.call(this);
+      if (this.heatmap) this.heatmap.parse.call(this);
+
+      await Promise.all(this.items.map(d => d.load(arg)));
 
       return;
     }
@@ -585,13 +584,6 @@ function ea_datasets_tiff() {
           "raster-resampling": "nearest"
         }
       });
-
-      // TODO: Remove this. It's a hack for transmission-lines-collection not
-      // having per-element rasters but a single collection raster.
-      //
-      if (this.id === 'transmission-lines-collection') {
-        MAPBOX.setLayoutProperty(this.id, 'visibility', 'none');
-      }
     };
 
     if (this.raster && this.raster.data) {

@@ -203,7 +203,7 @@ function ea_controls_collection_list() {
 
   if (!ds.items) return;
 
-  const e = ce('ul', null, { class: 'controls-dataset-collection' });
+  const e = ce('ul', null, { class: 'collection' });
 
   for (let d of ds.items)
     e.append(ce('li', d.name));
@@ -312,17 +312,8 @@ class dscontrols extends HTMLElement {
   };
 
   init() {
-    // TODO: Remove this. We should check somehow else for elements of a collection.
-    //
-    if (['transmission-lines-operational', 'transmission-lines-planned'].includes(this.ds.id)) {
-      this.renderable = false;
-      return;
-    }
-
     if (this.ds.parent)
-      this.range_group = ea_controls_range.call(this, (this.ds.parent.category.unit || 'percentage'));
-
-    this.renderable = true;
+      this.range_group = ea_controls_range.call(this, (this.ds.parent.category.unit || 'range'));
 
     this.checkbox = ea_controls_checkbox.call(this);
 
@@ -339,7 +330,7 @@ class dscontrols extends HTMLElement {
     else if (c.range === 'single')
       this.range_group = ea_controls_single.call(this, lr);
 
-    if (this.ds.dataype === 'collection')
+    if (this.ds.items)
       this.collection_list = ea_controls_collection_list.call(this);
 
     if (this.ds.mutant)
@@ -370,8 +361,6 @@ class dscontrols extends HTMLElement {
   };
 
   render() {
-    if (!this.renderable) return this;
-
     this.content.style.display = this.ds.active ? '' : 'none';
 
     slot_populate.call(this, this.ds, {

@@ -52,43 +52,9 @@ async function ea_overlord(msg) {
   const state = ea_state_sync();
 
   switch (msg.type) {
-  case "init": {
-    const id = location.get_query_param('id');
-
-    ea_layout_init();
-
-    GEOGRAPHY = (await fetch(`${ea_settings.database}/geographies?id=eq.${id}`).then(r => r.json()))[0];
-    MAPBOX = mapbox_setup();
-
-    await ea_datasets_init(GEOGRAPHY.id, state.inputs, state.preset, bounds => {
-      mapbox_fit(bounds);
-      mapbox_change_theme(ea_settings.mapbox_theme);
-    });
-
-    const a = DS.all
-          .map(d => {
-            // dsinput and dscontrols might have already been created by items_init
-            //
-            d.input_el = d.input_el || new dsinput(d);
-            d.controls_el = d.controls_el || new dscontrols(d);
-            return d;
-          })
-          .filter(d => d.active)
-          .map(d => d.id)
-          .sort((x,y) => (state.inputs.indexOf(x) < state.inputs.indexOf(y)) ? -1 : 1);
-
-    state.set_inputs_param(a);
-
-    ea_views_init();
-    ea_inputs_init();
-    ea_indexes_init(state);
-    ea_controls_init(state);
-    ea_nanny_init(state);
-
-    ea_loading(false);
-
+  case "init":
+    ea_overlord_init(state);
     break;
-  }
 
   case "view": {
     let t = msg.target;
@@ -378,4 +344,40 @@ function ea_state_sync() {
     preset: preset,
     set_preset_param: set_preset_param,
   };
+};
+
+async function ea_overlord_init(state) {
+  const id = location.get_query_param('id');
+
+  ea_layout_init();
+
+  GEOGRAPHY = (await fetch(`${ea_settings.database}/geographies?id=eq.${id}`).then(r => r.json()))[0];
+  MAPBOX = mapbox_setup();
+
+  await ea_datasets_init(GEOGRAPHY.id, state.inputs, state.preset, bounds => {
+    mapbox_fit(bounds);
+    mapbox_change_theme(ea_settings.mapbox_theme);
+  });
+
+  const a = DS.all
+        .map(d => {
+          // dsinput and dscontrols might have already been created by items_init
+          //
+          d.input_el = d.input_el || new dsinput(d);
+          d.controls_el = d.controls_el || new dscontrols(d);
+          return d;
+        })
+        .filter(d => d.active)
+        .map(d => d.id)
+        .sort((x,y) => (state.inputs.indexOf(x) < state.inputs.indexOf(y)) ? -1 : 1);
+
+  state.set_inputs_param(a);
+
+  ea_views_init();
+  ea_inputs_init();
+  ea_indexes_init(state);
+  ea_controls_init(state);
+  ea_nanny_init(state);
+
+  ea_loading(false);
 };

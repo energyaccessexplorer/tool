@@ -412,7 +412,7 @@ class dscontrols extends HTMLElement {
       const el = ce('div', null, { id: name, class: 'controls-subbranch' });
 
       el.append(
-        title = ce('div', (ea_branch_dict[name] || name), { class: 'controls-subbranch-title' }),
+        title = ce('div', (ea_branch_dict[name] || name), { class: 'controls-subbranch-title up-title' }),
         conel = ce('div', null, { class: 'controls-container' })
       );
 

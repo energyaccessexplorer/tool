@@ -4,7 +4,7 @@
   user-select: none;
   display: flex;
   flex-flow: row nowrap;
-  border-top: solid 1px #d9d9d9;
+  border-top: solid 1px var(--the-white);
 }
 
 #controls-tabs {
@@ -12,6 +12,7 @@
   z-index: 0;
   display: flex;
   flex-flow: column nowrap;
+  background-color: white;
 }
 
 #controls-contents {
@@ -35,18 +36,15 @@
   position: sticky;
   top: 0;
   z-index: 10;
+  margin-bottom: 1px;
 }
 
 .controls-subbranch-title {
   font-size: 1em;
-  font-weight: bold;
   white-space: nowrap;
-  text-transform: uppercase;
   box-sizing: border-box;
   padding: 1em 0.7em;
   border-bottom: solid 1px #d9d9d9;
-  background-color: white;
-  color: var(--the-green);
   cursor: pointer;
 
   position: sticky;
@@ -62,6 +60,7 @@
 
 .collapse {
   cursor: pointer;
+  fill: var(--the-color);
 }
 
 #controls-wrapper select {

@@ -19,9 +19,9 @@ a {
   font-weight: bold;
   text-transform: uppercase;
   font-size: 1.2em;
-  color: var(--the-green);
-  fill: var(--the-green);
-  margin-bottom: 5px;
+  color: var(--the-green) !important;
+  fill: var(--the-green) !important;
+  background-color: white !important;
 }
 
 .up-title.active {

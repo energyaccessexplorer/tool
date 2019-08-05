@@ -64,10 +64,8 @@ function ea_indexes_init(state) {
           POPULATION_PIE.svg
         ]
       ]
-    ],
-      scale
-    ]
-  ));
+    ]]
+  ), scale);
 };
 
 function ea_index_drawable(inputs, target) {

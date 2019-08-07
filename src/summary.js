@@ -10,7 +10,7 @@
 
 async function ea_summary() {
   const pop = DS.get('population');
-  await pop.load('heatmap');
+  await pop.load('raster');
   const p = pop.raster.data;
 
   const content = ce('div');
@@ -141,7 +141,7 @@ async function ea_summary_analyse(raster) {
 
   if (!pop) return null;
 
-  await pop.load('heatmap');
+  await pop.load('raster');
   const p = pop.raster.data;
   const nodata = pop.raster.nodata;
 

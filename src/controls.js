@@ -101,14 +101,14 @@ function ea_controls_mutant_options() {
 function ea_controls_range(label, single = false, opts = {}) {
   const ds = this.ds;
 
-  const d = [ds.heatmap.domain.min, ds.heatmap.domain.max];
+  const d = [ds.raster.config.domain.min, ds.raster.config.domain.max];
 
   const range_norm = d3.scaleLinear().domain([0,1]).range(d);
   const domain = d.slice(0);
 
   function update_range_value(x,i,el) {
     let v = domain[i] = range_norm(x);
-    el.innerText = (v * (ds.heatmap.factor || 1)).toFixed(ds.heatmap.precision || 0);
+    el.innerText = (v * (ds.raster.config.factor || 1)).toFixed(ds.raster.config.precision || 0);
 
     ds.domain = domain;
   };
@@ -129,7 +129,7 @@ function ea_controls_range(label, single = false, opts = {}) {
 
   const r = ea_svg_interval(
     single,
-    [range_norm.invert(ds.heatmap.init.min), range_norm.invert(ds.heatmap.init.max)], {
+    [range_norm.invert(ds.raster.config.init.min), range_norm.invert(ds.raster.config.init.max)], {
       width: opts.width || 320,
       callback1: x => update_range_value(x, 0, v1),
       callback2: x => update_range_value(x, 1, v2),
@@ -458,7 +458,7 @@ class dscontrols extends HTMLElement {
     }
 
     if (this.range_group) {
-      const d = this.ds.category.heatmap.init;
+      const d = this.ds.category.raster.config.init;
       this.range_group.change(d.min, d.max);
     }
 

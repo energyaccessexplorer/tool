@@ -250,7 +250,7 @@ async function ea_overlord(msg) {
       if (rc && rc.value !== null) {
         v = rc.value;
 
-        if (t.heatmap) v = v * t.heatmap.factor;
+        if (t.raster.config) v = v * t.raster.config.factor;
 
         table_pointer([{
           "target": t.name,

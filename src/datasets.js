@@ -22,11 +22,14 @@ class DS {
     this.items = !!config.collection ? [] : undefined;
 
     if (o.heatmap_file) {
-      this.heatmap = o.category.heatmap;
-      this.heatmap.endpoint = o.heatmap_file.endpoint;
-      this.heatmap.parse = ea_datasets_tiff;
+      const r = this.raster = {};
 
-      if (this.heatmap.scale === 'multi-key-delta')
+      r.config = JSON.parse(JSON.stringify(o.category.heatmap));
+
+      r.endpoint = o.heatmap_file.endpoint;
+      r.parse = ea_datasets_tiff;
+
+      if (r.config.scale === 'multi-key-delta')
         this.children = [];
 
       if (!this.mutant && !this.items)
@@ -102,7 +105,7 @@ class DS {
       if (this.mutant) t = null;
       else if (this.vectors) t = this.vectors.shape_type;
       else if (this.parent) t = this.parent.datatype;
-      else if (this.heatmap) t = "raster";
+      else if (this.raster) t = "raster";
       else throw `Cannot decide datatype of ${this.id}`;
 
       return t;
@@ -156,8 +159,9 @@ class DS {
     this.datatype = m.datatype;
 
     this.raster = m.raster;
+    this.canvas = m.canvas;
+
     this.vectors = m.vectors;
-    this.heatmap = m.heatmap;
 
     this.color_scale_fn = m.color_scale_fn;
     this.scale_stops = m.scale_stops;
@@ -171,18 +175,21 @@ class DS {
 
     this.host = host;
 
-    await host.heatmap.parse.call(host);
+    await host.raster.parse.call(host);
 
     this.datatype = host.datatype;
 
-    this.heatmap = host.heatmap;
     this.raster = host.raster;
+    this.canvas = host.canvas;
+
     this.vectors = host.vectors;
 
     this.color_scale_fn = host.color_scale_fn;
     this.scale_stops = host.scale_stops;
 
     this.input_el.refresh();
+
+    this.canvas = host.canvas;
 
     let src;
     if (src = MAPBOX.getSource(this.id)) {
@@ -209,7 +216,7 @@ class DS {
 
     await Promise.all([
       this.csv.parse.call(this),
-      this.heatmap.parse.call(this),
+      this.raster.parse.call(this),
       this.vectors.parse.call(this),
     ]);
 
@@ -226,12 +233,13 @@ class DS {
       d.child_id = v;
       d.parent = this;
       d.config = {};
+      d.raster = {};
+
       d.metadata = this.metadata;
 
-      Object.assign(d.heatmap = {}, this.heatmap);
-      d.heatmap.scale = "key-delta";
+      Object.assign(d.raster, this.raster);
+      d.raster.config.scale = "key-delta";
 
-      Object.assign(d.raster = {}, this.raster);
       Object.assign(d.vectors = {}, this.vectors);
       Object.assign(d.features = {}, JSON.parse(features_json));
 
@@ -282,9 +290,10 @@ class DS {
   scale_fn(i) {
     let s = null;
 
-    const d = (this.heatmap.domain && [this.heatmap.domain.min, this.heatmap.domain.max]) || [0,1];
+    const dom = this.raster.config.domain;
+    const d = (dom && [dom.min, dom.max]) || [0,1];
     const t = this.domain;
-    const v = this.heatmap.scale;
+    const v = this.raster.config.scale;
     const r = ((typeof this.invert !== 'undefined' && this.invert.includes(i)) ? [1,0] : [0,1]);
 
     switch (v) {
@@ -314,7 +323,7 @@ class DS {
             .domain(t || d)
             .range(r)
 
-      s = lin.clamp(this.heatmap.clamp);
+      s = lin.clamp(this.raster.config.clamp);
       break;
     }
     }
@@ -330,6 +339,9 @@ class DS {
 
     if (this.layer)
       MAPBOX.setLayoutProperty(this.id, 'visibility', t ? 'visible' : 'none');
+
+    if (this.host)
+      MAPBOX.setLayoutProperty(this.host.id, 'visibility', t ? 'visible' : 'none');
   };
 
   async turn(v, draw) {
@@ -355,15 +367,19 @@ class DS {
 
   async load(arg) {
     if (this.items) {
-      // Collections will (as of now) always share heatmaps.
+      // Collections will (as of now) always share rasters.
       //
-      if (this.heatmap) this.heatmap.parse.call(this);
+      if (this.raster) this.raster.parse.call(this);
 
       await Promise.all(this.items.map(d => d.load(arg)));
     }
 
+    if (this.mutant) {
+      return Promise.all(this.config.mutant_targets.map(i => DS.get(i).load(arg)));
+    }
+
     if (!arg)
-      await Promise.all(['vectors', 'csv', 'heatmap'].map(i => this[i] ? this.load(i) : null));
+      await Promise.all(['vectors', 'csv', 'raster'].map(i => this[i] ? this.load(i) : null));
     else
       if (this[arg]) await this[arg].parse.call(this);
   };
@@ -374,6 +390,10 @@ class DS {
 
     if (this.items) {
       for (let d of this.items) d.raise();
+    }
+
+    if (this.host) {
+      this.host.raise();
     }
   };
 
@@ -423,8 +443,9 @@ async function ea_datasets_init(id, inputs, preset, callback) {
 
         ds.active = true;
 
+        await ds.load('csv');
         await ds.load('vectors');
-        await ds.load('heatmap');
+        await ds.load('raster');
 
         callback(ds.vectors.bounds);
       })();
@@ -445,12 +466,13 @@ async function ea_datasets_init(id, inputs, preset, callback) {
 };
 
 function ea_datasets_color_scale() {
-  let cs = this.heatmap.color_stops;
+  let cs = this.raster.config.color_stops;
+
   let c = ea_color_scale.name;
   let d = ea_color_scale.domain;
 
   if (!cs || !cs.length)
-    this.heatmap.color_stops = cs = ea_color_scale.stops;
+    this.raster.config.color_stops = cs = ea_color_scale.stops;
   else
     d = Array(cs.length).fill(0).map((x,i) => (0 + i * (1/(cs.length-1))));
 
@@ -459,17 +481,19 @@ function ea_datasets_color_scale() {
   {
     let intervals;
 
-    if (this.heatmap.configuration && (intervals = this.heatmap.configuration.intervals)) {
+    if (this.raster.config.configuration && (intervals = this.raster.config.configuration.intervals)) {
       let l = intervals.length;
+
+      let domain = this.raster.config.domain;
 
       let s = d3.scaleLinear()
           .domain([0,255])
-          .range([this.heatmap.domain.min, this.heatmap.domain.max])
+          .range([domain.min, domain.max])
           .clamp(true);
 
       const a = new Uint8Array(1024).fill(-1);
       for (let i = 0; i < 1024; i += 4) {
-        let j = interval_index(s(i/4), intervals, this.heatmap.clamp);
+        let j = interval_index(s(i/4), intervals, this.raster.config.clamp);
 
         if (j === -1) {
           a[i] = a[i+1] = a[i+2] = a[i+3] = 0;
@@ -501,7 +525,7 @@ function ea_datasets_color_scale() {
       this.color_scale_fn = d3.scaleLinear()
         .domain(d)
         .range(cs)
-        .clamp(this.heatmap.clamp || false);
+        .clamp(this.raster.config.clamp || false);
     }
   }
 };
@@ -552,7 +576,7 @@ function ea_datasets_tiff() {
     function draw() {
       if (this.vectors) return;
 
-      let d = this.heatmap.domain;
+      let d = this.raster.config.domain;
 
       if (!this.source) {
         (new plotty.plot({
@@ -593,12 +617,12 @@ function ea_datasets_tiff() {
       const image = await tiff.getImage();
       const rasters = await image.readRasters();
 
-      this.raster = {
-        data: rasters[0],
-        width: image.getWidth(),
-        height: image.getHeight(),
-        nodata: parseFloat(tiff.fileDirectories[0][0].GDAL_NODATA)
-      };
+      const r = this.raster;
+
+      r.data = rasters[0];
+      r.width = image.getWidth();
+      r.height = image.getHeight();
+      r.nodata = parseFloat(tiff.fileDirectories[0][0].GDAL_NODATA);
 
       if (!this.canvas) this.canvas = ce('canvas');
 
@@ -613,7 +637,7 @@ function ea_datasets_tiff() {
     return;
   }
 
-  return fetch(this.heatmap.endpoint)
+  return fetch(this.raster.endpoint)
     .then(r => {
       if (!(r.ok && r.status < 400)) ea_datasets_fail.call(this, "TIFF");
       else return r;

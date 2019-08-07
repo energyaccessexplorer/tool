@@ -99,7 +99,7 @@ If you are interested in identifying areas that are close to social load (e.g. s
       let i;
 
       i = setInterval(_ => {
-        if (this.ds.domain[1] !== this.ds.heatmap.domain['max']) {
+        if (this.ds.domain[1] !== this.ds.raster.config.domain['max']) {
           clearInterval(i);
           fn();
         }

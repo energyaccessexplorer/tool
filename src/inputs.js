@@ -192,8 +192,8 @@ class dsinput extends HTMLElement {
     switch (d.datatype) {
     case "raster":
       el = tmpl("#ramp-label-min-max");
-      qs('[bind=min]', el).innerText = d.heatmap.domain.min * d.heatmap.factor;
-      qs('[bind=max]', el).innerText = d.heatmap.domain.max * d.heatmap.factor;
+      qs('[bind=min]', el).innerText = d.raster.config.domain.min * d.raster.config.factor;
+      qs('[bind=max]', el).innerText = d.raster.config.domain.max * d.raster.config.factor;
       break;
 
     case "polygons":

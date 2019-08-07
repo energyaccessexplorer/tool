@@ -1,5 +1,5 @@
 function ea_report() {
-  const canvas = DS.get('population').canvas;
+  const canvas = DS.get('population').raster.canvas;
   const canvas_ratio = canvas.width/canvas.height;
 
   let doc;

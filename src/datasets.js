@@ -159,7 +159,6 @@ class DS {
     this.datatype = m.datatype;
 
     this.raster = m.raster;
-    this.canvas = m.canvas;
 
     this.vectors = m.vectors;
 
@@ -175,7 +174,6 @@ class DS {
     this.datatype = host.datatype;
 
     this.raster = host.raster;
-    this.canvas = host.canvas;
 
     this.vectors = host.vectors;
 
@@ -564,22 +562,23 @@ function ea_datasets_tiff() {
     function draw() {
       if (this.vectors) return;
 
-      let d = this.raster.config.domain;
+      const r = this.raster;
+      let d = r.config.domain;
 
       if (!this.source) {
         (new plotty.plot({
-          canvas: this.canvas,
-          data: this.raster.data,
-          width: this.raster.width,
-          height: this.raster.height,
+          canvas: r.canvas,
+          data: r.data,
+          width: r.width,
+          height: r.height,
           domain: [d.min, d.max],
-          noDataValue: this.raster.nodata,
+          noDataValue: r.nodata,
           colorScale: this.color_theme,
         })).render();
 
         this.add_source({
           "type": "canvas",
-          "canvas": this.canvas,
+          "canvas": r.canvas,
           "animate": false,
           "coordinates": MAPBOX.coords
         });
@@ -612,7 +611,7 @@ function ea_datasets_tiff() {
       r.height = image.getHeight();
       r.nodata = parseFloat(tiff.fileDirectories[0][0].GDAL_NODATA);
 
-      if (!this.canvas) this.canvas = ce('canvas');
+      if (!r.canvas) r.canvas = ce('canvas');
 
       draw.call(this);
     }

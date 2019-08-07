@@ -52,9 +52,10 @@ async function ea_overlord(msg) {
   const state = ea_state_sync();
 
   switch (msg.type) {
-  case "init":
+  case "init": {
     ea_overlord_init(state);
     break;
+  }
 
   case "view": {
     let t = msg.target;

@@ -19,22 +19,21 @@ function ea_inputs_init() {
 };
 
 function ea_inputs(list) {
-  sortable('#inputs-list', 'disable');
-
   const inputs = qs('#inputs-pane');
   const inputs_list = qs('#inputs-list', inputs);
 
   const ldc = list.map(i => DS.get(i).input_el);
+  const empty = inputs_list.children.length === 0;
 
-  const init = inputs_list.children.length === 0;
+  if (!empty) sortable('#inputs-list', 'disable');
 
   for (let i of ldc)
-    if (!inputs_list.contains(i)) { (init ? inputs_list.append(i) : inputs_list.prepend(i)) }
+    if (!inputs_list.contains(i)) { empty ? inputs_list.append(i) : inputs_list.prepend(i) }
 
   for (let i of inputs_list.children)
     if (!list.includes(i.ds.id)) inputs_list.removeChild(i);
 
-  sortable('#inputs-list', 'enable');
+  if (!empty) sortable('#inputs-list', 'enable');
 };
 
 async function ea_inputs_sort(list) {

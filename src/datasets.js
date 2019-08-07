@@ -360,12 +360,10 @@ class DS {
       if (this.heatmap) this.heatmap.parse.call(this);
 
       await Promise.all(this.items.map(d => d.load(arg)));
-
-      return;
     }
 
     if (!arg)
-      await Promise.all(['vectors', 'csv', 'heatmap'].map(i => (this[i]) ? this.load(i) : null));
+      await Promise.all(['vectors', 'csv', 'heatmap'].map(i => this[i] ? this.load(i) : null));
     else
       if (this[arg]) await this[arg].parse.call(this);
   };
@@ -604,9 +602,7 @@ function ea_datasets_tiff() {
 
       if (!this.canvas) this.canvas = ce('canvas');
 
-      if (MAPBOX) {
-        draw.call(this);
-      }
+      draw.call(this);
     }
 
     return;

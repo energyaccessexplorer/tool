@@ -317,17 +317,17 @@ class DS {
     return s;
   };
 
-  async visible(t) {
+  async visibility(t) {
     if (this.items) {
-      await Promise.all(this.items.map(d => d.visible(t)));
+      await Promise.all(this.items.map(d => d.visibility(t)));
       return;
     }
 
     if (this.layer)
-      MAPBOX.setLayoutProperty(this.id, 'visibility', t ? 'visible' : 'none');
+      this.layer.setLayoutProperty(this.id, 'visibility', t ? 'visible' : 'none');
 
     if (this.host)
-      MAPBOX.setLayoutProperty(this.host.id, 'visibility', t ? 'visible' : 'none');
+      this.host.layer.setLayoutProperty(this.host.id, 'visibility', t ? 'visible' : 'none');
   };
 
   async turn(v, draw) {
@@ -348,7 +348,7 @@ class DS {
 
     if (this.controls_el) this.controls_el.turn(v);
 
-    this.visible(v && draw);
+    this.visibility(v && draw);
   };
 
   async load(arg) {

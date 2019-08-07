@@ -212,7 +212,7 @@ async function ea_overlord(msg) {
 
         if (!t) return;
 
-        if (t.features) {
+        if (t.vectors.features) {
           const et = MAPBOX.queryRenderedFeatures(e.point)[0];
           if (!et) return;
 

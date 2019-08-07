@@ -152,7 +152,7 @@ class dsinput extends HTMLElement {
       break;
 
     case 'polygons':
-      e = (ds.vectors.color_stops && ds.vectors.color_stops.length && ds.parent) ?
+      e = (ds.vectors.config.color_stops && ds.vectors.config.color_stops.length && ds.parent) ?
         cs :
         ea_svg_polygons_symbol.call(ds);
       break;
@@ -197,7 +197,7 @@ class dsinput extends HTMLElement {
       break;
 
     case "polygons":
-      el = (d.vectors.color_stops && d.vectors.color_stops.length && d.parent) ?
+      el = (d.vectors.config.color_stops && d.vectors.config.color_stops.length && d.parent) ?
         tmpl("#ramp-label-0-100") :
         null;
       break;

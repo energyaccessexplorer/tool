@@ -37,22 +37,24 @@ class DS {
     }
 
     if (o.vectors_file) {
-      this.vectors = o.category.vectors;
-      this.vectors.endpoint = o.vectors_file.endpoint;
+      const v = this.vectors = {};
 
-      switch (this.vectors.shape_type) {
+      v.config = JSON.parse(JSON.stringify(o.category.vectors));
+      v.endpoint = o.vectors_file.endpoint;
+
+      switch (v.config.shape_type) {
       case "points": {
-        this.vectors.parse = ea_datasets_points;
+        v.parse = ea_datasets_points;
         break;
       }
 
       case "polygons": {
-        this.vectors.parse = ea_datasets_polygons;
+        v.parse = ea_datasets_polygons;
         break;
       }
 
       case "lines": {
-        this.vectors.parse = ea_datasets_lines;
+        v.parse = ea_datasets_lines;
         break;
       }
       }
@@ -103,7 +105,7 @@ class DS {
       let t = null;
 
       if (this.mutant) t = null;
-      else if (this.vectors) t = this.vectors.shape_type;
+      else if (this.vectors) t = this.vectors.config.shape_type;
       else if (this.parent) t = this.parent.datatype;
       else if (this.raster) t = "raster";
       else throw `Cannot decide datatype of ${this.id}`;
@@ -204,7 +206,7 @@ class DS {
       this.vectors.parse.call(this),
     ]);
 
-    const features_json = JSON.stringify(this.features);
+    const features_json = JSON.stringify(this.vectors.features);
 
     for (let v in this.csv.options) {
       // we can do this because category is plain JSON, not javascript.
@@ -225,7 +227,7 @@ class DS {
       d.raster.config.scale = "key-delta";
 
       Object.assign(d.vectors = {}, this.vectors);
-      Object.assign(d.features = {}, JSON.parse(features_json));
+      Object.assign(d.vectors.features = {}, JSON.parse(features_json));
 
       Object.assign(d.csv = {}, this.csv);
 
@@ -239,9 +241,9 @@ class DS {
 
   async singlefilter_init() {
     let o = this.parent.config.polygons[this.child_id];
-    let cs = this.vectors.color_stops;
+    let cs = this.vectors.config.color_stops;
 
-    let max = Math.max.apply(null, this.features.features.map(f => f.properties[o]));
+    let max = Math.max.apply(null, this.vectors.features.features.map(f => f.properties[o]));
     max = (max <= 1) ? 1 : 100;
 
     const d = Array(cs.length).fill(0).map((x,i) => (0 + i * (max/(cs.length-1))));
@@ -250,13 +252,13 @@ class DS {
     this.color_scale_fn = s;
     this.scale_stops = d;
 
-    const fs = this.features.features;
+    const fs = this.vectors.features.features;
     for (let i = 0; i < fs.length; i += 1)
       fs[i].properties.__color = s(fs[i].properties[o])
 
     this.table = this.parent.table.map(r => r[this.child_id]);
 
-    let src; if (src = MAPBOX.getSource(this.id)) { src.setData(this.features); }
+    let src; if (src = MAPBOX.getSource(this.id)) { src.setData(this.vectors.features); }
   };
 
   /*
@@ -327,6 +329,7 @@ class DS {
     if (this.host) {
       this.hosts.forEach(d => d.layer.setLayoutProperty(d.id, 'visibility', 'none'));
       this.host.layer.setLayoutProperty(this.host.id, 'visibility', t ? 'visible' : 'none');
+    }
   };
 
   async turn(v, draw) {
@@ -635,18 +638,18 @@ function ea_datasets_geojson() {
   const source = _ => {
     this.add_source({
       "type": "geojson",
-      "data": this.features
+      "data": this.vectors.features
     });
   };
 
-  if (this.features)
+  if (this.vectors.features)
     return new Promise((res, rej) => { source(); res(); });
 
   return fetch(this.vectors.endpoint)
     .then(r => r.json())
     .catch(err => ea_datasets_fail.call(this, "GEOJSON"))
     .then(r => {
-      this.features = r;
+      this.vectors.features = r;
 
       try {
         this.vectors.bounds = geojsonExtent(r);
@@ -664,17 +667,19 @@ function ea_datasets_geojson() {
 function ea_datasets_points() {
   return ea_datasets_geojson.call(this)
     .then(_ => {
+      const v = this.vectors.config;
+
       this.add_layer({
         "type": "circle",
         "layout": {
           "visibility": "none",
         },
         "paint": {
-          "circle-radius": this.vectors.width || 3,
-          "circle-opacity": this.vectors.opacity,
-          "circle-color": this.vectors.fill || 'cyan',
-          "circle-stroke-width": this.vectors['stroke-width'] || 1,
-          "circle-stroke-color": this.vectors.stroke || 'black',
+          "circle-radius": v.width || 3,
+          "circle-opacity": v.opacity,
+          "circle-color": v.fill || 'cyan',
+          "circle-stroke-width": v['stroke-width'] || 1,
+          "circle-stroke-color": v.stroke || 'black',
         },
       });
     });
@@ -683,7 +688,7 @@ function ea_datasets_points() {
 function ea_datasets_lines() {
   return ea_datasets_geojson.call(this)
     .then(_ => {
-      let da = this.vectors.dasharray.split(' ').map(x => +x);
+      let da = this.vectors.config.dasharray.split(' ').map(x => +x);
 
       // mapbox-gl does not follow SVG's stroke-dasharray convention when it comes
       // to single numbered arrays.
@@ -700,8 +705,8 @@ function ea_datasets_lines() {
           "visibility": "none",
         },
         "paint": {
-          "line-width": this.vectors.width || 1,
-          "line-color": this.vectors.stroke,
+          "line-width": this.vectors.config.width || 1,
+          "line-color": this.vectors.config.stroke,
           "line-dasharray": da,
         },
       });
@@ -711,15 +716,17 @@ function ea_datasets_lines() {
 function ea_datasets_polygons() {
   return ea_datasets_geojson.call(this)
     .then(_ => {
+      const v = this.vectors.config;
+
       this.add_layer({
         "type": "fill",
         "layout": {
           "visibility": "none",
         },
         "paint": {
-          "fill-color": this.parent ? ['get', '__color'] : this.vectors.fill,
-          "fill-outline-color": this.vectors.stroke,
-          "fill-opacity": this.vectors.opacity,
+          "fill-color": this.parent ? ['get', '__color'] : v.fill,
+          "fill-outline-color": v.stroke,
+          "fill-opacity": v.opacity,
         },
       });
     });

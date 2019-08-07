@@ -421,8 +421,8 @@ function ea_svg_points_symbol() {
     .attr('r', 12)
     .attr('cx', size/2)
     .attr('cy', size/2)
-    .attr('fill', this.vectors.fill)
-    .attr('stroke', this.vectors.stroke)
+    .attr('fill', this.vectors.config.fill)
+    .attr('stroke', this.vectors.config.stroke)
     .attr('stroke-width', 2);
 
   return container.node();
@@ -441,9 +441,9 @@ function ea_svg_lines_symbol() {
     .append('path')
     .attr('d', "M 0.5625,23.71875 C 2.0625,8.0625 14.439788,10.706994 17.625,7.5 20.810212,4.2930056 23.71875,0.375 23.71875,0.375")
     .attr('fill', 'none')
-    .attr('stroke-dasharray', this.vectors.dasharray)
-    .attr('stroke', this.vectors.stroke)
-    .attr('stroke-width', this.vectors.width * 2);
+    .attr('stroke-dasharray', this.vectors.config.dasharray)
+    .attr('stroke', this.vectors.config.stroke)
+    .attr('stroke-width', this.vectors.config.width * 2);
 
   return container.node();
 };
@@ -461,10 +461,10 @@ function ea_svg_polygons_symbol() {
   container
     .append('path')
     .attr('d', "M 5.5532202,7.3474994 24.062506,2.1642083 26.51526,25.827 1.3896115,25.827438 Z")
-    .attr('fill', this.vectors.fill)
-    .attr('fill-opacity', this.vectors.opacity)
-    .attr('stroke', this.vectors.stroke)
-    .attr('stroke-width', this.vectors.width - 1 || 1);
+    .attr('fill', this.vectors.config.fill)
+    .attr('fill-opacity', this.vectors.config.opacity)
+    .attr('stroke', this.vectors.config.stroke)
+    .attr('stroke-width', this.vectors.config.width - 1 || 1);
 
   return container.node();
 };

@@ -74,10 +74,7 @@ function ea_controls_mutant_options() {
   const container = ce('div', null, { class: 'control-option' })
   const select = ce('select');
 
-  ds.config.mutant_targets.forEach(i => {
-    const host = DS.get(i);
-    select.append(ce('option', host.name, { value: i }));
-  });
+  ds.hosts.forEach(d => select.append(ce('option', d.name, { value: d })));
 
   select.value = ds.host.id;
 

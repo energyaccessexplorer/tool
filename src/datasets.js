@@ -150,11 +150,9 @@ class DS {
   };
 
   mutant_init() {
-    if (!this.mutant) throw `${this.id} is not a mutant. Bye.`
+    this.hosts = this.config.mutant_targets.map(i => DS.get(i));
 
-    let m = DS.get(this.config.mutant_targets[0]);
-
-    this.host = m;
+    const m = this.host = this.hosts[0];
 
     this.datatype = m.datatype;
 
@@ -168,14 +166,9 @@ class DS {
   };
 
   async mutate(host) {
-    if (!this.mutant) throw `${this.id} is not a mutant.`;
-
-    if (!this.config.mutant_targets.includes(host.id))
-      throw `${this.id} is not configured to mutate into ${host.id}.`
+    await host.raster.parse.call(host);
 
     this.host = host;
-
-    await host.raster.parse.call(host);
 
     this.datatype = host.datatype;
 
@@ -190,13 +183,6 @@ class DS {
     this.input_el.refresh();
 
     this.canvas = host.canvas;
-
-    let src;
-    if (src = MAPBOX.getSource(this.id)) {
-      src.canvas = MAPBOX.getSource(host.id).canvas;
-      src.play();
-      src.pause();
-    }
 
     return this;
   };
@@ -375,7 +361,7 @@ class DS {
     }
 
     if (this.mutant) {
-      return Promise.all(this.config.mutant_targets.map(i => DS.get(i).load(arg)));
+      return Promise.all(this.hosts.map(d => d.load(arg)));
     }
 
     if (!arg)

@@ -182,8 +182,6 @@ class DS {
 
     this.input_el.refresh();
 
-    this.canvas = host.canvas;
-
     return this;
   };
 
@@ -326,7 +324,8 @@ class DS {
     if (this.layer)
       this.layer.setLayoutProperty(this.id, 'visibility', t ? 'visible' : 'none');
 
-    if (this.host)
+    if (this.host) {
+      this.hosts.forEach(d => d.layer.setLayoutProperty(d.id, 'visibility', 'none'));
       this.host.layer.setLayoutProperty(this.host.id, 'visibility', t ? 'visible' : 'none');
   };
 

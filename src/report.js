@@ -144,13 +144,20 @@ contact our team at`;
 
     const pies = qsa('#summary-graphs .index-graphs-container svg');
 
+    doc.line(hhalf, c, hhalf, page.height, 'S');
+
     await images_block("eai", lpad, c, pies[0], pies[1]);
     await images_block("ani", hhalf, c, pies[6], pies[7]);
 
-    c += font_size * 2;
+    y = c + block_height;
 
-    await images_block("demand", lpad, c + block_height, pies[2], pies[3]);
-    await images_block("supply", hhalf, c + block_height, pies[4], pies[5]);
+    doc.line(lpad, y, page.width + lpad, y, 'S');
+
+    c += font_size * 2;
+    y = c + block_height;
+
+    await images_block("demand", lpad, y, pies[2], pies[3]);
+    await images_block("supply", hhalf, y, pies[4], pies[5]);
   };
 
   async function svg_png(svg, width, height) {
@@ -190,7 +197,7 @@ contact our team at`;
     doc.setFontSize(font_size);
     doc.setTextColor("#00794C");
 
-    doc.text(ea_indexes[indexname]['name'].toUpperCase(), x, y);
+    doc.text(ea_indexes[indexname]['name'].toUpperCase(), x + 20, y);
 
     const image_width = map_height * canvas_ratio;
 

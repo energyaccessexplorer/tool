@@ -33,10 +33,10 @@ async function ea_summary() {
   scale.append(
     ea_svg_color_steps(
       d3.scaleLinear()
-        .domain(ea_color_scale.domain)
-        .range(ea_color_scale.stops)
+        .domain(ea_default_colorscale.domain)
+        .range(ea_default_colorscale.stops)
         .clamp(false),
-      ea_color_scale.domain),
+      ea_default_colorscale.domain),
     tmpl("#ramp-label-low-high"));
 
   async function get_summaries(idxn) {
@@ -44,8 +44,8 @@ async function ea_summary() {
 
     summary[idxn] = await ea_summary_analyse(raster);
 
-    let ppie = ea_svg_pie(summary[idxn]['population']['distribution'].map(x => [x]), 75, 0, ea_color_scale.stops, null);
-    let apie = ea_svg_pie(summary[idxn]['area']['distribution'].map(x => [x]), 75, 0, ea_color_scale.stops, null);
+    let ppie = ea_svg_pie(summary[idxn]['population']['distribution'].map(x => [x]), 75, 0, ea_default_colorscale.stops, null);
+    let apie = ea_svg_pie(summary[idxn]['area']['distribution'].map(x => [x]), 75, 0, ea_default_colorscale.stops, null);
 
     graphs.append(el_tree(
       [ ce('div', null, { class: 'index-group' }), [
@@ -82,7 +82,7 @@ async function ea_summary() {
 
   graphs.append(ce('div', scale.cloneNode(true), { class: "index-graphs-scale" }));
 
-  const s = ea_color_scale.stops;
+  const s = ea_default_colorscale.stops;
 
   const i20 = i => (20 * i) + "-" + (20 * (i+1));
 
@@ -147,7 +147,7 @@ async function ea_summary_analyse(raster) {
 
   let a = new Float32Array(raster.length).fill(-1);
 
-  let f = d3.scaleQuantize().domain([0,1]).range(ea_color_scale.domain);
+  let f = d3.scaleQuantize().domain([0,1]).range(ea_default_colorscale.domain);
 
   for (var i = 0; i < raster.length; i += 1) {
     const r = raster[i];

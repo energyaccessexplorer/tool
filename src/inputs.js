@@ -134,12 +134,12 @@ class dsinput extends HTMLElement {
     const ds = this.ds;
     let e, cs;
 
-    if (ds.scale_stops) {
-      cs = ea_svg_color_steps(ds.color_scale_fn, ds.scale_stops);
+    if (ds.colorscale && ds.colorscale.stops) {
+      cs = ea_svg_color_steps(ds.colorscale.fn, ds.colorscale.stops);
     }
     else {
       if (ds.parent)
-        cs = ea_svg_color_steps(ds.parent.color_scale_fn, ds.parent.scale_stops);
+        cs = ea_svg_color_steps(ds.parent.colorscale.fn, ds.parent.colorscale.stops);
     }
 
     switch (ds.datatype) {

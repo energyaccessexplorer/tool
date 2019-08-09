@@ -24,10 +24,10 @@ function ea_indexes_init(state) {
   scale.append(
     ea_svg_color_steps(
       d3.scaleLinear()
-        .domain(ea_color_scale.domain)
-        .range(ea_color_scale.stops)
+        .domain(ea_default_colorscale.domain)
+        .range(ea_default_colorscale.stops)
         .clamp(false),
-      ea_color_scale.domain),
+      ea_default_colorscale.domain),
     tmpl("#ramp-label-low-high"));
 
   const cos = qs('#canvas-output-select');
@@ -47,8 +47,8 @@ function ea_indexes_init(state) {
   info.append(tmpl('#svg-info'));
   info.onclick = _ => ea_indexes_modal();
 
-  window.POPULATION_PIE = ea_svg_pie([[0], [0], [0], [0], [0]], 75, 0, ea_color_scale.stops, null);
-  window.AREA_PIE = ea_svg_pie([[0], [0], [0], [0], [0]], 75, 0, ea_color_scale.stops, null);
+  window.POPULATION_PIE = ea_svg_pie([[0], [0], [0], [0], [0]], 75, 0, ea_default_colorscale.stops, null);
+  window.AREA_PIE = ea_svg_pie([[0], [0], [0], [0], [0]], 75, 0, ea_default_colorscale.stops, null);
 
   qs('#index-graphs').append(el_tree(
     [ ce('div', null, { class: 'index-graphs-container' }), [

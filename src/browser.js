@@ -19,9 +19,8 @@
     },
 
     Safari: {
-      min: 10,
+      min: 11,
       reason: "Shadow DOM support",
-      note: "not fully functional (canvas shows empty rasters)"
     },
 
     Edge: {
@@ -64,13 +63,9 @@
     throw "Internet Explorer is unsupported. Hej då.";
   }
 
-  else if (m = v.match(/(Firefox|Chrome|Opera|Edge) (.*)/i)) {
+  else if (m = v.match(/(Firefox|Chrome|Opera|Edge|Safari) (.*)/i)) {
     if (support[m[1]]["min"] > parseInt(m[2])) {
       alert("This platform is known NOT to work on " + v + "." + update);
     }
-  }
-
-  else if (m = v.match(/Safari (.*)/i)) {
-    alert("This platform is known to be " + support['Safari']['note'] + " on " + v + "." + usethis);
   }
 })();

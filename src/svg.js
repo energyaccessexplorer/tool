@@ -256,7 +256,7 @@ function ea_svg_pie(data, outer, inner, colors, inner_text) {
   };
 };
 
-function ea_svg_color_steps(color_scale, steps, height) {
+function ea_svg_color_steps(colorscale, steps, height) {
   const h = height || 8;
 
   const svg = d3.select(document.createElementNS(d3.namespaces.svg, "svg"))
@@ -266,7 +266,7 @@ function ea_svg_color_steps(color_scale, steps, height) {
 
   steps.forEach((v,i) => {
     g.append('rect')
-      .attr('fill', color_scale(v,i))
+      .attr('fill', colorscale(v,i))
       .attr('stroke', 'none')
       .attr('x', `${(100/steps.length) * i}%`)
       .attr('width', `${100/steps.length}%`)

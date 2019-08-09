@@ -45,7 +45,6 @@ build-tool:
 	@cat \
 		${LIB}/d3.js \
 		${LIB}/geotiff.js \
-		${LIB}/plotty.js \
 		${LIB}/mapbox-gl.js \
 		${LIB}/geojson-extent.js \
 		${LIB}/flash.js \

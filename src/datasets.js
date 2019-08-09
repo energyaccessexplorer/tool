@@ -31,9 +31,6 @@ class DS {
 
       if (r.config.scale === 'multi-key-delta')
         this.children = [];
-
-      if (!this.mutant && !this.items)
-        ea_datasets_color_scale.call(this);
     }
 
     if (o.vectors_file) {
@@ -112,6 +109,9 @@ class DS {
 
       return t;
     })();
+
+    if (this.datatype === 'raster')
+      ea_datasets_colorscale.call(this);
   };
 
   disable() {
@@ -162,8 +162,7 @@ class DS {
 
     this.vectors = m.vectors;
 
-    this.color_scale_fn = m.color_scale_fn;
-    this.scale_stops = m.scale_stops;
+    this.colorscale = m.colorscale;
   };
 
   async mutate(host) {
@@ -177,8 +176,7 @@ class DS {
 
     this.vectors = host.vectors;
 
-    this.color_scale_fn = host.color_scale_fn;
-    this.scale_stops = host.scale_stops;
+    this.colorscale = host.colorscale;
 
     this.input_el.refresh();
 
@@ -247,8 +245,9 @@ class DS {
     const d = Array(cs.length).fill(0).map((x,i) => (0 + i * (max/(cs.length-1))));
     const s = d3.scaleLinear().domain(d).range(cs);
 
-    this.color_scale_fn = s;
-    this.scale_stops = d;
+    this.colorscale = {};
+    this.colorscale.fn = s;
+    this.colorscale.stops = d;
 
     const fs = this.vectors.features.features;
     for (let i = 0; i < fs.length; i += 1)
@@ -451,25 +450,26 @@ async function ea_datasets_init(id, inputs, preset, callback) {
   await Promise.all(DS.all.filter(d => d.children).map(d => d.children_init(inputs)));
 };
 
-function ea_datasets_color_scale() {
+function ea_datasets_colorscale() {
+  let d;
   let cs = this.raster.config.color_stops;
 
-  let c = ea_color_scale.name;
-  let d = ea_color_scale.domain;
 
-  if (!cs || !cs.length)
-    this.raster.config.color_stops = cs = ea_color_scale.stops;
-  else
+  if (!cs || !cs.length) {
+    cs = ea_default_colorscale.stops;
+    d = ea_default_colorscale.domain;
+  }
+  else {
     d = Array(cs.length).fill(0).map((x,i) => (0 + i * (1/(cs.length-1))));
+  }
 
-  this.scale_stops = d;
+  this.colorscale = {};
+  this.colorscale.stops = d;
 
   {
     let intervals;
 
     if (this.raster.config.configuration && (intervals = this.raster.config.configuration.intervals)) {
-      let l = intervals.length;
-
       let domain = this.raster.config.domain;
 
       let s = d3.scaleLinear()
@@ -496,19 +496,18 @@ function ea_datasets_color_scale() {
         a[i+3] = color[3];
       }
 
-      plotty.colorscales[c = this.id] = a;
-
-      this.color_theme = c;
-
-      this.color_scale_fn = (x,i) => cs[i];
+      this.colorscale.data = a;
+      this.colorscale.fn = (x,i) => cs[i];
     }
 
     else {
-      plotty.addColorScale((c = this.id), cs, d);
+      const a = ea_colorscale({
+        stops: cs,
+        domain: d
+      });
 
-      this.color_theme = c;
-
-      this.color_scale_fn = d3.scaleLinear()
+      this.colorscale.data = a.data;
+      this.colorscale.fn = d3.scaleLinear()
         .domain(d)
         .range(cs)
         .clamp(this.raster.config.clamp || false);
@@ -563,18 +562,18 @@ function ea_datasets_tiff() {
       const r = this.raster;
       let d = r.config.domain;
 
-      if (this.vectors || this.items) return;
+      if (this.datatype !== 'raster') return;
 
       if (!this.source) {
-        (new plotty.plot({
+        ea_plot({
           canvas: r.canvas,
           data: r.data,
           width: r.width,
           height: r.height,
           domain: [d.min, d.max],
-          noDataValue: r.nodata,
-          colorScale: this.color_theme,
-        })).render();
+          nodata: r.nodata,
+          colorscale: this.colorscale
+        });
 
         this.add_source({
           "type": "canvas",

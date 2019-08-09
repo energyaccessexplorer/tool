@@ -26,17 +26,17 @@ function ea_plot(opts) {
 };
 
 /*
- * ea_canvas_plot
+ * ea_plot_output
  *
  * @param "raster" []numbers
  * @param "canvas" a canvas element (if null, will default to canvas#output)
  */
 
-function ea_canvas_plot(data, canvas) {
+function ea_plot_output(data, canvas = null) {
   const A = DS.get('boundaries');
 
   if (!data.length) {
-    warn("ea_canvas_plot: no raster given. Filling up with a blank (transparent) one...");
+    warn("ea_plot_output: no raster given. Filling up with a blank (transparent) one...");
     data = new Float32Array(A.raster.data.length).fill(-1);
   };
 

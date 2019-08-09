@@ -560,10 +560,10 @@ function ea_datasets_csv() {
 function ea_datasets_tiff() {
   async function run_it(blob) {
     function draw() {
-      if (this.vectors) return;
-
       const r = this.raster;
       let d = r.config.domain;
+
+      if (this.vectors || this.items) return;
 
       if (!this.source) {
         (new plotty.plot({
@@ -634,15 +634,9 @@ function ea_datasets_tiff() {
 };
 
 function ea_datasets_geojson() {
-  const source = _ => {
-    this.add_source({
-      "type": "geojson",
-      "data": this.vectors.features
-    });
-  };
 
   if (this.vectors.features)
-    return new Promise((res, rej) => { source(); res(); });
+    return new Promise((res, rej) => res());
 
   return fetch(this.vectors.endpoint)
     .then(r => r.json())
@@ -659,14 +653,18 @@ function ea_datasets_geojson() {
         warn(`geojsonExtent failed for '${this.id}'. This is not fatal. Here's the error:`, r);
         log(err);
       }
-    })
-    .then(r => source());
+    });
 };
 
 function ea_datasets_points() {
   return ea_datasets_geojson.call(this)
     .then(_ => {
       const v = this.vectors.config;
+
+      this.add_source({
+        "type": "geojson",
+        "data": this.vectors.features
+      });
 
       this.add_layer({
         "type": "circle",
@@ -687,16 +685,42 @@ function ea_datasets_points() {
 function ea_datasets_lines() {
   return ea_datasets_geojson.call(this)
     .then(_ => {
-      let da = this.vectors.config.dasharray.split(' ').map(x => +x);
-
       // mapbox-gl does not follow SVG's stroke-dasharray convention when it comes
       // to single numbered arrays.
       //
+      let da = this.vectors.config.dasharray.split(' ').map(x => +x);
       if (da.length === 1) {
         (da[0] === 0) ?
           da = [1] :
           da = [da[0], da[0]];
       }
+
+      specs = null;
+
+      const fs = this.vectors.features.features;
+
+
+      for (let i = 0; i < fs.length; i += 1) {
+        if (specs) {
+          for (let s of Object.keys(specs)) {
+            if (fs[i].properties[s] === specs[s]['match'] || (new RegExp(specs[s]['match'])).test(fs[i].properties[s])) {
+              fs[i].properties['__color'] = specs[s]['stroke'];
+              fs[i].properties['__width'] = specs[s]['stroke-width'];
+              fs[i].properties['__dasharray'] = specs[s]['stroke-width'];
+            }
+          }
+        }
+        else {
+          fs[i].properties['__color'] = this.vectors.config.stroke;
+          fs[i].properties['__width'] = this.vectors.config.width || 1;
+          fs[i].properties['__dasharray'] = da;
+        }
+      }
+
+      this.add_source({
+        "type": "geojson",
+        "data": this.vectors.features
+      });
 
       this.add_layer({
         "type": "line",
@@ -704,8 +728,11 @@ function ea_datasets_lines() {
           "visibility": "none",
         },
         "paint": {
-          "line-width": this.vectors.config.width || 1,
-          "line-color": this.vectors.config.stroke,
+          "line-color": ['get', '__color'],
+          "line-width": ['get', '__width'],
+          // Waiting for mapbox to do something about this...
+          //
+          // "line-dasharray": ['get', '__dasharray']
           "line-dasharray": da,
         },
       });
@@ -716,6 +743,11 @@ function ea_datasets_polygons() {
   return ea_datasets_geojson.call(this)
     .then(_ => {
       const v = this.vectors.config;
+
+      this.add_source({
+        "type": "geojson",
+        "data": this.vectors.features
+      });
 
       this.add_layer({
         "type": "fill",

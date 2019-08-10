@@ -1,3 +1,194 @@
+class dscontrols extends HTMLElement {
+  constructor(d) {
+    if (!(d instanceof DS)) throw Error(`dscontrols: Expected a DS. Got ${d}.`);
+    super();
+
+    this.ds = d;
+    attach.call(this, shadow_tmpl('#ds-controls-template'));
+
+    this.content = qs('content', this);
+    this.spinner = qs('.loading', this);
+
+    this.show_advanced = false;
+
+    this.init();
+
+    this.render();
+
+    return this;
+  };
+
+  activate() {
+    this.ds.active = !this.ds.active;
+
+    ea_overlord({
+      "type": "dataset",
+      "target": this.ds,
+      "caller": "controls activate",
+    });
+  };
+
+  init() {
+    if (this.ds.parent)
+      this.range_group = ea_controls_range.call(this, (this.ds.parent.category.unit || 'range'));
+
+    this.checkbox = ea_controls_checkbox.call(this);
+
+    const cat = this.ds.category;
+    const c = cat.configuration.controls;
+
+    if (c.weight)
+      this.weight_group = ea_controls_weight.call(this);
+
+    const lr = c.range_label || cat.unit || 'range';
+
+    if (c.range === 'double')
+      this.range_group = ea_controls_range.call(this, lr);
+    else if (c.range === 'single')
+      this.range_group = ea_controls_single.call(this, lr);
+
+    if (this.ds.items)
+      this.collection_list = ea_controls_collection_list.call(this);
+
+    if (this.ds.mutant)
+      this.mutant_options = ea_controls_mutant_options.call(this);
+
+    const dropdownlist = [{
+      "content": "Dataset info",
+      "action": _ => ea_dataset_modal(this.ds)
+    }];
+
+    if (this.weight_group) {
+      dropdownlist.push({
+        "content": "Toggle advanced controls",
+        "action": _ => {
+          if (!this.ds.active) this.activate();
+
+          qs('.advanced-controls', this).style.display = (this.show_advanced = !this.show_advanced) ? 'block' : 'none';
+        }
+      });
+    }
+
+    dropdownlist.push({
+      "content": "Reset default values",
+      "action": _ => this.reset_defaults()
+    });
+
+    this.dropdown = new dropdown(dropdownlist)
+  };
+
+  render() {
+    this.content.style.display = this.ds.active ? '' : 'none';
+
+    slot_populate.call(this, this.ds, {
+      "dropdown": this.dropdown,
+      "info": this.info,
+      "checkbox": this.checkbox.svg,
+      "collection-list": this.collection_list,
+      "mutant-options": this.mutant_options,
+      "range-slider": this.range_group && this.range_group.el,
+      "weight-slider": this.weight_group && this.weight_group.el,
+    });
+
+    if (!this.weight_group && !this.range_group) this.content.remove();
+
+    this.inject();
+
+    return this;
+  };
+
+  loading(t) {
+    this.spinner.style.display = t ? 'block' : 'none';
+  };
+
+  turn(t) {
+    this.content.style.display = t ? '' : 'none';
+    if (this.checkbox) this.checkbox.change(t);
+  };
+
+  inject() {
+    const ds = this.ds;
+    const path = ds.category.configuration.path;
+
+    if (!path.length) return;
+    if (ds.children) return;
+
+    const controls_el = qs('#controls-contents');
+    const controls_tabs_el = qs('#controls-tabs');
+
+    function create_tab(name) {
+      return ce('div', name, { id: 'controls-tab-' + name, class: 'controls-branch-tab up-title' });
+    };
+
+    function create_branch(name) {
+      return ce('div', null, { id: name, class: 'controls-branch' });
+    };
+
+    function create_subbranch(name) {
+      let conel, title;
+      const el = ce('div', null, { id: name, class: 'controls-subbranch' });
+
+      el.append(
+        title = ce('div', (ea_branch_dict[name] || name), { class: 'controls-subbranch-title up-title' }),
+        conel = ce('div', null, { class: 'controls-container' })
+      );
+
+      title.prepend(ce('span', collapse_triangle('s'), { class: 'collapse triangle' }));
+      title.addEventListener('mouseup', e => elem_collapse(conel, el));
+
+      return el;
+    };
+
+    let t = qs(`#controls-tab-${path[0]}.controls-branch-tab`);
+    if (!t) {
+      t = create_tab(path[0]);
+      t.onclick = _ => ea_controls_select_tab(t, path[0]);
+      controls_tabs_el.append(t);
+    }
+
+    let b = qs(`#${path[0]}.controls-branch`, controls_el);
+    if (!b) b = create_branch(path[0]);
+    controls_el.append(b);
+
+    let sb = qs(`#${path[1]}.controls-subbranch`, b);
+    if (!sb) sb = create_subbranch(path[1]);
+    b.append(sb);
+
+    const container = qs('.controls-container', sb);
+    if (container) container.append(this);
+  };
+
+  disable() {
+    qs('main', this).classList.add('disabled');
+
+    this.loading(true);
+
+    this.spinner.remove();
+    this.content.remove();
+
+    if (this.checkbox) this.checkbox.svg.remove();
+  };
+
+  reset_defaults() {
+    if (this.weight_group) {
+      this.weight_group.change(this.ds.weight = 2);
+    }
+
+    if (this.range_group) {
+      const d = this.ds.category.raster.config.init;
+      this.range_group.change(d.min, d.max);
+    }
+
+    ea_overlord({
+      "type": "dataset",
+      "target": this.ds,
+      "caller": "dscontrols restore defaults"
+    });
+  };
+}
+
+customElements.define('ds-controls', dscontrols);
+
 function ea_controls_init(state) {
   ea_controls_selectlist();
   ea_controls_presets_init(state.preset);
@@ -277,194 +468,3 @@ function ea_controls_presets_set(d, v) {
 
   return d.active;
 };
-
-class dscontrols extends HTMLElement {
-  constructor(d) {
-    if (!(d instanceof DS)) throw Error(`dscontrols: Expected a DS. Got ${d}.`);
-    super();
-
-    this.ds = d;
-    attach.call(this, shadow_tmpl('#ds-controls-template'));
-
-    this.content = qs('content', this);
-    this.spinner = qs('.loading', this);
-
-    this.show_advanced = false;
-
-    this.init();
-
-    this.render();
-
-    return this;
-  };
-
-  activate() {
-    this.ds.active = !this.ds.active;
-
-    ea_overlord({
-      "type": "dataset",
-      "target": this.ds,
-      "caller": "controls activate",
-    });
-  };
-
-  init() {
-    if (this.ds.parent)
-      this.range_group = ea_controls_range.call(this, (this.ds.parent.category.unit || 'range'));
-
-    this.checkbox = ea_controls_checkbox.call(this);
-
-    const cat = this.ds.category;
-    const c = cat.configuration.controls;
-
-    if (c.weight)
-      this.weight_group = ea_controls_weight.call(this);
-
-    const lr = c.range_label || cat.unit || 'range';
-
-    if (c.range === 'double')
-      this.range_group = ea_controls_range.call(this, lr);
-    else if (c.range === 'single')
-      this.range_group = ea_controls_single.call(this, lr);
-
-    if (this.ds.items)
-      this.collection_list = ea_controls_collection_list.call(this);
-
-    if (this.ds.mutant)
-      this.mutant_options = ea_controls_mutant_options.call(this);
-
-    const dropdownlist = [{
-      "content": "Dataset info",
-      "action": _ => ea_dataset_modal(this.ds)
-    }];
-
-    if (this.weight_group) {
-      dropdownlist.push({
-        "content": "Toggle advanced controls",
-        "action": _ => {
-          if (!this.ds.active) this.activate();
-
-          qs('.advanced-controls', this).style.display = (this.show_advanced = !this.show_advanced) ? 'block' : 'none';
-        }
-      });
-    }
-
-    dropdownlist.push({
-      "content": "Reset default values",
-      "action": _ => this.reset_defaults()
-    });
-
-    this.dropdown = new dropdown(dropdownlist)
-  };
-
-  render() {
-    this.content.style.display = this.ds.active ? '' : 'none';
-
-    slot_populate.call(this, this.ds, {
-      "dropdown": this.dropdown,
-      "info": this.info,
-      "checkbox": this.checkbox.svg,
-      "collection-list": this.collection_list,
-      "mutant-options": this.mutant_options,
-      "range-slider": this.range_group && this.range_group.el,
-      "weight-slider": this.weight_group && this.weight_group.el,
-    });
-
-    if (!this.weight_group && !this.range_group) this.content.remove();
-
-    this.inject();
-
-    return this;
-  };
-
-  loading(t) {
-    this.spinner.style.display = t ? 'block' : 'none';
-  };
-
-  turn(t) {
-    this.content.style.display = t ? '' : 'none';
-    if (this.checkbox) this.checkbox.change(t);
-  };
-
-  inject() {
-    const ds = this.ds;
-    const path = ds.category.configuration.path;
-
-    if (!path.length) return;
-    if (ds.children) return;
-
-    const controls_el = qs('#controls-contents');
-    const controls_tabs_el = qs('#controls-tabs');
-
-    function create_tab(name) {
-      return ce('div', name, { id: 'controls-tab-' + name, class: 'controls-branch-tab up-title' });
-    };
-
-    function create_branch(name) {
-      return ce('div', null, { id: name, class: 'controls-branch' });
-    };
-
-    function create_subbranch(name) {
-      let conel, title;
-      const el = ce('div', null, { id: name, class: 'controls-subbranch' });
-
-      el.append(
-        title = ce('div', (ea_branch_dict[name] || name), { class: 'controls-subbranch-title up-title' }),
-        conel = ce('div', null, { class: 'controls-container' })
-      );
-
-      title.prepend(ce('span', collapse_triangle('s'), { class: 'collapse triangle' }));
-      title.addEventListener('mouseup', e => elem_collapse(conel, el));
-
-      return el;
-    };
-
-    let t = qs(`#controls-tab-${path[0]}.controls-branch-tab`);
-    if (!t) {
-      t = create_tab(path[0]);
-      t.onclick = _ => ea_controls_select_tab(t, path[0]);
-      controls_tabs_el.append(t);
-    }
-
-    let b = qs(`#${path[0]}.controls-branch`, controls_el);
-    if (!b) b = create_branch(path[0]);
-    controls_el.append(b);
-
-    let sb = qs(`#${path[1]}.controls-subbranch`, b);
-    if (!sb) sb = create_subbranch(path[1]);
-    b.append(sb);
-
-    const container = qs('.controls-container', sb);
-    if (container) container.append(this);
-  };
-
-  disable() {
-    qs('main', this).classList.add('disabled');
-
-    this.loading(true);
-
-    this.spinner.remove();
-    this.content.remove();
-
-    if (this.checkbox) this.checkbox.svg.remove();
-  };
-
-  reset_defaults() {
-    if (this.weight_group) {
-      this.weight_group.change(this.ds.weight = 2);
-    }
-
-    if (this.range_group) {
-      const d = this.ds.category.raster.config.init;
-      this.range_group.change(d.min, d.max);
-    }
-
-    ea_overlord({
-      "type": "dataset",
-      "target": this.ds,
-      "caller": "dscontrols restore defaults"
-    });
-  };
-}
-
-customElements.define('ds-controls', dscontrols);

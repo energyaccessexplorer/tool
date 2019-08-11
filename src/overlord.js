@@ -364,8 +364,8 @@ async function ea_overlord_init(state) {
         .map(d => {
           // dsinput and dscontrols might have already been created by items_init
           //
-          d.input_el = d.input_el || new dsinput(d);
-          d.controls_el = d.controls_el || new dscontrols(d);
+          d.input = d.input || new dsinput(d);
+          d.controls = d.controls || new dscontrols(d);
           return d;
         })
         .filter(d => d.active)

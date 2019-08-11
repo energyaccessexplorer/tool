@@ -118,8 +118,8 @@ class DS {
     this.active = false;
     this.disabled = true;
 
-    if (this.controls_el) this.controls_el.disable();
-    if (this.input_el) this.input_el.disable();
+    if (this.controls) this.controls.disable();
+    if (this.input) this.input.disable();
 
     if (this.items) {
       for (let d of this.items) { d.disable(); }
@@ -178,7 +178,7 @@ class DS {
 
     this.colorscale = host.colorscale;
 
-    this.input_el.refresh();
+    this.input.refresh();
 
     return this;
   };
@@ -186,7 +186,7 @@ class DS {
   items_init() {
     for (let i of this.config.collection) {
       const d = DS.get(i);
-      d.input_el = d.input_el || new dsinput(d);
+      d.input = d.input || new dsinput(d);
       d.collection = this;
 
       this.items.push(d);
@@ -341,21 +341,21 @@ class DS {
 
   async turn(v, draw) {
     if (v) {
-      if (this.controls_el) this.controls_el.loading(true);
+      this.controls.loading(true);
       await this.load();
-      if (this.controls_el) this.controls_el.loading(false);
+      this.controls.loading(false);
     }
 
     if (this.items) {
       await Promise.all(this.items.map(d => d.turn(v, draw)));
-      this.controls_el.turn(v);
+      this.controls.turn(v);
 
       return;
     }
 
     if (this.mutant) this.mutate(this.host);
 
-    if (this.controls_el) this.controls_el.turn(v);
+    if (this.controls) this.controls.turn(v);
 
     this.visibility(v && draw);
   };

@@ -105,7 +105,7 @@ class dscontrols extends HTMLElement {
     if (!path.length) return;
     if (ds.children) return;
 
-    const controls_el = qs('#controls-contents');
+    const controls = qs('#controls-contents');
     const controls_tabs_el = qs('#controls-tabs');
 
     function create_tab(name) {
@@ -138,9 +138,9 @@ class dscontrols extends HTMLElement {
       controls_tabs_el.append(t);
     }
 
-    let b = qs(`#${path[0]}.controls-branch`, controls_el);
+    let b = qs(`#${path[0]}.controls-branch`, controls);
     if (!b) b = create_branch(path[0]);
-    controls_el.append(b);
+    controls.append(b);
 
     let sb = qs(`#${path[1]}.controls-subbranch`, b);
     if (!sb) sb = create_subbranch(path[1]);
@@ -185,7 +185,7 @@ function ea_controls_init(state) {
   ea_controls_selectlist();
   ea_controls_presets_init(state.preset);
 
-  const controls_el = qs('#controls-contents');
+  const controls = qs('#controls-contents');
   const controls_tabs_el = qs('#controls-tabs');
   const tab_all = ce('div', "all", { id: 'controls-tab-all', class: 'controls-branch-tab up-title' });
 
@@ -195,7 +195,7 @@ function ea_controls_init(state) {
     for (let e of qsa('.controls-branch-tab', controls_tabs_el))
       e.classList.remove('active');
 
-    for (let e of qsa('.controls-branch', controls_el))
+    for (let e of qsa('.controls-branch', controls))
       e.style.display = '';
 
     tab_all.classList.add('active');
@@ -208,19 +208,19 @@ function ea_controls_init(state) {
 
 function ea_controls_select_tab(tab, name) {
   const controls_tabs_el = qs('#controls-tabs');
-  const controls_el = qs('#controls-contents');
+  const controls = qs('#controls-contents');
 
   for (let e of qsa('.controls-branch-tab', controls_tabs_el))
     e.classList.remove('active');
 
-  for (let e of qsa('.controls-branch', controls_el)) {
+  for (let e of qsa('.controls-branch', controls)) {
     let all = (name === 'all');
     e.style.display = all ? '' : 'none';
   }
 
   tab.classList.add('active');
 
-  const b = qs('#' + name, controls_el);
+  const b = qs('#' + name, controls);
   if (b) b.style.display = 'block';
 };
 

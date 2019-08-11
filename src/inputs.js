@@ -22,7 +22,7 @@ function ea_inputs(list) {
   const inputs = qs('#inputs-pane');
   const inputs_list = qs('#inputs-list', inputs);
 
-  const ldc = list.map(i => DS.get(i).input_el);
+  const ldc = list.map(i => DS.get(i).input);
   const empty = inputs_list.children.length === 0;
 
   if (!empty) sortable('#inputs-list', 'disable');
@@ -172,7 +172,7 @@ class dsinput extends HTMLElement {
       for (let d of ds.items) {
         let li = ce('li');
 
-        li.append(d.input_el.svg_el, ce('div', d.name, { class: 'subheader' }));
+        li.append(d.input.svg_el, ce('div', d.name, { class: 'subheader' }));
         el.append(li);
       }
 

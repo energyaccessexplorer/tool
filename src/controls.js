@@ -6,6 +6,8 @@ class dscontrols extends HTMLElement {
     this.ds = d;
     attach.call(this, shadow_tmpl('#ds-controls-template'));
 
+    this.main = qs('main', this);
+    this.header = qs('header', this);
     this.content = qs('content', this);
     this.spinner = qs('.loading', this);
 
@@ -16,16 +18,6 @@ class dscontrols extends HTMLElement {
     this.render();
 
     return this;
-  };
-
-  activate() {
-    this.ds.active = !this.ds.active;
-
-    ea_overlord({
-      "type": "dataset",
-      "target": this.ds,
-      "caller": "controls activate",
-    });
   };
 
   init() {
@@ -62,7 +54,7 @@ class dscontrols extends HTMLElement {
       dropdownlist.push({
         "content": "Toggle advanced controls",
         "action": _ => {
-          if (!this.ds.active) this.activate();
+          if (!this.ds.active) this.ds.toggle();
 
           qs('.advanced-controls', this).style.display = (this.show_advanced = !this.show_advanced) ? 'block' : 'none';
         }
@@ -159,7 +151,7 @@ class dscontrols extends HTMLElement {
   };
 
   disable() {
-    qs('main', this).classList.add('disabled');
+    this.main.classList.add('disabled');
 
     this.loading(true);
 
@@ -235,12 +227,12 @@ function ea_controls_select_tab(tab, name) {
 function ea_controls_checkbox() {
   const ds = this.ds;
 
-  const checkbox = ea_svg_checkbox(ds.active);
+  const checkbox = ea_svg_checkbox(this.ds.active);
   const svg = checkbox.svg;
 
-  const checkbox_activate = e => {
+  const checkbox_toggle = e => {
     if (e.target.closest('svg') === svg)
-      this.activate();
+      this.ds.toggle();
 
     else if (e.target.closest('.more-dropdown') === this.dropdown)
       return;
@@ -251,10 +243,10 @@ function ea_controls_checkbox() {
       svg.dispatchEvent(event);
     }
 
-    return ds.active;
+    return this.ds.active;
   };
 
-  qs('header', this).onclick = checkbox_activate;
+  this.header.onclick = checkbox_toggle;
 
   return checkbox;
 };

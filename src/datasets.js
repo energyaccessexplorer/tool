@@ -329,6 +329,16 @@ class DS {
     }
   };
 
+  toggle() {
+    this.active = !this.active;
+
+    ea_overlord({
+      "type": "dataset",
+      "target": this,
+      "caller": "ds toggle",
+    });
+  };
+
   async turn(v, draw) {
     if (v) {
       if (this.controls_el) this.controls_el.loading(true);

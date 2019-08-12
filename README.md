@@ -1,4 +1,4 @@
-# Energy Access Explorer Frontend
+# Energy Access Explorer Tool
 
 This is the source code for the primary visualisation of the platform. A live
 version found [here](https://energyaccessexplorer.org/maps-and-data/select).

@@ -184,26 +184,29 @@ function mapbox_pointer(content, x, y) {
   let p = qs('#mapbox-pointer');
 
   if (!p) {
-    p = ce('div', content, {
+    p = ce('div', null, {
       id: "mapbox-pointer",
       style: `
 position: absolute;
-left: ${x}px;
-top: ${y}px;
-background-color: white;
-box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
-border-radius: 0 4px 4px 4px;
-padding: 16px;`
+left: ${x - 10}px;
+top: ${y - 10}px;
+height: 20px;
+width: 20px;
+background-color: transparent;
+`
     });
   }
 
   document.body.append(p);
 
+  const mark = nanny.pick_element(p, { position: "W", message: content, title: "Details", close: false });
+
   let l;
 
-  document.body.addEventListener('mousemove', (l = function() {
+  p.addEventListener('mouseleave', (l = function() {
     p.remove();
-    document.removeEventListener('mousemove', l);
+    mark.remove();
+    document.removeEventListener('mouseleave', l);
   }));
 };
 

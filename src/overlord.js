@@ -374,6 +374,8 @@ async function ea_overlord_init(state) {
 
   state.set_inputs_param(a);
 
+  ea_controls_sort_datasets(GEOGRAPHY.configuration.sort_datasets);
+
   ea_views_init();
   ea_inputs_init();
   ea_indexes_init(state);

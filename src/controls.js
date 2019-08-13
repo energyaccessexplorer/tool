@@ -460,3 +460,14 @@ function ea_controls_presets_set(d, v) {
 
   return d.active;
 };
+
+function ea_controls_sort_datasets(list) {
+  const collection = qsa('ds-controls', qs('#controls'));
+
+  for (let id of list.reverse()) {
+    for (let dsc of collection) {
+      if (dsc.ds.id === id)
+        dsc.closest('.controls-container').prepend(dsc);
+    }
+  }
+};

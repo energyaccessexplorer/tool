@@ -121,7 +121,7 @@ function table_pointer(dict, prop, event) {
     t.append(el_tree([
       ce('tr'), [
         ce('td', ce('strong', e.target)),
-        ce('td', prop[e.dataset])
+        ce('td', prop[e.dataset].toString())
       ]
     ]));
   });

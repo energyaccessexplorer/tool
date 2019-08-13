@@ -231,11 +231,11 @@ class DS {
 
       this.children.push(d);
 
-      d.singlefilter_init();
+      d.child_init();
     }
   };
 
-  async singlefilter_init() {
+  async child_init() {
     let o = this.parent.config.polygons[this.child_id];
     let cs = this.vectors.config.color_stops;
 

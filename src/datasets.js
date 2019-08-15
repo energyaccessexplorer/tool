@@ -138,13 +138,13 @@ class DS {
   };
 
   add_source(opts) {
-    if (this.source) return;
+    if (this.source && MAPBOX.getSource(this.id)) return;
 
     this.source = MAPBOX.addSource(this.id, opts);
   };
 
   add_layer(opts) {
-    if (this.layer) return;
+    if (this.layer && MAPBOX.getLayer(this.id)) return;
 
     opts['id'] = this.id;
     opts['source'] = this.id;
@@ -255,7 +255,6 @@ class DS {
 
     this.table = this.parent.table.map(r => r[this.child_id]);
 
-    let src; if (src = MAPBOX.getSource(this.id)) { src.setData(this.vectors.features); }
   };
 
   /*
@@ -574,9 +573,9 @@ function ea_datasets_tiff() {
 
       if (this.datatype !== 'raster') return;
 
-      if (!this.source) {
-        ea_plot({
-          canvas: r.canvas,
+      if (!r.canvas) {
+        r.canvas = ea_plot({
+          canvas: ce('canvas'),
           data: r.data,
           width: r.width,
           height: r.height,
@@ -584,14 +583,14 @@ function ea_datasets_tiff() {
           nodata: r.nodata,
           colorscale: this.colorscale
         });
-
-        this.add_source({
-          "type": "canvas",
-          "canvas": r.canvas,
-          "animate": false,
-          "coordinates": MAPBOX.coords
-        });
       }
+
+      this.add_source({
+        "type": "canvas",
+        "canvas": r.canvas,
+        "animate": false,
+        "coordinates": MAPBOX.coords
+      });
 
       this.add_layer({
         "type": 'raster',
@@ -619,8 +618,6 @@ function ea_datasets_tiff() {
       r.width = image.getWidth();
       r.height = image.getHeight();
       r.nodata = parseFloat(tiff.fileDirectories[0][0].GDAL_NODATA);
-
-      if (!r.canvas) r.canvas = ce('canvas');
 
       draw.call(this);
     }

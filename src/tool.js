@@ -23,6 +23,8 @@ function ea_plot(opts) {
   }
 
   ctx.putImageData(imagedata, 0, 0);
+
+  return canvas;
 };
 
 /*
@@ -40,10 +42,8 @@ function ea_plot_output(data, canvas = null) {
     data = new Float32Array(A.raster.data.length).fill(-1);
   };
 
-  if (!canvas) canvas = qs('canvas#output');
-
   ea_plot({
-    canvas: canvas,
+    canvas: canvas || qs('canvas#output'),
     data: data,
     width: A.raster.width,
     height: A.raster.height,

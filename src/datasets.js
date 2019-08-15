@@ -27,7 +27,7 @@ class DS {
       r.config = JSON.parse(JSON.stringify(o.category.heatmap));
 
       r.endpoint = o.heatmap_file.endpoint;
-      r.parse = ea_datasets_tiff;
+      r.parse = _ => ea_datasets_tiff.call(this);
 
       if (r.config.scale === 'multi-key-delta')
         this.children = [];
@@ -41,26 +41,27 @@ class DS {
 
       switch (v.config.shape_type) {
       case "points": {
-        v.parse = ea_datasets_points;
+        v.parse = x => ea_datasets_points.call(x || this);
         break;
       }
 
       case "polygons": {
-        v.parse = ea_datasets_polygons;
+        v.parse = x => ea_datasets_polygons.call(x || this);
         break;
       }
 
       case "lines": {
-        v.parse = ea_datasets_lines;
+        v.parse = x => ea_datasets_lines.call(x || this);
         break;
       }
       }
     }
 
     if (o.csv_file) {
-      this.csv = config.csv;
-      this.csv.endpoint = o.csv_file.endpoint;
-      this.csv.parse = ea_datasets_csv;
+      const c = this.csv = config.csv || {};
+
+      c.endpoint = o.csv_file.endpoint;
+      c.parse = _ => ea_datasets_csv.call(this);
     }
 
     this.presets = {};
@@ -166,7 +167,7 @@ class DS {
   };
 
   async mutate(host) {
-    await host.raster.parse.call(host);
+    await host.raster.parse();
 
     this.host = host;
 
@@ -194,12 +195,10 @@ class DS {
   };
 
   async children_init(inputs) {
-    if (!this.csv) return;
-
     await Promise.all([
-      this.csv.parse.call(this),
-      this.raster.parse.call(this),
-      this.vectors.parse.call(this),
+      this.csv ? this.csv.parse() : null,
+      this.raster ? this.raster.parse() : null,
+      this.vectors ? this.vectors.parse() : null,
     ]);
 
     const features_json = JSON.stringify(this.vectors.features);
@@ -224,6 +223,7 @@ class DS {
 
       Object.assign(d.vectors = {}, this.vectors);
       Object.assign(d.vectors.features = {}, JSON.parse(features_json));
+      d.vectors.parse = _ => this.vectors.parse(d);
 
       Object.assign(d.csv = {}, this.csv);
 
@@ -364,7 +364,7 @@ class DS {
     if (this.items) {
       // Collections will (as of now) always share rasters.
       //
-      if (this.raster) this.raster.parse.call(this);
+      if (this.raster) this.raster.parse();
 
       await Promise.all(this.items.map(d => d.load(arg)));
     }
@@ -376,7 +376,7 @@ class DS {
     if (!arg)
       await Promise.all(['vectors', 'csv', 'raster'].map(i => this[i] ? this.load(i) : null));
     else
-      if (this[arg]) await this[arg].parse.call(this);
+      if (this[arg]) await this[arg].parse();
   };
 
   async raise() {
@@ -643,7 +643,6 @@ function ea_datasets_tiff() {
 };
 
 function ea_datasets_geojson() {
-
   if (this.vectors.features)
     return new Promise((res, rej) => res());
 

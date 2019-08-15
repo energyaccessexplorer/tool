@@ -227,7 +227,7 @@ function ea_controls_select_tab(tab, name) {
 function ea_controls_checkbox() {
   const ds = this.ds;
 
-  const checkbox = ea_svg_checkbox(this.ds.active);
+  const checkbox = ea_svg_switch(this.ds.active);
   const svg = checkbox.svg;
 
   const checkbox_toggle = e => {

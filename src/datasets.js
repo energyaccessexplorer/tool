@@ -202,30 +202,32 @@ class DS {
     ]);
 
     const features_json = JSON.stringify(this.vectors.features);
+    const children = this.config.children.datasets;
 
-    for (let v in this.csv.options) {
+    this.table = ea_datasets_table.call(this, this.vectors.features.features);
+
+    for (let v in children) {
       // we can do this because category is plain JSON, not javascript.
+      //
       let cat = JSON.parse(JSON.stringify(this.category));
       cat.name = this.id + "-" + v;
-      cat.name_long = this.csv.options[v];
+      cat.name_long = children[v];
 
       let d = new DS({ category: cat });
 
       d.child_id = v;
       d.parent = this;
-      d.config = {};
-      d.raster = {};
-
+      d.config = this.config;
       d.metadata = this.metadata;
 
-      Object.assign(d.raster, this.raster);
+      Object.assign(d.raster = {}, this.raster);
       d.raster.config.scale = "key-delta";
 
       Object.assign(d.vectors = {}, this.vectors);
-      Object.assign(d.vectors.features = {}, JSON.parse(features_json));
+      d.vectors.features = JSON.parse(features_json);
       d.vectors.parse = _ => this.vectors.parse(d);
 
-      Object.assign(d.csv = {}, this.csv);
+      d.csv = this.csv;
 
       await d.init(inputs.includes(d.id), null);
 
@@ -236,10 +238,10 @@ class DS {
   };
 
   async child_init() {
-    let o = this.parent.config.polygons[this.child_id];
+    let id = this.child_id;
     let cs = this.vectors.config.color_stops;
 
-    let max = Math.max.apply(null, this.vectors.features.features.map(f => f.properties[o]));
+    let max = Math.max.apply(null, this.vectors.features.features.map(f => f.properties[id]));
     max = (max <= 1) ? 1 : 100;
 
     const d = Array(cs.length).fill(0).map((x,i) => (0 + i * (max/(cs.length-1))));
@@ -251,10 +253,12 @@ class DS {
 
     const fs = this.vectors.features.features;
     for (let i = 0; i < fs.length; i += 1)
-      fs[i].properties.__color = s(fs[i].properties[o])
+      fs[i].properties.__color = s(fs[i].properties[id])
 
-    this.table = this.parent.table.map(r => r[this.child_id]);
+    this.table = {};
 
+    for (let k in this.parent.table)
+      this.table[k] = this.parent.table[k][id] * (max === 100 ? 1 : 100);
   };
 
   /*
@@ -544,25 +548,31 @@ This is not fatal. Dataset disabled.`
   throw Error(`"Dataset '${this.name}' disabled`);
 };
 
-function ea_datasets_csv() {
-  if (this.table) return;
+function ea_datasets_table(sources) {
+  // TODO: this is features-centric, we should be able to get these values
+  //       from the CSV
+  //
+  const table = {};
+  const keys = Object.keys(this.config.children.datasets);
 
+  for (let i = 0; i < sources.length; i += 1) {
+    let o = {};
+    let f = sources[i];
+
+    keys.forEach(k => o[k] = +f.properties[k]);
+
+    table[+f.properties[this.config.id_key]] = o;
+  }
+
+  return table;
+};
+
+function ea_datasets_csv() {
   fetch(this.csv.endpoint)
     .then(r => r.text())
-    .then(t => d3.csvParse(t, d => {
-      const o = { oid: +d[this.csv.oid] };
-      Object.keys(this.csv.options).forEach(k => o[k] = +d[k]);
-      return o;
-    }))
-    .then(data => {
-      // HACK: so we can access them by oid (as an array, they are
-      // generally a sequence starting at 1)
-      //
-      if (data[0]['oid'] === 1) data.unshift({ oid: 0 });
-
-      this.table = data;
-    })
-    .catch(e => warn(`'${this.id}' raised an error and several datasets might depend on this. Bye!`));
+    .then(t => d3.csvParse(t))
+    .then(d => this.csv.data = d)
+    .catch(e => warn(`'${this.id}' seems to be misconfigured. ${e}`));
 };
 
 function ea_datasets_tiff() {

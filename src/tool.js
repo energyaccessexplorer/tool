@@ -98,7 +98,7 @@ function ea_coordinates_in_raster(coords, bounds, raster) {
   let x = (coords[0] - bounds[0][0]);
   let y = (bounds[0][1] - coords[1]); // yes, right that is.
 
-  a = null;
+  let a = null;
 
   if ((x > 0 && x < cw &&
        y > 0 && y < ch )) {

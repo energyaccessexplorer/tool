@@ -291,9 +291,8 @@ class DS {
 
       s = x => {
         let z = this.table[x];
-        if (!z) return -1;
 
-        return (z < t[0] || z > t[1]) ? -1 : 1;
+        return ((undefined === z) || z < t[0] || z > t[1]) ? -1 : 1;
       };
       break;
     }

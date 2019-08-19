@@ -87,38 +87,39 @@ class dsinput extends HTMLElement {
     const e = tmpl('#opacity-control');
     let o = 1;
 
-    const grad = ea_svg_interval(
-      true, null, {
-        callback1: null,
-        callback2: x => o = x,
-        end_callback: _ => {
-          let t = null;
+    const grad = ea_svg_interval({
+      init: [null, 100],
+      domain: [0, 100],
+      single: true,
+      callback2: x => o = x/100,
+      end_callback: _ => {
+        let t = null;
 
-          switch (this.ds.datatype) {
-          case 'points':
-            t = ['circle-opacity', 'circle-stroke-opacity'];
-            break;
+        switch (this.ds.datatype) {
+        case 'points':
+          t = ['circle-opacity', 'circle-stroke-opacity'];
+          break;
 
-          case 'lines':
-            t = ['line-opacity'];
-            break;
+        case 'lines':
+          t = ['line-opacity'];
+          break;
 
-          case 'polygons':
-            t = ['fill-opacity'];
-            break;
+        case 'polygons':
+          t = ['fill-opacity'];
+          break;
 
-          case 'raster':
-            t = ['raster-opacity'];
-            break;
+        case 'raster':
+          t = ['raster-opacity'];
+          break;
 
-          default:
-            break;
-          }
-
-          for (let i of t)
-            MAPBOX.setPaintProperty(this.ds.id, i, parseFloat(o));
+        default:
+          break;
         }
+
+        for (let i of t)
+          MAPBOX.setPaintProperty(this.ds.id, i, parseFloat(o));
       }
+    }
     );
 
     const b = qs('.box', e);

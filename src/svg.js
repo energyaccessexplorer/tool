@@ -192,101 +192,6 @@ function ea_svg_radio(init, callback) {
   return svg.node();
 };
 
-function ea_svg_range_steps(steps, init, opts = {}) {
-  const callback1 = opts.callback1;
-  const callback2 = opts.callback2;
-  const end_callback = opts.end_callback;
-
-  const radius = 6.5,
-        svgwidth = opts.width || 256,
-        svgheight = (radius * 2) + 2,
-        linewidth = radius * 2,
-        svgmin = radius + 1,
-        svgmax = svgwidth - radius - 1;
-
-  const norm = d3.scaleQuantize().domain([svgmin, svgmax]).range(steps);
-  const denorm = d3.scaleLinear().domain([steps[0], steps[steps.length-1]]).range([svgmin, svgmax]);
-
-  const svg = d3.select(document.createElementNS(d3.namespaces.svg, "svg"))
-        .attr('class', 'svg-range');
-
-  const defs = svg.append('defs');
-
-  const g = svg.append('g');
-
-  const gutter = g.append('rect');
-
-  const c1 = g.append('circle');
-
-  svg
-    .attr('width', svgwidth + 2)
-    .attr('height', svgheight + 2);
-
-  defs
-    .append('filter')
-    .attr('id', 'shadow-range-steps')
-    .append('feDropShadow')
-    .attr('dx', 0.1)
-    .attr('dy', 0.1)
-    .attr('stdDeviation', 0.8);
-
-  gutter
-    .attr('stroke', 'black')
-    .attr('stroke-width', 0.1)
-    .attr('fill', 'transparent')
-    .attr('x', 1)
-    .attr('y', (svgheight / 2) - 1)
-    .attr('width', svgwidth - 2)
-    .attr('height', 1);
-
-  steps.forEach(s => {
-    g.append('rect')
-      .attr('x', denorm(s))
-      .attr('y', radius - 2)
-      .attr('fill', 'lightgray')
-      .attr('stroke', 'none')
-      .attr('width', 0.5)
-      .attr('height', radius + 2);
-  });
-
-  c1
-    .attr('r', radius)
-    .attr('cy', svgheight/2)
-    .attr('fill', 'white')
-    .attr('style', 'filter: url(#shadow-range-steps);')
-    .style('cursor', 'grab')
-    .raise();
-
-  let x_position;
-
-  function dragged(x) {
-    c1.attr('cx', denorm(norm(x)));
-    if (typeof drag_callback === 'function') drag_callback(norm(x));
-  };
-
-  function change(v) {
-    c1.attr('cx', denorm(v));
-    if (typeof drag_callback === 'function') drag_callback(v);
-  };
-
-  c1.call(
-    d3.drag()
-      .on('drag', _ => {
-        x_position = Math.max(svgmin, Math.min(d3.event.x, svgmax));
-        dragged(x_position);
-      })
-      .on('start', _ => c1.raise())
-      .on('end', _ => (typeof end_callback === 'function') ? end_callback(norm(x_position)) : 0)
-  );
-
-  dragged(denorm(init));
-
-  return {
-    svg: svg.node(),
-    change: change
-  };
-};
-
 function ea_svg_pie(data, outer, inner, colors, inner_text) {
   const width =  outer * 2,
         height = outer * 2;
@@ -381,19 +286,23 @@ function ea_svg_color_steps(colorscale, steps, height) {
   return svg.node();
 };
 
-function ea_svg_interval(single, init, opts = {}) {
-  const callback1 = opts.callback1;
-  const callback2 = opts.callback2;
-  const end_callback = opts.end_callback;
+function ea_svg_interval(opts = {}) {
+  const {single, domain, init, steps, width, callback1, callback2, end_callback} = opts;
 
   const radius = 6.5,
-        svgwidth = opts.width || 256,
+        svgwidth = width || 256,
         svgheight = (radius * 2) + 2,
         linewidth = radius * 2,
         svgmin = radius + 1,
         svgmax = svgwidth - radius - 1;
 
-  const norm = d3.scaleLinear().domain([svgmin, svgmax]).range([0,1]);
+  let norm = d3.scaleLinear().domain([svgmin, svgmax]).range(domain);
+  let denorm = norm.invert;
+
+  if (steps) {
+    norm = d3.scaleQuantize().domain([svgmin, svgmax]).range(steps);
+    denorm = d3.scaleLinear().domain([steps[0], steps[steps.length-1]]).range([svgmin, svgmax]);
+  }
 
   const svg = d3.select(document.createElementNS(d3.namespaces.svg, "svg"))
         .attr('class', 'svg-interval');
@@ -401,6 +310,7 @@ function ea_svg_interval(single, init, opts = {}) {
   const defs = svg.append('defs');
 
   const g = svg.append('g');
+  const ticks = g.append('g');
 
   const gutter = g.append('rect');
   const marked = g.append('rect');
@@ -425,13 +335,6 @@ function ea_svg_interval(single, init, opts = {}) {
     .attr('dy', 0.1)
     .attr('stdDeviation', 0.8);
 
-  marked
-    .attr('fill', fill)
-    .attr('stroke', 'none')
-    .attr('x', 1)
-    .attr('y', (svgheight / 2) - 1.5)
-    .attr('height', 2);
-
   gutter
     .attr('stroke', 'black')
     .attr('stroke-width', 0.1)
@@ -442,6 +345,24 @@ function ea_svg_interval(single, init, opts = {}) {
     .attr('ry', 0)
     .attr('width', svgwidth - 2)
     .attr('height', 1);
+
+  ticks.selectAll('rect.tick')
+    .data(steps || []).enter()
+    .append('rect')
+    .attr('class', 'tick')
+    .attr('x', d => denorm(d))
+    .attr('y', radius - 2)
+    .attr('fill', 'lightgray')
+    .attr('stroke', 'none')
+    .attr('width', 0.5)
+    .attr('height', radius + 2);
+
+  marked
+    .attr('fill', fill)
+    .attr('stroke', 'none')
+    .attr('x', 1)
+    .attr('y', (svgheight / 2) - 1.5)
+    .attr('height', 2);
 
   c1
     .attr('r', radius)
@@ -459,27 +380,35 @@ function ea_svg_interval(single, init, opts = {}) {
     .attr('stroke-width', 'none')
     .style('cursor', 'grab');
 
-  function drag_callback(c, cx, rx, w, callback) {
+  function dragged(c, cx, rx, w, callback) {
+    if (steps) {
+      cx = denorm(norm(cx));
+      rx = denorm(norm(rx));
+      w = denorm(norm(w));
+    }
+
     c.attr('cx', cx);
 
     marked
       .attr('x', rx - radius)
-      .attr('width', w + radius);
+      .attr('width', w);
 
     if (typeof callback === 'function') callback(norm(cx).toFixed(2));
   };
+
+  let x_position;
 
   c1.call(
     d3.drag()
       .on('drag', _ => {
         const c2x = c2.attr('cx');
-        const cx = Math.min(c2x, Math.max(d3.event.x, svgmin));
+        const cx = x_position = Math.min(c2x, Math.max(d3.event.x, svgmin));
 
-        drag_callback(c1, cx, cx, c2x - cx, callback1);
+        dragged(c1, cx, cx, c2x - cx, callback1);
       })
       .on('start', _ => c1.raise())
       .on('end', _ => {
-        if (typeof end_callback === 'function') end_callback();
+        if (typeof end_callback === 'function') end_callback(norm(x_position));
       })
   );
 
@@ -487,29 +416,25 @@ function ea_svg_interval(single, init, opts = {}) {
     d3.drag()
       .on('drag', _ => {
         const c1x = c1.attr('cx');
-        const cx = Math.max(c1x, Math.min(d3.event.x, svgmax));
+        const cx = x_position = Math.max(c1x, Math.min(d3.event.x, svgmax));
 
-        drag_callback(c2, cx, c1x, cx - c1x, callback2);
+        dragged(c2, cx, c1x, cx - c1x, callback2);
       })
       .on('start', _ => c2.raise())
       .on('end', _ => {
-        if (typeof end_callback === 'function') end_callback();
+        if (typeof end_callback === 'function') end_callback(norm(x_position));
       })
   );
 
   function change(a,b) {
-    const i0 = norm.invert(a);
-    const i1 = norm.invert(b);
+    const i0 = denorm(a);
+    const i1 = denorm(b);
 
-    drag_callback(c1, i0, i0, i1 - i0, callback1);
-    drag_callback(c2, i1, i0, i1 - i0, callback2);
+    dragged(c1, i0, i0, i1 - i0, callback1);
+    dragged(c2, i1, i0, i1 - i0, callback2);
   };
 
-  const i0 = (init ? norm.invert(init[0]) : svgmin);
-  const i1 = (init ? norm.invert(init[1]) : svgmax);
-
-  drag_callback(c1, i0, i0, i1 - i0, callback1);
-  drag_callback(c2, i1, i0, i1 - i0, callback2);
+  if (init) change(init[0], init[1]);
 
   if (single) c1.remove();
 

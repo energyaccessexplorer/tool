@@ -22,7 +22,7 @@ class dscontrols extends HTMLElement {
 
   init() {
     if (this.ds.parent)
-      this.range_group = ea_controls_range.call(this, (this.ds.parent.category.unit || 'range'));
+      this.range_group = ea_controls_range.call(this);
 
     this.checkbox = ea_controls_checkbox.call(this);
 
@@ -34,10 +34,16 @@ class dscontrols extends HTMLElement {
 
     const lr = c.range_label || cat.unit || 'range';
 
-    if (c.range === 'double')
-      this.range_group = ea_controls_range.call(this, lr);
-    else if (c.range === 'single')
-      this.range_group = ea_controls_single.call(this, lr);
+    let steps;
+    if (c.range_steps) {
+      steps = [];
+      const s = (this.ds.raster.config.domain.max - this.ds.raster.config.domain.min) / (c.range_steps - 1);
+
+      for (let i = 0; i < c.range_steps; i += 1)
+        steps[i] = this.ds.raster.config.domain.min + (s * i);
+    }
+
+    this.range_group = ea_controls_range.call(this, lr, { steps: steps, single: c.range === 'single' });
 
     if (this.ds.items)
       this.collection_list = ea_controls_collection_list.call(this);
@@ -278,19 +284,14 @@ function ea_controls_mutant_options() {
   return container;
 };
 
-function ea_controls_range(label, single = false, opts = {}) {
+function ea_controls_range(label, opts = {}) {
   const ds = this.ds;
 
-  const d = [ds.raster.config.domain.min, ds.raster.config.domain.max];
+  ds.domain = [ds.raster.config.domain.min, ds.raster.config.domain.max];
 
-  const range_norm = d3.scaleLinear().domain([0,1]).range(d);
-  const domain = d.slice(0);
-
-  function update_range_value(x,i,el) {
-    let v = domain[i] = range_norm(x);
-    el.innerText = (v * (ds.raster.config.factor || 1)).toFixed(ds.raster.config.precision || 0);
-
-    ds.domain = domain;
+  function update(x,i,el) {
+    el.innerText = (x * (ds.raster.config.factor || 1)).toFixed(ds.raster.config.precision || 0);
+    ds.domain[i] = x;
   };
 
   const l = elem(`
@@ -303,25 +304,22 @@ function ea_controls_range(label, single = false, opts = {}) {
   const v1 = qs('[bind=v1]', l);
   const v2 = qs('[bind=v2]', l);
 
-  function c(a,b) {
-    return r.change(range_norm.invert(a), range_norm.invert(b));
-  };
-
-  const r = ea_svg_interval(
-    single,
-    [range_norm.invert(ds.raster.config.init.min), range_norm.invert(ds.raster.config.init.max)], {
-      width: opts.width || 320,
-      callback1: x => update_range_value(x, 0, v1),
-      callback2: x => update_range_value(x, 1, v2),
-      end_callback: _ => {
-        ea_overlord({
-          "type": "dataset",
-          "target": ds,
-          "caller": "ea_controls_range",
-        });
-      }
+  const r = ea_svg_interval({
+    single: opts.single,
+    init: [ds.raster.config.init.min, ds.raster.config.init.max],
+    domain: ds.domain,
+    width: opts.width || 320,
+    steps: opts.steps,
+    callback1: x => update(x, 0, v1),
+    callback2: x => update(x, 1, v2),
+    end_callback: _ => {
+      ea_overlord({
+        "type": "dataset",
+        "target": ds,
+        "caller": "ea_controls_range",
+      });
     }
-  );
+  });
 
   const el = ce('div');
   el.append(r.svg, l);
@@ -329,19 +327,15 @@ function ea_controls_range(label, single = false, opts = {}) {
   return {
     el: el,
     svg: r.svg,
-    change: c,
+    change: r.change,
     label: l
   };
-};
-
-function ea_controls_single(label) {
-  return ea_controls_range.call(this, label, true);
 };
 
 function ea_controls_weight(init) {
   const ds = this.ds;
 
-  const weights = Array.apply(null, Array(5)).map((_, i) => i + 1);
+  const weights = [1,2,3,4,5];
 
   const label = elem(`
 <div class="label">
@@ -350,22 +344,22 @@ function ea_controls_weight(init) {
   <span>${weights[weights.length - 1]}</span>
 </div>`);
 
-  const w = ea_svg_range_steps(
-    weights,
-    ds.weight, {
-      width: 320,
-      drag_callback: null,
-      end_callback: x => {
-        ds.weight = x;
+  const w = ea_svg_interval({
+    single: true,
+    init: [null, ds.weight],
+    domain: [1, 5],
+    steps: weights,
+    width: 320,
+    end_callback: x => {
+      ds.weight = x;
 
-        ea_overlord({
-          "type": "dataset",
-          "target": ds,
-          "caller": "ea_controls_weight",
-        });
-      }
+      ea_overlord({
+        "type": "dataset",
+        "target": ds,
+        "caller": "ea_controls_weight",
+      });
     }
-  );
+  });
 
   const el = ce('div');
   el.append(w.svg, label);

@@ -162,7 +162,7 @@ function right_pane(t) {
 function ea_nanny_init(state) {
   window.ea_nanny = new nanny(ea_nanny_steps);
 
-  if (state.inputs.length > 1) return;
+  if (state.inputs.length > 0) return;
   if (state.view !== "inputs") return;
 
   const w = localStorage.getItem('needs-nanny');
@@ -171,11 +171,15 @@ function ea_nanny_init(state) {
 };
 
 function ea_nanny_force_start() {
-  history.replaceState(null, null, location.set_query_param('inputs', 'boundaries'));
+  history.replaceState(null, null, location.set_query_param('inputs', ''));
   history.replaceState(null, null, location.set_query_param('output', 'eai'));
   history.replaceState(null, null, location.set_query_param('view', 'inputs'));
 
-  DS.all.filter(d => d.active && d.id !== 'boundaries').forEach(d => d.turn(false, false));
+  DS.all.filter(d => d.active).forEach(d => d.turn(false, false));
+
+  ea_view('inputs');
+  ea_controls_select_tab(qs('#controls-tab-filters'), "filters");
+  ea_modal.hide();
 
   ea_overlord({
     "type": "refresh",
@@ -225,25 +229,30 @@ function ea_layout_init() {
   set_heights();
 };
 
+async function ea_view(v, btn) {
+  const el = qs('#views');
+  const btns = qsa('#views .up-title', el);
+
+  btns.forEach(e => e.classList.remove('active'));
+
+  await delay(0.1);
+
+  ea_overlord({
+    "type": "view",
+    "target": v,
+    "caller": "ea_views_init",
+  });
+
+  qs('#view-' + v, el).classList.add('active');
+};
+
 function ea_views_init() {
   const el = qs('#views');
 
   Object.keys(ea_views).forEach(v => {
-    const btn = ce('div', ea_views[v]['name'], { class: 'view up-title', ripple: '' });
+    const btn = ce('div', ea_views[v]['name'], { class: 'view up-title', id: 'view-' + v, ripple: '' });
 
-    btn.addEventListener('mouseup', function(e) {
-      qsa('#views .up-title', el).forEach(e => e.classList.remove('active'));
-
-      setTimeout(_ => {
-        ea_overlord({
-          "type": "view",
-          "target": v,
-          "caller": "ea_views_init",
-        });
-
-        btn.classList.add('active');
-      }, 50);
-    });
+    btn.onclick = _ => ea_view(v);
 
     if (location.get_query_param('view') === v) btn.classList.add('active');
 

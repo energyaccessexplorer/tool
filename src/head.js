@@ -165,3 +165,7 @@ function debug() {
 function warn() {
   return console.warn.apply(console, arguments);
 };
+
+function delay(s) {
+  return new Promise(_ => setTimeout(_, s * 1000));
+};

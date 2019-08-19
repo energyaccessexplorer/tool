@@ -342,6 +342,8 @@ class DS {
   };
 
   async turn(v, draw) {
+    this.active = v;
+
     if (v) {
       this.controls.loading(true);
       await this.load();

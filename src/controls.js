@@ -101,6 +101,8 @@ class dscontrols extends HTMLElement {
 
   turn(t) {
     this.content.style.display = t ? '' : 'none';
+    this.main.classList[this.ds.active ? 'add' : 'remove']('active');
+
     if (this.checkbox) this.checkbox.change(t);
   };
 

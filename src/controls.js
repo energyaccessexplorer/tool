@@ -22,15 +22,16 @@ class dscontrols extends HTMLElement {
 
   init() {
     if (this.ds.parent)
-      this.range_group = ea_controls_range.call(this);
+      this.range_group = ea_controls_range.call(this.ds, { label: this.ds.parent.category.unit });
 
-    this.checkbox = ea_controls_checkbox.call(this);
+    this.checkbox = ea_controls_checkbox.call(this.ds);
+    this.header.onclick = this.checkbox.click;
 
     const cat = this.ds.category;
     const c = cat.configuration.controls;
 
     if (c.weight)
-      this.weight_group = ea_controls_weight.call(this);
+      this.weight_group = ea_controls_weight.call(this.ds);
 
     const lr = c.range_label || cat.unit || 'range';
 
@@ -43,13 +44,13 @@ class dscontrols extends HTMLElement {
         steps[i] = this.ds.raster.config.domain.min + (s * i);
     }
 
-    this.range_group = ea_controls_range.call(this, lr, { steps: steps, single: c.range === 'single' });
+    this.range_group = ea_controls_range.call(this.ds, { label: lr, steps: steps, single: c.range === 'single' });
 
     if (this.ds.items)
-      this.collection_list = ea_controls_collection_list.call(this);
+      this.collection_list = ea_controls_collection_list.call(this.ds);
 
     if (this.ds.mutant)
-      this.mutant_options = ea_controls_mutant_options.call(this);
+      this.mutant_options = ea_controls_mutant_options.call(this.ds);
 
     const dropdownlist = [{
       "content": "Dataset info",
@@ -233,14 +234,12 @@ function ea_controls_select_tab(tab, name) {
 };
 
 function ea_controls_checkbox() {
-  const ds = this.ds;
-
-  const checkbox = ea_svg_switch(this.ds.active);
+  const checkbox = ea_svg_switch(this.active);
   const svg = checkbox.svg;
 
-  const checkbox_toggle = e => {
+  checkbox.click = e => {
     if (e.target.closest('svg') === svg)
-      this.ds.toggle();
+      this.toggle();
 
     else if (e.target.closest('.more-dropdown') === this.dropdown)
       return;
@@ -251,55 +250,49 @@ function ea_controls_checkbox() {
       svg.dispatchEvent(event);
     }
 
-    return this.ds.active;
+    return this.active;
   };
-
-  this.header.onclick = checkbox_toggle;
 
   return checkbox;
 };
 
 function ea_controls_mutant_options() {
-  const ds = this.ds;
-
   const container = ce('div', null, { class: 'control-option' })
   const select = ce('select');
 
-  ds.hosts.forEach(d => select.append(ce('option', d.name, { value: d.id })));
+  this.hosts.forEach(d => select.append(ce('option', d.name, { value: d.id })));
 
-  select.value = ds.host.id;
+  select.value = this.host.id;
 
-  select.addEventListener('change', async function() {
-    const host = DS.get(this.value);
+  select.onchange = async function(e) {
+    const host = DS.get(e.target.value);
 
-    await ds.mutate(host);
+    await this.mutate(host);
 
     ea_overlord({
       "type": "dataset",
-      "target": ds,
+      "target": this,
       "caller": "ea_controls_mutant_options",
     });
-  });
+  };
 
   container.append(select);
 
   return container;
 };
 
-function ea_controls_range(label, opts = {}) {
-  const ds = this.ds;
+function ea_controls_range(opts = {}) {
+  this.domain = [this.raster.config.domain.min, this.raster.config.domain.max];
 
-  ds.domain = [ds.raster.config.domain.min, ds.raster.config.domain.max];
-
-  function update(x,i,el) {
-    el.innerText = (x * (ds.raster.config.factor || 1)).toFixed(ds.raster.config.precision || 0);
-    ds.domain[i] = x;
+  const update = (x,i,el) => {
+    el.innerText = (x * (this.raster.config.factor || 1)).toFixed(this.raster.config.precision || 0);
+    this.domain[i] = x;
   };
 
   const l = elem(`
 <div class="label">
   <span bind="v1"></span>
-  <span class="unit-label">${label}</span>
+  <span class="unit-label">${opts.label || 'range'}</span>
   <span bind="v2"></span>
 </div>`);
 
@@ -308,16 +301,16 @@ function ea_controls_range(label, opts = {}) {
 
   const r = ea_svg_interval({
     single: opts.single,
-    init: [ds.raster.config.init.min, ds.raster.config.init.max],
-    domain: ds.domain,
     width: opts.width || 320,
+    init: [this.raster.config.init.min, this.raster.config.init.max],
+    domain: this.domain,
     steps: opts.steps,
     callback1: x => update(x, 0, v1),
     callback2: x => update(x, 1, v2),
     end_callback: _ => {
       ea_overlord({
         "type": "dataset",
-        "target": ds,
+        "target": this,
         "caller": "ea_controls_range",
       });
     }
@@ -334,9 +327,7 @@ function ea_controls_range(label, opts = {}) {
   };
 };
 
-function ea_controls_weight(init) {
-  const ds = this.ds;
-
+function ea_controls_weight() {
   const weights = [1,2,3,4,5];
 
   const label = elem(`
@@ -348,16 +339,16 @@ function ea_controls_weight(init) {
 
   const w = ea_svg_interval({
     single: true,
-    init: [null, ds.weight],
+    init: [null, this.weight],
     domain: [1, 5],
     steps: weights,
     width: 320,
     end_callback: x => {
-      ds.weight = x;
+      this.weight = x;
 
       ea_overlord({
         "type": "dataset",
-        "target": ds,
+        "target": this,
         "caller": "ea_controls_weight",
       });
     }
@@ -375,13 +366,11 @@ function ea_controls_weight(init) {
 };
 
 function ea_controls_collection_list() {
-  const ds = this.ds;
-
-  if (!ds.items) return;
+  if (!this.items) return;
 
   const e = ce('ul', null, { class: 'collection' });
 
-  for (let d of ds.items)
+  for (let d of this.items)
     e.append(ce('li', d.name));
 
   return e;

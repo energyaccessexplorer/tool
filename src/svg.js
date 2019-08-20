@@ -62,8 +62,8 @@ function ea_svg_checkbox(init, callback) {
 };
 
 function ea_svg_switch(init, callback, opts = {}) {
-  const radius = 12,
-        svgwidth = 42,
+  const radius = 10,
+        svgwidth = 38,
         svgheight = (radius * 2) + 2,
         linewidth = radius * 2,
         svgmin = radius + 1,
@@ -141,7 +141,7 @@ function ea_svg_switch(init, callback, opts = {}) {
 };
 
 function ea_svg_radio(init, callback) {
-  const size = 24;
+  const size = 20;
 
   const svg = d3.select(document.createElementNS(d3.namespaces.svg, "svg"))
         .attr('class', 'svg-radio');
@@ -263,7 +263,7 @@ function ea_svg_pie(data, outer, inner, colors, inner_text) {
 };
 
 function ea_svg_color_steps(colorscale, steps, height) {
-  const h = height || 8;
+  const h = height || 5;
 
   const svg = d3.select(document.createElementNS(d3.namespaces.svg, "svg"))
         .attr('class', 'svg-interval');
@@ -289,7 +289,7 @@ function ea_svg_color_steps(colorscale, steps, height) {
 function ea_svg_interval(opts = {}) {
   const {single, domain, init, steps, width, callback1, callback2, end_callback} = opts;
 
-  const radius = 6.5,
+  const radius = 6,
         svgwidth = width || 256,
         svgheight = (radius * 2) + 2,
         linewidth = radius * 2,
@@ -447,7 +447,7 @@ function ea_svg_interval(opts = {}) {
 function ea_svg_points_symbol() {
   if (!(this instanceof DS)) throw `${this} should be a DS. Bye.`;
 
-  const size = 28;
+  const size = 24;
 
   const container = d3.select(document.createElementNS(d3.namespaces.svg, "svg"))
         .attr("class", 'svg-point')
@@ -456,7 +456,7 @@ function ea_svg_points_symbol() {
 
   container
     .append('circle')
-    .attr('r', 12)
+    .attr('r', (size/2) - 2)
     .attr('cx', size/2)
     .attr('cy', size/2)
     .attr('fill', this.vectors.config.fill)

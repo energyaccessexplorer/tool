@@ -47,8 +47,8 @@ function ea_indexes_init(state) {
   info.append(tmpl('#svg-info'));
   info.onclick = _ => ea_indexes_modal();
 
-  window.POPULATION_PIE = ea_svg_pie([[0], [0], [0], [0], [0]], 75, 0, ea_default_colorscale.stops, null);
-  window.AREA_PIE = ea_svg_pie([[0], [0], [0], [0], [0]], 75, 0, ea_default_colorscale.stops, null);
+  window.POPULATION_PIE = ea_svg_pie([[0], [0], [0], [0], [0]], 70, 0, ea_default_colorscale.stops, null);
+  window.AREA_PIE = ea_svg_pie([[0], [0], [0], [0], [0]], 70, 0, ea_default_colorscale.stops, null);
 
   qs('#index-graphs').append(el_tree(
     [ ce('div', null, { class: 'index-graphs-container' }), [

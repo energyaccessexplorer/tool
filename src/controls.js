@@ -301,7 +301,7 @@ function ea_controls_range(opts = {}) {
 
   const r = ea_svg_interval({
     single: opts.single,
-    width: opts.width || 320,
+    width: opts.width || 256,
     init: [this.raster.config.init.min, this.raster.config.init.max],
     domain: this.domain,
     steps: opts.steps,
@@ -342,7 +342,7 @@ function ea_controls_weight() {
     init: [null, this.weight],
     domain: [1, 5],
     steps: weights,
-    width: 320,
+    width: 256,
     end_callback: x => {
       this.weight = x;
 

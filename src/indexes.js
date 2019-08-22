@@ -112,8 +112,7 @@ function ea_indexes_list(state) {
     let e = document.createEvent('HTMLEvents');
 
     for (n of nodes) {
-      e.initEvent((this === n) ? "select" : "unselect", true, true);
-      qs('.radio svg', n).dispatchEvent(e);
+      qs('.radio svg', n).dispatchEvent(new Event((this === n) ? "select" : "unselect"));
     }
 
     ea_overlord({

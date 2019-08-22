@@ -92,7 +92,7 @@
 
       <div id="right-pane">
         <div id="inputs-pane">
-          <ul id="inputs-list"></ul>
+          <div id="inputs-list"></div>
 
           <div id="canvas-output-container">
             <select id="canvas-output-select"></select>
@@ -397,7 +397,6 @@ energy demand, low economic activity, and low access to infrastructure and resou
       :host {
         background-color: var(--the-white);
         display: flex;
-        position: relative;
 
         color: var(--the-gray);
         fill: var(--the-gray);
@@ -416,7 +415,6 @@ energy demand, low economic activity, and low access to infrastructure and resou
         justify-content: space-between;
 
         flex: 1 0;
-        margin-right: 1em;
         user-select: none;
       }
 
@@ -508,7 +506,7 @@ energy demand, low economic activity, and low access to infrastructure and resou
         </section>
 
         <section>
-          <h3>Why is this dataset used?</h3><pre bind="why"></pre>
+          <h3>Why is this dataset used?</h3><pre class="description-text" bind="why"></pre>
         </section>
 
         <section>

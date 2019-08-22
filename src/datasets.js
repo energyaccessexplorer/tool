@@ -711,25 +711,21 @@ function ea_datasets_lines() {
           da = [da[0], da[0]];
       }
 
-      specs = null;
-
       const fs = this.vectors.features.features;
-
+      const specs = this.vectors.config.specs;
 
       for (let i = 0; i < fs.length; i += 1) {
         if (specs) {
-          for (let s of Object.keys(specs)) {
-            if (fs[i].properties[s] === specs[s]['match'] || (new RegExp(specs[s]['match'])).test(fs[i].properties[s])) {
-              fs[i].properties['__color'] = specs[s]['stroke'];
-              fs[i].properties['__width'] = specs[s]['stroke-width'];
-              fs[i].properties['__dasharray'] = specs[s]['stroke-width'];
+          for (let s of specs) {
+            if (fs[i].properties[s.key] === s.match || (new RegExp(s.match)).test(fs[i].properties[s.key])) {
+              if (undefined !== s['stroke']) fs[i].properties['__color'] = s['stroke'];
+              if (undefined !== s['stroke-width']) fs[i].properties['__width'] = s['stroke-width'];
             }
           }
         }
         else {
           fs[i].properties['__color'] = this.vectors.config.stroke;
           fs[i].properties['__width'] = this.vectors.config.width || 1;
-          fs[i].properties['__dasharray'] = da;
         }
       }
 

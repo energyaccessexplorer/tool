@@ -324,7 +324,7 @@ function ea_state_sync() {
   if (Object.keys(ea_views).includes(view_param)) {
     view = view_param;
   } else {
-    view = 'outputs';
+    view = 'inputs';
     set_view_param();
   }
 

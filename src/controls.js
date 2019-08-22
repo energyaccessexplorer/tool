@@ -241,14 +241,11 @@ function ea_controls_checkbox() {
     if (e.target.closest('svg') === svg)
       this.toggle();
 
-    else if (e.target.closest('.more-dropdown') === this.dropdown)
+    else if (e.target.closest('.more-dropdown') === this.controls.dropdown)
       return;
 
-    else {
-      let event = document.createEvent('HTMLEvents');
-      event.initEvent('click', true, true);
-      svg.dispatchEvent(event);
-    }
+    else
+      svg.dispatchEvent(new Event('click', { bubbles: true }));
 
     return this.active;
   };

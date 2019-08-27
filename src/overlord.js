@@ -87,6 +87,8 @@ async function ea_overlord(msg) {
 
     right_pane(t);
 
+    window.dispatchEvent(new Event('resize'));
+
     break;
   }
 

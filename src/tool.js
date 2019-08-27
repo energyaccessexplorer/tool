@@ -115,18 +115,18 @@ function ea_coordinates_in_raster(coords, bounds, raster) {
   return a;
 };
 
-function table_pointer(dict, prop, event) {
+function table_data(dict, prop, event) {
   const t = document.createElement('table');
-  dict.forEach(e => {
+  dict.forEach(d => {
     t.append(el_tree([
       ce('tr'), [
-        ce('td', ce('strong', e.target)),
-        ce('td', prop[e.dataset].toString())
+        ce('td', ce('strong', d.target)),
+        ce('td', prop[d.dataset].toString())
       ]
     ]));
   });
 
-  mapbox_pointer(t, event.originalEvent.pageX, event.originalEvent.pageY)
+  return t;
 };
 
 function hex_to_rgba(str) {

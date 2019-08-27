@@ -199,7 +199,7 @@ background-color: transparent;
 
   document.body.append(p);
 
-  const mark = nanny.pick_element(p, { position: "W", message: content, title: "Details", close: false });
+  const mark = nanny.pick_element(p, { position: "W", message: content, close: false });
 
   let l;
 

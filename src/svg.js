@@ -229,7 +229,7 @@ function ea_svg_pie(data, outer, inner, colors, inner_text) {
       .append("path")
       .attr("fill", (d,i) => colors[i])
       .attr("d", arc)
-      .on("mouseenter", function(d) { n = nanny.pick_element(this, { "title": (d.value * 100).toFixed(2) + "%", "message": "", "position": "W", close: false }); })
+      .on("mouseenter", function(d) { n = nanny.pick_element(this, { message: (d.value * 100).toFixed(2) + "%", position: "W", close: false }); })
       .on("mouseleave", function(d) { if (n) n.remove(); })
       .each(function(d) { this._current = d });
 

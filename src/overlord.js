@@ -204,9 +204,33 @@ async function ea_overlord(msg) {
           name: "Analysis"
         };
         nodata = -1;
+
+        const o = ea_coordinates_in_raster(
+          [e.lngLat.lng, e.lngLat.lat],
+          MAPBOX.coords,
+          {
+            data: t.raster.data,
+            width: b.raster.width,
+            height: b.raster.height,
+            nodata: nodata
+          }
+        );
+
+        if (o && o.value !== null) {
+          let f = d3.scaleQuantize().domain([0,1]).range(["Low", "Medium", "High"]);
+
+          mapbox_pointer(
+            ce('div', `<strong>${ea_indexes[state.output]['name']}</strong>: ${f(o.value)}`, {}),
+            e.originalEvent.pageX,
+            e.originalEvent.pageY
+          );
+        }
+        else {
+          log("No value on raster.", o);
+        }
       }
 
-      else {
+      else if (state.view === "inputs") {
         const i = state.inputs[0];
         t = DS.get(i);
 
@@ -221,46 +245,52 @@ async function ea_overlord(msg) {
           if (et.source === i) {
             let at;
 
-            if (!(at = t.config.features_attr_map)) {
-              warn("Dataset is not configured to display info. (configuration.features_attr_map)");
-              return;
+            if (at = t.config.features_attr_map) {
+              mapbox_pointer(
+                table_data(at, et.properties),
+                e.originalEvent.pageX,
+                e.originalEvent.pageY
+              );
             }
-
-            if (at) table_pointer(at, et.properties, e);
+            else {
+              warn("Dataset is not configured to display info. (configuration.features_attr_map)");
+            }
           }
 
           return;
         }
-        else if (t.data) {
-          // go on... next part applies to outputs.
+        else if (t.raster.data) {
+          const rc = ea_coordinates_in_raster(
+            [e.lngLat.lng, e.lngLat.lat],
+            MAPBOX.coords,
+            {
+              data: t.raster.data,
+              width: b.raster.width,
+              height: b.raster.height,
+              nodata: nodata
+            }
+          );
+
+          if (rc && rc.value !== null) {
+            v = rc.value;
+
+            if (t.raster.config) v = v * t.raster.config.factor;
+
+            mapbox_pointer(
+              table_data([{
+                "target": t.name,
+                "dataset": "value"
+              }], {
+                "value": `${v.toFixed(2)} <code>${t.category.unit || ''}</code>`
+              }),
+              e.originalEvent.pageX,
+              e.originalEvent.pageY
+            );
+          }
+          else {
+            log("No value on raster.", rc);
+          }
         }
-      }
-
-      const rc = ea_coordinates_in_raster(
-        [e.lngLat.lng, e.lngLat.lat],
-        MAPBOX.coords,
-        {
-          data: t.raster.data || t.data,
-          width: b.raster.width,
-          height: b.raster.height,
-          nodata: nodata
-        }
-      );
-
-      if (rc && rc.value !== null) {
-        v = rc.value;
-
-        if (t.raster.config) v = v * t.raster.config.factor;
-
-        table_pointer([{
-          "target": t.name,
-          "dataset": "value"
-        }], {
-          "value": `${v.toFixed(2)} <code>${t.category.unit || ''}</code>`
-        }, e);
-      }
-      else {
-        log("No value on raster.", rc);
       }
 
       break;

@@ -122,7 +122,7 @@ class dsinput extends HTMLElement {
     }
     );
 
-    const b = qs('.box', e);
+    const b = qs('.opacity-box', e);
 
     qs('.slider', e).append(grad.svg);
     qs('.icon', e).onclick = _ => b.style.display = 'block';

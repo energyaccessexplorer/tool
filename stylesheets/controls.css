@@ -7,6 +7,12 @@
   border-top: solid 1px var(--the-white);
 }
 
+.controls-branch,
+.controls-subbranch,
+.controls-container {
+  position: relative;
+}
+
 #controls-tabs {
   height: 100%;
   display: flex;

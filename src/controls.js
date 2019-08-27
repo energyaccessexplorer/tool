@@ -336,7 +336,7 @@ function ea_controls_weight() {
 
   const w = ea_svg_interval({
     single: true,
-    init: [null, this.weight],
+    init: [1, this.weight],
     domain: [1, 5],
     steps: weights,
     width: 256,

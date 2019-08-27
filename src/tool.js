@@ -260,17 +260,6 @@ function ea_views_init() {
   });
 };
 
-function ea_help() {
-  const hm = qs('[bind=help-message]').cloneNode(true);
-  hm.style.display = 'block';
-
-  ea_modal.set({
-    header: "Help",
-    content: hm,
-    footer: null
-  }).show();
-};
-
 function ea_colorscale(opts) {
   const w = 256;
 

@@ -113,17 +113,8 @@
         </div>
 
         <div id="drawer">
-          <div onclick="ea_help();">
+          <div onclick="ea_nanny_force_start();">
             Help
-            <div bind="help-message">
-              <p>
-                What can we help you with?
-
-                <ul>
-                  <li><a onclick="ea_nanny_force_start();">Restart tutorial</a></li>
-                </ul>
-              </p>
-            </div>
           </div>
 
           <div>
@@ -407,6 +398,7 @@ energy demand, low economic activity, and low access to infrastructure and resou
 
         white-space: nowrap;
         border-bottom: solid 1px #d9d9d9;
+        position: relative;
       }
 
       header {
@@ -480,6 +472,18 @@ energy demand, low economic activity, and low access to infrastructure and resou
 
       .subheader {
         font-size: 0.7em;
+      }
+
+      .opacity-box {
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        display: none;
+        background-color: white;
+        box-shadow: 0 20px 30px 0 rgba(0,0,0,0.2);
+        padding: 16px;
+        padding-bottom: 4px;
+        z-index: 1;
       }
     </style>
 
@@ -559,16 +563,7 @@ energy demand, low economic activity, and low access to infrastructure and resou
           </g>
         </svg>
 
-        <div class="box"
-             style="position: absolute;
-                    top: -10px;
-                    right: 20px;
-                    display: none;
-                    background-color: white;
-                    box-shadow: 0 20px 30px 0 rgba(0,0,0,0.2);
-                    padding: 16px;
-                    padding-bottom: 4px;">
-
+        <div class="opacity-box">
           <div class="slider"></div>
 
           <div style="display: flex;
@@ -608,7 +603,6 @@ energy demand, low economic activity, and low access to infrastructure and resou
     <div style="display: flex;
                 flex-flow: row nowrap;
                 justify-content: space-between;
-                margin-right: -0.4em;
                 padding-left: 0em;">
       <div>0</div>
       <div style="padding-left: 0.7em">20</div>

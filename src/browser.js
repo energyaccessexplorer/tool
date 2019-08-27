@@ -55,8 +55,8 @@
   var v = browser_version();
   var m;
 
-  var usethis = " Please use a recent version of: Firefox, Chrome or Opera.";
-  var update = " Please update your browser.";
+  var usethis = " Please use a recent version of Firefox, Chrome or Opera.";
+  var update = " Please update your browser to the latest version.";
 
   if (v.match(/IE/i)) {
     alert("This platform is known NOT to work on Internet Explorer." + usethis);

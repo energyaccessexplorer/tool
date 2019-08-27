@@ -28,7 +28,7 @@ function ea_indexes_init(state) {
         .range(ea_default_colorscale.stops)
         .clamp(false),
       ea_default_colorscale.domain),
-    tmpl("#ramp-label-low-high"));
+    tmpl("#ramp-label-low-medium-high"));
 
   const cos = qs('#canvas-output-select');
   for (let i in ea_indexes)

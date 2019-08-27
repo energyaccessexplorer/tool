@@ -37,7 +37,7 @@ async function ea_summary() {
         .range(ea_default_colorscale.stops)
         .clamp(false),
       ea_default_colorscale.domain),
-    tmpl("#ramp-label-low-high"));
+    tmpl("#ramp-label-low-medium-high"));
 
   async function get_summaries(idxn) {
     let raster = ea_analysis(ea_list_filter_type(idxn), idxn);

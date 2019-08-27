@@ -52,10 +52,14 @@ class dscontrols extends HTMLElement {
     if (this.ds.mutant)
       this.mutant_options = ea_controls_mutant_options.call(this.ds);
 
-    const dropdownlist = [{
-      "content": "Dataset info",
-      "action": _ => ea_dataset_modal(this.ds)
-    }];
+    const dropdownlist = [];
+
+    if (!Object.keys(this.ds.metadata).every(k => !this.ds.metadata[k])) {
+      dropdownlist.push({
+        "content": "Dataset info",
+        "action": _ => ea_dataset_modal(this.ds)
+      });
+    }
 
     if (this.weight_group) {
       dropdownlist.push({

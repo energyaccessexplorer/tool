@@ -63,9 +63,13 @@
     throw "Internet Explorer is unsupported. Hej då.";
   }
 
-  else if (m = v.match(/(Firefox|Chrome|Opera|Edge|Safari) (.*)/i)) {
+  else if (m = v.match(/(Firefox|Chrome|Opera|Safari) (.*)/i)) {
     if (support[m[1]]["min"] > parseInt(m[2])) {
       alert("This platform is known NOT to work on " + v + "." + update);
     }
+  }
+
+  else if (m = v.match(/Edge (.*)/i)) {
+    alert("Edge browser will support our set of technologies late 2019." + usethis);
   }
 })();

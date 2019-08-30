@@ -61,6 +61,11 @@ function tmpl(el, data = null) {
     if (data[v]) e.innerText = data[v];
   }
 
+  for (let e of r.querySelectorAll('[bind-cond]')) {
+    let v = e.getAttribute('bind-cond');
+    if (undefined === data[v] || data[v] === null) e.remove();
+  }
+
   return r.firstElementChild;
 };
 

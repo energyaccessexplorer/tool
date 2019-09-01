@@ -49,7 +49,7 @@ function ea_plot_output(data, canvas = null) {
     height: A.raster.height,
     domain: [0,1],
     nodata: -1,
-    colorscale: ea_default_colorscale,
+    colorscale: ea_analysis_colorscale,
   });
 };
 

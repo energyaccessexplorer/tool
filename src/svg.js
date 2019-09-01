@@ -380,17 +380,16 @@ function ea_svg_interval(opts = {}) {
     .attr('stroke-width', 'none')
     .style('cursor', 'grab');
 
-  function dragged(c, cx, rx, w, callback) {
-    if (steps) {
-      cx = denorm(norm(cx));
-      w = denorm(norm(w));
-    }
+  function dragged(c, cx, callback) {
+    if (steps) cx = denorm(norm(cx));
 
     c.attr('cx', cx);
 
+    const w = +c2.attr('cx') - c1.attr('cx');
+
     marked
-      .attr('x', rx - radius)
-      .attr('width', w);
+      .attr('x', +c1.attr('cx'))
+      .attr('width', (w < 0) ? 0 : w);
 
     if (typeof callback === 'function') callback(norm(cx).toFixed(2));
   };
@@ -403,7 +402,7 @@ function ea_svg_interval(opts = {}) {
         const c2x = c2.attr('cx');
         const cx = x_position = Math.min(c2x, Math.max(d3.event.x, svgmin));
 
-        dragged(c1, cx, cx, c2x - cx, callback1);
+        dragged(c1, cx, callback1);
       })
       .on('start', _ => c1.raise())
       .on('end', _ => {
@@ -417,7 +416,7 @@ function ea_svg_interval(opts = {}) {
         const c1x = c1.attr('cx');
         const cx = x_position = Math.max(c1x, Math.min(d3.event.x, svgmax));
 
-        dragged(c2, cx, c1x, cx - c1x, callback2);
+        dragged(c2, cx, callback2);
       })
       .on('start', _ => c2.raise())
       .on('end', _ => {
@@ -426,11 +425,8 @@ function ea_svg_interval(opts = {}) {
   );
 
   function change(a,b) {
-    const i0 = denorm(a);
-    const i1 = denorm(b);
-
-    dragged(c1, i0, i0, i1 - i0, callback1);
-    dragged(c2, i1, i0, i1 - i0, callback2);
+    dragged(c1, denorm(a), callback1);
+    dragged(c2, denorm(b), callback2);
   };
 
   if (init) change(init[0], init[1]);

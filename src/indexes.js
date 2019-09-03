@@ -158,6 +158,10 @@ function ea_indexes_modal() {
   ea_modal.set({
     header: "Energy Access Explorer Indexes",
     content: c,
-    footer: null
+    footer: elem(`
+<a style="text-align: right; display: block;" href="https://www.wri.org/publication/energy-access-explorer-data-and-methods">
+  See technical note for more detailed methodology
+</a>
+`)
   }).show();
 };

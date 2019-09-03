@@ -39,6 +39,7 @@ body {
   display: flex;
   flex: 1 100%;
   justify-content: space-around;
+  z-index: 1;
 }
 
 #maparea {

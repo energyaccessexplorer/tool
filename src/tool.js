@@ -120,7 +120,7 @@ function table_data(dict, prop, event) {
   dict.forEach(d => {
     t.append(el_tree([
       ce('tr'), [
-        ce('td', ce('strong', d.target)),
+        ce('td', ce('strong', d.target + ": &nbsp;")),
         ce('td', prop[d.dataset].toString())
       ]
     ]));
@@ -243,7 +243,7 @@ async function ea_view(v, btn) {
     "caller": "ea_views_init",
   });
 
-  qs('#view-' + v, el).classList.add('active');
+  qs('#view-' + v).classList.add('active');
 };
 
 function ea_views_init() {

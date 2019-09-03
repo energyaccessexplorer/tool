@@ -58,7 +58,11 @@ function tmpl(el, data = null) {
 
   for (let e of r.querySelectorAll('[bind]')) {
     let v = e.getAttribute('bind');
-    if (data[v]) e.innerText = data[v];
+
+    if (data[v] instanceof Element)
+      e.append(data[v]);
+    else
+      e.innerHTML = data[v];
   }
 
   for (let e of r.querySelectorAll('[bind-cond]')) {

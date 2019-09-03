@@ -129,7 +129,7 @@ class dsinput extends HTMLElement {
     const b = qs('.opacity-box', e);
 
     qs('.slider', e).append(grad.svg);
-    qs('.icon', e).onclick = _ => b.style.display = 'block';
+    qs('svg', e).onclick = _ => b.style.display = 'block';
     b.onmouseleave = _ => b.style.display = 'none';
 
     return e;

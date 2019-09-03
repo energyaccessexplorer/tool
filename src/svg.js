@@ -192,7 +192,10 @@ function ea_svg_radio(init, callback) {
   return svg.node();
 };
 
-function ea_svg_pie(data, outer, inner, colors, inner_text) {
+function ea_svg_pie(data, outer, inner, colors, inner_text, parse) {
+  if (typeof parse !== 'function')
+    parse = x => (x * 100).toFixed(2);
+
   const width =  outer * 2,
         height = outer * 2;
 
@@ -229,7 +232,7 @@ function ea_svg_pie(data, outer, inner, colors, inner_text) {
       .append("path")
       .attr("fill", (d,i) => colors[i])
       .attr("d", arc)
-      .on("mouseenter", function(d) { n = nanny.pick_element(this, { message: (d.value * 100).toFixed(2) + "%", position: "W", close: false }); })
+      .on("mouseenter", function(d) { n = nanny.pick_element(this, { message: parse(d.value) + "%", position: "W", close: false }); })
       .on("mouseleave", function(d) { if (n) n.remove(); })
       .each(function(d) { this._current = d });
 

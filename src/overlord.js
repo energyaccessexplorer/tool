@@ -203,7 +203,7 @@ async function ea_overlord(msg) {
             data: MAPBOX.getSource('output-source').raster
           },
           category: {},
-          name: "Analysis"
+          name: ea_indexes[state.output]['name']
         };
         nodata = -1;
 

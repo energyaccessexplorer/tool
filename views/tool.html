@@ -292,13 +292,11 @@ energy demand, low economic activity, and low access to infrastructure and resou
         padding: 0.9em 1.5em 0.9em 1.5em;
       }
 
-      .label {
-        display: flex;
-        justify-content: space-between;
+      .ramp {
         font-size: 0.8em;
       }
 
-      .unit-label {
+      .unit-ramp {
         font-weight: bold;
         color: darkgray;
       }
@@ -562,61 +560,24 @@ energy demand, low economic activity, and low access to infrastructure and resou
   </template>
 
   <template id="opacity-control">
-    <div class="opacity-root">
-      <div>
-        <svg class="icon" width="14px" height="14px" viewBox="0 0 14 14">
-          <g id="UI-Kit" transform="translate(-563.000000, -732.000000)" fill="#393F44">
-            <path d="M574,734.970107 L574,741.029893 C573.726681,741.51753 573.389413,741.962365 573,742.352242 L573,733.647758 C573.389413,734.037635 573.726681,734.48247 574,734.970107 Z M571,732.330304 L571,743.669696 C570.679203,743.796241 570.344927,743.894735 570,743.962266 L570,732.037734 C570.344927,732.105265 570.679203,732.203759 571,732.330304 Z M568,744 C565.169158,743.556854 563,741.039325 563,738 C563,734.960675 565.169158,732.443146 568,732 L568,744 Z" id="Opacity"></path>
-          </g>
-        </svg>
+    <div>
+      <svg width="14px" height="14px" viewBox="0 0 14 14">
+        <g id="UI-Kit" transform="translate(-563.000000, -732.000000)" fill="#393F44">
+          <path d="M574,734.970107 L574,741.029893 C573.726681,741.51753 573.389413,741.962365 573,742.352242 L573,733.647758 C573.389413,734.037635 573.726681,734.48247 574,734.970107 Z M571,732.330304 L571,743.669696 C570.679203,743.796241 570.344927,743.894735 570,743.962266 L570,732.037734 C570.344927,732.105265 570.679203,732.203759 571,732.330304 Z M568,744 C565.169158,743.556854 563,741.039325 563,738 C563,734.960675 565.169158,732.443146 568,732 L568,744 Z" id="Opacity"></path>
+        </g>
+      </svg>
 
-        <div class="opacity-box">
-          <div class="slider"></div>
-
-          <div style="display: flex;
-                      justify-content: space-between;
-                      padding-right: 0.5em;
-                      padding-left: 0.5em;
-                      font-size: 0.8em;">
-            <span>0%</span>
-            <span>Opacity</span>
-            <span>100%</span>
-          </div>
-        </div>
+      <div class="opacity-box">
+        <div class="slider"></div>
       </div>
     </div>
   </template>
 
-  <template id="ramp-label-low-medium-high">
+  <template id="ramp">
     <div style="display: flex;
+                font-size: 0.8em;
                 flex-flow: row nowrap;
                 justify-content: space-between;">
-      <div>Low</div>
-      <div>Medium</div>
-      <div>High</div>
-    </div>
-  </template>
-
-  <template id="ramp-label-min-max">
-    <div style="display: flex;
-                flex-flow: row nowrap;
-                justify-content: space-between;">
-      <div bind="min"></div>
-      <div bind="max"></div>
-    </div>
-  </template>
-
-  <template id="ramp-label-0-100">
-    <div style="display: flex;
-                flex-flow: row nowrap;
-                justify-content: space-between;
-                padding-left: 0em;">
-      <div>0</div>
-      <div style="padding-left: 0.7em">20</div>
-      <div style="padding-left: 0.7em">40</div>
-      <div style="padding-left: 0.7em">60</div>
-      <div style="padding-left: 0.7em">80</div>
-      <div>100</div>
     </div>
   </template>
 

@@ -84,8 +84,12 @@ class dsinput extends HTMLElement {
   };
 
   opacity() {
-    const e = tmpl('#opacity-control');
     let o = 1;
+    const e = tmpl('#opacity-control');
+    const ramp = tmpl('#ramp');
+    ramp.append(ce('div', '0%'), ce('div', 'Opacity'), ce('div', '100%'));
+
+    qs('.opacity-box', e).append(ramp);
 
     const grad = ea_svg_interval({
       init: [null, 100],
@@ -186,21 +190,23 @@ class dsinput extends HTMLElement {
   ramp() {
     const d = this.ds;
     let t = null;
-    let el = null;
+    let el = tmpl("#ramp");
 
     if (d.items) return;
 
     switch (d.datatype) {
     case "raster":
-      el = tmpl("#ramp-label-min-max");
-      qs('[bind=min]', el).innerText = d.raster.config.domain.min * d.raster.config.factor;
-      qs('[bind=max]', el).innerText = d.raster.config.domain.max * d.raster.config.factor;
+      el.append (
+        ce('div', d.raster.config.domain.min * d.raster.config.factor + ""),
+        ce('div', d.raster.config.domain.max * d.raster.config.factor + ""));
       break;
 
     case "polygons":
-      el = (d.vectors.config.color_stops && d.vectors.config.color_stops.length && d.parent) ?
-        tmpl("#ramp-label-0-100") :
-        null;
+      if (d.vectors.config.color_stops && d.vectors.config.color_stops.length && d.parent) {
+        el.append(
+          ce('div', "0"),
+          ce('div', "100"));
+      }
       break;
 
     default:

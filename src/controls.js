@@ -22,7 +22,7 @@ class dscontrols extends HTMLElement {
 
   init() {
     if (this.ds.parent)
-      this.range_group = ea_controls_range.call(this.ds, { label: this.ds.parent.category.unit });
+      this.range_group = ea_controls_range.call(this.ds, { ramp: this.ds.parent.category.unit });
 
     this.checkbox = ea_controls_checkbox.call(this.ds);
     this.header.onclick = this.checkbox.click;
@@ -44,7 +44,7 @@ class dscontrols extends HTMLElement {
         steps[i] = this.ds.raster.config.domain.min + (s * i);
     }
 
-    this.range_group = ea_controls_range.call(this.ds, { label: lr, steps: steps, single: c.range === 'single' });
+    this.range_group = ea_controls_range.call(this.ds, { ramp: lr, steps: steps, single: c.range === 'single' });
 
     if (this.ds.items)
       this.collection_list = ea_controls_collection_list.call(this.ds);
@@ -290,15 +290,12 @@ function ea_controls_range(opts = {}) {
     this.domain[i] = x;
   };
 
-  const l = elem(`
-<div class="label">
-  <span bind="v1"></span>
-  <span class="unit-label">${opts.label || 'range'}</span>
-  <span bind="v2"></span>
-</div>`);
+  const v1 = ce('div', null, { bind: "v1" });
+  const v2 = ce('div', null, { bind: "v2" });
 
-  const v1 = qs('[bind=v1]', l);
-  const v2 = qs('[bind=v2]', l);
+  l = tmpl('#ramp');
+  l.className = 'ramp';
+  l.append(v1, ce('div', opts.ramp || 'range', { class: "unit-ramp" }), v2);
 
   const r = ea_svg_interval({
     single: opts.single,
@@ -324,19 +321,19 @@ function ea_controls_range(opts = {}) {
     el: el,
     svg: r.svg,
     change: r.change,
-    label: l
+    ramp: l
   };
 };
 
 function ea_controls_weight() {
   const weights = [1,2,3,4,5];
 
-  const label = elem(`
-<div class="label">
-  <span>${weights[0]}</span>
-  <span class="unit-label">importance</span>
-  <span>${weights[weights.length - 1]}</span>
-</div>`);
+  const ramp = tmpl('#ramp');
+  ramp.append(
+    ce('div', weights[0] + ""),
+    ce('div', "importance", { class: "unit-ramp" }),
+    ce('div', weights[weights.length - 1] + "")
+  );
 
   const w = ea_svg_interval({
     single: true,
@@ -356,13 +353,13 @@ function ea_controls_weight() {
   });
 
   const el = ce('div');
-  el.append(w.svg, label);
+  el.append(w.svg, ramp);
 
   return {
     el: el,
     svg: w.svg,
     change: w.change,
-    label: label,
+    ramp: ramp,
   };
 };
 

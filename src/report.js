@@ -136,9 +136,9 @@ contact our team at`;
 
     c += (h * 2) + 5;
 
-    doc.text('MIN', hhalf - (w/2), c);
-    doc.text('MID', hhalf - 10, c);
-    doc.text('MAX', hhalf + (w/2) - 26, c);
+    doc.text('Low', hhalf - (w/2), c);
+    doc.text('Medium', hhalf - 20, c);
+    doc.text('High', hhalf + (w/2) - 26, c);
 
     c += font_size * 3;
 

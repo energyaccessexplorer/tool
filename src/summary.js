@@ -29,6 +29,13 @@ async function ea_summary() {
 
   const nodata = pop.nodata;
 
+  const ramp = tmpl("#ramp");
+  ramp.append(
+    ce('div', "Low"),
+    ce('div', "Medium"),
+    ce('div', "High")
+  );
+
   const scale = ce('div');
   scale.append(
     ea_svg_color_steps(
@@ -37,7 +44,7 @@ async function ea_summary() {
         .range(ea_analysis_colorscale.stops)
         .clamp(false),
       ea_analysis_colorscale.domain),
-    tmpl("#ramp-label-low-medium-high"));
+    ramp);
 
   async function get_summaries(idxn) {
     let raster = ea_analysis(ea_list_filter_type(idxn), idxn);

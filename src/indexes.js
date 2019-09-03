@@ -20,6 +20,13 @@ async function ea_indexes_graphs(raster) {
 };
 
 function ea_indexes_init(state) {
+  const ramp = tmpl("#ramp");
+  ramp.append(
+    ce('div', "Low"),
+    ce('div', "Medium"),
+    ce('div', "High")
+  );
+
   const scale = ce('div', null, { class: 'index-graphs-scale' });
   scale.append(
     ea_svg_color_steps(
@@ -28,7 +35,7 @@ function ea_indexes_init(state) {
         .range(ea_analysis_colorscale.stops)
         .clamp(false),
       ea_analysis_colorscale.domain),
-    tmpl("#ramp-label-low-medium-high"));
+    ramp);
 
   const cos = qs('#canvas-output-select');
   for (let i in ea_indexes)

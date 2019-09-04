@@ -576,6 +576,72 @@ energy demand, low economic activity, and low access to infrastructure and resou
     </div>
   </template>
 
+  <template id="country-overview">
+    <div class="country-overview">
+      <section>
+        <strong>Population:</strong> <span bind="population"></span> million
+      </section>
+
+      <section>
+        <strong>&nbsp;&nbsp;&nbsp;&nbsp; Urban:</strong> <span bind="urban_population"></span>%
+      </section>
+
+      <section>
+        <strong>&nbsp;&nbsp;&nbsp;&nbsp; Rural:</strong> <span bind="rural_population"></span>%
+      </section>
+
+      <section>
+        <strong>Area:</strong> <span bind="area"></span> km<sup>2</sup>
+      </section>
+
+      <section>
+        <strong>GDP per capita:</strong> USD <span bind="gdp_percapita"></span>
+      </section>
+
+      <section>
+        <strong>Electrification Rate:</strong> <span bind="electrification"></span>%
+      </section>
+
+      <section>
+        <div style="display: flex; justify-content: space-around;
+                    text-align: center;
+                    text-transform: uppercase;
+                    color: var(--the-green);">
+          <strong style="margin: 0.5em;">Urban</strong>
+          <strong style="margin: 0.5em;">Rural</strong>
+        </div>
+
+        <div style="display: flex; justify-content: space-around;
+                    margin-bottom: 30px;">
+          <div style="display: flex; justify-content: space-around; width: 240px; padding: 0 1em;
+                      border-right: 1px solid lightgray;">
+            <span class="small">
+              Electrified:&nbsp; <strong><span bind="urban_electrification"></span>%</strong>
+            </span>
+
+            <span bind="urban_electrification_pie"></span>
+          </div>
+
+          <div style="display: flex; justify-content: space-around; width: 240px; padding: 0 1em;">
+            <span class="small">
+              Electrified:&nbsp; <strong><span bind="rural_electrification"></span>%</strong>
+            </span>
+
+            <span bind="rural_electrification_pie"></span>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <strong>Energy intensity level of primary energy (MJ/$2011 PPP GDP):</strong> <span bind="primary_intensity"></span>
+      </section>
+
+      <section>
+        <strong>Power outages in firms in a typical month:</strong> <span bind="outages_average"></span>
+      </section>
+    </div>
+  </template>
+
   <template id="svg-info">
     <svg width="14px" height="14px" viewBox="0 0 14 14">
       <g stroke="none" stroke-width="1" fill-rule="evenodd">

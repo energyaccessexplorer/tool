@@ -75,3 +75,7 @@ aside.nanny-marker .nanny-close-button::before {
   50%  { opacity: 1.0; }
   100% { opacity: 0.7; }
 }
+
+.country-overview section {
+  margin: 1em 0;
+}

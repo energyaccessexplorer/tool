@@ -113,6 +113,21 @@ class DS {
 
     if (this.datatype === 'raster')
       ea_datasets_colorscale.call(this);
+
+    switch (this.datatype) {
+    case 'raster':
+      this.download = this.raster.endpoint;
+      break;
+
+    case 'polygons':
+    case 'points':
+    case 'lines':
+      this.download = this.vectors.endpoint;
+      break;
+
+    default:
+      break;
+    }
   };
 
   disable() {

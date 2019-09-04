@@ -285,6 +285,21 @@ function ea_colorscale(opts) {
   };
 };
 
+async function fake_download(url, name) {
+  const a = document.createElement('a');
+  a.href = url;
+  a.target = "_blank";
+  a.download = name ? name : '';
+  a.style.display = 'none';
+
+  document.body.appendChild(a);
+
+  await delay(0.1);
+
+  a.click();
+  a.remove();
+};
+
 async function ea_overview(cca3) {
   let r;
 

@@ -446,6 +446,8 @@ async function ea_datasets_init(id, inputs, preset, callback) {
         await ds.load('vectors');
         await ds.load('raster');
 
+        if (!ds.vectors.bounds) throw `'boundaries' dataset has now vectors.bounds`;
+
         callback(ds.vectors.bounds);
       })();
 
@@ -659,16 +661,7 @@ function ea_datasets_geojson() {
     .catch(err => ea_datasets_fail.call(this, "GEOJSON"))
     .then(r => {
       this.vectors.features = r;
-
-      try {
-        this.vectors.bounds = geojsonExtent(r);
-      }
-      catch (err) {
-        if (this.id === 'boundaries') throw err;
-
-        warn(`geojsonExtent failed for '${this.id}'. This is not fatal. Here's the error:`, r);
-        log(err);
-      }
+      if (this.id === 'boundaries') this.vectors.bounds = geojsonExtent(r);
     });
 };
 

@@ -1,7 +1,7 @@
 function ea_select_topo_flag(c) {
   let cca3 = c.cca3.toLowerCase();
 
-  const width = 200;
+  const width = MOBILE ? 100 : 200;
   const padding = 1;
 
   const config = c.configuration.flag || {
@@ -95,6 +95,8 @@ async function ea_select_geography(c) {
 
 function ea_select_setup() {
   const playground = qs('#playground');
+
+  MOBILE = window.innerWidth < 1152;
 
   let curr_c = null;
 

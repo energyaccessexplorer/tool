@@ -4,6 +4,10 @@
   <head>
     <meta charset="utf-8">
 
+    <meta name="HandheldFriendly" content="true">
+    <meta name="MobileOptimized" content="640">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+
     <script src="/lib/cookie-notice.js"></script>
     <script src="./browser.js"></script>
 
@@ -60,6 +64,8 @@
       </div>
     </nav>
 
+    <div id="mobile-switcher"></div>
+
     <div id="playground">
       <div id="controls-wrapper">
         <div class="controls-select-container"></div>
@@ -79,10 +85,9 @@
 
       <div id="visual">
         <div id="maparea">
+          <div id="views"></div>
           <div id="mapbox-container"></div>
         </div>
-
-        <div id="views"></div>
       </div>
 
       <div id="right-pane">
@@ -687,6 +692,30 @@ energy demand, low economic activity, and low access to infrastructure and resou
   <template id="svg-layers">
     <svg width="24" height="24" viewBox="0 0 24 24">
       <path d="M0 0h24v24H0z" fill="none"/><path d="M11.99 18.54l-7.37-5.73L3 14.07l9 7 9-7-1.63-1.27-7.38 5.74zM12 16l7.36-5.73L21 9l-9-7-9 7 1.63 1.27L12 16z"/>
+    </svg>
+  </template>
+
+  <template id="svg-list">
+    <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+      <path d="M3,4H7V8H3V4M9,5V7H21V5H9M3,10H7V14H3V10M9,11V13H21V11H9M3,16H7V20H3V16M9,17V19H21V17H9" />
+    </svg>
+  </template>
+
+  <template id="svg-map">
+    <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+      <path d="M9,3L3.36,4.9C3.15,4.97 3,5.15 3,5.38V20.5A0.5,0.5 0 0,0 3.5,21L3.66,20.97L9,18.9L15,21L20.64,19.1C20.85,19.03 21,18.85 21,18.62V3.5A0.5,0.5 0 0,0 20.5,3L20.34,3.03L15,5.1L9,3M8,5.45V17.15L5,18.31V6.46L8,5.45M10,5.47L14,6.87V18.53L10,17.13V5.47M19,5.7V17.54L16,18.55V6.86L19,5.7M7.46,6.3L5.57,6.97V9.12L7.46,8.45V6.3M7.46,9.05L5.57,9.72V11.87L7.46,11.2V9.05M7.46,11.8L5.57,12.47V14.62L7.46,13.95V11.8M7.46,14.55L5.57,15.22V17.37L7.46,16.7V14.55Z" />
+    </svg>
+  </template>
+
+  <template id="svg-controls">
+    <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+      <path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z" />
+    </svg>
+  </template>
+
+  <template id="svg-pie">
+    <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+      <path d="M11,2V22C5.9,21.5 2,17.2 2,12C2,6.8 5.9,2.5 11,2M13,2V11H22C21.5,6.2 17.8,2.5 13,2M13,13V22C17.7,21.5 21.5,17.8 22,13H13Z" />
     </svg>
   </template>
 </html>

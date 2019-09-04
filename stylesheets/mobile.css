@@ -1,0 +1,53 @@
+#mobile-switcher {
+  display: none;
+}
+
+@media (max-width: 72em) {
+  .more-dropdown {
+    display: none !important;
+  }
+
+  #canvas-output-container,
+  .controls-select-container {
+    display: none;
+  }
+
+  #controls-wrapper {
+    min-width: unset;
+    width: 100%;
+    position: absolute;
+    z-index: 1;
+  }
+
+  #right-pane {
+    width: 100%;
+    position: absolute;
+  }
+
+  #controls-tabs {
+    display: none;
+  }
+
+  #mobile-switcher {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-evenly;
+  }
+
+  #mobile-switcher > div {
+    flex: 1;
+    text-align: center;
+    padding: 12px;
+    fill: var(--the-color);
+  }
+
+  #mobile-switcher > div.active {
+    background-color: #dedede;
+  }
+
+  #views {
+    width: 100%;
+    top: unset;
+    bottom: 51px;
+  }
+}

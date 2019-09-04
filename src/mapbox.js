@@ -199,15 +199,35 @@ background-color: transparent;
 
   document.body.append(p);
 
-  const mark = nanny.pick_element(p, { position: "W", message: content, close: false });
+  let cls = false;
+  let pos = "W";
+
+  if (MOBILE) {
+    cls = true;
+    pos = "C";
+  }
+
+  const mark = nanny.pick_element((MOBILE ? document.body : p), { position: pos, message: content, close: cls });
 
   let l;
+  let lo;
 
   p.addEventListener('mouseleave', (l = function() {
     p.remove();
     mark.remove();
     document.removeEventListener('mouseleave', l);
   }));
+
+  if (MOBILE) {
+    delay(0.01)
+      .then(_ => {
+        document.body.addEventListener('click', (lo = function() {
+          p.remove();
+          mark.remove();
+          document.removeEventListener('click', lo);
+        }));
+      });
+  }
 };
 
 function mapbox_fit(bounds) {

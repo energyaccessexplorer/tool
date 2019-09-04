@@ -45,7 +45,7 @@ body {
 #maparea {
   position: relative;
   flex: 1;
-  width: 100%;
+  width: 100%;    /* will be changed by JS */
   height: auto;    /* will be changed by JS */
   padding: 0;
   margin: auto;

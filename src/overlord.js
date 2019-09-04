@@ -382,6 +382,8 @@ function ea_state_sync() {
 async function ea_overlord_init(state) {
   const id = location.get_query_param('id');
 
+  MOBILE = screen.width < 1152;
+
   ea_layout_init();
 
   GEOGRAPHY = (await fetch(`${ea_settings.database}/geographies?id=eq.${id}`).then(r => r.json()))[0];
@@ -412,7 +414,9 @@ async function ea_overlord_init(state) {
   ea_inputs_init();
   ea_indexes_init(state);
   ea_controls_init(state);
-  ea_nanny_init(state);
+
+  if (!MOBILE) ea_nanny_init(state);
+  if (MOBILE) ea_mobile_init();
 
   ea_loading(false);
 };

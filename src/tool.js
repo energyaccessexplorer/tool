@@ -224,6 +224,8 @@ function ea_layout_init() {
     l.style['height'] = p.clientHeight - (o.clientHeight + d.clientHeight + 4) + "px";
   };
 
+  if (MOBILE) m.style['width'] = screen.width + "px";
+
   document.body.onresize = set_heights;
 
   set_heights();

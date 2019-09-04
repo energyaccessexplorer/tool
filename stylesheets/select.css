@@ -36,3 +36,27 @@ body {
    */
   border: none;
 }
+
+@media (max-width: 72em) {
+  #playground {
+    flex-flow: column nowrap;
+    width: unset;
+  }
+
+  .country-item {
+    display: flex;
+    padding: 1em;
+    width: unset;
+  }
+
+  .country-item svg {
+    order: 1;
+    vertical-align: middle;
+  }
+
+  .country-item h2 {
+    order: 2;
+    vertical-align: middle;
+    padding-left: 1em;
+  }
+}

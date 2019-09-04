@@ -72,6 +72,7 @@ build-tool:
 		${SRC}/nanny-steps.js \
 		${SRC}/report.js \
 		${SRC}/summary.js \
+		${SRC}/mobile.js \
 		> ${DIST}/tool/main.js
 
 	@cat \
@@ -85,6 +86,7 @@ build-tool:
 		${CSS}/ripple.css \
 		${CSS}/svg.css \
 		${CSS}/summary.css \
+		${CSS}/mobile.css \
 		> ${DIST}/tool/main.css
 
 	@cp ${SRC}/browser.js ${DIST}/tool/

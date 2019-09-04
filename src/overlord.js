@@ -197,6 +197,24 @@ async function ea_overlord(msg) {
 
       let t;
 
+      function add_lnglat(td, lnglat = [0, 0]) {
+        td.append(el_tree([ce('tr'), [ce('td', "&nbsp;"), ce('td', "&nbsp;")]]));
+
+        td.append(el_tree([
+          ce('tr'), [
+            ce('td', "longitude"),
+            ce('td', ce('code', lnglat[0].toFixed(2)))
+          ]
+        ]));
+
+        td.append(el_tree([
+          ce('tr'), [
+            ce('td', "latitude"),
+            ce('td', ce('code', lnglat[1].toFixed(2)))
+          ]
+        ]));
+      };
+
       if (state.view === "outputs") {
         t = {
           raster: {
@@ -221,8 +239,17 @@ async function ea_overlord(msg) {
         if (o && o.value !== null) {
           let f = d3.scaleQuantize().domain([0,1]).range(["Low", "Medium", "High"]);
 
+          let td = table_data([{
+            "target": t.name,
+            "dataset": "value"
+          }], {
+            "value": f(o.value)
+          });
+
+          add_lnglat(td, [e.lngLat.lng, e.lngLat.lat]);
+
           mapbox_pointer(
-            ce('div', `<strong>${ea_indexes[state.output]['name']}</strong>: ${f(o.value)}`, {}),
+            td,
             e.originalEvent.pageX,
             e.originalEvent.pageY
           );
@@ -248,8 +275,11 @@ async function ea_overlord(msg) {
             let at;
 
             if (at = t.config.features_attr_map) {
+              let td = table_data(at, et.properties);
+              add_lnglat(td, [e.lngLat.lng, e.lngLat.lat]);
+
               mapbox_pointer(
-                table_data(at, et.properties),
+                td,
                 e.originalEvent.pageX,
                 e.originalEvent.pageY
               );
@@ -273,24 +303,30 @@ async function ea_overlord(msg) {
             }
           );
 
-          if (rc && rc.value !== null) {
+          if (rc && rc.value !== null && rc.value !== t.raster.nodata) {
             v = rc.value;
 
             if (t.raster.config) v = v * t.raster.config.factor;
 
+            const vv = (v%1 === 0) ? v : v.toFixed(2);
+
+            const td = table_data([{
+              "target": t.name,
+              "dataset": "value"
+            }], {
+              "value": `${vv} <code>${t.category.unit || ''}</code>`
+            });
+
+            add_lnglat(td, [e.lngLat.lng, e.lngLat.lat]);
+
             mapbox_pointer(
-              table_data([{
-                "target": t.name,
-                "dataset": "value"
-              }], {
-                "value": `${v.toFixed(2)} <code>${t.category.unit || ''}</code>`
-              }),
+              td,
               e.originalEvent.pageX,
               e.originalEvent.pageY
             );
           }
           else {
-            log("No value on raster.", rc);
+            log("No value (or nodata value) on raster.", rc);
           }
         }
       }

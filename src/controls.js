@@ -408,7 +408,16 @@ async function ea_controls_selectlist() {
     }
   });
 
-  qsa('.controls-select-container')[0].append(sl.el);
+  const info = tmpl('#svg-info');
+  info.querySelector('path').setAttribute('fill', 'rgba(255, 255, 255, 0.3)');
+  info.onclick = ea_overview;
+  info.style = `
+transform: scale(1.2);
+margin-bottom: 5px;
+cursor: pointer;
+`;
+
+  qsa('.controls-select-container')[0].append(sl.el, info);
 
   set_default(sl.input);
 };

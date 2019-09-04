@@ -75,10 +75,12 @@
 }
 
 .controls-select-container {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+
   width: 100%;
   box-sizing: border-box;
-
-  flex: 0 0 auto;
 
   font-size: 1.2em;
 
@@ -97,7 +99,6 @@ input[list="controls-country"] {
   font-weight: lighter;
 
   text-align: center;
-  margin: auto;
 
   color: white;
   background-color: var(--the-green);

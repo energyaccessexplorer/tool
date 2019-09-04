@@ -319,6 +319,9 @@ class DS {
 
     case 'linear':
     default: {
+      if (t[0] === t[1])
+        return s = x => (x === +t[0]) ? 1 : -1;
+
       const lin = d3.scaleLinear()
             .domain(t || d)
             .range(r)

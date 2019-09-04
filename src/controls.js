@@ -453,4 +453,14 @@ function ea_controls_sort_datasets(list) {
         dsc.closest('.controls-container').prepend(dsc);
     }
   }
+
+  const subcategories = qsa('.controls-subbranch', qs('#controls'));
+
+  for (let id of [
+    'demographics', 'productive-uses',
+    'resources', 'infrastructure'
+  ]) {
+    for (let s of subcategories)
+      if (s.id === id) s.closest('.controls-branch').append(s);
+  }
 };

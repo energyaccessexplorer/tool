@@ -6,10 +6,6 @@ canvas.mapboxgl-canvas {
   cursor: crosshair;
 }
 
-svg#svg-map {
-  opacity: 1.0;
-}
-
 #coord-tooltip {
   position: absolute;
   display: none;

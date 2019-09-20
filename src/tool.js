@@ -208,20 +208,30 @@ function ea_dataset_modal(ds) {
 function ea_layout_init() {
   const n = qs('nav');
   const p = qs('#playground');
+  const w = qs('#mobile-switcher');
+
   const m = qs('#maparea', p);
+  const b = qs('#mapbox-container', m);
+  const v = qs('#views', m);
+
   const c = qs('#controls-wrapper', p);
   const r = qs('#right-pane', p);
+
+  const l = qs('#inputs-list', r);
   const o = qs('#canvas-output-container', r);
   const d = qs('#drawer', r);
-  const l = qs('#inputs-list', r);
 
   function set_heights() {
+    const h = window.innerHeight - n.clientHeight - (MOBILE ? w.clientHeight : 0);
+
     p.style['height'] =
       c.style['height'] =
       m.style['height'] =
-      window.innerHeight - n.clientHeight + "px";
+      r.style['height'] = h + "px";
 
-    l.style['height'] = p.clientHeight - (o.clientHeight + d.clientHeight + 4) + "px";
+    b.style['height'] = (h - (MOBILE ? v.clientHeight : 0)) + "px";
+
+    l.style['height'] = h - (o.clientHeight + d.clientHeight + 4) + "px";
   };
 
   if (MOBILE) m.style['width'] = screen.width + "px";

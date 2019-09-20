@@ -93,9 +93,15 @@
   padding: 1em 2em;
 }
 
-#index-graphs-info {
+#index-graphs-toolbox {
+  display: flex;
   padding-right: 1em;
   float: right;
+}
+
+#index-graphs-toolbox div {
+  padding-right: 0.5em;
+  cursor: pointer;
 }
 
 #canvas-output-container {

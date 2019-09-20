@@ -50,6 +50,8 @@ function ea_indexes_init(state) {
     });
   };
 
+  const toolbox = qs('#index-graphs-toolbox');
+
   const info = qs('#index-graphs-info');
   info.append(tmpl('#svg-info'));
   info.onclick = _ => ea_indexes_modal();

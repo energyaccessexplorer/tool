@@ -47,8 +47,12 @@
 
   #views {
     width: 100%;
+    position: initial;
     top: unset;
-    bottom: 51px;
+  }
+
+  #mapbox-container {
+    position: relative;
   }
 
   #playground {

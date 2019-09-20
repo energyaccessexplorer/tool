@@ -412,8 +412,10 @@ async function ea_controls_selectlist() {
   info.querySelector('path').setAttribute('fill', 'rgba(255, 255, 255, 0.3)');
   info.onclick = ea_overview;
   info.style = `
+display: inline-block;
 transform: scale(1.2);
-margin-bottom: 5px;
+paddin: 10px;
+width: 50px;
 cursor: pointer;
 `;
 

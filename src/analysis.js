@@ -145,9 +145,8 @@ function ea_analysis(list, type) {
  */
 
 async function ea_plot_active_analysis(type, cs = 'ea') {
-  const list = ea_list_filter_type(type);
+  const raster = ea_active_analysis(type);
 
-  const raster = await ea_analysis(list, type);
   ea_plot_output(raster);
 
   qs('#canvas-output-select').value = type;
@@ -166,4 +165,9 @@ async function ea_plot_active_analysis(type, cs = 'ea') {
   }
 
   return raster;
+};
+
+function ea_active_analysis(type) {
+  const list = ea_list_filter_type(type);
+  return ea_analysis(list, type);
 };

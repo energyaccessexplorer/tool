@@ -171,3 +171,40 @@ function ea_active_analysis(type) {
   const list = ea_list_filter_type(type);
   return ea_analysis(list, type);
 };
+
+async function raster_to_tiff(type) {
+  const b = DS.get('boundaries');
+
+  const raster = await ea_active_analysis(type);
+
+  const scale = d3.scaleLinear().domain([0,1]).range([0,254]);
+  const fn = function(x) {
+    if (x === -1) return 255;
+    return scale(x);
+  };
+
+  const arr = new Uint8Array(raster.length).fill(255);
+  for (let i = 0; i < raster.length; i += 1)
+    arr[i] = fn(raster[i]);
+
+  const metadata = {
+    ImageWidth: b.raster.width,
+    ImageLength: b.raster.height,
+    ResolutionUnit: "1",
+    XPosition: b.vectors.bounds[0],
+    YPosition: b.vectors.bounds[1],
+    ModelTiepoint: [ 0, 0, 0, b.vectors.bounds[0], b.vectors.bounds[3], 0 ],
+    XResolution: "1",
+    YResolution: "1",
+    GDAL_NODATA: "255",
+    ModelPixelScale: [(b.vectors.bounds[2] - b.vectors.bounds[0]) / b.raster.width, (b.vectors.bounds[3] - b.vectors.bounds[1]) / b.raster.height, 0]
+  };
+
+  const arrayBuffer = await GeoTIFF.writeArrayBuffer(arr, metadata);
+
+  let blob = new Blob([arrayBuffer], { type: "application/octet-stream;charset=utf-8" });
+
+  fake_download(URL.createObjectURL(blob), `energyaccessexplorer-${type}.tif`);
+
+  return blob;
+};

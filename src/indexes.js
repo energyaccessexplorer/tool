@@ -56,6 +56,10 @@ function ea_indexes_init(state) {
   info.append(tmpl('#svg-info'));
   info.onclick = _ => ea_indexes_modal();
 
+  const download = qs('#index-graphs-download');
+  download.append(tmpl('#svg-download'));
+  download.onclick = _ => raster_to_tiff(location.get_query_param('output'));
+
   window.POPULATION_PIE = ea_svg_pie([[0], [0], [0], [0], [0]], 70, 0, ea_analysis_colorscale.stops, null);
   window.AREA_PIE = ea_svg_pie([[0], [0], [0], [0], [0]], 70, 0, ea_analysis_colorscale.stops, null);
 

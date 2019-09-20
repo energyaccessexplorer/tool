@@ -458,7 +458,7 @@ async function ea_datasets_init(id, inputs, preset, callback) {
       if (ds.id === 'boundaries') (async _ => {
         boundaries = ds;
 
-        ds.active = true;
+        ds.active = false;
 
         await ds.load('csv');
         await ds.load('vectors');

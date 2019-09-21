@@ -2,6 +2,8 @@ class DS {
   constructor(o) {
     this.id = o.category.name;
 
+    this.dataset_id = o.id;
+
     this.category = o.category;
 
     let config = o.configuration || {};

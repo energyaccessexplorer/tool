@@ -297,6 +297,33 @@ function ea_colorscale(opts) {
   };
 };
 
+function ea_current_config() {
+  const state = ea_state_sync();
+  const config = {
+    geography_id: location.get_query_param('id'),
+    analysis_type: state.output,
+    datasets: []
+  };
+
+  for (let i of state.inputs) {
+    let d = DS.get(i);
+    let c = {};
+
+    c.id = d.dataset_id;
+    c.category = d.id;
+    c.weight = d.weight;
+    c.domain = d.domain.map(x => +x);
+
+    config.datasets.push(c);
+  }
+
+  let blob = new Blob([JSON.stringify(config)], { type: "application/octet-stream;charset=utf-8" });
+
+  fake_download(URL.createObjectURL(blob), `energyaccessexplorer-${state.output}.json`);
+
+  return config;
+};
+
 async function fake_download(url, name) {
   const a = document.createElement('a');
   a.href = url;

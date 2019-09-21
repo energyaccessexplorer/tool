@@ -106,6 +106,7 @@
             <div id="index-graphs-toolbox">
               <a id="index-graphs-info" title="Info about different indexes"></a>
               <a id="index-graphs-download" title="Download TIFF image of the current analysis"></a>
+              <a id="index-graphs-code" title="Download JSON file of the current analysis"></a>
             </div>
             <div id="index-graphs-description"></div>
           </div>
@@ -648,6 +649,12 @@ energy demand, low economic activity, and low access to infrastructure and resou
         <strong>Power outages in firms in a typical month:</strong> <span bind="outages_average"></span>
       </section>
     </div>
+  </template>
+
+  <template id="svg-code">
+    <svg width="24px" height="24px" viewBox="0 0 24 24">
+      <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>
+    </svg>
   </template>
 
   <template id="svg-info">

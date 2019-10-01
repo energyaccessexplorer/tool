@@ -237,7 +237,7 @@ async function ea_overlord(msg) {
         );
 
         if (o && o.value !== null) {
-          let f = d3.scaleQuantize().domain([0,1]).range(["Low", "Medium", "High"]);
+          let f = d3.scaleQuantize().domain([0,1]).range(["Low", "Low-Medium", "Medium", "Medium-High", "High"]);
 
           let td = table_data([{
             "target": t.name,

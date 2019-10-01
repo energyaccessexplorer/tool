@@ -77,13 +77,13 @@ class dscontrols extends HTMLElement {
       "action": _ => this.reset_defaults()
     });
 
-    if (this.ds.download) {
-      dropdownlist.push({
-        "content": "Download dataset file",
-        "action": _ => fake_download(this.ds.download, null)
-      });
-    }
-
+    // if (this.ds.download) {
+    //   dropdownlist.push({
+    //     "content": "Download dataset file",
+    //     "action": _ => fake_download(this.ds.download, null)
+    //   });
+    // }
+    //
     this.dropdown = new dropdown(dropdownlist)
   };
 

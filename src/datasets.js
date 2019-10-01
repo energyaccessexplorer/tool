@@ -300,8 +300,9 @@ class DS {
     const r = ((typeof this.invert !== 'undefined' && this.invert.includes(i)) ? [1,0] : [0,1]);
 
     switch (v) {
-    case 'multi-key-delta':
+    case 'multi-key-delta': {
       break;
+    }
 
     case 'key-delta': {
       if (!this.table) return (s = x => 1);

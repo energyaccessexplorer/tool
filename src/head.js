@@ -176,5 +176,6 @@ function warn() {
 };
 
 function delay(s) {
+  if (typeof s !== 'number') throw "ArgumentError: delay expects an number";
   return new Promise(_ => setTimeout(_, s * 1000));
 };

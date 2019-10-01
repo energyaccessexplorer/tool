@@ -297,8 +297,8 @@ async function ea_overlord(msg) {
             MAPBOX.coords,
             {
               data: t.raster.data,
-              width: b.raster.width,
-              height: b.raster.height,
+              width: t.raster.width,
+              height: t.raster.height,
               nodata: nodata
             }
           );

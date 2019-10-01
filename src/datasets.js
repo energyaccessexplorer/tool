@@ -320,6 +320,18 @@ class DS {
       break;
     }
 
+    case 'intervals': {
+      const ti = this.category.configuration.analysis_intervals;
+
+      const q = d3.scaleQuantile()
+            .domain(ti)
+            .range([0, 0.25, 0.5, 0.75, 1]);
+
+      s = x => (x >= this.domain[0]) && (x <= this.domain[1]) ? q(x) : -1;
+
+      break;
+    }
+
     case 'linear':
     default: {
       if (t[0] === t[1])

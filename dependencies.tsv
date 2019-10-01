@@ -6,6 +6,7 @@ mapbox-gl.css	https://api.mapbox.com/mapbox-gl-js/v1.2.0/mapbox-gl.css
 geojson-extent.js	https://raw.githubusercontent.com/mapbox/geojson-extent/master/geojson-extent.js
 htmlsortable.js	https://raw.githubusercontent.com/lukasoppermann/html5sortable/master/dist/html5sortable.min.js
 countries.json	https://raw.githubusercontent.com/mledoze/countries/master/dist/countries.json
+helpers.js	https://gitlab.com/fabbe/web-toolbelt/raw/master/helpers.js
 location.js	https://gitlab.com/fabbe/web-toolbelt/raw/master/location.js
 flash.js	https://gitlab.com/fabbe/web-toolbelt/raw/master/flash.js
 modal.js	https://gitlab.com/fabbe/web-toolbelt/raw/master/modal.js

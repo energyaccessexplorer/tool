@@ -47,6 +47,7 @@ build-tool:
 		${LIB}/geotiff.js \
 		${LIB}/mapbox-gl.js \
 		${LIB}/geojson-extent.js \
+		${LIB}/helpers.js \
 		${LIB}/flash.js \
 		${LIB}/modal.js \
 		${LIB}/location.js \
@@ -58,7 +59,6 @@ build-tool:
 
 	@echo -n "const ea_settings = " | cat - \
 		settings.json \
-        ${SRC}/head.js \
 		${SRC}/analysis.js \
 		${SRC}/overlord.js \
 		${SRC}/tool.js \

@@ -26,6 +26,9 @@ default: build
 
 build: build-tool build-select
 
+deps:
+	DEST=${DIST}/lib deps
+
 start:
 	(cd ${DIST} && ${STATIC_SERVER}) &
 

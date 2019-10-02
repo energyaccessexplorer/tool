@@ -102,6 +102,7 @@ build-select:
 	@cat \
 		${LIB}/d3.js \
 		${LIB}/topojson.js \
+		${LIB}/helpers.js \
 		${LIB}/flash.js \
 		${LIB}/modal.js \
 		${LIB}/selectlist.js \
@@ -109,7 +110,6 @@ build-select:
 
 	@echo -n "const ea_settings = " | cat - \
 		settings.json \
-        ${SRC}/head.js \
 		${SRC}/svg.js \
 		${SRC}/ui.js \
 		${SRC}/select.js \

@@ -108,6 +108,7 @@ class DS {
       else if (this.vectors) t = this.vectors.config.shape_type;
       else if (this.parent) t = this.parent.datatype;
       else if (this.raster) t = "raster";
+      else if (this.csv) t = "table";
       else throw `Cannot decide datatype of ${this.id}`;
 
       return t;
@@ -157,7 +158,9 @@ class DS {
   add_source(opts) {
     if (this.source && MAPBOX.getSource(this.id)) return;
 
-    this.source = MAPBOX.addSource(this.id, opts);
+    MAPBOX.addSource(this.id, opts);
+
+    this.source = MAPBOX.getSource(this.id);
   };
 
   add_layer(opts) {
@@ -607,8 +610,7 @@ function ea_datasets_csv() {
   fetch(this.csv.endpoint)
     .then(r => r.text())
     .then(t => d3.csvParse(t))
-    .then(d => this.csv.data = d)
-    .catch(e => warn(`'${this.id}' seems to be misconfigured. ${e}`));
+    .then(d => this.csv.data = d);
 };
 
 function ea_datasets_tiff() {

@@ -62,6 +62,7 @@ build-tool:
 
 	@echo -n "const ea_settings = " | cat - \
 		settings.json \
+		${SRC}/shared.js \
 		${SRC}/analysis.js \
 		${SRC}/overlord.js \
 		${SRC}/tool.js \

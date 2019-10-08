@@ -179,6 +179,29 @@ async function ea_overlord(msg) {
   }
 
   case "refresh": {
+    if (!MAPBOX.getSource('output-source')) {
+      MAPBOX.addSource('output-source', {
+        "type": 'canvas',
+        "canvas": 'output',
+        "animate": false,
+        "coordinates": MAPBOX.coords
+      });
+    }
+
+    if (!MAPBOX.getLayer('output-layer')) {
+      MAPBOX.addLayer({
+        "id": 'output-layer',
+        "source": 'output-source',
+        "type": 'raster',
+        "layout": {
+          "visibility": "none",
+        },
+        "paint": {
+          "raster-resampling": "nearest",
+        }
+      }, MAPBOX.first_symbol);
+    }
+
     ea_overlord({
       "type": "view",
       "target": state.view,

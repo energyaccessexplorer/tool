@@ -21,9 +21,6 @@ class dscontrols extends HTMLElement {
   };
 
   init() {
-    if (this.ds.parent)
-      this.range_group = ea_controls_range.call(this.ds, { ramp: this.ds.parent.category.unit });
-
     this.checkbox = ea_controls_checkbox.call(this.ds);
     this.header.onclick = this.checkbox.click;
 
@@ -77,6 +74,9 @@ class dscontrols extends HTMLElement {
       "action": _ => this.reset_defaults()
     });
 
+    // Enable this later when we are ready to let the users download the
+    // original file.
+    //
     // if (this.ds.download) {
     //   dropdownlist.push({
     //     "content": "Download dataset file",
@@ -203,7 +203,10 @@ customElements.define('ds-controls', dscontrols);
 
 function ea_controls_init(state) {
   ea_controls_selectlist();
-  ea_controls_presets_init(state.preset);
+
+  // TODO: enable this later when we bring back presets
+  //
+  // ea_controls_presets_init(state.preset);
 
   const controls = qs('#controls-contents');
   const controls_tabs_el = qs('#controls-tabs');
@@ -290,6 +293,8 @@ function ea_controls_mutant_options() {
 };
 
 function ea_controls_range(opts = {}) {
+  if (!this.raster) return null;
+
   this.domain = [this.raster.config.domain.min, this.raster.config.domain.max];
 
   const update = (x,i,el) => {

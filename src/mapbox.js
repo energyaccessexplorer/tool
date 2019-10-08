@@ -140,33 +140,10 @@ function mapbox_setup() {
 };
 
 function mapbox_change_theme(theme) {
-  const set_output = _ => {
-    if (!MAPBOX.getSource('output-source')) {
-      MAPBOX.addSource('output-source', {
-        "type": 'canvas',
-        "canvas": 'output',
-        "animate": false,
-        "coordinates": MAPBOX.coords
-      });
-    }
-
+  function set_output() {
     const c = MAPBOX.getStyle().layers.find(l => l.type === 'symbol');
 
     MAPBOX.first_symbol = ((c && c.id) || undefined);
-
-    if (!MAPBOX.getLayer('output-layer')) {
-      MAPBOX.addLayer({
-        "id": 'output-layer',
-        "source": 'output-source',
-        "type": 'raster',
-        "layout": {
-          "visibility": "none",
-        },
-        "paint": {
-          "raster-resampling": "nearest",
-        }
-      }, MAPBOX.first_symbol);
-    }
 
     ea_overlord({
       type: "refresh",

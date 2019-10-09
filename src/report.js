@@ -275,8 +275,8 @@ contact our team at`;
     const s0 = document.createElement('script');
     const s1 = document.createElement('script');
 
-    s0.src = "/maps-and-data/lib/jspdf.js";
-    s1.src = "/maps-and-data/lib/jspdf-autotable.js";
+    s0.src = "/tool/lib/jspdf.js";
+    s1.src = "/tool/lib/jspdf-autotable.js";
 
     s0.onload = _ => document.head.append(s1);
     s1.onload = gen_pdf;

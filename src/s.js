@@ -69,12 +69,12 @@ async function ea_select_geography(c) {
   const sl = new selectlist(`geographies-select-` + c.id, data, {
     'change': function(e) {
       const x = coll.find(x => x.name === this.value);
-      if (x) location = location = `/maps-and-data/a?id=${x.id}`;
+      if (x) location = location = `/tool/a?id=${x.id}`;
     }
   });
 
   if (coll.length === 0) {
-    location = `/maps-and-data/a?id=${c.id}`;
+    location = `/tool/a?id=${c.id}`;
     return;
   }
 

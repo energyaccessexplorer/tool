@@ -24,7 +24,7 @@ LIB = ${DIST}/lib
 
 default: build
 
-build: build-tool build-select
+build: build-a build-s
 
 deps:
 	DEST=${DIST}/lib deps
@@ -38,12 +38,12 @@ watch:
 stop:
 	-@lsof -t -i :${WEB_PORT} | xargs -r kill -9
 
-build-tool:
-	@echo "Building tool"
-	@mkdir -p ${DIST}/tool
-	@cp ${VIEWS}/tool.html ${DIST}/tool/index.html
-	@cp ${CSS}/ripple.css ${DIST}/tool/ripple.css
-	@cp ${CSS}/svg.css ${DIST}/tool/svg.css
+build-a:
+	@echo "Building a"
+	@mkdir -p ${DIST}/a
+	@cp ${VIEWS}/a.html ${DIST}/a/index.html
+	@cp ${CSS}/ripple.css ${DIST}/a/ripple.css
+	@cp ${CSS}/svg.css ${DIST}/a/svg.css
 
 	@cat \
 		${LIB}/d3.js \
@@ -58,14 +58,14 @@ build-tool:
 		${LIB}/nanny.js \
 		${LIB}/selectlist.js \
 		${LIB}/dropdown.js \
-		> ${DIST}/tool/libs.js
+		> ${DIST}/a/libs.js
 
 	@echo -n "const ea_settings = " | cat - \
 		settings.json \
 		${SRC}/shared.js \
 		${SRC}/analysis.js \
 		${SRC}/overlord.js \
-		${SRC}/tool.js \
+		${SRC}/a.js \
 		${SRC}/svg.js \
 		${SRC}/controls.js \
 		${SRC}/ui.js \
@@ -77,11 +77,11 @@ build-tool:
 		${SRC}/report.js \
 		${SRC}/summary.js \
 		${SRC}/mobile.js \
-		> ${DIST}/tool/main.js
+		> ${DIST}/a/main.js
 
 	@cat \
 		${CSS}/general.css \
-		${CSS}/tool.css \
+		${CSS}/a.css \
 		${CSS}/layout.css \
 		${CSS}/controls.css \
 		${CSS}/maparea.css \
@@ -91,14 +91,14 @@ build-tool:
 		${CSS}/svg.css \
 		${CSS}/summary.css \
 		${CSS}/mobile.css \
-		> ${DIST}/tool/main.css
+		> ${DIST}/a/main.css
 
-	@cp ${SRC}/browser.js ${DIST}/tool/
+	@cp ${SRC}/browser.js ${DIST}/a/
 
-build-select:
-	@echo "Building select"
-	@mkdir -p ${DIST}/select
-	@cp ${VIEWS}/select.html ${DIST}/select/index.html
+build-s:
+	@echo "Building s"
+	@mkdir -p ${DIST}/s
+	@cp ${VIEWS}/s.html ${DIST}/s/index.html
 
 	@cat \
 		${LIB}/d3.js \
@@ -107,24 +107,24 @@ build-select:
 		${LIB}/flash.js \
 		${LIB}/modal.js \
 		${LIB}/selectlist.js \
-		> ${DIST}/select/libs.js
+		> ${DIST}/s/libs.js
 
 	@echo -n "const ea_settings = " | cat - \
 		settings.json \
 		${SRC}/svg.js \
 		${SRC}/ui.js \
-		${SRC}/select.js \
-		> ${DIST}/select/main.js
+		${SRC}/s.js \
+		> ${DIST}/s/main.js
 
 	@cat \
 		${CSS}/general.css \
-		${CSS}/select.css \
+		${CSS}/s.css \
 		${CSS}/maparea.css \
 		${CSS}/views.css \
 		${CSS}/ripple.css \
-		> ${DIST}/select/main.css
+		> ${DIST}/s/main.css
 
-	@cp ${SRC}/browser.js ${DIST}/select/
+	@cp ${SRC}/browser.js ${DIST}/s/
 
 synced:
 	@rsync -OPrv \

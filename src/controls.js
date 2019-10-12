@@ -25,7 +25,7 @@ class dscontrols extends HTMLElement {
     this.header.onclick = this.checkbox.click;
 
     const cat = this.ds.category;
-    const c = cat.configuration.controls;
+    const c = cat.controls;
 
     if (c.weight)
       this.weight_group = ea_controls_weight.call(this.ds);
@@ -120,7 +120,7 @@ class dscontrols extends HTMLElement {
 
   inject() {
     const ds = this.ds;
-    const path = ds.category.configuration.path;
+    const path = ds.category.controls.path;
 
     if (!path.length) return;
     if (ds.children) return;
@@ -187,7 +187,7 @@ class dscontrols extends HTMLElement {
     }
 
     if (this.range_group) {
-      const d = this.ds.category.raster.config.init;
+      const d = this.ds.raster.config.init;
       this.range_group.change(d.min, d.max);
     }
 

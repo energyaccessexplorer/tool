@@ -29,12 +29,12 @@ function ea_analysis(list, type) {
     .filter(d => {
       if (typeof d.scale_fn(type) !== 'function') return false;
 
-      if (d.raster.config.scale === 'key-delta' &&
+      if (d.analysis.scale === 'key-delta' &&
           (d.domain[0] === d.raster.config.domain.min && d.domain[1] === d.raster.config.domain.max)) return false;
 
       return true;
     })
-    .sort((x,y) => x.raster.config.scale === "key-delta" ? -1 : 1);
+    .sort((x,y) => x.analysis.scale === "key-delta" ? -1 : 1);
 
   // Add up how much demand and supply datasets will account for. Then, just
   // below, these values will be split into 50-50 of the total analysis.
@@ -71,7 +71,7 @@ function ea_analysis(list, type) {
   // instead.
   //
   const full_weight = list
-        .reduce((a,c) => ((c.raster.config.scale === "key-delta") ? a : c.weight + a), 0);
+        .reduce((a,c) => ((c.analysis.scale === "key-delta") ? a : c.weight + a), 0);
 
   if (list.length === 1 && full_weight === 0) return it;
 

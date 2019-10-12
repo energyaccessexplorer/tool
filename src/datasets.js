@@ -9,29 +9,31 @@ class DS {
     let config = o.configuration || {};
     this.config = config;
 
+    this.analysis = o.category.analysis || {};
+
     this.name = config.name_override || o.category.name_long;
 
-    this.indexname = (o.category.configuration.path && o.category.configuration.path[0]) || null;
+    this.indexname = (o.category.controls.path && o.category.controls.path[0]) || null;
 
-    this.weight = o.category.weight || 2;
+    this.weight = this.analysis.weight || 2;
 
     this.metadata = o.metadata;
 
-    this.invert = config.invert_override || o.category.configuration.invert;
+    this.invert = config.invert_override || o.category.analysis.invert;
 
     this.mutant = !!config.mutant;
 
     this.items = !!config.collection ? [] : undefined;
 
-    if (o.heatmap_file) {
+    if (o.raster_file) {
       const r = this.raster = {};
 
-      r.config = JSON.parse(JSON.stringify(o.category.heatmap));
+      r.config = JSON.parse(JSON.stringify(o.category.raster));
 
-      r.endpoint = o.heatmap_file.endpoint;
+      r.endpoint = o.raster_file.endpoint;
       r.parse = _ => ea_datasets_tiff.call(this);
 
-      if (r.config.scale === 'multi-key-delta')
+      if (this.analysis.scale === 'multi-key-delta')
         this.children = [];
     }
 
@@ -241,7 +243,7 @@ class DS {
       d.metadata = this.metadata;
 
       Object.assign(d.raster = {}, this.raster);
-      d.raster.config.scale = "key-delta";
+      d.analysis.scale = "key-delta";
 
       Object.assign(d.vectors = {}, this.vectors);
       d.vectors.features = JSON.parse(features_json);
@@ -299,7 +301,7 @@ class DS {
     const dom = this.raster.config.domain;
     const d = (dom && [dom.min, dom.max]) || [0,1];
     const t = this.domain;
-    const v = this.raster.config.scale;
+    const v = this.analysis.scale;
     const r = ((typeof this.invert !== 'undefined' && this.invert.includes(i)) ? [1,0] : [0,1]);
 
     switch (v) {
@@ -324,10 +326,8 @@ class DS {
     }
 
     case 'intervals': {
-      const ti = this.category.configuration.analysis_intervals;
-
       const q = d3.scaleQuantile()
-            .domain(ti)
+            .domain(this.analysis.intervals)
             .range([0, 0.25, 0.5, 0.75, 1]);
 
       s = x => (x >= this.domain[0]) && (x <= this.domain[1]) ? q(x) : -1;
@@ -344,7 +344,7 @@ class DS {
             .domain(t || d)
             .range(r)
 
-      s = lin.clamp(this.raster.config.clamp);
+      s = lin.clamp(this.analysis.clamp);
       break;
     }
     }
@@ -463,7 +463,7 @@ window.__dstable = {};
  */
 
 async function ea_datasets_init(id, inputs, preset, callback) {
-  let attrs = '*,heatmap_file(*),vectors_file(*),csv_file(*),category(*)';
+  let attrs = '*,raster_file(*),vectors_file(*),csv_file(*),category(*)';
 
   let boundaries;
 
@@ -518,52 +518,55 @@ function ea_datasets_colorscale() {
   this.colorscale = {};
   this.colorscale.stops = d;
 
-  {
-    let intervals;
+  switch (this.raster.config.scale) {
+  case "intervals": {
+    let domain = this.raster.config.domain;
 
-    if (this.raster.config.configuration && (intervals = this.raster.config.configuration.intervals)) {
-      let domain = this.raster.config.domain;
+    let s = d3.scaleLinear()
+        .domain([0,255])
+        .range([domain.min, domain.max])
+        .clamp(true);
 
-      let s = d3.scaleLinear()
-          .domain([0,255])
-          .range([domain.min, domain.max])
-          .clamp(true);
+    const a = new Uint8Array(1024).fill(-1);
+    for (let i = 0; i < 1024; i += 4) {
+      let j = interval_index(s(i/4), this.raster.config.intervals);
 
-      const a = new Uint8Array(1024).fill(-1);
-      for (let i = 0; i < 1024; i += 4) {
-        let j = interval_index(s(i/4), intervals, this.raster.config.clamp);
-
-        if (j === -1) {
-          a[i] = a[i+1] = a[i+2] = a[i+3] = 0;
-          continue;
-        }
-
-        let cj = cs[j];
-
-        let color = hex_to_rgba(cs[j]);
-
-        a[i] = color[0];
-        a[i+1] = color[1];
-        a[i+2] = color[2];
-        a[i+3] = color[3];
+      if (j === -1) {
+        a[i] = a[i+1] = a[i+2] = a[i+3] = 0;
+        continue;
       }
 
-      this.colorscale.data = a;
-      this.colorscale.fn = (x,i) => cs[i];
+      let cj = cs[j];
+
+      let color = hex_to_rgba(cs[j]);
+
+      a[i] = color[0];
+      a[i+1] = color[1];
+      a[i+2] = color[2];
+      a[i+3] = color[3];
     }
 
-    else {
-      const a = ea_colorscale({
-        stops: cs,
-        domain: d
-      });
+    this.colorscale.data = a;
+    this.colorscale.fn = (x,i) => cs[i];
 
-      this.colorscale.data = a.data;
-      this.colorscale.fn = d3.scaleLinear()
-        .domain(d)
-        .range(cs)
-        .clamp(this.raster.config.clamp || false);
-    }
+    break;
+  }
+
+  case "linear":
+  default: {
+    const a = ea_colorscale({
+      stops: cs,
+      domain: d
+    });
+
+    this.colorscale.data = a.data;
+    this.colorscale.fn = d3.scaleLinear()
+      .domain(d)
+      .range(cs)
+      .clamp(this.analysis.clamp || false);
+
+    break;
+  }
   }
 };
 

@@ -19,7 +19,7 @@ class DS {
 
     this.metadata = o.metadata;
 
-    this.invert = config.invert_override || o.category.analysis.invert;
+    this.invert = config.invert_override || (o.category.analysis && o.category.analysis.invert);
 
     this.mutant = !!config.mutant;
 
@@ -381,9 +381,12 @@ class DS {
     this.active = v;
 
     if (v) {
-      this.controls.loading(true);
-      await this.load();
-      this.controls.loading(false);
+      if (this.controls) {
+        this.controls.loading(true);
+        await this.load();
+        this.controls.loading(false);
+      }
+      else await this.load();
     }
 
     if (this.items) {
@@ -610,6 +613,8 @@ function ea_datasets_table(sources) {
 };
 
 function ea_datasets_csv() {
+  if (this.csv.data) return;
+
   fetch(this.csv.endpoint)
     .then(r => r.text())
     .then(t => d3.csvParse(t))

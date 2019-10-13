@@ -149,6 +149,7 @@ deploy:
 		--exclude=.git \
 		--exclude=default.mk \
 		--exclude=makefile \
+		--exclude=data \
 		${DIST}/ ${SRV_USER}@${SRV_SERVER}:${SRV_DEST}
 
 	make reconfig env=development

@@ -24,7 +24,7 @@ function ea_layout_init() {
 
     b.style['height'] = (h - (MOBILE ? v.clientHeight : 0)) + "px";
 
-    l.style['height'] = h - ((o ? o.clientHeight : 0) + d.clientHeight + 4) + "px";
+    if (l) l.style['height'] = h - ((o ? o.clientHeight : 0) + d.clientHeight + 4) + "px";
   };
 
   if (MOBILE) m.style['width'] = screen.width + "px";
@@ -157,7 +157,7 @@ function date_valid(d) {
   return d instanceof Date && !isNaN(d);
 };
 
-function interval_index(v, arr, clamp) {
+function interval_index(v, arr) {
   // TODO: implement non-clamp?
   //
   for (let i = 0; i < arr.length-1; i += 1) {

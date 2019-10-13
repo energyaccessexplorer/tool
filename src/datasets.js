@@ -468,30 +468,28 @@ window.__dstable = {};
 async function ea_datasets_init(id, inputs, preset, callback) {
   let attrs = '*,raster_file(*),vectors_file(*),csv_file(*),category(*)';
 
-  let boundaries;
+  let core = `${ea_settings.database}/datasets?geography_id=eq.${id}&select=${attrs}`;
 
-  await fetch(`${ea_settings.database}/datasets?geography_id=eq.${id}&select=${attrs}`)
+  let bounds;
+
+  await fetch(`${core}&category_name=eq.boundaries`)
     .then(r => r.json())
-    .then(r => r.map(e => {
-      let active = (inputs.includes(e.category.name));
-      let ds = new DS(e);
+    .then(async e => {
+      let ds = new DS(e[0]);
 
-      if (ds.id === 'boundaries') (async _ => {
-        boundaries = ds;
+      ds.active = false;
 
-        ds.active = false;
+      await ds.load('vectors');
+      await ds.load('csv');
+      await ds.load('raster');
 
-        await ds.load('csv');
-        await ds.load('vectors');
-        await ds.load('raster');
+      if (!(bounds = ds.vectors.bounds)) throw `'boundaries' dataset has now vectors.bounds`;
+    });
 
-        if (!ds.vectors.bounds) throw `'boundaries' dataset has now vectors.bounds`;
-
-        callback(ds.vectors.bounds);
-      })();
-
-      ds.init(active, preset);
-    }));
+  await fetch(`${core}&category_name=not.eq.boundaries`)
+    .then(r => r.json())
+    .then(r => r.filter(x => (!!x.category.timeline === !!TIMELINE_DATES) || x.category.name === 'boundaries'))
+    .then(r => r.map(e => (new DS(e)).init(inputs.includes(e.category.name), preset)));
 
   // We need all the datasets to be initialised _before_ setting
   // mutant/collection attributes (order is never guaranteed)
@@ -503,6 +501,8 @@ async function ea_datasets_init(id, inputs, preset, callback) {
   // the next step is to syncronise the entire thing.
   //
   await Promise.all(DS.all.filter(d => d.children).map(d => d.children_init(inputs)));
+
+  callback(bounds);
 };
 
 function ea_datasets_colorscale() {

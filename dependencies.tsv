@@ -6,11 +6,11 @@ mapbox-gl.css	https://api.mapbox.com/mapbox-gl-js/v1.2.0/mapbox-gl.css
 geojson-extent.js	https://raw.githubusercontent.com/mapbox/geojson-extent/master/geojson-extent.js
 htmlsortable.js	https://raw.githubusercontent.com/lukasoppermann/html5sortable/master/dist/html5sortable.min.js
 countries.json	https://raw.githubusercontent.com/mledoze/countries/master/dist/countries.json
-helpers.js	https://gitlab.com/fabbe/web-toolbelt/raw/master/helpers.js
-location.js	https://gitlab.com/fabbe/web-toolbelt/raw/master/location.js
-flash.js	https://gitlab.com/fabbe/web-toolbelt/raw/master/flash.js
-modal.js	https://gitlab.com/fabbe/web-toolbelt/raw/master/modal.js
-nanny.js	https://gitlab.com/fabbe/web-toolbelt/raw/master/nanny.js
-selectlist.js	https://gitlab.com/fabbe/web-toolbelt/raw/master/selectlist.js
+helpers.js	https://git.fabbe.io/web-toolbelt/plain/helpers.js
+location.js	https://git.fabbe.io/web-toolbelt/plain/location.js
+flash.js	https://git.fabbe.io/web-toolbelt/plain/flash.js
+modal.js	https://git.fabbe.io/web-toolbelt/plain/modal.js
+nanny.js	https://git.fabbe.io/web-toolbelt/plain/nanny.js
+selectlist.js	https://git.fabbe.io/web-toolbelt/plain/selectlist.js
 jspdf.js	https://unpkg.com/jspdf@latest/dist/jspdf.min.js
 jspdf-autotable.js	https://unpkg.com/jspdf-autotable@latest/dist/jspdf.plugin.autotable.js

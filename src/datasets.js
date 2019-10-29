@@ -7,6 +7,8 @@ class DS {
     this.category = o.category;
 
     let config = o.configuration || {};
+    config.children = config.children || {};
+
     this.config = config;
 
     this.analysis = o.category.analysis || {};
@@ -284,9 +286,10 @@ class DS {
   };
 
   /*
-   * scale_fn
+   * analysis_fn
    *
-   * Extract the scaling function given a dataset and the current parameters.
+   * Scaling function that sets the behaviour of a dataset when contributing to
+   * an analysis. Whether it's a filter, a linearised part, etc...
    *
    * @param "i" string
    *   name of the current index being drawn and decide if the range of the
@@ -295,7 +298,7 @@ class DS {
    * returns function (ds domain) -> [0,1]
    */
 
-  scale_fn(i) {
+  analysis_fn(i) {
     let s = null;
 
     const dom = this.raster.config.domain;
@@ -306,6 +309,7 @@ class DS {
 
     switch (v) {
     case 'multi-key-delta': {
+      // the children will be key-deltas
       break;
     }
 
@@ -328,7 +332,7 @@ class DS {
     case 'intervals': {
       const q = d3.scaleQuantile()
             .domain(this.analysis.intervals)
-            .range([0, 0.25, 0.5, 0.75, 1]);
+            .range(NORM_STOPS);
 
       s = x => (x >= this.domain[0]) && (x <= this.domain[1]) ? q(x) : -1;
 

@@ -21,13 +21,13 @@ function ea_analysis(list, type) {
 
   // Get smart on the filters:
   //
-  // - Disregard datasets which have no scale_fn (eg. boundaries).
+  // - Disregard datasets which have no analysis_fn (eg. boundaries).
   // - Disregard datasets which are filters and use the entire domain (useless).
   // - Place the filters first. This will return -1's sooner and make our loops faster.
   //
   list = list
     .filter(d => {
-      if (typeof d.scale_fn(type) !== 'function') return false;
+      if (typeof d.analysis_fn(type) !== 'function') return false;
 
       if (d.analysis.scale === 'key-delta' &&
           (d.domain[0] === d.raster.config.domain.min && d.domain[1] === d.raster.config.domain.max)) return false;
@@ -58,7 +58,7 @@ function ea_analysis(list, type) {
   // Each dataset has a different scaling function. We cache these to optimise
   // the huge loop we are about to do.
   //
-  const scales = list.map(d => d.scale_fn(type));
+  const afns = list.map(d => d.analysis_fn(type));
 
   // The values will be normalised. Initialise the values:
   //
@@ -96,7 +96,7 @@ function ea_analysis(list, type) {
         a = -1; continue;
       }
 
-      const sv = scales[j](v);
+      const sv = afns[j](v);
 
       // Three options: within domain/range, clipping or clamping. This is where
       // the clipping happens. The clamping was done by the scaling function

@@ -1,7 +1,7 @@
 function ea_svg_checkbox(init, callback) {
   const size = 24;
 
-  const svg = d3.select(document.createElementNS(d3.namespaces.svg, "svg"))
+  const svg = d3.create("svg")
         .attr('class', 'svg-checkbox');
 
   const g = svg.append('g');
@@ -69,7 +69,7 @@ function ea_svg_switch(init, callback, opts = {}) {
         svgmin = radius + 1,
         svgmax = svgwidth - radius - 1;
 
-  const svg = d3.select(document.createElementNS(d3.namespaces.svg, "svg"))
+  const svg = d3.create("svg")
         .attr('class', 'svg-checkbox');
 
   const defs = svg.append('defs');
@@ -143,7 +143,7 @@ function ea_svg_switch(init, callback, opts = {}) {
 function ea_svg_radio(init, callback) {
   const size = 20;
 
-  const svg = d3.select(document.createElementNS(d3.namespaces.svg, "svg"))
+  const svg = d3.create("svg")
         .attr('class', 'svg-radio');
 
   const g = svg.append('g');
@@ -207,17 +207,17 @@ function ea_svg_pie(data, outer, inner, colors, inner_text, parse) {
         .innerRadius(((inner === null || inner === undefined || inner === false) ? outer - (outer/4) : inner))
         .outerRadius(outer - (outer/15));
 
-  let svg = d3.select(document.createElementNS(d3.namespaces.svg, "svg"))
+  const svg = d3.create("svg")
       .attr('class', 'svg-pie')
       .attr("width", width)
       .attr("height", height);
 
-  let g = svg.append("g")
+  const g = svg.append("g")
       .attr("transform", `translate(${ width / 2 }, ${ height / 2 })`);
 
   let n;
 
-  let outline = svg.append('circle')
+  const outline = svg.append('circle')
       .attr('cx', width / 2)
       .attr('cy', height / 2)
       .attr('r', outer - (outer/15) - 1)
@@ -268,7 +268,7 @@ function ea_svg_pie(data, outer, inner, colors, inner_text, parse) {
 function ea_svg_color_steps(colorscale, steps, height) {
   const h = height || 5;
 
-  const svg = d3.select(document.createElementNS(d3.namespaces.svg, "svg"))
+  const svg = d3.create("svg")
         .attr('class', 'svg-interval');
 
   const g = svg.append('g');
@@ -307,7 +307,7 @@ function ea_svg_interval(opts = {}) {
     denorm = d3.scaleLinear().domain([steps[0], steps[steps.length-1]]).range([svgmin, svgmax]);
   }
 
-  const svg = d3.select(document.createElementNS(d3.namespaces.svg, "svg"))
+  const svg = d3.create("svg")
         .attr('class', 'svg-interval');
 
   const defs = svg.append('defs');
@@ -447,12 +447,12 @@ function ea_svg_points_symbol() {
 
   const size = 24;
 
-  const container = d3.select(document.createElementNS(d3.namespaces.svg, "svg"))
+  const svg = d3.create("svg")
         .attr("class", 'svg-point')
         .attr("width", size)
         .attr("height", size);
 
-  container
+  svg
     .append('circle')
     .attr('r', (size/2) - 2)
     .attr('cx', size/2)
@@ -461,7 +461,7 @@ function ea_svg_points_symbol() {
     .attr('stroke', this.vectors.config.stroke)
     .attr('stroke-width', 2);
 
-  return container.node();
+  return svg.node();
 };
 
 function ea_svg_lines_symbol() {
@@ -469,11 +469,11 @@ function ea_svg_lines_symbol() {
 
   const size = 28;
 
-  const container = d3.select(document.createElementNS(d3.namespaces.svg, "svg"))
+  const svg = d3.create("svg")
         .attr("width", size)
         .attr("height", size);
 
-  container
+  svg
     .append('path')
     .attr('d', "M 0.5625,23.71875 C 2.0625,8.0625 14.439788,10.706994 17.625,7.5 20.810212,4.2930056 23.71875,0.375 23.71875,0.375")
     .attr('fill', 'none')
@@ -481,7 +481,7 @@ function ea_svg_lines_symbol() {
     .attr('stroke', this.vectors.config.stroke)
     .attr('stroke-width', this.vectors.config.width * 2);
 
-  return container.node();
+  return svg.node();
 };
 
 function ea_svg_polygons_symbol() {
@@ -489,12 +489,12 @@ function ea_svg_polygons_symbol() {
 
   const size = 28;
 
-  const container = d3.select(document.createElementNS(d3.namespaces.svg, "svg"))
+  const svg = d3.create("svg")
         .attr("class", 'svg-polygon')
         .attr("width", size)
         .attr("height", size);
 
-  container
+  svg
     .append('path')
     .attr('d', "M 5.5532202,7.3474994 24.062506,2.1642083 26.51526,25.827 1.3896115,25.827438 Z")
     .attr('fill', this.vectors.config.fill)
@@ -502,5 +502,7 @@ function ea_svg_polygons_symbol() {
     .attr('stroke', this.vectors.config.stroke)
     .attr('stroke-width', this.vectors.config.width - 1 || 1);
 
-  return container.node();
+  return svg.node();
+};
+
 };

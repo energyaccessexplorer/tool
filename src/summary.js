@@ -91,7 +91,7 @@ async function ea_summary() {
 
   const s = ea_analysis_colorscale.stops;
 
-  const i20 = i => (20 * i) + "-" + (20 * (i+1));
+  const lowmedhigh = i => ["low", "low-med", "medium", "med-high", "high"][i]
 
   const tables_tab = ce('div', null, { class: 'tab hidden' });
 
@@ -103,7 +103,7 @@ async function ea_summary() {
 
     table.append(thead = ce('thead'), tbody = ce('tbody'));
     thead.append(thr = ce('tr', ce('th'), { class: 'number-labels-row' }));
-    s.forEach((x,i) => thr.append(ce('th', i20(i), { style: `background-color: ${x};`})));
+    s.forEach((x,i) => thr.append(ce('th', lowmedhigh(i), { style: `background-color: ${x};`})));
 
     for (var k in summary) {
       let tr = ce('tr', ce('td', ea_indexes[k]['name'], { class: 'index-name' }));

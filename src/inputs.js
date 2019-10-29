@@ -79,8 +79,10 @@ class dsinput extends HTMLElement {
 
   refresh() {
     const tmp = this.svg();
-    qs('[slot=svg]', this).replaceChild(tmp, this.svg_el);
-    this.svg_el = tmp;
+    const it = qs('[slot=svg]', this);
+
+    elem_empty(it);
+    it.append(this.svg_el = tmp);
   };
 
   opacity() {

@@ -100,3 +100,45 @@ dialog pre {
 .more-dropdown-li:hover:active {
   background-color: #cecece
 }
+
+aside.nanny-marker {
+  background-color: rgba(0,0,0,1);
+  border-radius: 3px;
+  box-shadow: 0 20px 30px 0 rgba(0,0,0,0.2);
+
+  max-width: 400px;
+
+  animation: pulse 3s ease-out;
+  animation-iteration-count: infinite;
+  opacity: 0.5;
+  z-index: 9999;
+}
+
+aside.nanny-marker * {
+  color: white;
+}
+
+aside.nanny-marker main {
+  padding: 1em;
+}
+
+aside.nanny-marker header {
+  font-weight: bold;
+  font-size: 1.05em;
+  margin-bottom: 0.7em;
+}
+
+aside.nanny-marker .nanny-close-button::before {
+  font-size: 1.5em;
+  padding: 2px 7px;
+}
+
+aside.nanny-marker .nanny-close-button::before {
+  content: '×';
+}
+
+@keyframes pulse {
+  0%   { opacity: 0.7; }
+  50%  { opacity: 1.0; }
+  100% { opacity: 0.7; }
+}

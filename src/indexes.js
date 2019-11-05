@@ -28,14 +28,7 @@ function ea_indexes_init(state) {
   );
 
   const scale = ce('div', null, { class: 'index-graphs-scale' });
-  scale.append(
-    ea_svg_color_steps(
-      d3.scaleLinear()
-        .domain(ea_analysis_colorscale.domain)
-        .range(ea_analysis_colorscale.stops)
-        .clamp(false),
-      ea_analysis_colorscale.domain),
-    ramp);
+  scale.append(ea_analysis_colorscale.svg, ramp);
 
   const cos = qs('#canvas-output-select');
   for (let i in ea_indexes)

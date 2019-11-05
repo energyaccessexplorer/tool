@@ -1,12 +1,9 @@
 function ea_plot(opts) {
-  const {canvas, data, width, height, domain, nodata, colorscale} = opts;
+  const {canvas, data, width, height, nodata, colorscale} = opts;
 
   const ctx = canvas.getContext("2d");
   const imagedata = ctx.createImageData(width, height);
   const imgd = imagedata.data;
-
-  const s = d3.scaleLinear().domain(domain).range([0,255]);
-  const cs = colorscale.data;
 
   canvas.width = width;
   canvas.height = height;
@@ -14,11 +11,13 @@ function ea_plot(opts) {
   for (let i = p = 0; i < data.length; i += 1, p += 4) {
     if (data[i] === nodata) continue;
 
-    const c = Math.round(s(data[i]));
+    const c = colorscale.fn(data[i]);
 
-    imgd[p] = cs[c*4];;
-    imgd[p+1] = cs[c*4+1];
-    imgd[p+2] = cs[c*4+2];
+    if (!c) continue;
+
+    imgd[p] = c[0];
+    imgd[p+1] = c[1];
+    imgd[p+2] = c[2];
     imgd[p+3] = 255;
   }
 
@@ -47,7 +46,6 @@ function ea_plot_output(data, canvas = null) {
     data: data,
     width: A.raster.width,
     height: A.raster.height,
-    domain: [0,1],
     nodata: -1,
     colorscale: ea_analysis_colorscale,
   });

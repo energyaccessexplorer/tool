@@ -1,3 +1,5 @@
+NORM_STOPS = d3.range(0, 1.000000001, 0.25);
+
 function ea_layout_init() {
   const n = qs('nav');
   const p = qs('#playground');
@@ -35,27 +37,34 @@ function ea_layout_init() {
 };
 
 function ea_colorscale(opts) {
-  const w = 256;
+  let s;
 
-  let s = d3.scaleLinear()
-      .domain(opts.domain.map(i => i * 255))
-      .range(opts.stops)
+  let {intervals,stops,domain} = opts;
+
+  if (!stops || !stops.length)
+    stops = ea_default_colorscale.stops;
+
+  if (!domain || domain.length < 2)
+    domain = NORM_STOPS;
+
+  if (intervals && intervals.length) {
+    s = d3.scaleQuantile()
+      .domain(domain = intervals)
+      .range(stops);
+  }
+  else {
+    s = d3.scaleLinear()
+      .domain(d3.range(domain.min, domain.max + 0.0000001, (domain.max - domain.min) / (stops.length - 1)))
+      .range(stops)
       .clamp(true);
-
-  const a = new Uint8Array(w*4).fill(-1);
-  for (let i = 0; i < a.length; i += 4) {
-    let color = s(i/4).match(/rgb\((.*)\)/)[1].split(',').map(x => parseInt(x));
-
-    a[i] = color[0];
-    a[i+1] = color[1];
-    a[i+2] = color[2];
-    a[i+3] = 255;
   }
 
   return {
-    stops: opts.stops,
-    domain: opts.domain,
-    data: a,
+    domain: domain,
+    fn: x => parseRGBA(s(x)),
+    stops: stops,
+    intervals: intervals,
+    svg: ea_svg_color_steps(stops)
   };
 };
 
@@ -157,18 +166,11 @@ function date_valid(d) {
   return d instanceof Date && !isNaN(d);
 };
 
-function interval_index(v, arr) {
-  // TODO: implement non-clamp?
-  //
-  for (let i = 0; i < arr.length-1; i += 1) {
-    if (v >= arr[i] && v <= arr[i+1]) return i;
-  }
-
-  return -1;
-};
-
-function hex_to_rgba(str) {
+function parseRGBA(str) {
   let c;
+
+  if (!str) return [0, 0, 0, 255];
+
   if (str.match(/^#([A-Fa-f0-9]{3}){1,2}$/)) {
     c = str.substring(1).split('');
 
@@ -178,6 +180,10 @@ function hex_to_rgba(str) {
 
     return [(c>>16)&255, (c>>8)&255, c&255, 255];
   }
+  else if (c = str.match(/^rgba?\(([0-9]{1,3}),\ ?([0-9]{1,3}),\ ?([0-9]{1,3}),?\ ?([0-9]{1,3})?\)$/)) {
+    return [+c[1], +c[2], +c[3], +c[4] || 255];
+  }
 
-  throw new Error("hex_to_rgba: argument doesn't match");
+  else
+    throw new Error(`parseRGBA: argument ${str} doesn't match`);
 };

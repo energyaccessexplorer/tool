@@ -141,12 +141,8 @@ class dsinput extends HTMLElement {
     const ds = this.ds;
     let e, cs;
 
-    if (ds.colorscale && ds.colorscale.stops) {
-      cs = ea_svg_color_steps(ds.colorscale.fn, ds.colorscale.stops);
-    }
-    else {
-      if (ds.parent)
-        cs = ea_svg_color_steps(ds.parent.colorscale.fn, ds.parent.colorscale.stops);
+    if (ds.colorscale && ds.colorscale.svg) {
+      cs = ds.colorscale.svg;
     }
 
     switch (ds.datatype) {
@@ -159,9 +155,7 @@ class dsinput extends HTMLElement {
       break;
 
     case 'polygons':
-      e = (ds.vectors.config.color_stops && ds.vectors.config.color_stops.length && ds.parent) ?
-        cs :
-        ea_svg_polygons_symbol.call(ds);
+      e = cs || ea_svg_polygons_symbol.call(ds);
       break;
 
     case 'raster':

@@ -118,18 +118,29 @@ class DS {
       return t;
     })();
 
-    if (this.datatype === 'raster')
-      ea_datasets_colorscale.call(this);
-
     switch (this.datatype) {
     case 'raster':
       this.download = this.raster.endpoint;
+
+      this.colorscale = ea_colorscale({
+        stops: this.raster.config.color_stops,
+        domain: this.raster.config.domain,
+        intervals: this.raster.config.intervals,
+      });
+
       break;
 
     case 'polygons':
     case 'points':
     case 'lines':
       this.download = this.vectors.endpoint;
+
+      if (this.vectors.config.color_stops && this.parent)
+        this.colorscale = ea_colorscale({
+          stops: this.vectors.config.color_stops,
+          domain: this.raster.config.domain,
+        });
+
       break;
 
     default:
@@ -270,10 +281,6 @@ class DS {
 
     const d = Array(cs.length).fill(0).map((x,i) => (0 + i * (max/(cs.length-1))));
     const s = d3.scaleLinear().domain(d).range(cs);
-
-    this.colorscale = {};
-    this.colorscale.fn = s;
-    this.colorscale.stops = d;
 
     const fs = this.vectors.features.features;
     for (let i = 0; i < fs.length; i += 1)
@@ -509,74 +516,6 @@ async function ea_datasets_init(id, inputs, preset, callback) {
   callback(bounds);
 };
 
-function ea_datasets_colorscale() {
-  let d;
-  let cs = this.raster.config.color_stops;
-
-
-  if (!cs || !cs.length) {
-    cs = ea_default_colorscale.stops;
-    d = ea_default_colorscale.domain;
-  }
-  else {
-    d = Array(cs.length).fill(0).map((x,i) => (0 + i * (1/(cs.length-1))));
-  }
-
-  this.colorscale = {};
-  this.colorscale.stops = d;
-
-  switch (this.raster.config.scale) {
-  case "intervals": {
-    let domain = this.raster.config.domain;
-
-    let s = d3.scaleLinear()
-        .domain([0,255])
-        .range([domain.min, domain.max])
-        .clamp(true);
-
-    const a = new Uint8Array(1024).fill(-1);
-    for (let i = 0; i < 1024; i += 4) {
-      let j = interval_index(s(i/4), this.raster.config.intervals);
-
-      if (j === -1) {
-        a[i] = a[i+1] = a[i+2] = a[i+3] = 0;
-        continue;
-      }
-
-      let cj = cs[j];
-
-      let color = hex_to_rgba(cs[j]);
-
-      a[i] = color[0];
-      a[i+1] = color[1];
-      a[i+2] = color[2];
-      a[i+3] = color[3];
-    }
-
-    this.colorscale.data = a;
-    this.colorscale.fn = (x,i) => cs[i];
-
-    break;
-  }
-
-  case "linear":
-  default: {
-    const a = ea_colorscale({
-      stops: cs,
-      domain: d
-    });
-
-    this.colorscale.data = a.data;
-    this.colorscale.fn = d3.scaleLinear()
-      .domain(d)
-      .range(cs)
-      .clamp(this.analysis.clamp || false);
-
-    break;
-  }
-  }
-};
-
 /*
  * The following functions fetch and load the different types of data to the
  * datasets geojsons (points, lines or polygons), CSV's or rasters.
@@ -639,7 +578,6 @@ function ea_datasets_tiff() {
           data: r.data,
           width: r.width,
           height: r.height,
-          domain: [d.min, d.max],
           nodata: r.nodata,
           colorscale: this.colorscale
         });

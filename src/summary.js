@@ -37,14 +37,7 @@ async function ea_summary() {
   );
 
   const scale = ce('div');
-  scale.append(
-    ea_svg_color_steps(
-      d3.scaleLinear()
-        .domain(ea_analysis_colorscale.domain)
-        .range(ea_analysis_colorscale.stops)
-        .clamp(false),
-      ea_analysis_colorscale.domain),
-    ramp);
+  scale.append(ea_analysis_colorscale.svg.cloneNode(true), ramp);
 
   async function get_summaries(idxn) {
     let raster = ea_analysis(ea_list_filter_type(idxn), idxn);
@@ -154,7 +147,7 @@ async function ea_summary_analyse(raster) {
 
   let a = new Float32Array(raster.length).fill(-1);
 
-  let f = d3.scaleQuantize().domain([0,1]).range(ea_analysis_colorscale.domain);
+  let f = d3.scaleQuantize().domain([0,1]).range(NORM_STOPS);
 
   for (var i = 0; i < raster.length; i += 1) {
     const r = raster[i];

@@ -80,6 +80,8 @@ function ea_list_filter_type(type) {
  * Transform a set of coordinates to the "relative position" inside a raster
  * that is bound to an area
  *
+ * NOTE: mercator only.
+ *
  * @param "coords" int[2]. Coordinates in Longitude/Latitude to be transformed.
  * @param "bounds" int[2][2]. Bounding box containing the raster data.
  * @param "raster" { width int, height int, novalue numeric, array numeric[] }
@@ -90,23 +92,19 @@ function ea_coordinates_in_raster(coords, bounds, raster) {
   if (coords.length !== 2)
     throw Error(`ea_coordinates_raster: expected and array of length 2. Got ${coords}`);
 
-  const cw = bounds[1][0] - bounds[0][0];
-  const ch = bounds[1][1] - bounds[2][1];
+  const hs = d3.scaleLinear().domain([bounds[0][0], bounds[1][0]]).range([0, raster.width]);
+  const vs = d3.scaleLinear().domain([bounds[1][1], bounds[2][1]]).range([0, raster.height]);
 
-  let x = (coords[0] - bounds[0][0]);
-  let y = (bounds[0][1] - coords[1]); // yes, right that is.
+  const plng = Math.floor(hs(coords[0]));
+  const plat = Math.floor(vs(coords[1]));
 
   let a = null;
 
-  if ((x > 0 && x < cw &&
-       y > 0 && y < ch )) {
-    a = {
-      x: Math.floor((x * raster.width) / cw),
-      y: Math.floor((y * raster.height) / ch)
-    };
+  if ((plng > 0 && plng < raster.width &&
+       plat > 0 && plat < raster.height )) {
+    a = { x: coords[0], y: coords[1] };
 
-    let v = raster.data[(a.y * raster.width) + a.x];
-
+    const v = raster.data[(plat * raster.width) + plng];
     a.value = v === raster.nodata ? null : v;
   }
 

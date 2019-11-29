@@ -15,7 +15,7 @@ class DS {
 
     this.name = config.name_override || o.category.name_long;
 
-    this.indexname = (o.category.controls.path && o.category.controls.path[0]) || null;
+    this.indexname = maybe(o.category, 'controls', 'path', 0);
 
     this.weight = this.analysis.weight || 2;
 
@@ -72,7 +72,7 @@ class DS {
 
     this.presets = {};
 
-    if (o.presets && o.presets.length) {
+    if (maybe(o.presets, 'length')) {
       o.presets.forEach(p => {
         return this.presets[p.name] = {
           "weight": p.weight,
@@ -82,7 +82,7 @@ class DS {
       });
     }
 
-    else if (o.category.presets && o.category.presets.length) {
+    else if (maybe(o.category, 'presets', 'length')) {
       o.category.presets.forEach(p => {
         return this.presets[p.name] = {
           "weight": p.weight,
@@ -601,7 +601,7 @@ function ea_datasets_tiff() {
       });
     };
 
-    if (this.raster && this.raster.data) {
+    if (maybe(this.raster, 'data')) {
       draw.call(this);
     }
 
@@ -623,7 +623,7 @@ function ea_datasets_tiff() {
     return;
   };
 
-  if (this.raster && this.raster.data) {
+  if (maybe(this.raster, 'data')) {
     run_it.call(this);
     return;
   }

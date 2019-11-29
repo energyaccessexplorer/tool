@@ -47,7 +47,7 @@ function ea_colorscale(opts) {
   if (!domain || domain.length < 2)
     domain = NORM_STOPS;
 
-  if (intervals && intervals.length) {
+  if (maybe(intervals, 'length')) {
     s = d3.scaleQuantile()
       .domain(domain = intervals)
       .range(stops);

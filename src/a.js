@@ -63,7 +63,7 @@ function ea_list_filter_type(type) {
   let idxn;
 
   if (['supply', 'demand'].includes(type))
-    idxn = d => d.indexname === type || d.indexname === null;
+    idxn = d => d.indexname === type || !d.indexname;
 
   else if (['eai', 'ani'].includes(type))
     idxn = d => true;

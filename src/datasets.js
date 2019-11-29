@@ -692,14 +692,42 @@ function ea_datasets_lines() {
       const fs = this.vectors.features.features;
       const specs = this.vectors.config.specs;
 
+      const criteria = [];
+
       for (let i = 0; i < fs.length; i += 1) {
         if (specs) {
+          const c = { params: [] };
+          let p = false;
+
           for (let s of specs) {
-            if (fs[i].properties[s.key] === s.match || (new RegExp(s.match)).test(fs[i].properties[s.key])) {
-              if (undefined !== s['stroke']) fs[i].properties['__color'] = s['stroke'];
-              if (undefined !== s['stroke-width']) fs[i].properties['__width'] = s['stroke-width'];
+            let m;
+
+            const r = new RegExp(s.match);
+            const v = fs[i].properties[s.key];
+
+            if (!v) continue;
+
+            const vs = v + "";
+
+            if (vs === s.match || (m = vs.match(r))) {
+              c[s.key] = vs ? vs : m[1];
+              if (c.params.indexOf(s.key) < 0) c.params.push(s.key);
+
+              if (undefined !== s['stroke']) {
+                fs[i].properties['__color'] = s['stroke'];
+                c['stroke'] = s['stroke'];
+              }
+
+              if (undefined !== s['stroke-width']) {
+                fs[i].properties['__width'] = s['stroke-width'];
+                c['stroke-width'] = s['stroke-width'];
+              }
+
+              p = true;
             }
           }
+
+          if (p && criteria.indexOf(JSON.stringify(c)) < 0) criteria.push(JSON.stringify(c));
         }
         else {
           fs[i].properties['__color'] = this.vectors.config.stroke;
@@ -726,6 +754,9 @@ function ea_datasets_lines() {
           "line-dasharray": da,
         },
       });
+
+      if (criteria.length)
+        this.input.line_legends(criteria.map(x => JSON.parse(x)));
     });
 };
 

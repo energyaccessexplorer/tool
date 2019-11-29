@@ -85,6 +85,36 @@ class dsinput extends HTMLElement {
     it.append(this.svg_el = tmp);
   };
 
+  line_legends(legends) {
+    const it = qs('[slot=svg]', this);
+
+    elem_empty(it);
+
+    const ul = ce('div', null, { style: "font-size: smaller;" });
+
+    for (let l of legends) {
+      const svg = d3.create("svg")
+            .attr("width", 24)
+            .attr("height", 24)
+            .attr("style", "vertical-align: middle;")
+            .attr("viewBox", "-3 0 32 32");
+
+      svg
+        .append('path')
+        .attr('d', "M 0.5625,23.71875 C 2.0625,8.0625 14.439788,10.706994 17.625,7.5 20.810212,4.2930056 23.71875,0.375 23.71875,0.375")
+        .attr('fill', 'none')
+        .attr('stroke', l['stroke'] || 'black')
+        .attr('stroke-width', l['stroke-width'] || 1);
+
+      const li = ce('div');
+      li.append(svg.node(), ce('span', '&nbsp;&nbsp;&nbsp;'), l.params.map(p => l[p]).join(", "));
+
+      ul.append(li);
+    }
+
+    it.append(ul);
+  };
+
   opacity() {
     let o = 1;
     const e = tmpl('#opacity-control');

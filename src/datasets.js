@@ -46,17 +46,17 @@ class DS {
       v.endpoint = o.vectors_file.endpoint;
 
       switch (v.config.shape_type) {
-      case "points": {
+      case 'points': {
         v.parse = x => ea_datasets_points.call(x || this);
         break;
       }
 
-      case "polygons": {
+      case 'polygons': {
         v.parse = x => ea_datasets_polygons.call(x || this);
         break;
       }
 
-      case "lines": {
+      case 'lines': {
         v.parse = x => ea_datasets_lines.call(x || this);
         break;
       }

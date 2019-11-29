@@ -137,6 +137,25 @@ aside.nanny-marker .nanny-close-button::before {
   content: '×';
 }
 
+.download-link {
+  display: block;
+  padding: 0.5em 1em;
+  max-width: 15em;
+  text-decoration: none;
+  color: var(--the-blue);
+  clear: both;
+}
+
+.download-link:after {
+  margin-left: 1em;
+  content: '\21F2';
+}
+
+.description-text {
+  font-family: without-serif, sans-serif;
+  white-space: pre-line;
+}
+
 @keyframes pulse {
   0%   { opacity: 0.7; }
   50%  { opacity: 1.0; }

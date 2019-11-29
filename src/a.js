@@ -161,21 +161,6 @@ function ea_nanny_force_start() {
   ea_nanny.start();
 };
 
-function ea_dataset_modal(ds) {
-  const b = ds.metadata;
-  b['why'] = ds.category.metadata.why;
-
-  const content = tmpl('#ds-info-modal', b);
-  qs('#metadata-sources', content).href = ds.metadata.download_original_url;
-  qs('#learn-more', content).href = ds.metadata.learn_more_url;
-
-  ea_modal.set({
-    header: ds.name,
-    content: content,
-    footer: null
-  }).show();
-};
-
 function ea_current_config() {
   const state = ea_state_sync();
   const config = {

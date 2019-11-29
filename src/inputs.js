@@ -125,8 +125,7 @@ class dsinput extends HTMLElement {
         for (let i of t)
           MAPBOX.setPaintProperty(this.ds.id, i, parseFloat(o));
       }
-    }
-    );
+    });
 
     const b = qs('.opacity-box', e);
 
@@ -191,13 +190,13 @@ class dsinput extends HTMLElement {
     if (d.items) return;
 
     switch (d.datatype) {
-    case "raster":
+    case 'raster':
       el.append (
         ce('div', d.raster.config.domain.min * d.raster.config.factor + ""),
         ce('div', d.raster.config.domain.max * d.raster.config.factor + ""));
       break;
 
-    case "polygons":
+    case 'polygons':
       if (d.vectors.config.color_stops && d.vectors.config.color_stops.length && d.parent) {
         el.append(
           ce('div', "0"),

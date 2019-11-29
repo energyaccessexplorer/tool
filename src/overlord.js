@@ -52,12 +52,12 @@ async function ea_overlord(msg) {
   const state = ea_state_sync();
 
   switch (msg.type) {
-  case "init": {
+  case 'init': {
     ea_overlord_init(state);
     break;
   }
 
-  case "view": {
+  case 'view': {
     let t = msg.target;
 
     state.set_view_param(t);
@@ -92,7 +92,7 @@ async function ea_overlord(msg) {
     break;
   }
 
-  case "dataset": {
+  case 'dataset': {
     const ds = msg.target;
 
     const resort = !["ea_controls_range", "ea_controls_weight"].includes(msg.caller);
@@ -132,14 +132,14 @@ async function ea_overlord(msg) {
     break;
   }
 
-  case "index": {
+  case 'index': {
     state.set_output_param(msg.target);
     ea_plot_active_analysis(msg.target).then(raster => ea_indexes_graphs(raster));
 
     break;
   }
 
-  case "preset": {
+  case 'preset': {
     if (!msg.target) throw `Argument error: Overlord: Could not set ${msg.target} preset`;
 
     const inputs = DS.all.filter(d => ea_controls_presets_set(d, msg.target)).map(d => d.id);
@@ -161,7 +161,7 @@ async function ea_overlord(msg) {
     break;
   }
 
-  case "sort": {
+  case 'sort': {
     if (state.view === "inputs") {
       ea_inputs_sort(msg.target);
       state.set_inputs_param(msg.target);
@@ -178,7 +178,7 @@ async function ea_overlord(msg) {
     break;
   }
 
-  case "refresh": {
+  case 'refresh': {
     if (!MAPBOX.getSource('output-source')) {
       MAPBOX.addSource('output-source', {
         "type": 'canvas',
@@ -211,7 +211,7 @@ async function ea_overlord(msg) {
     break;
   }
 
-  case "map": {
+  case 'map': {
     if (msg.target === "click") {
       const e = msg.event;
 

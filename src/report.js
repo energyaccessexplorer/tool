@@ -131,8 +131,13 @@ contact our team at`;
     const w = 300;
     const h = 10;
 
-    await doc.addImage((await svg_png(qs('#summary-graphs .svg-interval'), w, h)),
-                       "PNG", hhalf - (w/2), c, w, h);
+    // let raw_img = await svg_png(qs('#summary-graphs svg.svg-interval'), w, h);
+    //
+    // HACK: due to something in FF ~68 (or something I cannot see), this:
+    //
+    let raw_img = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAuAAAAAFCAYAAAAEyFkRAAAA2UlEQVRoQ+2WsQnCYBQG3w9BbC0khQg2gnGH1KksLF3DFTNEFkkrkexw3XcZ4ODd/0GuVXVb+WkAMPA6fZeuHQYAJSLcwPv6m8/HGsM1eD5g4P5c59tjdUuAy3REu/TL9pn8x6UPAbq/GeCQSTFlgDsCyoABTpmUY4C7AcqAAU6ZlLMbMMDdAWbAAMdUxoMM8PgJYAIMcExlPMgAj58AKsAAR3Vmwwzw7PcnrzfASZvZLAM8+/3J6w1w0qYsA9wNYAYMcExlPMgAj58AJsAAx1TGgwzw+AmgAv5XGjqZcIaIdAAAAABJRU5ErkJggg==";
+
+    await doc.addImage(raw_img, "PNG", hhalf - (w/2), c, w, h);
 
     c += (h * 2) + 5;
 

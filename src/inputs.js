@@ -53,7 +53,6 @@ class dsinput extends HTMLElement {
     attach.call(this, shadow_tmpl('#ds-input-template'));
 
     this.svg_el = this.svg();
-    this.ramp_el = this.ramp();
 
     this.render();
 
@@ -65,7 +64,6 @@ class dsinput extends HTMLElement {
 
     slot_populate.call(this, this.ds, {
       "svg": this.svg_el,
-      "ramp": this.ramp_el,
       "opacity": this.opacity(),
       "handle": tmpl("#svg-handle"),
     });
@@ -118,10 +116,10 @@ class dsinput extends HTMLElement {
   opacity() {
     let o = 1;
     const e = tmpl('#opacity-control');
-    const ramp = tmpl('#ramp');
-    ramp.append(ce('div', '0%'), ce('div', 'Opacity'), ce('div', '100%'));
+    const r = tmpl('#ramp');
+    r.append(ce('div', '0%'), ce('div', 'Opacity'), ce('div', '100%'));
 
-    qs('.opacity-box', e).append(ramp);
+    qs('.opacity-box', e).append(r);
 
     const grad = ea_svg_interval({
       init: [null, 100],
@@ -132,21 +130,25 @@ class dsinput extends HTMLElement {
         let t = null;
 
         switch (this.ds.datatype) {
-        case 'points':
+        case 'points': {
           t = ['circle-opacity', 'circle-stroke-opacity'];
           break;
+        }
 
-        case 'lines':
+        case 'lines': {
           t = ['line-opacity'];
           break;
+        }
 
-        case 'polygons':
+        case 'polygons': {
           t = ['fill-opacity'];
           break;
+        }
 
-        case 'raster':
+        case 'raster': {
           t = ['raster-opacity'];
           break;
+        }
 
         default:
           break;
@@ -168,32 +170,50 @@ class dsinput extends HTMLElement {
 
   svg() {
     const ds = this.ds;
-    let e, cs;
-
-    if (ds.colorscale && ds.colorscale.svg) {
-      cs = ds.colorscale.svg;
-    }
+    let d = ce('div');
+    let e = maybe(ds.colorscale, 'svg') || ce('div');
 
     switch (ds.datatype) {
     case 'points':
       e = ea_svg_points_symbol.call(ds);
       break;
 
-    case 'lines':
+    case 'lines': {
       e = ea_svg_lines_symbol.call(ds);
       break;
+    }
 
-    case 'polygons':
-      e = cs || ea_svg_polygons_symbol.call(ds);
+    case 'polygons': {
+      if (ds.id.match('boundaries-')) {
+        e.append(ea_svg_color_steps(ds.colorscale.stops));
+
+        let r = tmpl('#ramp');
+        r.append(ce('div', "0"), ce('div', "%"), ce('div', "100"));
+        d.append(r);
+      }
+
+      else {
+        e = ea_svg_polygons_symbol.call(ds);
+      }
+
       break;
+    }
 
-    case 'raster':
-      e = cs;
+    case 'raster': {
+      let r = tmpl("#ramp");
+      r.append (
+        ce('div', ds.raster.config.domain.min * ds.raster.config.factor + ""),
+        ce('div', ds.raster.config.domain.max * ds.raster.config.factor + ""));
+
+      d.append(r);
+
       break;
+    }
 
-    default:
+    default: {
       warn("dsinput.svg could not be set.", ds.id);
       break;
+    }
     }
 
     if (ds.items) {
@@ -209,36 +229,9 @@ class dsinput extends HTMLElement {
       return el;
     }
 
-    return e;
-  };
+    d.prepend(e);
 
-  ramp() {
-    const d = this.ds;
-    let t = null;
-    let el = tmpl("#ramp");
-
-    if (d.items) return;
-
-    switch (d.datatype) {
-    case 'raster':
-      el.append (
-        ce('div', d.raster.config.domain.min * d.raster.config.factor + ""),
-        ce('div', d.raster.config.domain.max * d.raster.config.factor + ""));
-      break;
-
-    case 'polygons':
-      if (d.vectors.config.color_stops && d.vectors.config.color_stops.length && d.parent) {
-        el.append(
-          ce('div', "0"),
-          ce('div', "100"));
-      }
-      break;
-
-    default:
-      break;
-    }
-
-    return el;
+    return d;
   };
 }
 

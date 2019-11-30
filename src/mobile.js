@@ -30,7 +30,7 @@ function ea_mobile_init() {
 
 function ea_mobile_switch(v) {
   switch (v) {
-  case 'controls':
+  case 'controls':{
     for (let e of ['#controls-wrapper'])
       qs(e).style.display = '';
 
@@ -38,8 +38,9 @@ function ea_mobile_switch(v) {
       qs(e).style.display = 'none';
 
     break;
+  }
 
-  case 'right':
+  case 'right': {
     for (let e of ['#controls-wrapper'])
       qs(e).style.display = 'none';
 
@@ -47,9 +48,10 @@ function ea_mobile_switch(v) {
       qs(e).style.display = '';
 
     break;
+  }
 
   case 'outputs':
-  case 'inputs':
+  case 'inputs': {
     for (let e of ['#controls-wrapper'])
       qs(e).style.display = 'none';
 
@@ -58,9 +60,10 @@ function ea_mobile_switch(v) {
 
     ea_view(v);
     break;
+  }
 
-  default:
   case 'map':
+  default: {
     for (let e of ['#right-pane', '#controls-wrapper', '#views'])
       qs(e).style.display = 'none';
 
@@ -68,5 +71,6 @@ function ea_mobile_switch(v) {
       qs(e).style.display = '';
 
     break;
+  }
   }
 };

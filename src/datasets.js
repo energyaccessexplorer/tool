@@ -21,7 +21,7 @@ class DS {
 
     this.metadata = o.metadata;
 
-    this.invert = config.invert_override || (o.category.analysis && o.category.analysis.invert);
+    this.invert = config.invert_override || maybe(o.category.analysis, 'invert');
 
     this.mutant = !!config.mutant;
 
@@ -64,7 +64,9 @@ class DS {
     }
 
     if (o.csv_file) {
-      const c = this.csv = config.csv || {};
+      const c = this.csv = {};
+
+      c.config = JSON.parse(JSON.stringify(o.category.csv));
 
       c.endpoint = o.csv_file.endpoint;
       c.parse = _ => ea_datasets_csv.call(this);
@@ -135,11 +137,11 @@ class DS {
     case 'lines':
       this.download = this.vectors.endpoint;
 
-      if (this.vectors.config.color_stops && this.parent)
+      if (this.id.match('^boundaries')) {
         this.colorscale = ea_colorscale({
-          stops: this.vectors.config.color_stops,
-          domain: this.raster.config.domain,
+          stops: this.vectors.config.specs.color_stops
         });
+      }
 
       break;
 
@@ -212,8 +214,6 @@ class DS {
 
     this.vectors = host.vectors;
 
-    this.colorscale = host.colorscale;
-
     this.input.refresh();
 
     return this;
@@ -262,7 +262,7 @@ class DS {
       d.vectors.features = JSON.parse(features_json);
       d.vectors.parse = _ => this.vectors.parse(d);
 
-      d.csv = this.csv;
+      Object.assign(d.csv = {}, this.csv);
 
       await d.init(inputs.includes(d.id), null);
 
@@ -274,7 +274,7 @@ class DS {
 
   async child_init() {
     let id = this.child_id;
-    let cs = this.vectors.config.color_stops;
+    let cs = this.vectors.config.specs.color_stops;
 
     let max = Math.max.apply(null, this.vectors.features.features.map(f => f.properties[id]));
     max = (max <= 1) ? 1 : 100;

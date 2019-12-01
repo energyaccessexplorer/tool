@@ -494,6 +494,8 @@ async function ea_datasets_init(id, inputs, preset, callback) {
       await ds.load('csv');
       await ds.load('raster');
 
+      GEOGRAPHY.vectors_id_key = ds.config.id_key;
+
       if (!(bounds = ds.vectors.bounds)) throw `'boundaries' dataset has now vectors.bounds`;
     });
 
@@ -549,7 +551,7 @@ function ea_datasets_table(sources) {
 
     keys.forEach(k => o[k] = +f.properties[k]);
 
-    table[+f.properties[this.config.id_key]] = o;
+    table[+f.properties[GEOGRAPHY.vectors_id_key]] = o;
   }
 
   return table;
@@ -765,6 +767,10 @@ function ea_datasets_polygons() {
     .then(_ => {
       const v = this.vectors.config;
 
+      const fs = this.vectors.features.features;
+      for (let i = 0; i < fs.length; i += 1)
+        fs[i].id = fs[i].properties[GEOGRAPHY.vectors_id_key];
+
       this.add_source({
         "type": "geojson",
         "data": this.vectors.features
@@ -778,8 +784,10 @@ function ea_datasets_polygons() {
         "paint": {
           "fill-color": this.parent ? ['get', '__color'] : v.fill,
           "fill-outline-color": v.stroke,
-          "fill-opacity": v.opacity,
+          "fill-opacity": [ "case", [ "boolean", [ "feature-state", "hover" ], false ], 0.7, 1 ]
         },
       });
+
+      mapbox_hover(this.id);
     });
 };

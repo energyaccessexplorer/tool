@@ -224,3 +224,22 @@ function mapbox_fit(bounds) {
 
   MAPBOX.coords = [[l,u], [r,u], [r,d], [l,d]];
 };
+
+function mapbox_hover(id) {
+  let t = null;
+
+  MAPBOX.on('mousemove', id, function(e) {
+    let nt;
+
+    if (e.features.length > 0) {
+      nt = e.features[0].properties[GEOGRAPHY.vectors_id_key];
+      if (t) MAPBOX.setFeatureState({ source: id, id: (t === nt) ? nt : t }, { hover: (t === nt) });
+      t = nt;
+    }
+  });
+
+  MAPBOX.on('mouseleave', id, function() {
+    if (t) MAPBOX.setFeatureState({ source: id, id: t }, { hover: false });
+    t = null;
+  });
+};

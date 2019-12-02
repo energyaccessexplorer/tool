@@ -36,7 +36,7 @@ watch:
 	@ WATCH_CMD="make build" ${WATCH} ${SRC} ${CSS} ${VIEWS}
 
 stop:
-	-@lsof -t -i :${WEB_PORT} | xargs -r kill -9
+	@stop-port ${WEB_PORT}
 
 build-a:
 	@echo "Building a"

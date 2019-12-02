@@ -501,7 +501,7 @@ async function ea_datasets_init(id, inputs, preset, callback) {
 
   await fetch(`${core}&category_name=not.eq.boundaries`)
     .then(r => r.json())
-    .then(r => r.filter(x => (!!x.category.timeline === !!TIMELINE_DATES) || x.category.name === 'boundaries'))
+    .then(r => r.filter(e => ea_category_filter(e)))
     .then(r => r.map(e => (new DS(e)).init(inputs.includes(e.category.name), preset)));
 
   // We need all the datasets to be initialised _before_ setting
@@ -555,15 +555,6 @@ function ea_datasets_table(sources) {
   }
 
   return table;
-};
-
-function ea_datasets_csv() {
-  if (this.csv.data) return;
-
-  fetch(this.csv.endpoint)
-    .then(r => r.text())
-    .then(t => d3.csvParse(t))
-    .then(d => this.csv.data = d);
 };
 
 function ea_datasets_tiff() {

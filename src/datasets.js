@@ -758,6 +758,10 @@ function ea_datasets_polygons() {
     .then(_ => {
       const v = this.vectors.config;
 
+      if (this.category.timeline) {
+        ea_datasets_polygons_csv_timeline.call(this);
+      }
+
       const fs = this.vectors.features.features;
       for (let i = 0; i < fs.length; i += 1)
         fs[i].id = fs[i].properties[GEOGRAPHY.vectors_id_key];
@@ -773,7 +777,7 @@ function ea_datasets_polygons() {
           "visibility": "none",
         },
         "paint": {
-          "fill-color": this.parent ? ['get', '__color'] : v.fill,
+          "fill-color": (this.parent || this.category.timeline) ? ['get', '__color'] : v.fill,
           "fill-outline-color": v.stroke,
           "fill-opacity": [ "case", [ "boolean", [ "feature-state", "hover" ], false ], 0.7, 1 ]
         },

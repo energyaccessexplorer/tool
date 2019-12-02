@@ -192,6 +192,21 @@ class dsinput extends HTMLElement {
         d.append(r);
       }
 
+      else if (ds.category.timeline) {
+        const r = tmpl("#ramp");
+        r.append(
+          ce('div', (maybe(ds.csv, 'data', 'min') || 0) + ""),
+          ce('div', ds.unit),
+          ce('div', (maybe(ds.csv, 'data', 'max') || 100) + "")
+        );
+
+        e.append(
+          ea_svg_color_steps(ds.csv.config.color_stops), r,
+          ce('div', null, { style: "display: inline-block; width: 64px; height: 5px; background-color: rgba(155,155,155,1); margin: 15px 15px 0 0;" }),
+          ce('div', "Not Available", { style: "display: inline-block; font-size: x-small;" })
+        );
+      }
+
       else {
         e = ea_svg_polygons_symbol.call(ds);
       }

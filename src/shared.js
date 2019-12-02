@@ -8,6 +8,7 @@ function ea_layout_init() {
   const m = qs('#maparea', p);
   const b = qs('#mapbox-container', m);
   const v = qs('#views', m);
+  const t = qs('#timeline');
 
   const c = qs('#controls-wrapper', p);
   const r = qs('#right-pane', p);
@@ -22,11 +23,13 @@ function ea_layout_init() {
     p.style['height'] =
       c.style['height'] =
       m.style['height'] =
+      b.style['height'] =
       r.style['height'] = h + "px";
 
     b.style['height'] = (h - (MOBILE ? v.clientHeight : 0)) + "px";
 
     if (l) l.style['height'] = h - ((o ? o.clientHeight : 0) + d.clientHeight + 4) + "px";
+    if (t) b.style['height'] = m.style['height'] = h - t.clientHeight + "px";
   };
 
   if (MOBILE) m.style['width'] = screen.width + "px";

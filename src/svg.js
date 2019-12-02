@@ -505,4 +505,211 @@ function ea_svg_polygons_symbol() {
   return svg.node();
 };
 
+function ea_svg_timeline_slider(opts) {
+  const {steps, dragging, parent, width, init} = opts;
+
+  const radius = 16,
+        svgwidth = width,
+        svgheight = (radius * 2) + 3,
+        linewidth = radius * 3,
+        svgmin = radius + 2,
+        svgmax = svgwidth - radius - 2;
+
+  const norm = d3.scaleQuantize().domain([svgmin, svgmax]).range(steps);
+  const denorm = d3.scaleLinear().domain([steps[0], steps[steps.length-1]]).range([svgmin, svgmax]);
+
+  const svg = d3.create("svg")
+        .attr('class', 'svg-timeline');
+
+  const g = svg.append('g');
+
+  const gutter = g.append('rect');
+
+  const circle = g.append('circle');
+
+  svg
+    .attr('width', svgwidth + 2)
+    .attr('height', svgheight + 2 + 30);
+
+  steps.forEach(x => {
+    g.append('text').text(x)
+      .attr('transform', `translate(${denorm(x) - 16}, ${svgheight + 32})`)
+      .style('font-family', 'monospace')
+  });
+
+  gutter
+    .attr('stroke', '#42505B')
+    .attr('stroke-width', 0.5)
+    .attr('fill', 'white')
+    .attr('x', 1)
+    .attr('y', 1)
+    .attr('rx', radius)
+    .attr('ry', radius)
+    .attr('width', svgwidth - 2)
+    .attr('height', svgheight - 2);
+
+  circle
+    .attr('r', radius)
+    .attr('cy', svgheight/2)
+    .attr('fill', '#E4A82E')
+    .attr('stroke', '#42505B')
+    .attr('stroke-width', 3)
+    .style('cursor', 'grab');
+
+  function drag(cx) {
+    const cx0 = denorm(norm(cx));
+    circle.attr('cx', cx0);
+
+    dragging(norm(cx));
+  };
+
+  const behaviour = d3.drag()
+        .on('drag', _ => drag(d3.event.x));
+
+  circle.call(behaviour);
+
+  gutter.on('click', _ => drag(d3.event.offsetX));
+
+  drag(denorm(steps[init || 0]));
+
+  return {
+    svg: svg.node(),
+    set: x => drag(denorm(x))
+  };
+};
+
+function ea_svg_multiline(opts) {
+  const {domain, range, data, color, message} = opts;
+
+  const width = opts.width || 600;
+  const height = opts.height || 400;
+
+  const margin = { top: 20, right: 20, bottom: 30, left: 40 };
+
+  const svg = d3.create("svg")
+        .attr("viewBox", [0, 0, width, height]);
+
+  const x = d3.scaleUtc()
+        .domain(d3.extent(data.dates))
+        .range([margin.left, width - margin.right]);
+
+  const y = d3.scaleLinear()
+        .domain(domain || [d3.min(data.series, d => d3.min(d.values)), d3.max(data.series, d => d3.max(d.values))]).nice()
+        .range([height - margin.bottom, margin.top]);
+
+  const xAxis = g => g
+        .attr("transform", `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(x).ticks(width / 80).tickSizeOuter(0));
+
+  const yAxis = g => g
+        .attr("transform", `translate(${margin.left},0)`)
+        .call(d3.axisLeft(y))
+        .call(g => g.select(".domain").remove())
+
+  const line = d3.line()
+        .defined(d => !isNaN(d))
+        .x((d, i) => x(data.dates[i]))
+        .y(d => y(d));
+
+  const dot = svg.append("g")
+        .attr("display", "none");
+
+  const path = svg.append("g")
+        .attr("fill", "none")
+        .attr("stroke-width", 1.5)
+        .attr("stroke-linejoin", "round")
+        .attr("stroke-linecap", "round")
+        .selectAll("path")
+        .data(data.series)
+        .join("path")
+        .style("mix-blend-mode", "multiply")
+        .attr("stroke", d => d.color || color)
+        .attr("d", d => line(d.values));
+
+  const dotnode = dot.node();
+
+  dot.append("circle")
+    .attr("r", 2.5)
+    .attr("fill", 'transparent');
+
+  svg.append("g")
+    .call(xAxis);
+
+  svg.append("g")
+    .call(yAxis);
+
+  let n;
+
+  function hover(svg, path) {
+    svg
+      .style("position", "relative");
+
+    if ("ontouchstart" in document) {
+      svg
+        .style("-webkit-tap-highlight-color", "transparent")
+        .on("touchmove", moved)
+        .on("touchstart", entered)
+        .on("touchend", left)
+    }
+    else {
+      svg
+        .on("mousemove", moved)
+        .on("mouseenter", entered)
+        .on("mouseleave", left);
+    }
+
+    function moved() {
+      d3.event.preventDefault();
+
+      const ym = y.invert(d3.event.layerY);
+      const xm = x.invert(d3.event.layerX);
+      const i1 = d3.bisectLeft(data.dates, xm, 1);
+      const i0 = i1 - 1;
+      const i = xm - data.dates[i0] > data.dates[i1] - xm ? i1 : i0;
+      const s = data.series.reduce((a, b) => Math.abs(a.values[i] - ym) < Math.abs(b.values[i] - ym) ? a : b);
+
+      if (undefined === data.dates[i] || undefined === s.values[i]) return;
+
+      path.attr("stroke", d => d === s ? (d.color || color) : "#ddd").filter(d => d === s).raise();
+
+      dot.attr("transform", `translate(${x(data.dates[i])},${y(s.values[i])})`);
+
+      n ? n.remove() : null;
+
+      n = nanny.pick_element(dot.node(), {
+        title: s.name,
+        message: typeof message === 'function' ? message(s, i, s.values[i]) : s.name,
+        position: "W",
+        close: false
+      });
+    };
+
+    function entered() {
+      path.style("mix-blend-mode", null).attr("stroke", "#ddd");
+      dot.attr("display", null);
+    };
+
+    function left() {
+      path.style("mix-blend-mode", "multiply").attr("stroke", d => d.color || color);
+      dot.attr("display", "none");
+      n ? n.remove() : null;
+    };
+  };
+
+  function highlight(name, date) {
+    const s = data.series.find(x => x.name === name);
+    const i = data.dates.findIndex(x => x.getTime() === date.getTime());
+
+    path.attr("stroke", d => d === s ? (d.color || color) : "#ddd").filter(d => d === s).raise();
+    dot.attr("transform", `translate(${x(data.dates[i])},${y(s.values[i])})`);
+    dot.select("text").text(s.name);
+    dot.attr("display", null);
+  };
+
+  svg.call(hover, path);
+
+  return {
+    svg: svg.node(),
+    highlight: highlight,
+  };
 };

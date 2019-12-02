@@ -24,7 +24,7 @@ LIB = ${DIST}/lib
 
 default: build
 
-build: build-a build-s
+build: build-a build-t build-s
 
 deps:
 	DEST=${DIST}/lib deps
@@ -94,6 +94,59 @@ build-a:
 		> ${DIST}/a/main.css
 
 	@cp ${SRC}/browser.js ${DIST}/a/
+
+build-t:
+	@echo "Building t"
+	@mkdir -p ${DIST}/t
+	@cp ${VIEWS}/t.html ${DIST}/t/index.html
+	@cp ${CSS}/ripple.css ${DIST}/t/ripple.css
+	@cp ${CSS}/svg.css ${DIST}/t/svg.css
+
+	@cat \
+		${LIB}/d3.js \
+		${LIB}/geotiff.js \
+		${LIB}/mapbox-gl.js \
+		${LIB}/geojson-extent.js \
+		${LIB}/helpers.js \
+		${LIB}/flash.js \
+		${LIB}/modal.js \
+		${LIB}/location.js \
+		${LIB}/htmlsortable.js \
+		${LIB}/nanny.js \
+		${LIB}/selectlist.js \
+		${LIB}/dropdown.js \
+		> ${DIST}/t/libs.js
+
+	@echo -n "const ea_settings = " | cat - \
+		settings.json \
+		${SRC}/shared.js \
+		${SRC}/t.js \
+		${SRC}/overlord-t.js \
+		${SRC}/svg.js \
+		${SRC}/controls.js \
+		${SRC}/ui.js \
+		${SRC}/inputs.js \
+		${SRC}/datasets.js \
+		${SRC}/mapbox.js \
+		${SRC}/report.js \
+		${SRC}/summary.js \
+		${SRC}/mobile.js \
+		> ${DIST}/t/main.js
+
+	@cat \
+		${CSS}/general.css \
+		${CSS}/t.css \
+		${CSS}/layout.css \
+		${CSS}/controls.css \
+		${CSS}/maparea.css \
+		${CSS}/views.css \
+		${CSS}/ripple.css \
+		${CSS}/svg.css \
+		${CSS}/summary.css \
+		${CSS}/mobile.css \
+		> ${DIST}/t/main.css
+
+	@cp ${SRC}/browser.js ${DIST}/t/
 
 build-s:
 	@echo "Building s"

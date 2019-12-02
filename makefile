@@ -64,8 +64,8 @@ build-a:
 		settings.json \
 		${SRC}/shared.js \
 		${SRC}/analysis.js \
-		${SRC}/overlord.js \
 		${SRC}/a.js \
+		${SRC}/a-overlord.js \
 		${SRC}/svg.js \
 		${SRC}/controls.js \
 		${SRC}/ui.js \
@@ -121,7 +121,7 @@ build-t:
 		settings.json \
 		${SRC}/shared.js \
 		${SRC}/t.js \
-		${SRC}/overlord-t.js \
+		${SRC}/t-overlord.js \
 		${SRC}/svg.js \
 		${SRC}/controls.js \
 		${SRC}/ui.js \

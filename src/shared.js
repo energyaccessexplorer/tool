@@ -13,7 +13,7 @@ function ea_layout_init() {
   const r = qs('#right-pane', p);
 
   const l = qs('#inputs-list', r);
-  const o = qs('#canvas-output-container', r);
+  const o = qs('#bottom-right-container', r);
   const d = qs('#drawer', r);
 
   function set_heights() {

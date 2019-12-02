@@ -139,7 +139,7 @@ body {
   margin-top: 8px;
 }
 
-#canvas-output-container {
+#bottom-right-container {
   height: 350px;
   margin-top: 3px;
   box-sizing: border-box;

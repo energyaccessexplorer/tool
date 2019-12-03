@@ -308,7 +308,9 @@ class DS {
   analysis_fn(i) {
     let s = null;
 
-    const dom = this.raster.config.domain;
+    const dom = maybe(this.raster, 'config', 'domain');
+    if (!dom) return s;
+
     const d = (dom && [dom.min, dom.max]) || [0,1];
     const t = this.domain;
     const v = this.analysis.scale;

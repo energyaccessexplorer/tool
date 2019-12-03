@@ -781,7 +781,7 @@ function ea_datasets_polygons() {
         "paint": {
           "fill-color": (this.parent || this.category.timeline) ? ['get', '__color'] : v.fill,
           "fill-outline-color": v.stroke,
-          "fill-opacity": [ "case", [ "boolean", [ "feature-state", "hover" ], false ], 0.7, 1 ]
+          "fill-opacity": [ "case", [ "boolean", [ "feature-state", "hover" ], false ], 0.7 * v.opacity, 1 * v.opacity]
         },
       });
 

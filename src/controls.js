@@ -142,6 +142,7 @@ class dscontrols extends HTMLElement {
 
     this.spinner.remove();
     this.content.remove();
+    this.dropdown.remove();
 
     if (this.checkbox) this.checkbox.svg.remove();
   };

@@ -108,14 +108,13 @@ class DS {
     this.active = active || (!presetsempty && p);
 
     this.datatype = (_ => {
-      let t = null;
+      let t;
 
       if (this.mutant) t = null;
       else if (this.vectors) t = this.vectors.config.shape_type;
       else if (this.parent) t = this.parent.datatype;
       else if (this.raster) t = "raster";
       else if (this.csv) t = "table";
-      else throw `Cannot decide datatype of ${this.id}`;
 
       return t;
     })();
@@ -145,7 +144,23 @@ class DS {
 
       break;
 
+    case null:
+      // don't fail, it's a mutant...
+      break;
+
+    case undefined:
     default:
+      ea_flash.push({
+        title: `'${this.id}' disabled`,
+        message: `Cannot decide dataset's type`,
+        timeout: 5000,
+        type: 'error'
+      });
+
+      console.error(`Cannot decide datatype of ${this.id}`);
+
+      this.disable();
+
       break;
     }
   };
@@ -154,7 +169,9 @@ class DS {
     this.active = false;
     this.disabled = true;
 
-    if (this.controls) this.controls.disable();
+    until(_ => this.controls)
+      .then(_ => this.controls.disable());
+
     if (this.input) this.input.disable();
 
     if (this.items) {
@@ -164,6 +181,8 @@ class DS {
     if (this.collection) {
       if (!this.collection.disabled) this.collection.disable();
     }
+
+    delete __dstable[this.id];
 
     ea_overlord({
       "type": "dataset",

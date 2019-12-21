@@ -248,7 +248,7 @@ function ea_controls_dropdown() {
 };
 
 function ea_category_filter(d) {
-  return true;
+  return d.category.name !== 'boundaries';
 };
 
 function ea_datasets_csv() {

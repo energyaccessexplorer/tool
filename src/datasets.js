@@ -500,11 +500,14 @@ window.__dstable = {};
 async function ea_datasets_init(id, inputs, preset, callback) {
   let attrs = '*,raster_file(*),vectors_file(*),csv_file(*),category(*)';
 
-  let core = `${ea_settings.database}/datasets?geography_id=eq.${id}&select=${attrs}`;
-
   let bounds;
+  let boundaries_id;
 
-  await fetch(`${core}&category_name=eq.boundaries`)
+  await fetch(`${ea_settings.database}/geography_boundaries?geography_id=eq.${id}`)
+    .then(r => r.json())
+    .then(r => boundaries_id = r[0]['id']);
+
+  await fetch(`${ea_settings.database}/datasets?id=eq.${boundaries_id}&select=${attrs}`)
     .then(r => r.json())
     .then(async e => {
       let ds = new DS(e[0]);
@@ -520,7 +523,7 @@ async function ea_datasets_init(id, inputs, preset, callback) {
       if (!(bounds = ds.vectors.bounds)) throw `'boundaries' dataset has now vectors.bounds`;
     });
 
-  await fetch(`${core}&category_name=not.eq.boundaries`)
+  await fetch(`${ea_settings.database}/datasets?geography_id=eq.${id}&select=${attrs}`)
     .then(r => r.json())
     .then(r => r.filter(e => ea_category_filter(e)))
     .then(r => r.map(e => (new DS(e)).init(inputs.includes(e.category.name), preset)));

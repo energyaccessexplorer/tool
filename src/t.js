@@ -101,7 +101,7 @@ function ea_controls_dropdown() {
 };
 
 function ea_category_filter(d) {
-  return d.category.timeline;
+  return d.category.timeline && d.category_name !== 'boundaries';
 };
 
 function ea_datasets_csv() {

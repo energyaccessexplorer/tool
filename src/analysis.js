@@ -19,22 +19,24 @@ function ea_analysis(list, type) {
 
   const it = new Float32Array(list[0] ? list[0].raster.data.length : 0).fill(-1);
 
-  // Get smart on the filters:
-  //
-  // - Disregard datasets which have no analysis_fn (eg. boundaries).
-  // - Disregard datasets which are filters and use the entire domain (useless).
-  // - Place the filters first. This will return -1's sooner and make our loops faster.
-  //
   list = list
     .filter(d => {
+      // Discard datasets which have no analysis_fn (eg. boundaries).
+      //
       if (typeof d.analysis_fn(type) !== 'function') return false;
 
+      // Discard datasets which are filters and use the entire domain (useless).
+      //
       if (d.analysis.scale === 'key-delta' &&
           (d.domain[0] === d.raster.config.domain.min && d.domain[1] === d.raster.config.domain.max)) return false;
 
       return true;
     })
-    .sort((x,y) => x.analysis.scale === "key-delta" ? -1 : 1);
+    .sort((x,y) => {
+      // Place the filters first. They will return -1's sooner and make our loops faster.
+      //
+      return x.analysis.scale === "key-delta" ? -1 : 1
+    });
 
   // Add up how much demand and supply datasets will account for. Then, just
   // below, these values will be split into 50-50 of the total analysis.

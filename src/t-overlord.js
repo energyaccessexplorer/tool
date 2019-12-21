@@ -92,7 +92,7 @@ async function ea_overlord(msg) {
     // }
     //
     if (state.inputs.length) {
-      const datasets = DS.all.filter(d => d.category.timeline && d.csv.data && d.active);
+      const datasets = DS.all.filter(d => d.active && d.category.timeline && d.csv.data);
 
       if (TIMELINE_DISTRICT)
         ea_timeline_lines_draw(datasets, TIMELINE_DISTRICT);
@@ -124,7 +124,7 @@ async function ea_overlord(msg) {
     const dsid = state.inputs[0];
     const ds = DS.get(dsid);
 
-    // const datasets = DS.all.filter(d => d.category.timeline && d.csv.data && d.active);
+    // const datasets = DS.all.filter(d => d.active && d.category.timeline && d.csv.data);
     // if (TIMELINE_BARS) TIMELINE_BARS.setvalues(ea_timeline_bars_prepare(datasets));
 
     DS.all.forEach(d => {
@@ -174,7 +174,7 @@ async function ea_overlord(msg) {
           // if (TIMELINE_BARS) TIMELINE_BARS.highlight(et.properties['District']);
           // if (TIMELINE_LINES) TIMELINE_LINES.newdata();
 
-          const datasets = DS.all.filter(d => d.category.timeline && d.csv.data && d.active);
+          const datasets = DS.all.filter(d => d.active && d.category.timeline && d.csv.data);
           // datasets.forEach(d => colors[d.id] = d.csv.config.color_stops.slice(-1));
 
           ea_timeline_lines_draw(datasets, (TIMELINE_DISTRICT = et.properties['District']));

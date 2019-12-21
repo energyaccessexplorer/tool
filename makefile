@@ -30,10 +30,10 @@ deps:
 	DEST=${DIST}/lib deps
 
 start:
-	(cd ${DIST} && ${STATIC_SERVER}) &
+	cd ${DIST} && ${STATIC_SERVER}
 
 watch:
-	@ WATCH_CMD="make build" ${WATCH} ${SRC} ${CSS} ${VIEWS}
+	@ WATCH_CMD="make build" watch-code ${SRC} ${CSS} ${VIEWS}
 
 stop:
 	@stop-port ${WEB_PORT}

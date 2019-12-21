@@ -374,72 +374,80 @@ async function ea_overlord(msg) {
  */
 
 function ea_state_sync() {
+  const url = new URL(location);
+
   let view, output, inputs, preset;
 
-  let view_param = location.get_query_param('view');
-  let output_param = location.get_query_param('output');
-  let inputs_param = location.get_query_param('inputs');
-  let preset_param = location.get_query_param('preset');
+  let view_param = url.searchParams.get('view');
+  let output_param = url.searchParams.get('output');
+  let inputs_param = url.searchParams.get('inputs');
+  let preset_param = url.searchParams.get('preset');
+
+  function go(fn) {
+    fn();
+    history.replaceState(null, null, url);
+  };
 
   function set_view_param(m) {
-    history.replaceState(null, null, location.set_query_param('view', (m || view)));
+    url.searchParams.set('view', (m || view));
   };
 
   function set_output_param(o) {
-    history.replaceState(null, null, location.set_query_param('output', (o || output)));
+    url.searchParams.set('output', (o || output));
   };
 
   function set_inputs_param(i) {
-    history.replaceState(null, null, location.set_query_param('inputs', (i || inputs).toString()));
+    url.searchParams.set('inputs', (i || inputs).join('.'));
   };
 
   function set_preset_param(p) {
     qs('#controls-preset').value = (p || 'custom');
-    history.replaceState(null, null, location.set_query_param('preset', (p || 'custom')));
+    url.searchParams.set('preset', (p || 'custom'));
   };
 
   if (Object.keys(ea_indexes).includes(output_param)) {
     output = output_param;
   } else {
     output = "eai";
-    set_output_param();
+    go(set_output_param);
   }
 
   if (!inputs_param) {
     inputs = [];
-    set_inputs_param();
+    go(set_inputs_param);
   } else {
-    inputs = inputs_param.split(',');
+    inputs = inputs_param.split('.');
   }
 
   if (Object.keys(ea_views).includes(view_param)) {
     view = view_param;
   } else {
     view = 'inputs';
-    set_view_param();
+    go(set_view_param);
   }
 
-  if (['market','planning', 'investment', 'custom'].includes(preset_param)) {
+  if (['market', 'planning', 'investment', 'custom'].includes(preset_param)) {
     preset = preset_param;
   } else {
     preset = 'custom';
-    set_preset_param();
+    go(set_preset_param);
   }
 
   return {
     view: view,
-    set_view_param: set_view_param,
+    set_view_param: _ => go(set_view_param),
     output: output,
-    set_output_param: set_output_param,
+    set_output_param: _ => go(set_output_param),
     inputs: inputs,
-    set_inputs_param: set_inputs_param,
+    set_inputs_param: _ => go(set_inputs_param),
     preset: preset,
-    set_preset_param: set_preset_param,
+    set_preset_param: _ => go(set_preset_param),
   };
 };
 
 async function ea_overlord_init(state) {
-  const id = location.get_query_param('id');
+  const url = new URL(location);
+  const id = url.searchParams.get('id');
 
   MOBILE = screen.width < 1152;
 

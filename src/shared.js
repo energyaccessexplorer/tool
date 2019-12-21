@@ -89,6 +89,8 @@ async function ea_view(v, btn) {
 };
 
 function ea_views_init() {
+  const url = new URL(location);
+
   const el = qs('#views');
 
   Object.keys(ea_views).forEach(v => {
@@ -96,7 +98,7 @@ function ea_views_init() {
 
     btn.onclick = _ => ea_view(v);
 
-    if (location.get_query_param('view') === v) btn.classList.add('active');
+    if (url.searchParams.get('view') === v) btn.classList.add('active');
 
     el.append(btn);
   });

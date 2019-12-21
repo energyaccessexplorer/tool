@@ -20,6 +20,8 @@ async function ea_indexes_graphs(raster) {
 };
 
 function ea_indexes_init(state) {
+  const url = new URL(location);
+
   const ramp = tmpl("#ramp");
   ramp.append(
     ce('div', "Low"),
@@ -51,7 +53,7 @@ function ea_indexes_init(state) {
 
   const download = qs('#index-graphs-download');
   download.append(tmpl('#svg-download'));
-  download.onclick = _ => raster_to_tiff(location.get_query_param('output'));
+  download.onclick = _ => raster_to_tiff(url.searchParams.get('output'));
 
   const code = qs('#index-graphs-code');
   code.append(tmpl('#svg-code'));

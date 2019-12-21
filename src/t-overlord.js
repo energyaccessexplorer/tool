@@ -201,20 +201,23 @@ async function ea_overlord(msg) {
  */
 
 function ea_state_sync() {
+  const url = new URL(location);
+
   let view, inputs;
 
-  let view_param = location.get_query_param('view');
-  let inputs_param = location.get_query_param('inputs');
+  let view_param = url.searchParams.get('view');
+  let inputs_param = url.searchParams.get('inputs');
 
   function set_inputs_param(i) {
-    history.replaceState(null, null, location.set_query_param('inputs', (i || inputs).toString()));
+    url.searchParams.set('inputs', (i || inputs).join('.'));
+    history.replaceState(null, null, url);
   };
 
   if (!inputs_param) {
     inputs = [];
     set_inputs_param();
   } else {
-    inputs = inputs_param.split(',');
+    inputs = inputs_param.split('.');
   }
 
   return {
@@ -224,7 +227,8 @@ function ea_state_sync() {
 };
 
 async function ea_overlord_init(state) {
-  const id = location.get_query_param('id');
+  const url = new URL(location);
+  const id = url.searchParams.get('id');
 
   MOBILE = screen.width < 1152;
 

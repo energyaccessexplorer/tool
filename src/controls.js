@@ -355,7 +355,8 @@ function ea_controls_collection_list() {
 async function ea_controls_selectlist() {
   let data = {};
 
-  const id = location.get_query_param('id');
+  const url = new URL(location);
+  const id = url.searchParams.get('id');
 
   const pidq = GEOGRAPHY.parent_id ? `eq.${GEOGRAPHY.parent_id}` : "is.null";
   const list = await fetch(ea_settings.database + `/geographies?select=id,name&online=eq.true&datasets_count=gt.0&parent_id=${pidq}&order=name.asc`)

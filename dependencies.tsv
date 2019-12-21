@@ -7,7 +7,6 @@ geojson-extent.js	https://raw.githubusercontent.com/mapbox/geojson-extent/master
 htmlsortable.js	https://raw.githubusercontent.com/lukasoppermann/html5sortable/master/dist/html5sortable.min.js
 countries.json	https://raw.githubusercontent.com/mledoze/countries/master/dist/countries.json
 helpers.js	https://git.fabbe.io/web-toolbelt/plain/helpers.js
-location.js	https://git.fabbe.io/web-toolbelt/plain/location.js
 flash.js	https://git.fabbe.io/web-toolbelt/plain/flash.js
 modal.js	https://git.fabbe.io/web-toolbelt/plain/modal.js
 nanny.js	https://git.fabbe.io/web-toolbelt/plain/nanny.js

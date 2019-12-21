@@ -142,9 +142,12 @@ function ea_nanny_init(state) {
 };
 
 function ea_nanny_force_start() {
-  history.replaceState(null, null, location.set_query_param('inputs', ''));
-  history.replaceState(null, null, location.set_query_param('output', 'eai'));
-  history.replaceState(null, null, location.set_query_param('view', 'inputs'));
+  const url = new URL(location);
+  url.searchParams.set('inputs', '');
+  url.searchParams.set('output', 'eai');
+  url.searchParams.set('view', 'inputs');
+
+  history.replaceState(null, null, url);
 
   DS.all.filter(d => d.active).forEach(d => d.turn(false, false));
 
@@ -162,9 +165,11 @@ function ea_nanny_force_start() {
 };
 
 function ea_current_config() {
+  const url = new URL(location);
+
   const state = ea_state_sync();
   const config = {
-    geography_id: location.get_query_param('id'),
+    geography_id: url.searchParams.get('id'),
     analysis_type: state.output,
     datasets: []
   };

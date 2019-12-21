@@ -234,7 +234,7 @@ async function ea_overlord_init(state) {
 
   ea_layout_init();
 
-  GEOGRAPHY = (await fetch(`${ea_settings.database}/geographies?id=eq.${id}`).then(r => r.json()))[0];
+  GEOGRAPHY = await ea_api("geographies", { id: `eq.${id}` }, { object: true });
   MAPBOX = mapbox_setup();
 
   await ea_datasets_init(GEOGRAPHY.id, state.inputs, null, bounds => {

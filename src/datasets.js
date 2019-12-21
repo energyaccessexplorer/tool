@@ -503,14 +503,12 @@ async function ea_datasets_init(id, inputs, preset, callback) {
   let bounds;
   let boundaries_id;
 
-  await fetch(`${ea_settings.database}/geography_boundaries?geography_id=eq.${id}`)
-    .then(r => r.json())
-    .then(r => boundaries_id = r[0]['id']);
+  await ea_api("geography_boundaries", { geography_id: `eq.${id}`}, { object: true })
+    .then(r => boundaries_id = r.id);
 
-  await fetch(`${ea_settings.database}/datasets?id=eq.${boundaries_id}&select=${attrs}`)
-    .then(r => r.json())
+  await ea_api("datasets", { id: `eq.${boundaries_id}`, select: attrs }, { object: true })
     .then(async e => {
-      let ds = new DS(e[0]);
+      let ds = new DS(e);
 
       ds.active = false;
 
@@ -523,8 +521,7 @@ async function ea_datasets_init(id, inputs, preset, callback) {
       if (!(bounds = ds.vectors.bounds)) throw `'boundaries' dataset has now vectors.bounds`;
     });
 
-  await fetch(`${ea_settings.database}/datasets?geography_id=eq.${id}&select=${attrs}`)
-    .then(r => r.json())
+  await ea_api("datasets", { geography_id: `eq.${id}`, select: attrs })
     .then(r => r.filter(e => ea_category_filter(e)))
     .then(r => r.map(e => (new DS(e)).init(inputs.includes(e.category.name), preset)));
 

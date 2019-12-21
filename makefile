@@ -63,6 +63,7 @@ build-a:
 	@echo -n "const ea_settings = " | cat - \
 		settings.json \
 		${SRC}/shared.js \
+		${SRC}/api.js \
 		${SRC}/analysis.js \
 		${SRC}/a.js \
 		${SRC}/a-overlord.js \
@@ -120,6 +121,7 @@ build-t:
 	@echo -n "const ea_settings = " | cat - \
 		settings.json \
 		${SRC}/shared.js \
+		${SRC}/api.js \
 		${SRC}/t.js \
 		${SRC}/t-overlord.js \
 		${SRC}/svg.js \
@@ -164,6 +166,7 @@ build-s:
 
 	@echo -n "const ea_settings = " | cat - \
 		settings.json \
+		${SRC}/api.js \
 		${SRC}/svg.js \
 		${SRC}/ui.js \
 		${SRC}/s.js \

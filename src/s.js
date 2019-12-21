@@ -61,7 +61,7 @@ function ea_select_topo_flag(c) {
 };
 
 async function ea_select_geography(c) {
-  const coll = await fetch(ea_settings.database + `/geographies?online=eq.true&datasets_count=gt.0&parent_id=eq.${c.id}`).then(r => r.json());
+  const coll = await ea_api("geographies", { online: "eq.true", datasets_count: "gt.0", parent_id: `eq.${c.id}` });
 
   const data = {};
   for (let x of coll) data[x.name] = x.name;
@@ -100,8 +100,7 @@ function ea_select_setup() {
 
   let curr_c = null;
 
-  fetch(ea_settings.database + '/geographies?online=eq.true&adm=eq.0')
-    .then(r => r.json())
+  ea_api("geographies", { online: "eq.true", adm: "eq.0" })
     .then(countries_online => {
       for (let co of countries_online) {
         const d = ce('div', ce('h2', co.name, { class: 'country-name' }), { class: 'country-item', ripple: "" });

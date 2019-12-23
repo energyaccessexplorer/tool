@@ -493,11 +493,13 @@ window.__dstable = {};
  * @param "id" uuid
  * @param "inputs" string[] with DS.id's
  * @param "preset" string ("custom", "market", "investment", "planning")
+ * @param "pack" string ("all" ...)
+ * @param "callback" function to run with the boundaries
  *
  * returns DS[]
  */
 
-async function ea_datasets_init(id, inputs, preset, callback) {
+async function ea_datasets_init(id, inputs, preset, pack, callback) {
   let attrs = '*,raster_file(*),vectors_file(*),csv_file(*),category(*)';
 
   let bounds;
@@ -521,7 +523,7 @@ async function ea_datasets_init(id, inputs, preset, callback) {
       if (!(bounds = ds.vectors.bounds)) throw `'boundaries' dataset has now vectors.bounds`;
     });
 
-  await ea_api("datasets", { geography_id: `eq.${id}`, select: attrs })
+  await ea_api("datasets", { geography_id: `eq.${id}`, select: attrs, pack: `eq.${pack}` })
     .then(r => r.filter(e => ea_category_filter(e)))
     .then(r => r.map(e => (new DS(e)).init(inputs.includes(e.category.name), preset)));
 

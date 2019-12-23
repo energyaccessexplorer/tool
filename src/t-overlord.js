@@ -203,7 +203,7 @@ async function ea_overlord_init(state) {
   GEOGRAPHY = await ea_api("geographies", { id: `eq.${id}` }, { object: true });
   MAPBOX = mapbox_setup();
 
-  await ea_datasets_init(GEOGRAPHY.id, state.inputs, null, bounds => {
+  await ea_datasets_init(GEOGRAPHY.id, state.inputs, null, state.pack, bounds => {
     mapbox_fit(bounds);
     mapbox_change_theme(ea_settings.mapbox_theme);
   });

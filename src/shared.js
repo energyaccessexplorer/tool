@@ -207,3 +207,46 @@ function parseRGBA(str) {
   else
     throw new Error(`parseRGBA: argument ${str} doesn't match`);
 };
+
+/*
+ * ea_state_sync
+ *
+ * Gather the parameters from the current URL, clean them up, set the defaults
+ *
+ * returns an Object with the handled params and their set_ methods.
+ */
+
+function ea_state_sync() {
+  const url = new URL(location);
+  const o = {}
+
+  for (let k in ea_state_params) {
+    let v = url.searchParams.get(k);
+
+    if (!v || v === "") {
+      o[k] = ea_state_params[k];
+    } else {
+      o[k] = ea_state_params[k] instanceof Array ? v.split(',') : v;
+    }
+
+    url.searchParams.set(k, o[k]);
+  }
+
+  history.replaceState(null, null, url);
+
+  return o;
+};
+
+function ea_state_set(k,a) {
+  const url = new URL(location);
+  const s = url.searchParams.get(k);
+
+  if (!a || s === "") {
+    url.searchParams.set(k, ea_state_params[k]);
+  } else {
+    const v = ea_state_params[k] instanceof Array ? a.join(',') : a;
+    url.searchParams.set(k,v);
+  }
+
+  history.replaceState(null, null, url);
+};

@@ -145,6 +145,11 @@
     window.ea_modal = new modal("ea-modal", {});
     window.ea_flash = new flash();
 
+    ea_state_params = {
+      'view': 'inputs',
+      'inputs': [],
+    };
+
     ea_overlord({
       "type": 'init',
       "caller": 'require'

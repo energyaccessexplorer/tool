@@ -76,7 +76,7 @@ async function ea_overlord(msg) {
     await ds.turn(ds.active, true);
     ds.raise();
 
-    state.set_inputs_param(inputs);
+    ea_state_set('inputs', inputs);
 
     // const rp = qs('#right-pane');
     // elem_empty(rp);
@@ -137,7 +137,7 @@ async function ea_overlord(msg) {
 
   case 'sort': {
     ea_inputs_sort(msg.target);
-    state.set_inputs_param(msg.target);
+    ea_state_set('inputs', msg.target);
 
     break;
   }
@@ -192,40 +192,6 @@ async function ea_overlord(msg) {
   if (typeof msg.callback === 'function') msg.callback();
 };
 
-/*
- * ea_state_sync
- *
- * Gather the parameters from the current URL, clean them up, set the defaults
- *
- * returns an Object with the handled params and their set_ methods.
- */
-
-function ea_state_sync() {
-  const url = new URL(location);
-
-  let view, inputs;
-
-  let view_param = url.searchParams.get('view');
-  let inputs_param = url.searchParams.get('inputs');
-
-  function set_inputs_param(i) {
-    url.searchParams.set('inputs', (i || inputs).join('.'));
-    history.replaceState(null, null, url);
-  };
-
-  if (!inputs_param) {
-    inputs = [];
-    set_inputs_param();
-  } else {
-    inputs = inputs_param.split('.');
-  }
-
-  return {
-    inputs: inputs,
-    set_inputs_param: set_inputs_param,
-  };
-};
-
 async function ea_overlord_init(state) {
   const url = new URL(location);
   const id = url.searchParams.get('id');
@@ -254,7 +220,7 @@ async function ea_overlord_init(state) {
         .map(d => d.id)
         .sort((x,y) => (state.inputs.indexOf(x) < state.inputs.indexOf(y)) ? -1 : 1);
 
-  state.set_inputs_param(a);
+  ea_state_set('inputs', a);
 
   ea_controls_sort_datasets(GEOGRAPHY.configuration.sort_datasets);
 

@@ -60,7 +60,7 @@ async function ea_overlord(msg) {
   case 'view': {
     let t = msg.target;
 
-    state.set_view_param(t);
+    ea_state_set('view', t);
 
     await Promise.all(state.inputs.map(id => DS.get(id).turn(true, (t === 'inputs'))));
 
@@ -97,7 +97,7 @@ async function ea_overlord(msg) {
 
     const resort = !["ea_controls_range", "ea_controls_weight"].includes(msg.caller);
 
-    state.set_preset_param(null);
+    ea_state_set('preset', null);
 
     ds.active ?
       (resort && state.inputs.unshift(ds.id)) :
@@ -126,14 +126,14 @@ async function ea_overlord(msg) {
       throw `Argument Error: Overlord: Could not set the view ${state.view}`;
     }
 
-    state.set_output_param();
-    state.set_inputs_param(inputs);
+    ea_state_set('output');
+    ea_state_set('inputs', inputs);
 
     break;
   }
 
   case 'index': {
-    state.set_output_param(msg.target);
+    ea_state_set('output', msg.target);
     ea_plot_active_analysis(msg.target).then(raster => ea_indexes_graphs(raster));
 
     break;
@@ -155,8 +155,8 @@ async function ea_overlord(msg) {
       ea_inputs(inputs);
     }
 
-    state.set_preset_param(msg.target);
-    state.set_inputs_param(inputs);
+    ea_state_set('preset', msg.target);
+    ea_state_set('inputs', inputs);
 
     break;
   }
@@ -164,7 +164,7 @@ async function ea_overlord(msg) {
   case 'sort': {
     if (state.view === "inputs") {
       ea_inputs_sort(msg.target);
-      state.set_inputs_param(msg.target);
+      ea_state_set('inputs', msg.target);
     }
 
     else if (state.view === "outputs") {
@@ -365,86 +365,6 @@ async function ea_overlord(msg) {
   if (typeof msg.callback === 'function') msg.callback();
 };
 
-/*
- * ea_state_sync
- *
- * Gather the parameters from the current URL, clean them up, set the defaults
- *
- * returns an Object with the handled params and their set_ methods.
- */
-
-function ea_state_sync() {
-  const url = new URL(location);
-
-  let view, output, inputs, preset;
-
-  let view_param = url.searchParams.get('view');
-  let output_param = url.searchParams.get('output');
-  let inputs_param = url.searchParams.get('inputs');
-  let preset_param = url.searchParams.get('preset');
-
-  function go(fn) {
-    fn();
-    history.replaceState(null, null, url);
-  };
-
-  function set_view_param(m) {
-    url.searchParams.set('view', (m || view));
-  };
-
-  function set_output_param(o) {
-    url.searchParams.set('output', (o || output));
-  };
-
-  function set_inputs_param(i) {
-    url.searchParams.set('inputs', (i || inputs).join('.'));
-  };
-
-  function set_preset_param(p) {
-    qs('#controls-preset').value = (p || 'custom');
-    url.searchParams.set('preset', (p || 'custom'));
-  };
-
-  if (Object.keys(ea_indexes).includes(output_param)) {
-    output = output_param;
-  } else {
-    output = "eai";
-    go(set_output_param);
-  }
-
-  if (!inputs_param) {
-    inputs = [];
-    go(set_inputs_param);
-  } else {
-    inputs = inputs_param.split('.');
-  }
-
-  if (Object.keys(ea_views).includes(view_param)) {
-    view = view_param;
-  } else {
-    view = 'inputs';
-    go(set_view_param);
-  }
-
-  if (['market', 'planning', 'investment', 'custom'].includes(preset_param)) {
-    preset = preset_param;
-  } else {
-    preset = 'custom';
-    go(set_preset_param);
-  }
-
-  return {
-    view: view,
-    set_view_param: _ => go(set_view_param),
-    output: output,
-    set_output_param: _ => go(set_output_param),
-    inputs: inputs,
-    set_inputs_param: _ => go(set_inputs_param),
-    preset: preset,
-    set_preset_param: _ => go(set_preset_param),
-  };
-};
-
 async function ea_overlord_init(state) {
   const url = new URL(location);
   const id = url.searchParams.get('id');
@@ -473,7 +393,7 @@ async function ea_overlord_init(state) {
         .map(d => d.id)
         .sort((x,y) => (state.inputs.indexOf(x) < state.inputs.indexOf(y)) ? -1 : 1);
 
-  state.set_inputs_param(a);
+  ea_state_set('inputs', a);
 
   ea_controls_sort_datasets(GEOGRAPHY.configuration.sort_datasets);
 

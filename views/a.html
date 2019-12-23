@@ -218,6 +218,13 @@ energy demand, low economic activity, and low access to infrastructure and resou
     window.ea_modal = new modal("ea-modal", {});
     window.ea_flash = new flash();
 
+    ea_state_params = {
+      'view': 'inputs',
+      'output': 'eai',
+      'inputs': [],
+      'preset': 'custom',
+    };
+
     ea_overlord({
       "type": 'init',
       "caller": 'require'

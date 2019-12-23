@@ -171,6 +171,4 @@ async function ea_datasets_polygons_csv_timeline(t) {
     //
     console.warn(err);
   }
-
-  this.input = new dsinput(this);
 };

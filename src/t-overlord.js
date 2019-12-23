@@ -78,6 +78,8 @@ async function ea_overlord(msg) {
 
     ea_state_set('inputs', inputs);
 
+    ea_inputs(state.inputs);
+
     // const rp = qs('#right-pane');
     // elem_empty(rp);
     //
@@ -114,8 +116,6 @@ async function ea_overlord(msg) {
       //
       // rp.append(TIMELINE_BARS.svg);
     }
-
-    ea_inputs(state.inputs);
 
     break;
   }
@@ -223,16 +223,6 @@ async function ea_overlord_init(state) {
   ea_state_set('inputs', a);
 
   ea_controls_sort_datasets(GEOGRAPHY.configuration.sort_datasets);
-
-  // const dsid = state.inputs[0];
-  // if (dsid && dsid !== "") {
-  //   const ds = DS.get(dsid);
-  //
-  //   if (ds.category.timeline) {
-  //     await until(_ => ds.layer);
-  //     ds.raise();
-  //   }
-  // }
 
   ea_inputs_init();
   ea_timeline_init();

@@ -77,7 +77,6 @@ async function ea_overlord(msg) {
         MAPBOX.setLayoutProperty('output-layer', 'visibility', 'none');
 
       ea_inputs(state.inputs);
-
       ea_inputs_sort(state.inputs);
     }
 

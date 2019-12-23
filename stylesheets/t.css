@@ -7,6 +7,10 @@
   margin: 2em auto;
 }
 
+#right-pane .header {
+  padding: 0 1em;
+}
+
 #right-pane .graphs {
   padding: 0 0.5em;
 }

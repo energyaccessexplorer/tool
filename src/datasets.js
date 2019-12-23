@@ -561,6 +561,15 @@ This is not fatal. Dataset disabled.`
   throw Error(`"Dataset '${this.name}' disabled`);
 };
 
+function ea_datasets_csv() {
+  if (this.csv.data) return;
+
+  fetch(this.csv.endpoint)
+    .then(d => d.text())
+    .then(r => d3.csvParse(r))
+    .then(d => this.csv.data = d);
+};
+
 function ea_datasets_table(sources) {
   // TODO: this is features-centric, we should be able to get these values
   //       from the CSV

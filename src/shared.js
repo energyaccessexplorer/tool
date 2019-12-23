@@ -182,10 +182,6 @@ async function ea_overview(cca3) {
   }
 };
 
-function date_valid(d) {
-  return d instanceof Date && !isNaN(d);
-};
-
 function parseRGBA(str) {
   let c;
 

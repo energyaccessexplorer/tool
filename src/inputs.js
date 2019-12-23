@@ -194,6 +194,7 @@ class dsinput extends HTMLElement {
 
       else if (ds.category.timeline) {
         const r = tmpl("#ramp");
+
         r.append(
           ce('div', (maybe(ds.csv, 'data', 'min') || 0) + ""),
           ce('div', ds.unit),

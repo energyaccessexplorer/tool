@@ -250,12 +250,3 @@ function ea_controls_dropdown() {
 function ea_category_filter(d) {
   return d.category.name !== 'boundaries';
 };
-
-function ea_datasets_csv() {
-  if (this.csv.data) return;
-
-  fetch(this.csv.endpoint)
-    .then(r => r.text())
-    .then(r => d3.csvParse(r))
-    .then(d => this.csv.data = d);
-};

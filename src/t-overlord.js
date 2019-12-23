@@ -115,6 +115,10 @@ async function ea_overlord(msg) {
       // });
       //
       // rp.append(TIMELINE_BARS.svg);
+    } else {
+      const rp = qs('#right-pane');
+      qs('#district-header', rp).innerText = "";
+      if (TIMELINE_LINES) TIMELINE_LINES.svg.remove();
     }
 
     break;

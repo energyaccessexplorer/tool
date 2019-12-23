@@ -104,31 +104,6 @@ function ea_category_filter(d) {
   return d.category.timeline && d.category_name !== 'boundaries';
 };
 
-function ea_datasets_csv() {
-  if (this.csv.data) return;
-
-  const t = !!this.category.timeline;
-
-  const getdate = function(d) {
-    for (let k in d) {
-      let x = new Date(k);
-
-      if (date_valid(x)) {
-        if (TIMELINE_DATES.indexOf(k) < 0)
-          TIMELINE_DATES.push(k);
-      }
-    }
-
-    return d;
-  };
-
-  fetch(this.csv.endpoint)
-    .then(r => r.text())
-    .then(t => d3.csvParse(t, (t ? getdate : undefined)))
-    .then(d => this.csv.data = d)
-    .then(_ => t ? TIMELINE_DATES.sort() : null);
-};
-
 async function ea_datasets_polygons_csv_timeline(t) {
   t = t || TIMELINE_CURRENT_DATE || TIMELINE_DATES[TIMELINE_DATES.length - 1];
 
@@ -140,8 +115,8 @@ async function ea_datasets_polygons_csv_timeline(t) {
   if (!data) warn(this.id, "has no csv.data");
 
   if (undefined === data.min || undefined === data.max) {
-    data.min = d3.min(d3.min([].concat.apply(TIMELINE_DATES.map(d => data.map(r => +r[d])))));
-    data.max = d3.max(d3.max([].concat.apply(TIMELINE_DATES.map(d => data.map(r => +r[d])))));
+    data.min = d3.min([].concat(...TIMELINE_DATES.map(d => data.map(r => +r[d]))));
+    data.max = d3.max([].concat(...TIMELINE_DATES.map(d => data.map(r => +r[d]))));
   }
 
   const l = d3.scaleQuantize().domain([data.min, data.max]).range(cs);
@@ -171,4 +146,6 @@ async function ea_datasets_polygons_csv_timeline(t) {
     //
     console.warn(err);
   }
+
+  if (this.input) this.input.refresh();
 };

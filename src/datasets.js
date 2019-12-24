@@ -558,7 +558,7 @@ This is not fatal. Dataset disabled.`
 
   this.disable();
 
-  throw Error(`"Dataset '${this.name}' disabled`);
+  throw Error(`"Dataset ${this.category_name} disabled. Failed to get ${format}.`);
 };
 
 function ea_datasets_csv() {
@@ -654,6 +654,7 @@ function ea_datasets_tiff() {
   }
 
   return fetch(this.raster.endpoint)
+    .catch(err => ea_datasets_fail.call(this, "TIFF"))
     .then(r => {
       if (!(r.ok && r.status < 400)) ea_datasets_fail.call(this, "TIFF");
       else return r;
@@ -667,8 +668,12 @@ function ea_datasets_geojson() {
     return new Promise((res, rej) => res());
 
   return fetch(this.vectors.endpoint)
-    .then(r => r.json())
     .catch(err => ea_datasets_fail.call(this, "GEOJSON"))
+    .then(r => {
+      if (!(r.ok && r.status < 400)) ea_datasets_fail.call(this, "GEOJSON");
+      else return r;
+    })
+    .then(r => r.json())
     .then(r => {
       this.vectors.features = r;
       if (this.id === 'boundaries') this.vectors.bounds = geojsonExtent(r);

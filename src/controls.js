@@ -158,7 +158,7 @@ class dscontrols extends HTMLElement {
     }
 
     ea_overlord({
-      "type": "dataset",
+      "type": "controls",
       "target": this.ds,
       "caller": "dscontrols_restore_defaults"
     });
@@ -285,7 +285,7 @@ function ea_controls_range(opts = {}) {
     callback2: x => update(x, 1, v2),
     end_callback: _ => {
       ea_overlord({
-        "type": "dataset",
+        "type": "controls",
         "target": this,
         "caller": "ea_controls_range",
       });
@@ -323,7 +323,7 @@ function ea_controls_weight() {
       this.weight = x;
 
       ea_overlord({
-        "type": "dataset",
+        "type": "controls",
         "target": this,
         "caller": "ea_controls_weight",
       });

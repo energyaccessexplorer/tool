@@ -94,14 +94,12 @@ async function ea_overlord(msg) {
   case 'dataset': {
     const ds = msg.target;
 
-    const resort = !["ea_controls_range", "ea_controls_weight"].includes(msg.caller);
-
     ea_state_set('preset', null);
 
     let inputs = state.inputs;
 
     if (ds.active) {
-      if (resort) inputs.unshift(ds.id);
+      inputs.unshift(ds.id);
     }
     else {
       inputs.splice(inputs.indexOf(ds.id), 1)
@@ -118,7 +116,7 @@ async function ea_overlord(msg) {
     else if (state.view === "inputs") {
       await ds.turn(ds.active, true);
 
-      if (resort) ds.raise();
+      ds.raise();
 
       ea_plot_active_analysis(state.output);
     }
@@ -130,6 +128,19 @@ async function ea_overlord(msg) {
     inputs = [...new Set(inputs)];
     ea_cards(inputs);
     ea_state_set('inputs', inputs);
+
+    break;
+  }
+
+  case 'controls': {
+    if (state.view === "outputs") {
+      ea_indexes_list(state);
+      ea_plot_active_analysis(state.output).then(raster => ea_indexes_graphs(raster));
+    }
+
+    else if (state.view === "inputs") {
+      ea_plot_active_analysis(state.output);
+    }
 
     break;
   }

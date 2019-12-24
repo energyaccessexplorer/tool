@@ -66,7 +66,7 @@ build-a:
 		${SRC}/api.js \
 		${SRC}/analysis.js \
 		${SRC}/a.js \
-		${SRC}/a-overlord.js \
+		${SRC}/overlord.js \
 		${SRC}/svg.js \
 		${SRC}/controls.js \
 		${SRC}/ui.js \
@@ -123,7 +123,7 @@ build-t:
 		${SRC}/shared.js \
 		${SRC}/api.js \
 		${SRC}/t.js \
-		${SRC}/t-overlord.js \
+		${SRC}/overlord.js \
 		${SRC}/svg.js \
 		${SRC}/controls.js \
 		${SRC}/ui.js \

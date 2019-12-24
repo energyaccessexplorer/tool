@@ -149,3 +149,70 @@ async function ea_datasets_polygons_csv_timeline(t) {
 
   if (this.card) this.card.refresh();
 };
+
+function ea_overlord_init(state) {
+  ea_timeline_init();
+};
+
+function ea_overlord_refresh(state) { };
+
+async function ea_overlord_view(state, msg) {
+  await Promise.all(state.inputs.map(id => DS.get(id).turn(true, true)));
+
+  ea_cards(state.inputs);
+  ea_cards_sort(state.inputs);
+};
+
+async function ea_overlord_dataset(state, msg) {
+  const ds = msg.target;
+
+  let inputs = state.inputs;
+
+  if (ds.active) {
+    state.inputs.unshift(ds.id);
+  } else {
+    state.inputs.splice(state.inputs.indexOf(ds.id), 1);
+    ds.card.remove();
+  }
+
+  await ds.turn(ds.active, true);
+  ds.raise();
+
+  inputs = [...new Set(inputs)];
+  ea_cards(inputs);
+  ea_state_set('inputs', inputs);
+
+  if (state.inputs.length) {
+    const datasets = DS.all.filter(d => d.active && d.category.timeline && d.csv.data);
+
+    if (TIMELINE_DISTRICT)
+      ea_timeline_lines_draw(datasets, TIMELINE_DISTRICT);
+  } else {
+    const rp = qs('#right-pane');
+    qs('#district-header', rp).innerText = "";
+    if (TIMELINE_LINES) TIMELINE_LINES.svg.remove();
+  }
+};
+
+function ea_overlord_map_click(state, msg) {
+  const e = msg.event;
+
+  const b = DS.get('boundaries');
+  let nodata = b.raster.nodata;
+
+  const i = state.inputs[0];
+  let t = DS.get(i);
+
+  if (!t) return;
+
+  if (t.vectors) {
+    const et = MAPBOX.queryRenderedFeatures(e.point)[0];
+    if (!et) return;
+
+    if (et.source === i) {
+      const datasets = DS.all.filter(d => d.active && d.category.timeline && d.csv.data);
+
+      ea_timeline_lines_draw(datasets, (TIMELINE_DISTRICT = et.properties['District']));
+    }
+  }
+};

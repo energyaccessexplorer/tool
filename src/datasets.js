@@ -172,7 +172,7 @@ class DS {
     until(_ => this.controls)
       .then(_ => this.controls.disable());
 
-    if (this.input) this.input.disable();
+    if (this.card) this.card.disable();
 
     if (this.items) {
       for (let d of this.items) { d.disable(); }
@@ -233,7 +233,7 @@ class DS {
 
     this.vectors = host.vectors;
 
-    this.input.refresh();
+    this.card.refresh();
 
     return this;
   };
@@ -241,7 +241,7 @@ class DS {
   items_init() {
     for (let i of this.config.collection) {
       const d = DS.get(i);
-      d.input = d.input || new dsinput(d);
+      d.card = d.card || new dscard(d);
       d.collection = this;
 
       this.items.push(d);
@@ -786,7 +786,7 @@ function ea_datasets_lines() {
       });
 
       if (criteria.length)
-        this.input.line_legends(criteria.map(x => JSON.parse(x)));
+        this.card.line_legends(criteria.map(x => JSON.parse(x)));
     });
 };
 

@@ -1,9 +1,9 @@
-function ea_inputs_init(arr) {
-  const pane = qs('#inputs-pane');
-  const list = qs('#inputs-list', pane);
+function ea_cards_init(arr) {
+  const pane = qs('#cards-pane');
+  const list = qs('#cards-list', pane);
 
-  sortable('#inputs-list', {
-    "items": 'ds-input',
+  sortable('#cards-list', {
+    "items": 'ds-card',
     "forcePlaceholderSize": true,
     "placeholder": '<div style="margin: 1px; background-color: rgba(0,0,0,0.3);"></div>',
   })[0]
@@ -13,43 +13,43 @@ function ea_inputs_init(arr) {
         ea_overlord({
           "type": 'sort',
           "target": e.detail.destination.items.map(i => i.getAttribute('bind')),
-          "caller": 'ea_inputs_init',
+          "caller": 'ea_cards_init',
         })
       });
 
-  ea_inputs(arr.reverse());
+  ea_cards(arr.reverse());
 };
 
-function ea_inputs(list) {
-  const inputs = qs('#inputs-pane');
-  const inputs_list = qs('#inputs-list', inputs);
+function ea_cards(list) {
+  const cards = qs('#cards-pane');
+  const cards_list = qs('#cards-list', cards);
 
-  const ldc = list.map(i => DS.get(i).input);
-  const empty = inputs_list.children.length === 0;
+  const ldc = list.map(i => DS.get(i).card);
+  const empty = cards_list.children.length === 0;
 
-  if (!empty) sortable('#inputs-list', 'disable');
+  if (!empty) sortable('#cards-list', 'disable');
 
   for (let i of ldc)
-    if (!inputs_list.contains(i)) inputs_list.prepend(i)
+    if (!cards_list.contains(i)) cards_list.prepend(i)
 
-  if (!empty) sortable('#inputs-list', 'enable');
+  if (!empty) sortable('#cards-list', 'enable');
 };
 
-async function ea_inputs_sort(list) {
+async function ea_cards_sort(list) {
   for (let i of list.slice(0).reverse())
     await DS.get(i).raise();
 };
 
-class dsinput extends HTMLElement {
+class dscard extends HTMLElement {
   constructor(d) {
-    if (!(d instanceof DS)) throw Error(`dsinput: Expected a DS. Got ${d}.`);
+    if (!(d instanceof DS)) throw Error(`dscard: Expected a DS. Got ${d}.`);
     super();
 
     this.ds = d;
 
     if (d.disabled) return undefined;
 
-    attach.call(this, shadow_tmpl('#ds-input-template'));
+    attach.call(this, shadow_tmpl('#ds-card-template'));
 
     this.svg_el = this.svg();
 
@@ -226,7 +226,7 @@ class dsinput extends HTMLElement {
     }
 
     default: {
-      warn("dsinput.svg could not be set.", ds.id);
+      warn("dscard.svg could not be set.", ds.id);
       break;
     }
     }
@@ -237,7 +237,7 @@ class dsinput extends HTMLElement {
       for (let d of ds.items) {
         let li = ce('li');
 
-        li.append(d.input.svg_el, ce('div', d.name, { class: 'subheader' }));
+        li.append(d.card.svg_el, ce('div', d.name, { class: 'subheader' }));
         el.append(li);
       }
 
@@ -250,4 +250,4 @@ class dsinput extends HTMLElement {
   };
 }
 
-customElements.define('ds-input', dsinput);
+customElements.define('ds-card', dscard);

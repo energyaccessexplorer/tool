@@ -126,7 +126,7 @@ function table_data(dict, prop, event) {
 };
 
 function right_pane(t) {
-  qs('#inputs-pane').style.display = (t === 'inputs') ? '' : 'none';
+  qs('#cards-pane').style.display = (t === 'inputs') ? '' : 'none';
   qs('#indexes-pane').style.display = (t === 'outputs') ? '' : 'none';
 };
 

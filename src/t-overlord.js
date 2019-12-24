@@ -5,7 +5,7 @@
  *
  * Any communication between the app's components:
  *   - controls
- *   - inputs
+ *   - cards
  *   - map
  *   - datasets
  *   ... etc. should be done via this function.
@@ -17,7 +17,7 @@
  *      view: set the entire app between {} views
  *      dataset: change params or (de)activate a DS
  *      timeline-change: react to the slider
- *      sort: sort the selected datasets (inputs)
+ *      sort: sort the selected datasets (cards)
  *      refresh: a auxiliary to re-set the view
  *      map: handle user-map interactions
  *
@@ -56,8 +56,8 @@ async function ea_overlord(msg) {
   case 'view': {
     await Promise.all(state.inputs.map(id => DS.get(id).turn(true, true)));
 
-    ea_inputs(state.inputs);
-    ea_inputs_sort(state.inputs);
+    ea_cards(state.inputs);
+    ea_cards_sort(state.inputs);
 
     window.dispatchEvent(new Event('resize'));
 
@@ -73,14 +73,14 @@ async function ea_overlord(msg) {
       state.inputs.unshift(ds.id);
     } else {
       state.inputs.splice(state.inputs.indexOf(ds.id), 1);
-      ds.input.remove();
+      ds.card.remove();
     }
 
     await ds.turn(ds.active, true);
     ds.raise();
 
     inputs = [...new Set(inputs)];
-    ea_inputs(inputs);
+    ea_cards(inputs);
     ea_state_set('inputs', inputs);
 
     // const rp = qs('#right-pane');
@@ -143,7 +143,7 @@ async function ea_overlord(msg) {
   }
 
   case 'sort': {
-    ea_inputs_sort(msg.target);
+    ea_cards_sort(msg.target);
     ea_state_set('inputs', msg.target);
 
     break;
@@ -217,9 +217,9 @@ async function ea_overlord_init(state) {
 
   const a = DS.all
         .map(d => {
-          // dsinput and dscontrols might have already been created by items_init
+          // dscard and dscontrols might have already been created by items_init
           //
-          d.input = d.input || new dsinput(d);
+          d.card = d.card || new dscard(d);
           d.controls = d.controls || new dscontrols(d);
           return d;
         })
@@ -231,7 +231,7 @@ async function ea_overlord_init(state) {
 
   ea_controls_sort_datasets(GEOGRAPHY.configuration.sort_datasets);
 
-  ea_inputs_init(a);
+  ea_cards_init(a);
   ea_timeline_init();
   ea_controls_init(state);
 

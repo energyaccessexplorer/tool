@@ -147,5 +147,5 @@ async function ea_datasets_polygons_csv_timeline(t) {
     console.warn(err);
   }
 
-  if (this.input) this.input.refresh();
+  if (this.card) this.card.refresh();
 };

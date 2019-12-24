@@ -70,7 +70,7 @@ build-a:
 		${SRC}/svg.js \
 		${SRC}/controls.js \
 		${SRC}/ui.js \
-		${SRC}/inputs.js \
+		${SRC}/cards.js \
 		${SRC}/indexes.js \
 		${SRC}/datasets.js \
 		${SRC}/mapbox.js \
@@ -127,7 +127,7 @@ build-t:
 		${SRC}/svg.js \
 		${SRC}/controls.js \
 		${SRC}/ui.js \
-		${SRC}/inputs.js \
+		${SRC}/cards.js \
 		${SRC}/datasets.js \
 		${SRC}/mapbox.js \
 		${SRC}/report.js \

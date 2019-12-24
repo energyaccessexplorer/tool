@@ -5,7 +5,7 @@
  *
  * Any communication between the app's components:
  *   - controls
- *   - inputs
+ *   - cards
  *   - map
  *   - datasets
  *   ... etc. should be done via this function.
@@ -18,7 +18,7 @@
  *      dataset: change params or (de)activate a DS
  *      index: change the currently shown index
  *      preset: change the preset
- *      sort: sort the selected datasets (inputs)
+ *      sort: sort the selected datasets (cards)
  *      refresh: a auxiliary to re-set the view
  *      map: handle user-map interactions
  *
@@ -76,8 +76,8 @@ async function ea_overlord(msg) {
       if (MAPBOX.getLayer('output-layer'))
         MAPBOX.setLayoutProperty('output-layer', 'visibility', 'none');
 
-      ea_inputs(state.inputs);
-      ea_inputs_sort(state.inputs);
+      ea_cards(state.inputs);
+      ea_cards_sort(state.inputs);
     }
 
     else {
@@ -105,7 +105,7 @@ async function ea_overlord(msg) {
     }
     else {
       inputs.splice(inputs.indexOf(ds.id), 1)
-      ds.input.remove();
+      ds.card.remove();
     }
 
     if (state.view === "outputs") {
@@ -128,7 +128,7 @@ async function ea_overlord(msg) {
     }
 
     inputs = [...new Set(inputs)];
-    ea_inputs(inputs);
+    ea_cards(inputs);
     ea_state_set('inputs', inputs);
 
     break;
@@ -154,7 +154,7 @@ async function ea_overlord(msg) {
 
     else if (state.view === "inputs") {
       await Promise.all(DS.all.map(d => d.turn(d.active, true)));
-      ea_inputs(inputs);
+      ea_cards(inputs);
     }
 
     ea_state_set('preset', msg.target);
@@ -165,7 +165,7 @@ async function ea_overlord(msg) {
 
   case 'sort': {
     if (state.view === "inputs") {
-      ea_inputs_sort(msg.target);
+      ea_cards_sort(msg.target);
       ea_state_set('inputs', msg.target);
     }
 
@@ -385,9 +385,9 @@ async function ea_overlord_init(state) {
 
   const a = DS.all
         .map(d => {
-          // dsinput and dscontrols might have already been created by items_init
+          // dscard and dscontrols might have already been created by items_init
           //
-          d.input = d.input || new dsinput(d);
+          d.card = d.card || new dscard(d);
           d.controls = d.controls || new dscontrols(d);
           return d;
         })
@@ -400,7 +400,7 @@ async function ea_overlord_init(state) {
   ea_controls_sort_datasets(GEOGRAPHY.configuration.sort_datasets);
 
   ea_views_init();
-  ea_inputs_init(a);
+  ea_cards_init(a);
   ea_indexes_init(state);
   ea_controls_init(state);
 

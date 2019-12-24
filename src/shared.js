@@ -13,7 +13,7 @@ function ea_layout_init() {
   const c = qs('#controls-wrapper', p);
   const r = qs('#right-pane', p);
 
-  const l = qs('#inputs-list', r);
+  const l = qs('#cards-list', r);
   const o = qs('#bottom-right-container', r);
   const d = qs('#drawer', r);
 

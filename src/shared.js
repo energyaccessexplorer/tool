@@ -219,11 +219,18 @@ function ea_state_sync() {
   for (let k in ea_state_params) {
     let v = url.searchParams.get(k);
 
+    let arr = !ea_state_params[k].length;
+
     if (!v || v === "") {
-      o[k] = ea_state_params[k];
+      o[k] = ea_state_params[k][0] || [];
     } else {
-      o[k] = ea_state_params[k] instanceof Array ? v.split(',') : v;
+      o[k] = arr ? v.split(',') : v;
     }
+
+    // Force the default if tampered with.
+    //
+    if (!arr && !ea_state_params[k].includes(v))
+      o[k] = ea_state_params[k][0];
 
     url.searchParams.set(k, o[k]);
   }
@@ -235,14 +242,12 @@ function ea_state_sync() {
 
 function ea_state_set(k,a) {
   const url = new URL(location);
-  const s = url.searchParams.get(k);
 
-  if (!a || s === "") {
-    url.searchParams.set(k, ea_state_params[k]);
-  } else {
-    const v = ea_state_params[k] instanceof Array ? a.join(',') : a;
-    url.searchParams.set(k,v);
-  }
+  let v = a || maybe(ea_state_params, k, 0) || "";
+
+  url.searchParams.set(k,v);
 
   history.replaceState(null, null, url);
+
+  return url.searchParams.get(k);
 };

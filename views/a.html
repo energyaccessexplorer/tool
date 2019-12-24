@@ -218,12 +218,18 @@ energy demand, low economic activity, and low access to infrastructure and resou
     window.ea_modal = new modal("ea-modal", {});
     window.ea_flash = new flash();
 
+    /*
+     * empty array means it'll be treated as an editable array
+     *
+     * non-empty array means that only those values are allowed (defaults [0])
+     */
+
     ea_state_params = {
-      'view': 'inputs',
-      'output': 'eai',
-      'inputs': [],
-      'preset': 'custom',
-      'pack': "all",
+      "view": ['inputs', 'outputs'],
+      "output": ['eai', 'ani', 'demand', 'supply'],
+      "inputs": [],
+      "preset": ['custom'],
+      "pack": [],
     };
 
     ea_overlord({

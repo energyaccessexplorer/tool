@@ -160,7 +160,7 @@ class dscontrols extends HTMLElement {
     ea_overlord({
       "type": "dataset",
       "target": this.ds,
-      "caller": "dscontrols restore defaults"
+      "caller": "dscontrols_restore_defaults"
     });
   };
 }

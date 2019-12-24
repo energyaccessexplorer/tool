@@ -30,10 +30,7 @@ function ea_inputs(list) {
   if (!empty) sortable('#inputs-list', 'disable');
 
   for (let i of ldc)
-    if (!inputs_list.contains(i)) { empty ? inputs_list.append(i) : inputs_list.prepend(i) }
-
-  for (let i of inputs_list.children)
-    if (!list.includes(i.ds.id)) inputs_list.removeChild(i);
+    if (!inputs_list.contains(i)) inputs_list.prepend(i)
 
   if (!empty) sortable('#inputs-list', 'enable');
 };

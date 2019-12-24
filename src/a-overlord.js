@@ -98,11 +98,15 @@ async function ea_overlord(msg) {
 
     ea_state_set('preset', null);
 
-    ds.active ?
-      (resort && state.inputs.unshift(ds.id)) :
-      state.inputs.splice(state.inputs.indexOf(ds.id), 1); // REMOVE()
+    let inputs = state.inputs;
 
-    const inputs = [...new Set(state.inputs)]; // UNIQUE()
+    if (ds.active) {
+      if (resort) inputs.unshift(ds.id);
+    }
+    else {
+      inputs.splice(inputs.indexOf(ds.id), 1)
+      ds.input.remove();
+    }
 
     if (state.view === "outputs") {
       await ds.turn(ds.active, false);
@@ -114,8 +118,6 @@ async function ea_overlord(msg) {
     else if (state.view === "inputs") {
       await ds.turn(ds.active, true);
 
-      ea_inputs(inputs);
-
       if (resort) ds.raise();
 
       ea_plot_active_analysis(state.output);
@@ -125,7 +127,8 @@ async function ea_overlord(msg) {
       throw `Argument Error: Overlord: Could not set the view ${state.view}`;
     }
 
-    ea_state_set('output');
+    inputs = [...new Set(inputs)];
+    ea_inputs(inputs);
     ea_state_set('inputs', inputs);
 
     break;

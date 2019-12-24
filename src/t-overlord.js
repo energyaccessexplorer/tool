@@ -67,18 +67,21 @@ async function ea_overlord(msg) {
   case 'dataset': {
     const ds = msg.target;
 
-    ds.active ?
-      state.inputs.unshift(ds.id) :
-      state.inputs.splice(state.inputs.indexOf(ds.id), 1); // REMOVE()
+    let inputs = state.inputs;
 
-    const inputs = [...new Set(state.inputs)]; // UNIQUE()
+    if (ds.active) {
+      state.inputs.unshift(ds.id);
+    } else {
+      state.inputs.splice(state.inputs.indexOf(ds.id), 1);
+      ds.input.remove();
+    }
 
     await ds.turn(ds.active, true);
     ds.raise();
 
+    inputs = [...new Set(inputs)];
+    ea_inputs(inputs);
     ea_state_set('inputs', inputs);
-
-    ea_inputs(state.inputs);
 
     // const rp = qs('#right-pane');
     // elem_empty(rp);

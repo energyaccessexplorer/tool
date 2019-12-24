@@ -70,13 +70,6 @@
       <div id="controls-wrapper">
         <div class="controls-select-container"></div>
 
-        <div class="controls-select-container" style="display: none;">
-          Select an Action:
-          <select id="controls-preset">
-            <option value="custom" selected></option>
-          </select>
-        </div>
-
         <div id="controls">
           <div id="controls-tabs"></div>
           <div id="controls-contents"></div>
@@ -191,12 +184,6 @@ energy demand, low economic activity, and low access to infrastructure and resou
       }
     };
 
-    ea_presets = {
-      "market": "Exploring new energy markets",
-      "planning": "Planning for electrification",
-      "investment": "Investing for impact"
-    };
-
     ea_branch_dict = {
       "sub-national": "Sub-national data",
       "demographics": "Demographics",
@@ -228,7 +215,6 @@ energy demand, low economic activity, and low access to infrastructure and resou
       "view": ['inputs', 'outputs'],
       "output": ['eai', 'ani', 'demand', 'supply'],
       "inputs": [],
-      "preset": ['custom'],
       "pack": [],
     };
 

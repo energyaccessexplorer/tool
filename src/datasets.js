@@ -72,40 +72,11 @@ class DS {
       c.parse = _ => ea_datasets_csv.call(this);
     }
 
-    this.presets = {};
-
-    if (maybe(o.presets, 'length')) {
-      o.presets.forEach(p => {
-        return this.presets[p.name] = {
-          "weight": p.weight,
-          "min": p.min,
-          "max": p.max
-        };
-      });
-    }
-
-    else if (maybe(o.category, 'presets', 'length')) {
-      o.category.presets.forEach(p => {
-        return this.presets[p.name] = {
-          "weight": p.weight,
-          "min": p.min,
-          "max": p.max
-        };
-      });
-    }
-
     __dstable[this.id] = this;
   };
 
-  init(active, preset) {
-    let presetsempty = Object.keys(this.presets).length === 0;
-    let p = this.presets[preset];
-
-    if (!presetsempty && p) {
-      this.weight = p.weight;
-    }
-
-    this.active = active || (!presetsempty && p);
+  init(active) {
+    this.active = active;
 
     this.datatype = (_ => {
       let t;
@@ -492,14 +463,13 @@ window.__dstable = {};
  *
  * @param "id" uuid
  * @param "inputs" string[] with DS.id's
- * @param "preset" string ("custom", "market", "investment", "planning")
  * @param "pack" string ("all" ...)
  * @param "callback" function to run with the boundaries
  *
  * returns DS[]
  */
 
-async function ea_datasets_init(id, inputs, preset, pack, callback) {
+async function ea_datasets_init(id, inputs, pack, callback) {
   let attrs = '*,raster_file(*),vectors_file(*),csv_file(*),category(*)';
 
   let bounds;
@@ -525,7 +495,7 @@ async function ea_datasets_init(id, inputs, preset, pack, callback) {
 
   await ea_api("datasets", { geography_id: `eq.${id}`, select: attrs, pack: `eq.${pack}` })
     .then(r => r.filter(e => ea_category_filter(e)))
-    .then(r => r.map(e => (new DS(e)).init(inputs.includes(e.category.name), preset)));
+    .then(r => r.map(e => (new DS(e)).init(inputs.includes(e.category.name))));
 
   // We need all the datasets to be initialised _before_ setting
   // mutant/collection attributes (order is never guaranteed)

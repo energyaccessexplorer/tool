@@ -170,10 +170,6 @@ customElements.define('ds-controls', dscontrols);
 function ea_controls_init(state) {
   ea_controls_selectlist();
 
-  // TODO: enable this later when we bring back presets
-  //
-  // ea_controls_presets_init(state.preset);
-
   const controls = qs('#controls-contents');
   const controls_tabs_el = qs('#controls-tabs');
   const tab_all = ce('div', "all", { id: 'controls-tab-all', class: 'controls-branch-tab up-title' });
@@ -397,37 +393,6 @@ cursor: pointer;
   qsa('.controls-select-container')[0].append(sl.el, info);
 
   set_default(sl.input);
-};
-
-function ea_controls_presets_init(v) {
-  const el = qs('#controls-preset');
-
-  Object.keys(ea_presets).forEach(k => el.append(ce('option', ea_presets[k], { value: k })));
-
-  el.value = v || "custom";
-  qs('option[value="custom"]', el).innerText = "Custom Analysis";
-
-  el.addEventListener('change', function(e) {
-    ea_overlord({
-      "type": "preset",
-      "target": this.value,
-      "caller": "ea_controls_presets_init change"
-    });
-  });
-};
-
-function ea_controls_presets_set(d, v) {
-  let p = d.presets[v];
-
-  d.active = !!p;
-
-  if (p) {
-    d.weight = p.weight;
-  } else {
-    d.weight = 2;
-  }
-
-  return d.active;
 };
 
 function ea_controls_sort_datasets(list) {

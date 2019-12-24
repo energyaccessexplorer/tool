@@ -17,7 +17,6 @@
  *      view: set the entire app between {outputs, inputs} views
  *      dataset: change params or (de)activate a DS
  *      index: change the currently shown index
- *      preset: change the preset
  *      sort: sort the selected datasets (cards)
  *      refresh: a auxiliary to re-set the view
  *      map: handle user-map interactions
@@ -32,7 +31,6 @@
  *      view: "inputs" or "outputs"
  *      dataset: a DS object
  *      index: "demand", "supply", "eai" or "ani"
- *      preset: "market", "planning", "investment", or "custom"
  *      sort: an array with the ID's of the active datasets
  *      refresh: "inputs" or "outputs"
  *      map: "click"
@@ -94,8 +92,6 @@ async function ea_overlord(msg) {
   case 'dataset': {
     const ds = msg.target;
 
-    ea_state_set('preset', null);
-
     let inputs = state.inputs;
 
     if (ds.active) {
@@ -148,28 +144,6 @@ async function ea_overlord(msg) {
   case 'index': {
     ea_state_set('output', msg.target);
     ea_plot_active_analysis(msg.target).then(raster => ea_indexes_graphs(raster));
-
-    break;
-  }
-
-  case 'preset': {
-    if (!msg.target) throw `Argument error: Overlord: Could not set ${msg.target} preset`;
-
-    const inputs = DS.all.filter(d => ea_controls_presets_set(d, msg.target)).map(d => d.id);
-
-    if (state.view === "outputs") {
-      ea_indexes_list(state);
-      await Promise.all(DS.all.map(d => d.turn(d.active, false)));
-      ea_plot_active_analysis(state.output);
-    }
-
-    else if (state.view === "inputs") {
-      await Promise.all(DS.all.map(d => d.turn(d.active, true)));
-      ea_cards(inputs);
-    }
-
-    ea_state_set('preset', msg.target);
-    ea_state_set('inputs', inputs);
 
     break;
   }
@@ -389,7 +363,7 @@ async function ea_overlord_init(state) {
   GEOGRAPHY = await ea_api("geographies", { id: `eq.${id}` }, { object: true });
   MAPBOX = mapbox_setup();
 
-  await ea_datasets_init(GEOGRAPHY.id, state.inputs, state.preset, state.pack, bounds => {
+  await ea_datasets_init(GEOGRAPHY.id, state.inputs, state.pack, bounds => {
     mapbox_fit(bounds);
     mapbox_change_theme(ea_settings.mapbox_theme);
   });

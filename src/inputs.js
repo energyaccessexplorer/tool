@@ -1,6 +1,6 @@
-function ea_inputs_init() {
-  const inputs = qs('#inputs-pane');
-  const list = qs('#inputs-list', inputs);
+function ea_inputs_init(arr) {
+  const pane = qs('#inputs-pane');
+  const list = qs('#inputs-list', pane);
 
   sortable('#inputs-list', {
     "items": 'ds-input',
@@ -16,6 +16,8 @@ function ea_inputs_init() {
           "caller": 'ea_inputs_init',
         })
       });
+
+  ea_inputs(arr.reverse());
 };
 
 function ea_inputs(list) {

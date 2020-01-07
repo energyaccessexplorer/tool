@@ -103,14 +103,3 @@
   padding-right: 0.5em;
   cursor: pointer;
 }
-
-#bottom-right-container {
-  background-color: white;
-  text-align: center;
-}
-
-#canvas-output-select {
-  border: none;
-  font-size: 1em;
-  background-color: white;
-}

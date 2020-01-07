@@ -92,6 +92,7 @@ build-a:
 		${CSS}/svg.css \
 		${CSS}/summary.css \
 		${CSS}/mobile.css \
+		${CSS}/cards.css \
 		> ${DIST}/a/main.css
 
 	@cp ${SRC}/browser.js ${DIST}/a/
@@ -146,6 +147,7 @@ build-t:
 		${CSS}/svg.css \
 		${CSS}/summary.css \
 		${CSS}/mobile.css \
+		${CSS}/cards.css \
 		> ${DIST}/t/main.css
 
 	@cp ${SRC}/browser.js ${DIST}/t/

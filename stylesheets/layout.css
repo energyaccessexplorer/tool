@@ -71,14 +71,6 @@ body {
   z-index: 1;
 }
 
-#cards-list {
-  margin: 0;
-  padding: 0;
-  list-style-type: none;
-  background-color: var(--the-white);
-  overflow-y: scroll;
-}
-
 #drawer {
   border-top: 1px solid lightgray;
   width: 100%;

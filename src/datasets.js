@@ -493,6 +493,8 @@ async function ea_datasets_init(id, inputs, pack, callback) {
       if (!(bounds = ds.vectors.bounds)) throw `'boundaries' dataset has now vectors.bounds`;
     });
 
+  pack = maybe(pack, 'length') ? pack : 'all';
+
   await ea_api("datasets", { geography_id: `eq.${id}`, select: attrs, pack: `eq.${pack}` })
     .then(r => r.filter(e => ea_category_filter(e)))
     .then(r => r.map(e => (new DS(e)).init(inputs.includes(e.category.name))));

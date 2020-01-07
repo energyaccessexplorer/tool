@@ -335,7 +335,7 @@
         flex-flow: row nowrap;
         justify-content: space-between;
 
-        flex: 1 0;
+        flex: 1;
         user-select: none;
       }
 
@@ -352,9 +352,19 @@
         padding: 0.5em;
       }
 
-      [name=name],
-      [name=opacity] {
+      [layout=title] {
         flex: 1;
+      }
+
+      [layout=info],
+      [layout=opacity] {
+        flex: 0 1 auto;
+        width: 24px;
+      }
+
+      [name=info] svg {
+        width: 18px;
+        margin-top: -2px;
       }
 
       [name=unit] {
@@ -420,8 +430,18 @@
 
     <main>
       <header>
-        <slot name="name"></slot> <slot name="unit"></slot>
-        <slot name="opacity"></slot>
+        <div layout="title">
+          <slot name="name"></slot>
+          <slot name="unit"></slot>
+        </div>
+
+        <div layout="opacity">
+          <slot name="opacity"></slot>
+        </div>
+
+        <div layout="info">
+          <slot name="info"></slot>
+        </div>
       </header>
 
       <content>

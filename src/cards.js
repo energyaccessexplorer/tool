@@ -63,6 +63,7 @@ class dscard extends HTMLElement {
 
     slot_populate.call(this, this.ds, {
       "svg": this.svg_el,
+      "info": this.info(),
       "opacity": this.opacity(),
       "handle": tmpl("#svg-handle"),
     });
@@ -110,6 +111,13 @@ class dscard extends HTMLElement {
     }
 
     it.append(ul);
+  };
+
+  info() {
+    const e = tmpl('#svg-info');
+    e.onclick = _ => ea_dataset_modal(this.ds);
+
+    return e;
   };
 
   opacity() {

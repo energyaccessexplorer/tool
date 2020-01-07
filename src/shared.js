@@ -29,7 +29,7 @@ function ea_layout_init() {
 
     b.style['height'] = (h - (MOBILE ? v.clientHeight : 0)) + "px";
 
-    if (i) i.style['height'] = h + "px" - d.clientHeight;
+    if (i) i.style['height'] = h - d.clientHeight + "px";
     if (l) l.style['height'] = h - ((o ? o.clientHeight : 0) + d.clientHeight + 4) + "px";
     if (t) b.style['height'] = m.style['height'] = h - t.clientHeight + "px";
   };

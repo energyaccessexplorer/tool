@@ -94,7 +94,7 @@
 }
 
 .controls-select-container .selectlist-input,
-input[list="controls-country"] {
+input[list="controls-geography"] {
   box-sizing: border-box;
   font-size: 1.7em;
   padding: 0.5em 1em;

@@ -372,10 +372,14 @@ async function ea_controls_selectlist() {
     return input;
   };
 
-  const sl = new selectlist("controls-country", data, {
+  const sl = new selectlist("controls-geography", data, {
     'change': function(e) {
-      const c = list.find(c => c.name === this.value);
-      if (c && id !== c.id) location = location.search.replace(new RegExp(`id=${UUID_REGEXP}`), `id=${c.id}`);
+      const c = list.find(x => x.name === this.value);
+
+      if (maybe(c, 'id') && id !== c.id) {
+        url.searchParams.set('id', c.id);
+        location = url;
+      }
     }
   });
 

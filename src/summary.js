@@ -121,11 +121,14 @@ async function ea_summary() {
   };
 
   const report = ce('button', "Export PDF Report", { class: 'big-green-button' });
-  report.onclick = ea_report;
+  report.onclick = ea_report_pdf;
+
+  const csv = ce('button', "Export CSV Report", { class: 'big-green-button' });
+  csv.onclick = _ => ea_report_csv(summary);
 
   content.append(graphs_tab, tables_tab);
 
-  const footer = ce('div', [switcher, report], { style: "text-align: center;" });
+  const footer = ce('div', [switcher, report, csv], { style: "text-align: center;" });
 
   ea_modal.set({
     header: "Snapshot",

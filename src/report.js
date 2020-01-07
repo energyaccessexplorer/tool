@@ -1,4 +1,4 @@
-function ea_report() {
+function ea_report_pdf() {
   const canvas = DS.get('population').raster.canvas;
   const canvas_ratio = canvas.width/canvas.height;
 
@@ -290,4 +290,34 @@ contact our team at`;
   } else {
     gen_pdf();
   };
+};
+
+function ea_report_csv(summary) {
+  const csv = [];
+
+  const datasets = DS.all
+        .filter(d => d.active)
+        .map(d => d.id + ":" + d.domain)
+        .join(";");
+
+  csv.push("# Selected datasets:min,max -- " + datasets);
+
+  csv.push([
+    "index",
+    "share",
+    ["low", "low-med", "medium", "med-high", "high"].toString()
+  ].join());
+
+  for (let i in summary) {
+    for (let s in summary[i]) {
+      csv.push([
+        i,
+        s,
+        summary[i][s]['amounts']
+      ].join());
+    }
+  }
+
+  const blob = new Blob([csv.join("\n") + "\n"], { type: "text/csv" });
+  fake_download(URL.createObjectURL(blob), `energyaccessexplorer-report.csv`);
 };

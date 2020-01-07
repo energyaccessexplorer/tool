@@ -13,6 +13,7 @@ function ea_layout_init() {
   const c = qs('#controls-wrapper', p);
   const r = qs('#right-pane', p);
 
+  const i = qs('#indexes-pane', r);
   const l = qs('#cards-list', r);
   const o = qs('#bottom-right-container', r);
   const d = qs('#drawer', r);
@@ -28,6 +29,7 @@ function ea_layout_init() {
 
     b.style['height'] = (h - (MOBILE ? v.clientHeight : 0)) + "px";
 
+    if (i) i.style['height'] = h + "px" - d.clientHeight;
     if (l) l.style['height'] = h - ((o ? o.clientHeight : 0) + d.clientHeight + 4) + "px";
     if (t) b.style['height'] = m.style['height'] = h - t.clientHeight + "px";
   };

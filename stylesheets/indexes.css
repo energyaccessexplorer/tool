@@ -1,4 +1,5 @@
 #indexes-pane {
+  background-color: var(--the-white);
   color: var(--the-color);
   fill: var(--the-color);
 }

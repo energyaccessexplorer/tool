@@ -1,3 +1,8 @@
+:root {
+  --right-pane-width: 24em;
+  --controls-pane-width: 32em;
+}
+
 body {
   overflow: hidden;
 }
@@ -16,7 +21,7 @@ body {
 }
 
 #controls-wrapper {
-  min-width: 32em;
+  min-width: var(--controls-pane-width);
   display: flex;
   flex-flow: column nowrap;
   flex: 0;
@@ -52,32 +57,31 @@ body {
 }
 
 #right-pane {
-  display: flex;
-  flex-flow: column nowrap;
-  width: 350px;
+  position: relative;
+  display: block;
+  width: var(--right-pane-width);
 }
 
 #indexes-pane,
 #cards-pane {
+  position: absolute;
+  width: inherit;
+  z-index: 0;
+
   display: flex;
   flex-flow: column nowrap;
-
-  flex: 1 0 auto;
-  width: 100%;
-}
-
-#indexes-list,
-#cards-list {
-  z-index: 1;
 }
 
 #drawer {
   border-top: 1px solid lightgray;
-  width: 100%;
+  width: inherit;
   box-sizing: border-box;
   display: flex;
   justify-content: space-around;
   background-color: #F8F8F8;
+  position: absolute;
+  bottom: 0;
+  z-index: 2;
 }
 
 #drawer > div {

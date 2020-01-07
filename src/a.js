@@ -126,8 +126,8 @@ function table_data(dict, prop, event) {
 };
 
 function right_pane(t) {
-  qs('#cards-pane').style.display = (t === 'inputs') ? '' : 'none';
-  qs('#indexes-pane').style.display = (t === 'outputs') ? '' : 'none';
+  qs('#cards-pane').style['z-index'] = (t === 'inputs') ? 1 : 0;
+  qs('#indexes-pane').style['z-index'] = (t === 'outputs') ? 1 : 0;
 };
 
 function ea_nanny_init(state) {

@@ -11,6 +11,9 @@ class dscontrols extends HTMLElement {
     this.content = qs('content', this);
     this.spinner = qs('.loading', this);
 
+    this.manual_min = qs('.manual-controls input[bind=min]', this);
+    this.manual_max = qs('.manual-controls input[bind=max]', this);
+
     this.show_advanced = false;
 
     this.init();
@@ -42,6 +45,8 @@ class dscontrols extends HTMLElement {
     }
 
     this.range_group = ea_controls_range.call(this.ds, { ramp: lr, steps: steps, single: c.range === 'single' });
+
+    this.manual_setup();
 
     if (this.ds.items)
       this.collection_list = ea_controls_collection_list.call(this.ds);
@@ -163,6 +168,57 @@ class dscontrols extends HTMLElement {
       "caller": "dscontrols_restore_defaults"
     });
   };
+
+  manual_setup() {
+    if (!this.manual_min || !this.manual_max) return;
+
+    this.manual_min.value = this.ds.domain[0];
+    this.manual_max.value = this.ds.domain[1];
+
+    this.manual_min.onchange = e => {
+      const v = +e.target.value;
+
+      if (v > this.ds.domain[1]) {
+        e.target.value = v = this.ds.domain[1];
+      }
+
+      this.ds.domain[0] = v;
+      this.range_group.change(...this.ds.domain);
+
+      ea_overlord({
+        "type": "dataset",
+        "target": this.ds,
+        "caller": "ea_controls manual",
+      });
+    };
+
+    this.manual_max.onchange = e => {
+      let v = +e.target.value;
+
+      if (v < this.ds.domain[0]) {
+        e.target.value = v = this.ds.domain[0];
+      }
+
+      this.ds.domain[1] = v;
+      this.range_group.change(...this.ds.domain);
+
+      ea_overlord({
+        "type": "dataset",
+        "target": this.ds,
+        "caller": "ea_controls manual",
+      });
+    };
+
+    switch (maybe(this.ds, 'category', 'controls', 'range')) {
+    case 'single':
+      this.manual_min.setAttribute('disabled', true);
+      break;
+
+    case 'double':
+    default:
+      break;
+    }
+  };
 }
 
 customElements.define('ds-controls', dscontrols);
@@ -261,7 +317,11 @@ function ea_controls_range(opts = {}) {
 
   const update = (x,i,el) => {
     el.innerText = (x * (this.raster.config.factor || 1)).toFixed(this.raster.config.precision || 0);
-    this.domain[i] = x;
+
+    const man = maybe(this.controls, i ? 'manual_min' : 'manual_max');
+    if (man) man.value = x;
+
+    this.domain[i] = parseFloat(x);
   };
 
   const v1 = ce('div', null, { bind: "v1" });

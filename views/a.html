@@ -279,6 +279,18 @@ energy demand, low economic activity, and low access to infrastructure and resou
         padding: 0.7em;
       }
 
+      .manual-controls {
+        display: none;
+        justify-content: space-around;
+        border-top: solid 1px #dfdfdf;
+        padding-top: 1em;
+      }
+
+      .manual-controls input {
+        font-family: monospace;
+        width: 6em;
+      }
+
       .advanced-controls {
         display: none;
         border-top: solid 1px #dfdfdf;
@@ -375,6 +387,11 @@ energy demand, low economic activity, and low access to infrastructure and resou
 
         <div class="group range-group">
           <slot name="range-slider"></slot>
+        </div>
+
+        <div class="group manual-controls">
+          min: <input type="number" bind="min">
+          max: <input type="number" bind="max">
         </div>
 
         <div class="advanced-controls">

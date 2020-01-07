@@ -234,6 +234,11 @@ function ea_controls_dropdown() {
     "action": _ => this.reset_defaults()
   });
 
+  dropdownlist.push({
+    "content": "Set values manually",
+    "action": _ => qs('.manual-controls', this).style.display = 'flex'
+  });
+
   // Enable this later when we are ready to let the users download the
   // original file.
   //

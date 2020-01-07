@@ -46,7 +46,7 @@
 
 async function ea_overlord(msg) {
   if (!msg) throw "Argument Error: Overlord: I have nothing to do!";
-  if (typeof msg.caller === 'undefined' || !msg.caller) throw "Argument Error: Overlord: Who is the caller?";
+  if (!msg.caller) throw "Argument Error: Overlord: Who is the caller?";
 
   const state = ea_state_sync();
 

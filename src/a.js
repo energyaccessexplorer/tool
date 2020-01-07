@@ -402,7 +402,7 @@ function ea_overlord_map_click(state, msg) {
       }
     );
 
-    if (o && o.value !== null) {
+    if (typeof maybe(o, 'value') === 'number') {
       let f = d3.scaleQuantize().domain([0,1]).range(["Low", "Low-Medium", "Medium", "Medium-High", "High"]);
 
       let td = table_data([{
@@ -469,7 +469,8 @@ function ea_overlord_map_click(state, msg) {
         }
       );
 
-      if (rc && rc.value !== null && rc.value !== t.raster.nodata) {
+      if (typeof maybe(rc, 'value') === 'number' &&
+          rc.value !== t.raster.nodata) {
         v = rc.value;
 
         if (t.raster.config) v = v * t.raster.config.factor;

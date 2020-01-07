@@ -143,7 +143,7 @@ function mapbox_change_theme(theme) {
   function set_output() {
     const c = MAPBOX.getStyle().layers.find(l => l.type === 'symbol');
 
-    MAPBOX.first_symbol = ((c && c.id) || undefined);
+    MAPBOX.first_symbol = maybe(c, 'id');
 
     ea_overlord({
       type: "refresh",

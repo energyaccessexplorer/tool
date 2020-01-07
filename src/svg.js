@@ -204,7 +204,7 @@ function ea_svg_pie(data, outer, inner, colors, inner_text, parse) {
         .sort(null);
 
   const arc = d3.arc()
-        .innerRadius(((inner === null || inner === undefined || inner === false) ? outer - (outer/4) : inner))
+        .innerRadius(typeof inner !== 'number' ? outer - (outer/4) : inner)
         .outerRadius(outer - (outer/15));
 
   const svg = d3.create("svg")

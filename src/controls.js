@@ -66,8 +66,8 @@ class dscontrols extends HTMLElement {
       "checkbox": this.checkbox.svg,
       "collection-list": this.collection_list,
       "mutant-options": this.mutant_options,
-      "range-slider": this.range_group && this.range_group.el,
-      "weight-slider": this.weight_group && this.weight_group.el,
+      "range-slider": maybe(this.range_group, 'el'),
+      "weight-slider": maybe(this.weight_group, 'el'),
     });
 
     if (!this.weight_group && !this.range_group) this.content.remove();

@@ -130,12 +130,6 @@ async function ea_overlord(msg) {
   }
 
   case 'timeline-change': {
-    const dsid = state.inputs[0];
-    const ds = DS.get(dsid);
-
-    // const datasets = DS.all.filter(d => d.active && d.category.timeline && d.csv.data);
-    // if (TIMELINE_BARS) TIMELINE_BARS.setvalues(ea_timeline_bars_prepare(datasets));
-
     DS.all.forEach(d => {
       if (!d.category.timeline || !d.vectors.features) return;
       ea_datasets_polygons_csv_timeline.call(d, msg.target);

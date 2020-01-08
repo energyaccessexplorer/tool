@@ -27,7 +27,7 @@ function ea_svg_checkbox(init, callback) {
     .append('feDropShadow')
     .attr('dx', 0.1)
     .attr('dy', 0.1)
-    .attr('stdDeviation', 0.8)
+    .attr('stdDeviation', 0.8);
 
   gutter
     .attr('x', 0)
@@ -95,7 +95,7 @@ function ea_svg_switch(init, callback, opts = {}) {
     .append('feDropShadow')
     .attr('dx', 0.2)
     .attr('dy', 0.2)
-    .attr('stdDeviation', 0.8)
+    .attr('stdDeviation', 0.8);
 
   gutter
     .attr('stroke', 'none')
@@ -604,7 +604,7 @@ function ea_svg_multiline(opts) {
   const yAxis = g => g
         .attr("transform", `translate(${margin.left},0)`)
         .call(d3.axisLeft(y))
-        .call(g => g.select(".domain").remove())
+        .call(g => g.select(".domain").remove());
 
   const line = d3.line()
         .defined(d => !isNaN(d))
@@ -649,7 +649,7 @@ function ea_svg_multiline(opts) {
         .style("-webkit-tap-highlight-color", "transparent")
         .on("touchmove", moved)
         .on("touchstart", entered)
-        .on("touchend", left)
+        .on("touchend", left);
     }
     else {
       svg

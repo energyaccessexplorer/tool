@@ -286,7 +286,7 @@ function ea_controls_checkbox() {
 };
 
 function ea_controls_mutant_options() {
-  const container = ce('div', null, { class: 'control-option' })
+  const container = ce('div', null, { class: 'control-option' });
   const select = ce('select');
 
   this.hosts.forEach(d => select.append(ce('option', d.name, { value: d.id })));
@@ -449,7 +449,6 @@ async function ea_controls_selectlist() {
   info.style = `
 display: inline-block;
 transform: scale(1.2);
-paddin: 10px;
 width: 50px;
 cursor: pointer;
 `;

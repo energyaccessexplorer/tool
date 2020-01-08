@@ -84,7 +84,7 @@ async function ea_summary() {
 
   const s = ea_analysis_colorscale.stops;
 
-  const lowmedhigh = i => ["low", "low-med", "medium", "med-high", "high"][i]
+  const lowmedhigh = i => ["low", "low-med", "medium", "med-high", "high"][i];
 
   const tables_tab = ce('div', null, { class: 'tab hidden' });
 

@@ -37,7 +37,7 @@ async function ea_api_parse(response, options = {}) {
       localStorage.removeItem('token');
 
       if (body.message === 'JWT expired') {
-        type = null
+        type = null;
         title = "Session expired";
         message = "Log in on the other tab.";
 

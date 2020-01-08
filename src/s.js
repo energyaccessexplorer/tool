@@ -9,7 +9,7 @@ function ea_select_topo_flag(c) {
     'y': 0,
     'height': 30,
     'aspect-ratio': "xMidYMid slice"
-  }
+  };
 
   const svg = d3.select(document.createElementNS("http://www.w3.org/2000/svg", "svg"))
         .attr('width',  width)
@@ -106,7 +106,7 @@ function ea_select_setup() {
         const d = ce('div', ce('h2', co.name, { class: 'country-name' }), { class: 'country-item', ripple: "" });
         d.onclick = _ => setTimeout(_ => ea_select_geography(co), 350);
 
-        d.append(ea_select_topo_flag(co))
+        d.append(ea_select_topo_flag(co));
         playground.append(d);
       }
 

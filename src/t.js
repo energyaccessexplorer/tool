@@ -42,7 +42,7 @@ function ea_timeline_lines_draw(datasets, district) {
       return {
         values: TIMELINE_DATES.map(k => (r[k] === "" ? undefined : +r[k])),
         name: c.id,
-        color: c.csv.config.color_stops.slice(-1)
+        color: c.timeline.color_stops.slice(-1)
       };
     }));
   }, []);
@@ -110,7 +110,7 @@ async function ea_datasets_polygons_csv_timeline(t) {
   await until(_ => this.csv.data);
 
   const data = this.csv.data;
-  const cs = this.csv.config.color_stops;
+  const cs = this.timeline.color_stops;
 
   if (!data) warn(this.id, "has no csv.data");
 
@@ -183,7 +183,7 @@ async function ea_overlord_dataset(state, msg) {
   ea_state_set('inputs', inputs);
 
   if (state.inputs.length) {
-    const datasets = DS.all.filter(d => d.active && d.category.timeline && d.csv.data);
+    const datasets = DS.all.filter(d => d.active && d.timeline && d.csv.data);
 
     if (TIMELINE_DISTRICT)
       ea_timeline_lines_draw(datasets, TIMELINE_DISTRICT);
@@ -210,8 +210,7 @@ function ea_overlord_map_click(state, msg) {
     if (!et) return;
 
     if (et.source === i) {
-      const datasets = DS.all.filter(d => d.active && d.category.timeline && d.csv.data);
-
+      const datasets = DS.all.filter(d => d.active && d.timeline && d.csv.data);
       ea_timeline_lines_draw(datasets, (TIMELINE_DISTRICT = et.properties['District']));
     }
   }

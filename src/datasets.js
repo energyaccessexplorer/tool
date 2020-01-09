@@ -11,17 +11,19 @@ class DS {
 
     this.config = config;
 
-    this.analysis = o.category.analysis || {};
+    this.analysis = o.category.analysis;
+
+    this.weight = maybe(this, 'analysis', 'weight') || 2;
+
+    this.timeline = o.category.timeline;
 
     this.name = config.name_override || o.category.name_long;
 
     this.indexname = maybe(o.category, 'controls', 'path', 0);
 
-    this.weight = this.analysis.weight || 2;
-
     this.metadata = o.metadata;
 
-    this.invert = config.invert_override || maybe(o.category.analysis, 'invert');
+    this.invert = config.invert_override || maybe(o.analysis, 'invert');
 
     this.mutant = !!config.mutant;
 
@@ -767,7 +769,7 @@ function ea_datasets_polygons() {
     .then(_ => {
       const v = this.vectors.config;
 
-      if (this.category.timeline) {
+      if (this.timeline) {
         ea_datasets_polygons_csv_timeline.call(this);
       }
 
@@ -786,7 +788,7 @@ function ea_datasets_polygons() {
           "visibility": "none",
         },
         "paint": {
-          "fill-color": (this.parent || this.category.timeline) ? ['get', '__color'] : v.fill,
+          "fill-color": (this.parent || this.timeline) ? ['get', '__color'] : v.fill,
           "fill-outline-color": v.stroke,
           "fill-opacity": [ "case", [ "boolean", [ "feature-state", "hover" ], false ], 0.7 * v.opacity, 1 * v.opacity]
         },

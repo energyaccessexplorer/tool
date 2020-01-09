@@ -199,7 +199,7 @@ class dscard extends HTMLElement {
         d.append(r);
       }
 
-      else if (ds.category.timeline) {
+      else if (ds.timeline) {
         const r = tmpl("#ramp");
 
         r.append(
@@ -209,7 +209,7 @@ class dscard extends HTMLElement {
         );
 
         e.append(
-          ea_svg_color_steps(ds.csv.config.color_stops), r,
+          ea_svg_color_steps(ds.timeline.color_stops), r,
           ce('div', null, { style: "display: inline-block; width: 64px; height: 5px; background-color: rgba(155,155,155,1); margin: 15px 15px 0 0;" }),
           ce('div', "Not Available", { style: "display: inline-block; font-size: x-small;" })
         );

@@ -19,7 +19,9 @@ class DS {
 
     this.name = config.name_override || o.category.name_long;
 
-    this.indexname = maybe(o.category, 'controls', 'path', 0);
+    this.path = config.controls_path || maybe(o.category, 'controls', 'path');
+
+    this.indexname = maybe(this.path, 0);
 
     this.metadata = o.metadata;
 

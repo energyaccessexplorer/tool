@@ -101,7 +101,7 @@ function ea_controls_dropdown() {
 };
 
 function ea_category_filter(d) {
-  return d.category.timeline && d.category_name !== 'boundaries';
+  return d.category.name !== 'boundaries';
 };
 
 async function ea_datasets_polygons_csv_timeline(t) {

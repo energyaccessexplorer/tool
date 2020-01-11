@@ -29,6 +29,14 @@ class DS {
 
     this.items = !!config.collection ? [] : undefined;
 
+    if (this.timeline) {
+      const b = DS.get('boundaries');
+      const v = this.vectors = JSON.parse(JSON.stringify(b.vectors));
+
+      v.endpoint = b.vectors.endpoint;
+      v.parse = x => ea_datasets_polygons.call(x || this);
+    }
+
     if (o.raster_file) {
       const r = this.raster = {};
 
@@ -83,7 +91,10 @@ class DS {
     this.datatype = (_ => {
       let t;
 
+      // careful with the order
+      //
       if (this.mutant) t = null;
+      else if (this.timeline) t = "timeline";
       else if (this.vectors) t = this.vectors.config.shape_type;
       else if (this.parent) t = this.parent.datatype;
       else if (this.raster) t = "raster";
@@ -93,6 +104,12 @@ class DS {
     })();
 
     switch (this.datatype) {
+    case 'timeline':
+      this.colorscale = ea_colorscale({
+        stops: this.timeline.color_stops
+      });
+      break;
+
     case 'raster':
       this.download = this.raster.endpoint;
 

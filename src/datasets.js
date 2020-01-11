@@ -492,7 +492,7 @@ async function ea_datasets_init(id, inputs, pack, callback) {
 
       GEOGRAPHY.vectors_id_key = ds.config.id_key;
 
-      if (!(bounds = ds.vectors.bounds)) throw `'boundaries' dataset has now vectors.bounds`;
+      if (!(bounds = ds.vectors.bounds)) throw `'boundaries' dataset has no vectors.bounds`;
     });
 
   pack = maybe(pack, 'length') ? pack : 'all';
@@ -532,7 +532,7 @@ This is not fatal. Dataset disabled.`
 
   this.disable();
 
-  throw Error(`"Dataset ${this.category_name} disabled. Failed to get ${format}.`);
+  throw Error(`"Dataset ${this.name} disabled. Failed to get ${format}.`);
 };
 
 function ea_datasets_csv() {

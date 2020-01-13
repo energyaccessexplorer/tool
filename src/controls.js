@@ -172,14 +172,14 @@ class dscontrols extends HTMLElement {
   manual_setup() {
     if (!this.manual_min || !this.manual_max) return;
 
-    this.manual_min.value = this.ds.domain[0];
-    this.manual_max.value = this.ds.domain[1];
+    this.manual_min.value = maybe(this.ds, 'domain', 0) || "";
+    this.manual_max.value = maybe(this.ds, 'domain', 1) || "";
 
     this.manual_min.onchange = e => {
-      const v = +e.target.value;
+      let v = +e.target.value;
 
       if (v > this.ds.domain[1]) {
-        e.target.value = v = this.ds.domain[1];
+        e.target.value = this.ds.domain[1];
       }
 
       this.ds.domain[0] = v;
@@ -196,7 +196,7 @@ class dscontrols extends HTMLElement {
       let v = +e.target.value;
 
       if (v < this.ds.domain[0]) {
-        e.target.value = v = this.ds.domain[0];
+        e.target.value = this.ds.domain[0];
       }
 
       this.ds.domain[1] = v;
@@ -318,7 +318,7 @@ function ea_controls_range(opts = {}) {
   const update = (x,i,el) => {
     el.innerText = (x * (this.raster.config.factor || 1)).toFixed(this.raster.config.precision || 0);
 
-    const man = maybe(this.controls, i ? 'manual_min' : 'manual_max');
+    const man = maybe(this.controls, i ? 'manual_max' : 'manual_min');
     if (man) man.value = x;
 
     this.domain[i] = parseFloat(x);

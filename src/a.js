@@ -71,7 +71,7 @@ function ea_list_filter_type(type) {
   else
     idxn = d => d.id === type;
 
-  return DS.all.filter(d => d.active && idxn(d));
+  return DS.all.filter(d => d.active && d.raster && idxn(d));
 };
 
 /*

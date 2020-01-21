@@ -1,6 +1,6 @@
 class DS {
   constructor(o) {
-    this.id = o.category.name;
+    this.id = o.name || o.category.name;
 
     this.dataset_id = o.id;
 
@@ -17,7 +17,7 @@ class DS {
 
     this.timeline = o.category.timeline;
 
-    this.name = config.name_override || o.category.name_long;
+    this.name = o.name_long || o.name || o.category.name_long || o.category.name;
 
     this.path = config.controls_path || maybe(o.category, 'controls', 'path');
 

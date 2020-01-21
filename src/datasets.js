@@ -814,5 +814,8 @@ function ea_datasets_polygons() {
       });
 
       mapbox_hover(this.id);
+
+      if (this.timeline)
+        mapbox_dblclick(this.id);
     });
 };

@@ -126,6 +126,7 @@ function mapbox_setup() {
 
   mb.zoomTo(mb.getZoom() * 0.95, {duration: 0});
 
+  mb.doubleClickZoom.disable();
   mb.dragRotate.disable();
   mb.touchZoomRotate.disableRotation();
 
@@ -207,22 +208,15 @@ background-color: transparent;
   }
 };
 
-function mapbox_fit(bounds) {
+function mapbox_fit(bounds, animate = false) {
   const rect = qs('#maparea').getBoundingClientRect();
 
   const hp = (rect.width > rect.height) ? 0 : (rect.width * 0.1);
   const vp = (rect.height > rect.width) ? 0 : (rect.height * 0.1);
 
-  MAPBOX.fitBounds(bounds, { animate: false, padding: { top: vp, bottom: vp, left: hp, right: hp } });
+  MAPBOX.fitBounds(bounds, { animate: animate, padding: { top: vp, bottom: vp, left: hp, right: hp } });
 
-  const b = bounds;
-
-  const l = b[0];
-  const r = b[2];
-  const d = b[1];
-  const u = b[3];
-
-  MAPBOX.coords = [[l,u], [r,u], [r,d], [l,d]];
+  return bounds;
 };
 
 function mapbox_hover(id) {
@@ -241,5 +235,13 @@ function mapbox_hover(id) {
   MAPBOX.on('mouseleave', id, function() {
     if (t) MAPBOX.setFeatureState({ source: id, id: t }, { hover: false });
     t = null;
+  });
+};
+
+function mapbox_dblclick(id) {
+  MAPBOX.on('dblclick', id, function(e) {
+    if (e.features.length > 0) {
+      mapbox_fit(geojsonExtent(e.features[0]), true);
+    }
   });
 };

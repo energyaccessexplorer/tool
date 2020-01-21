@@ -63,7 +63,15 @@ async function ea_overlord(msg) {
     MAPBOX = mapbox_setup();
 
     await ea_datasets_init(GEOGRAPHY.id, state.inputs, state.pack, bounds => {
-      mapbox_fit(bounds);
+      const b = mapbox_fit(bounds);
+
+      const l = b[0];
+      const r = b[2];
+      const d = b[1];
+      const u = b[3];
+
+      MAPBOX.coords = [[l,u], [r,u], [r,d], [l,d]];
+
       mapbox_change_theme(ea_settings.mapbox_theme);
     });
 

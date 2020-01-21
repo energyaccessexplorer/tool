@@ -516,7 +516,12 @@ async function ea_datasets_init(id, inputs, pack, callback) {
 
   pack = maybe(pack, 'length') ? pack : 'all';
 
-  await ea_api("datasets", { geography_id: `eq.${id}`, select: attrs, pack: `eq.${pack}` })
+  await ea_api("datasets", {
+    geography_id: `eq.${id}`,
+    select: attrs,
+    pack: `eq.${pack}`,
+    online: "eq.true"
+  })
     .then(r => r.filter(e => ea_category_filter(e)))
     .then(r => r.map(e => (new DS(e)).init(inputs.includes(e.category.name))));
 

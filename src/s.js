@@ -61,7 +61,11 @@ function ea_select_topo_flag(c) {
 };
 
 async function ea_select_geography(c) {
-  const coll = await ea_api("geographies", { online: "eq.true", datasets_count: "gt.0", parent_id: `eq.${c.id}` });
+  const coll = await ea_api("geographies", {
+    online: "eq.true",
+    datasets_count: "gt.0",
+    parent_id: `eq.${c.id}`
+  });
 
   const data = {};
   for (let x of coll) data[x.name] = x.name;

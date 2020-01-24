@@ -93,7 +93,6 @@ class dscontrols extends HTMLElement {
     const path = ds.path;
 
     if (!path.length) return;
-    if (ds.children) return;
 
     const controls = qs('#controls-contents');
     const controls_tabs_el = qs('#controls-tabs');

@@ -7,7 +7,6 @@ class DS {
     this.category = o.category;
 
     let config = o.configuration || {};
-    config.children = config.children || {};
 
     this.config = config;
 
@@ -46,9 +45,6 @@ class DS {
 
       r.endpoint = o.raster_file.endpoint;
       r.parse = _ => ea_datasets_tiff.call(this);
-
-      if (this.analysis.scale === 'multi-key-delta')
-        this.children = [];
     }
 
     if (o.vectors_file) {
@@ -98,7 +94,6 @@ class DS {
       if (this.mutant) t = null;
       else if (this.timeline) t = "timeline";
       else if (this.vectors) t = this.vectors.config.shape_type;
-      else if (this.parent) t = this.parent.datatype;
       else if (this.raster) t = "raster";
       else if (this.csv) t = "table";
 
@@ -127,12 +122,6 @@ class DS {
     case 'points':
     case 'lines':
       this.download = this.vectors.endpoint;
-
-      if (this.id.match('^boundaries')) {
-        this.colorscale = ea_colorscale({
-          stops: this.vectors.config.specs.color_stops
-        });
-      }
 
       break;
 
@@ -240,69 +229,6 @@ class DS {
     }
   };
 
-  async children_init(inputs) {
-    await Promise.all([
-      this.csv ? this.csv.parse() : null,
-      this.raster ? this.raster.parse() : null,
-      this.vectors ? this.vectors.parse() : null,
-    ]);
-
-    const features_json = JSON.stringify(this.vectors.features);
-    const children = this.config.children.datasets;
-
-    this.table = ea_datasets_table.call(this, this.vectors.features.features);
-
-    for (let v in children) {
-      // we can do this because category is plain JSON, not javascript.
-      //
-      let cat = JSON.parse(JSON.stringify(this.category));
-      cat.name = this.id + "-" + v;
-      cat.name_long = children[v];
-
-      let d = new DS({ category: cat });
-
-      d.child_id = v;
-      d.parent = this;
-      d.config = this.config;
-      d.metadata = this.metadata;
-
-      Object.assign(d.raster = {}, this.raster);
-      d.analysis.scale = "key-delta";
-
-      Object.assign(d.vectors = {}, this.vectors);
-      d.vectors.features = JSON.parse(features_json);
-      d.vectors.parse = _ => this.vectors.parse(d);
-
-      Object.assign(d.csv = {}, this.csv);
-
-      await d.init(inputs.includes(d.id), null);
-
-      this.children.push(d);
-
-      d.child_init();
-    }
-  };
-
-  async child_init() {
-    let id = this.child_id;
-    let cs = this.vectors.config.specs.color_stops;
-
-    let max = Math.max.apply(null, this.vectors.features.features.map(f => f.properties[id]));
-    max = (max <= 1) ? 1 : 100;
-
-    const d = Array(cs.length).fill(0).map((x,i) => (0 + i * (max/(cs.length-1))));
-    const s = d3.scaleLinear().domain(d).range(cs);
-
-    const fs = this.vectors.features.features;
-    for (let i = 0; i < fs.length; i += 1)
-      fs[i].properties.__color = s(fs[i].properties[id])
-
-    this.table = {};
-
-    for (let k in this.parent.table)
-      this.table[k] = this.parent.table[k][id] * (max === 100 ? 1 : 100);
-  };
-
   /*
    * analysis_fn
    *
@@ -327,12 +253,8 @@ class DS {
     const v = this.analysis.scale;
     const r = ((undefined !== this.invert && this.invert.includes(i)) ? [1,0] : [0,1]);
 
-    switch (v) {
-    case 'multi-key-delta': {
-      // the children will be key-deltas
-      break;
-    }
 
+    switch (v) {
     case 'key-delta': {
       if (!this.table) return (s = x => 1);
 
@@ -531,11 +453,6 @@ async function ea_datasets_init(id, inputs, pack, callback) {
   DS.all.filter(d => d.mutant).forEach(d => d.mutant_init());
   DS.all.filter(d => d.items).forEach(d => d.items_init());
 
-  // parents generate new children datasets. We need to wait for these since
-  // the next step is to syncronise the entire thing.
-  //
-  await Promise.all(DS.all.filter(d => d.children).map(d => d.children_init(inputs)));
-
   callback(bounds);
 };
 
@@ -566,25 +483,6 @@ function ea_datasets_csv() {
     .then(d => d.text())
     .then(r => d3.csvParse(r))
     .then(d => this.csv.data = d);
-};
-
-function ea_datasets_table(sources) {
-  // TODO: this is features-centric, we should be able to get these values
-  //       from the CSV
-  //
-  const table = {};
-  const keys = Object.keys(this.config.children.datasets);
-
-  for (let i = 0; i < sources.length; i += 1) {
-    let o = {};
-    let f = sources[i];
-
-    keys.forEach(k => o[k] = +f.properties[k]);
-
-    table[+f.properties[GEOGRAPHY.vectors_id_key]] = o;
-  }
-
-  return table;
 };
 
 function ea_datasets_tiff() {
@@ -812,7 +710,7 @@ function ea_datasets_polygons() {
           "visibility": "none",
         },
         "paint": {
-          "fill-color": (this.parent || this.timeline) ? ['get', '__color'] : v.fill,
+          "fill-color": this.timeline ? ['get', '__color'] : v.fill,
           "fill-outline-color": v.stroke,
           "fill-opacity": [ "case", [ "boolean", [ "feature-state", "hover" ], false ], 0.7 * v.opacity, 1 * v.opacity]
         },

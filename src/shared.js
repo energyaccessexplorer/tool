@@ -255,3 +255,7 @@ function ea_state_set(k,a) {
 
   return url.searchParams.get(k);
 };
+
+function has(element, attr) {
+  return !(typeof element[attr] === 'undefined' || element[attr] === null);
+};

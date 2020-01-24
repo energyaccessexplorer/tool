@@ -174,12 +174,12 @@ async function ea_datasets_polygons_csv_timeline(t) {
     k: t || TIMELINE_CURRENT_DATE || TIMELINE_DATES[TIMELINE_DATES.length - 1],
 
     minfn: (data) => {
-      if (undefined === data.min)
+      if (has(data, 'min'))
         data.min = d3.min([].concat(...TIMELINE_DATES.map(d => data.map(r => +r[d]))));
     },
 
     maxfn: (data) => {
-      if (undefined === data.max)
+      if (has(data, 'max'))
         data.max = d3.max([].concat(...TIMELINE_DATES.map(d => data.map(r => +r[d]))));
     }
   }

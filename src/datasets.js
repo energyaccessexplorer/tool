@@ -251,8 +251,7 @@ class DS {
     const d = (dom && [dom.min, dom.max]) || [0,1];
     const t = this.domain;
     const v = this.analysis.scale;
-    const r = ((undefined !== this.invert && this.invert.includes(i)) ? [1,0] : [0,1]);
-
+    const r = this.invert && this.invert.includes(i) ? [1,0] : [0,1];
 
     switch (v) {
     case 'key-delta': {
@@ -638,12 +637,12 @@ function ea_datasets_lines() {
               c[s.key] = vs ? vs : m[1];
               if (c.params.indexOf(s.key) < 0) c.params.push(s.key);
 
-              if (undefined !== s['stroke']) {
+              if (has(s, 'stroke')) {
                 fs[i].properties['__color'] = s['stroke'];
                 c['stroke'] = s['stroke'];
               }
 
-              if (undefined !== s['stroke-width']) {
+              if (has(s, 'stroke-width')) {
                 fs[i].properties['__width'] = s['stroke-width'];
                 c['stroke-width'] = s['stroke-width'];
               }

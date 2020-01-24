@@ -668,7 +668,7 @@ function ea_svg_multiline(opts) {
       const i = xm - data.dates[i0] > data.dates[i1] - xm ? i1 : i0;
       const s = data.series.reduce((a, b) => Math.abs(a.values[i] - ym) < Math.abs(b.values[i] - ym) ? a : b, []);
 
-      if (undefined === data.dates[i] || undefined === s.values[i]) return;
+      if (!(has(data.dates, i) && has(s.values,i))) return;
 
       path.attr("stroke", d => d === s ? (d.color || color) : "#ddd").filter(d => d === s).raise();
 

@@ -25,7 +25,7 @@ class DS {
 
     this.metadata = o.metadata;
 
-    this.invert = config.invert_override || maybe(o.analysis, 'invert');
+    this.invert = config.invert_override || maybe(this.analysis, 'invert');
 
     this.mutant = !!config.mutant;
 
@@ -325,7 +325,7 @@ class DS {
     const d = (dom && [dom.min, dom.max]) || [0,1];
     const t = this.domain;
     const v = this.analysis.scale;
-    const r = ((typeof this.invert !== 'undefined' && this.invert.includes(i)) ? [1,0] : [0,1]);
+    const r = ((undefined !== this.invert && this.invert.includes(i)) ? [1,0] : [0,1]);
 
     switch (v) {
     case 'multi-key-delta': {

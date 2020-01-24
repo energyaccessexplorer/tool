@@ -718,7 +718,53 @@ function ea_datasets_polygons() {
 
       mapbox_hover(this.id);
 
-      if (this.timeline)
+      if (this.timeline) {
         mapbox_dblclick(this.id);
+      }
     });
 };
+
+async function ea_datasets_polygons_csv(opts) {
+  await until(_ => this.csv.data);
+
+  const data = this.csv.data;
+  const stops = this.colorscale.stops;
+
+  if (!data) warn(this.id, "has no csv.data");
+
+  opts.minfn(data);
+  opts.maxfn(data);
+
+  const l = d3.scaleQuantize().domain([data.min, data.max]).range(stops);
+  const s = x => (!x || x === "") ? "rgba(155,155,155,1)" : l(x);
+
+  this.csv.scale = l;
+
+  if (!data) {
+    warn("No data for", this.id);
+    return;
+  }
+
+  const fs = this.vectors.features.features;
+  for (let i = 0; i < fs.length; i += 1) {
+    let row = data.find(r => +r[this.csv.idkey] === +fs[i].properties[this.vectors.idkey]);
+
+    if (!row) {
+      console.error(i, this.csv.idkey, this.vectors.idkey, data);
+      throw `${this.id} NO ROW!`;
+    }
+    fs[i].properties.__color = s(+row[opts.k]);
+  }
+
+  try {
+    if (this.source)
+      this.source.setData(this.vectors.features);
+  } catch (err) {
+    // TODO: find out what this error is when changing mapbox's themes it is not
+    //       fatal, so we just report it.
+    //
+    console.warn(err);
+  }
+
+  if (this.card) this.card.refresh();
+}

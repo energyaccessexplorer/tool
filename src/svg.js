@@ -506,7 +506,7 @@ function ea_svg_polygons_symbol() {
 };
 
 function ea_svg_timeline_slider(opts) {
-  const {steps, dragging, parent, width, init} = opts;
+  const {steps, dragging, width, init} = opts;
 
   const radius = 16,
         svgwidth = width,
@@ -666,7 +666,7 @@ function ea_svg_multiline(opts) {
       const i1 = d3.bisectLeft(data.dates, xm, 1);
       const i0 = i1 - 1;
       const i = xm - data.dates[i0] > data.dates[i1] - xm ? i1 : i0;
-      const s = data.series.reduce((a, b) => Math.abs(a.values[i] - ym) < Math.abs(b.values[i] - ym) ? a : b);
+      const s = data.series.reduce((a, b) => Math.abs(a.values[i] - ym) < Math.abs(b.values[i] - ym) ? a : b, []);
 
       if (undefined === data.dates[i] || undefined === s.values[i]) return;
 

@@ -42,7 +42,7 @@ function ea_timeline_lines_draw(datasets, district) {
       return {
         values: TIMELINE_DATES.map(k => (r[k] === "" ? undefined : +r[k])),
         name: c.id,
-        color: c.timeline.color_stops.slice(-1)
+        color: c.colorscale.stops.slice(-1)
       };
     }));
   }, []);
@@ -102,52 +102,6 @@ function ea_controls_dropdown() {
 
 function ea_category_filter(d) {
   return d.category.name !== 'boundaries';
-};
-
-async function ea_datasets_polygons_csv_timeline(t) {
-  t = t || TIMELINE_CURRENT_DATE || TIMELINE_DATES[TIMELINE_DATES.length - 1];
-
-  await until(_ => this.csv.data);
-
-  const data = this.csv.data;
-  const cs = this.timeline.color_stops;
-
-  if (!data) warn(this.id, "has no csv.data");
-
-  if (undefined === data.min || undefined === data.max) {
-    data.min = d3.min([].concat(...TIMELINE_DATES.map(d => data.map(r => +r[d]))));
-    data.max = d3.max([].concat(...TIMELINE_DATES.map(d => data.map(r => +r[d]))));
-  }
-
-  const l = d3.scaleQuantize().domain([data.min, data.max]).range(cs);
-  const s = x => (!x || x === "") ? "rgba(155,155,155,1)" : l(x);
-
-  this.csv.scale = l;
-
-  if (!data) {
-    warn("No data for", this.id);
-    return;
-  }
-
-  const fs = this.vectors.features.features;
-  for (let i = 0; i < fs.length; i += 1) {
-    let row = data.find(r => r['OBJECTID'] === fs[i].properties[GEOGRAPHY.vectors_id_key].toString());
-
-    if (!row) throw "NO ROW!";
-    fs[i].properties.__color = s(row[t]);
-  }
-
-  try {
-    if (this.source)
-      this.source.setData(this.vectors.features);
-  } catch (err) {
-    // TODO: find out what this error is when changing mapbox's themes it is not
-    //       fatal, so we just report it.
-    //
-    console.warn(err);
-  }
-
-  if (this.card) this.card.refresh();
 };
 
 function ea_overlord_init(state) {
@@ -215,3 +169,21 @@ function ea_overlord_map_click(state, msg) {
     }
   }
 };
+async function ea_datasets_polygons_csv_timeline(t) {
+  const opts = {
+    k: t || TIMELINE_CURRENT_DATE || TIMELINE_DATES[TIMELINE_DATES.length - 1],
+
+    minfn: (data) => {
+      if (undefined === data.min)
+        data.min = d3.min([].concat(...TIMELINE_DATES.map(d => data.map(r => +r[d]))));
+    },
+
+    maxfn: (data) => {
+      if (undefined === data.max)
+        data.max = d3.max([].concat(...TIMELINE_DATES.map(d => data.map(r => +r[d]))));
+    }
+  }
+
+  ea_datasets_polygons_csv.call(this, opts);
+};
+

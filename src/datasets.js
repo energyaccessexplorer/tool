@@ -431,8 +431,6 @@ async function ea_datasets_init(id, inputs, pack, callback) {
       await ds.load('csv');
       await ds.load('raster');
 
-      GEOGRAPHY.vectors_id_key = ds.config.id_key;
-
       if (!(bounds = ds.vectors.bounds)) throw `'boundaries' dataset has no vectors.bounds`;
     });
 
@@ -482,7 +480,8 @@ function ea_datasets_csv() {
   fetch(this.csv.endpoint)
     .then(d => d.text())
     .then(r => d3.csvParse(r))
-    .then(d => this.csv.data = d);
+    .then(d => this.csv.data = d)
+    .then(d => this.csv.idkey = ID_GUESSES.find(x => d[0].hasOwnProperty(x)));
 };
 
 function ea_datasets_tiff() {
@@ -696,8 +695,9 @@ function ea_datasets_polygons() {
       }
 
       const fs = this.vectors.features.features;
+      this.vectors.idkey = ID_GUESSES.find(x => fs[0].properties.hasOwnProperty(x));
       for (let i = 0; i < fs.length; i += 1)
-        fs[i].id = fs[i].properties[GEOGRAPHY.vectors_id_key];
+        fs[i].id = fs[i].properties[this.vectors.idkey];
 
       this.add_source({
         "type": "geojson",

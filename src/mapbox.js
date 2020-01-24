@@ -224,9 +224,10 @@ function mapbox_hover(id) {
 
   MAPBOX.on('mousemove', id, function(e) {
     let nt;
+    const ds = DS.get(id);
 
     if (e.features.length > 0) {
-      nt = e.features[0].properties[GEOGRAPHY.vectors_id_key];
+      nt = e.features[0].properties[ds.vectors.idkey];
       if (t) MAPBOX.setFeatureState({ source: id, id: (t === nt) ? nt : t }, { hover: (t === nt) });
       t = nt;
     }

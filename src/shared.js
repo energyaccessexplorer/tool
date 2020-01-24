@@ -1,5 +1,7 @@
 NORM_STOPS = d3.range(0, 1.000000001, 0.25);
 
+ID_GUESSES = ['OBJECTID', 'Code', 'OID', 'ID'];
+
 function ea_layout_init() {
   const n = qs('nav');
   const p = qs('#playground');

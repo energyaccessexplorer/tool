@@ -370,7 +370,7 @@ function ea_controls_range(opts = {}) {
   const r = ea_svg_interval({
     single: opts.single,
     width: opts.width || 256,
-    init: this.default_domain,
+    init: this.domain_default,
     domain: this.domain,
     steps: opts.steps,
     callback1: x => update(x, 0, v1),

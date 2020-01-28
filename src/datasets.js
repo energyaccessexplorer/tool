@@ -253,7 +253,7 @@ class DS {
     this.colorscale = m.colorscale;
 
     this.domain = m.domain;
-    this.domain_default = m.default_domain;
+    this.domain_default = m.domain_default;
   };
 
   async mutate(host) {
@@ -266,7 +266,7 @@ class DS {
     this.colorscale = host.colorscale;
 
     this.domain = host.domain;
-    this.domain_default = host.default_domain;
+    this.domain_default = host.domain_default;
 
     this.card.refresh();
 

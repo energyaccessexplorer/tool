@@ -1,10 +1,12 @@
 class DS {
-  constructor(o) {
+  constructor(o, active) {
     this.id = o.name || o.category.name;
 
     this.dataset_id = o.id;
 
     this.category = o.category;
+
+    this.active = active || false;
 
     let config = o.configuration || {};
 
@@ -130,7 +132,7 @@ class DS {
       break;
 
     case undefined:
-    default:
+    default: {
       ea_flash.push({
         title: `'${this.id}' disabled`,
         message: `Cannot decide dataset's type`,
@@ -138,11 +140,12 @@ class DS {
         type: 'error'
       });
 
-      console.error(`Cannot decide datatype of ${this.id}`);
+      warn(`Datatype of ${this.id} is undefined. Disabling...`);
 
       this.disable();
 
       break;
+    }
     }
   };
 
@@ -195,11 +198,8 @@ class DS {
     const m = this.host = this.hosts[0];
 
     this.datatype = m.datatype;
-
     this.raster = m.raster;
-
     this.vectors = m.vectors;
-
     this.colorscale = m.colorscale;
   };
 
@@ -209,11 +209,8 @@ class DS {
     this.host = host;
 
     this.datatype = host.datatype;
-
     this.raster = host.raster;
-
     this.vectors = host.vectors;
-
     this.card.refresh();
 
     return this;
@@ -443,7 +440,6 @@ async function ea_datasets_init(id, inputs, pack, callback) {
     pack: `eq.${pack}`,
     online: "eq.true"
   })
-    .then(r => r.filter(e => ea_category_filter(e)))
     .then(r => r.map(e => (new DS(e)).init(inputs.includes(e.category.name))));
 
   // We need all the datasets to be initialised _before_ setting
@@ -488,10 +484,10 @@ function ea_datasets_csv() {
 function ea_datasets_tiff() {
   async function run_it(blob) {
     function draw() {
+      if (this.datatype !== 'raster') return;
+
       const r = this.raster;
       let d = r.config.domain;
-
-      if (this.datatype !== 'raster') return;
 
       if (!r.canvas) {
         r.canvas = ea_plot({

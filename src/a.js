@@ -252,10 +252,6 @@ function ea_controls_dropdown() {
   return dropdownlist;
 };
 
-function ea_category_filter(d) {
-  return d.category.name !== 'boundaries';
-};
-
 function ea_overlord_init(state) {
   ea_views_init();
   ea_indexes_init(state);

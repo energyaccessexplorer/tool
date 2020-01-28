@@ -181,9 +181,10 @@ class dscard extends HTMLElement {
     let e = maybe(ds.colorscale, 'svg') || ce('div');
 
     switch (ds.datatype) {
-    case 'points':
+    case 'points': {
       e = ea_svg_points_symbol.call(ds);
       break;
+    }
 
     case 'lines': {
       e = ea_svg_lines_symbol.call(ds);

@@ -139,7 +139,7 @@ async function ea_overlord(msg) {
 
   case 'timeline-change': {
     DS.all.forEach(d => {
-      if (d.timeline && d.vectors.features)
+      if (d.timeline && d.active && d.vectors.features)
         ea_datasets_polygons_csv_timeline.call(d, msg.target);
     });
 

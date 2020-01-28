@@ -6,7 +6,7 @@ TIMELINE_DISTRICT = null;
 async function ea_timeline_init() {
   await until(_ => TIMELINE_DATES.length > 0);
 
-  const steps = TIMELINE_DATES.map(x => parseInt(x.replace('(^[0-9]{4}-)', '\1')))
+  const steps = TIMELINE_DATES.map(x => parseInt(x.replace('(^[0-9]{4}-)', '\1')));
 
   const parent = qs('#timeline');
   const padding = 100;
@@ -98,10 +98,6 @@ function ea_controls_dropdown() {
   }
 
   return dropdownlist;
-};
-
-function ea_category_filter(d) {
-  return d.category.name !== 'boundaries';
 };
 
 function ea_overlord_init(state) {

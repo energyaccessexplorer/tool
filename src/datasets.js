@@ -767,7 +767,7 @@ function ea_datasets_polygons() {
         "paint": {
           "fill-color": this.datatype.match("polygons-") ? ['get', '__color'] : v.fill,
           "fill-outline-color": v.stroke,
-          "fill-opacity": [ "case", [ "boolean", [ "feature-state", "hover" ], false ], 0.7 * v.opacity, 1 * v.opacity]
+          "fill-opacity": [ "case", [ "boolean", [ "get", "__hidden" ], false ], 0, 1 * v.opacity ]
         },
       });
 

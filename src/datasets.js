@@ -346,6 +346,8 @@ class DS {
     if (this.controls) this.controls.turn(v);
 
     this.visibility(v && draw);
+
+    if (!v && this.card) this.card.remove();
   };
 
   async load(arg) {

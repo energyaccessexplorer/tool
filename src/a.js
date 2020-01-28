@@ -328,7 +328,6 @@ async function ea_overlord_dataset(state, msg) {
   }
   else {
     inputs.splice(inputs.indexOf(ds.id), 1);
-    ds.card.remove();
   }
 
   if (state.view === "outputs") {

@@ -126,7 +126,6 @@ async function ea_overlord_dataset(state, msg) {
     state.inputs.unshift(ds.id);
   } else {
     state.inputs.splice(state.inputs.indexOf(ds.id), 1);
-    ds.card.remove();
   }
 
   await ds.turn(ds.active, true);

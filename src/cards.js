@@ -147,6 +147,8 @@ class dscard extends HTMLElement {
           break;
         }
 
+        case 'polygons-fixed':
+        case 'polygons-timeline':
         case 'polygons': {
           t = ['fill-opacity'];
           break;
@@ -207,7 +209,8 @@ class dscard extends HTMLElement {
       break;
     }
 
-    case 'timeline': {
+    case 'polygons-fixed':
+    case 'polygons-timeline': {
       const r = tmpl("#ramp");
 
       r.append(

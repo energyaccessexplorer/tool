@@ -88,28 +88,11 @@ class DS {
   init(active) {
     this.active = active;
 
-    this.datatype = (_ => {
-      let t;
 
-      // careful with the order
-      //
-      if (this.mutant) t = null;
-      else if (this.timeline) t = "timeline";
-      else if (this.vectors) t = this.vectors.config.shape_type;
-      else if (this.raster) t = "raster";
-      else if (this.csv) t = "table";
 
-      return t;
-    })();
 
     switch (this.datatype) {
-    case 'timeline':
-      this.colorscale = ea_colorscale({
-        stops: this.timeline.color_stops
-      });
-      break;
-
-    case 'raster':
+    case 'raster': {
       this.download = this.raster.endpoint;
 
       this.colorscale = ea_colorscale({
@@ -119,17 +102,39 @@ class DS {
       });
 
       break;
+    }
 
-    case 'polygons':
+    case 'raster-mutant': {
+      break;
+    }
+
     case 'points':
     case 'lines':
+    case 'polygons': {
+      this.download = this.vectors.endpoint;
+      break;
+    }
+
+    case 'polygons-fixed': {
       this.download = this.vectors.endpoint;
 
-      break;
+      if (this.config.column) {
+        this.colorscale = ea_colorscale({
+          stops: this.vectors.config.specs.color_stops
+        });
 
-    case null:
-      // don't fail, it's a mutant...
+        ea_datasets_polygons_csv_column.call(this);
+      }
       break;
+    }
+
+    case 'polygons-timeline': {
+      this.colorscale = ea_colorscale({
+        stops: this.timeline.color_stops
+      });
+
+      break;
+    }
 
     case undefined:
     default: {
@@ -147,6 +152,23 @@ class DS {
       break;
     }
     }
+  };
+
+  get datatype() {
+    let t;
+
+    if (this.vectors) t = this.vectors.config.shape_type;
+    else if (this.raster) t = "raster";
+    else if (this.csv) t = "table";
+
+    if (this.config.column) t += "-fixed";
+    else if (this.timeline) t += "-timeline";
+
+    if (this.mutant) {
+      t = "raster-mutant";
+    }
+
+    return t;
   };
 
   disable() {
@@ -197,7 +219,6 @@ class DS {
 
     const m = this.host = this.hosts[0];
 
-    this.datatype = m.datatype;
     this.raster = m.raster;
     this.vectors = m.vectors;
     this.colorscale = m.colorscale;
@@ -208,7 +229,6 @@ class DS {
 
     this.host = host;
 
-    this.datatype = host.datatype;
     this.raster = host.raster;
     this.vectors = host.vectors;
     this.card.refresh();
@@ -707,7 +727,7 @@ function ea_datasets_polygons() {
           "visibility": "none",
         },
         "paint": {
-          "fill-color": this.timeline ? ['get', '__color'] : v.fill,
+          "fill-color": this.datatype.match("polygons-") ? ['get', '__color'] : v.fill,
           "fill-outline-color": v.stroke,
           "fill-opacity": [ "case", [ "boolean", [ "feature-state", "hover" ], false ], 0.7 * v.opacity, 1 * v.opacity]
         },

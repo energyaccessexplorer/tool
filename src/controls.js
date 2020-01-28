@@ -44,7 +44,45 @@ class dscontrols extends HTMLElement {
         steps[i] = this.ds.raster.config.domain.min + (s * i);
     }
 
-    this.range_group = ea_controls_range.call(this.ds, { ramp: lr, steps: steps, single: c.range === 'single' });
+    switch (this.ds.datatype) {
+    case 'raster':
+    case 'raster-mutant': {
+      this.range_group = ea_controls_range.call(this.ds, {
+        ramp: lr,
+        steps: steps,
+        single: c.range === 'single'
+      });
+      break;
+    }
+
+    case 'points':
+    case 'lines':
+    case 'polygons': {
+      if (!this.ds.raster) break;
+
+      this.range_group = ea_controls_range.call(this.ds, {
+        ramp: lr,
+        steps: steps,
+        single: c.range === 'single'
+      });
+      break;
+    }
+
+    case 'polygons-fixed':
+    case 'polygons-timeline': {
+      this.range_group = ea_controls_range.call(this.ds, {
+        ramp: lr,
+        steps: steps,
+        single: c.range === 'single'
+      });
+      break;
+    }
+
+    default: {
+      this.range_group = null;
+      break;
+    }
+    }
 
     this.manual_setup();
 
@@ -314,8 +352,11 @@ function ea_controls_range(opts = {}) {
 
   this.domain = [this.raster.config.domain.min, this.raster.config.domain.max];
 
-  const update = (x,i,el) => {
-    el.innerText = (x * (this.raster.config.factor || 1)).toFixed(this.raster.config.precision || 0);
+  const update = (x, i, el) => {
+    if (this.datatype.match('raster-'))
+      el.innerText = (x * (this.raster.config.factor || 1)).toFixed(this.raster.config.precision || 0);
+    else
+      el.innerText = x;
 
     const man = maybe(this.controls, i ? 'manual_max' : 'manual_min');
     if (man) man.value = x;

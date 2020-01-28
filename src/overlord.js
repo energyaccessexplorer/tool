@@ -76,6 +76,7 @@ async function ea_overlord(msg) {
     });
 
     const a = DS.all
+          .filter(d => !d.disabled)
           .map(d => {
             // dscard and dscontrols might have already been created by items_init
             //

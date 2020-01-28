@@ -808,15 +808,7 @@ async function ea_datasets_polygons_csv(opts) {
     fs[i].properties.__color = s(+row[opts.k]);
   }
 
-  try {
-    if (this.source)
-      this.source.setData(this.vectors.features);
-  } catch (err) {
-    // TODO: find out what this error is when changing mapbox's themes it is not
-    //       fatal, so we just report it.
-    //
-    console.warn(err);
-  }
+  mapbox_set_data.call(this, this.vectors.features);
 
   if (this.card) this.card.refresh();
 }

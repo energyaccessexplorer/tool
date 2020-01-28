@@ -141,6 +141,8 @@ async function ea_overlord_dataset(state, msg) {
     qs('#district-header', rp).innerText = "";
     if (TIMELINE_LINES) TIMELINE_LINES.svg.remove();
   }
+
+  ea_filter_valued_polygons();
 };
 
 function ea_overlord_map_click(state, msg) {
@@ -182,3 +184,28 @@ async function ea_datasets_polygons_csv_column() {
   ea_datasets_polygons_csv.call(this, opts);
 };
 
+function ea_filter_valued_polygons() {
+  const datasets = DS.all.filter(d => d.active && d.csv.data && d.datatype.match("-(fixed|timeline)"));
+
+  function m(d,r) {
+    if (d.config.column)
+      return +r[d.config.column] >= d.domain[0] && +r[d.config.column] <= d.domain[1];
+    else if (d.timeline)
+      return +r[TIMELINE_CURRENT_DATE] >= d.domain[0] && +r[TIMELINE_CURRENT_DATE] <= d.domain[1];
+  }
+
+  const arr = datasets.map(d => d.csv.data.filter(r => m(d,r)).map(r => +r[d.csv.idkey]));
+
+  if (!arr.length) return;
+
+  const result = arr[0].filter(e => arr.every(a => a.includes(e)));
+
+  datasets
+    .forEach(d => {
+      const fs = d.vectors.features.features;
+      for (let i = 0; i < fs.length; i += 1)
+        fs[i].properties.__hidden = !result.includes(+fs[i].properties[d.vectors.idkey]);
+
+      mapbox_set_data.call(d, d.vectors.features);
+    });
+};

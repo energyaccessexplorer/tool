@@ -219,6 +219,18 @@ function mapbox_fit(bounds, animate = false) {
   return bounds;
 };
 
+function mapbox_set_data(data) {
+  try {
+    if (this.source)
+      this.source.setData(data);
+  } catch (err) {
+    // TODO: find out what this error is when changing mapbox's themes.
+    //       it is not fatal, so we just report it.
+    //
+    console.warn(err);
+  }
+};
+
 function mapbox_hover(id) {
   let t = null;
 

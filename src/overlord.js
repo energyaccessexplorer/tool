@@ -125,7 +125,13 @@ async function ea_overlord(msg) {
     }
 
     else if (state.view === "inputs") {
-      ea_plot_active_analysis(state.output);
+      // TODO: this is wrong. waiting for specs...
+      //
+      if (typeof ea_filter_valued_polygons === 'function')
+        ea_filter_valued_polygons();
+
+      if (typeof ea_plot_active_analysis === 'function')
+        ea_plot_active_analysis(state.output);
     }
 
     break;

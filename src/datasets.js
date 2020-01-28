@@ -32,6 +32,59 @@ class DS {
 
     this.items = !!config.collection ? [] : undefined;
 
+    this.files_setup(o);
+
+    this.init();
+
+    __dstable[this.id] = this;
+  };
+
+  files_setup(o) {
+    if (o.category.raster && o.raster_file) {
+      this.raster = {};
+      this.raster.config = JSON.parse(JSON.stringify(o.category.raster));
+
+
+      this.raster.endpoint = o.raster_file.endpoint;
+      this.raster.parse = _ => ea_datasets_tiff.call(this);
+    }
+
+    if (o.category.vectors && o.vectors_file) {
+      this.vectors = {};
+      this.vectors.config = JSON.parse(JSON.stringify(o.category.vectors));
+      this.vectors.endpoint = o.vectors_file.endpoint;
+
+      switch (this.vectors.config.shape_type) {
+      case 'points': {
+        this.vectors.parse = x => ea_datasets_points.call(x || this);
+        break;
+      }
+
+      case 'polygons': {
+        this.vectors.parse = x => ea_datasets_polygons.call(x || this);
+        break;
+      }
+
+      case 'lines': {
+        this.vectors.parse = x => ea_datasets_lines.call(x || this);
+        break;
+      }
+      }
+    }
+
+    if (o.category.csv && o.csv_file) {
+      this.csv = {};
+
+      this.csv.config = JSON.parse(JSON.stringify(o.category.csv));
+
+      this.csv.endpoint = o.csv_file.endpoint;
+      this.csv.parse = _ => ea_datasets_csv.call(this);
+
+
+    }
+  }
+
+  init() {
     if (this.timeline) {
       const b = DS.get('boundaries');
       const v = this.vectors = JSON.parse(JSON.stringify(b.vectors));
@@ -39,57 +92,6 @@ class DS {
       v.endpoint = b.vectors.endpoint;
       v.parse = x => ea_datasets_polygons.call(x || this);
     }
-
-    if (o.raster_file) {
-      const r = this.raster = {};
-
-      r.config = JSON.parse(JSON.stringify(o.category.raster));
-
-      r.endpoint = o.raster_file.endpoint;
-      r.parse = _ => ea_datasets_tiff.call(this);
-    }
-
-    if (o.vectors_file) {
-      const v = this.vectors = {};
-
-      v.config = JSON.parse(JSON.stringify(o.category.vectors));
-      v.endpoint = o.vectors_file.endpoint;
-
-      switch (v.config.shape_type) {
-      case 'points': {
-        v.parse = x => ea_datasets_points.call(x || this);
-        break;
-      }
-
-      case 'polygons': {
-        v.parse = x => ea_datasets_polygons.call(x || this);
-        break;
-      }
-
-      case 'lines': {
-        v.parse = x => ea_datasets_lines.call(x || this);
-        break;
-      }
-      }
-    }
-
-    if (o.csv_file) {
-      const c = this.csv = {};
-
-      c.config = JSON.parse(JSON.stringify(o.category.csv));
-
-      c.endpoint = o.csv_file.endpoint;
-      c.parse = _ => ea_datasets_csv.call(this);
-    }
-
-    __dstable[this.id] = this;
-  };
-
-  init(active) {
-    this.active = active;
-
-
-
 
     switch (this.datatype) {
     case 'raster': {
@@ -460,7 +462,8 @@ async function ea_datasets_init(id, inputs, pack, callback) {
     pack: `eq.${pack}`,
     online: "eq.true"
   })
-    .then(r => r.map(e => (new DS(e)).init(inputs.includes(e.category.name))));
+    .then(r => r.filter(d => d.category.name !== 'boundaries'))
+    .then(r => r.map(e => new DS(e, inputs.includes(e.category.name))));
 
   // We need all the datasets to be initialised _before_ setting
   // mutant/collection attributes (order is never guaranteed)

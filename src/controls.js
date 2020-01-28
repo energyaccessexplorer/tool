@@ -348,10 +348,6 @@ function ea_controls_mutant_options() {
 };
 
 function ea_controls_range(opts = {}) {
-  if (!this.raster) return null;
-
-  this.domain = [this.raster.config.domain.min, this.raster.config.domain.max];
-
   const update = (x, i, el) => {
     if (this.datatype.match('raster-'))
       el.innerText = (x * (this.raster.config.factor || 1)).toFixed(this.raster.config.precision || 0);
@@ -374,7 +370,7 @@ function ea_controls_range(opts = {}) {
   const r = ea_svg_interval({
     single: opts.single,
     width: opts.width || 256,
-    init: [this.raster.config.init.min, this.raster.config.init.max],
+    init: this.default_domain,
     domain: this.domain,
     steps: opts.steps,
     callback1: x => update(x, 0, v1),

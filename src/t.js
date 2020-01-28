@@ -167,17 +167,17 @@ function ea_overlord_map_click(state, msg) {
 async function ea_datasets_polygons_csv_timeline(t) {
   const opts = {
     k: t || TIMELINE_CURRENT_DATE || TIMELINE_DATES[TIMELINE_DATES.length - 1],
+  };
 
-    minfn: (data) => {
-      if (has(data, 'min'))
-        data.min = d3.min([].concat(...TIMELINE_DATES.map(d => data.map(r => +r[d]))));
-    },
+  ea_datasets_polygons_csv.call(this, opts);
+};
 
-    maxfn: (data) => {
-      if (has(data, 'max'))
-        data.max = d3.max([].concat(...TIMELINE_DATES.map(d => data.map(r => +r[d]))));
-    }
-  }
+async function ea_datasets_polygons_csv_column() {
+  const k = this.config.column;
+
+  const opts = {
+    k: k,
+  };
 
   ea_datasets_polygons_csv.call(this, opts);
 };

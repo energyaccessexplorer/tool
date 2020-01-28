@@ -40,13 +40,35 @@ class DS {
   };
 
   files_setup(o) {
+    function check_domain() {
+      if (undefined === this.domain) {
+        ea_flash.push({
+          title: `'${this.id}' disabled`,
+          message: `Cannot set dataset's domain`,
+          timeout: 5000,
+          type: 'error'
+        });
+        warn(`Could not set a domain for ${this.id}. Disabling...`);
+        this.disable();
+      }
+    };
+
     if (o.category.raster && o.raster_file) {
       this.raster = {};
       this.raster.config = JSON.parse(JSON.stringify(o.category.raster));
 
-
       this.raster.endpoint = o.raster_file.endpoint;
       this.raster.parse = _ => ea_datasets_tiff.call(this);
+
+      if (typeof maybe(this.raster, 'config', 'domain', 'min') === 'number' &&
+          typeof maybe(this.raster, 'config', 'domain', 'max') === 'number')
+        this.domain = [this.raster.config.domain.min, this.raster.config.domain.max];
+
+      if (typeof maybe(this.raster, 'config', 'init', 'min') === 'number' &&
+          typeof maybe(this.raster, 'config', 'init', 'max') === 'number')
+        this.domain_default = [this.raster.config.init.min, this.raster.config.init.max];
+
+      check_domain.call(this);
     }
 
     if (o.category.vectors && o.vectors_file) {
@@ -80,7 +102,12 @@ class DS {
       this.csv.endpoint = o.csv_file.endpoint;
       this.csv.parse = _ => ea_datasets_csv.call(this);
 
+      if (typeof maybe(this.csv, 'config', 'min') === 'number' &&
+          typeof maybe(this.csv, 'config', 'max') === 'number') {
+        this.domain = this.domain_default = [this.csv.config.min, this.csv.config.max];
+      }
 
+      check_domain.call(this);
     }
   }
 
@@ -224,6 +251,9 @@ class DS {
     this.raster = m.raster;
     this.vectors = m.vectors;
     this.colorscale = m.colorscale;
+
+    this.domain = m.domain;
+    this.domain_default = m.default_domain;
   };
 
   async mutate(host) {
@@ -233,6 +263,11 @@ class DS {
 
     this.raster = host.raster;
     this.vectors = host.vectors;
+    this.colorscale = host.colorscale;
+
+    this.domain = host.domain;
+    this.domain_default = host.default_domain;
+
     this.card.refresh();
 
     return this;
@@ -752,10 +787,7 @@ async function ea_datasets_polygons_csv(opts) {
 
   if (!data) warn(this.id, "has no csv.data");
 
-  opts.minfn(data);
-  opts.maxfn(data);
-
-  const l = d3.scaleQuantize().domain([data.min, data.max]).range(stops);
+  const l = d3.scaleQuantize().domain(this.domain).range(stops);
   const s = x => (!x || x === "") ? "rgba(155,155,155,1)" : l(x);
 
   this.csv.scale = l;

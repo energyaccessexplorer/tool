@@ -97,7 +97,7 @@ function ea_views_init() {
 
   const el = qs('#views');
 
-  Object.keys(ea_views).forEach(v => {
+  for (let v in ea_views) {
     const btn = ce('div', ea_views[v]['name'], { class: 'view up-title', id: 'view-' + v, ripple: '' });
 
     btn.onclick = _ => ea_view(v);
@@ -105,7 +105,7 @@ function ea_views_init() {
     if (url.searchParams.get('view') === v) btn.classList.add('active');
 
     el.append(btn);
-  });
+  }
 };
 
 function ea_dataset_modal(ds) {

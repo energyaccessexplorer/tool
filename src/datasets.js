@@ -12,15 +12,15 @@ class DS {
 
     this.config = config;
 
-    this.analysis = o.category.analysis;
+    this.analysis = this.category.analysis;
 
     this.weight = maybe(this, 'analysis', 'weight') || 2;
 
-    this.timeline = o.category.timeline;
+    this.timeline = this.category.timeline;
 
-    this.name = o.name_long || o.name || o.category.name_long || o.category.name;
+    this.name = o.name_long || o.name || this.category.name_long || this.category.name;
 
-    this.path = config.controls_path || maybe(o.category, 'controls', 'path');
+    this.path = config.controls_path || maybe(this.category, 'controls', 'path');
 
     this.indexname = maybe(this.path, 0);
 
@@ -109,7 +109,7 @@ class DS {
 
       check_domain.call(this);
     }
-  }
+  };
 
   init() {
     if (this.timeline) {

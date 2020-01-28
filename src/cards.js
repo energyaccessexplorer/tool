@@ -129,7 +129,7 @@ class dscard extends HTMLElement {
     qs('.opacity-box', e).append(r);
 
     const grad = ea_svg_interval({
-      init: [null, 100],
+      init: [0, 100],
       domain: [0, 100],
       single: true,
       callback2: x => o = x/100,
@@ -194,18 +194,7 @@ class dscard extends HTMLElement {
     }
 
     case 'polygons': {
-      if (ds.id.match('boundaries-')) {
-        e.append(ea_svg_color_steps(ds.colorscale.stops));
-
-        let r = tmpl('#ramp');
-        r.append(ce('div', "0"), ce('div', "%"), ce('div', "100"));
-        d.append(r);
-      }
-
-      else {
-        e = ea_svg_polygons_symbol.call(ds);
-      }
-
+      e = ea_svg_polygons_symbol.call(ds);
       break;
     }
 
@@ -214,9 +203,9 @@ class dscard extends HTMLElement {
       const r = tmpl("#ramp");
 
       r.append(
-        ce('div', (maybe(ds.csv, 'data', 'min') || 0) + ""),
-        ce('div', ds.unit),
-        ce('div', (maybe(ds.csv, 'data', 'max') || 100) + "")
+        ce('div', ds.domain[0].toString()),
+        ce('div', ds.category.unit),
+        ce('div', ds.domain[1].toString())
       );
 
       d.append(r,

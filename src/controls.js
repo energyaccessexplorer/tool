@@ -136,7 +136,7 @@ class dscontrols extends HTMLElement {
     const controls_tabs_el = qs('#controls-tabs');
 
     function create_tab(name) {
-      return ce('div', name, { id: 'controls-tab-' + name, class: 'controls-branch-tab up-title' });
+      return ce('div', ea_branch_dict[name] || name, { id: 'controls-tab-' + name, class: 'controls-branch-tab up-title' });
     };
 
     function create_branch(name) {

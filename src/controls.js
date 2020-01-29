@@ -50,7 +50,7 @@ class dscontrols extends HTMLElement {
       this.range_group = ea_controls_range.call(this.ds, {
         ramp: lr,
         steps: steps,
-        single: c.range === 'single'
+        sliders: c.range
       });
       break;
     }
@@ -63,7 +63,7 @@ class dscontrols extends HTMLElement {
       this.range_group = ea_controls_range.call(this.ds, {
         ramp: lr,
         steps: steps,
-        single: c.range === 'single'
+        sliders: c.range
       });
       break;
     }
@@ -73,7 +73,7 @@ class dscontrols extends HTMLElement {
       this.range_group = ea_controls_range.call(this.ds, {
         ramp: lr,
         steps: steps,
-        single: c.range === 'single'
+        sliders: c.range
       });
       break;
     }
@@ -252,6 +252,9 @@ class dscontrols extends HTMLElement {
       break;
 
     case 'double':
+      break;
+
+    case null:
     default:
       break;
     }
@@ -348,6 +351,8 @@ function ea_controls_mutant_options() {
 };
 
 function ea_controls_range(opts = {}) {
+  if (!opts.sliders) return null;
+
   const update = (x, i, el) => {
     if (this.datatype.match('raster-'))
       el.innerText = (x * (this.raster.config.factor || 1)).toFixed(this.raster.config.precision || 0);
@@ -368,7 +373,7 @@ function ea_controls_range(opts = {}) {
   l.append(v1, ce('div', opts.ramp || 'range', { class: "unit-ramp" }), v2);
 
   const r = ea_svg_interval({
-    single: opts.single,
+    sliders: opts.sliders,
     width: opts.width || 256,
     init: this.domain_default,
     domain: this.domain,
@@ -406,7 +411,7 @@ function ea_controls_weight() {
   );
 
   const w = ea_svg_interval({
-    single: true,
+    sliders: "single",
     init: [1, this.weight],
     domain: [1, 5],
     steps: weights,

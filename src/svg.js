@@ -290,7 +290,7 @@ function ea_svg_color_steps(steps, height) {
 };
 
 function ea_svg_interval(opts = {}) {
-  const {single, domain, init, steps, width, callback1, callback2, end_callback} = opts;
+  const {sliders, domain, init, steps, width, callback1, callback2, end_callback} = opts;
 
   const radius = 6,
         svgwidth = width || 256,
@@ -434,7 +434,7 @@ function ea_svg_interval(opts = {}) {
 
   if (init) change(init[0], init[1]);
 
-  if (single) c1.remove();
+  if (sliders === "single") c1.remove();
 
   return {
     svg: svg.node(),

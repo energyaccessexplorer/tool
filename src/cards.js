@@ -131,7 +131,7 @@ class dscard extends HTMLElement {
     const grad = ea_svg_interval({
       init: [0, 100],
       domain: [0, 100],
-      single: true,
+      sliders: "single",
       callback2: x => o = x/100,
       end_callback: _ => {
         let t = null;

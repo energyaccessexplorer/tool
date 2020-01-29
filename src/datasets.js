@@ -268,6 +268,17 @@ class DS {
     this.layer = MAPBOX.addLayer(opts, MAPBOX.first_symbol);
   };
 
+  update_source(data) {
+    try {
+      if (this.source) this.source.setData(data);
+    } catch (err) {
+      // TODO: find out what this error is when changing mapbox's themes.
+      //       it is not fatal, so we just report it.
+      //
+      warn(err);
+    }
+  }
+
   mutant_init() {
     this.hosts = this.config.mutant_targets.map(i => DST[i]);
 
@@ -554,7 +565,8 @@ This is not fatal. Dataset disabled.`
 function ea_datasets_csv() {
   if (this.csv.data) return;
 
-  fetch(this.csv.endpoint)
+  return fetch(this.csv.endpoint)
+    .catch(err => ea_datasets_fail.call(this, "CSV"))
     .then(d => d.text())
     .then(r => d3.csvParse(r))
     .then(d => this.csv.data = d)
@@ -564,8 +576,6 @@ function ea_datasets_csv() {
 function ea_datasets_tiff() {
   async function run_it(blob) {
     function draw() {
-      if (this.datatype !== 'raster') return;
-
       const r = this.raster;
       let d = r.config.domain;
 
@@ -598,41 +608,36 @@ function ea_datasets_tiff() {
       });
     };
 
-    if (maybe(this.raster, 'data')) {
-      draw.call(this);
-    }
-
-    else {
+    if (!maybe(this.raster, 'data')) {
       const tiff = await GeoTIFF.fromBlob(blob);
       const image = await tiff.getImage();
       const rasters = await image.readRasters();
 
-      const r = this.raster;
-
-      r.data = rasters[0];
-      r.width = image.getWidth();
-      r.height = image.getHeight();
-      r.nodata = parseFloat(tiff.fileDirectories[0][0].GDAL_NODATA);
-
-      draw.call(this);
+      this.raster.data = rasters[0];
+      this.raster.width = image.getWidth();
+      this.raster.height = image.getHeight();
+      this.raster.nodata = parseFloat(tiff.fileDirectories[0][0].GDAL_NODATA);
     }
 
-    return;
+    if (this.datatype === 'raster') draw.call(this);
   };
 
+  let t;
   if (maybe(this.raster, 'data')) {
-    run_it.call(this);
-    return;
+    t = new Promise((res, rej) => res());
   }
 
-  return fetch(this.raster.endpoint)
-    .catch(err => ea_datasets_fail.call(this, "TIFF"))
-    .then(r => {
-      if (!(r.ok && r.status < 400)) ea_datasets_fail.call(this, "TIFF");
-      else return r;
-    })
-    .then(r => r.blob())
-    .then(b => run_it.call(this, b));
+  else {
+    t = fetch(this.raster.endpoint)
+      .catch(err => ea_datasets_fail.call(this, "TIFF"))
+      .then(r => {
+        if (!(r.ok && r.status < 400)) ea_datasets_fail.call(this, "TIFF");
+        else return r;
+      })
+      .then(r => r.blob())
+  }
+
+  return t.then(b => run_it.call(this, b));
 };
 
 function ea_datasets_geojson() {
@@ -802,7 +807,7 @@ function ea_datasets_polygons() {
 };
 
 async function ea_datasets_polygons_csv(opts) {
-  await until(_ => this.csv.data);
+  await until(_ => this.csv.data && this.vectors.features);
 
   const data = this.csv.data;
   const stops = this.colorscale.stops;
@@ -810,7 +815,7 @@ async function ea_datasets_polygons_csv(opts) {
   if (!data) warn(this.id, "has no csv.data");
 
   const l = d3.scaleQuantize().domain(this.domain).range(stops);
-  const s = x => (!x || x === "") ? "rgba(155,155,155,1)" : l(x);
+  const s = x => (null === x || undefined === x || x === "") ? "rgba(155,155,155,1)" : l(x);
 
   this.csv.scale = l;
 
@@ -824,13 +829,21 @@ async function ea_datasets_polygons_csv(opts) {
     let row = data.find(r => +r[this.csv.idkey] === +fs[i].properties[this.vectors.idkey]);
 
     if (!row) {
-      console.error(i, this.csv.idkey, this.vectors.idkey, data);
-      throw `${this.id} NO ROW!`;
+      warn(`${this.id} NO ROW!`, i, this.csv.idkey, this.vectors.idkey, data);
+      continue;
     }
-    fs[i].properties.__color = s(+row[opts.k]);
+    fs[i].properties.__color = s(+row[opts.key]);
   }
 
-  mapbox_set_data.call(this, this.vectors.features);
+  this.update_source(this.vectors.features);
 
   if (this.card) this.card.refresh();
 }
+
+async function ea_datasets_polygons_csv_column() {
+  const opts = {
+    key: this.config.column,
+  };
+
+  ea_datasets_polygons_csv.call(this, opts);
+};

@@ -45,7 +45,7 @@ async function ea_api_parse(response, options = {}) {
 
         window.ea_token_interval = setInterval(function() {
           if (!localStorage.getItem('token'))
-            console.log("Waiting for token");
+            log("Waiting for token");
 
           else {
             clearInterval(window.ea_token_interval);

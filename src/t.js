@@ -168,17 +168,7 @@ function ea_overlord_map_click(state, msg) {
 };
 async function ea_datasets_polygons_csv_timeline(t) {
   const opts = {
-    k: t || TIMELINE_CURRENT_DATE || TIMELINE_DATES[TIMELINE_DATES.length - 1],
-  };
-
-  ea_datasets_polygons_csv.call(this, opts);
-};
-
-async function ea_datasets_polygons_csv_column() {
-  const k = this.config.column;
-
-  const opts = {
-    k: k,
+	key: t || TIMELINE_CURRENT_DATE || TIMELINE_DATES[TIMELINE_DATES.length - 1],
   };
 
   ea_datasets_polygons_csv.call(this, opts);
@@ -206,6 +196,6 @@ function ea_filter_valued_polygons() {
       for (let i = 0; i < fs.length; i += 1)
         fs[i].properties.__hidden = !result.includes(+fs[i].properties[d.vectors.idkey]);
 
-      mapbox_set_data.call(d, d.vectors.features);
+      d.update_source(d.vectors.features);
     });
 };

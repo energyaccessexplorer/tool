@@ -128,7 +128,7 @@ class dscontrols extends HTMLElement {
 
   inject() {
     const ds = this.ds;
-    const path = ds.path;
+    const path = maybe(ds.category, 'controls', 'path');
 
     if (!path.length) return;
 

@@ -6,6 +6,8 @@ class DS {
 
     this.category = o.category;
 
+    this.category_overrides(o.category_overrides);
+
     this.active = active || false;
 
     let config = o.configuration || {};
@@ -20,9 +22,7 @@ class DS {
 
     this.name = o.name_long || o.name || this.category.name_long || this.category.name;
 
-    this.path = config.controls_path || maybe(this.category, 'controls', 'path');
-
-    this.indexname = maybe(this.path, 0);
+    this.indexname = maybe(this.category, 'controls', 'path', 0);
 
     this.metadata = o.metadata;
 
@@ -180,6 +180,31 @@ class DS {
 
       break;
     }
+    }
+  };
+
+  category_overrides(ovrr) {
+    if (!ovrr) return;
+
+    const configs = ['raster', 'vectors', 'csv', 'analysis', 'timeline', 'controls'];
+
+    for (let c of configs) {
+      if (!ovrr[c]) continue;
+
+      for (let a in ovrr[c]) {
+        if (!maybe(this.category, c)) continue;
+
+        log(this.id, "category override:", c, "->", a, "=", ovrr[c][a], "was", this.category[c][a]);
+        this.category[c][a] = ovrr[c][a];
+      }
+    }
+
+    const attrs = ['unit', 'name', 'name_long'];
+    for (let a of attrs) {
+      if (!ovrr[a]) continue;
+
+      log(this.id, "category override:", a, "=", ovrr[a], "was", this.category[a]);
+      this.category[a] = ovrr[a];
     }
   };
 

@@ -88,7 +88,7 @@ function ea_index_drawable(inputs, target) {
   for (let i of inputs) {
     if (i === 'boundaries') continue;
 
-    let n = DS.get(i).indexname;
+    let n = DST[i].indexname;
     counts[n] += 1;
 
     counts['ani'] += 1;

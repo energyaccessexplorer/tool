@@ -36,7 +36,7 @@ class DS {
 
     this.init();
 
-    __dstable[this.id] = this;
+    DST[this.id] = this;
   };
 
   files_setup(o) {
@@ -113,7 +113,7 @@ class DS {
 
   init() {
     if (this.timeline) {
-      const b = DS.get('boundaries');
+      const b = DST['boundaries'];
       const v = this.vectors = JSON.parse(JSON.stringify(b.vectors));
 
       v.endpoint = b.vectors.endpoint;
@@ -217,7 +217,7 @@ class DS {
       if (!this.collection.disabled) this.collection.disable();
     }
 
-    delete __dstable[this.id];
+    delete DST[this.id];
 
     ea_overlord({
       "type": "dataset",
@@ -244,7 +244,7 @@ class DS {
   };
 
   mutant_init() {
-    this.hosts = this.config.mutant_targets.map(i => DS.get(i));
+    this.hosts = this.config.mutant_targets.map(i => DST[i]);
 
     const m = this.host = this.hosts[0];
 
@@ -275,7 +275,7 @@ class DS {
 
   items_init() {
     for (let i of this.config.collection) {
-      const d = DS.get(i);
+      const d = DST[i];
       d.card = d.card || new dscard(d);
       d.collection = this;
 
@@ -439,18 +439,15 @@ class DS {
   // class methods
 
   static get all() {
-    return Object.keys(__dstable).map(i => __dstable[i]);
+    return Object.keys(DST).map(i => DST[i]);
   };
 
   static get(i) {
-    return __dstable[i];
+    return DST[i];
   };
 };
 
-/*
- * This is a workaround for not having class variables
- */
-window.__dstable = {};
+window.DST = {};
 
 /*
  * ea_datasets_init

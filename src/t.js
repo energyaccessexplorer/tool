@@ -107,7 +107,7 @@ function ea_overlord_init(state) {
 function ea_overlord_refresh(state) { };
 
 async function ea_overlord_view(state, msg) {
-  await Promise.all(state.inputs.map(id => DS.get(id).turn(true, true)));
+  await Promise.all(state.inputs.map(id => DST[id].turn(true, true)));
 
   ea_cards(state.inputs);
   ea_cards_sort(state.inputs);
@@ -148,11 +148,11 @@ async function ea_overlord_dataset(state, msg) {
 function ea_overlord_map_click(state, msg) {
   const e = msg.event;
 
-  const b = DS.get('boundaries');
+  const b = DST['boundaries'];
   let nodata = b.raster.nodata;
 
   const i = state.inputs[0];
-  let t = DS.get(i);
+  let t = DST[i];
 
   if (!t) return;
 

@@ -24,7 +24,7 @@ function ea_cards(list) {
   const cards = qs('#cards-pane');
   const cards_list = qs('#cards-list', cards);
 
-  const ldc = list.map(i => DS.get(i).card);
+  const ldc = list.map(i => DST[i].card);
   const empty = cards_list.children.length === 0;
 
   if (!empty) sortable('#cards-list', 'disable');
@@ -37,7 +37,7 @@ function ea_cards(list) {
 
 async function ea_cards_sort(list) {
   for (let i of list.slice(0).reverse())
-    await DS.get(i).raise();
+    await DST[i].raise();
 };
 
 class dscard extends HTMLElement {

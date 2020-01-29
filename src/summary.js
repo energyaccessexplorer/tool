@@ -9,7 +9,7 @@
  */
 
 async function ea_summary() {
-  const pop = DS.get('population');
+  const pop = DST['population'];
   await pop.load('raster');
   const p = pop.raster.data;
 
@@ -140,7 +140,7 @@ async function ea_summary() {
 };
 
 async function ea_summary_analyse(raster) {
-  const pop = DS.get('population');
+  const pop = DST['population'];
 
   if (!pop) return null;
 

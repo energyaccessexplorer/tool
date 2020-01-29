@@ -236,7 +236,7 @@ function mapbox_hover(id) {
 
   MAPBOX.on('mousemove', id, function(e) {
     let nt;
-    const ds = DS.get(id);
+    const ds = DST[id];
 
     if (e.features.length > 0) {
       nt = e.features[0].properties[ds.vectors.idkey];

@@ -176,7 +176,7 @@ function ea_active_analysis(type) {
 };
 
 async function raster_to_tiff(type) {
-  const b = DS.get('boundaries');
+  const b = DST['boundaries'];
 
   const raster = await ea_active_analysis(type);
 

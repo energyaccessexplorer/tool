@@ -34,7 +34,7 @@ function ea_plot(opts) {
  */
 
 function ea_plot_output(data, canvas = null) {
-  const A = DS.get('boundaries');
+  const A = DST['boundaries'];
 
   if (!data.length) {
     warn("ea_plot_output: no raster given. Filling up with a blank (transparent) one...");
@@ -175,7 +175,7 @@ function ea_current_config() {
   };
 
   for (let i of state.inputs) {
-    let d = DS.get(i);
+    let d = DST[i];
     let c = {};
 
     c.id = d.dataset_id;
@@ -289,7 +289,7 @@ async function ea_overlord_view(state, msg) {
 
   ea_state_set('view', t);
 
-  await Promise.all(state.inputs.map(id => DS.get(id).turn(true, (t === 'inputs'))));
+  await Promise.all(state.inputs.map(id => DST[id].turn(true, (t === 'inputs'))));
 
   if (t === "outputs") {
     ea_indexes_list(state);
@@ -353,7 +353,7 @@ async function ea_overlord_dataset(state, msg) {
 function ea_overlord_map_click(state, msg) {
   const e = msg.event;
 
-  const b = DS.get('boundaries');
+  const b = DST['boundaries'];
   let nodata = b.raster.nodata;
 
   let t;
@@ -422,7 +422,7 @@ function ea_overlord_map_click(state, msg) {
 
   else if (state.view === "inputs") {
     const i = state.inputs[0];
-    t = DS.get(i);
+    t = DST[i];
 
     if (!t) return;
 

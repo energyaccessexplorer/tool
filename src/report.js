@@ -1,5 +1,5 @@
 function ea_report_pdf() {
-  const canvas = DS.get('population').raster.canvas;
+  const canvas = DST['population'].raster.canvas;
   const canvas_ratio = canvas.width/canvas.height;
 
   let doc;

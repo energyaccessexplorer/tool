@@ -345,10 +345,10 @@ class DS {
 
     switch (v) {
     case 'key-delta': {
-      if (!this.table) return (s = x => 1);
+      if (!maybe(this.csv, 'table')) return (s = x => 1);
 
       s = x => {
-        let z = this.table[x];
+        let z = this.csv.table[x];
 
         return ((undefined === z) || z < t[0] || z > t[1]) ? -1 : 1;
       };
@@ -809,6 +809,9 @@ function ea_datasets_polygons() {
 async function ea_datasets_polygons_csv(opts) {
   await until(_ => this.csv.data && this.vectors.features);
 
+  if (this.config.column)
+    this.csv.table = ea_datasets_table.call(this);
+
   const data = this.csv.data;
   const stops = this.colorscale.stops;
 
@@ -846,4 +849,16 @@ async function ea_datasets_polygons_csv_column() {
   };
 
   ea_datasets_polygons_csv.call(this, opts);
+};
+
+function ea_datasets_table() {
+  const table = {};
+  const data = this.csv.data;
+
+  for (let i = 0; i < data.length; i++) {
+    d = data[i];
+    table[d[this.csv.idkey]] = +d[this.config.column];
+  }
+
+  return table;
 };

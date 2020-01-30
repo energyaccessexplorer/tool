@@ -461,14 +461,8 @@ class DS {
     }
   };
 
-  // class methods
-
-  static get all() {
+  static get list() {
     return Object.keys(DST).map(i => DST[i]);
-  };
-
-  static get(i) {
-    return DST[i];
   };
 };
 
@@ -525,8 +519,8 @@ async function ea_datasets_init(id, inputs, pack, callback) {
   // We need all the datasets to be initialised _before_ setting
   // mutant/collection attributes (order is never guaranteed)
   //
-  DS.all.filter(d => d.mutant).forEach(d => d.mutant_init());
-  DS.all.filter(d => d.items).forEach(d => d.items_init());
+  DS.list.filter(d => d.mutant).forEach(d => d.mutant_init());
+  DS.list.filter(d => d.items).forEach(d => d.items_init());
 
   callback(bounds);
 };

@@ -75,7 +75,7 @@ async function ea_overlord(msg) {
       mapbox_change_theme(ea_settings.mapbox_theme);
     });
 
-    const a = DS.all
+    const a = DS.list
           .filter(d => !d.disabled)
           .map(d => {
             // dscard and dscontrols might have already been created by items_init
@@ -145,7 +145,7 @@ async function ea_overlord(msg) {
   }
 
   case 'timeline-change': {
-    DS.all.forEach(d => {
+    DS.list.forEach(d => {
       if (d.timeline && d.active && d.vectors.features)
         ea_datasets_polygons_csv_timeline.call(d, msg.target);
     });

@@ -74,7 +74,7 @@ function ea_list_filter_type(type) {
   else
     idxn = d => d.id === type;
 
-  return DS.all.filter(d => d.active && d.raster && idxn(d));
+  return DS.list.filter(d => d.active && d.raster && idxn(d));
 };
 
 /*
@@ -152,7 +152,7 @@ function ea_nanny_force_start() {
 
   history.replaceState(null, null, url);
 
-  DS.all.filter(d => d.active).forEach(d => d.turn(false, false));
+  DS.list.filter(d => d.active).forEach(d => d.turn(false, false));
 
   ea_view('inputs');
   ea_controls_select_tab(qs('#controls-tab-filters'), "filters");

@@ -8,8 +8,7 @@
  *
  * @param "type" string. That can be:
  *   - ID of a dataset, or
- *   - the shortname of an index: eai, ani, demand or supply. Some datasets behave
- *     differently depending on this.
+ *   - the shortname of an indexname
  *
  * returns DS to be plotted onto a canvas
  */
@@ -39,20 +38,24 @@ function ea_analysis(list, type) {
       return x.analysis.scale === "key-delta" ? -1 : 1
     });
 
-  // Add up how much demand and supply datasets will account for. Then, just
-  // below, these values will be split into 50-50 of the total analysis.
+  // Add up how much non-compound indexes datasets will account for. Then, just
+  // below, these values will be split into equal proportions of the total
+  // analysis.
   //
+  const singles = {};
+  Object.keys(ea_indexes).forEach(i => !ea_indexes[i].compound ? singles[i] = 0 : null);
+
   const tots = list
         .reduce((a,d) => {
           if (d.indexname) a[d.indexname] += d.weight;
           return a;
-        }, { "supply": 0, "demand": 0 });
+        }, singles);
 
   const weights = {};
 
   list.forEach(d => {
     if (d.indexname)
-      weights[d.id] = d.weight / (tots[d.indexname] * 2);
+      weights[d.id] = d.weight / (tots[d.indexname] * Object.keys(singles).length);
   });
 
   const sum = Object.keys(weights).reduce((acc, curr) => (weights[curr] || 0) + acc, 0);

@@ -22,7 +22,7 @@ class DS {
 
     this.name = o.name_long || o.name || this.category.name_long || this.category.name;
 
-    this.indexname = maybe(this.category, 'controls', 'path', 0);
+    this.indexname = maybe(this.analysis, 'index');
 
     this.metadata = o.metadata;
 

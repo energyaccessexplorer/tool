@@ -62,11 +62,14 @@ function ea_plot_output(data, canvas = null) {
 function ea_list_filter_type(type) {
   let idxn;
 
-  if (['supply', 'demand'].includes(type))
-    idxn = d => d.indexname === type || !d.indexname;
+  const singles = Object.keys(ea_indexes).filter(i => !ea_indexes[i].compound);
+  const multi = Object.keys(ea_indexes).filter(i => ea_indexes[i].compound);
 
-  else if (['eai', 'ani'].includes(type))
-    idxn = d => true;
+  if (singles.includes(type))
+    idxn = d => (d.indexname === type) || !d.indexname;
+
+  else if (multi.includes(type))
+    idxn = d => ea_indexes[type].compound.includes(d.indexname) || !d.indexname;
 
   else
     idxn = d => d.id === type;

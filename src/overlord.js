@@ -31,7 +31,7 @@
  *      init: null
  *      view: "inputs" or "outputs"
  *      dataset: a DS object
- *      index: "demand", "supply", "eai" or "ani"
+ *      index: eg: "demand", "supply", "eai" or "ani"
  *      sort: an array with the ID's of the active datasets
  *      refresh: "inputs" or "outputs"
  *      map: "click"

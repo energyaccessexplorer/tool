@@ -184,7 +184,7 @@ function ea_filter_valued_polygons() {
       return +r[TIMELINE_CURRENT_DATE] >= d.domain[0] && +r[TIMELINE_CURRENT_DATE] <= d.domain[1];
   }
 
-  const arr = datasets.map(d => d.csv.data.filter(r => m(d,r)).map(r => +r[d.csv.idkey]));
+  const arr = datasets.map(d => d.csv.data.filter(r => m(d,r)).map(r => +r[d.csv.key]));
 
   if (!arr.length) return;
 
@@ -194,7 +194,7 @@ function ea_filter_valued_polygons() {
     .forEach(d => {
       const fs = d.vectors.features.features;
       for (let i = 0; i < fs.length; i += 1)
-        fs[i].properties.__hidden = !result.includes(+fs[i].properties[d.vectors.idkey]);
+        fs[i].properties.__hidden = !result.includes(+fs[i].properties[d.vectors.key]);
 
       d.update_source(d.vectors.features);
     });

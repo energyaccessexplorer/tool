@@ -74,6 +74,7 @@ class DS {
       this.vectors = {};
       this.vectors.config = JSON.parse(JSON.stringify(o.category.vectors));
       this.vectors.endpoint = o.vectors_file.endpoint;
+      this.vectors.key = maybe(o.vectors_file, 'configuration', 'key') || 'OBJECTID';
 
       switch (this.vectors.config.shape_type) {
       case 'points': {
@@ -97,6 +98,7 @@ class DS {
       this.csv = {};
       this.csv.config = JSON.parse(JSON.stringify(o.category.csv));
       this.csv.endpoint = o.csv_file.endpoint;
+      this.csv.key = maybe(o.csv_file, 'configuration', 'key') || 'OBJECTID';
       this.csv.parse = _ => ea_datasets_csv.call(this);
 
       if (typeof maybe(this.csv, 'config', 'min') === 'number' &&
@@ -556,8 +558,7 @@ function ea_datasets_csv() {
     .catch(err => ea_datasets_fail.call(this, "CSV"))
     .then(d => d.text())
     .then(r => d3.csvParse(r))
-    .then(d => this.csv.data = d)
-    .then(d => this.csv.idkey = ID_GUESSES.find(x => d[0].hasOwnProperty(x)));
+    .then(d => this.csv.data = d);
 };
 
 function ea_datasets_tiff() {
@@ -764,9 +765,8 @@ function ea_datasets_polygons() {
       }
 
       const fs = this.vectors.features.features;
-      this.vectors.idkey = ID_GUESSES.find(x => fs[0].properties.hasOwnProperty(x));
       for (let i = 0; i < fs.length; i += 1)
-        fs[i].id = fs[i].properties[this.vectors.idkey];
+        fs[i].id = fs[i].properties[this.vectors.key];
 
       this.add_source({
         "type": "geojson",
@@ -816,10 +816,10 @@ async function ea_datasets_polygons_csv(opts) {
 
   const fs = this.vectors.features.features;
   for (let i = 0; i < fs.length; i += 1) {
-    let row = data.find(r => +r[this.csv.idkey] === +fs[i].properties[this.vectors.idkey]);
+    let row = data.find(r => +r[this.csv.key] === +fs[i].properties[this.vectors.key]);
 
     if (!row) {
-      warn(`${this.id} NO ROW!`, i, this.csv.idkey, this.vectors.idkey, data);
+      warn(`${this.id} NO ROW!`, i, this.csv.key, this.vectors.key, data);
       continue;
     }
     fs[i].properties.__color = s(+row[opts.key]);
@@ -844,7 +844,7 @@ function ea_datasets_table() {
 
   for (let i = 0; i < data.length; i++) {
     d = data[i];
-    table[d[this.csv.idkey]] = +d[this.config.column];
+    table[d[this.csv.key]] = +d[this.config.column];
   }
 
   return table;

@@ -227,7 +227,7 @@ function mapbox_hover(id) {
     const ds = DST[id];
 
     if (e.features.length > 0) {
-      nt = e.features[0].properties[ds.vectors.idkey];
+      nt = e.features[0].properties[ds.vectors.key];
       if (t) MAPBOX.setFeatureState({ source: id, id: (t === nt) ? nt : t }, { hover: (t === nt) });
       t = nt;
     }

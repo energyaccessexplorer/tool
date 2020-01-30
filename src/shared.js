@@ -1,7 +1,5 @@
 NORM_STOPS = d3.range(0, 1.000000001, 0.25);
 
-ID_GUESSES = ['County_ID', 'DistrictID', 'Code', 'OBJECTID', 'OID', 'FID', 'ID'];
-
 function ea_layout_init() {
   const n = qs('nav');
   const p = qs('#playground');

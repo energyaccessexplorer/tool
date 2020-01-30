@@ -16,7 +16,8 @@
 function ea_analysis(list, type) {
   const t0 = performance.now();
 
-  const it = new Float32Array(list[0] ? list[0].raster.data.length : 0).fill(-1);
+  const boundaries = DST['boundaries'];
+  const it = new Float32Array(list.length ? boundaries.raster.data.length: 0).fill(-1);
 
   list = list
     .filter(d => {
@@ -33,9 +34,10 @@ function ea_analysis(list, type) {
       return true;
     })
     .sort((x,y) => {
-      // Place the filters first. They will return -1's sooner and make our loops faster.
+      // Place the filters and exclusion buffers first. They will return -1's
+      // sooner and make our loops faster.
       //
-      return x.analysis.scale === "key-delta" ? -1 : 1
+      return (x.analysis.scale === "key-delta" || x.analysis.scale === "exclusion-buffer") ? 1 : -1;
     });
 
   // Add up how much non-compound indexes datasets will account for. Then, just

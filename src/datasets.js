@@ -56,7 +56,6 @@ class DS {
     if (o.category.raster && o.raster_file) {
       this.raster = {};
       this.raster.config = JSON.parse(JSON.stringify(o.category.raster));
-
       this.raster.endpoint = o.raster_file.endpoint;
       this.raster.parse = _ => ea_datasets_tiff.call(this);
 
@@ -96,9 +95,7 @@ class DS {
 
     if (o.category.csv && o.csv_file) {
       this.csv = {};
-
       this.csv.config = JSON.parse(JSON.stringify(o.category.csv));
-
       this.csv.endpoint = o.csv_file.endpoint;
       this.csv.parse = _ => ea_datasets_csv.call(this);
 
@@ -114,10 +111,9 @@ class DS {
   init() {
     if (this.timeline) {
       const b = DST['boundaries'];
-      const v = this.vectors = JSON.parse(JSON.stringify(b.vectors));
-
-      v.endpoint = b.vectors.endpoint;
-      v.parse = x => ea_datasets_polygons.call(x || this);
+      this.vectors = JSON.parse(JSON.stringify(b.vectors));
+      this.vectors.endpoint = b.vectors.endpoint;
+      this.vectors.parse = x => ea_datasets_polygons.call(x || this);
     }
 
     switch (this.datatype) {
@@ -334,11 +330,8 @@ class DS {
 
   analysis_fn(i) {
     let s = null;
+    if (!this.analysis) return s;
 
-    const dom = maybe(this.raster, 'config', 'domain');
-    if (!dom) return s;
-
-    const d = (dom && [dom.min, dom.max]) || [0,1];
     const t = this.domain;
     const v = this.analysis.scale;
     const r = this.invert && this.invert.includes(i) ? [1,0] : [0,1];
@@ -372,14 +365,8 @@ class DS {
 
     case 'linear':
     default: {
-      if (t[0] === t[1])
-        return s = x => (x === +t[0]) ? 1 : -1;
-
-      const lin = d3.scaleLinear()
-            .domain(t || d)
-            .range(r)
-
-      s = lin.clamp(this.analysis.clamp);
+      if (t[0] === t[1]) return s = x => (x === +t[0]) ? 1 : -1;
+      s = d3.scaleLinear().domain(t).range(r).clamp(this.analysis.clamp);
       break;
     }
     }

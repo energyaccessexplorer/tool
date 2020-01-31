@@ -493,7 +493,7 @@ async function ea_datasets_init(id, inputs, pack, callback) {
   let bounds;
   let boundaries_id;
 
-  await ea_api("geography_boundaries", { geography_id: `eq.${id}`}, { object: true })
+  await ea_api("geography_boundaries", { "geography_id": `eq.${id}`}, { object: true })
     .then(r => boundaries_id = r.id);
 
   const bp = {

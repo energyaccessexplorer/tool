@@ -455,13 +455,15 @@ async function ea_controls_selectlist() {
   const url = new URL(location);
   const id = url.searchParams.get('id');
 
-  const list = await ea_api("geographies", {
-    select: ["id", "name"],
-    online: "eq.true",
-    datasets_count: "gt.0",
-    parent_id: GEOGRAPHY.parent_id ? `eq.${GEOGRAPHY.parent_id}` : "is.null",
-    order: "name.asc"
-  }).then(j => {
+  const p = {
+    "select": ["id", "name"],
+    "online": "eq.true",
+    "datasets_count": "gt.0",
+    "parent_id": GEOGRAPHY.parent_id ? `eq.${GEOGRAPHY.parent_id}` : "is.null",
+    "order": "name.asc"
+  };
+
+  const list = await ea_api("geographies", p).then(j => {
     j.forEach(g => data[g.name] = g.name);
     return j;
   });

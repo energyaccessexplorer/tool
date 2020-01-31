@@ -59,7 +59,7 @@ async function ea_overlord(msg) {
 
     ea_layout_init();
 
-    GEOGRAPHY = await ea_api("geographies", { id: `eq.${id}` }, { object: true });
+    GEOGRAPHY = await ea_api("geographies", { "id": `eq.${id}` }, { object: true });
     MAPBOX = mapbox_setup();
 
     await ea_datasets_init(GEOGRAPHY.id, state.inputs, state.pack, bounds => {

@@ -442,10 +442,8 @@ function ea_svg_interval(opts = {}) {
   };
 };
 
-function ea_svg_points_symbol() {
-  if (!(this instanceof DS)) throw `${this} should be a DS. Bye.`;
-
-  const size = 24;
+function ea_svg_points_symbol(opts) {
+  const {size,fill,stroke,strokewidth} = opts;
 
   const svg = d3.create("svg")
         .attr("class", 'svg-point')
@@ -457,17 +455,15 @@ function ea_svg_points_symbol() {
     .attr('r', (size/2) - 2)
     .attr('cx', size/2)
     .attr('cy', size/2)
-    .attr('fill', this.vectors.config.fill)
-    .attr('stroke', this.vectors.config.stroke)
-    .attr('stroke-width', 2);
+    .attr('fill', fill)
+    .attr('stroke', stroke)
+    .attr('stroke-width', strokewidth);
 
   return svg.node();
 };
 
-function ea_svg_lines_symbol() {
-  if (!(this instanceof DS)) throw `${this} should be a DS. Bye.`;
-
-  const size = 28;
+function ea_svg_lines_symbol(opts) {
+  const {size,dasharray,stroke,width,fill} = opts;
 
   const svg = d3.create("svg")
         .attr("width", size)
@@ -476,18 +472,16 @@ function ea_svg_lines_symbol() {
   svg
     .append('path')
     .attr('d', "M 0.5625,23.71875 C 2.0625,8.0625 14.439788,10.706994 17.625,7.5 20.810212,4.2930056 23.71875,0.375 23.71875,0.375")
-    .attr('fill', 'none')
-    .attr('stroke-dasharray', this.vectors.config.dasharray)
-    .attr('stroke', this.vectors.config.stroke)
-    .attr('stroke-width', this.vectors.config.width * 2);
+    .attr('fill', fill)
+    .attr('stroke-dasharray', dasharray)
+    .attr('stroke', stroke)
+    .attr('stroke-width', width * 2);
 
   return svg.node();
 };
 
-function ea_svg_polygons_symbol() {
-  if (!(this instanceof DS)) throw `${this} should be a DS. Bye.`;
-
-  const size = 28;
+function ea_svg_polygons_symbol(opts) {
+  const {size,stroke,strokewidth,fill,opacity} = opts;
 
   const svg = d3.create("svg")
         .attr("class", 'svg-polygon')
@@ -497,10 +491,10 @@ function ea_svg_polygons_symbol() {
   svg
     .append('path')
     .attr('d', "M 5.5532202,7.3474994 24.062506,2.1642083 26.51526,25.827 1.3896115,25.827438 Z")
-    .attr('fill', this.vectors.config.fill)
-    .attr('fill-opacity', this.vectors.config.opacity)
-    .attr('stroke', this.vectors.config.stroke)
-    .attr('stroke-width', this.vectors.config.width - 1 || 1);
+    .attr('fill', fill)
+    .attr('fill-opacity', opacity)
+    .attr('stroke', stroke)
+    .attr('stroke-width', strokewidth);
 
   return svg.node();
 };

@@ -184,17 +184,34 @@ class dscard extends HTMLElement {
 
     switch (ds.datatype) {
     case 'points': {
-      e = ea_svg_points_symbol.call(ds);
+      e = ea_svg_points_symbol({
+        size: 24,
+        fill: ds.vectors.fill,
+        stroke: ds.vectors.stroke,
+        strokewidth: 2,
+      });
       break;
     }
 
     case 'lines': {
-      e = ea_svg_lines_symbol.call(ds);
+      e = ea_svg_lines_symbol({
+        size: 28,
+        dasharray: ds.vectors.dasharray,
+        stroke: ds.vectors.stroke,
+        width: ds.vectors.width * 2,
+        fill: "none"
+      });
       break;
     }
 
     case 'polygons': {
-      e = ea_svg_polygons_symbol.call(ds);
+      e = ea_svg_polygons_symbol({
+        size: 28,
+        fill: ds.vectors.fill,
+        opacity: ds.vectors.opacity,
+        stroke: ds.vectors.stroke,
+        strokewidth: (ds.vectors.width - 1) || 1
+      });
       break;
     }
 

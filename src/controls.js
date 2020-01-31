@@ -354,10 +354,7 @@ function ea_controls_range(opts = {}) {
   if (!opts.sliders) return null;
 
   const update = (x, i, el) => {
-    if (this.datatype.match('raster-'))
-      el.innerText = (x * (this.raster.factor || 1)).toFixed(this.raster.precision || 0);
-    else
-      el.innerText = x;
+    el.innerText = (+x).toFixed(maybe(this, 'raster', 'precision') || 0);
 
     const man = maybe(this.controls, i ? 'manual_max' : 'manual_min');
     if (man) man.value = x;

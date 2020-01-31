@@ -225,7 +225,8 @@ class dscard extends HTMLElement {
         ce('div', ds.domain[1].toString())
       );
 
-      d.append(r,
+      d.append(
+        r,
         ce('div', null, { style: "display: inline-block; width: 64px; height: 5px; background-color: rgba(155,155,155,1); margin: 15px 15px 0 0;" }),
         ce('div', "Not Available", { style: "display: inline-block; font-size: x-small;" })
       );
@@ -236,8 +237,8 @@ class dscard extends HTMLElement {
     case 'raster': {
       let r = tmpl("#ramp");
       r.append (
-        ce('div', ds.raster.domain.min * ds.raster.factor + ""),
-        ce('div', ds.raster.domain.max * ds.raster.factor + ""));
+        ce('div', ds.raster.domain.min + ""),
+        ce('div', ds.raster.domain.max + ""));
 
       d.append(r);
 

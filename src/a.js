@@ -471,8 +471,6 @@ function ea_overlord_map_click(state, msg) {
           rc.value !== t.raster.nodata) {
         v = rc.value;
 
-        if (t.raster) v = v * t.raster.factor;
-
         const vv = (v%1 === 0) ? v : v.toFixed(2);
 
         const td = table_data([{

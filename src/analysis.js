@@ -28,8 +28,8 @@ function ea_analysis(list, type) {
       // Discard datasets which are filters and use the entire domain (useless).
       //
       if (d.analysis.scale === 'key-delta' &&
-          (d.domain[0] === d.raster.config.domain.min &&
-           d.domain[1] === d.raster.config.domain.max)) return false;
+          (d.domain[0] === d.raster.domain.min &&
+           d.domain[1] === d.raster.domain.max)) return false;
 
       return true;
     })

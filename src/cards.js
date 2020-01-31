@@ -236,8 +236,8 @@ class dscard extends HTMLElement {
     case 'raster': {
       let r = tmpl("#ramp");
       r.append (
-        ce('div', ds.raster.config.domain.min * ds.raster.config.factor + ""),
-        ce('div', ds.raster.config.domain.max * ds.raster.config.factor + ""));
+        ce('div', ds.raster.domain.min * ds.raster.factor + ""),
+        ce('div', ds.raster.domain.max * ds.raster.factor + ""));
 
       d.append(r);
 

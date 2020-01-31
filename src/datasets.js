@@ -58,29 +58,27 @@ class DS {
     const c = maybe(o.df.find(x => x.func === 'csv'), 'file');
 
     if (o.category.raster && r) {
-      this.raster = {};
-      this.raster.config = JSON.parse(JSON.stringify(o.category.raster));
+      this.raster = JSON.parse(JSON.stringify(o.category.raster));
       this.raster.endpoint = r.endpoint;
       this.raster.parse = _ => ea_datasets_tiff.call(this);
 
-      if (typeof maybe(this.raster, 'config', 'domain', 'min') === 'number' &&
-          typeof maybe(this.raster, 'config', 'domain', 'max') === 'number')
-        this.domain = [this.raster.config.domain.min, this.raster.config.domain.max];
+      if (typeof maybe(this.raster, 'domain', 'min') === 'number' &&
+          typeof maybe(this.raster, 'domain', 'max') === 'number')
+        this.domain = [this.raster.domain.min, this.raster.domain.max];
 
-      if (typeof maybe(this.raster, 'config', 'init', 'min') === 'number' &&
-          typeof maybe(this.raster, 'config', 'init', 'max') === 'number')
-        this.domain_default = [this.raster.config.init.min, this.raster.config.init.max];
+      if (typeof maybe(this.raster, 'init', 'min') === 'number' &&
+          typeof maybe(this.raster, 'init', 'max') === 'number')
+        this.domain_default = [this.raster.init.min, this.raster.init.max];
 
       check_domain.call(this);
     }
 
     if (o.category.vectors && v) {
-      this.vectors = {};
-      this.vectors.config = JSON.parse(JSON.stringify(o.category.vectors));
+      this.vectors = JSON.parse(JSON.stringify(o.category.vectors));
       this.vectors.endpoint = v.endpoint;
       this.vectors.key = maybe(v, 'configuration', 'key') || 'OBJECTID';
 
-      switch (this.vectors.config.shape_type) {
+      switch (this.vectors.shape_type) {
       case 'points': {
         this.vectors.parse = x => ea_datasets_points.call(x || this);
         break;
@@ -99,15 +97,14 @@ class DS {
     }
 
     if (o.category.csv && c) {
-      this.csv = {};
-      this.csv.config = JSON.parse(JSON.stringify(o.category.csv));
+      this.csv =  JSON.parse(JSON.stringify(o.category.csv));
       this.csv.endpoint = c.endpoint;
       this.csv.key = maybe(c, 'configuration', 'key') || 'OBJECTID';
       this.csv.parse = _ => ea_datasets_csv.call(this);
 
-      if (typeof maybe(this.csv, 'config', 'min') === 'number' &&
-          typeof maybe(this.csv, 'config', 'max') === 'number') {
-        this.domain = this.domain_default = [this.csv.config.min, this.csv.config.max];
+      if (typeof maybe(this.csv, 'min') === 'number' &&
+          typeof maybe(this.csv, 'max') === 'number') {
+        this.domain = this.domain_default = [this.csv.min, this.csv.max];
       }
 
       check_domain.call(this);
@@ -127,9 +124,9 @@ class DS {
       this.download = this.raster.endpoint;
 
       this.colorscale = ea_colorscale({
-        stops: this.raster.config.color_stops,
-        domain: this.raster.config.domain,
-        intervals: this.raster.config.intervals,
+        stops: this.raster.color_stops,
+        domain: this.raster.domain,
+        intervals: this.raster.intervals,
       });
 
       break;
@@ -151,7 +148,7 @@ class DS {
 
       if (this.config.column) {
         this.colorscale = ea_colorscale({
-          stops: this.vectors.config.specs.color_stops
+          stops: this.vectors.specs.color_stops
         });
 
         ea_datasets_polygons_csv_column.call(this);
@@ -213,7 +210,7 @@ class DS {
   get datatype() {
     let t;
 
-    if (this.vectors) t = this.vectors.config.shape_type;
+    if (this.vectors) t = this.vectors.shape_type;
     else if (this.raster) t = "raster";
     else if (this.csv) t = "table";
 
@@ -572,7 +569,6 @@ function ea_datasets_tiff() {
   async function run_it(blob) {
     function draw() {
       const r = this.raster;
-      let d = r.config.domain;
 
       if (!r.canvas) {
         r.canvas = ea_plot({
@@ -655,7 +651,7 @@ function ea_datasets_geojson() {
 function ea_datasets_points() {
   return ea_datasets_geojson.call(this)
     .then(_ => {
-      const v = this.vectors.config;
+      const v = this.vectors;
 
       this.add_source({
         "type": "geojson",
@@ -684,7 +680,7 @@ function ea_datasets_lines() {
       // mapbox-gl does not follow SVG's stroke-dasharray convention when it comes
       // to single numbered arrays.
       //
-      let da = this.vectors.config.dasharray.split(' ').map(x => +x);
+      let da = this.vectors.dasharray.split(' ').map(x => +x);
       if (da.length === 1) {
         (da[0] === 0) ?
           da = [1] :
@@ -692,7 +688,7 @@ function ea_datasets_lines() {
       }
 
       const fs = this.vectors.features.features;
-      const specs = this.vectors.config.specs;
+      const specs = this.vectors.specs;
 
       const criteria = [];
 
@@ -732,8 +728,8 @@ function ea_datasets_lines() {
           if (p && criteria.indexOf(JSON.stringify(c)) < 0) criteria.push(JSON.stringify(c));
         }
         else {
-          fs[i].properties['__color'] = this.vectors.config.stroke;
-          fs[i].properties['__width'] = this.vectors.config.width || 1;
+          fs[i].properties['__color'] = this.vectors.stroke;
+          fs[i].properties['__width'] = this.vectors.width || 1;
         }
       }
 
@@ -765,7 +761,7 @@ function ea_datasets_lines() {
 function ea_datasets_polygons() {
   return ea_datasets_geojson.call(this)
     .then(_ => {
-      const v = this.vectors.config;
+      const v = this.vectors;
 
       if (this.timeline) {
         ea_datasets_polygons_csv_timeline.call(this);

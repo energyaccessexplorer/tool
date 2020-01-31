@@ -38,10 +38,10 @@ class dscontrols extends HTMLElement {
     let steps;
     if (c.range_steps) {
       steps = [];
-      const s = (this.ds.raster.config.domain.max - this.ds.raster.config.domain.min) / (c.range_steps - 1);
+      const s = (this.ds.raster.domain.max - this.ds.raster.domain.min) / (c.range_steps - 1);
 
       for (let i = 0; i < c.range_steps; i += 1)
-        steps[i] = this.ds.raster.config.domain.min + (s * i);
+        steps[i] = this.ds.raster.domain.min + (s * i);
     }
 
     switch (this.ds.datatype) {
@@ -195,7 +195,7 @@ class dscontrols extends HTMLElement {
     }
 
     if (this.range_group) {
-      const d = this.ds.raster.config.init;
+      const d = this.ds.raster.init;
       this.range_group.change(d.min, d.max);
     }
 
@@ -355,7 +355,7 @@ function ea_controls_range(opts = {}) {
 
   const update = (x, i, el) => {
     if (this.datatype.match('raster-'))
-      el.innerText = (x * (this.raster.config.factor || 1)).toFixed(this.raster.config.precision || 0);
+      el.innerText = (x * (this.raster.factor || 1)).toFixed(this.raster.precision || 0);
     else
       el.innerText = x;
 

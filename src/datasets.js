@@ -53,10 +53,14 @@ class DS {
       }
     };
 
-    if (o.category.raster && o.raster_file) {
+    const r = maybe(o.df.find(x => x.func === 'raster'), 'file');
+    const v = maybe(o.df.find(x => x.func === 'vectors'), 'file');
+    const c = maybe(o.df.find(x => x.func === 'csv'), 'file');
+
+    if (o.category.raster && r) {
       this.raster = {};
       this.raster.config = JSON.parse(JSON.stringify(o.category.raster));
-      this.raster.endpoint = o.raster_file.endpoint;
+      this.raster.endpoint = r.endpoint;
       this.raster.parse = _ => ea_datasets_tiff.call(this);
 
       if (typeof maybe(this.raster, 'config', 'domain', 'min') === 'number' &&
@@ -70,11 +74,11 @@ class DS {
       check_domain.call(this);
     }
 
-    if (o.category.vectors && o.vectors_file) {
+    if (o.category.vectors && v) {
       this.vectors = {};
       this.vectors.config = JSON.parse(JSON.stringify(o.category.vectors));
-      this.vectors.endpoint = o.vectors_file.endpoint;
-      this.vectors.key = maybe(o.vectors_file, 'configuration', 'key') || 'OBJECTID';
+      this.vectors.endpoint = v.endpoint;
+      this.vectors.key = maybe(v, 'configuration', 'key') || 'OBJECTID';
 
       switch (this.vectors.config.shape_type) {
       case 'points': {
@@ -94,11 +98,11 @@ class DS {
       }
     }
 
-    if (o.category.csv && o.csv_file) {
+    if (o.category.csv && c) {
       this.csv = {};
       this.csv.config = JSON.parse(JSON.stringify(o.category.csv));
-      this.csv.endpoint = o.csv_file.endpoint;
-      this.csv.key = maybe(o.csv_file, 'configuration', 'key') || 'OBJECTID';
+      this.csv.endpoint = c.endpoint;
+      this.csv.key = maybe(c, 'configuration', 'key') || 'OBJECTID';
       this.csv.parse = _ => ea_datasets_csv.call(this);
 
       if (typeof maybe(this.csv, 'config', 'min') === 'number' &&
@@ -484,7 +488,7 @@ window.DST = {};
  */
 
 async function ea_datasets_init(id, inputs, pack, callback) {
-  let attrs = '*,raster_file(*),vectors_file(*),csv_file(*),category(*)';
+  let select = ["*", "category(*)", "df:_datasets_files(*,file(*))"];
 
   let bounds;
   let boundaries_id;
@@ -492,7 +496,13 @@ async function ea_datasets_init(id, inputs, pack, callback) {
   await ea_api("geography_boundaries", { geography_id: `eq.${id}`}, { object: true })
     .then(r => boundaries_id = r.id);
 
-  await ea_api("datasets", { id: `eq.${boundaries_id}`, select: attrs }, { object: true })
+  const bp = {
+    "id": `eq.${boundaries_id}`,
+    "select": select,
+    "df.active": "eq.true"
+  };
+
+  await ea_api("datasets", bp, { object: true })
     .then(async e => {
       let ds = new DS(e);
 
@@ -507,12 +517,15 @@ async function ea_datasets_init(id, inputs, pack, callback) {
 
   pack = maybe(pack, 'length') ? pack : 'all';
 
-  await ea_api("datasets", {
-    geography_id: `eq.${id}`,
-    select: attrs,
-    pack: `eq.${pack}`,
-    online: "eq.true"
-  })
+  const p = {
+    "geography_id": `eq.${id}`,
+    "select": select,
+    "pack": `eq.${pack}`,
+    "online": "eq.true",
+    "df.active": "eq.true"
+  };
+
+  await ea_api("datasets", p)
     .then(r => r.filter(d => d.category.name !== 'boundaries'))
     .then(r => r.map(e => new DS(e, inputs.includes(e.category.name))));
 

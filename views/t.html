@@ -82,11 +82,11 @@
       </div>
 
       <div id="visual">
-        <div id="timeline"></div>
-
         <div id="maparea">
           <div id="mapbox-container"></div>
+          <div id="views"></div>
         </div>
+        <div id="timeline"></div>
       </div>
 
       <div id="right-pane">
@@ -127,6 +127,18 @@
   </body>
 
   <script>
+    ea_views = {
+      "timeline": {
+        "name": "Timeline",
+        "description": "Underlying data that go into the analysis"
+      },
+
+      "filtered": {
+        "name": "Target Areas",
+        "description": "Filtered areas"
+      },
+    };
+
     ea_branch_dict = {
       "sub-national": "Sub-national data",
       "demographics": "Demographics",
@@ -144,7 +156,7 @@
     window.ea_flash = new flash();
 
     ea_state_params = {
-      "view": ['inputs'],
+      "view": ['timeline', 'filtered'],
       "inputs": [],
       "pack": [],
     };

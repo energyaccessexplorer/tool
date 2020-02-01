@@ -102,15 +102,32 @@ function ea_controls_dropdown() {
 
 function ea_overlord_init(state) {
   ea_timeline_init();
+  ea_views_init();
 };
 
 function ea_overlord_refresh(state) { };
 
 async function ea_overlord_view(state, msg) {
-  await Promise.all(state.inputs.map(id => DST[id].turn(true, true)));
+  let t = msg.target;
 
-  ea_cards(state.inputs);
-  ea_cards_sort(state.inputs);
+  ea_state_set('view', t);
+
+  await Promise.all(state.inputs.map(id => DST[id].turn(true, (t === 'timeline'))));
+
+  if (t === "outputs") {
+    qs('#timeline').style.height = '0';
+  }
+
+  else if (t === 'filtered') {
+    qs('#timeline').style.height = '0';
+  }
+
+  else if (t === "timeline") {
+    qs('#timeline').style.height = '';
+
+    ea_cards(state.inputs);
+    ea_cards_sort(state.inputs);
+  }
 };
 
 async function ea_overlord_dataset(state, msg) {
@@ -124,8 +141,12 @@ async function ea_overlord_dataset(state, msg) {
     state.inputs.splice(state.inputs.indexOf(ds.id), 1);
   }
 
-  await ds.turn(ds.active, true);
-  ds.raise();
+  if (state.view === 'timeline') {
+    await ds.turn(ds.active, true);
+    ds.raise();
+  } else {
+    await ds.turn(ds.active, false);
+  }
 
   inputs = [...new Set(inputs)];
   ea_cards(inputs);

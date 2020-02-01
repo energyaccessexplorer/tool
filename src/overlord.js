@@ -125,13 +125,13 @@ async function ea_overlord(msg) {
     }
 
     else if (state.view === "inputs") {
-      // TODO: this is wrong. waiting for specs...
-      //
-      if (typeof ea_filter_valued_polygons === 'function')
-        ea_filter_valued_polygons();
+      ea_plot_active_analysis(state.output);
+    }
 
-      if (typeof ea_plot_active_analysis === 'function')
-        ea_plot_active_analysis(state.output);
+    else if (state.view === "filtered") {
+    }
+
+    else if (state.view === "timeline") {
     }
 
     break;

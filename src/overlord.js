@@ -105,7 +105,7 @@ async function ea_overlord(msg) {
   }
 
   case 'view': {
-    ea_overlord_view(state, msg);
+    await ea_overlord_view(state, msg);
 
     window.dispatchEvent(new Event('resize'));
 
@@ -129,6 +129,7 @@ async function ea_overlord(msg) {
     }
 
     else if (state.view === "filtered") {
+      ea_filter_valued_polygons();
     }
 
     else if (state.view === "timeline") {

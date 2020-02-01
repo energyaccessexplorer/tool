@@ -760,12 +760,11 @@ function ea_datasets_lines() {
 
 function ea_datasets_polygons() {
   return ea_datasets_geojson.call(this)
-    .then(_ => {
+    .then(async _ => {
       const v = this.vectors;
 
-      if (this.timeline) {
+      if (this.timeline)
         ea_datasets_polygons_csv_timeline.call(this);
-      }
 
       const fs = this.vectors.features.features;
       for (let i = 0; i < fs.length; i += 1)
@@ -789,10 +788,6 @@ function ea_datasets_polygons() {
       });
 
       mapbox_hover(this.id);
-
-      if (this.timeline) {
-        mapbox_dblclick(this.id);
-      }
     });
 };
 
@@ -807,7 +802,7 @@ async function ea_datasets_polygons_csv(opts) {
 
   if (!data) warn(this.id, "has no csv.data");
 
-  const l = d3.scaleQuantize().domain(this.domain).range(stops);
+  const l = d3.scaleQuantize().domain([this.csv.min, this.csv.max]).range(stops);
   const s = x => (null === x || undefined === x || x === "") ? "rgba(155,155,155,1)" : l(x);
 
   this.csv.scale = l;

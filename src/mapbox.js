@@ -238,11 +238,3 @@ function mapbox_hover(id) {
     t = null;
   });
 };
-
-function mapbox_dblclick(id) {
-  MAPBOX.on('dblclick', id, function(e) {
-    if (e.features.length > 0) {
-      mapbox_fit(geojsonExtent(e.features[0]), true);
-    }
-  });
-};

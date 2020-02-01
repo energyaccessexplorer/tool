@@ -105,7 +105,30 @@ function ea_overlord_init(state) {
   ea_views_init();
 };
 
-function ea_overlord_refresh(state) { };
+function ea_overlord_refresh(state) {
+  if (!MAPBOX.getSource('filtered-source')) {
+    MAPBOX.addSource('filtered-source', {
+      "type": 'geojson',
+      "data": DST['boundaries'].vectors.features
+    });
+  }
+
+  if (!MAPBOX.getLayer('filtered-layer')) {
+    MAPBOX.addLayer({
+      "id": 'filtered-layer',
+      "source": 'filtered-source',
+      "type": 'fill',
+      "layout": {
+        "visibility": "none",
+      },
+      "paint": {
+        "fill-color": "#0571B0",
+        "fill-outline-color": "black",
+        "fill-opacity": [ "case", [ "boolean", [ "get", "__hidden" ], false ], 0, 1 ]
+      },
+    }, MAPBOX.first_symbol);
+  }
+};
 
 async function ea_overlord_view(state, msg) {
   let t = msg.target;
@@ -120,10 +143,14 @@ async function ea_overlord_view(state, msg) {
 
   else if (t === 'filtered') {
     qs('#timeline').style.height = '0';
+    MAPBOX.setLayoutProperty('filtered-layer', 'visibility', 'visible');
+    TIMELINE_CURRENT_DATE = TIMELINE_DATES.slice(-1)[0];
+    ea_filter_valued_polygons();
   }
 
   else if (t === "timeline") {
     qs('#timeline').style.height = '';
+    MAPBOX.setLayoutProperty('filtered-layer', 'visibility', 'none');
 
     ea_cards(state.inputs);
     ea_cards_sort(state.inputs);
@@ -162,8 +189,6 @@ async function ea_overlord_dataset(state, msg) {
     qs('#district-header', rp).innerText = "";
     if (TIMELINE_LINES) TIMELINE_LINES.svg.remove();
   }
-
-  ea_filter_valued_polygons();
 };
 
 function ea_overlord_map_click(state, msg) {
@@ -187,10 +212,18 @@ function ea_overlord_map_click(state, msg) {
     }
   }
 };
+
 async function ea_datasets_polygons_csv_timeline(t) {
   const opts = {
 	key: t || TIMELINE_CURRENT_DATE || TIMELINE_DATES[TIMELINE_DATES.length - 1],
   };
+
+  await until(_ => this.csv.data);
+
+  if (!this.domain) {
+    this.domain[0] = d3.min([].concat(...TIMELINE_DATES.map(d => this.csv.data.map(r => +r[d]))));
+    this.domain[1] = d3.max([].concat(...TIMELINE_DATES.map(d => this.csv.data.map(r => +r[d]))));
+  }
 
   ea_datasets_polygons_csv.call(this, opts);
 };
@@ -199,11 +232,13 @@ function ea_filter_valued_polygons() {
   const datasets = DS.list.filter(d => d.active && d.csv.data && d.datatype.match("-(fixed|timeline)"));
 
   function m(d,r) {
-    if (d.config.column)
-      return +r[d.config.column] >= d.domain[0] && +r[d.config.column] <= d.domain[1];
-    else if (d.timeline)
+    const c = d.config.column;
+
+    if (d.timeline)
       return +r[TIMELINE_CURRENT_DATE] >= d.domain[0] && +r[TIMELINE_CURRENT_DATE] <= d.domain[1];
-  }
+    else if (c)
+      return +r[c] >= d.domain[0] && +r[c] <= d.domain[1];
+  };
 
   const arr = datasets.map(d => d.csv.data.filter(r => m(d,r)).map(r => +r[d.csv.key]));
 
@@ -211,12 +246,13 @@ function ea_filter_valued_polygons() {
 
   const result = arr[0].filter(e => arr.every(a => a.includes(e)));
 
-  datasets
-    .forEach(d => {
-      const fs = d.vectors.features.features;
-      for (let i = 0; i < fs.length; i += 1)
-        fs[i].properties.__hidden = !result.includes(+fs[i].properties[d.vectors.key]);
+  const source = MAPBOX.getSource('filtered-source');
 
-      d.update_source(d.vectors.features);
-    });
+  const b = DST.boundaries;
+  const fs = source._data.features;
+
+  for (let i = 0; i < fs.length; i += 1)
+    fs[i].properties.__hidden = !result.includes(+fs[i].properties[b.vectors.key]);
+
+  source.setData(source._data);
 };

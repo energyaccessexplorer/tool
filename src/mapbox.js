@@ -218,23 +218,3 @@ function mapbox_fit(bounds, animate = false) {
 
   return bounds;
 };
-
-function mapbox_hover(id) {
-  let t = null;
-
-  MAPBOX.on('mousemove', id, function(e) {
-    let nt;
-    const ds = DST[id];
-
-    if (e.features.length > 0) {
-      nt = e.features[0].properties[ds.vectors.key];
-      if (t) MAPBOX.setFeatureState({ source: id, id: (t === nt) ? nt : t }, { hover: (t === nt) });
-      t = nt;
-    }
-  });
-
-  MAPBOX.on('mouseleave', id, function() {
-    if (t) MAPBOX.setFeatureState({ source: id, id: t }, { hover: false });
-    t = null;
-  });
-};

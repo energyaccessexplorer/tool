@@ -45,20 +45,17 @@ class DS {
     function check_domain() {
       if (undefined === this.domain) {
         ea_flash.push({
-          title: `'${this.id}' disabled`,
+          title: `'${this.id}' ignored`,
           message: `Cannot set dataset's domain`,
           timeout: 5000,
           type: 'error'
         });
-        warn(`Could not set a domain for ${this.id}. Disabling...`);
+        warn(`Could not set a domain for ${this.id}. Abort.`);
         this.disable();
       }
     };
 
     const r = maybe(o.df.find(x => x.func === 'raster'), 'file');
-    const v = maybe(o.df.find(x => x.func === 'vectors'), 'file');
-    const c = maybe(o.df.find(x => x.func === 'csv'), 'file');
-
     if (o.category.raster && r) {
       this.raster = JSON.parse(JSON.stringify(o.category.raster));
       this.raster.endpoint = r.endpoint;
@@ -80,6 +77,7 @@ class DS {
       check_domain.call(this);
     }
 
+    const v = maybe(o.df.find(x => x.func === 'vectors'), 'file');
     if (o.category.vectors && v) {
       this.vectors = JSON.parse(JSON.stringify(o.category.vectors));
       this.vectors.endpoint = v.endpoint;
@@ -103,6 +101,7 @@ class DS {
       }
     }
 
+    const c = maybe(o.df.find(x => x.func === 'csv'), 'file');
     if (o.category.csv && c) {
       this.csv = JSON.parse(JSON.stringify(o.category.csv));
       this.csv.endpoint = c.endpoint;
@@ -159,8 +158,6 @@ class DS {
         this.colorscale = ea_colorscale({
           stops: this.vectors.specs.color_stops
         });
-
-        ea_datasets_polygons_csv_column.call(this);
       }
       break;
     }
@@ -201,8 +198,6 @@ class DS {
 
       for (let a in ovrr[c]) {
         if (!maybe(this.category, c)) continue;
-
-        log(this.id, "category override:", c, "->", a, "=", ovrr[c][a], "was", this.category[c][a]);
         this.category[c][a] = ovrr[c][a];
       }
     }
@@ -210,8 +205,6 @@ class DS {
     const attrs = ['unit', 'name', 'name_long'];
     for (let a of attrs) {
       if (!ovrr[a]) continue;
-
-      log(this.id, "category override:", a, "=", ovrr[a], "was", this.category[a]);
       this.category[a] = ovrr[a];
     }
   };
@@ -237,8 +230,7 @@ class DS {
     this.active = false;
     this.disabled = true;
 
-    until(_ => this.controls)
-      .then(_ => this.controls.disable());
+    if (this.controls) this.controls.disable();
 
     if (this.card) this.card.disable();
 
@@ -776,6 +768,8 @@ function ea_datasets_polygons() {
 
       if (this.timeline)
         ea_datasets_polygons_csv_timeline.call(this);
+      else if (this.config.column)
+        ea_datasets_polygons_csv_column.call(this);
 
       const fs = this.vectors.features.features;
       for (let i = 0; i < fs.length; i += 1)
@@ -797,8 +791,6 @@ function ea_datasets_polygons() {
           "fill-opacity": [ "case", [ "boolean", [ "get", "__hidden" ], false ], 0, 1 * v.opacity ]
         },
       });
-
-      mapbox_hover(this.id);
     });
 };
 

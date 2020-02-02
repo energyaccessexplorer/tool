@@ -33,16 +33,25 @@ class dscontrols extends HTMLElement {
     if (c.weight)
       this.weight_group = ea_controls_weight.call(this.ds);
 
-    const lr = c.range_label || cat.unit || 'range';
+    if (this.ds.items)
+      this.collection_list = ea_controls_collection_list.call(this.ds);
+
+    if (this.ds.mutant)
+      ea_controls_mutant_options.call(this.ds);
+
+    this.dropdown = new dropdown(ea_controls_dropdown.call(this));
+    const cat = this.ds.category;
 
     let steps;
-    if (c.range_steps) {
+    if (cat.controls.range_steps) {
       steps = [];
-      const s = (this.ds.raster.domain.max - this.ds.raster.domain.min) / (c.range_steps - 1);
+      const s = (this.ds.raster.domain.max - this.ds.raster.domain.min) / (cat.controls.range_steps - 1);
 
-      for (let i = 0; i < c.range_steps; i += 1)
+      for (let i = 0; i < cat.controls.range_steps; i += 1)
         steps[i] = this.ds.raster.domain.min + (s * i);
     }
+
+    const lr = cat.controls.range_label || cat.unit || 'range';
 
     switch (this.ds.datatype) {
     case 'raster':
@@ -50,7 +59,7 @@ class dscontrols extends HTMLElement {
       this.range_group = ea_controls_range.call(this.ds, {
         ramp: lr,
         steps: steps,
-        sliders: c.range
+        sliders: cat.controls.range
       });
       break;
     }
@@ -63,7 +72,8 @@ class dscontrols extends HTMLElement {
       this.range_group = ea_controls_range.call(this.ds, {
         ramp: lr,
         steps: steps,
-        sliders: c.range
+        sliders: cat.controls.range,
+        domain: this.ds.domain
       });
       break;
     }
@@ -75,7 +85,7 @@ class dscontrols extends HTMLElement {
       this.range_group = ea_controls_range.call(this.ds, {
         ramp: lr,
         steps: steps,
-        sliders: c.range
+        sliders: cat.controls.range,
         domain: this.ds.domain
       });
       break;
@@ -89,18 +99,9 @@ class dscontrols extends HTMLElement {
 
     this.manual_setup();
 
-    if (this.ds.items)
-      this.collection_list = ea_controls_collection_list.call(this.ds);
-
-    if (this.ds.mutant)
-      this.mutant_options = ea_controls_mutant_options.call(this.ds);
-
-    this.dropdown = new dropdown(ea_controls_dropdown.call(this));
   };
 
   render() {
-    this.content.style.display = this.ds.active ? '' : 'none';
-
     slot_populate.call(this, this.ds, {
       "dropdown": this.dropdown,
       "info": this.info,
@@ -123,7 +124,7 @@ class dscontrols extends HTMLElement {
   };
 
   turn(t) {
-    this.content.style.display = t ? '' : 'none';
+    this.content.style.display = t ? 'block' : 'none';
     this.main.classList[this.ds.active ? 'add' : 'remove']('active');
 
     if (this.checkbox) this.checkbox.change(t);

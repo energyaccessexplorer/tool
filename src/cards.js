@@ -220,9 +220,9 @@ class dscard extends HTMLElement {
       const r = tmpl("#ramp");
 
       r.append(
-        ce('div', ds.domain[0].toString()),
+        ce('div', maybe(ds.domain, 0) + ""),
         ce('div', ds.category.unit),
-        ce('div', ds.domain[1].toString())
+        ce('div', maybe(ds.domain, 1) + "")
       );
 
       d.append(

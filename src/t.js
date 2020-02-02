@@ -180,7 +180,7 @@ async function ea_overlord_dataset(state, msg) {
   ea_state_set('inputs', inputs);
 
   if (state.inputs.length) {
-    const datasets = DS.list.filter(d => d.active && d.timeline && d.csv.data);
+    const datasets = DS.list.filter(d => d.active && d.timeline && maybe(d, 'csv', 'data'));
 
     if (TIMELINE_DISTRICT)
       ea_timeline_lines_draw(datasets, TIMELINE_DISTRICT);
@@ -207,7 +207,7 @@ function ea_overlord_map_click(state, msg) {
     if (!et) return;
 
     if (et.source === i) {
-      const datasets = DS.list.filter(d => d.active && d.timeline && d.csv.data);
+      const datasets = DS.list.filter(d => d.active && d.timeline && maybe(d, 'csv', 'data'));
       ea_timeline_lines_draw(datasets, (TIMELINE_DISTRICT = et.properties['District']));
     }
   }

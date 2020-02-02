@@ -36,6 +36,18 @@ class DS {
 
     this.files_setup(o);
 
+    if (!this.mutant) ;
+    else if (undefined === this.domain) {
+      ea_flash.push({
+        title: `'${this.id}' ignored`,
+        message: `Cannot set dataset's domain`,
+        timeout: 5000,
+        type: 'error'
+      });
+      warn(`Could not set a domain for ${this.id}. Abort.`);
+      this.disable();
+    }
+
     this.init();
 
     if (!this.disabled) {
@@ -47,41 +59,6 @@ class DS {
   };
 
   files_setup(o) {
-    function check_domain() {
-      if (undefined === this.domain) {
-        ea_flash.push({
-          title: `'${this.id}' ignored`,
-          message: `Cannot set dataset's domain`,
-          timeout: 5000,
-          type: 'error'
-        });
-        warn(`Could not set a domain for ${this.id}. Abort.`);
-        this.disable();
-      }
-    };
-
-    const r = maybe(o.df.find(x => x.func === 'raster'), 'file');
-    if (o.category.raster && r) {
-      this.raster = JSON.parse(JSON.stringify(o.category.raster));
-      this.raster.endpoint = r.endpoint;
-      this.raster.parse = _ => ea_datasets_tiff.call(this);
-
-      if (typeof maybe(this.raster, 'domain', 'min') === 'number' &&
-          typeof maybe(this.raster, 'domain', 'max') === 'number') {
-        this.domain = [this.raster.domain.min, this.raster.domain.max];
-        this._domain = JSON.parse(JSON.stringify(this.domain));
-        this.domain_init = JSON.parse(JSON.stringify(this.domain));
-      }
-
-      if (typeof maybe(this.raster, 'init', 'min') === 'number' &&
-          typeof maybe(this.raster, 'init', 'max') === 'number') {
-        this._domain = [this.raster.init.min, this.raster.init.max];
-        this.domain_init = JSON.parse(JSON.stringify(this._domain));
-      }
-
-      check_domain.call(this);
-    }
-
     const v = maybe(o.df.find(x => x.func === 'vectors'), 'file');
     if (o.category.vectors && v) {
       this.vectors = JSON.parse(JSON.stringify(o.category.vectors));
@@ -106,6 +83,26 @@ class DS {
       }
     }
 
+    const r = maybe(o.df.find(x => x.func === 'raster'), 'file');
+    if (o.category.raster && r) {
+      this.raster = JSON.parse(JSON.stringify(o.category.raster));
+      this.raster.endpoint = r.endpoint;
+      this.raster.parse = _ => ea_datasets_tiff.call(this);
+
+      if (typeof maybe(this.raster, 'domain', 'min') === 'number' &&
+          typeof maybe(this.raster, 'domain', 'max') === 'number') {
+        this.domain = [this.raster.domain.min, this.raster.domain.max];
+        this._domain = JSON.parse(JSON.stringify(this.domain));
+        this.domain_init = JSON.parse(JSON.stringify(this.domain));
+      }
+
+      if (typeof maybe(this.raster, 'init', 'min') === 'number' &&
+          typeof maybe(this.raster, 'init', 'max') === 'number') {
+        this._domain = [this.raster.init.min, this.raster.init.max];
+        this.domain_init = JSON.parse(JSON.stringify(this._domain));
+      }
+    }
+
     const c = maybe(o.df.find(x => x.func === 'csv'), 'file');
     if (o.category.csv && c) {
       this.csv = JSON.parse(JSON.stringify(o.category.csv));
@@ -119,8 +116,6 @@ class DS {
         this._domain = JSON.parse(JSON.stringify(this.domain));
         this.domain_init = JSON.parse(JSON.stringify(this.domain));
       }
-
-      check_domain.call(this);
     }
   };
 

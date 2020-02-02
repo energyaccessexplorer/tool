@@ -76,15 +76,7 @@ async function ea_overlord(msg) {
     });
 
     const a = DS.list
-          .filter(d => !d.disabled)
-          .map(d => {
-            // dscard and dscontrols might have already been created by items_init
-            //
-            d.card = d.card || new dscard(d);
-            d.controls = d.controls || new dscontrols(d);
-            return d;
-          })
-          .filter(d => d.active)
+          .filter(d => d.active && !d.disabled)
           .map(d => d.id)
           .sort((x,y) => (state.inputs.indexOf(x) < state.inputs.indexOf(y)) ? -1 : 1);
 

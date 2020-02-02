@@ -38,6 +38,11 @@ class DS {
 
     this.init();
 
+    if (!this.disabled) {
+      this.card = new dscard(this);
+      this.controls = new dscontrols(this);
+    }
+
     DST[this.id] = this;
   };
 
@@ -443,6 +448,7 @@ class DS {
     }
 
     if (this.mutant) {
+      await until(_ => maybe(this.hosts, 'length') === this.config.mutant_targets.length);
       return Promise.all(this.hosts.map(d => d.load(arg)));
     }
 

@@ -40,6 +40,9 @@ class dscontrols extends HTMLElement {
       ea_controls_mutant_options.call(this.ds);
 
     this.dropdown = new dropdown(ea_controls_dropdown.call(this));
+  };
+
+  async range_group_controls() {
     const cat = this.ds.category;
 
     let steps;
@@ -56,6 +59,8 @@ class dscontrols extends HTMLElement {
     switch (this.ds.datatype) {
     case 'raster':
     case 'raster-mutant': {
+      await until(_ => this.ds._domain);
+
       this.range_group = ea_controls_range.call(this.ds, {
         ramp: lr,
         steps: steps,
@@ -68,6 +73,8 @@ class dscontrols extends HTMLElement {
     case 'lines':
     case 'polygons': {
       if (!this.ds.raster) break;
+
+      await until(_ => this.ds._domain);
 
       this.range_group = ea_controls_range.call(this.ds, {
         ramp: lr,
@@ -99,6 +106,9 @@ class dscontrols extends HTMLElement {
 
     this.manual_setup();
 
+    slot_populate.call(this, {}, {
+      "range-slider": maybe(this.range_group, 'el'),
+    });
   };
 
   render() {
@@ -107,12 +117,8 @@ class dscontrols extends HTMLElement {
       "info": this.info,
       "checkbox": this.checkbox.svg,
       "collection-list": this.collection_list,
-      "mutant-options": this.mutant_options,
-      "range-slider": maybe(this.range_group, 'el'),
       "weight-slider": maybe(this.weight_group, 'el'),
     });
-
-    if (!this.weight_group && !this.range_group) this.content.remove();
 
     this.inject();
 
@@ -128,6 +134,8 @@ class dscontrols extends HTMLElement {
     this.main.classList[this.ds.active ? 'add' : 'remove']('active');
 
     if (this.checkbox) this.checkbox.change(t);
+
+    if (t && !this.range_group) this.range_group_controls();
   };
 
   inject() {
@@ -329,7 +337,9 @@ function ea_controls_checkbox() {
   return checkbox;
 };
 
-function ea_controls_mutant_options() {
+async function ea_controls_mutant_options() {
+  await until(_ => maybe(this.hosts, 'length') === this.config.mutant_targets.length);
+
   const container = ce('div', null, { class: 'control-option' });
   const select = ce('select');
 
@@ -351,7 +361,11 @@ function ea_controls_mutant_options() {
 
   container.append(select);
 
-  return container;
+  this.mutant_options = container;
+
+  slot_populate.call(this.controls, null, {
+    "mutant-options": this.mutant_options,
+  });
 };
 
 function ea_controls_range(opts = {}) {

@@ -138,9 +138,9 @@ async function ea_overlord(msg) {
   }
 
   case 'timeline-change': {
-    DS.list.forEach(d => {
+    DS.list.forEach(async d => {
       if (d.timeline && d.active && d.vectors.features)
-        ea_datasets_polygons_csv_timeline.call(d, msg.target);
+        ea_datasets_polygons_csv.call(d, ea_timeline_date(msg.target));
     });
 
     break;

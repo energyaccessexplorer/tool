@@ -36,7 +36,7 @@ class DS {
 
     this.files_setup(o);
 
-    if (!this.mutant) ;
+    if (this.mutant) ;
     else if (undefined === this.domain) {
       ea_flash.push({
         title: `'${this.id}' ignored`,
@@ -767,10 +767,16 @@ function ea_datasets_polygons() {
     .then(async _ => {
       const v = this.vectors;
 
-      if (this.timeline)
-        ea_datasets_polygons_csv_timeline.call(this);
-      else if (this.config.column)
-        ea_datasets_polygons_csv_column.call(this);
+      if (this.csv) {
+        let col;
+        if (this.timeline) {
+          await ea_datasets_polygons_csv_timeline.call(this);
+          col = ea_timeline_date(null);
+        }
+        else if (this.config.column) col = this.config.column;
+
+        ea_datasets_polygons_csv.call(this, col);
+      }
 
       const fs = this.vectors.features.features;
       for (let i = 0; i < fs.length; i += 1)
@@ -795,7 +801,7 @@ function ea_datasets_polygons() {
     });
 };
 
-async function ea_datasets_polygons_csv(opts) {
+async function ea_datasets_polygons_csv(col) {
   await until(_ => this.csv.data && this.vectors.features);
 
   if (this.config.column)
@@ -824,20 +830,12 @@ async function ea_datasets_polygons_csv(opts) {
       warn(`${this.id} NO ROW!`, i, this.csv.key, this.vectors.key, data);
       continue;
     }
-    fs[i].properties.__color = s(+row[opts.key]);
+    fs[i].properties.__color = s(+row[col]);
   }
 
   this.update_source(this.vectors.features);
 
   if (this.card) this.card.refresh();
-};
-
-async function ea_datasets_polygons_csv_column() {
-  const opts = {
-    key: this.config.column,
-  };
-
-  ea_datasets_polygons_csv.call(this, opts);
 };
 
 function ea_datasets_table() {

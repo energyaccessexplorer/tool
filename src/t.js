@@ -213,11 +213,11 @@ function ea_overlord_map_click(state, msg) {
   }
 };
 
-async function ea_datasets_polygons_csv_timeline(t) {
-  const opts = {
-	key: t || TIMELINE_CURRENT_DATE || TIMELINE_DATES[TIMELINE_DATES.length - 1],
-  };
+function ea_timeline_date(t) {
+  return t || TIMELINE_CURRENT_DATE || TIMELINE_DATES.slice(-1)[0];
+}
 
+async function ea_datasets_polygons_csv_timeline() {
   await until(_ => this.csv.data);
 
   this.domain[0] = d3.min([].concat(...TIMELINE_DATES.map(d => this.csv.data.map(r => +r[d]))));
@@ -225,8 +225,6 @@ async function ea_datasets_polygons_csv_timeline(t) {
 
   this._domain = JSON.parse(JSON.stringify(this.domain));
   this.domain_init = JSON.parse(JSON.stringify(this.domain));
-
-  ea_datasets_polygons_csv.call(this, opts);
 };
 
 function ea_filter_valued_polygons() {

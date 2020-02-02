@@ -132,7 +132,7 @@ class DS {
       this.download = this.raster.endpoint;
 
       this.colorscale = ea_colorscale({
-        stops: this.raster.color_stops,
+        stops: this.category.colorstops,
         domain: this.raster.domain,
         intervals: this.raster.intervals,
       });
@@ -156,7 +156,7 @@ class DS {
 
       if (this.config.column) {
         this.colorscale = ea_colorscale({
-          stops: this.vectors.specs.color_stops
+          stops: this.category.colorstops,
         });
       }
       break;
@@ -164,7 +164,7 @@ class DS {
 
     case 'polygons-timeline': {
       this.colorscale = ea_colorscale({
-        stops: this.timeline.color_stops
+        stops: this.category.colorstops,
       });
 
       break;

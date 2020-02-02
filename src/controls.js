@@ -70,10 +70,13 @@ class dscontrols extends HTMLElement {
 
     case 'polygons-fixed':
     case 'polygons-timeline': {
+      await until(_ => this.ds._domain);
+
       this.range_group = ea_controls_range.call(this.ds, {
         ramp: lr,
         steps: steps,
         sliders: c.range
+        domain: this.ds.domain
       });
       break;
     }
@@ -359,7 +362,7 @@ function ea_controls_range(opts = {}) {
     const man = maybe(this.controls, i ? 'manual_max' : 'manual_min');
     if (man) man.value = x;
 
-    this.domain[i] = parseFloat(x);
+    this._domain[i] = parseFloat(x);
   };
 
   const v1 = ce('div', null, { bind: "v1" });
@@ -372,7 +375,7 @@ function ea_controls_range(opts = {}) {
   const r = ea_svg_interval({
     sliders: opts.sliders,
     width: opts.width || 256,
-    init: this.domain_default,
+    init: this.domain_init,
     domain: this.domain,
     steps: opts.steps,
     callback1: x => update(x, 0, v1),

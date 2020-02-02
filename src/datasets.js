@@ -10,6 +10,8 @@ class DS {
 
     this.active = active || false;
 
+    this._domain = null;
+
     let config = o.configuration || {};
 
     this.config = config;
@@ -63,12 +65,17 @@ class DS {
       this.raster.parse = _ => ea_datasets_tiff.call(this);
 
       if (typeof maybe(this.raster, 'domain', 'min') === 'number' &&
-          typeof maybe(this.raster, 'domain', 'max') === 'number')
+          typeof maybe(this.raster, 'domain', 'max') === 'number') {
         this.domain = [this.raster.domain.min, this.raster.domain.max];
+        this._domain = JSON.parse(JSON.stringify(this.domain));
+        this.domain_init = JSON.parse(JSON.stringify(this.domain));
+      }
 
       if (typeof maybe(this.raster, 'init', 'min') === 'number' &&
-          typeof maybe(this.raster, 'init', 'max') === 'number')
-        this.domain_default = [this.raster.init.min, this.raster.init.max];
+          typeof maybe(this.raster, 'init', 'max') === 'number') {
+        this._domain = [this.raster.init.min, this.raster.init.max];
+        this.domain_init = JSON.parse(JSON.stringify(this._domain));
+      }
 
       check_domain.call(this);
     }
@@ -97,14 +104,16 @@ class DS {
     }
 
     if (o.category.csv && c) {
-      this.csv =  JSON.parse(JSON.stringify(o.category.csv));
+      this.csv = JSON.parse(JSON.stringify(o.category.csv));
       this.csv.endpoint = c.endpoint;
       this.csv.key = maybe(c, 'configuration', 'key') || 'OBJECTID';
       this.csv.parse = _ => ea_datasets_csv.call(this);
 
-      if (typeof maybe(this.csv, 'min') === 'number' &&
-          typeof maybe(this.csv, 'max') === 'number') {
-        this.domain = this.domain_default = [this.csv.min, this.csv.max];
+      if (typeof maybe(this.csv, 'domain', 'min') === 'number' &&
+          typeof maybe(this.csv, 'domain', 'max') === 'number') {
+        this.domain = [this.csv.domain.min, this.csv.domain.max];
+        this._domain = JSON.parse(JSON.stringify(this.domain));
+        this.domain_init = JSON.parse(JSON.stringify(this.domain));
       }
 
       check_domain.call(this);
@@ -288,7 +297,8 @@ class DS {
     this.colorscale = m.colorscale;
 
     this.domain = m.domain;
-    this.domain_default = m.domain_default;
+    this._domain = m._domain;
+    this.domain_init = m.domain_init;
   };
 
   async mutate(host) {
@@ -301,7 +311,8 @@ class DS {
     this.colorscale = host.colorscale;
 
     this.domain = host.domain;
-    this.domain_default = host.domain_default;
+    this._domain = host._domain;
+    this.domain_init = host.domain_init;
 
     this.card.refresh();
 
@@ -335,7 +346,7 @@ class DS {
     let s = null;
     if (!this.analysis) return s;
 
-    const t = this.domain;
+    const t = this._domain;
     const v = this.analysis.scale;
     const r = this.invert && this.invert.includes(i) ? [1,0] : [0,1];
 
@@ -361,7 +372,7 @@ class DS {
             .domain(this.analysis.intervals)
             .range(NORM_STOPS);
 
-      s = x => (x >= this.domain[0]) && (x <= this.domain[1]) ? q(x) : -1;
+      s = x => (x >= this._domain[0]) && (x <= this._domain[1]) ? q(x) : -1;
 
       break;
     }
@@ -802,7 +813,7 @@ async function ea_datasets_polygons_csv(opts) {
 
   if (!data) warn(this.id, "has no csv.data");
 
-  const l = d3.scaleQuantize().domain([this.csv.min, this.csv.max]).range(stops);
+  const l = d3.scaleQuantize().domain(this.domain).range(stops);
   const s = x => (null === x || undefined === x || x === "") ? "rgba(155,155,155,1)" : l(x);
 
   this.csv.scale = l;
@@ -826,7 +837,7 @@ async function ea_datasets_polygons_csv(opts) {
   this.update_source(this.vectors.features);
 
   if (this.card) this.card.refresh();
-}
+};
 
 async function ea_datasets_polygons_csv_column() {
   const opts = {

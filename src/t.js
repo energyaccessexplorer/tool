@@ -220,10 +220,11 @@ async function ea_datasets_polygons_csv_timeline(t) {
 
   await until(_ => this.csv.data);
 
-  if (!this.domain) {
-    this.domain[0] = d3.min([].concat(...TIMELINE_DATES.map(d => this.csv.data.map(r => +r[d]))));
-    this.domain[1] = d3.max([].concat(...TIMELINE_DATES.map(d => this.csv.data.map(r => +r[d]))));
-  }
+  this.domain[0] = d3.min([].concat(...TIMELINE_DATES.map(d => this.csv.data.map(r => +r[d]))));
+  this.domain[1] = d3.max([].concat(...TIMELINE_DATES.map(d => this.csv.data.map(r => +r[d]))));
+
+  this._domain = JSON.parse(JSON.stringify(this.domain));
+  this.domain_init = JSON.parse(JSON.stringify(this.domain));
 
   ea_datasets_polygons_csv.call(this, opts);
 };
@@ -235,9 +236,9 @@ function ea_filter_valued_polygons() {
     const c = d.config.column;
 
     if (d.timeline)
-      return +r[TIMELINE_CURRENT_DATE] >= d.domain[0] && +r[TIMELINE_CURRENT_DATE] <= d.domain[1];
+      return +r[TIMELINE_CURRENT_DATE] >= d._domain[0] && +r[TIMELINE_CURRENT_DATE] <= d._domain[1];
     else if (c)
-      return +r[c] >= d.domain[0] && +r[c] <= d.domain[1];
+      return +r[c] >= d._domain[0] && +r[c] <= d._domain[1];
   };
 
   const arr = datasets.map(d => d.csv.data.filter(r => m(d,r)).map(r => +r[d.csv.key]));

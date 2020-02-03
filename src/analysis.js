@@ -56,8 +56,7 @@ function ea_analysis(list, type) {
   const weights = {};
 
   list.forEach(d => {
-    if (d.indexname)
-      weights[d.id] = d.weight / (tots[d.indexname] * Object.keys(singles).length);
+    weights[d.id] = d.indexname ? d.weight / (tots[d.indexname] * Object.keys(singles).length) : 0;
   });
 
   const sum = Object.keys(weights).reduce((acc, curr) => (weights[curr] || 0) + acc, 0);

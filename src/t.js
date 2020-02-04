@@ -130,6 +130,11 @@ function ea_overlord_refresh(state) {
   }
 };
 
+function right_pane(t) {
+  qs('#cards-pane').style['z-index'] = (t === 'timeline') ? 1 : 0;
+  qs('#filtered-pane').style['z-index'] = (t === 'filtered') ? 1 : 0;
+};
+
 async function ea_overlord_view(state, msg) {
   let t = msg.target;
 
@@ -155,6 +160,8 @@ async function ea_overlord_view(state, msg) {
     ea_cards(state.inputs);
     ea_cards_sort(state.inputs);
   }
+
+  right_pane(t);
 };
 
 async function ea_overlord_dataset(state, msg) {

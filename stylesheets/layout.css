@@ -62,6 +62,7 @@ body {
   width: var(--right-pane-width);
 }
 
+#filtered-pane,
 #indexes-pane,
 #cards-pane {
   position: absolute;

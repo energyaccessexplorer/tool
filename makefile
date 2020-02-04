@@ -148,6 +148,7 @@ build-t:
 		${CSS}/summary.css \
 		${CSS}/mobile.css \
 		${CSS}/cards.css \
+		${CSS}/filtered.css \
 		> ${DIST}/t/main.css
 
 	@cp ${SRC}/browser.js ${DIST}/t/

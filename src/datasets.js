@@ -681,14 +681,18 @@ function ea_datasets_points() {
 function ea_datasets_lines() {
   return ea_datasets_geojson.call(this)
     .then(_ => {
+      let da = [1];
+
       // mapbox-gl does not follow SVG's stroke-dasharray convention when it comes
       // to single numbered arrays.
       //
-      let da = this.vectors.dasharray.split(' ').map(x => +x);
-      if (da.length === 1) {
-        (da[0] === 0) ?
-          da = [1] :
-          da = [da[0], da[0]];
+      if (this.vectors.dasharray) {
+        da = this.vectors.dasharray.split(' ').map(x => +x);
+        if (da.length === 1) {
+          (da[0] === 0) ?
+            da = [1] :
+            da = [da[0], da[0]];
+        }
       }
 
       const fs = this.vectors.features.features;

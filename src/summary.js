@@ -75,7 +75,7 @@ async function ea_summary() {
     c.style.display = 'none';
     document.body.append(c);
 
-    ea_plot_output(raster, c);
+    ea_plot_outputcanvas(raster, c);
   };
 
   await Promise.all(Object.keys(ea_indexes).map(i => get_summaries(i)));

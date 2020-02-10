@@ -154,7 +154,7 @@ function ea_analysis(list, type) {
 async function ea_plot_active_analysis(type, cs = 'ea') {
   const raster = ea_active_analysis(type);
 
-  ea_plot_output(raster);
+  ea_plot_outputcanvas(raster);
 
   qs('#canvas-output-select').value = type;
   qs('#index-graphs-title').innerText = ea_indexes[type]['name'];

@@ -259,3 +259,29 @@ function ea_state_set(k,a) {
 function has(element, attr) {
   return !(typeof element[attr] === 'undefined' || element[attr] === null);
 };
+
+/*
+ * ea_list_filter_type
+ *
+ * Utility.
+ *
+ * @param "type" string. ID or indexname.
+ */
+
+function ea_list_filter_type(type) {
+  let idxn;
+
+  const singles = Object.keys(ea_indexes).filter(i => !ea_indexes[i].compound);
+  const multi = Object.keys(ea_indexes).filter(i => ea_indexes[i].compound);
+
+  if (singles.includes(type))
+    idxn = d => (d.indexname === type) || !d.indexname;
+
+  else if (multi.includes(type))
+    idxn = d => ea_indexes[type].compound.includes(d.indexname) || !d.indexname;
+
+  else
+    idxn = d => d.id === type;
+
+  return DS.list.filter(d => d.active && d.raster && idxn(d));
+};

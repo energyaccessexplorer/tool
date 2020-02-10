@@ -489,7 +489,7 @@ window.DST = {};
  */
 
 async function ea_datasets_init(id, inputs, pack, callback) {
-  let select = ["*", "category(*)", "df:_datasets_files(*,file(*))"];
+  let select = ["*", "category:categories(*)", "df:_datasets_files(*,file:files(*))"];
 
   let bounds;
   let boundaries_id;

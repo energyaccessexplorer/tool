@@ -156,6 +156,11 @@ aside.nanny-marker .nanny-close-button::before {
   white-space: pre-line;
 }
 
+.bottom-right-container {
+  background-color: white;
+  text-align: center;
+}
+
 @keyframes pulse {
   0%   { opacity: 0.7; }
   50%  { opacity: 1.0; }

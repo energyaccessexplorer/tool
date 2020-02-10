@@ -7,7 +7,7 @@
     display: none !important;
   }
 
-  #bottom-right-container,
+  .bottom-right-container,
   .controls-select-container {
     display: none;
   }

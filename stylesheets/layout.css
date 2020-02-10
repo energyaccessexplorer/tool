@@ -66,11 +66,16 @@ body {
 #indexes-pane,
 #cards-pane {
   position: absolute;
-  width: inherit;
-  z-index: 0;
-
   display: flex;
   flex-flow: column nowrap;
+
+  width: inherit;
+  height: 100%;
+  z-index: 0;
+}
+
+#cards-list {
+  flex-grow: 1;
 }
 
 #drawer {
@@ -136,9 +141,10 @@ body {
   margin-top: 8px;
 }
 
-#bottom-right-container {
-  height: 350px;
+.bottom-right-container {
+  height: auto;
   margin-top: 3px;
+  margin-bottom: 47px;
   box-sizing: border-box;
   z-index: 0;
 }
@@ -149,5 +155,6 @@ body {
 }
 
 canvas#output {
-  height: 300px;
+  max-height: 300px;
+  max-width: 100%;
 }

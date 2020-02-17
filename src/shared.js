@@ -269,6 +269,14 @@ function has(element, attr) {
   return !(typeof element[attr] === 'undefined' || element[attr] === null);
 };
 
+function humanformat(s) {
+  return s
+	.replace('_', ' ')
+	.replace('-', ' ')
+	.replace(/^([a-z])/, x => x.toUpperCase())
+	.replace(/\ ([a-z])/g, x => x.toUpperCase());
+};
+
 /*
  * ea_list_filter_type
  *

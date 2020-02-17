@@ -148,19 +148,19 @@ class dscontrols extends HTMLElement {
     const controls_tabs_el = qs('#controls-tabs');
 
     function create_tab(name) {
-      return ce('div', ea_branch_dict[name] || name, { id: 'controls-tab-' + name, class: 'controls-branch-tab up-title' });
+      return ce('div', humanformat(name), { id: 'controls-tab-' + name, class: 'controls-branch-tab up-title' });
     };
 
     function create_branch(name) {
-      return ce('div', null, { id: name, class: 'controls-branch' });
+      return ce('div', null, { id: 'controls-branch-' + name, class: 'controls-branch' });
     };
 
     function create_subbranch(name) {
       let conel, title;
-      const el = ce('div', null, { id: name, class: 'controls-subbranch' });
+      const el = ce('div', null, { id: 'controls-subbranch-' + name, class: 'controls-subbranch' });
 
       el.append(
-        title = ce('div', (ea_branch_dict[name] || name), { class: 'controls-subbranch-title up-title' }),
+        title = ce('div', humanformat(name), { class: 'controls-subbranch-title up-title' }),
         conel = ce('div', null, { class: 'controls-container' })
       );
 
@@ -177,11 +177,11 @@ class dscontrols extends HTMLElement {
       controls_tabs_el.append(t);
     }
 
-    let b = qs(`#${path[0]}.controls-branch`, controls);
+    let b = qs(`#controls-branch-${path[0]}.controls-branch`, controls);
     if (!b) b = create_branch(path[0]);
     controls.append(b);
 
-    let sb = qs(`#${path[1]}.controls-subbranch`, b);
+    let sb = qs(`#controls-subbranch-${path[1]}.controls-subbranch`, b);
     if (!sb) sb = create_subbranch(path[1]);
     b.append(sb);
 
@@ -315,7 +315,7 @@ function ea_controls_select_tab(tab, name) {
 
   tab.classList.add('active');
 
-  const b = qs('#' + name, controls);
+  const b = qs('#controls-branch-' + name, controls);
   if (b) b.style.display = 'block';
 };
 

@@ -89,15 +89,15 @@ function right_pane(t) {
   const panes = ["cards", "indexes", "filtered"];
 
   const views = {
-	"timeline": ["cards"],
-	"inputs": ["cards"],
-	"outputs": ["indexes"],
-	"filtered": ["filtered"],
+    "timeline": ["cards"],
+    "inputs": ["cards"],
+    "outputs": ["indexes"],
+    "filtered": ["filtered"],
   };
 
   for (let pi of panes) {
-	let p; if (!(p = qs(`#${pi}-pane`))) continue;
-	p.style['z-index'] = (views[t].indexOf(pi) > -1) ? 1 : 0;
+    let p; if (!(p = qs(`#${pi}-pane`))) continue;
+    p.style['z-index'] = (views[t].indexOf(pi) > -1) ? 1 : 0;
   }
 };
 
@@ -271,10 +271,10 @@ function has(element, attr) {
 
 function humanformat(s) {
   return s
-	.replace('_', ' ')
-	.replace('-', ' ')
-	.replace(/^([a-z])/, x => x.toUpperCase())
-	.replace(/\ ([a-z])/g, x => x.toUpperCase());
+    .replace('_', ' ')
+    .replace('-', ' ')
+    .replace(/^([a-z])/, x => x.toUpperCase())
+    .replace(/\ ([a-z])/g, x => x.toUpperCase());
 };
 
 /*

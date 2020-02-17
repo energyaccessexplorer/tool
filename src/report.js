@@ -175,10 +175,10 @@ contact our team at`;
 
     svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
 
-	let blob = new Blob([svg.outerHTML], { type: "image/svg+xml;charset=utf-8" });
-	let img = new Image();
+    let blob = new Blob([svg.outerHTML], { type: "image/svg+xml;charset=utf-8" });
+    let img = new Image();
 
-	let url = URL.createObjectURL(blob);
+    let url = URL.createObjectURL(blob);
 
     load_image = u => new Promise((resolve, reject) => {
       img.onload = _ => resolve(u);

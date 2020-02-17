@@ -297,6 +297,8 @@ function ea_controls_init(state) {
   const tab_filters = qs('#controls-tab-filters', controls_tabs_el);
   if (tab_filters) ea_controls_select_tab(tab_filters, "filters");
   else ea_controls_select_tab(tab_all, "all");
+
+  ea_controls_sort_datasets(GEOGRAPHY.configuration);
 };
 
 function ea_controls_select_tab(tab, name) {
@@ -516,23 +518,41 @@ cursor: pointer;
   set_default(sl.input);
 };
 
-function ea_controls_sort_datasets(list) {
-  const collection = qsa('ds-controls', qs('#controls'));
+function ea_controls_sort_datasets(config) {
+  const {sort_datasets, sort_subbranches, sort_branches} = config;
 
-  for (let id of list.reverse()) {
-    for (let dsc of collection) {
-      if (dsc.ds.id === id)
-        dsc.closest('.controls-container').prepend(dsc);
+  const controls = qs('#controls');
+  const controls_elements = qsa('ds-controls', controls);
+
+  if (sort_datasets)
+    for (let id of sort_datasets.reverse()) {
+      for (let el of controls_elements) {
+        if (el.ds.id === id)
+          el.closest('.controls-container').prepend(el);
+      }
     }
-  }
 
-  const subcategories = qsa('.controls-subbranch', qs('#controls'));
+  const subbranches_elements = qsa('.controls-subbranch', controls);
 
-  for (let id of [
-    'demographics', 'productive-uses',
-    'resources', 'infrastructure'
-  ]) {
-    for (let s of subcategories)
-      if (s.id === id) s.closest('.controls-branch').append(s);
-  }
+  if (sort_subbranches)
+    for (let subbranch of sort_subbranches.reverse()) {
+      for (let el of subbranches_elements)
+        if (el.id === subbranch) el.closest('.controls-branch').prepend(el);
+    }
+
+  const branches_elements = qsa('.controls-branch', controls);
+  const branches_tabs = qsa('.controls-branch-tab', controls);
+
+  if (sort_branches)
+    for (let branch of sort_branches.reverse()) {
+      for (let el of branches_elements) {
+        if (el.id === branch) {
+          qs('#controls-contents').prepend(el);
+
+          const t = qs('#controls-tab-' + branch);
+          if (t) qs('#controls-tabs').prepend(t);
+          else warn("nope...");
+        }
+      }
+    }
 };

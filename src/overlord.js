@@ -82,8 +82,6 @@ async function ea_overlord(msg) {
 
     ea_state_set('inputs', a);
 
-    ea_controls_sort_datasets(GEOGRAPHY.configuration.sort_datasets);
-
     ea_cards_init(a);
     ea_controls_init(state);
 

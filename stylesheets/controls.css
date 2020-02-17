@@ -109,23 +109,3 @@ input[list="controls-geography"] {
   border: none;
   width: calc(100% - 50px);
 }
-
-#controls-tab-filters {
-  order: 1;
-}
-
-#controls-tab-demand {
-  order: 2;
-}
-
-#controls-tab-supply {
-  order: 4;
-}
-
-#controls-tab-other {
-  order: 32;
-}
-
-#controls-tab-all {
-  order: 32;
-}

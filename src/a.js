@@ -12,11 +12,6 @@ function table_data(dict, prop, event) {
   return t;
 };
 
-function right_pane(t) {
-  qs('#cards-pane').style['z-index'] = (t === 'inputs') ? 1 : 0;
-  qs('#indexes-pane').style['z-index'] = (t === 'outputs') ? 1 : 0;
-};
-
 function ea_nanny_init(state) {
   window.ea_nanny = new nanny(ea_nanny_steps);
 

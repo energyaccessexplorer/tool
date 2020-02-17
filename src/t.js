@@ -128,11 +128,7 @@ function ea_overlord_refresh(state) {
       },
     }, MAPBOX.first_symbol);
   }
-};
 
-function right_pane(t) {
-  qs('#cards-pane').style['z-index'] = (t === 'timeline') ? 1 : 0;
-  qs('#filtered-pane').style['z-index'] = (t === 'filtered') ? 1 : 0;
 };
 
 async function ea_overlord_view(state, msg) {

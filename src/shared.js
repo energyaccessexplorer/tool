@@ -85,6 +85,22 @@ async function ea_view(v, btn) {
   qs('#view-' + v).classList.add('active');
 };
 
+function right_pane(t) {
+  const panes = ["cards", "indexes", "filtered"];
+
+  const views = {
+	"timeline": ["cards"],
+	"inputs": ["cards"],
+	"outputs": ["indexes"],
+	"filtered": ["filtered"],
+  };
+
+  for (let pi of panes) {
+	let p; if (!(p = qs(`#${pi}-pane`))) continue;
+	p.style['z-index'] = (views[t].indexOf(pi) > -1) ? 1 : 0;
+  }
+};
+
 function ea_views_init() {
   const url = new URL(location);
 

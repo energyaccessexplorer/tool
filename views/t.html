@@ -101,6 +101,27 @@
 
         <div id="filtered-pane">
           <p>Some information about filtered stuff...</p>
+
+          <div class="bottom-right-container">
+            <select id="canvas-output-select"></select>
+            <canvas id="output"></canvas>
+          </div>
+        </div>
+
+        <div id="indexes-pane">
+          <div id="index-graphs">
+            <div id="index-graphs-title" class="up-title"></div>
+            <div id="index-graphs-toolbox">
+              <a id="index-graphs-info" title="Info about different indexes"></a>
+              <a id="index-graphs-download" title="Download TIFF image of the current analysis"></a>
+              <a id="index-graphs-code" title="Download JSON file of the current analysis"></a>
+            </div>
+            <div id="index-graphs-description"></div>
+          </div>
+
+          <ul id="indexes-list"></ul>
+
+          <div id="summary-button" class="up-title" onclick="ea_summary_wrapper();" ripple>Snapshot</div>
         </div>
 
         <div id="drawer">
@@ -142,10 +163,36 @@
         "description": "Filtered areas"
       },
 
+      "outputs": {
+        "name": "Analysis",
+        "description": "Results of the analysis"
+      }
+    };
+
+    ea_indexes = {
+	  "supply": {
+        "name": "Supply Index",
+        "description": "Current and/or potential",
+        "compound": null,
+	  },
+      "eai": {
+        "name": "Energy Access Potential",
+        "compound": ["supply"],
+        "description": "Current and/or potential",
+        "info": `
+The Energy Access Potential Index indentifies areas with higher energy demand and supply
+which are characterized with higher index values. It is an aggregated measure of all selected
+data sets under both Demand and Supply categories.`
+      },
     };
 
     ea_default_colorscale = ea_colorscale({
       stops: d3.schemeRdBu[5].reverse(),
+      domain: { min: 0, max: 1 },
+    });
+
+    ea_analysis_colorscale = ea_colorscale({
+      stops: NORM_STOPS.map(x => d3.interpolateMagma(x)),
       domain: { min: 0, max: 1 },
     });
 
@@ -155,6 +202,7 @@
     ea_state_params = {
       "view": ['timeline', 'filtered'],
       "inputs": [],
+      "output": ['eai'],
       "pack": [],
     };
 

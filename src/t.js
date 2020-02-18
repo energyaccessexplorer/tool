@@ -1,5 +1,6 @@
 const TIMELINE = true;
 
+TIMELINE_DATES = [];
 TIMELINE_CURRENT_DATE = null;
 TIMELINE_LINES = null;
 TIMELINE_DISTRICT = null;

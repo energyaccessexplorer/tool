@@ -132,11 +132,13 @@ build-t:
 		${SRC}/api.js \
 		${SRC}/t.js \
 		${SRC}/plot.js \
+		${SRC}/analysis.js \
 		${SRC}/overlord.js \
 		${SRC}/svg.js \
 		${SRC}/controls.js \
 		${SRC}/ui.js \
 		${SRC}/cards.js \
+		${SRC}/indexes.js \
 		${SRC}/datasets.js \
 		${SRC}/mapbox.js \
 		${SRC}/report.js \
@@ -157,6 +159,7 @@ build-t:
 		${CSS}/mobile.css \
 		${CSS}/cards.css \
 		${CSS}/filtered.css \
+		${CSS}/indexes.css \
 		> ${DIST}/t/main.css
 
 	@cp ${SRC}/browser.js ${DIST}/t/

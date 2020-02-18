@@ -24,7 +24,11 @@ LIB = ${DIST}/lib
 
 default: build
 
-build: build-a build-t build-s
+build: build-a build-t build-s reload
+
+reload:
+	@sleep 0.3
+	-@chrome-remote-reload
 
 deps:
 	DEST=${DIST}/lib deps
@@ -33,7 +37,7 @@ start:
 	cd ${DIST} && ${STATIC_SERVER}
 
 watch:
-	@ WATCH_CMD="make build" watch-code ${SRC} ${CSS} ${VIEWS}
+	@ WATCH_CMD="make build reload" watch-code ${SRC} ${CSS} ${VIEWS}
 
 stop:
 	@stop-port ${WEB_PORT}

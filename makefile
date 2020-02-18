@@ -14,7 +14,7 @@
 #
 # MAPBOX_DEFAULT_THEME=mapbox/basic-v9
 #
-include default.mk
+.include <default.mk>
 
 DIST = ./dist
 SRC = ./src
@@ -219,16 +219,16 @@ deploy:
 	make build
 
 reconfig:
-ifeq (${env}, production)
+.if ${env} == "production"
 	@sed -i \
 		-e 's%"database": "${DB_SERV_DEV}",%"database": "${DB_SERV_PROD}",%' \
 		-e 's%"mapbox_theme": "",%"mapbox_theme": "${MAPBOX_DEFAULT_THEME}",%' \
 		settings.json
-else
+.else
 	@sed -i \
 		-e 's%"database": "${DB_SERV_PROD}",%"database": "${DB_SERV_DEV}",%' \
 		-e 's%"mapbox_theme": "${MAPBOX_DEFAULT_THEME}",%"mapbox_theme": "",%' \
 		settings.json
-endif
+.endif
 
-include extras.mk
+.include <extras.mk>

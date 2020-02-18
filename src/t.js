@@ -14,7 +14,7 @@ async function ea_timeline_init() {
 
   const tl = ea_svg_timeline_slider({
     steps: steps,
-    width: parent.clientWidth - padding,
+    width: qs('#maparea').clientWidth - padding,
     init: steps.length - 1,
     parent: parent,
     dragging: function(x) {

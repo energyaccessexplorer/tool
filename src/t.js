@@ -1,4 +1,5 @@
-TIMELINE_DATES = [];
+const TIMELINE = true;
+
 TIMELINE_CURRENT_DATE = null;
 TIMELINE_LINES = null;
 TIMELINE_DISTRICT = null;
@@ -87,140 +88,11 @@ function ea_timeline_lines_draw(datasets, district) {
   qs('#district-graph', rp).append(TIMELINE_LINES.svg);
 };
 
-function ea_controls_dropdown() {
-  const dropdownlist = [];
-
-  if (!Object.keys(this.ds.metadata).every(k => !this.ds.metadata[k])) {
-    dropdownlist.push({
-      "content": "Dataset info",
-      "action": _ => ea_dataset_modal(this.ds)
-    });
-  }
-
-  return dropdownlist;
-};
-
-function ea_overlord_init(state) {
-  ea_timeline_init();
-  ea_views_init();
-};
-
-function ea_overlord_refresh(state) {
-  if (!MAPBOX.getSource('filtered-source')) {
-    MAPBOX.addSource('filtered-source', {
-      "type": 'geojson',
-      "data": DST['boundaries'].vectors.features
-    });
-  }
-
-  if (!MAPBOX.getLayer('filtered-layer')) {
-    MAPBOX.addLayer({
-      "id": 'filtered-layer',
-      "source": 'filtered-source',
-      "type": 'fill',
-      "layout": {
-        "visibility": "none",
-      },
-      "paint": {
-        "fill-color": "#0571B0",
-        "fill-outline-color": "black",
-        "fill-opacity": [ "case", [ "boolean", [ "get", "__hidden" ], false ], 0, 1 ]
-      },
-    }, MAPBOX.first_symbol);
-  }
-
-};
-
-async function ea_overlord_view(state, msg) {
-  let t = msg.target;
-
-  ea_state_set('view', t);
-
-  await Promise.all(state.inputs.map(id => DST[id].turn(true, (t === 'timeline'))));
-
-  if (t === "outputs") {
-    qs('#timeline').style.height = '0';
-  }
-
-  else if (t === 'filtered') {
-    qs('#timeline').style.height = '0';
-    MAPBOX.setLayoutProperty('filtered-layer', 'visibility', 'visible');
-    TIMELINE_CURRENT_DATE = TIMELINE_DATES.slice(-1)[0];
-    ea_filter_valued_polygons();
-  }
-
-  else if (t === "timeline") {
-    qs('#timeline').style.height = '';
-    MAPBOX.setLayoutProperty('filtered-layer', 'visibility', 'none');
-
-    ea_cards(state.inputs);
-    ea_cards_sort(state.inputs);
-  }
-
-  right_pane(t);
-};
-
-async function ea_overlord_dataset(state, msg) {
-  const ds = msg.target;
-
-  let inputs = state.inputs;
-
-  if (ds.active) {
-    state.inputs.unshift(ds.id);
-  } else {
-    state.inputs.splice(state.inputs.indexOf(ds.id), 1);
-  }
-
-  if (state.view === 'timeline') {
-    await ds.turn(ds.active, true);
-    ds.raise();
-  } else {
-    await ds.turn(ds.active, false);
-  }
-
-  inputs = [...new Set(inputs)];
-  ea_cards(inputs);
-  ea_state_set('inputs', inputs);
-
-  if (state.inputs.length) {
-    const datasets = DS.list.filter(d => d.active && d.timeline && maybe(d, 'csv', 'data'));
-
-    if (TIMELINE_DISTRICT)
-      ea_timeline_lines_draw(datasets, TIMELINE_DISTRICT);
-  } else {
-    const rp = qs('#right-pane');
-    qs('#district-header', rp).innerText = "";
-    if (TIMELINE_LINES) TIMELINE_LINES.svg.remove();
-  }
-};
-
-function ea_overlord_map_click(state, msg) {
-  const e = msg.event;
-
-  const b = DST['boundaries'];
-  let nodata = b.raster.nodata;
-
-  const i = state.inputs[0];
-  let t = DST[i];
-
-  if (!t) return;
-
-  if (t.vectors) {
-    const et = MAPBOX.queryRenderedFeatures(e.point)[0];
-    if (!et) return;
-
-    if (et.source === i) {
-      const datasets = DS.list.filter(d => d.active && d.timeline && maybe(d, 'csv', 'data'));
-      ea_timeline_lines_draw(datasets, (TIMELINE_DISTRICT = et.properties['District']));
-    }
-  }
-};
-
 function ea_timeline_date(t) {
   return t || TIMELINE_CURRENT_DATE || TIMELINE_DATES.slice(-1)[0];
 }
 
-async function ea_datasets_polygons_csv_timeline() {
+async function ea_timeline_datasets_polygons_csv() {
   await until(_ => this.csv.data);
 
   this.domain[0] = d3.min([].concat(...TIMELINE_DATES.map(d => this.csv.data.map(r => +r[d]))));
@@ -230,7 +102,7 @@ async function ea_datasets_polygons_csv_timeline() {
   this.domain_init = JSON.parse(JSON.stringify(this.domain));
 };
 
-function ea_filter_valued_polygons() {
+function ea_timeline_filter_valued_polygons() {
   const datasets = DS.list.filter(d => d.active && maybe(d.csv, 'data') && d.datatype.match("-(fixed|timeline)"));
 
   function m(d,r) {

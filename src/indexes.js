@@ -57,7 +57,7 @@ function ea_indexes_init(state) {
 
   const code = qs('#index-graphs-code');
   code.append(tmpl('#svg-code'));
-  code.onclick = _ => ea_current_config();
+  code.onclick = _ => ea_indexes_current_config();
 
   window.POPULATION_PIE = ea_svg_pie([[0], [0], [0], [0], [0]], 70, 0, ea_analysis_colorscale.stops, null);
   window.AREA_PIE = ea_svg_pie([[0], [0], [0], [0], [0]], 70, 0, ea_analysis_colorscale.stops, null);
@@ -169,4 +169,33 @@ function ea_indexes_modal() {
 </a>
 `)
   }).show();
+};
+
+function ea_indexes_current_config() {
+  const url = new URL(location);
+
+  const state = ea_state_sync();
+  const config = {
+    geography_id: url.searchParams.get('id'),
+    analysis_type: state.output,
+    datasets: []
+  };
+
+  for (let i of state.inputs) {
+    let d = DST[i];
+    let c = {};
+
+    c.id = d.dataset_id;
+    c.category = d.id;
+    c.weight = d.weight;
+    c.domain = d.domain.map(x => +x);
+
+    config.datasets.push(c);
+  }
+
+  let blob = new Blob([JSON.stringify(config)], { type: "application/octet-stream;charset=utf-8" });
+
+  fake_download(URL.createObjectURL(blob), `energyaccessexplorer-${state.output}.json`);
+
+  return config;
 };

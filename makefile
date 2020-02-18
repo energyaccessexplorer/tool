@@ -62,6 +62,7 @@ build-a:
 
 	@echo -n "const ea_settings = " | cat - \
 		settings.json \
+		${SRC}/utils.js \
 		${SRC}/shared.js \
 		${SRC}/api.js \
 		${SRC}/analysis.js \
@@ -122,6 +123,7 @@ build-t:
 
 	@echo -n "const ea_settings = " | cat - \
 		settings.json \
+		${SRC}/utils.js \
 		${SRC}/shared.js \
 		${SRC}/api.js \
 		${SRC}/t.js \

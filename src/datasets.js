@@ -774,7 +774,7 @@ function ea_datasets_polygons() {
       if (this.csv) {
         let col;
         if (this.timeline) {
-          await ea_datasets_polygons_csv_timeline.call(this);
+          await ea_timeline_datasets_polygons_csv.call(this);
           col = ea_timeline_date(null);
         }
         else if (this.config.column) col = this.config.column;

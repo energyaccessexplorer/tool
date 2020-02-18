@@ -556,3 +556,47 @@ function ea_controls_sort_datasets(config) {
       }
     }
 };
+
+function ea_controls_dropdown() {
+  const dropdownlist = [];
+
+  if (!Object.keys(this.ds.metadata).every(k => !this.ds.metadata[k])) {
+    dropdownlist.push({
+      "content": "Dataset info",
+      "action": _ => ea_dataset_modal(this.ds)
+    });
+  }
+
+  if (this.weight_group) {
+    dropdownlist.push({
+      "content": "Toggle advanced controls",
+      "action": _ => {
+        if (!this.ds.active) this.ds.toggle();
+
+        qs('.advanced-controls', this).style.display = (this.show_advanced = !this.show_advanced) ? 'block' : 'none';
+      }
+    });
+  }
+
+  dropdownlist.push({
+    "content": "Reset default values",
+    "action": _ => this.reset_defaults()
+  });
+
+  dropdownlist.push({
+    "content": "Set values manually",
+    "action": _ => qs('.manual-controls', this).style.display = 'flex'
+  });
+
+  // Enable this later when we are ready to let the users download the
+  // original file.
+  //
+  // if (this.ds.download) {
+  //   dropdownlist.push({
+  //     "content": "Download dataset file",
+  //     "action": _ => fake_download(this.ds.download, null)
+  //   });
+  // }
+  //
+  return dropdownlist;
+};

@@ -85,7 +85,7 @@ async function ea_view(v, btn) {
   qs('#view-' + v).classList.add('active');
 };
 
-function right_pane(t) {
+function ea_view_right_pane(t) {
   const panes = ["cards", "indexes", "filtered"];
 
   const views = {
@@ -195,28 +195,6 @@ async function ea_overview(cca3) {
   }
 };
 
-function parseRGBA(str) {
-  let c;
-
-  if (!str) return [0, 0, 0, 255];
-
-  if (str.match(/^#([A-Fa-f0-9]{3}){1,2}$/)) {
-    c = str.substring(1).split('');
-
-    if (c.length === 3) c = [c[0], c[0], c[1], c[1], c[2], c[2]];
-
-    c = '0x' + c.join('');
-
-    return [(c>>16)&255, (c>>8)&255, c&255, 255];
-  }
-  else if (c = str.match(/^rgba?\(([0-9]{1,3}),\ ?([0-9]{1,3}),\ ?([0-9]{1,3}),?\ ?([0-9]{1,3})?\)$/)) {
-    return [+c[1], +c[2], +c[3], +c[4] || 255];
-  }
-
-  else
-    throw new Error(`parseRGBA: argument ${str} doesn't match`);
-};
-
 /*
  * ea_state_sync
  *
@@ -263,18 +241,6 @@ function ea_state_set(k,a) {
   history.replaceState(null, null, url);
 
   return url.searchParams.get(k);
-};
-
-function has(element, attr) {
-  return !(typeof element[attr] === 'undefined' || element[attr] === null);
-};
-
-function humanformat(s) {
-  return s
-    .replace('_', ' ')
-    .replace('-', ' ')
-    .replace(/^([a-z])/, x => x.toUpperCase())
-    .replace(/\ ([a-z])/g, x => x.toUpperCase());
 };
 
 /*

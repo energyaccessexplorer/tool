@@ -536,8 +536,9 @@ function ea_controls_sort_datasets(config) {
 
   if (sort_subbranches)
     for (let subbranch of sort_subbranches.reverse()) {
-      for (let el of subbranches_elements)
-        if (el.id === subbranch) el.closest('.controls-branch').prepend(el);
+      for (let el of subbranches_elements) {
+        if (el.id === 'controls-subbranch-' + subbranch) el.closest('.controls-branch').prepend(el);
+      }
     }
 
   const branches_elements = qsa('.controls-branch', controls);
@@ -546,7 +547,7 @@ function ea_controls_sort_datasets(config) {
   if (sort_branches)
     for (let branch of sort_branches.reverse()) {
       for (let el of branches_elements) {
-        if (el.id === branch) {
+        if (el.id === 'controls-branch-' + branch) {
           qs('#controls-contents').prepend(el);
 
           const t = qs('#controls-tab-' + branch);

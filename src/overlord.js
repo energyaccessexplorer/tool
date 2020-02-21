@@ -49,6 +49,7 @@ async function ea_overlord(msg) {
   if (!msg.caller) throw "Argument Error: Overlord: Who is the caller?";
 
   const state = ea_state_sync();
+  const {view, inputs, output, pack} = state;
 
   switch (msg.type) {
   case 'init': {
@@ -62,7 +63,7 @@ async function ea_overlord(msg) {
     GEOGRAPHY = await ea_api("geographies", { "id": `eq.${id}` }, { object: true });
     MAPBOX = mapbox_setup();
 
-    await ea_datasets_init(GEOGRAPHY.id, state.inputs, state.pack, bounds => {
+    await ea_datasets_init(GEOGRAPHY.id, inputs, pack, bounds => {
       const b = mapbox_fit(bounds);
 
       const l = b[0];
@@ -78,7 +79,7 @@ async function ea_overlord(msg) {
     const a = DS.list
           .filter(d => d.active && !d.disabled)
           .map(d => d.id)
-          .sort((x,y) => (state.inputs.indexOf(x) < state.inputs.indexOf(y)) ? -1 : 1);
+          .sort((x,y) => (inputs.indexOf(x) < inputs.indexOf(y)) ? -1 : 1);
 
     ea_state_set('inputs', a);
 
@@ -96,33 +97,30 @@ async function ea_overlord(msg) {
 
   case 'view': {
     await ea_overlord_view(state, msg);
-
     window.dispatchEvent(new Event('resize'));
-
     break;
   }
 
   case 'dataset': {
     ea_overlord_dataset(state, msg);
-
     break;
   }
 
   case 'controls': {
-    if (state.view === "outputs") {
-      ea_indexes_list(state);
-      ea_plot_active_analysis(state.output).then(raster => ea_indexes_graphs(raster));
+    if (view === "outputs") {
+      ea_indexes_list(inputs, output);
+      ea_plot_active_analysis(output).then(raster => ea_indexes_graphs(raster));
     }
 
-    else if (state.view === "inputs") {
-      ea_plot_active_analysis(state.output);
+    else if (view === "inputs") {
+      ea_plot_active_analysis(output);
     }
 
-    else if (state.view === "filtered") {
+    else if (view === "filtered") {
       ea_timeline_filter_valued_polygons();
     }
 
-    else if (state.view === "timeline") {
+    else if (view === "timeline") {
     }
 
     break;
@@ -156,7 +154,7 @@ async function ea_overlord(msg) {
 
     ea_overlord({
       "type": "view",
-      "target": state.view,
+      "target": view,
       "caller": "ea_overlord refresh"
     });
 
@@ -165,7 +163,7 @@ async function ea_overlord(msg) {
 
   case 'map': {
     if (msg.target === "click") {
-      ea_overlord_map_click(state, msg);
+      ea_overlord_map_click(state, msg.event);
     }
 
     break;
@@ -180,16 +178,25 @@ async function ea_overlord(msg) {
 
 async function ea_overlord_view(state, msg) {
   const t = msg.target;
-  const timeline = qs('#timeline');
-
   ea_state_set('view', t);
 
   await Promise.all(state.inputs.map(id => DST[id].turn(true, (t === 'inputs' || t === 'timeline'))));
 
-  if (t === "outputs") {
-    ea_indexes_list(state);
+  ea_overlord_update_view(state);
+  ea_view_right_pane(t);
+};
 
-    ea_plot_active_analysis(state.output)
+function ea_overlord_update_view() {
+  const state = ea_state_sync();
+  const timeline = qs('#timeline');
+
+  const {view, output, inputs} = state;
+
+  switch (view) {
+  case "outputs": {
+    ea_indexes_list(state.inputs, state.output);
+
+    ea_plot_active_analysis(output)
       .then(raster => ea_indexes_graphs(raster))
       .then(_ => {
         if (timeline) timeline.style.display = 'none';
@@ -199,44 +206,47 @@ async function ea_overlord_view(state, msg) {
 
         MAPBOX.setLayoutProperty('output-layer', 'visibility', 'visible')
       });
+    break;
   }
-
-  else if (t === "timeline") {
-    if (timeline) timeline.style.display = '';
-
-    MAPBOX.setLayoutProperty('filtered-layer', 'visibility', 'none');
-    MAPBOX.setLayoutProperty('output-layer', 'visibility', 'none');
-
-    ea_cards(state.inputs);
-    ea_cards_sort(state.inputs);
-  }
-
-  else if (t === "inputs") {
+  case "inputs": {
     if (MAPBOX.getLayer('output-layer'))
       MAPBOX.setLayoutProperty('output-layer', 'visibility', 'none');
 
-    ea_cards(state.inputs);
-    ea_cards_sort(state.inputs);
-  }
+    ea_cards(inputs);
+    ea_cards_sort(inputs);
 
-  else if (t === 'filtered') {
+    ea_plot_active_analysis(output);
+    break;
+  }
+  case "filtered": {
     if (timeline) timeline.style.display = 'none';
 
     MAPBOX.setLayoutProperty('filtered-layer', 'visibility', 'visible');
     MAPBOX.setLayoutProperty('output-layer', 'visibility', 'none');
 
-    ea_plot_active_analysis(state.output)
+    ea_plot_active_analysis(output)
       .then(raster => ea_indexes_graphs(raster));
 
     TIMELINE_CURRENT_DATE = TIMELINE_DATES.slice(-1)[0];
     ea_timeline_filter_valued_polygons();
+    break;
   }
+  case "timeline": {
+    if (timeline) timeline.style.display = '';
 
-  else {
-    throw `Argument Error: Overlord: Could not set/find the view '${state.view}'.`;
+    MAPBOX.setLayoutProperty('filtered-layer', 'visibility', 'none');
+    MAPBOX.setLayoutProperty('output-layer', 'visibility', 'none');
+
+    ea_cards(inputs);
+    ea_cards_sort(inputs);
+
+    break;
   }
-
-  ea_view_right_pane(t);
+  default: {
+    throw `Argument Error: Overlord: Could not set/find the view '${view}'.`;
+    break;
+  }
+  }
 };
 
 async function ea_overlord_dataset(state, msg) {
@@ -259,13 +269,15 @@ async function ea_overlord_dataset(state, msg) {
   }
 
   if (state.view === "outputs") {
-    ea_indexes_list(state);
+    ea_indexes_list(inputs. state.output);
     ea_plot_active_analysis(state.output).then(raster => ea_indexes_graphs(raster));
   }
 
   const _inputs = [...new Set(inputs)];
   ea_cards(_inputs);
   ea_state_set('inputs', _inputs);
+
+  if (!TIMELINE) return;
 
   if (maybe(TIMELINE_CURRENT_DATE) && _inputs.length) {
     const datasets = DS.list.filter(d => d.active && d.timeline && maybe(d, 'csv', 'data'));
@@ -338,13 +350,13 @@ function ea_overlord_refresh(state) {
   }
 };
 
-function ea_overlord_map_click(state, msg) {
-  const e = msg.event;
-
+function ea_overlord_map_click(state, e) {
   const b = DST['boundaries'];
   let nodata = b.raster.nodata;
 
-  const i = maybe(state, 'inputs', 0);
+  const {view, inputs, output} = state;
+
+  const i = maybe(inputs, 0);
   let t;
 
   function add_lnglat(td, lnglat = [0, 0]) {
@@ -365,13 +377,13 @@ function ea_overlord_map_click(state, msg) {
     ]));
   };
 
-  if (state.view === "outputs") {
+  if (view === "outputs") {
     t = {
       raster: {
         data: MAPBOX.getSource('output-source').raster
       },
       category: {},
-      name: ea_indexes[state.output]['name']
+      name: ea_indexes[output]['name']
     };
     nodata = -1;
 
@@ -409,8 +421,8 @@ function ea_overlord_map_click(state, msg) {
     }
   }
 
-  else if (state.view === "inputs") {
-    t  = DST[i];;
+  else if (view === "inputs") {
+    t  = DST[i];
 
     if (!t) return;
 
@@ -479,7 +491,9 @@ function ea_overlord_map_click(state, msg) {
     }
   }
 
-  else if (state.view === "timeline") {
+  else if (view === "timeline") {
+    t  = DST[i];
+
     if (!t) return;
 
     if (t.vectors) {

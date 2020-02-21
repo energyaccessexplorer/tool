@@ -80,7 +80,7 @@ function ea_indexes_init(state) {
   ), scale);
 };
 
-function ea_index_drawable(inputs, target) {
+function ea_index_drawable(inputs, output) {
   const counts = {};
 
   for (let i in ea_indexes) counts[i] = 0;
@@ -95,11 +95,10 @@ function ea_index_drawable(inputs, target) {
     counts['eai'] += 1;
   }
 
-  return counts[target] > 0;
+  return counts[output] > 0;
 };
 
-function ea_indexes_list(state) {
-  const target = state.output;
+function ea_indexes_list(inputs, output) {
   const nodes = [];
 
   const indexes_list = qs('#indexes-list');
@@ -112,7 +111,7 @@ function ea_indexes_list(state) {
       ce('span', v)
     );
 
-    if (!ea_index_drawable(state.inputs, t))
+    if (!ea_index_drawable(inputs, t))
       d.setAttribute('disabled', "");
 
     return d;
@@ -138,7 +137,7 @@ function ea_indexes_list(state) {
     let node = i_elem(t, ea_indexes[t]['name'], ea_indexes[t]['description']);
 
     let ler = qs('.radio', node);
-    ler.append(ea_svg_radio(t === target));
+    ler.append(ea_svg_radio(t === output));
 
     node.addEventListener('mouseup', _ => setTimeout(_ => trigger_this.call(node), 10));
 

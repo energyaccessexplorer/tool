@@ -24,11 +24,7 @@ async function ea_timeline_init() {
       if (TIMELINE_CURRENT_DATE === t) return;
       else TIMELINE_CURRENT_DATE = t;
 
-      ea_overlord({
-        "type": "timeline-change",
-        "target": t,
-        "caller": "timeline_init dragging"
-      });
+      O.timeline = t;
     }
   });
 

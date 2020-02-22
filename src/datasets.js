@@ -244,11 +244,7 @@ class DS {
 
     delete DST[this.id];
 
-    ea_overlord({
-      "type": "dataset",
-      "target": this,
-      "caller": "dataset disable"
-    });
+    O.dataset(this, 'weight', x);
   };
 
   add_source(opts) {
@@ -397,12 +393,16 @@ class DS {
 
   toggle() {
     this.active = !this.active;
+    O.dataset(this, 'toggle');
+  };
 
-    ea_overlord({
-      "type": "dataset",
-      "target": this,
-      "caller": "ds toggle",
-    });
+  set __domain(d) {
+    this._domain = d;
+  };
+
+  set _active(d) {
+    this.raise();
+    this.turn(d, true);
   };
 
   async turn(v, draw) {

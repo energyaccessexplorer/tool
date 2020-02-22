@@ -130,12 +130,7 @@ function mapbox_setup() {
   mb.dragRotate.disable();
   mb.touchZoomRotate.disableRotation();
 
-  mb.on('mouseup', e => ea_overlord({
-    type: "map",
-    target: "click",
-    event: e,
-    caller: "mapbox mouseup"
-  }));
+  mb.on('mouseup', e => O.map('click', e));
 
   return mb;
 };
@@ -146,10 +141,7 @@ function mapbox_change_theme(theme) {
 
     MAPBOX.first_symbol = maybe(c, 'id');
 
-    ea_overlord({
-      type: "refresh",
-      caller: "mapbox_change_theme",
-    });
+    O.refresh();
   };
 
   MAPBOX.once('style.load', set_output);

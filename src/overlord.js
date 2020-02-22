@@ -1,200 +1,195 @@
-/*
- * ea_overlord
- *
- * Connects the entire app, changes states and updates components accordingly.
- *
- * Any communication between the app's components:
- *   - controls
- *   - cards
- *   - map
- *   - datasets
- *   ... etc. should be done via this function.
- *
- * @param "msg" object.
- *
- *   type (required)
- *      init: init the app. doh!
- *      view: set the entire app between {outputs, inputs} views
- *      dataset: change params or (de)activate a DS
- *      timeline-change: react to the slider
- *      index: change the currently shown index
- *      sort: sort the selected datasets (cards)
- *      refresh: a auxiliary to re-set the view
- *      map: handle user-map interactions
- *
- *      Each type might (and will) do different things depending on the
- *      current view.
- *
- *   target
- *      Is context specific to the type. They are obvious:
- *
- *      init: null
- *      view: "inputs" or "outputs"
- *      dataset: a DS object
- *      index: eg: "demand", "supply", "eai" or "ani"
- *      sort: an array with the ID's of the active datasets
- *      refresh: "inputs" or "outputs"
- *      map: "click"
- *
- *   caller (required)
- *      The name of the function calling ea_overlord. Useful for debugging
- *      and behavioural decisions based on it.
- * }
- *
- * returns nothing
- */
+class Overlord {
+  refresh() {
+    ea_overlord_special_layers();
+    this.view = O.o.view;
+  };
 
-async function ea_overlord(msg) {
-  if (!msg) throw "Argument Error: Overlord: I have nothing to do!";
-  if (!msg.caller) throw "Argument Error: Overlord: Who is the caller?";
+  layers(v) {
+    Promise.all(O.o.inputs.map(id => DST[id].turn(true, (v === 'inputs' || v === 'timeline'))));
+  };
 
-  const state = ea_state_sync();
-  const {view, inputs, output, pack} = state;
+  dataset(_ds, arg, data) {
+    let ds;
 
-  switch (msg.type) {
-  case 'init': {
-    const url = new URL(location);
-    const id = url.searchParams.get('id');
+    switch (_ds.constructor.name) {
+    case "DS":
+      ds = _ds;
+      break;
 
-    MOBILE = screen.width < 1152;
+    case "string":
+      ds = DST[i];
+      break;
 
-    ea_layout_init();
-
-    GEOGRAPHY = await ea_api("geographies", { "id": `eq.${id}` }, { object: true });
-    MAPBOX = mapbox_setup();
-
-    await ea_datasets_init(GEOGRAPHY.id, inputs, pack, bounds => {
-      const b = mapbox_fit(bounds);
-
-      const l = b[0];
-      const r = b[2];
-      const d = b[1];
-      const u = b[3];
-
-      MAPBOX.coords = [[l,u], [r,u], [r,d], [l,d]];
-
-      mapbox_change_theme(ea_settings.mapbox_theme);
-    });
-
-    const a = DS.list
-          .filter(d => d.active && !d.disabled)
-          .map(d => d.id)
-          .sort((x,y) => (inputs.indexOf(x) < inputs.indexOf(y)) ? -1 : 1);
-
-    ea_state_set('inputs', a);
-
-    ea_cards_init(a);
-    ea_controls_init(state);
-
-    if (MOBILE) ea_mobile_init();
-
-    ea_loading(false);
-
-    ea_overlord_init(state);
-
-    break;
-  }
-
-  case 'view': {
-    await ea_overlord_view(state, msg);
-    window.dispatchEvent(new Event('resize'));
-    break;
-  }
-
-  case 'dataset': {
-    ea_overlord_dataset(state, msg);
-    break;
-  }
-
-  case 'controls': {
-    if (view === "outputs") {
-      ea_indexes_list(inputs, output);
-      ea_plot_active_analysis(output).then(raster => ea_indexes_graphs(raster));
+    default:
+      console.error("O.dataset: Do not know what to do with", _ds);
+      throw Error("O.dataset: ArgumentError.");
+      break;
     }
 
-    else if (view === "inputs") {
-      ea_plot_active_analysis(output);
+    if (!ds) throw Error("ds was never set...");
+
+    switch (arg) {
+    case "domain":
+      ds.__domain = data;
+      ea_overlord_update_view();
+      break;
+
+    case "active":
+      ds._active = data;
+      break;
+
+    case "disable":
+    case "mutate":
+    default:
+      ea_overlord_dataset(ds);
+      break;
     }
+  };
 
-    else if (view === "filtered") {
-      ea_timeline_filter_valued_polygons();
-    }
+  set datasets(arr) {
+    ea_cards_sort(arr);
+    this.set('inputs', arr);
+  };
 
-    else if (view === "timeline") {
-    }
-
-    break;
-  }
-
-  case 'index': {
-    ea_state_set('output', msg.target);
-    ea_plot_active_analysis(msg.target).then(raster => ea_indexes_graphs(raster));
-
-    break;
-  }
-
-  case 'timeline-change': {
+  set timeline(t) {
     DS.list.forEach(async d => {
       if (d.timeline && d.active && d.vectors.features)
-        ea_datasets_polygons_csv.call(d, ea_timeline_date(msg.target));
-    });
+        ea_datasets_polygons_csv.call(d, ea_timeline_date(t));
+    })
+  };
 
-    break;
-  }
+  get index() {
+    const url = new URL(location);
+    return url.searchParams.get('index');
+  };
 
-  case 'sort': {
-    ea_cards_sort(msg.target);
-    ea_state_set('inputs', msg.target);
+  set index(t) {
+    this.set('output', t);
+    ea_plot_active_analysis(t).then(raster => ea_indexes_graphs(raster));
+  };
 
-    break;
-  }
+  get view() {
+    const url = new URL(location);
+    return url.searchParams.get('view');
+  };
 
-  case 'refresh': {
-    ea_overlord_refresh(state);
+  set view(t) {
+    this.set('view', t);
 
-    ea_overlord({
-      "type": "view",
-      "target": view,
-      "caller": "ea_overlord refresh"
-    });
+    this.layers(t);
 
-    break;
-  }
+    ea_overlord_update_view(t);
 
-  case 'map': {
-    if (msg.target === "click") {
-      ea_overlord_map_click(state, msg.event);
+    ea_view_buttons(t);
+    ea_view_right_pane(t);
+
+    window.dispatchEvent(new Event('resize'));
+  };
+
+  map(interaction, event) {
+    if (interaction === "click")
+      ea_overlord_map_click(O.o, event);
+  };
+
+  set(k,v) {
+    const url = new URL(location);
+
+    let t = v || maybe(ea_state_params, k, 0) || "";
+
+    url.searchParams.set(k,t);
+
+    history.replaceState(null, null, url);
+
+    return url.searchParams.get(k);
+  };
+
+  get o() {
+    const url = new URL(location);
+    const o = {};
+
+    for (let k in ea_state_params) {
+      let v = url.searchParams.get(k);
+
+      let arr = !ea_state_params[k].length;
+
+      if (!v || v === "") {
+        o[k] = ea_state_params[k][0] || [];
+      } else {
+        o[k] = arr ? v.split(',') : v;
+      }
+
+      // Force the default if tampered with.
+      //
+      if (!arr && !ea_state_params[k].includes(v))
+        o[k] = ea_state_params[k][0];
+
+      url.searchParams.set(k, o[k]);
     }
 
-    break;
-  }
+    history.replaceState(null, null, url);
 
-  default:
-    throw `Overlord: I don't know message type '${msg.type}'`
-  }
+    return o;
+  };
+}
 
-  if (typeof msg.callback === 'function') msg.callback();
+O = new Overlord();
+
+async function ea_init() {
+  const url = new URL(location);
+  const id = url.searchParams.get('id');
+
+  const {view, inputs, output, pack} = O.o;
+
+  MOBILE = screen.width < 1152;
+
+  ea_layout_init();
+
+  GEOGRAPHY = await ea_api("geographies", { "id": `eq.${id}` }, { object: true });
+  MAPBOX = mapbox_setup();
+
+  await ea_datasets_init(GEOGRAPHY.id, inputs, pack, bounds => {
+    const b = mapbox_fit(bounds);
+
+    const l = b[0];
+    const r = b[2];
+    const d = b[1];
+    const u = b[3];
+
+    MAPBOX.coords = [[l,u], [r,u], [r,d], [l,d]];
+
+    mapbox_change_theme(ea_settings.mapbox_theme);
+  });
+
+  const a = DS.list
+        .filter(d => d.active && !d.disabled)
+        .map(d => d.id)
+        .sort((x,y) => (inputs.indexOf(x) < inputs.indexOf(y)) ? -1 : 1);
+
+  O.set('inputs', a);
+
+  ea_cards_init(a);
+  ea_controls_init(O.o);
+
+  if (MOBILE) ea_mobile_init();
+
+  ea_loading(false);
+
+  ea_views_init();
+  ea_indexes_init(O.o);
+
+  if (TIMELINE) ea_timeline_init();
+
+  if (!MOBILE && !TIMELINE) ea_nanny_init(O.o);
 };
 
-async function ea_overlord_view(state, msg) {
-  const t = msg.target;
-  ea_state_set('view', t);
-
-  await Promise.all(state.inputs.map(id => DST[id].turn(true, (t === 'inputs' || t === 'timeline'))));
-
-  ea_overlord_update_view(state);
-  ea_view_right_pane(t);
-};
-
-function ea_overlord_update_view() {
-  const state = ea_state_sync();
+function ea_overlord_update_view(v) {
   const timeline = qs('#timeline');
 
-  const {view, output, inputs} = state;
+  const {view, output, inputs} = O.o;
 
   switch (view) {
   case "outputs": {
-    ea_indexes_list(state.inputs, state.output);
+    ea_indexes_list();
 
     ea_plot_active_analysis(output)
       .then(raster => ea_indexes_graphs(raster))
@@ -208,6 +203,7 @@ function ea_overlord_update_view() {
       });
     break;
   }
+
   case "inputs": {
     if (MAPBOX.getLayer('output-layer'))
       MAPBOX.setLayoutProperty('output-layer', 'visibility', 'none');
@@ -218,6 +214,7 @@ function ea_overlord_update_view() {
     ea_plot_active_analysis(output);
     break;
   }
+
   case "filtered": {
     if (timeline) timeline.style.display = 'none';
 
@@ -231,6 +228,7 @@ function ea_overlord_update_view() {
     ea_timeline_filter_valued_polygons();
     break;
   }
+
   case "timeline": {
     if (timeline) timeline.style.display = '';
 
@@ -242,6 +240,7 @@ function ea_overlord_update_view() {
 
     break;
   }
+
   default: {
     throw `Argument Error: Overlord: Could not set/find the view '${view}'.`;
     break;
@@ -249,33 +248,28 @@ function ea_overlord_update_view() {
   }
 };
 
-async function ea_overlord_dataset(state, msg) {
-  const ds = msg.target;
+async function ea_overlord_dataset(ds) {
+  const {inputs, output, view} = O.o;
 
-  const inputs = state.inputs;
+  if (ds.active) inputs.unshift(ds.id);
+  else inputs.splice(inputs.indexOf(ds.id), 1);
 
-  if (ds.active) {
-    inputs.unshift(ds.id);
-  } else {
-    inputs.splice(inputs.indexOf(ds.id), 1);
-  }
-
-  if (state.view === "inputs" || state.view === "timeline") {
+  if (view === "inputs" || view === "timeline") {
     await ds.turn(ds.active, true);
     ds.raise();
-    ea_plot_active_analysis(state.output);
+    ea_plot_active_analysis(output);
   } else {
     await ds.turn(ds.active, false);
   }
 
-  if (state.view === "outputs") {
-    ea_indexes_list(inputs. state.output);
-    ea_plot_active_analysis(state.output).then(raster => ea_indexes_graphs(raster));
+  if (view === "outputs") {
+    ea_indexes_list();
+    ea_plot_active_analysis(output).then(raster => ea_indexes_graphs(raster));
   }
 
   const _inputs = [...new Set(inputs)];
   ea_cards(_inputs);
-  ea_state_set('inputs', _inputs);
+  O.set('inputs', _inputs);
 
   if (!TIMELINE) return;
 
@@ -291,16 +285,7 @@ async function ea_overlord_dataset(state, msg) {
   }
 };
 
-function ea_overlord_init(state) {
-  ea_views_init();
-  ea_indexes_init(state);
-
-  if (TIMELINE) ea_timeline_init();
-
-  if (!MOBILE && !TIMELINE) ea_nanny_init(state);
-};
-
-function ea_overlord_refresh(state) {
+function ea_overlord_special_layers() {
   if (!MAPBOX.getSource('output-source')) {
     MAPBOX.addSource('output-source', {
       "type": 'canvas',

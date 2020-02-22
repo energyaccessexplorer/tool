@@ -21,15 +21,11 @@ function ea_nanny_force_start() {
 
   DS.list.filter(d => d.active).forEach(d => d.turn(false, false));
 
-  ea_view('inputs');
+  O.view = 'inputs';
   ea_controls_select_tab(qs('#controls-tab-filters'), "filters");
   ea_modal.hide();
 
-  ea_overlord({
-    "type": "refresh",
-    "target": null,
-    "caller": "ea_nanny_force_start"
-  });
+  O.refresh();
 
   ea_nanny.start();
 };

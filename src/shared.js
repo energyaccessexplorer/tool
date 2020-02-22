@@ -68,21 +68,14 @@ function ea_colorscale(opts) {
   };
 };
 
-async function ea_view(v, btn) {
+function ea_view_buttons(v, btn) {
   const el = qs('#views');
   const btns = qsa('#views .up-title', el);
 
   btns.forEach(e => e.classList.remove('active'));
 
-  await delay(0.1);
-
-  ea_overlord({
-    "type": "view",
-    "target": v,
-    "caller": "ea_views_init",
-  });
-
-  qs('#view-' + v).classList.add('active');
+  const t = qs('#view-' + v);
+  if (t) t.classList.add('active');
 };
 
 function ea_view_right_pane(t) {
@@ -102,16 +95,17 @@ function ea_view_right_pane(t) {
 };
 
 function ea_views_init() {
-  const url = new URL(location);
-
   const el = qs('#views');
 
   for (let v in ea_views) {
     const btn = ce('div', ea_views[v]['name'], { class: 'view up-title', id: 'view-' + v, ripple: '' });
 
-    btn.onclick = _ => ea_view(v);
+    btn.onclick = async _ => {
+      await delay(0.2);
+      O.view = v;
+    };
 
-    if (url.searchParams.get('view') === v) btn.classList.add('active');
+    if (O.o.view === v) btn.classList.add('active');
 
     el.append(btn);
   }
@@ -193,54 +187,6 @@ async function ea_overview(cca3) {
       ),
     }).show();
   }
-};
-
-/*
- * ea_state_sync
- *
- * Gather the parameters from the current URL, clean them up, set the defaults
- *
- * returns an Object with the handled params and their set_ methods.
- */
-
-function ea_state_sync() {
-  const url = new URL(location);
-  const o = {}
-
-  for (let k in ea_state_params) {
-    let v = url.searchParams.get(k);
-
-    let arr = !ea_state_params[k].length;
-
-    if (!v || v === "") {
-      o[k] = ea_state_params[k][0] || [];
-    } else {
-      o[k] = arr ? v.split(',') : v;
-    }
-
-    // Force the default if tampered with.
-    //
-    if (!arr && !ea_state_params[k].includes(v))
-      o[k] = ea_state_params[k][0];
-
-    url.searchParams.set(k, o[k]);
-  }
-
-  history.replaceState(null, null, url);
-
-  return o;
-};
-
-function ea_state_set(k,a) {
-  const url = new URL(location);
-
-  let v = a || maybe(ea_state_params, k, 0) || "";
-
-  url.searchParams.set(k,v);
-
-  history.replaceState(null, null, url);
-
-  return url.searchParams.get(k);
 };
 
 /*

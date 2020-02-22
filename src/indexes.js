@@ -37,13 +37,7 @@ function ea_indexes_init(state) {
     cos.append(ce('option', ea_indexes[i]['name'], { value: i }));
 
   cos.value = state.output;
-  cos.onchange = function() {
-    ea_overlord({
-      "type": "index",
-      "target": this.value,
-      "caller": "ea_indexes_init select"
-    });
-  };
+  cos.onchange = x => { O.index = x.target.value };
 
   const toolbox = qs('#index-graphs-toolbox');
 
@@ -98,7 +92,8 @@ function ea_index_drawable(inputs, output) {
   return counts[output] > 0;
 };
 
-function ea_indexes_list(inputs, output) {
+function ea_indexes_list() {
+  const {inputs, output} = O.o;
   const nodes = [];
 
   const indexes_list = qs('#indexes-list');
@@ -126,11 +121,7 @@ function ea_indexes_list(inputs, output) {
       qs('.radio svg', n).dispatchEvent(new Event((this === n) ? "select" : "unselect"));
     }
 
-    ea_overlord({
-      "type": 'index',
-      "target": this.getAttribute('bind'),
-      "caller": 'ea_indexes_list'
-    });
+    O.index = this.getAttribute('bind');
   };
 
   for (let t in ea_indexes) {
@@ -173,14 +164,13 @@ function ea_indexes_modal() {
 function ea_indexes_current_config() {
   const url = new URL(location);
 
-  const state = ea_state_sync();
   const config = {
     geography_id: url.searchParams.get('id'),
-    analysis_type: state.output,
+    analysis_type: O.o.output,
     datasets: []
   };
 
-  for (let i of state.inputs) {
+  for (let i of O.o.inputs) {
     let d = DST[i];
     let c = {};
 
@@ -194,7 +184,7 @@ function ea_indexes_current_config() {
 
   let blob = new Blob([JSON.stringify(config)], { type: "application/octet-stream;charset=utf-8" });
 
-  fake_download(URL.createObjectURL(blob), `energyaccessexplorer-${state.output}.json`);
+  fake_download(URL.createObjectURL(blob), `energyaccessexplorer-${O.o.output}.json`);
 
   return config;
 };

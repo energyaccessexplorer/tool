@@ -203,19 +203,15 @@ class dscontrols extends HTMLElement {
 
   reset_defaults() {
     if (this.weight_group) {
-      this.weight_group.change(this.ds.weight = 2);
+      this.weight_group.change(2);
+      O.dataset(this, 'weight', 2);
     }
 
     if (this.range_group) {
       const d = this.ds.raster.init;
       this.range_group.change(d.min, d.max);
+      O.dataset(this, 'domain', d);
     }
-
-    ea_overlord({
-      "type": "controls",
-      "target": this.ds,
-      "caller": "dscontrols_restore_defaults"
-    });
   };
 
   manual_setup() {
@@ -234,11 +230,6 @@ class dscontrols extends HTMLElement {
       this.ds.domain[0] = v;
       this.range_group.change(...this.ds.domain);
 
-      ea_overlord({
-        "type": "dataset",
-        "target": this.ds,
-        "caller": "ea_controls manual",
-      });
     };
 
     this.manual_max.onchange = e => {
@@ -251,11 +242,7 @@ class dscontrols extends HTMLElement {
       this.ds.domain[1] = v;
       this.range_group.change(...this.ds.domain);
 
-      ea_overlord({
-        "type": "dataset",
-        "target": this.ds,
-        "caller": "ea_controls manual",
-      });
+      O.dataset(this.ds, 'domain', d);
     };
 
     switch (maybe(this.ds, 'category', 'controls', 'range')) {
@@ -354,11 +341,7 @@ async function ea_controls_mutant_options() {
 
     await this.mutate(host);
 
-    ea_overlord({
-      "type": "dataset",
-      "target": this,
-      "caller": "ea_controls_mutant_options",
-    });
+    O.dataset(this, 'mutate', host);
   };
 
   container.append(select);
@@ -397,13 +380,7 @@ function ea_controls_range(opts = {}) {
     steps: opts.steps,
     callback1: x => update(x, 0, v1),
     callback2: x => update(x, 1, v2),
-    end_callback: _ => {
-      ea_overlord({
-        "type": "controls",
-        "target": this,
-        "caller": "ea_controls_range",
-      });
-    }
+    end_callback: _ => O.dataset(this, 'domain', domain),
   });
 
   const el = ce('div');
@@ -433,15 +410,7 @@ function ea_controls_weight() {
     domain: [1, 5],
     steps: weights,
     width: 256,
-    end_callback: x => {
-      this.weight = x;
-
-      ea_overlord({
-        "type": "controls",
-        "target": this,
-        "caller": "ea_controls_weight",
-      });
-    }
+    end_callback: x => O.dataset(this, 'weight', x)
   });
 
   const el = ce('div');

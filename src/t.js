@@ -119,7 +119,7 @@ function ea_timeline_filter_valued_polygons() {
 
   const source = MAPBOX.getSource('filtered-source');
 
-  const b = DST.boundaries;
+  const b = DST['boundaries'];
   const fs = source._data.features;
 
   for (let i = 0; i < fs.length; i += 1)

@@ -132,7 +132,7 @@ class Overlord {
   };
 }
 
-O = new Overlord();
+const O = new Overlord();
 
 async function ea_init() {
   const url = new URL(location);

@@ -50,6 +50,31 @@ class MapboxThemeControl {
   }
 };
 
+function ea_mapbox() {
+  mapboxgl.accessToken = ea_settings.mapbox_token;
+
+  const mb = new mapboxgl.Map({
+    "container": 'mapbox-container',
+    "trackResize": true,
+    "preserveDrawingBuffer": true, // this allows us to get canvas.toDataURL()
+    "style": mapbox_theme_pick("")
+  });
+
+  mb.addControl(new mapboxgl.NavigationControl({ showCompass: false }));
+
+  mb.addControl((new MapboxThemeControl()), 'top-right');
+
+  mb.zoomTo(mb.getZoom() * 0.95, {duration: 0});
+
+  mb.doubleClickZoom.disable();
+  mb.dragRotate.disable();
+  mb.touchZoomRotate.disableRotation();
+
+  mb.on('mouseup', e => O.map('click', e));
+
+  return mb;
+};
+
 function mapbox_theme_control_popup(btn) {
   let x = ce('div', null, { id: 'mapbox-theme-control-popup' });
   let radios = ce('div');
@@ -108,31 +133,6 @@ function mapbox_theme_pick(theme) {
       }
     }]
   });
-};
-
-function mapbox_setup() {
-  mapboxgl.accessToken = ea_settings.mapbox_token;
-
-  const mb = new mapboxgl.Map({
-    "container": 'mapbox-container',
-    "trackResize": true,
-    "preserveDrawingBuffer": true, // this allows us to get canvas.toDataURL()
-    "style": mapbox_theme_pick("")
-  });
-
-  mb.addControl(new mapboxgl.NavigationControl({ showCompass: false }));
-
-  mb.addControl((new MapboxThemeControl()), 'top-right');
-
-  mb.zoomTo(mb.getZoom() * 0.95, {duration: 0});
-
-  mb.doubleClickZoom.disable();
-  mb.dragRotate.disable();
-  mb.touchZoomRotate.disableRotation();
-
-  mb.on('mouseup', e => O.map('click', e));
-
-  return mb;
 };
 
 function mapbox_change_theme(theme) {

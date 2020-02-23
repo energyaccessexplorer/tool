@@ -471,7 +471,7 @@ class DS {
   };
 };
 
-window.DST = {};
+const DST = {};
 
 /*
  * ea_datasets_init

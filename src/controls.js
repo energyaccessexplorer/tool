@@ -220,30 +220,23 @@ class dscontrols extends HTMLElement {
     this.manual_min.value = maybe(this.ds, 'domain', 0) || "";
     this.manual_max.value = maybe(this.ds, 'domain', 1) || "";
 
-    this.manual_min.onchange = e => {
+    const change = (e,i) => {
       let v = +e.target.value;
 
-      if (v > this.ds.domain[1]) {
-        e.target.value = this.ds.domain[1];
+      if (v > this.ds.domain[(i+1)%2]) {
+        e.target.value = this.ds.domain[(i+1)%2];
       }
 
-      this.ds.domain[0] = v;
-      this.range_group.change(...this.ds.domain);
+      const d = [this.ds._domain[0], this.ds._domain[1]];
+      d[i] = v;
 
-    };
-
-    this.manual_max.onchange = e => {
-      let v = +e.target.value;
-
-      if (v < this.ds.domain[0]) {
-        e.target.value = this.ds.domain[0];
-      }
-
-      this.ds.domain[1] = v;
-      this.range_group.change(...this.ds.domain);
+      this.range_group.change(...d);
 
       O.dataset(this.ds, 'domain', d);
     };
+
+    this.manual_min.onchange = e => change(e, 0);
+    this.manual_max.onchange = e => change(e, 1);
 
     switch (maybe(this.ds, 'category', 'controls', 'range')) {
     case 'single':
@@ -356,13 +349,15 @@ async function ea_controls_mutant_options() {
 function ea_controls_range(opts = {}) {
   if (!opts.sliders) return null;
 
+  const domain = [];
+
   const update = (x, i, el) => {
     el.innerText = (+x).toFixed(maybe(this, 'raster', 'precision') || 0);
 
     const man = maybe(this.controls, i ? 'manual_max' : 'manual_min');
     if (man) man.value = x;
 
-    this._domain[i] = parseFloat(x);
+    domain[i] = parseFloat(x);
   };
 
   const v1 = ce('div', null, { bind: "v1" });

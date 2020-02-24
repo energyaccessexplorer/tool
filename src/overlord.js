@@ -132,20 +132,45 @@ class Overlord {
   };
 }
 
-const O = new Overlord();
-
-async function ea_init() {
+async function ea_init(callback) {
   const url = new URL(location);
   const id = url.searchParams.get('id');
+  let params;
+
+  GEOGRAPHY = await ea_api("geographies", { "id": `eq.${id}` }, { object: true });
+  TIMELINE = maybe(GEOGRAPHY, 'configuration', 'timeline');
+
+  if (TIMELINE) {
+    TIMELINE_DATES = [];
+    TIMELINE_CURRENT_DATE = null;
+    TIMELINE_LINES = null;
+    TIMELINE_DISTRICT = null;
+
+    params = {
+      "view": ['timeline', 'filtered', 'outputs'],
+      "inputs": [],
+      "output": ['eai'],
+      "pack": [],
+    };
+  } else {
+    qs('#timeline').remove();
+
+    params = {
+      "view": ['inputs', 'outputs'],
+      "inputs": [],
+      "output": ['eai', 'ani', 'demand', 'supply'],
+      "pack": [],
+    };
+  }
+
+  callback(url, params);
+
+  MAPBOX = ea_mapbox();
 
   const {view, inputs, output, pack} = O.o;
 
   MOBILE = screen.width < 1152;
-
   ea_layout_init();
-
-  GEOGRAPHY = await ea_api("geographies", { "id": `eq.${id}` }, { object: true });
-  MAPBOX = mapbox_setup();
 
   await ea_datasets_init(GEOGRAPHY.id, inputs, pack, bounds => {
     const b = mapbox_fit(bounds);

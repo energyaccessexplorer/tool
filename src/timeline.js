@@ -1,10 +1,3 @@
-const TIMELINE = true;
-
-TIMELINE_DATES = [];
-TIMELINE_CURRENT_DATE = null;
-TIMELINE_LINES = null;
-TIMELINE_DISTRICT = null;
-
 async function ea_timeline_init() {
   await until(_ => TIMELINE_DATES.length > 0);
 

@@ -1,4 +1,7 @@
-const TIMELINE = false;
+/*
+ * empty array means it'll be treated as an editable array
+ * non-empty arrays mean allowed values (default: first)
+ */
 
 function ea_nanny_init(state) {
   window.ea_nanny = new nanny(ea_nanny_steps);

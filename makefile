@@ -24,7 +24,7 @@ LIB = ${DIST}/lib
 
 default: build
 
-build: build-a build-t build-s reload
+build: build-a build-s reload
 
 reload:
 	@sleep 0.3
@@ -71,6 +71,7 @@ build-a:
 		${SRC}/api.js \
 		${SRC}/analysis.js \
 		${SRC}/a.js \
+		${SRC}/timeline.js \
 		${SRC}/plot.js \
 		${SRC}/overlord.js \
 		${SRC}/svg.js \
@@ -94,6 +95,7 @@ build-a:
 		${CSS}/maparea.css \
 		${CSS}/indexes.css \
 		${CSS}/views.css \
+		${CSS}/filtered.css \
 		${CSS}/ripple.css \
 		${CSS}/svg.css \
 		${CSS}/summary.css \
@@ -103,66 +105,6 @@ build-a:
 
 	@cp ${SRC}/browser.js ${DIST}/a/
 
-build-t:
-	@echo "Building t"
-	@mkdir -p ${DIST}/t
-	@cp ${VIEWS}/t.html ${DIST}/t/index.html
-	@cp ${CSS}/ripple.css ${DIST}/t/ripple.css
-	@cp ${CSS}/svg.css ${DIST}/t/svg.css
-
-	@cat \
-		${LIB}/d3.js \
-		${LIB}/geotiff.js \
-		${LIB}/mapbox-gl.js \
-		${LIB}/geojson-extent.js \
-		${LIB}/helpers.js \
-		${LIB}/flash.js \
-		${LIB}/modal.js \
-		${LIB}/location.js \
-		${LIB}/htmlsortable.js \
-		${LIB}/nanny.js \
-		${LIB}/selectlist.js \
-		${LIB}/dropdown.js \
-		> ${DIST}/t/libs.js
-
-	@echo -n "const ea_settings = " | cat - \
-		settings.json \
-		${SRC}/utils.js \
-		${SRC}/shared.js \
-		${SRC}/api.js \
-		${SRC}/t.js \
-		${SRC}/plot.js \
-		${SRC}/analysis.js \
-		${SRC}/overlord.js \
-		${SRC}/svg.js \
-		${SRC}/controls.js \
-		${SRC}/ui.js \
-		${SRC}/cards.js \
-		${SRC}/indexes.js \
-		${SRC}/datasets.js \
-		${SRC}/mapbox.js \
-		${SRC}/report.js \
-		${SRC}/summary.js \
-		${SRC}/mobile.js \
-		> ${DIST}/t/main.js
-
-	@cat \
-		${CSS}/general.css \
-		${CSS}/t.css \
-		${CSS}/layout.css \
-		${CSS}/controls.css \
-		${CSS}/maparea.css \
-		${CSS}/views.css \
-		${CSS}/ripple.css \
-		${CSS}/svg.css \
-		${CSS}/summary.css \
-		${CSS}/mobile.css \
-		${CSS}/cards.css \
-		${CSS}/filtered.css \
-		${CSS}/indexes.css \
-		> ${DIST}/t/main.css
-
-	@cp ${SRC}/browser.js ${DIST}/t/
 
 build-s:
 	@echo "Building s"

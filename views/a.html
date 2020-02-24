@@ -86,11 +86,21 @@
           <div id="mapbox-container"></div>
           <div id="views"></div>
         </div>
+		<div id="timeline"></div>
       </div>
 
       <div id="right-pane">
         <div id="cards-pane">
           <div id="cards-list"></div>
+
+          <div class="bottom-right-container">
+            <h3 id="district-header" class="header"></h3>
+            <div id="district-graph" class="graphs"></div>
+          </div>
+        </div>
+
+        <div id="filtered-pane">
+          <p>Some information about filtered stuff...</p>
 
           <div class="bottom-right-container">
             <select id="canvas-output-select"></select>
@@ -147,6 +157,17 @@
         "name": "Data",
         "description": "Underlying data that go into the analysis"
       },
+
+      "timeline": {
+        "name": "Data",
+        "description": "Underlying data that go into the analysis"
+      },
+
+      "filtered": {
+        "name": "Target Areas",
+        "description": "Filtered areas"
+      },
+
       "outputs": {
         "name": "Analysis",
         "description": "Results of the analysis"

@@ -227,20 +227,10 @@ energy demand, low economic activity, and low access to infrastructure and resou
     window.ea_modal = new modal("ea-modal", {});
     window.ea_flash = new flash();
 
-    /*
-     * empty array means it'll be treated as an editable array
-     *
-     * non-empty array means that only those values are allowed (defaults [0])
-     */
-
-    ea_state_params = {
-      "view": ['inputs', 'outputs'],
-      "output": ['eai', 'ani', 'demand', 'supply'],
-      "inputs": [],
-      "pack": [],
-    };
-
-	ea_init();
+	ea_init((url,params) => {
+	  U = new Proxy({ url: url, params: params }, UProxyHandler);
+	  O = new Overlord();
+	});
   </script>
 
   <script src="/javascripts/gapps.js"></script>

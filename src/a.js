@@ -15,12 +15,11 @@ function ea_nanny_init(state) {
 };
 
 function ea_nanny_force_start() {
-  const url = new URL(location);
-  url.searchParams.set('inputs', '');
-  url.searchParams.set('output', 'eai');
-  url.searchParams.set('view', 'inputs');
-
-  history.replaceState(null, null, url);
+  U.params = {
+    inputs: [],
+    output: 'eai',
+    view: 'inputs'
+  };
 
   DS.list.filter(d => d.active).forEach(d => d.turn(false, false));
 

@@ -1,4 +1,33 @@
 class Overlord {
+  constructor() {
+    const o = {};
+
+    for (let k in U.params) {
+      let v = U[k];
+
+      let arr = !U.params[k].length;
+
+      if (!v || v === "") {
+        o[k] = U.params[k][0] || [];
+      } else {
+        o[k] = arr ? v.split(',') : v;
+      }
+
+      // Force the default if tampered with.
+      //
+      if (!arr && !U.params[k].includes(v))
+        o[k] = U.params[k][0];
+    }
+
+    this.state = o;
+
+    U.params = o;
+  };
+
+  get o() {
+    return this.state;
+  };
+
   refresh() {
     ea_overlord_special_layers();
     this.view = O.o.view;
@@ -48,7 +77,7 @@ class Overlord {
 
   set datasets(arr) {
     ea_cards_sort(arr);
-    this.set('inputs', arr);
+    U.inputs = arr;
   };
 
   set timeline(t) {
@@ -64,7 +93,7 @@ class Overlord {
   };
 
   set index(t) {
-    this.set('output', t);
+    U.output = t;
     ea_plot_active_analysis(t).then(raster => ea_indexes_graphs(raster));
   };
 
@@ -74,7 +103,7 @@ class Overlord {
   };
 
   set view(t) {
-    this.set('view', t);
+    U.view = t;
 
     this.layers(t);
 
@@ -89,46 +118,6 @@ class Overlord {
   map(interaction, event) {
     if (interaction === "click")
       ea_overlord_map_click(O.o, event);
-  };
-
-  set(k,v) {
-    const url = new URL(location);
-
-    let t = v || maybe(ea_state_params, k, 0) || "";
-
-    url.searchParams.set(k,t);
-
-    history.replaceState(null, null, url);
-
-    return url.searchParams.get(k);
-  };
-
-  get o() {
-    const url = new URL(location);
-    const o = {};
-
-    for (let k in ea_state_params) {
-      let v = url.searchParams.get(k);
-
-      let arr = !ea_state_params[k].length;
-
-      if (!v || v === "") {
-        o[k] = ea_state_params[k][0] || [];
-      } else {
-        o[k] = arr ? v.split(',') : v;
-      }
-
-      // Force the default if tampered with.
-      //
-      if (!arr && !ea_state_params[k].includes(v))
-        o[k] = ea_state_params[k][0];
-
-      url.searchParams.set(k, o[k]);
-    }
-
-    history.replaceState(null, null, url);
-
-    return o;
   };
 }
 
@@ -190,7 +179,7 @@ async function ea_init(callback) {
         .map(d => d.id)
         .sort((x,y) => (inputs.indexOf(x) < inputs.indexOf(y)) ? -1 : 1);
 
-  O.set('inputs', a);
+  O.datasets = a;
 
   ea_cards_init(a);
   ea_controls_init(O.o);
@@ -294,7 +283,7 @@ async function ea_overlord_dataset(ds) {
 
   const _inputs = [...new Set(inputs)];
   ea_cards(_inputs);
-  O.set('inputs', _inputs);
+  O.datasets =  _inputs;
 
   if (!TIMELINE) return;
 
@@ -515,5 +504,37 @@ function ea_overlord_map_click(state, e) {
         ea_timeline_lines_draw(datasets, (TIMELINE_DISTRICT = et.properties['District']));
       }
     }
+  }
+};
+
+const UProxyHandler = {
+  get: function(o,p) {
+    if (p === "params") return o.params;
+    else return o.url.searchParams.get(p);
+  },
+
+  set: function(o,t,v) {
+    switch (t) {
+    case "inputs":
+    case "output":
+    case "view":
+    case "pack":
+      o.url.searchParams.set(t,v);
+      break;
+
+    case "params":
+      for (p in v) {
+        o.url.searchParams.set(p, v[p]);
+      }
+      break;
+
+    default:
+      throw TypeError(`U: I'm not allowed to set '${t}'`);
+      break;
+    }
+
+    history.replaceState(null, null, o.url);
+
+    return true;
   }
 };

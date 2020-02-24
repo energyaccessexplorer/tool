@@ -138,9 +138,7 @@ function mapbox_theme_pick(theme) {
 function mapbox_change_theme(theme) {
   function set_output() {
     const c = MAPBOX.getStyle().layers.find(l => l.type === 'symbol');
-
     MAPBOX.first_symbol = maybe(c, 'id');
-
     O.refresh();
   };
 

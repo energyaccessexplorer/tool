@@ -107,7 +107,7 @@ class Overlord {
 
     this.layers(t);
 
-    ea_overlord_update_view(t);
+    ea_overlord_update_view();
 
     ea_view_buttons(t);
     ea_view_right_pane(t);
@@ -152,14 +152,14 @@ async function ea_init(callback) {
     };
   }
 
-  callback(url, params);
+  MOBILE = screen.width < 1152;
+  ea_layout_init();
 
   MAPBOX = ea_mapbox();
 
-  const {view, inputs, output, pack} = O.o;
+  callback(url, params);
 
-  MOBILE = screen.width < 1152;
-  ea_layout_init();
+  const {view, inputs, output, pack} = O.o;
 
   await ea_datasets_init(GEOGRAPHY.id, inputs, pack, bounds => {
     const b = mapbox_fit(bounds);
@@ -196,7 +196,7 @@ async function ea_init(callback) {
   if (!MOBILE && !TIMELINE) ea_nanny_init(O.o);
 };
 
-function ea_overlord_update_view(v) {
+function ea_overlord_update_view() {
   const timeline = qs('#timeline');
 
   const {view, output, inputs} = O.o;
@@ -213,7 +213,7 @@ function ea_overlord_update_view(v) {
         if (MAPBOX.getLayer('filtered-layer'))
           MAPBOX.setLayoutProperty('filtered-layer', 'visibility', 'none');
 
-        MAPBOX.setLayoutProperty('output-layer', 'visibility', 'visible')
+        MAPBOX.setLayoutProperty('output-layer', 'visibility', 'visible');
       });
     break;
   }

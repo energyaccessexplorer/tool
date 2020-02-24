@@ -98,7 +98,7 @@ async function ea_summary() {
     thead.append(thr = ce('tr', ce('th'), { class: 'number-labels-row' }));
     s.forEach((x,i) => thr.append(ce('th', lowmedhigh(i), { style: `background-color: ${x};`})));
 
-    for (var k in summary) {
+    for (let k in summary) {
       let tr = ce('tr', ce('td', ea_indexes[k]['name'], { class: 'index-name' }));
       s.forEach((x,i) => tr.append(ce('td', (summary[k][j]['amounts'][i]).toLocaleString())));
 
@@ -155,7 +155,7 @@ async function ea_summary_analyse(raster) {
 
   let f = d3.scaleQuantize().domain([0,1]).range(NORM_STOPS);
 
-  for (var i = 0; i < raster.length; i += 1) {
+  for (let i = 0; i < raster.length; i += 1) {
     const r = raster[i];
     a[i] = (r === -1) ? -1 : f(r);
   }

@@ -80,9 +80,17 @@ function ea_analysis(list, type) {
   const full_weight = list
         .reduce((a,c) => ((c.analysis.scale === "key-delta") ? a : c.weight + a), 0);
 
+  let nr = list.find(l => !maybe(l, 'raster', 'data'));
+  if (nr) {
+    console.warn(`Dataset '${nr.id}' has no raster.data (yet).`,
+                 "I'll skip this analysis since I suspect a race condition)");
+
+    return it;
+  }
+
   if (list.length === 1 && full_weight === 0) return it;
 
-  for (var i = 0; i < it.length; i += 1) {
+  for (let i = 0; i < it.length; i += 1) {
     let a = 0;
 
     for (let j = 0; j < list.length; j += 1) {
@@ -132,7 +140,7 @@ function ea_analysis(list, type) {
 
   var f = d3.scaleLinear().domain([min,max]).range([0,1]);
 
-  for (var i = 0; i < it.length; i += 1) {
+  for (let i = 0; i < it.length; i += 1) {
     const r = it[i];
     it[i] = (r === -1) ? -1 : f(r);
   }

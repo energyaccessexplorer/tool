@@ -68,7 +68,7 @@ function ea_colorscale(opts) {
   };
 };
 
-function ea_view_buttons(v, btn) {
+function ea_view_buttons(v) {
   const el = qs('#views');
   const btns = qsa('#views .up-title', el);
 
@@ -102,12 +102,12 @@ function ea_views_init() {
 
     const btn = ce('div', ea_views[v]['name'], { class: 'view up-title', id: 'view-' + v, ripple: '' });
 
+    if (O.o.view === v) btn.classList.add('active');
+
     btn.onclick = async _ => {
       await delay(0.2);
       O.view = v;
     };
-
-    if (O.o.view === v) btn.classList.add('active');
 
     el.append(btn);
   }

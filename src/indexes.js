@@ -1,22 +1,34 @@
 async function ea_indexes_graphs(raster) {
   const t = await ea_summary_analyse(raster);
+  let g;
 
-  if (!t) return;
+  if (g = maybe(t, 'population')) {
+    g['distribution']
+      .forEach((x,i) => POPULATION_PIE['data'][i].push(x));
 
-  t['population']['distribution']
-    .forEach((x,i) => POPULATION_PIE['data'][i].push(x));
+    POPULATION_PIE.change(1);
 
-  t['area']['distribution']
-    .forEach((x,i) => AREA_PIE['data'][i].push(x));
+    qs('#population-number').innerHTML = g['total'].toLocaleString() + "&nbsp;" + "people";
 
-  POPULATION_PIE.change(1);
-  AREA_PIE.change(1);
+    g['distribution'].forEach((x,i) => POPULATION_PIE['data'][i].shift());
+  } else {
+    const pn = qs('#population-number');
+    if (pn) pn.closest('.index-graphs-group').remove();
+  }
 
-  qs('#population-number').innerHTML = t['population']['total'].toLocaleString() + "&nbsp;" + "people";
-  qs('#area-number').innerHTML = t['area']['total'].toLocaleString() + "&nbsp;" + "km<sup>2</sup>";
+  if (g = maybe(t, 'area')) {
+    g['distribution']
+      .forEach((x,i) => AREA_PIE['data'][i].push(x));
 
-  t['population']['distribution'].forEach((x,i) => POPULATION_PIE['data'][i].shift());
-  t['area']['distribution'].forEach((x,i) => AREA_PIE['data'][i].shift());
+    AREA_PIE.change(1);
+
+    qs('#area-number').innerHTML = g['total'].toLocaleString() + "&nbsp;" + "km<sup>2</sup>";
+
+    g['distribution'].forEach((x,i) => AREA_PIE['data'][i].shift());
+  } else {
+    const an = qs('#area-number');
+    if (an) an.closest('.index-graphs-group').remove();
+  }
 };
 
 function ea_indexes_init(state) {

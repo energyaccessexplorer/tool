@@ -140,13 +140,16 @@ async function ea_summary() {
 };
 
 async function ea_summary_analyse(raster) {
-  const pop = DST['population'];
+  let ds = DST['population'];
 
-  if (!pop) return null;
+  if (!ds) {
+    warn("No 'population' dataset present... Will use boundaries");
+    ds = DST['boundaries'];
+  }
 
-  await pop.load('raster');
-  const p = pop.raster.data;
-  const nodata = pop.raster.nodata;
+  await ds.load('raster');
+  const p = ds.raster.data;
+  const nodata = ds.raster.nodata;
 
   let a = new Float32Array(raster.length).fill(-1);
 
@@ -182,18 +185,21 @@ async function ea_summary_analyse(raster) {
   const ptotal = population_groups.reduce((a,b) => a + b, 0)
   const atotal = area_groups.reduce((a,b) => a + b, 0);
 
-  return {
-    population: {
+  const o = {};
+  if (ds.id === 'population')
+    o.population = {
       total: ptotal,
       amounts: population_groups,
       distribution: population_groups.reduce((a,b) => { a.push(b/ptotal); return a; }, [])
-    },
-    area: {
-      total: atotal,
-      amounts: area_groups,
-      distribution: area_groups.reduce((a,b) => { a.push(b/atotal); return a; }, [])
     }
-  };
+
+  o.area = {
+    total: atotal,
+    amounts: area_groups,
+    distribution: area_groups.reduce((a,b) => { a.push(b/atotal); return a; }, [])
+  }
+
+  return o;
 };
 
 /*

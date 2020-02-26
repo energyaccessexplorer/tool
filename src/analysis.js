@@ -203,7 +203,7 @@ function ea_active_analysis(type) {
   else
     idxn = d => d.id === type;
 
-  const list = DS.list.filter(d => d.active && d.raster && idxn(d));
+  const list = DS.list.filter(d => d.on && d.raster && idxn(d));
 
   return ea_analysis(list, type);
 };

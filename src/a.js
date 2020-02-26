@@ -21,7 +21,7 @@ function ea_nanny_force_start() {
     view: 'inputs'
   };
 
-  DS.list.filter(d => d.active).forEach(d => d.turn(false, false));
+  DS.list.filter(d => d.on).forEach(d => d.turn(false, false));
 
   O.view = 'inputs';
   ea_controls_select_tab(qs('#controls-tab-filters'), "filters");

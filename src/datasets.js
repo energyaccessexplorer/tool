@@ -1,5 +1,5 @@
 class DS {
-  constructor(o, active) {
+  constructor(o, on) {
     this.id = o.name || o.category.name;
 
     this.dataset_id = o.id;
@@ -8,7 +8,7 @@ class DS {
 
     this.category_overrides(o.category_overrides);
 
-    this.active = active || false;
+    this.on = on || false;
 
     this._domain = null;
 
@@ -227,7 +227,7 @@ class DS {
   };
 
   disable() {
-    this.active = false;
+    this.on = false;
     this.disabled = true;
 
     if (this.controls) this.controls.disable();
@@ -392,21 +392,20 @@ class DS {
   };
 
   toggle() {
-    this.active = !this.active;
-    O.dataset(this, 'toggle');
+    O.dataset(this, 'active', (this.on = !this.on));
   };
 
   set __domain(d) {
     this._domain = d;
   };
 
-  set _active(d) {
+  active(d, draw) {
     this.raise();
-    this.turn(d, true);
+    this.turn(d, draw);
   };
 
   async turn(v, draw) {
-    this.active = v;
+    this.on = v;
 
     if (v) {
       if (this.controls) {
@@ -507,7 +506,7 @@ async function ea_datasets_init(id, inputs, pack, callback) {
     .then(async e => {
       let ds = new DS(e);
 
-      ds.active = false;
+      ds.on = false;
 
       await ds.load('vectors');
       await ds.load('csv');

@@ -112,7 +112,7 @@ contact our team at`;
   function add_selected_datasets() {
     add_title("Selected Datasets");
 
-    const body = DS.list.filter(d => d.active).map(d => [d.name, d.category.unit, (d.domain || []).join(' - '), d.weight]);
+    const body = DS.list.filter(d => d.on).map(d => [d.name, d.category.unit, (d.domain || []).join(' - '), d.weight]);
 
     doc.autoTable({
       head: [['Dataset', 'Unit', 'Range', 'Importance']],
@@ -296,7 +296,7 @@ function ea_report_csv(summary) {
   const csv = [];
 
   const datasets = DS.list
-        .filter(d => d.active)
+        .filter(d => d.on)
         .map(d => d.id + ":" + d.domain)
         .join(";");
 

@@ -30,7 +30,7 @@ class Overlord {
       break;
 
     case "active":
-      ds._active = data;
+      ds.active(data, ['inputs', 'timeline'].includes(U.view));
       break;
 
     case "disable":
@@ -48,7 +48,7 @@ class Overlord {
 
   set timeline(t) {
     DS.list.forEach(async d => {
-      if (d.timeline && d.active && d.vectors.features)
+      if (d.timeline && d.on && d.vectors.features)
         ea_datasets_polygons_csv.call(d, ea_timeline_date(t));
     })
   };
@@ -125,7 +125,7 @@ async function ea_init(callback) {
   });
 
   O.datasets = DS.list
-    .filter(d => d.active && !d.disabled)
+    .filter(d => d.on && !d.disabled)
     .map(d => d.id)
     .sort((x,y) => (U.inputs.indexOf(x) < U.inputs.indexOf(y)) ? -1 : 1);
 
@@ -217,15 +217,15 @@ function ea_overlord_update_view() {
 async function ea_overlord_dataset(ds) {
   const {inputs, output, view} = U;
 
-  if (ds.active) inputs.unshift(ds.id);
+  if (ds.on) inputs.unshift(ds.id);
   else inputs.splice(inputs.indexOf(ds.id), 1);
 
   if (view === "inputs" || view === "timeline") {
-    await ds.turn(ds.active, true);
+    await ds.turn(ds.on, true);
     ds.raise();
     ea_plot_active_analysis(output);
   } else {
-    await ds.turn(ds.active, false);
+    await ds.turn(ds.on, false);
   }
 
   if (view === "outputs") {
@@ -240,7 +240,7 @@ async function ea_overlord_dataset(ds) {
   if (!TIMELINE) return;
 
   if (maybe(TIMELINE_CURRENT_DATE) && _inputs.length) {
-    const datasets = DS.list.filter(d => d.active && d.timeline && maybe(d, 'csv', 'data'));
+    const datasets = DS.list.filter(d => d.on && d.timeline && maybe(d, 'csv', 'data'));
 
     if (TIMELINE_DISTRICT)
       ea_timeline_lines_draw(datasets, TIMELINE_DISTRICT);
@@ -452,7 +452,7 @@ function ea_overlord_map_click(e) {
       if (!et) return;
 
       if (et.source === i) {
-        const datasets = DS.list.filter(d => d.active && d.timeline && maybe(d, 'csv', 'data'));
+        const datasets = DS.list.filter(d => d.on && d.timeline && maybe(d, 'csv', 'data'));
         ea_timeline_lines_draw(datasets, (TIMELINE_DISTRICT = et.properties['District']));
       }
     }

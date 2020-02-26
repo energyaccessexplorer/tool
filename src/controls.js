@@ -131,7 +131,7 @@ class dscontrols extends HTMLElement {
 
   turn(t) {
     this.content.style.display = t ? 'block' : 'none';
-    this.main.classList[this.ds.active ? 'add' : 'remove']('active');
+    this.main.classList[this.ds.on ? 'add' : 'remove']('active');
 
     if (this.checkbox) this.checkbox.change(t);
 
@@ -300,7 +300,7 @@ function ea_controls_select_tab(tab, name) {
 };
 
 function ea_controls_checkbox() {
-  const checkbox = ea_svg_switch(this.active);
+  const checkbox = ea_svg_switch(this.on);
   const svg = checkbox.svg;
 
   checkbox.click = e => {
@@ -313,7 +313,7 @@ function ea_controls_checkbox() {
     else
       svg.dispatchEvent(new Event('click', { bubbles: true }));
 
-    return this.active;
+    return this.on;
   };
 
   return checkbox;
@@ -536,7 +536,7 @@ function ea_controls_dropdown() {
     dropdownlist.push({
       "content": "Toggle advanced controls",
       "action": _ => {
-        if (!this.ds.active) this.ds.toggle();
+        if (!this.ds.on) this.ds.toggle();
 
         qs('.advanced-controls', this).style.display = (this.show_advanced = !this.show_advanced) ? 'block' : 'none';
       }

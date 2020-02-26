@@ -93,7 +93,7 @@ async function ea_timeline_datasets_polygons_csv() {
 };
 
 function ea_timeline_filter_valued_polygons() {
-  const datasets = DS.list.filter(d => d.active && maybe(d.csv, 'data') && d.datatype.match("-(fixed|timeline)"));
+  const datasets = DS.list.filter(d => d.on && maybe(d.csv, 'data') && d.datatype.match("-(fixed|timeline)"));
 
   function m(d,r) {
     const c = d.config.column;

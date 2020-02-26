@@ -167,12 +167,21 @@ function ea_analysis(list, type) {
 
 async function ea_plot_active_analysis(type, cs = 'ea') {
   const raster = ea_active_analysis(type);
-
   ea_plot_outputcanvas(raster);
 
+  const index = ea_indexes[type];
+
+  if (!type || !index) {
+    console.warn("ea_plot_active_analysis: Too early...",
+                 "This is an initialisation bug.",
+                 "Index type:", type);
+
+    return raster;
+  }
+
   qs('#canvas-output-select').value = type;
-  qs('#index-graphs-title').innerText = ea_indexes[type]['name'];
-  qs('#index-graphs-description').innerText = ea_indexes[type]['description'];
+  qs('#index-graphs-title').innerText = index['name'];
+  qs('#index-graphs-description').innerText = index['description'];
 
   // 'animate' is set to false on mapbox's configuration, since we don't want
   // mapbox eating the CPU at 60FPS for nothing.

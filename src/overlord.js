@@ -11,8 +11,8 @@ class Overlord {
       ds = _ds;
       break;
 
-    case "string":
-      ds = DST[i];
+    case "String":
+      ds = DST[_ds];
       break;
 
     default:
@@ -31,6 +31,14 @@ class Overlord {
 
     case "active":
       ds.active(data, ['inputs', 'timeline'].includes(U.view));
+
+      let arr = U.inputs;
+      if (ds.on) arr.unshift(ds.id);
+      else arr.splice(arr.indexOf(ds.id), 1);
+
+      O.datasets = arr;
+
+      ea_overlord_update_view();
       break;
 
     case "disable":
@@ -42,8 +50,8 @@ class Overlord {
   };
 
   set datasets(arr) {
-    ea_cards_sort(arr);
     U.inputs = arr;
+    ea_cards_sort(arr);
   };
 
   set timeline(t) {
@@ -472,7 +480,8 @@ const UProxyHandler = {
     case "inputs": {
       const i = o.url.searchParams.get(p);
       if (!i || i === "") v = [];
-      else v = i.split(',');
+      else v = i.split(',').filter(e => o.params.inputs.indexOf(e) > -1);
+
       break;
     }
 

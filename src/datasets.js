@@ -529,6 +529,8 @@ async function ea_datasets_init(id, inputs, pack, callback) {
     .then(r => r.filter(d => d.category.name !== 'boundaries'))
     .then(r => r.map(e => new DS(e, inputs.includes(e.category.name))));
 
+  U.params.inputs = [...new Set(DS.list.map(e => e.id))];
+
   // We need all the datasets to be initialised _before_ setting
   // mutant/collection attributes (order is never guaranteed)
   //

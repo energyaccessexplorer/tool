@@ -1,40 +1,6 @@
 class Overlord {
-  constructor() {
-    const o = {};
-
-    for (let k in U.params) {
-      let v = U[k];
-
-      let arr = !U.params[k].length;
-
-      if (!v || v === "") {
-        o[k] = U.params[k][0] || [];
-      } else {
-        o[k] = arr ? v.split(',') : v;
-      }
-
-      // Force the default if tampered with.
-      //
-      if (!arr && !U.params[k].includes(v))
-        o[k] = U.params[k][0];
-    }
-
-    this.state = o;
-
-    U.params = o;
-  };
-
-  get o() {
-    return this.state;
-  };
-
-  refresh() {
-    ea_overlord_special_layers();
-    this.view = O.o.view;
-  };
-
   layers(v) {
-    Promise.all(O.o.inputs.map(id => DST[id].turn(true, (v === 'inputs' || v === 'timeline'))));
+    Promise.all(U.inputs.map(id => DST[id].turn(true, (v === 'inputs' || v === 'timeline'))));
   };
 
   dataset(_ds, arg, data) {
@@ -87,19 +53,9 @@ class Overlord {
     })
   };
 
-  get index() {
-    const url = new URL(location);
-    return url.searchParams.get('index');
-  };
-
   set index(t) {
     U.output = t;
     ea_plot_active_analysis(t).then(raster => ea_indexes_graphs(raster));
-  };
-
-  get view() {
-    const url = new URL(location);
-    return url.searchParams.get('view');
   };
 
   set view(t) {
@@ -109,15 +65,19 @@ class Overlord {
 
     ea_overlord_update_view();
 
-    ea_view_buttons(t);
-    ea_view_right_pane(t);
+    ea_view_buttons();
+    ea_view_right_pane();
 
     window.dispatchEvent(new Event('resize'));
   };
 
   map(interaction, event) {
     if (interaction === "click")
-      ea_overlord_map_click(O.o, event);
+      ea_overlord_map_click(event);
+  };
+
+  async wait_for(func, finish) {
+    await until(func); finish();
   };
 }
 
@@ -159,47 +119,39 @@ async function ea_init(callback) {
 
   callback(url, params);
 
-  const {view, inputs, output, pack} = O.o;
-
-  await ea_datasets_init(GEOGRAPHY.id, inputs, pack, bounds => {
-    const b = mapbox_fit(bounds);
-
-    const l = b[0];
-    const r = b[2];
-    const d = b[1];
-    const u = b[3];
-
-    MAPBOX.coords = [[l,u], [r,u], [r,d], [l,d]];
-
+  await ea_datasets_init(GEOGRAPHY.id, U.inputs, U.pack, bounds => {
+    MAPBOX.coords = mapbox_fit(bounds);
     mapbox_change_theme(ea_settings.mapbox_theme);
   });
 
-  const a = DS.list
-        .filter(d => d.active && !d.disabled)
-        .map(d => d.id)
-        .sort((x,y) => (inputs.indexOf(x) < inputs.indexOf(y)) ? -1 : 1);
+  O.datasets = DS.list
+    .filter(d => d.active && !d.disabled)
+    .map(d => d.id)
+    .sort((x,y) => (U.inputs.indexOf(x) < U.inputs.indexOf(y)) ? -1 : 1);
 
-  O.datasets = a;
+  O.index = U.output;
 
-  ea_cards_init(a);
-  ea_controls_init(O.o);
+  ea_cards_init();
+  ea_controls_init();
 
   if (MOBILE) ea_mobile_init();
 
   ea_loading(false);
 
   ea_views_init();
-  ea_indexes_init(O.o);
+  ea_indexes_init();
 
   if (TIMELINE) ea_timeline_init();
 
-  if (!MOBILE && !TIMELINE) ea_nanny_init(O.o);
+  if (!MOBILE && !TIMELINE) ea_nanny_init();
 };
 
 function ea_overlord_update_view() {
   const timeline = qs('#timeline');
 
-  const {view, output, inputs} = O.o;
+  const {view, output, inputs} = U;
+
+  ea_overlord_special_layers();
 
   switch (view) {
   case "outputs": {
@@ -263,7 +215,7 @@ function ea_overlord_update_view() {
 };
 
 async function ea_overlord_dataset(ds) {
-  const {inputs, output, view} = O.o;
+  const {inputs, output, view} = U;
 
   if (ds.active) inputs.unshift(ds.id);
   else inputs.splice(inputs.indexOf(ds.id), 1);
@@ -349,11 +301,11 @@ function ea_overlord_special_layers() {
   }
 };
 
-function ea_overlord_map_click(state, e) {
+function ea_overlord_map_click(e) {
   const b = DST['boundaries'];
   let nodata = b.raster.nodata;
 
-  const {view, inputs, output} = state;
+  const {view, inputs, output} = U;
 
   const i = maybe(inputs, 0);
   let t;
@@ -509,15 +461,40 @@ function ea_overlord_map_click(state, e) {
 
 const UProxyHandler = {
   get: function(o,p) {
-    if (p === "params") return o.params;
-    else return o.url.searchParams.get(p);
+    let v;
+
+    switch (p) {
+    case "params": {
+      v = o.params;
+      break;
+    }
+
+    case "inputs": {
+      const i = o.url.searchParams.get(p);
+      if (!i || i === "") v = [];
+      else v = i.split(',');
+      break;
+    }
+
+    default: {
+      v = o.url.searchParams.get(p);
+      break;
+    }
+    }
+
+    return v;
   },
 
   set: function(o,t,v) {
     switch (t) {
-    case "inputs":
     case "output":
-    case "view":
+    case "view": {
+      if (!o.params[t].includes(v)) v = o.params[t][0];
+      o.url.searchParams.set(t,v);
+      break;
+    }
+
+    case "inputs":
     case "pack":
       o.url.searchParams.set(t,v);
       break;

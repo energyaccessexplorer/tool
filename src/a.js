@@ -3,11 +3,11 @@
  * non-empty arrays mean allowed values (default: first)
  */
 
-function ea_nanny_init(state) {
+function ea_nanny_init() {
   window.ea_nanny = new nanny(ea_nanny_steps);
 
-  if (state.inputs.length > 0) return;
-  if (state.view !== "inputs") return;
+  if (U.inputs.length > 0) return;
+  if (U.view !== "inputs") return;
 
   const w = localStorage.getItem('needs-nanny');
 
@@ -27,7 +27,7 @@ function ea_nanny_force_start() {
   ea_controls_select_tab(qs('#controls-tab-filters'), "filters");
   ea_modal.hide();
 
-  O.refresh();
+  O.view = U.view;
 
   ea_nanny.start();
 };

@@ -31,7 +31,7 @@ async function ea_indexes_graphs(raster) {
   }
 };
 
-function ea_indexes_init(state) {
+function ea_indexes_init() {
   const url = new URL(location);
 
   const ramp = tmpl("#ramp");
@@ -48,7 +48,7 @@ function ea_indexes_init(state) {
   for (let i in ea_indexes)
     cos.append(ce('option', ea_indexes[i]['name'], { value: i }));
 
-  cos.value = state.output;
+  cos.value = U.output;
   cos.onchange = x => { O.index = x.target.value };
 
   const toolbox = qs('#index-graphs-toolbox');
@@ -105,7 +105,6 @@ function ea_index_drawable(inputs, output) {
 };
 
 function ea_indexes_list() {
-  const {inputs, output} = O.o;
   const nodes = [];
 
   const indexes_list = qs('#indexes-list');
@@ -118,7 +117,7 @@ function ea_indexes_list() {
       ce('span', v)
     );
 
-    if (!ea_index_drawable(inputs, t))
+    if (!ea_index_drawable(U.inputs, t))
       d.setAttribute('disabled', "");
 
     return d;
@@ -140,7 +139,7 @@ function ea_indexes_list() {
     let node = i_elem(t, ea_indexes[t]['name'], ea_indexes[t]['description']);
 
     let ler = qs('.radio', node);
-    ler.append(ea_svg_radio(t === output));
+    ler.append(ea_svg_radio(t === U.output));
 
     node.addEventListener('mouseup', _ => setTimeout(_ => trigger_this.call(node), 10));
 
@@ -178,11 +177,11 @@ function ea_indexes_current_config() {
 
   const config = {
     geography_id: url.searchParams.get('id'),
-    analysis_type: O.o.output,
+    analysis_type: U.output,
     datasets: []
   };
 
-  for (let i of O.o.inputs) {
+  for (let i of U.inputs) {
     let d = DST[i];
     let c = {};
 
@@ -196,7 +195,7 @@ function ea_indexes_current_config() {
 
   let blob = new Blob([JSON.stringify(config)], { type: "application/octet-stream;charset=utf-8" });
 
-  fake_download(URL.createObjectURL(blob), `energyaccessexplorer-${O.o.output}.json`);
+  fake_download(URL.createObjectURL(blob), `energyaccessexplorer-${U.output}.json`);
 
   return config;
 };

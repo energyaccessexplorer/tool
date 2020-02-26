@@ -83,7 +83,13 @@ function ea_analysis(list, type) {
   let nr = list.find(l => !maybe(l, 'raster', 'data'));
   if (nr) {
     console.warn(`Dataset '${nr.id}' has no raster.data (yet).`,
-                 "I'll skip this analysis since I suspect a race condition)");
+                 "Skipping this analysis since I suspect a race condition.",
+                 "Telling O to wait for it...");
+
+    O.wait_for(
+      _ => nr.raster.data,
+      _ => ea_plot_active_analysis(U.output).then(raster => ea_indexes_graphs(raster))
+    );
 
     return it;
   }
@@ -183,7 +189,22 @@ async function ea_plot_active_analysis(type, cs = 'ea') {
 };
 
 function ea_active_analysis(type) {
-  const list = ea_list_filter_type(type);
+  let idxn;
+
+  const singles = Object.keys(ea_indexes).filter(i => !ea_indexes[i].compound);
+  const multi = Object.keys(ea_indexes).filter(i => ea_indexes[i].compound);
+
+  if (singles.includes(type))
+    idxn = d => (d.indexname === type) || !d.indexname;
+
+  else if (multi.includes(type))
+    idxn = d => ea_indexes[type].compound.includes(d.indexname) || !d.indexname;
+
+  else
+    idxn = d => d.id === type;
+
+  const list = DS.list.filter(d => d.active && d.raster && idxn(d));
+
   return ea_analysis(list, type);
 };
 

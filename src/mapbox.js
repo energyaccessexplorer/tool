@@ -139,7 +139,7 @@ function mapbox_change_theme(theme) {
   function set_output() {
     const c = MAPBOX.getStyle().layers.find(l => l.type === 'symbol');
     MAPBOX.first_symbol = maybe(c, 'id');
-    O.refresh();
+    O.view = U.view;
   };
 
   MAPBOX.once('style.load', set_output);
@@ -206,5 +206,10 @@ function mapbox_fit(bounds, animate = false) {
 
   MAPBOX.fitBounds(bounds, { animate: animate, padding: { top: vp, bottom: vp, left: hp, right: hp } });
 
-  return bounds;
+  const l = bounds[0];
+  const r = bounds[2];
+  const d = bounds[1];
+  const u = bounds[3];
+
+  return [[l,u], [r,u], [r,d], [l,d]];
 };

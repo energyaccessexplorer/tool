@@ -1,6 +1,5 @@
-function ea_cards_init(arr) {
-  const pane = qs('#cards-pane');
-  const list = qs('#cards-list', pane);
+function ea_cards_init() {
+  const list = qs('#cards-pane #cards-list');
 
   sortable('#cards-list', {
     "items": 'ds-card',
@@ -10,20 +9,19 @@ function ea_cards_init(arr) {
     .addEventListener('sortupdate',
                       e => O.datasets = e.detail.destination.items.map(i => i.getAttribute('bind')));
 
-  ea_cards(arr.reverse());
+  ea_cards();
 };
 
-function ea_cards(list) {
-  const cards = qs('#cards-pane');
-  const cards_list = qs('#cards-list', cards);
+function ea_cards() {
+  const cards_list = qs('#cards-pane #cards-list');
 
-  const ldc = list.map(i => DST[i].card);
+  const ldc = U.inputs.reverse().map(i => DST[i].card);
   const empty = cards_list.children.length === 0;
 
   if (!empty) sortable('#cards-list', 'disable');
 
   for (let i of ldc)
-    if (!cards_list.contains(i)) cards_list.prepend(i)
+    if (!cards_list.contains(i)) cards_list.prepend(i);
 
   if (!empty) sortable('#cards-list', 'enable');
 };

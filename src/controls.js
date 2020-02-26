@@ -255,7 +255,7 @@ class dscontrols extends HTMLElement {
 
 customElements.define('ds-controls', dscontrols);
 
-function ea_controls_init(state) {
+function ea_controls_init() {
   ea_controls_selectlist();
 
   const controls = qs('#controls-contents');

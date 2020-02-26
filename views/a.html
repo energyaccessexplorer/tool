@@ -227,7 +227,7 @@ energy demand, low economic activity, and low access to infrastructure and resou
     window.ea_modal = new modal("ea-modal", {});
     window.ea_flash = new flash();
 
-	ea_init((url,params) => {
+	ea_init((url, params) => {
 	  U = new Proxy({ url: url, params: params }, UProxyHandler);
 	  O = new Overlord();
 	});

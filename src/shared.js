@@ -68,17 +68,17 @@ function ea_colorscale(opts) {
   };
 };
 
-function ea_view_buttons(v) {
+function ea_view_buttons() {
   const el = qs('#views');
   const btns = qsa('#views .up-title', el);
 
   btns.forEach(e => e.classList.remove('active'));
 
-  const t = qs('#view-' + v);
+  const t = qs('#view-' + U.view);
   if (t) t.classList.add('active');
 };
 
-function ea_view_right_pane(t) {
+function ea_view_right_pane() {
   const panes = ["cards", "indexes", "filtered"];
 
   const views = {
@@ -90,7 +90,7 @@ function ea_view_right_pane(t) {
 
   for (let pi of panes) {
     let p; if (!(p = qs(`#${pi}-pane`))) continue;
-    p.style['z-index'] = (views[t].indexOf(pi) > -1) ? 1 : 0;
+    p.style['z-index'] = (views[U.view].indexOf(pi) > -1) ? 1 : 0;
   }
 };
 
@@ -102,7 +102,7 @@ function ea_views_init() {
 
     const btn = ce('div', ea_views[v]['name'], { class: 'view up-title', id: 'view-' + v, ripple: '' });
 
-    if (O.o.view === v) btn.classList.add('active');
+    if (U.view === v) btn.classList.add('active');
 
     btn.onclick = async _ => {
       await delay(0.2);
@@ -189,30 +189,4 @@ async function ea_overview(cca3) {
       ),
     }).show();
   }
-};
-
-/*
- * ea_list_filter_type
- *
- * Utility.
- *
- * @param "type" string. ID or indexname.
- */
-
-function ea_list_filter_type(type) {
-  let idxn;
-
-  const singles = Object.keys(ea_indexes).filter(i => !ea_indexes[i].compound);
-  const multi = Object.keys(ea_indexes).filter(i => ea_indexes[i].compound);
-
-  if (singles.includes(type))
-    idxn = d => (d.indexname === type) || !d.indexname;
-
-  else if (multi.includes(type))
-    idxn = d => ea_indexes[type].compound.includes(d.indexname) || !d.indexname;
-
-  else
-    idxn = d => d.id === type;
-
-  return DS.list.filter(d => d.active && d.raster && idxn(d));
 };

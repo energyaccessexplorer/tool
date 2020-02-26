@@ -40,7 +40,7 @@ async function ea_summary() {
   scale.append(ea_analysis_colorscale.svg.cloneNode(true), ramp);
 
   async function get_summaries(idxn) {
-    let raster = ea_analysis(ea_list_filter_type(idxn), idxn);
+    let raster = ea_analysis(idxn);
 
     summary[idxn] = await ea_summary_analyse(raster);
 

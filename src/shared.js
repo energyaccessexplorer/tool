@@ -34,6 +34,27 @@ function ea_layout_init() {
   document.body.onresize = set_heights;
 
   set_heights();
+
+  const oc = el_tree(
+    [ ce('div', null, { id: 'bottom-right-container-output', class: 'bottom-right-container' }), [
+      [ ce('select', null, { id: 'canvas-output-select' }) ],
+      [ ce('canvas', null, { id: 'output' }) ]
+    ]]
+  );
+
+  const gc = el_tree(
+    [ ce('div', null, { id: 'bottom-right-container-graphs', class: 'bottom-right-container' }), [
+      [ ce('h3', null, { id: 'district-header', class: "header" }) ],
+      [ ce('div', null, { id: 'district-graph', class: "graphs" }) ]
+    ]]
+  );
+
+  if (TIMELINE) {
+    qs('#filtered-pane').append(oc);
+    qs('#cards-pane').append(gc);
+  } else {
+    qs('#cards-pane').append(oc);
+  }
 };
 
 function ea_colorscale(opts) {

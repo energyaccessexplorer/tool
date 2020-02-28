@@ -37,7 +37,7 @@ function ea_analysis(list, type) {
       // Place the filters and exclusion buffers first. They will return -1's
       // sooner and make our loops faster.
       //
-      return (x.analysis.scale === "key-delta" || x.analysis.scale === "exclusion-buffer") ? 1 : -1;
+      return (["key-delta", "exclusion-buffer", "inclusion-buffer"].includes(x.analysis.scale)) ? 1 : -1;
     });
 
   // Add up how much non-compound indexes datasets will account for. Then, just

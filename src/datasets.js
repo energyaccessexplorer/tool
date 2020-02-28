@@ -355,6 +355,11 @@ class DS {
       break;
     }
 
+    case 'inclusion-buffer': {
+      s = x => (x >= t[0] && x <= t[1]) ? 1 : -1;
+      break;
+    }
+
     case 'intervals': {
       const q = d3.scaleQuantile()
             .domain(this.analysis.intervals)

@@ -86,12 +86,12 @@ function ea_indexes_init() {
   ), scale);
 };
 
-function ea_index_drawable(inputs, output) {
+function ea_index_drawable(indexname) {
   const counts = {};
 
   for (let i in ea_indexes) counts[i] = 0;
 
-  for (let i of inputs) {
+  for (let i of U.inputs) {
     if (i === 'boundaries') continue;
 
     let n = DST[i].indexname;
@@ -101,7 +101,7 @@ function ea_index_drawable(inputs, output) {
     counts['eai'] += 1;
   }
 
-  return counts[output] > 0;
+  return counts[indexname] > 0;
 };
 
 function ea_indexes_list() {
@@ -117,7 +117,7 @@ function ea_indexes_list() {
       ce('span', v)
     );
 
-    if (!ea_index_drawable(U.inputs, t))
+    if (!ea_index_drawable(t))
       d.setAttribute('disabled', "");
 
     return d;

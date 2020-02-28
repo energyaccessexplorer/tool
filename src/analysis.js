@@ -8,7 +8,7 @@
  *
  * @param "type" string. That can be:
  *   - ID of a dataset, or
- *   - the shortname of an indexname
+ *   - an indexname
  *
  * returns DS to be plotted onto a canvas
  */

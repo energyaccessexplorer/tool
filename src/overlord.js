@@ -504,19 +504,23 @@ const UProxyHandler = {
     }
 
     case "inputs":
-    case "pack":
+    case "pack": {
       o.url.searchParams.set(t,v);
       break;
+    }
 
-    case "params":
+    case "params": {
       for (p in v) {
+        if (!o.params[p].includes(v[p])) continue;
         o.url.searchParams.set(p, v[p]);
       }
       break;
+    }
 
-    default:
+    default: {
       throw TypeError(`U: I'm not allowed to set '${t}'`);
       break;
+    }
     }
 
     history.replaceState(null, null, o.url);

@@ -433,9 +433,6 @@ function ea_controls_collection_list() {
 async function ea_controls_selectlist() {
   let data = {};
 
-  const url = new URL(location);
-  const id = url.searchParams.get('id');
-
   const p = {
     "select": ["id", "name"],
     "online": "eq.true",
@@ -450,7 +447,7 @@ async function ea_controls_selectlist() {
   });
 
   function set_default(input) {
-    const g = list.find(x => x.id === id);
+    const g = list.find(x => x.id === GEOGRAPHY.id);
     if (g) input.value = g.name;
 
     return input;
@@ -460,7 +457,8 @@ async function ea_controls_selectlist() {
     'change': function(e) {
       const c = list.find(x => x.name === this.value);
 
-      if (maybe(c, 'id') && id !== c.id) {
+      if (maybe(c, 'id') && GEOGRAPHY.id !== c.id) {
+        const url = new URL(location);
         url.searchParams.set('id', c.id);
         location = url;
       }

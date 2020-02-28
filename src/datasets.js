@@ -26,9 +26,9 @@ class DS {
 
     this.indexname = maybe(this.analysis, 'index');
 
-    this.metadata = o.metadata;
-
     this.invert = config.invert_override || maybe(this.analysis, 'invert');
+
+    this.metadata = o.metadata;
 
     this.mutant = !!config.mutant;
 

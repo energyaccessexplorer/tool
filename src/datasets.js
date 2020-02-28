@@ -24,10 +24,6 @@ class DS {
 
     this.name = o.name_long || o.name || this.category.name_long || this.category.name;
 
-    this.indexname = maybe(this.analysis, 'index');
-
-    this.invert = config.invert_override || maybe(this.analysis, 'invert');
-
     this.metadata = o.metadata;
 
     this.mutant = !!config.mutant;
@@ -209,6 +205,16 @@ class DS {
     }
   };
 
+  get indexname() {
+    if (['inclusion-buffer', 'exclusion-buffer'].includes(maybe(this, 'analysis', 'scale')))
+      return undefined;
+
+    return maybe(
+      (maybe(this, 'analysis', 'indexes') || []).find(i => !['ani', 'eai'].includes(i.index)),
+      'index'
+    );
+  };
+
   get datatype() {
     let t;
 
@@ -323,20 +329,23 @@ class DS {
    * Scaling function that sets the behaviour of a dataset when contributing to
    * an analysis. Whether it's a filter, a linearised part, etc...
    *
-   * @param "i" string
-   *   name of the current index being drawn and decide if the range of the
-   *   function should be inverted.
+   * @param "indexname" string
+   *   name of the current index being drawn and decide if the dataset
+   *   contributes to the analysis at all and if the range of the function
+   *   should be inverted.
    *
    * returns function (ds domain) -> [0,1]
    */
 
-  analysis_fn(i) {
+  analysis_fn(indexname) {
     let s = null;
-    if (!this.analysis) return s;
+    if (!maybe(this, 'analysis', 'indexes')) return s;
+    if (!this.analysis.indexes.map(a => a.index).includes(indexname)) return s;
 
     const t = this._domain;
     const v = this.analysis.scale;
-    const r = this.invert && this.invert.includes(i) ? [1,0] : [0,1];
+    const c = this.analysis.indexes.find(i => i.index === indexname);
+    const r = (c && c.invert) ? [1,0] : [0,1];
 
     switch (v) {
     case 'key-delta': {

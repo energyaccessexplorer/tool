@@ -55,6 +55,7 @@ class dscard extends HTMLElement {
     slot_populate.call(this, this.ds, {
       "svg": this.svg_el,
       "info": this.info(),
+      "unit": (this.ds.category.unit && ce('span', `[${this.ds.category.unit}]`, { style: "margin-left: 1em;" })),
       "opacity": this.opacity(),
       "handle": tmpl("#svg-handle"),
     });
@@ -173,6 +174,18 @@ class dscard extends HTMLElement {
     let d = ce('div');
     let e = maybe(ds.colorscale, 'svg') || ce('div');
 
+    function ramp_values(a, b) {
+      const diff = Math.abs(b - a);
+      let i = 3 - Math.ceil(Math.log10(diff || 1));
+      if (i < 0) i = 0;
+
+      return [
+        ce('div', a.toFixed(i) + ""),
+        ce('div', ((a + b) / 2).toFixed(i)),
+        ce('div', b.toFixed(i) + "")
+      ];
+    }
+
     switch (ds.datatype) {
     case 'points': {
       e = ea_svg_points_symbol({
@@ -210,11 +223,10 @@ class dscard extends HTMLElement {
     case 'polygons-timeline': {
       const r = tmpl("#ramp");
 
-      r.append(
-        ce('div', maybe(ds.domain, 0) + ""),
-        ce('div', ds.category.unit),
-        ce('div', maybe(ds.domain, 1) + "")
-      );
+      if (typeof maybe(ds, 'domain', 0) === 'number' &&
+          typeof maybe(ds, 'domain', 1) === 'number') {
+        r.append(...ramp_values(ds.domain[0], ds.domain[1]));
+      }
 
       d.append(
         r,
@@ -227,11 +239,11 @@ class dscard extends HTMLElement {
 
     case 'raster': {
       let r = tmpl("#ramp");
-      r.append (
-        ce('div', ds.raster.domain.min + ""),
-        ce('div', ds.raster.domain.max + ""));
-
-      d.append(r);
+      if (typeof maybe(ds, 'raster', 'domain', 'min') === 'number' &&
+          typeof maybe(ds, 'raster', 'domain', 'max') === 'number') {
+        r.append(...ramp_values(ds.raster.domain.min, ds.raster.domain.max));
+        d.append(r);
+      }
 
       break;
     }

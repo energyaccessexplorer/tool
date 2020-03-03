@@ -343,8 +343,8 @@ class DS {
     if (!this.analysis.indexes.map(a => a.index).includes(indexname)) return s;
 
     const t = this._domain;
-    const v = this.analysis.scale;
     const c = this.analysis.indexes.find(i => i.index === indexname);
+    const v = c.scale || this.analysis.scale;
     const r = (c && c.invert) ? [1,0] : [0,1];
 
     switch (v) {

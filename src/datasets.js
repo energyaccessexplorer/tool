@@ -18,6 +18,8 @@ class DS {
 
     this.analysis = this.category.analysis;
 
+    this.index = maybe(this, 'analysis', 'index');
+
     this.weight = maybe(this, 'analysis', 'weight') || 2;
 
     this.timeline = this.category.timeline;
@@ -205,16 +207,6 @@ class DS {
     }
   };
 
-  get indexname() {
-    if (['inclusion-buffer', 'exclusion-buffer'].includes(maybe(this, 'analysis', 'scale')))
-      return undefined;
-
-    return maybe(
-      (maybe(this, 'analysis', 'indexes') || []).find(i => !['ani', 'eai'].includes(i.index)),
-      'index'
-    );
-  };
-
   get datatype() {
     let t;
 
@@ -329,7 +321,7 @@ class DS {
    * Scaling function that sets the behaviour of a dataset when contributing to
    * an analysis. Whether it's a filter, a linearised part, etc...
    *
-   * @param "indexname" string
+   * @param "type" string
    *   name of the current index being drawn and decide if the dataset
    *   contributes to the analysis at all and if the range of the function
    *   should be inverted.
@@ -337,17 +329,18 @@ class DS {
    * returns function (ds domain) -> [0,1]
    */
 
-  analysis_fn(indexname) {
-    let s = null;
-    if (!maybe(this, 'analysis', 'indexes')) return s;
-    if (!this.analysis.indexes.map(a => a.index).includes(indexname)) return s;
+  analysis_fn(type) {
+    if (!maybe(this, 'analysis', 'indexes')) return null;
+
+    const c = this.analysis.indexes.find(i => i.index === type);
+    if (!c) return null;
 
     const t = this._domain;
-    const c = this.analysis.indexes.find(i => i.index === indexname);
     const v = c.scale || this.analysis.scale;
     const r = (c && c.invert) ? [1,0] : [0,1];
 
-    switch (v) {
+    let s = null;
+    switch (c.scale) {
     case 'key-delta': {
       if (!maybe(this.csv, 'table')) return (s = x => 1);
 

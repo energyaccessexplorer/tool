@@ -8,7 +8,7 @@
  *
  * @param "type" string. That can be:
  *   - ID of a dataset, or
- *   - an indexname
+ *   - an index name
  *
  * returns DS to be plotted onto a canvas
  */
@@ -49,14 +49,14 @@ function ea_analysis(list, type) {
 
   const tots = list
         .reduce((a,d) => {
-          if (d.indexname) a[d.indexname] += d.weight;
+          if (d.index) a[d.index] += d.weight;
           return a;
         }, singles);
 
   const weights = {};
 
   list.forEach(d => {
-    weights[d.id] = d.indexname ? d.weight / (tots[d.indexname] * Object.keys(singles).length) : 0;
+    weights[d.id] = d.index ? d.weight / (tots[d.index] * Object.keys(singles).length) : 0;
   });
 
   const sum = Object.keys(weights).reduce((acc, curr) => (weights[curr] || 0) + acc, 0);
@@ -161,7 +161,7 @@ function ea_analysis(list, type) {
  *
  * Utility.
  *
- * @param "type" string. ID or indexname.
+ * @param "type" string. ID or index name.
  * @param "cs" string. Default color_theme to 'ea'.
  */
 
@@ -204,10 +204,10 @@ function ea_active_analysis(type) {
   const multi = Object.keys(ea_indexes).filter(i => ea_indexes[i].compound);
 
   if (singles.includes(type))
-    idxn = d => (d.indexname === type) || !d.indexname;
+    idxn = d => (d.index === type) || !d.index;
 
   else if (multi.includes(type))
-    idxn = d => ea_indexes[type].compound.includes(d.indexname) || !d.indexname;
+    idxn = d => ea_indexes[type].compound.includes(d.index) || !d.index;
 
   else
     idxn = d => d.id === type;

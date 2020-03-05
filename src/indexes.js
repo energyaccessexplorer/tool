@@ -86,7 +86,7 @@ function ea_indexes_init() {
   ), scale);
 };
 
-function ea_index_drawable(indexname) {
+function ea_index_drawable(type) {
   const counts = {};
 
   for (let i in ea_indexes) counts[i] = 0;
@@ -94,14 +94,14 @@ function ea_index_drawable(indexname) {
   for (let i of U.inputs) {
     if (i === 'boundaries') continue;
 
-    let n = DST[i].indexname;
+    let n = DST[i].index;
     counts[n] += 1;
 
     counts['ani'] += 1;
     counts['eai'] += 1;
   }
 
-  return counts[indexname] > 0;
+  return counts[type] > 0;
 };
 
 function ea_indexes_list() {

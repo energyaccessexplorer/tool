@@ -383,6 +383,11 @@ class DS {
     return s;
   };
 
+  analysis_scale(type) {
+    if (!maybe(this, 'analysis', 'indexes')) return null;
+    return this.analysis.indexes.find(i => i.index === type).scale;
+  }
+
   async visibility(t) {
     if (this.items) {
       await Promise.all(this.items.map(d => d.visibility(t)));

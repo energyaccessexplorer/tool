@@ -19,6 +19,13 @@ function ea_analysis(list, type) {
   const boundaries = DST['boundaries'];
   const it = new Float32Array(list.length ? boundaries.raster.data.length: 0).fill(-1);
 
+  const filters = ["key-delta", "exclusion-buffer", "inclusion-buffer"];
+
+  // There's nothing interesting about an analysis with only filters. Also,
+  // filters return 1 so an silly (single-valued) analysis would be plotted.
+  //
+  if (list.every(d => d.analysis_scale(type) in filters)) return it;
+
   list = list
     .filter(d => {
       // Discard datasets which have no analysis_fn (eg. boundaries).
@@ -27,17 +34,17 @@ function ea_analysis(list, type) {
 
       // Discard datasets which are filters and use the entire domain (useless).
       //
-      if (d.analysis.scale === 'key-delta' &&
+      if (d.analysis_scale(type) === 'key-delta' &&
           (d._domain[0] === d.raster.domain.min &&
            d._domain[1] === d.raster.domain.max)) return false;
 
       return true;
     })
     .sort((x,y) => {
-      // Place the filters and exclusion buffers first. They will return -1's
-      // sooner and make our loops faster.
+      // Place the filters first. They will return -1's sooner and make our
+      // loops faster.
       //
-      return (["key-delta", "exclusion-buffer", "inclusion-buffer"].includes(x.analysis.scale)) ? 1 : -1;
+      return (x.analysis_scale(type) in filters) ? 1 : -1;
     });
 
   // Add up how much non-compound indexes datasets will account for. Then, just
@@ -78,7 +85,7 @@ function ea_analysis(list, type) {
   // instead.
   //
   const full_weight = list
-        .reduce((a,c) => ((c.analysis.scale === "key-delta") ? a : c.weight + a), 0);
+        .reduce((a,c) => ((c.analysis_scale(type) === "key-delta") ? a : c.weight + a), 0);
 
   let nr = list.find(l => !maybe(l, 'raster', 'data'));
   if (nr) {

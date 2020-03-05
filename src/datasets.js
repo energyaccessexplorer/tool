@@ -346,7 +346,6 @@ class DS {
 
       s = x => {
         let z = this.csv.table[x];
-
         return ((undefined === z) || z < t[0] || z > t[1]) ? -1 : 1;
       };
       break;
@@ -830,7 +829,7 @@ async function ea_datasets_polygons_csv(col) {
   if (!data) warn(this.id, "has no csv.data");
 
   const l = d3.scaleQuantize().domain(this.domain).range(stops);
-  const s = x => (null === x || undefined === x || x === "") ? "rgba(155,155,155,1)" : l(x);
+  const s = x => (null === x || undefined === x || x === "") ? "rgba(155,155,155,1)" : l(+x);
 
   this.csv.scale = l;
 
@@ -847,7 +846,7 @@ async function ea_datasets_polygons_csv(col) {
       warn(`${this.id} NO ROW!`, i, this.csv.key, this.vectors.key, data);
       continue;
     }
-    fs[i].properties.__color = s(+row[col]);
+    fs[i].properties.__color = s(row[col]);
   }
 
   this.update_source(this.vectors.features);

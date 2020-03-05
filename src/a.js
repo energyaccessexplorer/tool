@@ -24,7 +24,7 @@ function ea_nanny_force_start() {
   DS.list.filter(d => d.on).forEach(d => d.turn(false, false));
 
   O.view = 'inputs';
-  ea_controls_select_tab(qs('#controls-tab-filters'), "filters");
+  ea_controls_select_tab(qs('#controls-tab-census'), "census");
   ea_modal.hide();
 
   O.view = U.view;

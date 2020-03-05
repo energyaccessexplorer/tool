@@ -68,6 +68,7 @@
   flex-flow: row nowrap;
   justify-content: space-around;
   text-align: center;
+  width: 100%;
 }
 
 .index-graphs-group {

@@ -24,8 +24,8 @@
     },
 
     Edge: {
-      min: 76,
-      reason: "Shadow DOM support"
+      min: 79,
+      reason: "EdgeHTML was never supported. Blink is now shipped."
     }
   };
 
@@ -63,13 +63,9 @@
     throw "Internet Explorer is unsupported. Hej då.";
   }
 
-  else if (m = v.match(/(Firefox|Chrome|Opera|Safari) (.*)/i)) {
+  else if (m = v.match(/(Edge|Firefox|Chrome|Opera|Safari) (.*)/i)) {
     if (support[m[1]]["min"] > parseInt(m[2])) {
       alert("This platform is known NOT to work on " + v + "." + update);
     }
-  }
-
-  else if (m = v.match(/Edge (.*)/i)) {
-    alert("Edge browser will support our set of technologies late 2019." + usethis);
   }
 })();

@@ -24,7 +24,7 @@ function ea_analysis(list, type) {
   // There's nothing interesting about an analysis with only filters. Also,
   // filters return 1 so an silly (single-valued) analysis would be plotted.
   //
-  if (list.every(d => d.analysis_scale(type) in filters)) return it;
+  if (list.every(d => filters.includes(d.analysis_scale(type)))) return it;
 
   list = list
     .filter(d => {
@@ -44,7 +44,7 @@ function ea_analysis(list, type) {
       // Place the filters first. They will return -1's sooner and make our
       // loops faster.
       //
-      return (x.analysis_scale(type) in filters) ? 1 : -1;
+      return (filters.includes(x.analysis_scale(type))) ? 1 : -1;
     });
 
   // Add up how much non-compound indexes datasets will account for. Then, just
@@ -52,7 +52,7 @@ function ea_analysis(list, type) {
   // analysis.
   //
   const singles = {};
-  Object.keys(ea_indexes).forEach(i => !ea_indexes[i].compound ? singles[i] = 0 : null);
+  for (let i in ea_indexes) if (!ea_indexes[i].compound) singles[i] = 0;
 
   const tots = list
         .reduce((a,d) => {

@@ -241,8 +241,6 @@ class DS {
     }
 
     delete DST[this.id];
-
-    O.dataset(this, 'weight', x);
   };
 
   add_source(opts) {

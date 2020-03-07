@@ -29,6 +29,11 @@ class Overlord {
       ea_overlord_update_view();
       break;
 
+    case "weight":
+      ds.weight = data;
+      ea_overlord_update_view();
+      break;
+
     case "active":
       ds.active(data, ['inputs', 'timeline'].includes(U.view));
 

@@ -13,39 +13,18 @@
  * returns DS to be plotted onto a canvas
  */
 
-function ea_analysis(list, type) {
+function ea_analysis(type) {
   const t0 = performance.now();
 
   const boundaries = DST['boundaries'];
-  const it = new Float32Array(list.length ? boundaries.raster.data.length: 0).fill(-1);
+  let list = ea_analysis_datasets(type);
 
-  const filters = ["key-delta", "exclusion-buffer", "inclusion-buffer"];
+  const it = new Float32Array(list.length ? boundaries.raster.data.length: 0).fill(-1);
 
   // There's nothing interesting about an analysis with only filters. Also,
   // filters return 1 so an silly (single-valued) analysis would be plotted.
   //
-  if (list.every(d => filters.includes(d.analysis_scale(type)))) return it;
-
-  list = list
-    .filter(d => {
-      // Discard datasets which have no analysis_fn (eg. boundaries).
-      //
-      if (typeof d.analysis_fn(type) !== 'function') return false;
-
-      // Discard datasets which are filters and use the entire domain (useless).
-      //
-      if (d.analysis_scale(type) === 'key-delta' &&
-          (d._domain[0] === d.raster.domain.min &&
-           d._domain[1] === d.raster.domain.max)) return false;
-
-      return true;
-    })
-    .sort((x,y) => {
-      // Place the filters first. They will return -1's sooner and make our
-      // loops faster.
-      //
-      return (filters.includes(x.analysis_scale(type))) ? 1 : -1;
-    });
+  if (list.every(d => ea_filters.includes(d.analysis_scale(type)))) return it;
 
   // Add up how much non-compound indexes datasets will account for. Then, just
   // below, these values will be split into equal proportions of the total
@@ -54,20 +33,35 @@ function ea_analysis(list, type) {
   const singles = {};
   for (let i in ea_indexes) if (!ea_indexes[i].compound) singles[i] = 0;
 
-  const tots = list
-        .reduce((a,d) => {
-          if (d.index) a[d.index] += d.weight;
-          return a;
-        }, singles);
+  const tots = list.reduce((a,d) => {
+    if (ea_filters.indexOf(d.analysis_scale(type)) > -1) ;
+    else if (d.index) a[d.index] += d.weight;
+
+    return a;
+  }, singles);
+
+  for (let s in singles) if (singles[s] === 0) delete singles[s];
 
   const weights = {};
-
   list.forEach(d => {
-    weights[d.id] = d.index ? d.weight / (tots[d.index] * Object.keys(singles).length) : 0;
+    if (ea_filters.indexOf(d.analysis_scale(type)) > -1) weights[d.id] = 0;
+    else {
+      switch (type) {
+      case "ani":
+        weights[d.id] = d.index ? d.weight / Object.keys(tots).reduce((a,c) => tots[c] + a, 0) : 0;
+        break;
+
+      default:
+        weights[d.id] = d.index ? d.weight / (tots[d.index] * Object.keys(singles).length) : 0;
+        break;
+      }
+    }
   });
 
-  const sum = Object.keys(weights).reduce((acc, curr) => (weights[curr] || 0) + acc, 0);
-  if (sum === 0) return it;
+  // If the total weight is 0, ciao.
+  //
+  if (Object.keys(weights).reduce((a,c) => (weights[c] || 0) + a, 0) === 0)
+    return it;
 
   // Each dataset has a different scaling function. We cache these to optimise
   // the huge loop we are about to do.
@@ -163,6 +157,36 @@ function ea_analysis(list, type) {
   return it;
 };
 
+function ea_analysis_datasets(type) {
+  return DS.list
+    .filter(d => {
+      return d.on
+        && d.raster
+        && d.analysis
+        && d.analysis.indexes.find(i => i.index === type);
+    })
+    .filter(d => {
+      // Discard datasets which have no analysis_fn (eg. boundaries).
+      //
+      if (typeof d.analysis_fn(type) !== 'function') return false;
+
+      // Discard datasets which are filters and use the entire domain (useless).
+      //
+      if (ea_filters.includes(d.analysis_scale(type)) &&
+          (d._domain[0] === d.raster.domain.min &&
+           d._domain[1] === d.raster.domain.max))
+        return false;
+
+      return true;
+    })
+    .sort((x,y) => {
+      // Place the filters first. They will return -1's sooner and make our
+      // loops faster.
+      //
+      return (ea_filters.includes(x.analysis_scale(type))) ? 1 : -1;
+    })
+};
+
 /*
  * ea_plot_active_analysis
  *
@@ -173,7 +197,7 @@ function ea_analysis(list, type) {
  */
 
 async function ea_plot_active_analysis(type, cs = 'ea') {
-  const raster = ea_active_analysis(type);
+  const raster = ea_analysis(type);
   ea_plot_outputcanvas(raster);
 
   const index = ea_indexes[type];
@@ -204,30 +228,10 @@ async function ea_plot_active_analysis(type, cs = 'ea') {
   return raster;
 };
 
-function ea_active_analysis(type) {
-  let idxn;
-
-  const singles = Object.keys(ea_indexes).filter(i => !ea_indexes[i].compound);
-  const multi = Object.keys(ea_indexes).filter(i => ea_indexes[i].compound);
-
-  if (singles.includes(type))
-    idxn = d => (d.index === type) || !d.index;
-
-  else if (multi.includes(type))
-    idxn = d => ea_indexes[type].compound.includes(d.index) || !d.index;
-
-  else
-    idxn = d => d.id === type;
-
-  const list = DS.list.filter(d => d.on && d.raster && idxn(d));
-
-  return ea_analysis(list, type);
-};
-
 async function raster_to_tiff(type) {
   const b = DST['boundaries'];
 
-  const raster = await ea_active_analysis(type);
+  const raster = await ea_analysis(type);
 
   const scale = d3.scaleLinear().domain([0,1]).range([0,254]);
   const fn = function(x) {

@@ -194,7 +194,7 @@ under Resource Availability and Infrastructure.`
       },
       "ani": {
         "name": "Assistance Need Index",
-        "compound": ["demand", "supply"],
+        "compound": null,
         "description": "Areas where financial assistance is needed",
         "info": `
 The Assistance Need Index identifies areas where market assistance is needed the most
@@ -203,6 +203,8 @@ measure of selected data sets under both Demand and Supply categories indicating
 energy demand, low economic activity, and low access to infrastructure and resources.`
       }
     };
+
+	ea_filters = ["key-delta", "exclusion-buffer", "inclusion-buffer"];
 
     ea_default_colorscale = ea_colorscale({
       stops: d3.schemeRdBu[5].reverse(),

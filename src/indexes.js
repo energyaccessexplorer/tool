@@ -86,24 +86,6 @@ function ea_indexes_init() {
   ), scale);
 };
 
-function ea_index_drawable(type) {
-  const counts = {};
-
-  for (let i in ea_indexes) counts[i] = 0;
-
-  for (let i of U.inputs) {
-    if (i === 'boundaries') continue;
-
-    let n = DST[i].index;
-    counts[n] += 1;
-
-    counts['ani'] += 1;
-    counts['eai'] += 1;
-  }
-
-  return counts[type] > 0;
-};
-
 function ea_indexes_list() {
   const nodes = [];
 
@@ -117,7 +99,7 @@ function ea_indexes_list() {
       ce('span', v)
     );
 
-    if (!ea_index_drawable(t))
+    if (ea_analysis_datasets(t) < 1)
       d.setAttribute('disabled', "");
 
     return d;

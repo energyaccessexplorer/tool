@@ -240,6 +240,11 @@ class DS {
       if (!this.collection.disabled) this.collection.disable();
     }
 
+    if (MAPBOX.getLayer(this.id)) MAPBOX.removeLayer(this.id);
+
+    const arr = U.inputs; arr.splice(U.inputs.indexOf(this.id), 1);
+    U.inputs = arr;
+
     delete DST[this.id];
   };
 

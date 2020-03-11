@@ -1,15 +1,15 @@
 # Copy and customise these in a default.mk
 #
-# WEB_PORT = 4231
+# TOOL_PORT = 4231
 #
 # SRV_USER = someuser
 # SRV_SERVER = example.org
-# SRV_DEST = /srv/http/energyaccessexplorer
+# TOOL_DEST = /srv/http/energyaccessexplorer
 #
-# DB_SERV_DEV = http://api-eneryaccessexplorer.localhost
-# DB_SERV_PROD = https://api-energyaccessexplorer.example.org
+# API_URL = http://api-example.localhost
+# DB_SERV_DEPLOY = https://api.example.org
 #
-# STATIC_SERVER = python3 -m http.server ${WEB_PORT}
+# STATIC_SERVER = python3 -m http.server ${TOOL_PORT}
 # WATCH = <whatever daemon you use observe code changes>
 #
 # MAPBOX_DEFAULT_THEME=mapbox/basic-v9
@@ -40,7 +40,7 @@ watch:
 	@ WATCH_CMD="make build reload" watch-code ${SRC} ${CSS} ${VIEWS}
 
 stop:
-	@stop-port ${WEB_PORT}
+	@stop-port ${TOOL_PORT}
 
 build-a:
 	@echo "Building a"
@@ -148,7 +148,7 @@ synced:
 		--exclude=.git \
 		--exclude=default.mk \
 		--exclude=makefile \
-		${DIST}/ ${SRV_USER}@${SRV_SERVER}:${SRV_DEST}
+		${DIST}/ ${SRV_USER}@${SRV_SERVER}:${TOOL_DEST}
 
 deploy:
 	make reconfig env=${env}
@@ -162,22 +162,16 @@ deploy:
 		--exclude=default.mk \
 		--exclude=makefile \
 		--exclude=data \
-		${DIST}/ ${SRV_USER}@${SRV_SERVER}:${SRV_DEST}
+		${DIST}/ ${SRV_USER}@${SRV_SERVER}:${TOOL_DEST}
 
 	make reconfig env=development
 	make build
 
 reconfig:
-.if ${env} == "production"
-	@sed -i \
-		-e 's%"database": "${DB_SERV_DEV}",%"database": "${DB_SERV_PROD}",%' \
-		-e 's%"mapbox_theme": "",%"mapbox_theme": "${MAPBOX_DEFAULT_THEME}",%' \
-		settings.json
-.else
-	@sed -i \
-		-e 's%"database": "${DB_SERV_PROD}",%"database": "${DB_SERV_DEV}",%' \
-		-e 's%"mapbox_theme": "${MAPBOX_DEFAULT_THEME}",%"mapbox_theme": "",%' \
-		settings.json
-.endif
+	@echo '{}' \
+		| jq '.database = ${API_URL}' \
+		| jq '.mapbox_token = ${MAPBOX_TOKEN}' \
+		| jq '.mapbox_theme = ${MAPBOX_THEME}' \
+		> settings.json
 
 .include <extras.mk>

@@ -409,14 +409,17 @@ class DS {
   };
 
   active(d, draw) {
-    this.raise();
-    this.turn(d, draw);
+    this
+      ._active(...arguments)
+      .catch(_ => ea_datasets_parse_fail.call(this));
   };
 
-  async turn(v, draw) {
+  async _active(v, draw) {
     this.on = v;
 
     if (v) {
+      if (draw) this.raise();
+
       if (this.controls) {
         this.controls.loading(true);
         await this.load();
@@ -426,7 +429,7 @@ class DS {
     }
 
     if (this.items) {
-      await Promise.all(this.items.map(d => d.turn(v, draw)));
+      await Promise.all(this.items.map(d => d.active(v, draw)));
       this.controls.turn(v);
 
       return;
@@ -567,6 +570,19 @@ This is not fatal. Dataset disabled.`
   this.disable();
 
   throw Error(`"Dataset ${this.name} disabled. Failed to get ${format}.`);
+};
+
+function ea_datasets_parse_fail() {
+  ea_flash.push({
+    type: 'error',
+    timeout: 5000,
+    title: "Parse error",
+    message: `
+Failed to process '${this.name}', seems misconfigured.
+This is not fatal. Dataset disabled.`
+  });
+
+  this.disable();
 };
 
 function ea_datasets_csv() {

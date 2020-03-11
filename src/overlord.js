@@ -1,6 +1,6 @@
 class Overlord {
   layers(v) {
-    Promise.all(U.inputs.map(id => DST[id].turn(true, (v === 'inputs' || v === 'timeline'))));
+    Promise.all(U.inputs.map(id => DST[id].active(true, (v === 'inputs' || v === 'timeline'))));
   };
 
   dataset(_ds, arg, data) {
@@ -234,11 +234,11 @@ async function ea_overlord_dataset(ds) {
   else inputs.splice(inputs.indexOf(ds.id), 1);
 
   if (view === "inputs" || view === "timeline") {
-    await ds.turn(ds.on, true);
+    await ds.active(ds.on, true);
     ds.raise();
     ea_plot_active_analysis(output);
   } else {
-    await ds.turn(ds.on, false);
+    await ds.active(ds.on, false);
   }
 
   if (view === "outputs") {

@@ -155,10 +155,8 @@ function ea_indexes_modal() {
 };
 
 function ea_indexes_current_config() {
-  const url = new URL(location);
-
   const config = {
-    geography_id: url.searchParams.get('id'),
+    geography_id: GEOGRAPHY.id,
     analysis_type: U.output,
     datasets: []
   };

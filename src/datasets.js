@@ -569,7 +569,7 @@ This is not fatal. Dataset disabled.`
 
   this.disable();
 
-  throw Error(`"Dataset ${this.name} disabled. Failed to get ${format}.`);
+  throw Error(`"Dataset ${this.name} disabled. Failed to fetch ${format}.`);
 };
 
 function ea_datasets_parse_fail() {

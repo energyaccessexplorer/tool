@@ -32,7 +32,13 @@ function ea_timeline_lines_draw(datasets, district) {
     return a.concat(c.csv.data.filter(r => r['District'] === district).map(r => {
       return {
         values: TIMELINE_DATES.map(k => (r[k] === "" ? undefined : +r[k])),
-        name: c.id,
+        id: c.id,
+        name: el_tree([
+          ce('span'), [
+            ce('span', c.name),
+            ce('span', "[" + c.category.unit + "]", { style: "margin-left: 1em; font-size: 0.8em;" }),
+          ]
+        ]),
         color: c.colorscale.stops.slice(-1)
       };
     }));
@@ -43,7 +49,7 @@ function ea_timeline_lines_draw(datasets, district) {
 
   const average = datasets.map(i => {
     return {
-      name: i['id'],
+      id: i['id'],
       values: TIMELINE_DATES.map(d => i.csv.data.map(r => +r[d])).map(x => x.reduce((a,c) => a + c, 0) / x.length)
     }
   });
@@ -65,7 +71,7 @@ function ea_timeline_lines_draw(datasets, district) {
           ]],
           [ ce('tr'), [
             ce('td', ce('strong', "State Average: &nbsp;")),
-            ce('td', (Math.round(average.find(x => x.name === m.name).values[i] * 100) / 100).toString())
+            ce('td', (Math.round(average.find(x => x.id === m.id).values[i] * 100) / 100).toString())
           ]]
         ]
       ]);

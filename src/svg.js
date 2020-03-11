@@ -620,8 +620,6 @@ function ea_svg_multiline(opts) {
         .attr("stroke", d => d.color || color)
         .attr("d", d => line(d.values));
 
-  const dotnode = dot.node();
-
   dot.append("circle")
     .attr("r", 2.5)
     .attr("fill", 'transparent');
@@ -690,20 +688,9 @@ function ea_svg_multiline(opts) {
     };
   };
 
-  function highlight(name, date) {
-    const s = data.series.find(x => x.name === name);
-    const i = data.dates.findIndex(x => x.getTime() === date.getTime());
-
-    path.attr("stroke", d => d === s ? (d.color || color) : "#ddd").filter(d => d === s).raise();
-    dot.attr("transform", `translate(${x(data.dates[i])},${y(s.values[i])})`);
-    dot.select("text").text(s.name);
-    dot.attr("display", null);
-  };
-
   svg.call(hover, path);
 
   return {
-    svg: svg.node(),
-    highlight: highlight,
+    svg: svg.node()
   };
 };

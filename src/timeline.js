@@ -84,6 +84,21 @@ function ea_timeline_lines_draw(datasets, district) {
   qs('#district-graph', rp).append(TIMELINE_LINES.svg);
 };
 
+function ea_timeline_lines_update(inputs) {
+  if (!TIMELINE) return;
+
+  if (maybe(TIMELINE_CURRENT_DATE) && inputs.length) {
+    const datasets = DS.list.filter(d => d.on && d.timeline && maybe(d, 'csv', 'data'));
+
+    if (TIMELINE_DISTRICT)
+      ea_timeline_lines_draw(datasets, TIMELINE_DISTRICT);
+  } else {
+    const rp = qs('#right-pane');
+    qs('#district-header', rp).innerText = "";
+    if (TIMELINE_LINES) TIMELINE_LINES.svg.remove();
+  }
+};
+
 function ea_timeline_date(t) {
   return t || TIMELINE_CURRENT_DATE || TIMELINE_DATES.slice(-1)[0];
 }

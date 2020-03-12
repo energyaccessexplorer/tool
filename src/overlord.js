@@ -1,6 +1,6 @@
 class Overlord {
-  layers(v) {
-    Promise.all(U.inputs.map(id => DST[id].active(true, (v === 'inputs' || v === 'timeline'))));
+  layers() {
+    Promise.all(U.inputs.map(id => DST[id].active(true, ['inputs', 'timeline'].includes(U.view))));
   };
 
   dataset(_ds, arg, data) {
@@ -26,12 +26,10 @@ class Overlord {
     switch (arg) {
     case "domain":
       ds.__domain = data;
-      ea_overlord_update_view();
       break;
 
     case "weight":
       ds.weight = data;
-      ea_overlord_update_view();
       break;
 
     case "active":
@@ -43,15 +41,19 @@ class Overlord {
 
       O.datasets = arr;
 
-      ea_overlord_update_view();
+      ea_timeline_lines_update(arr)
+      break;
+
+    case "mutate":
+      this.layers();
       break;
 
     case "disable":
-    case "mutate":
     default:
-      ea_overlord_dataset(ds);
       break;
     }
+
+    ea_overlord_view();
   };
 
   set datasets(arr) {
@@ -74,9 +76,9 @@ class Overlord {
   set view(t) {
     U.view = t;
 
-    this.layers(t);
+    this.layers();
 
-    ea_overlord_update_view();
+    ea_overlord_view();
 
     ea_view_buttons();
     ea_view_right_pane();
@@ -159,7 +161,7 @@ async function ea_init(callback) {
   if (!MOBILE && !TIMELINE) ea_nanny_init();
 };
 
-function ea_overlord_update_view() {
+function ea_overlord_view() {
   const timeline = qs('#timeline');
 
   const {view, output, inputs} = U;
@@ -224,43 +226,6 @@ function ea_overlord_update_view() {
     throw `Argument Error: Overlord: Could not set/find the view '${view}'.`;
     break;
   }
-  }
-};
-
-async function ea_overlord_dataset(ds) {
-  const {inputs, output, view} = U;
-
-  if (ds.on) inputs.unshift(ds.id);
-  else inputs.splice(inputs.indexOf(ds.id), 1);
-
-  if (view === "inputs" || view === "timeline") {
-    await ds.active(ds.on, true);
-    ds.raise();
-    ea_plot_active_analysis(output);
-  } else {
-    await ds.active(ds.on, false);
-  }
-
-  if (view === "outputs") {
-    ea_indexes_list();
-    ea_plot_active_analysis(output).then(raster => ea_indexes_graphs(raster));
-  }
-
-  const _inputs = [...new Set(inputs)];
-  ea_cards(_inputs);
-  O.datasets =  _inputs;
-
-  if (!TIMELINE) return;
-
-  if (maybe(TIMELINE_CURRENT_DATE) && _inputs.length) {
-    const datasets = DS.list.filter(d => d.on && d.timeline && maybe(d, 'csv', 'data'));
-
-    if (TIMELINE_DISTRICT)
-      ea_timeline_lines_draw(datasets, TIMELINE_DISTRICT);
-  } else {
-    const rp = qs('#right-pane');
-    qs('#district-header', rp).innerText = "";
-    if (TIMELINE_LINES) TIMELINE_LINES.svg.remove();
   }
 };
 

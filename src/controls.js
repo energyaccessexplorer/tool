@@ -167,6 +167,8 @@ class dscontrols extends HTMLElement {
       title.prepend(ce('span', collapse_triangle('s'), { class: 'collapse triangle' }));
       title.addEventListener('mouseup', e => elem_collapse(conel, el));
 
+      elem_collapse(conel, el);
+
       return el;
     };
 
@@ -274,11 +276,10 @@ function ea_controls_init() {
     tab_all.classList.add('active');
   };
 
-  const tab_filters = qs('#controls-tab-filters', controls_tabs_el);
-  if (tab_filters) ea_controls_select_tab(tab_filters, "filters");
-  else ea_controls_select_tab(tab_all, "all");
-
   ea_controls_sort_datasets(GEOGRAPHY.configuration);
+
+  const first = qs('.controls-branch-tab', controls_tabs_el);
+  ea_controls_select_tab(first, first.id.replace('controls-tab-', ''));
 };
 
 function ea_controls_select_tab(tab, name) {

@@ -86,7 +86,7 @@
           <div id="mapbox-container"></div>
           <div id="views"></div>
         </div>
-		<div id="timeline"></div>
+        <div id="timeline"></div>
       </div>
 
       <div id="right-pane">
@@ -142,13 +142,13 @@
   </body>
 
   <script>
-    window.ea_modal = new modal("ea-modal", {});
-    window.ea_flash = new flash();
+    ea_modal = new modal("ea-modal", {});
+    ea_flash = new flash();
 
-	ea_init((url, params) => {
-	  U = new Proxy({ url: url, params: params }, UProxyHandler);
-	  O = new Overlord();
-	});
+    ea_init((url, params) => {
+      U = new Proxy({ url: url, params: params }, UProxyHandler);
+      O = new Overlord();
+    });
   </script>
 
   <script src="/javascripts/gapps.js"></script>

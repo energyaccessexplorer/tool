@@ -1,3 +1,13 @@
 #filtered-pane {
-  background-color: var(--the-white);
+  padding: 0.7em 0 2em;
+  background-color: white;
+}
+
+#filtered-pane .up-title {
+  padding: 0.7em 1em;
+  text-align: left;
+}
+
+ul#filtered-subgeographies {
+  margin-left: 0;
 }

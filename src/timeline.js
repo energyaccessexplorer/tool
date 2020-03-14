@@ -114,6 +114,9 @@ async function ea_timeline_datasets_polygons_csv() {
 };
 
 function ea_timeline_filter_valued_polygons() {
+  const ul = qs('#filtered-subgeographies');
+  ul.innerHTML = "";
+
   const datasets = DS.list.filter(d => d.on && maybe(d.csv, 'data') && d.datatype.match("-(fixed|timeline)"));
 
   function m(d,r) {
@@ -136,8 +139,18 @@ function ea_timeline_filter_valued_polygons() {
   const b = DST['boundaries'];
   const fs = source._data.features;
 
-  for (let i = 0; i < fs.length; i += 1)
-    fs[i].properties.__hidden = !result.includes(+fs[i].properties[b.vectors.key]);
+  const names = [];
+
+  for (let i = 0; i < fs.length; i += 1) {
+    const x = result.includes(+fs[i].properties[b.vectors.key]);
+
+    fs[i].properties.__hidden = !x;
+
+    if (x) {
+      ul.append(ce('li', fs[i].properties['District']));
+      names.push(fs[i].properties['District']);
+    }
+  }
 
   source.setData(source._data);
 };

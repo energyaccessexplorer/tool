@@ -85,6 +85,7 @@ build-a:
 		${SRC}/report.js \
 		${SRC}/summary.js \
 		${SRC}/mobile.js \
+		${SRC}/globals.js \
 		> ${DIST}/a/main.js
 
 	@cat \

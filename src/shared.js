@@ -1,6 +1,8 @@
 NORM_STOPS = d3.range(0, 1.000000001, 0.25);
 
 function ea_layout_init() {
+  if (!GEOGRAPHY.timeline) qs('#timeline').remove();
+
   const n = qs('nav');
   const p = qs('#playground');
   const w = qs('#mobile-switcher');
@@ -49,7 +51,7 @@ function ea_layout_init() {
     ]]
   );
 
-  if (TIMELINE) {
+  if (GEOGRAPHY.timeline) {
     qs('#filtered-pane').append(oc);
     qs('#cards-pane').append(gc);
   } else {

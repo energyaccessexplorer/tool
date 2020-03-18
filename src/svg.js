@@ -500,7 +500,9 @@ function ea_svg_polygons_symbol(opts) {
 };
 
 function ea_svg_timeline_slider(opts) {
-  const {steps, dragging, width, init} = opts;
+  const {steps, drag, width, init} = opts;
+
+  let v;
 
   const radius = 16,
         svgwidth = width,
@@ -550,25 +552,26 @@ function ea_svg_timeline_slider(opts) {
     .attr('stroke-width', 3)
     .style('cursor', 'grab');
 
-  function drag(cx) {
-    const cx0 = denorm(norm(cx));
+  function _drag(cx) {
+    const nx = norm(cx);
+    const cx0 = denorm(nx);
     circle.attr('cx', cx0);
 
-    dragging(norm(cx));
+    if (nx !== v) drag(v = nx);
   };
 
   const behaviour = d3.drag()
-        .on('drag', _ => drag(d3.event.x));
+        .on('drag', _ => _drag(d3.event.x));
 
   circle.call(behaviour);
 
-  gutter.on('click', _ => drag(d3.event.offsetX));
+  gutter.on('click', _ => _drag(d3.event.offsetX));
 
-  drag(denorm(steps[init || 0]));
+  _drag(denorm(steps[init || 0]));
 
   return {
     svg: svg.node(),
-    set: x => drag(denorm(x))
+    set: x => _drag(denorm(x))
   };
 };
 

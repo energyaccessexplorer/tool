@@ -11,14 +11,7 @@ async function ea_timeline_init() {
     width: qs('#maparea').clientWidth - padding,
     init: steps.length - 1,
     parent: parent,
-    dragging: function(x) {
-      const t = TIMELINE_DATES.find(i => i.match(x));
-
-      if (TIMELINE_CURRENT_DATE === t) return;
-      else TIMELINE_CURRENT_DATE = t;
-
-      O.timeline = t;
-    }
+    drag: x => O.timeline = TIMELINE_DATES.find(i => i.match(x))
   });
 
   tl.svg.style.left = (padding / 2) + "px";
@@ -85,9 +78,9 @@ function ea_timeline_lines_draw(datasets, district) {
 };
 
 function ea_timeline_lines_update(inputs) {
-  if (!TIMELINE) return;
+  if (!GEOGRAPHY.timeline) return;
 
-  if (maybe(TIMELINE_CURRENT_DATE) && inputs.length) {
+  if (inputs.length) {
     const datasets = DS.list.filter(d => d.on && d.timeline && maybe(d, 'csv', 'data'));
 
     if (TIMELINE_DISTRICT)
@@ -100,7 +93,7 @@ function ea_timeline_lines_update(inputs) {
 };
 
 function ea_timeline_date(t) {
-  return t || TIMELINE_CURRENT_DATE || TIMELINE_DATES.slice(-1)[0];
+  return t || TIMELINE_DATES.slice(-1)[0];
 }
 
 async function ea_timeline_datasets_polygons_csv() {
@@ -120,12 +113,13 @@ function ea_timeline_filter_valued_polygons() {
   const datasets = DS.list.filter(d => d.on && maybe(d.csv, 'data') && d.datatype.match("-(fixed|timeline)"));
 
   function m(d,r) {
-    const c = d.config.column;
+    let c;
+    if (d.datatype.match("-timeline"))
+      c = TIMELINE_DATES.slice(0).reverse().find(x => parseInt(r[x]) > 0);
+    else if (d.datatype.match("-fixed"))
+      c = d.config.column;
 
-    if (d.timeline)
-      return +r[TIMELINE_CURRENT_DATE] >= d._domain[0] && +r[TIMELINE_CURRENT_DATE] <= d._domain[1];
-    else if (c)
-      return +r[c] >= d._domain[0] && +r[c] <= d._domain[1];
+    return +r[c] >= d._domain[0] && +r[c] <= d._domain[1];
   };
 
   const arr = datasets.map(d => d.csv.data.filter(r => m(d,r)).map(r => +r[d.csv.key]));

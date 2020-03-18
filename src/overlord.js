@@ -99,32 +99,18 @@ class Overlord {
 async function ea_init(callback) {
   const url = new URL(location);
   const id = url.searchParams.get('id');
-  let params;
 
   GEOGRAPHY = await ea_api("geographies", { "id": `eq.${id}` }, { object: true });
-  TIMELINE = maybe(GEOGRAPHY, 'configuration', 'timeline');
+  GEOGRAPHY.timeline = maybe(GEOGRAPHY, 'configuration', 'timeline');
 
-  if (TIMELINE) {
+  let params = 'default';
+
+  if (GEOGRAPHY.timeline) {
+    params = 'timeline';
+
     TIMELINE_DATES = [];
-    TIMELINE_CURRENT_DATE = null;
     TIMELINE_LINES = null;
     TIMELINE_DISTRICT = null;
-
-    params = {
-      "view": ['timeline', 'filtered', 'outputs'],
-      "inputs": [],
-      "output": ['eai'],
-      "pack": [],
-    };
-  } else {
-    qs('#timeline').remove();
-
-    params = {
-      "view": ['inputs', 'outputs'],
-      "inputs": [],
-      "output": ['eai', 'ani', 'demand', 'supply'],
-      "pack": [],
-    };
   }
 
   MOBILE = screen.width < 1152;
@@ -132,7 +118,7 @@ async function ea_init(callback) {
 
   MAPBOX = ea_mapbox();
 
-  callback(url, params);
+  callback(url, ea_params[params]);
 
   await ea_datasets_init(GEOGRAPHY.id, U.inputs, U.pack, bounds => {
     MAPBOX.coords = mapbox_fit(bounds);
@@ -156,9 +142,9 @@ async function ea_init(callback) {
   ea_views_init();
   ea_indexes_init();
 
-  if (TIMELINE) ea_timeline_init();
+  if (GEOGRAPHY.timeline) ea_timeline_init();
 
-  if (!MOBILE && !TIMELINE) ea_nanny_init();
+  if (!MOBILE && !GEOGRAPHY.timeline) ea_nanny_init();
 };
 
 function ea_overlord_view() {
@@ -205,7 +191,6 @@ function ea_overlord_view() {
     ea_plot_active_analysis(output)
       .then(raster => ea_indexes_graphs(raster));
 
-    TIMELINE_CURRENT_DATE = TIMELINE_DATES.slice(-1)[0];
     ea_timeline_filter_valued_polygons();
     break;
   }
@@ -253,7 +238,7 @@ function ea_overlord_special_layers() {
     }, MAPBOX.first_symbol);
   }
 
-  if (!TIMELINE) return;
+  if (!GEOGRAPHY.timeline) return;
 
   if (!MAPBOX.getSource('filtered-source')) {
     MAPBOX.addSource('filtered-source', {
@@ -439,8 +424,9 @@ function ea_overlord_map_click(e) {
 
 const UProxyHandler = {
   get: function(o,p) {
-    let v;
+    const i = o.url.searchParams.get(p);
 
+    let v;
     switch (p) {
     case "params": {
       v = o.params;
@@ -448,7 +434,6 @@ const UProxyHandler = {
     }
 
     case "inputs": {
-      const i = o.url.searchParams.get(p);
       if (!i || i === "") v = [];
       else v = i.split(',').filter(e => o.params.inputs.indexOf(e) > -1);
 
@@ -456,7 +441,7 @@ const UProxyHandler = {
     }
 
     default: {
-      v = o.url.searchParams.get(p);
+      v = (i === "" ? null : i);
       break;
     }
     }

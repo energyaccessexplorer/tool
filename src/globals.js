@@ -20,6 +20,24 @@ ea_views = {
   }
 };
 
+ea_params = {
+  "default": {
+    "view": ['inputs', 'outputs'],
+    "inputs": [],
+    "output": ['eai', 'ani', 'demand', 'supply'],
+    "pack": [],
+    "subgeo": [],
+  },
+
+  "timeline": {
+    "view": ['timeline', 'filtered', 'outputs'],
+    "inputs": [],
+    "output": ['eai', 'ani', 'demand', 'supply'],
+    "pack": [],
+    "subgeo": [],
+  }
+};
+
 ea_indexes = {
   "eai": {
     "name": "Energy Access Potential",

@@ -217,9 +217,7 @@ class DS {
     if (this.config.column) t += "-fixed";
     else if (this.timeline) t += "-timeline";
 
-    if (this.mutant) {
-      t = "raster-mutant";
-    }
+    if (this.mutant) t = "raster-mutant";
 
     return t;
   };

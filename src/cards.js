@@ -208,6 +208,7 @@ class dscard extends HTMLElement {
       break;
     }
 
+    case 'polygons-boundaries':
     case 'polygons': {
       e = ea_svg_polygons_symbol({
         size: 28,

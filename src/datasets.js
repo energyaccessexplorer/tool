@@ -35,6 +35,10 @@ class DS {
     this.files_setup(o);
 
     if (this.mutant) ;
+
+    else if (this.id === 'boundaries')
+      this.domain = this._domain = [-Infinity, Infinity];
+
     else if (undefined === this.domain) {
       ea_flash.push({
         title: `'${this.id}' ignored`,
@@ -168,6 +172,10 @@ class DS {
       break;
     }
 
+    case 'polygons-boundaries': {
+      break;
+    }
+
     case undefined:
     default: {
       ea_flash.push({
@@ -216,6 +224,8 @@ class DS {
 
     if (this.config.column) t += "-fixed";
     else if (this.timeline) t += "-timeline";
+
+    if (this.id === 'boundaries') t = "polygons-boundaries";
 
     if (this.mutant) t = "raster-mutant";
 

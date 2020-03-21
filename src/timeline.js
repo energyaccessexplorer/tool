@@ -115,7 +115,7 @@ function ea_timeline_filter_valued_polygons() {
     let c;
     if (d.datatype.match("polygons-(timeline)"))
       c = TIMELINE_DATES.slice(0).reverse().find(x => parseInt(r[x]) > 0);
-    else if (d.datatype.match("polygons-(fixed)"))
+    else if (d.datatype.match("polygons-(fixed|boundaries)"))
       c = d.config.column;
 
     return +r[c] >= d._domain[0] && +r[c] <= d._domain[1];

@@ -110,6 +110,7 @@ function ea_timeline_filter_valued_polygons() {
   const datasets = DS.list.filter(d => d.on && d.datatype.match("polygons-(fixed|timeline)"));
 
   const b = DST['boundaries'];
+  datasets.unshift(b);
 
   function m(d,r) {
     let c;
@@ -122,9 +123,6 @@ function ea_timeline_filter_valued_polygons() {
   };
 
   const arr = datasets.map(d => d.csv.data.filter(r => m(d,r)).map(r => +r[d.csv.key]));
-
-  if (!arr.length) return;
-
   const result = arr[0].filter(e => arr.every(a => a.includes(e)));
 
   const source = MAPBOX.getSource('filtered-source');
@@ -134,7 +132,7 @@ function ea_timeline_filter_valued_polygons() {
   for (let i = 0; i < fs.length; i += 1) {
     const x = result.includes(+fs[i].properties[b.vectors.key]);
 
-    fs[i].properties.__hidden = !x;
+    fs[i].properties.__hidden = U.subgeo ? (fs[i].id !== +U.subgeo) : !x;
 
     if (x) {
       ul.append(ce('li', fs[i].properties['District']));

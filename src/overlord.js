@@ -88,6 +88,17 @@ class Overlord {
     window.dispatchEvent(new Event('resize'));
   };
 
+  set subgeo(t) {
+    if (!t) {
+      U.subgeo = '';
+      O.dataset(DST['boundaries'], 'domain', DST['boundaries'].domain);
+      return;
+    }
+
+    U.subgeo = t;
+    O.dataset(DST['boundaries'], 'domain', [t, t]);
+  };
+
   map(interaction, event) {
     if (interaction === "click")
       ea_overlord_map_click(event);
@@ -462,6 +473,7 @@ const UProxyHandler = {
       break;
     }
 
+    case "subgeo":
     case "subgeoname":
     case "inputs":
     case "pack": {

@@ -173,6 +173,7 @@ function ea_analysis_datasets(type) {
       // Discard datasets which are filters and use the entire domain (useless).
       //
       if (ea_filters.includes(d.analysis_scale(type)) &&
+          d.raster.domain &&
           (d._domain[0] === d.raster.domain.min &&
            d._domain[1] === d.raster.domain.max))
         return false;
@@ -184,7 +185,7 @@ function ea_analysis_datasets(type) {
       // loops faster.
       //
       return (ea_filters.includes(x.analysis_scale(type))) ? 1 : -1;
-    })
+    });
 };
 
 /*

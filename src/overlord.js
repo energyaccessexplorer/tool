@@ -434,7 +434,6 @@ const UProxyHandler = {
     case "inputs": {
       if (!i || i === "") v = [];
       else v = i.split(',').filter(e => o.params.inputs.indexOf(e) > -1);
-
       break;
     }
 

@@ -367,7 +367,7 @@ class DS {
             .domain(this.analysis.intervals)
             .range(NORM_STOPS);
 
-      s = x => (x >= this._domain[0]) && (x <= this._domain[1]) ? q(x) : -1;
+      s = x => (x >= t[0]) && (x <= t[1]) ? q(x) : -1;
 
       break;
     }
@@ -806,7 +806,8 @@ function ea_datasets_polygons() {
           await ea_timeline_datasets_polygons_csv.call(this);
           col = ea_timeline_date(null);
         }
-        else if (this.config.column) col = this.config.column;
+        else if (this.config.column)
+          col = this.config.column;
 
         ea_datasets_polygons_csv.call(this, col);
       }

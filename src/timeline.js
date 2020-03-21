@@ -112,6 +112,7 @@ function ea_timeline_filter_valued_polygons() {
   ul.innerHTML = "";
 
   const datasets = DS.list.filter(d => d.on && maybe(d.csv, 'data') && d.datatype.match("-(fixed|timeline)"));
+  const b = DST['boundaries'];
 
   function m(d,r) {
     let c;
@@ -131,11 +132,8 @@ function ea_timeline_filter_valued_polygons() {
 
   const source = MAPBOX.getSource('filtered-source');
 
-  const b = DST['boundaries'];
-  const fs = source._data.features;
-
   const names = [];
-
+  const fs = source._data.features;
   for (let i = 0; i < fs.length; i += 1) {
     const x = result.includes(+fs[i].properties[b.vectors.key]);
 

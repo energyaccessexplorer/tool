@@ -109,7 +109,6 @@ async function ea_init(callback) {
     params = 'timeline';
 
     TIMELINE_DATES = [];
-    TIMELINE_DISTRICT = null;
   }
 
   MOBILE = screen.width < 1152;
@@ -415,7 +414,7 @@ function ea_overlord_map_click(e) {
 
       if (et.source === i) {
         const datasets = DS.list.filter(d => d.on && d.timeline && maybe(d, 'csv', 'data'));
-        ea_timeline_lines_draw(datasets, (TIMELINE_DISTRICT = et.properties['District']));
+        ea_timeline_lines_draw(datasets, (U.subgeoname = et.properties['District']));
       }
     }
   }
@@ -457,6 +456,7 @@ const UProxyHandler = {
       break;
     }
 
+    case "subgeoname":
     case "inputs":
     case "pack": {
       o.url.searchParams.set(t,v);

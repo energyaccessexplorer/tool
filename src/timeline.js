@@ -83,9 +83,7 @@ function ea_timeline_lines_update(inputs) {
 
   if (inputs.length) {
     const datasets = DS.list.filter(d => d.on && d.timeline && maybe(d, 'csv', 'data'));
-
-    if (TIMELINE_DISTRICT)
-      ea_timeline_lines_draw(datasets, TIMELINE_DISTRICT);
+    if (U.subgeoname) ea_timeline_lines_draw(datasets);
   } else {
     const rp = qs('#right-pane');
     qs('#district-header', rp).innerText = "";

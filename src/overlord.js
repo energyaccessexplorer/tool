@@ -109,7 +109,6 @@ async function ea_init(callback) {
     params = 'timeline';
 
     TIMELINE_DATES = [];
-    TIMELINE_LINES = null;
     TIMELINE_DISTRICT = null;
   }
 

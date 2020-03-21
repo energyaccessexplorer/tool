@@ -20,9 +20,9 @@ async function ea_timeline_init() {
   return tl;
 };
 
-function ea_timeline_lines_draw(datasets, district) {
+function ea_timeline_lines_draw(datasets) {
   const series = datasets.reduce((a,c) => {
-    return a.concat(c.csv.data.filter(r => r['District'] === district).map(r => {
+    return a.concat(c.csv.data.filter(r => r['District'] === U.subgeoname).map(r => {
       return {
         values: TIMELINE_DATES.map(k => (r[k] === "" ? undefined : +r[k])),
         id: c.id,
@@ -37,8 +37,8 @@ function ea_timeline_lines_draw(datasets, district) {
     }));
   }, []);
 
-  if (TIMELINE_LINES)
-    TIMELINE_LINES.svg.remove();
+  let lines = qs('#timeline-lines');
+  if (lines) lines.remove();
 
   const average = datasets.map(i => {
     return {
@@ -47,7 +47,7 @@ function ea_timeline_lines_draw(datasets, district) {
     }
   });
 
-  TIMELINE_LINES = ea_svg_multiline({
+  const ml = ea_svg_multiline({
     data: {
       series: series,
       dates: TIMELINE_DATES.map(d3.utcParse("%Y-%m-%d"))
@@ -70,11 +70,12 @@ function ea_timeline_lines_draw(datasets, district) {
       ]);
     }
   });
+  ml.svg.id = 'timeline-lines';
 
   const rp = qs('#right-pane');
 
-  qs('#district-header', rp).innerText = district;
-  qs('#district-graph', rp).append(TIMELINE_LINES.svg);
+  qs('#district-header', rp).innerText = U.subgeoname;
+  qs('#district-graph', rp).append(ml.svg);
 };
 
 function ea_timeline_lines_update(inputs) {
@@ -88,7 +89,9 @@ function ea_timeline_lines_update(inputs) {
   } else {
     const rp = qs('#right-pane');
     qs('#district-header', rp).innerText = "";
-    if (TIMELINE_LINES) TIMELINE_LINES.svg.remove();
+
+    let lines = qs('#timeline-lines');
+    if (lines) lines.remove();
   }
 };
 

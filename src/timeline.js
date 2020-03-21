@@ -82,7 +82,7 @@ function ea_timeline_lines_update(inputs) {
   if (!GEOGRAPHY.timeline) return;
 
   if (inputs.length) {
-    const datasets = DS.list.filter(d => d.on && d.timeline && maybe(d, 'csv', 'data'));
+    const datasets = DS.list.filter(d => d.on && d.datatype === 'polygons-timeline');
     if (U.subgeoname) ea_timeline_lines_draw(datasets);
   } else {
     const rp = qs('#right-pane');
@@ -107,14 +107,15 @@ function ea_timeline_filter_valued_polygons() {
   const ul = qs('#filtered-subgeographies');
   ul.innerHTML = "";
 
-  const datasets = DS.list.filter(d => d.on && maybe(d.csv, 'data') && d.datatype.match("-(fixed|timeline)"));
+  const datasets = DS.list.filter(d => d.on && d.datatype.match("polygons-(fixed|timeline)"));
+
   const b = DST['boundaries'];
 
   function m(d,r) {
     let c;
-    if (d.datatype.match("-timeline"))
+    if (d.datatype.match("polygons-(timeline)"))
       c = TIMELINE_DATES.slice(0).reverse().find(x => parseInt(r[x]) > 0);
-    else if (d.datatype.match("-fixed"))
+    else if (d.datatype.match("polygons-(fixed)"))
       c = d.config.column;
 
     return +r[c] >= d._domain[0] && +r[c] <= d._domain[1];

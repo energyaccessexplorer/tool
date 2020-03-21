@@ -65,7 +65,7 @@ class Overlord {
     U.timeline = t;
 
     DS.list.forEach(async d => {
-      if (d.timeline && d.on && d.vectors.features)
+      if (d.on && d.datatype === 'polygons-timeline')
         ea_datasets_polygons_csv.call(d, t);
     })
   };
@@ -415,7 +415,7 @@ function ea_overlord_map_click(e) {
       if (!et) return;
 
       if (et.source === i) {
-        const datasets = DS.list.filter(d => d.on && d.timeline && maybe(d, 'csv', 'data'));
+        const datasets = DS.list.filter(d => d.on && d.datatype === 'polygons-timeline');
         ea_timeline_lines_draw(datasets, (U.subgeoname = et.properties['District']));
       }
     }

@@ -62,9 +62,11 @@ class Overlord {
   };
 
   set timeline(t) {
+    U.timeline = t;
+
     DS.list.forEach(async d => {
       if (d.timeline && d.on && d.vectors.features)
-        ea_datasets_polygons_csv.call(d, ea_timeline_date(t));
+        ea_datasets_polygons_csv.call(d, t);
     })
   };
 
@@ -452,6 +454,11 @@ const UProxyHandler = {
     case "view": {
       if (!o.params[t].includes(v)) v = o.params[t][0];
       o.url.searchParams.set(t,v);
+      break;
+    }
+
+    case "timeline": {
+      o.url.searchParams.set(t, v || TIMELINE_DATES.slice(-1)[0]);
       break;
     }
 

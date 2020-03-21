@@ -93,10 +93,6 @@ function ea_timeline_lines_update(inputs) {
   }
 };
 
-function ea_timeline_date(t) {
-  return t || TIMELINE_DATES.slice(-1)[0];
-}
-
 async function ea_timeline_datasets_polygons_csv() {
   await until(_ => this.csv.data);
 

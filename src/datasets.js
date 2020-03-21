@@ -801,10 +801,10 @@ function ea_datasets_polygons() {
       const v = this.vectors;
 
       if (this.csv) {
-        let col;
+        let col = null;
         if (this.timeline) {
           await ea_timeline_datasets_polygons_csv.call(this);
-          col = ea_timeline_date(null);
+          col = U.timeline;
         }
         else if (this.config.column)
           col = this.config.column;

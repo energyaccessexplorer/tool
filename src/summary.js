@@ -2,14 +2,14 @@
  * ea_summary
  *
  * Given the current dataset selection, calculate the population impact through
- * the 'population' dataset on all Indexes. Draw some pie graphs and a modal
- * about it.
+ * the 'population-density' dataset on all Indexes. Draw some pie graphs and a
+ * modal about it.
  *
  * This is triggered by the "Snapshot" button.
  */
 
 async function ea_summary() {
-  const pop = DST['population'];
+  const pop = DST['population-density'];
   await pop.load('raster');
   const p = pop.raster.data;
 
@@ -44,7 +44,7 @@ async function ea_summary() {
 
     summary[idxn] = await ea_summary_analyse(raster);
 
-    let ppie = ea_svg_pie(summary[idxn]['population']['distribution'].map(x => [x]), 75, 0, ea_analysis_colorscale.stops, null);
+    let ppie = ea_svg_pie(summary[idxn]['population-density']['distribution'].map(x => [x]), 75, 0, ea_analysis_colorscale.stops, null);
     let apie = ea_svg_pie(summary[idxn]['area']['distribution'].map(x => [x]), 75, 0, ea_analysis_colorscale.stops, null);
 
     graphs.append(el_tree(
@@ -88,7 +88,7 @@ async function ea_summary() {
 
   const tables_tab = ce('div', null, { class: 'tab hidden' });
 
-  for (let j of ['area', 'population']) {
+  for (let j of ['area', 'population-density']) {
     const table = ce('table', null, { class: 'summary' });
     let thead, tbody, thr;
 
@@ -140,10 +140,10 @@ async function ea_summary() {
 };
 
 async function ea_summary_analyse(raster) {
-  let ds = DST['population'];
+  let ds = DST['population-density'];
 
   if (!ds) {
-    warn("No 'population' dataset present... Will use boundaries");
+    warn("No 'population-density' dataset present... Will use boundaries");
     ds = DST['boundaries'];
   }
 
@@ -186,14 +186,14 @@ async function ea_summary_analyse(raster) {
   const atotal = area_groups.reduce((a,b) => a + b, 0);
 
   const o = {};
-  if (ds.id === 'population')
-    o.population = {
+  if (ds.id === 'population-density')
+    o['population-density'] = {
       total: ptotal,
       amounts: population_groups,
       distribution: population_groups.reduce((a,b) => { a.push(b/ptotal); return a; }, [])
     }
 
-  o.area = {
+  o['area'] = {
     total: atotal,
     amounts: area_groups,
     distribution: area_groups.reduce((a,b) => { a.push(b/atotal); return a; }, [])

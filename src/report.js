@@ -1,5 +1,5 @@
 function ea_report_pdf() {
-  const canvas = DST['population'].raster.canvas;
+  const canvas = DST['population-density'].raster.canvas;
   const canvas_ratio = canvas.width/canvas.height;
 
   let doc;
@@ -77,7 +77,7 @@ contact our team at`;
   };
 
   function add_tables() {
-    const names = ['area', 'population'];
+    const names = ['area', 'population-density'];
     const tables = qsa('table.summary');
 
     for (let i = 0; i < tables.length; i += 1) {

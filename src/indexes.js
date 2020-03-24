@@ -2,7 +2,7 @@ async function ea_indexes_graphs(raster) {
   const t = await ea_summary_analyse(raster);
   let g;
 
-  if (g = maybe(t, 'population')) {
+  if (g = maybe(t, 'population-density')) {
     g['distribution']
       .forEach((x,i) => POPULATION_PIE['data'][i].push(x));
 

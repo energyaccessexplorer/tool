@@ -356,25 +356,8 @@ function ea_overlord_map_click(e) {
       const et = MAPBOX.queryRenderedFeatures(e.point)[0];
       if (!et) return;
 
-      log("Feature Properties:", et.properties);
-
-      if (et.source === i) {
-        let at;
-
-        if (at = t.config.features_attr_map) {
-          let td = table_data(at, et.properties);
-          add_lnglat(td, [e.lngLat.lng, e.lngLat.lat]);
-
-          mapbox_pointer(
-            td,
-            e.originalEvent.pageX,
-            e.originalEvent.pageY
-          );
-        }
-        else {
-          warn("Dataset is not configured to display info. (configuration.features_attr_map)");
-        }
-      }
+      if (et.source === i)
+        ea_datasets_polygons_feature_info.call(t, et, e);
 
       return;
     }
@@ -427,10 +410,9 @@ function ea_overlord_map_click(e) {
       if (!et) return;
 
       if (et.source === i) {
-        U.subgeoname = et.properties['District'];
-
+        if (et.properties['District']) U.subgeoname = et.properties['District'];
         ea_timeline_lines_draw();
-
+        ea_datasets_polygons_feature_info.call(t, et, e);
       }
     }
   }

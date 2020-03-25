@@ -897,3 +897,40 @@ function ea_datasets_table() {
 
   return table;
 };
+
+function ea_datasets_polygons_feature_info(et, e) {
+  log("Feature Properties:", et.properties);
+
+  function add_lnglat(td, lnglat = [0, 0]) {
+    td.append(el_tree([ce('tr'), [ce('td', "&nbsp;"), ce('td', "&nbsp;")]]));
+
+    td.append(el_tree([
+      ce('tr'), [
+        ce('td', "longitude"),
+        ce('td', ce('code', lnglat[0].toFixed(2)))
+      ]
+    ]));
+
+    td.append(el_tree([
+      ce('tr'), [
+        ce('td', "latitude"),
+        ce('td', ce('code', lnglat[1].toFixed(2)))
+      ]
+    ]));
+  };
+
+  let at;
+  if (at = this.config.features_attr_map) {
+    let td = table_data(at, et.properties);
+    add_lnglat(td, [e.lngLat.lng, e.lngLat.lat]);
+
+    mapbox_pointer(
+      td,
+      e.originalEvent.pageX,
+      e.originalEvent.pageY
+    );
+  }
+  else {
+    warn(`Dataset '${this.id}' is not configured to display info. (configuration.features_attr_map)`);
+  }
+};

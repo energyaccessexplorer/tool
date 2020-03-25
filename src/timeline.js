@@ -1,7 +1,7 @@
 async function ea_timeline_init() {
-  await until(_ => TIMELINE_DATES.length > 0);
+  await until(_ => GEOGRAPHY.timeline_dates.length > 0);
 
-  const steps = TIMELINE_DATES.map(x => parseInt(x.replace('(^[0-9]{4}-)', '\1')));
+  const steps = GEOGRAPHY.timeline_dates.map(x => parseInt(x.replace('(^[0-9]{4}-)', '\1')));
 
   const parent = qs('#timeline');
   const padding = 100;
@@ -11,7 +11,7 @@ async function ea_timeline_init() {
     width: qs('#maparea').clientWidth - padding,
     init: steps.length - 1,
     parent: parent,
-    drag: x => O.timeline = TIMELINE_DATES.find(i => i.match(x))
+    drag: x => O.timeline = GEOGRAPHY.timeline_dates.find(i => i.match(x))
   });
 
   tl.svg.style.left = (padding / 2) + "px";
@@ -28,7 +28,7 @@ function ea_timeline_lines_draw() {
   const series = datasets.reduce((a,c) => {
     return a.concat(c.csv.data.filter(r => r['District'] === U.subgeoname).map(r => {
       return {
-        values: TIMELINE_DATES.map(k => (r[k] === "" ? undefined : +r[k])),
+        values: GEOGRAPHY.timeline_dates.map(k => (r[k] === "" ? undefined : +r[k])),
         id: c.id,
         name: el_tree([
           ce('span'), [
@@ -47,14 +47,14 @@ function ea_timeline_lines_draw() {
   const average = datasets.map(i => {
     return {
       id: i['id'],
-      values: TIMELINE_DATES.map(d => i.csv.data.map(r => +r[d])).map(x => x.reduce((a,c) => a + c, 0) / x.length)
+      values: GEOGRAPHY.timeline_dates.map(d => i.csv.data.map(r => +r[d])).map(x => x.reduce((a,c) => a + c, 0) / x.length)
     }
   });
 
   const ml = ea_svg_multiline({
     data: {
       series: series,
-      dates: TIMELINE_DATES.map(d3.utcParse("%Y-%m-%d"))
+      dates: GEOGRAPHY.timeline_dates.map(d3.utcParse("%Y-%m-%d"))
     },
     color: "green",
     width: 350,
@@ -102,8 +102,8 @@ async function ea_timeline_lines_update() {
 async function ea_timeline_datasets_polygons_csv() {
   await until(_ => this.csv.data);
 
-  this.domain[0] = d3.min([].concat(...TIMELINE_DATES.map(d => this.csv.data.map(r => +r[d]))));
-  this.domain[1] = d3.max([].concat(...TIMELINE_DATES.map(d => this.csv.data.map(r => +r[d]))));
+  this.domain[0] = d3.min([].concat(...GEOGRAPHY.timeline_dates.map(d => this.csv.data.map(r => +r[d]))));
+  this.domain[1] = d3.max([].concat(...GEOGRAPHY.timeline_dates.map(d => this.csv.data.map(r => +r[d]))));
 
   this._domain = JSON.parse(JSON.stringify(this.domain));
   this.domain_init = JSON.parse(JSON.stringify(this.domain));
@@ -123,7 +123,7 @@ function ea_timeline_filter_valued_polygons() {
       .filter(r => {
         let c;
         if (d.datatype.match("polygons-(timeline)"))
-          c = TIMELINE_DATES.slice(0).reverse().find(x => parseInt(r[x]) > 0);
+          c = GEOGRAPHY.timeline_dates.slice(0).reverse().find(x => parseInt(r[x]) > 0);
         else if (d.datatype.match("polygons-(fixed|boundaries)"))
           c = d.config.column;
 

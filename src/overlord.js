@@ -115,14 +115,12 @@ async function ea_init(callback) {
 
   GEOGRAPHY = await ea_api("geographies", { "id": `eq.${id}` }, { object: true });
   GEOGRAPHY.timeline = maybe(GEOGRAPHY, 'configuration', 'timeline');
+  GEOGRAPHY.timeline_dates = maybe(GEOGRAPHY, 'configuration', 'timeline_dates');
 
   let params = 'default';
 
-  if (GEOGRAPHY.timeline) {
+  if (GEOGRAPHY.timeline)
     params = 'timeline';
-
-    TIMELINE_DATES = [];
-  }
 
   MOBILE = screen.width < 1152;
   ea_layout_init();
@@ -471,7 +469,7 @@ const UProxyHandler = {
     }
 
     case "timeline": {
-      o.url.searchParams.set(t, v || TIMELINE_DATES.slice(-1)[0]);
+      o.url.searchParams.set(t, v || GEOGRAPHY.timeline_dates.slice(-1)[0]);
       break;
     }
 

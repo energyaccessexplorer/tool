@@ -852,14 +852,18 @@ async function ea_datasets_polygons_csv(col) {
     this.csv.table = ea_datasets_table.call(this);
 
   const data = this.csv.data;
-  const stops = this.colorscale.stops;
+  let s;
 
-  if (!data) warn(this.id, "has no csv.data");
+  if (this.colorscale) {
+    if (!data) warn(this.id, "has no csv.data");
 
-  const l = d3.scaleQuantize().domain(this.domain).range(stops);
-  const s = x => (null === x || undefined === x || x === "") ? "rgba(155,155,155,1)" : l(+x);
+    const l = d3.scaleQuantize().domain(this.domain).range(this.colorscale.stops);
+    s = x => (null === x || undefined === x || x === "") ? "rgba(155,155,155,1)" : l(+x);
 
-  this.csv.scale = l;
+    this.csv.scale = l;
+  } else {
+    s = x => (null === x || undefined === x || x === "") ? "rgba(155,155,155,1)" : 'rgba(255,255,255,0.8)';
+  }
 
   if (!data) {
     warn("No data for", this.id);

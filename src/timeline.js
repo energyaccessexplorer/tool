@@ -20,7 +20,11 @@ async function ea_timeline_init() {
   return tl;
 };
 
-function ea_timeline_lines_draw(datasets) {
+function ea_timeline_lines_draw() {
+  const datasets = DS.list.filter(d => d.on && d.datatype === 'polygons-timeline');
+
+  if (!datasets.length) return;
+
   const series = datasets.reduce((a,c) => {
     return a.concat(c.csv.data.filter(r => r['District'] === U.subgeoname).map(r => {
       return {
@@ -78,12 +82,14 @@ function ea_timeline_lines_draw(datasets) {
   qs('#district-graph', rp).append(ml.svg);
 };
 
-function ea_timeline_lines_update(inputs) {
+async function ea_timeline_lines_update() {
   if (!GEOGRAPHY.timeline) return;
 
-  if (inputs.length) {
-    const datasets = DS.list.filter(d => d.on && d.datatype === 'polygons-timeline');
-    if (U.subgeoname) ea_timeline_lines_draw(datasets);
+  const datasets = DS.list.filter(d => d.on && d.datatype === 'polygons-timeline');
+
+  if (datasets.length) {
+    await Promise.all(datasets.map(d => until(_ => d.csv.data)));
+    if (U.subgeoname) ea_timeline_lines_draw();
   } else {
     const rp = qs('#right-pane');
     qs('#district-header', rp).innerText = "";
@@ -112,17 +118,21 @@ function ea_timeline_filter_valued_polygons() {
   const b = DST['boundaries'];
   datasets.unshift(b);
 
-  function m(d,r) {
-    let c;
-    if (d.datatype.match("polygons-(timeline)"))
-      c = TIMELINE_DATES.slice(0).reverse().find(x => parseInt(r[x]) > 0);
-    else if (d.datatype.match("polygons-(fixed|boundaries)"))
-      c = d.config.column;
+  function matches(d) {
+    return d.csv.data
+      .filter(r => {
+        let c;
+        if (d.datatype.match("polygons-(timeline)"))
+          c = TIMELINE_DATES.slice(0).reverse().find(x => parseInt(r[x]) > 0);
+        else if (d.datatype.match("polygons-(fixed|boundaries)"))
+          c = d.config.column;
 
-    return +r[c] >= d._domain[0] && +r[c] <= d._domain[1];
+        return +r[c] >= d._domain[0] && +r[c] <= d._domain[1];
+      })
+      .map(r => +r[d.csv.key]);
   };
 
-  const arr = datasets.map(d => d.csv.data.filter(r => m(d,r)).map(r => +r[d.csv.key]));
+  const arr = datasets.filter(d => d.csv.data).map(matches);
   const result = arr[0].filter(e => arr.every(a => a.includes(e)));
 
   const source = MAPBOX.getSource('filtered-source');

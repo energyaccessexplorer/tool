@@ -41,7 +41,7 @@ class Overlord {
 
       O.datasets = arr;
 
-      ea_timeline_lines_update(arr)
+      ea_timeline_lines_update();
       break;
 
     case "mutate":
@@ -426,8 +426,10 @@ function ea_overlord_map_click(e) {
       if (!et) return;
 
       if (et.source === i) {
-        const datasets = DS.list.filter(d => d.on && d.datatype === 'polygons-timeline');
-        ea_timeline_lines_draw(datasets, (U.subgeoname = et.properties['District']));
+        U.subgeoname = et.properties['District'];
+
+        ea_timeline_lines_draw();
+
       }
     }
   }
@@ -475,9 +477,13 @@ const UProxyHandler = {
 
     case "subgeo":
     case "subgeoname":
-    case "inputs":
     case "pack": {
       o.url.searchParams.set(t,v);
+      break;
+    }
+
+    case "inputs": {
+      o.url.searchParams.set(t, [...new Set(v)]);
       break;
     }
 

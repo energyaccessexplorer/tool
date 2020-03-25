@@ -213,3 +213,27 @@ function mapbox_fit(bounds, animate = false) {
 
   return [[l,u], [r,u], [r,d], [l,d]];
 };
+
+function mapbox_dblclick(id) {
+  MAPBOX.on('dblclick', id, function(e) {
+    if (e.features.length > 0) {
+      mapbox_fit(geojsonExtent(e.features[0]), true);
+      MAPBOX.changing_target = true;
+      O.subgeo = e.features[0].id;
+    }
+  });
+};
+
+function mapbox_zoomend(id) {
+  let _zoom;
+
+  MAPBOX.on('zoomend', id, function(e) {
+    const z = MAPBOX.getZoom();
+
+    if (!MAPBOX.changing_target)
+      if (_zoom > z && U.subgeo) O.subgeo = null;
+
+    MAPBOX.changing_target = false;
+    _zoom = z;
+  });
+};

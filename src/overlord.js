@@ -270,6 +270,9 @@ function ea_overlord_special_layers() {
         "fill-opacity": [ "case", [ "boolean", [ "get", "__hidden" ], false ], 0, 1 ]
       },
     }, MAPBOX.first_symbol);
+
+    mapbox_dblclick('filtered-layer');
+    mapbox_zoomend('filtered-layer');
   }
 };
 

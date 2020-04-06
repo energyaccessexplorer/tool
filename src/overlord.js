@@ -91,12 +91,12 @@ class Overlord {
   set subgeo(t) {
     if (!t) {
       U.subgeo = '';
-      O.dataset(DST['boundaries'], 'domain', DST['boundaries'].domain);
+      O.dataset('boundaries', 'domain', DST['boundaries'].domain);
       return;
     }
 
     U.subgeo = t;
-    O.dataset(DST['boundaries'], 'domain', [t, t]);
+    O.dataset('boundaries', 'domain', [t, t]);
   };
 
   map(interaction, event) {
@@ -109,7 +109,7 @@ class Overlord {
   };
 }
 
-async function ea_init(callback) {
+async function ea_init() {
   const url = new URL(location);
   const id = url.searchParams.get('id');
 
@@ -127,7 +127,8 @@ async function ea_init(callback) {
 
   MAPBOX = ea_mapbox();
 
-  callback(url, ea_params[params]);
+  U = new Proxy({ url: url, params: ea_params[params] }, UProxyHandler);
+  O = new Overlord();
 
   await ea_datasets_init(GEOGRAPHY.id, U.inputs, U.pack, bounds => {
     MAPBOX.coords = mapbox_fit(bounds);

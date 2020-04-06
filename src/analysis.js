@@ -83,9 +83,9 @@ function ea_analysis(type) {
 
   let nr = list.find(l => !maybe(l, 'raster', 'data'));
   if (nr) {
-    console.warn(`Dataset '${nr.id}' has no raster.data (yet).`,
-                 "Skipping this analysis since I suspect a race condition.",
-                 "Telling O to wait for it...");
+    warn(`Dataset '${nr.id}' has no raster.data (yet).`,
+         "Skipping this analysis since I suspect a race condition.",
+         "Telling O to wait for it...");
 
     O.wait_for(
       _ => nr.raster.data,
@@ -204,9 +204,9 @@ async function ea_plot_active_analysis(type, cs = 'ea') {
   const index = ea_indexes[type];
 
   if (!type || !index) {
-    console.warn("ea_plot_active_analysis: Too early...",
-                 "This is an initialisation bug.",
-                 "Index type:", type);
+    warn("ea_plot_active_analysis: Too early...",
+         "This is an initialisation bug.",
+         "Index type:", type);
 
     return raster;
   }

@@ -135,11 +135,6 @@ async function ea_init() {
     mapbox_change_theme(ea_settings.mapbox_theme);
   });
 
-  O.datasets = DS.list
-    .filter(d => d.on && !d.disabled)
-    .map(d => d.id)
-    .sort((x,y) => (U.inputs.indexOf(x) < U.inputs.indexOf(y)) ? -1 : 1);
-
   O.index = U.output;
 
   ea_cards_init();

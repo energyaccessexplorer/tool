@@ -1,6 +1,10 @@
 async function ea_timeline_init() {
   await until(_ => GEOGRAPHY.timeline_dates.length > 0);
 
+  O.dataset('boundaries', 'active', true);
+  U.subgeoname = "";
+  U.subgeo = "";
+
   const steps = GEOGRAPHY.timeline_dates.map(x => parseInt(x.replace('(^[0-9]{4}-)', '\1')));
 
   const parent = qs('#timeline');
@@ -123,7 +127,7 @@ function ea_timeline_filter_valued_polygons() {
       .filter(r => {
         let c;
         if (d.datatype.match("polygons-(timeline)"))
-          c = GEOGRAPHY.timeline_dates.slice(0).reverse().find(x => parseInt(r[x]) > 0);
+          c = GEOGRAPHY.timeline_dates.slice(0).reverse().find(x => +r[x] > 0);
         else if (d.datatype.match("polygons-(fixed|boundaries)"))
           c = d.config.column;
 

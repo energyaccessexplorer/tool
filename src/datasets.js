@@ -431,14 +431,14 @@ class DS {
     this.on = v;
 
     if (v) {
-      if (draw) this.raise();
-
       if (this.controls) {
         this.controls.loading(true);
         await this.load();
         this.controls.loading(false);
       }
       else await this.load();
+
+      if (draw) this.raise();
     }
 
     if (this.items) {
@@ -478,8 +478,10 @@ class DS {
   };
 
   async raise() {
-    if (this.layer)
+    if (this.layer) {
+      await until(_ => MAPBOX.getLayer(this.id));
       MAPBOX.moveLayer(this.id, MAPBOX.first_symbol);
+    }
 
     if (this.items) {
       for (let d of this.items) d.raise();
@@ -861,8 +863,6 @@ async function ea_datasets_polygons_csv(col) {
     s = x => (null === x || undefined === x || x === "") ? "rgba(155,155,155,1)" : l(+x);
 
     this.csv.scale = l;
-  } else {
-    s = x => (null === x || undefined === x || x === "") ? "rgba(155,155,155,1)" : 'rgba(255,255,255,0.8)';
   }
 
   if (!data) {
@@ -873,12 +873,7 @@ async function ea_datasets_polygons_csv(col) {
   const fs = this.vectors.features.features;
   for (let i = 0; i < fs.length; i += 1) {
     let row = data.find(r => +r[this.csv.key] === +fs[i].properties[this.vectors.key]);
-
-    if (!row) {
-      warn(`${this.id} NO ROW!`, i, this.csv.key, this.vectors.key, data);
-      continue;
-    }
-    fs[i].properties.__color = s(row[col]);
+    fs[i].properties.__color = (this.colorscale && row) ? s(row[col]) : "white";
   }
 
   this.update_source(this.vectors.features);

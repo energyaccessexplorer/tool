@@ -26,11 +26,6 @@ function ea_cards() {
   if (!empty) sortable('#cards-list', 'enable');
 };
 
-async function ea_cards_sort(list) {
-  for (let i of list.slice(0).reverse())
-    await DST[i].raise();
-};
-
 class dscard extends HTMLElement {
   constructor(d) {
     if (!(d instanceof DS)) throw Error(`dscard: Expected a DS. Got ${d}.`);

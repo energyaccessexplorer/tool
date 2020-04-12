@@ -592,26 +592,38 @@ function ea_svg_multiline(opts) {
         .domain(d3.extent(data.dates))
         .range([margin.left, width - margin.right]);
 
-  const y = d3.scaleLinear()
-        .domain(domain || [d3.min(data.series, d => d3.min(d.values)), d3.max(data.series, d => d3.max(d.values))]).nice()
-        .range([height - margin.bottom, margin.top]);
-
   const xAxis = g => g
         .attr("transform", `translate(0,${height - margin.bottom})`)
         .call(d3.axisBottom(x).ticks(width / 80).tickSizeOuter(0));
 
+  const y = d3.scaleLinear()
+        .range([height - margin.bottom, margin.top])
+        .nice();
+
+  let active_series;
+
+  const line = function(i) {
+    y.domain([
+      d3.min(data.series[i].values),
+      d3.max(data.series[i].values)
+    ]);
+
+    return d3.line()
+      .defined(d => !isNaN(d))
+      .x((d,j) => x(data.dates[j]))
+      .y(d => y(d));
+  };
+
   const yAxis = g => g
         .attr("transform", `translate(${margin.left},0)`)
-        .call(d3.axisLeft(y))
-        .call(g => g.select(".domain").remove());
-
-  const line = d3.line()
-        .defined(d => !isNaN(d))
-        .x((d, i) => x(data.dates[i]))
-        .y(d => y(d));
+        .call(d3.axisLeft(y));
 
   const dot = svg.append("g")
         .attr("display", "none");
+
+  dot.append("circle")
+    .attr("r", 5)
+    .attr("fill", 'transparent');
 
   const path = svg.append("g")
         .attr("fill", "none")
@@ -622,36 +634,29 @@ function ea_svg_multiline(opts) {
         .data(data.series)
         .join("path")
         .style("mix-blend-mode", "multiply")
+        .attr("id", (d,i) => 'line-' + i)
         .attr("stroke", d => d.color || color)
-        .attr("d", d => line(d.values));
-
-  dot.append("circle")
-    .attr("r", 2.5)
-    .attr("fill", 'transparent');
+        .attr("d", (d,i) => line(i)(d.values));
 
   svg.append("g")
     .call(xAxis);
 
-  svg.append("g")
-    .call(yAxis);
+  const yg = svg.append("g");
 
   let n;
 
-  function hover(svg, path) {
-    svg
-      .style("position", "relative");
+  function svghover(svg) {
+    svg.style("position", "relative");
 
     if ("ontouchstart" in document) {
       svg
         .style("-webkit-tap-highlight-color", "transparent")
         .on("touchmove", moved)
-        .on("touchstart", entered)
         .on("touchend", left);
     }
     else {
       svg
         .on("mousemove", moved)
-        .on("mouseenter", entered)
         .on("mouseleave", left);
     }
 
@@ -665,13 +670,16 @@ function ea_svg_multiline(opts) {
       const i = xm - data.dates[i0] > data.dates[i1] - xm ? i1 : i0;
       const s = data.series.reduce((a, b) => Math.abs(a.values[i] - ym) < Math.abs(b.values[i] - ym) ? a : b, []);
 
-      if (!(has(data.dates, i) && has(s.values,i))) return;
+      if (!(
+        active_series &&
+          has(s.values,i) &&
+          has(data.dates, i)
+      )) return;
 
-      path.attr("stroke", d => d === s ? (d.color || color) : "#ddd").filter(d => d === s).raise();
 
-      dot.attr("transform", `translate(${x(data.dates[i])},${y(s.values[i])})`);
+      dot.attr("transform", `translate(${x(data.dates[i])},${y(active_series.values[i])})`);
 
-      n ? n.remove() : null;
+      if (n) n.remove();
 
       n = nanny.pick_element(dot.node(), {
         title: s.name,
@@ -681,19 +689,59 @@ function ea_svg_multiline(opts) {
       });
     };
 
-    function entered() {
-      path.style("mix-blend-mode", null).attr("stroke", "#ddd");
-      dot.attr("display", null);
-    };
-
     function left() {
-      path.style("mix-blend-mode", "multiply").attr("stroke", d => d.color || color);
+      path
+        .attr("stroke", d => d.color || color)
+        .attr("stroke-width", strokewidth)
+        .style("mix-blend-mode", "multiply");
+
       dot.attr("display", "none");
       n ? n.remove() : null;
+
+      yg.call(x => x.selectAll(".tick").remove());
     };
   };
 
-  svg.call(hover, path);
+  function pathhover(path) {
+    if ("ontouchstart" in document) {
+      path
+        .on("touchstart", entered);
+    }
+    else {
+      path
+        .on("mouseenter", entered);
+    }
+
+    function entered() {
+      path
+        .attr("stroke", d => d.color || color)
+        .attr("stroke-width", strokewidth)
+        .style("mix-blend-mode", "multiply");
+
+      yg.call(x => x.selectAll(".tick").remove());
+
+      const j = +d3.event.target.id.replace('line-', '');
+
+      active_series = data.series[j];
+
+      path
+        .attr("stroke", (d,i) => i === j ? (d.color || color) : "#ddd")
+        .attr("stroke-width", (d,i) => i === j ? 7 : strokewidth);
+
+      y.domain([
+        d3.min(data.series[j].values),
+        d3.max(data.series[j].values)
+      ]);
+
+      dot.attr("display", null);
+
+      yg.call(yAxis);
+    };
+  };
+
+  svg.call(svghover);
+
+  path.call(pathhover);
 
   return {
     svg: svg.node()

@@ -578,6 +578,8 @@ function ea_svg_timeline_slider(opts) {
 function ea_svg_multiline(opts) {
   const {domain, range, data, color, message} = opts;
 
+  const strokewidth = 2.5;
+
   const width = opts.width || 600;
   const height = opts.height || 400;
 
@@ -613,7 +615,7 @@ function ea_svg_multiline(opts) {
 
   const path = svg.append("g")
         .attr("fill", "none")
-        .attr("stroke-width", 1.5)
+        .attr("stroke-width", strokewidth)
         .attr("stroke-linejoin", "round")
         .attr("stroke-linecap", "round")
         .selectAll("path")

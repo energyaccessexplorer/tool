@@ -42,12 +42,12 @@ class MapboxThemeControl {
     button.addEventListener('mouseup', e => mapbox_theme_control_popup(e.target.closest('button')));
 
     return this._container;
-  }
+  };
 
   onRemove() {
     this._container.parentNode.removeChild(this._container);
     this._map = undefined;
-  }
+  };
 };
 
 function ea_mapbox() {
@@ -70,7 +70,7 @@ function ea_mapbox() {
   mb.dragRotate.disable();
   mb.touchZoomRotate.disableRotation();
 
-  mb.on('mouseup', e => O.map('click', e));
+  mb.on('click', e => O.map('click', e));
 
   return mb;
 };

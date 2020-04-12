@@ -36,9 +36,6 @@ deps:
 start:
 	cd ${DIST} && ${STATIC_SERVER}
 
-watch:
-	@ WATCH_CMD="make build reload" watch-code ${SRC} ${CSS} ${VIEWS}
-
 stop:
 	@stop-port ${TOOL_PORT}
 
@@ -162,7 +159,6 @@ deploy:
 		--exclude=.git \
 		--exclude=default.mk \
 		--exclude=makefile \
-		--exclude=data \
 		${DIST}/ ${SRV_USER}@${SRV_SERVER}:${TOOL_DEST}
 
 	make reconfig env=development

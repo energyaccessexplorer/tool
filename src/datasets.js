@@ -473,8 +473,9 @@ class DS {
 
     if (!arg)
       await Promise.all(['vectors', 'csv', 'raster'].map(i => this[i] ? this.load(i) : null));
-    else
+    else {
       if (this[arg]) await this[arg].parse();
+    }
   };
 
   async raise() {
@@ -535,8 +536,8 @@ async function ea_datasets_init(id, inputs, pack, callback) {
 
       ds.on = false;
 
-      await ds.load('vectors');
       await ds.load('csv');
+      await ds.load('vectors');
       await ds.load('raster');
 
       if (!(bounds = ds.vectors.bounds)) throw `'boundaries' dataset has no vectors.bounds`;
@@ -810,8 +811,6 @@ function ea_datasets_lines() {
 function ea_datasets_polygons() {
   return ea_datasets_geojson.call(this)
     .then(async _ => {
-      const v = this.vectors;
-
       if (this.csv) {
         let col = null;
         if (this.timeline) {
@@ -839,9 +838,9 @@ function ea_datasets_polygons() {
           "visibility": "none",
         },
         "paint": {
-          "fill-color": this.datatype.match("polygons-") ? ['get', '__color'] : v.fill,
-          "fill-outline-color": v.stroke,
-          "fill-opacity": [ "case", [ "boolean", [ "get", "__hidden" ], false ], 0, 1 * v.opacity ]
+          "fill-color": this.datatype.match("polygons-") ? ['get', '__color'] : this.vectors.fill,
+          "fill-outline-color": this.vectors.stroke,
+          "fill-opacity": [ "case", [ "boolean", [ "get", "__hidden" ], false ], 0, 1 * this.vectors.opacity ]
         },
       });
     });

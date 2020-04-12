@@ -6,8 +6,10 @@ function ea_cards_init() {
     "forcePlaceholderSize": true,
     "placeholder": '<div style="margin: 1px; background-color: rgba(0,0,0,0.3);"></div>',
   })[0]
-    .addEventListener('sortupdate',
-                      e => O.datasets = e.detail.destination.items.map(i => i.getAttribute('bind')));
+    .addEventListener(
+      'sortupdate',
+      e => O.datasets = e.detail.destination.items.map(i => i.getAttribute('bind'))
+    );
 
   ea_cards();
 };

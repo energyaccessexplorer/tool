@@ -103,8 +103,11 @@ class Overlord {
   };
 
   async sort() {
-    for (let i of U.inputs.reverse())
-      await DST[i].raise();
+    const a = U.inputs.reverse();
+    await Promise.all(a.map(d => until(_ => MAPBOX.getLayer(d))));
+
+    for (let i = 0; i < a.length; i++)
+      MAPBOX.moveLayer(a[i], a[i+1] || MAPBOX.first_symbol);
   };
 
   async wait_for(func, finish) {

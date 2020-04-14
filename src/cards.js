@@ -123,7 +123,7 @@ class dscard extends HTMLElement {
       sliders: "single",
       callback2: x => o = x/100,
       end_callback: _ => {
-        let t = null;
+        let t = [];
 
         switch (this.ds.datatype) {
         case 'points': {
@@ -138,6 +138,7 @@ class dscard extends HTMLElement {
 
         case 'polygons-fixed':
         case 'polygons-timeline':
+        case 'polygons-boundaries':
         case 'polygons': {
           t = ['fill-opacity'];
           break;
@@ -149,6 +150,7 @@ class dscard extends HTMLElement {
         }
 
         default:
+          console.warn("opacity: undecided", this.ds.id, this.ds.datatype);
           break;
         }
 

@@ -22,9 +22,9 @@ VIEWS = ./views
 CSS = ./stylesheets
 LIB = ${DIST}/lib
 
-default: build
+default: build reload
 
-build: build-a build-s reload
+build: build-a build-s
 
 reload:
 	@sleep 0.3
@@ -136,6 +136,16 @@ build-s:
 
 	@cp ${SRC}/browser.js ${DIST}/s/
 
+sync:
+	@rsync -OPrv \
+		--checksum \
+		--copy-links \
+		--delete-before \
+		--exclude=.git \
+		--exclude=default.mk \
+		--exclude=makefile \
+		${DIST}/ ${SRV_USER}@${SRV_SERVER}:${TOOL_DEST}
+
 synced:
 	@rsync -OPrv \
 		--dry-run \
@@ -149,20 +159,8 @@ synced:
 		${DIST}/ ${SRV_USER}@${SRV_SERVER}:${TOOL_DEST}
 
 deploy:
-	make reconfig env=${env}
-	make build
-
-	@rsync -OPrv \
-		--checksum \
-		--copy-links \
-		--delete-before \
-		--exclude=.git \
-		--exclude=default.mk \
-		--exclude=makefile \
-		${DIST}/ ${SRV_USER}@${SRV_SERVER}:${TOOL_DEST}
-
-	make reconfig env=development
-	make build
+	make reconfig build sync env=${env}
+	make reconfig build reload env=development
 
 reconfig:
 	@echo '{}' \

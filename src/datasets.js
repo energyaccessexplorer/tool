@@ -458,6 +458,8 @@ class DS {
   };
 
   async load(arg) {
+    this.loading = true;
+
     if (this.items) {
       // Collections will (as of now) always share rasters.
       //
@@ -476,6 +478,8 @@ class DS {
     else {
       if (this[arg]) await this[arg].parse();
     }
+
+    this.loading = false;
   };
 
   async raise() {

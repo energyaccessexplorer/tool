@@ -10,8 +10,6 @@ function ea_cards_init() {
       'sortupdate',
       e => O.datasets = e.detail.destination.items.map(i => i.getAttribute('bind'))
     );
-
-  ea_cards();
 };
 
 function ea_cards() {

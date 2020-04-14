@@ -77,9 +77,7 @@ class Overlord {
 
   set view(t) {
     U.view = t;
-
-    this.layers();
-
+    O.layers();
     ea_overlord_view();
 
     ea_view_buttons();
@@ -147,16 +145,16 @@ async function ea_init() {
 
   if (MOBILE) ea_mobile_init();
 
-  ea_loading(false);
-
   ea_views_init();
   ea_indexes_init();
+
+  until(_ => DS.list.filter(d => d.on).every(d => d.loading === false)).then(O.sort);
 
   if (GEOGRAPHY.timeline) ea_timeline_init();
 
   if (!MOBILE && !GEOGRAPHY.timeline) ea_nanny_init();
 
-  O.sort(); // TODO: make this happen where all datasets are loaded...
+  ea_loading(false);
 };
 
 function ea_overlord_view() {
@@ -188,7 +186,6 @@ function ea_overlord_view() {
       MAPBOX.setLayoutProperty('output-layer', 'visibility', 'none');
 
     ea_cards(inputs);
-    O.sort();
 
     ea_plot_active_analysis(output);
     break;

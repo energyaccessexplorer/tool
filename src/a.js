@@ -6,11 +6,10 @@
 function ea_nanny_init() {
   window.ea_nanny = new nanny(ea_nanny_steps);
 
+  if (![null, "inputs"].includes(U.view)) return;
   if (U.inputs.length > 0) return;
-  if (U.view !== "inputs") return;
 
   const w = localStorage.getItem('needs-nanny');
-
   if (!w || !w.match(/false/)) ea_nanny.start();
 };
 

@@ -288,24 +288,6 @@ function ea_overlord_map_click(e) {
   const i = maybe(inputs, 0);
   let t;
 
-  function add_lnglat(td, lnglat = [0, 0]) {
-    td.append(el_tree([ce('tr'), [ce('td', "&nbsp;"), ce('td', "&nbsp;")]]));
-
-    td.append(el_tree([
-      ce('tr'), [
-        ce('td', "longitude"),
-        ce('td', ce('code', lnglat[0].toFixed(2)))
-      ]
-    ]));
-
-    td.append(el_tree([
-      ce('tr'), [
-        ce('td', "latitude"),
-        ce('td', ce('code', lnglat[1].toFixed(2)))
-      ]
-    ]));
-  };
-
   if (view === "outputs") {
     t = {
       raster: {
@@ -337,7 +319,7 @@ function ea_overlord_map_click(e) {
         "value": f(o.value)
       });
 
-      add_lnglat(td, [e.lngLat.lng, e.lngLat.lat]);
+      table_add_lnglat(td, [e.lngLat.lng, e.lngLat.lat]);
 
       mapbox_pointer(
         td,
@@ -389,7 +371,7 @@ function ea_overlord_map_click(e) {
           "value": `${vv} <code>${t.category.unit || ''}</code>`
         });
 
-        add_lnglat(td, [e.lngLat.lng, e.lngLat.lat]);
+        table_add_lnglat(td, [e.lngLat.lng, e.lngLat.lat]);
 
         mapbox_pointer(
           td,

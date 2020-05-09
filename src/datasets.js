@@ -545,6 +545,13 @@ async function ea_datasets_init(id, inputs, pack, callback) {
       await ds.load('raster');
 
       if (!(bounds = ds.vectors.bounds)) throw `'boundaries' dataset has no vectors.bounds`;
+
+      BOUNDARIES = {};
+
+      if (ds.config.column_name) {
+        for (let r of ds.csv.data)
+          BOUNDARIES[r[ds.config.column]] = r[ds.config.column_name];
+      }
     });
 
   pack = maybe(pack, 'length') ? pack : 'all';
@@ -899,36 +906,34 @@ function ea_datasets_table() {
 function ea_datasets_polygons_feature_info(et, e) {
   log("Feature Properties:", et.properties);
 
-  function add_lnglat(td, lnglat = [0, 0]) {
-    td.append(el_tree([ce('tr'), [ce('td', "&nbsp;"), ce('td', "&nbsp;")]]));
+  let at = [];
 
-    td.append(el_tree([
-      ce('tr'), [
-        ce('td', "longitude"),
-        ce('td', ce('code', lnglat[0].toFixed(2)))
-      ]
-    ]));
+  at.push({
+    "target": DST['boundaries'].config.boundaries_name || "Geography Name",
+    "dataset": "_boundaries_name",
+  });
 
-    td.append(el_tree([
-      ce('tr'), [
-        ce('td', "latitude"),
-        ce('td', ce('code', lnglat[1].toFixed(2)))
-      ]
-    ]));
-  };
+  et.properties["_boundaries_name"] = BOUNDARIES[et.properties[this.vectors.key]];
 
-  let at;
-  if (at = this.config.features_attr_map) {
-    let td = table_data(at, et.properties);
-    add_lnglat(td, [e.lngLat.lng, e.lngLat.lat]);
+  if (this.config.column) {
+    at.push({
+      "target": this.name,
+      "dataset": "_" + this.config.column,
+    });
 
-    mapbox_pointer(
-      td,
-      e.originalEvent.pageX,
-      e.originalEvent.pageY
-    );
+    et.properties["_" + this.config.column] = this.csv.table[et.properties[this.vectors.key]];
   }
-  else {
-    warn(`Dataset '${this.id}' is not configured to display info. (configuration.features_attr_map)`);
+
+  if (this.config.features_attr_map) {
+    at = at.concat(this.config.features_attr_map);
   }
+
+  let td = table_data(at, et.properties);
+  table_add_lnglat(td, [e.lngLat.lng, e.lngLat.lat]);
+
+  mapbox_pointer(
+    td,
+    e.originalEvent.pageX,
+    e.originalEvent.pageY
+  );
 };

@@ -1,15 +1,34 @@
-function table_data(dict, prop, event) {
-  const t = document.createElement('table');
+function table_data(dict, prop) {
+  const t = ce('table');
+
   dict.forEach(d => {
     t.append(el_tree([
       ce('tr'), [
         ce('td', ce('strong', d.target + ": &nbsp;")),
-        ce('td', prop[d.dataset].toString())
+        ce('td', prop[d.dataset] ? prop[d.dataset].toString() : "")
       ]
     ]));
   });
 
   return t;
+};
+
+function table_add_lnglat(td, lnglat = [0, 0]) {
+  td.append(el_tree([ce('tr'), [ce('td', "&nbsp;"), ce('td', "&nbsp;")]]));
+
+  td.append(el_tree([
+    ce('tr'), [
+      ce('td', "longitude"),
+      ce('td', ce('code', lnglat[0].toFixed(2)))
+    ]
+  ]));
+
+  td.append(el_tree([
+    ce('tr'), [
+      ce('td', "latitude"),
+      ce('td', ce('code', lnglat[1].toFixed(2)))
+    ]
+  ]));
 };
 
 async function fake_download(url, name) {

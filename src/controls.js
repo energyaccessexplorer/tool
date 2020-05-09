@@ -442,7 +442,7 @@ async function ea_controls_selectlist() {
     "order": "name.asc"
   };
 
-  const list = await ea_api("geographies", p).then(j => {
+  const list = await ea_api.get("geographies", p).then(j => {
     j.forEach(g => data[g.name] = g.name);
     return j;
   });

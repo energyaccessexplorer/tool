@@ -145,6 +145,7 @@
   <script>
     ea_modal = new modal("ea-modal", {});
     ea_flash = new flash();
+    ea_api = new pgrest(ea_settings.database, ea_flash);
     ea_init();
   </script>
 

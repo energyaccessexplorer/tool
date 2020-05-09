@@ -119,7 +119,7 @@ async function ea_init() {
   const url = new URL(location);
   const id = url.searchParams.get('id');
 
-  GEOGRAPHY = await ea_api("geographies", { "id": `eq.${id}` }, { object: true });
+  GEOGRAPHY = await ea_api.get("geographies", { "id": `eq.${id}` }, { one: true });
   GEOGRAPHY.timeline = maybe(GEOGRAPHY, 'configuration', 'timeline');
   GEOGRAPHY.timeline_dates = maybe(GEOGRAPHY, 'configuration', 'timeline_dates');
 

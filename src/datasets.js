@@ -525,7 +525,7 @@ async function ea_datasets_init(id, inputs, pack, callback) {
   let bounds;
   let boundaries_id;
 
-  await ea_api("geography_boundaries", { "geography_id": `eq.${id}` }, { object: true })
+  await ea_api.get("geography_boundaries", { "geography_id": `eq.${id}` }, { one: true })
     .then(r => boundaries_id = r.id);
 
   const bp = {
@@ -534,7 +534,7 @@ async function ea_datasets_init(id, inputs, pack, callback) {
     "df.active": "eq.true"
   };
 
-  await ea_api("datasets", bp, { object: true })
+  await ea_api.get("datasets", bp, { one: true })
     .then(async e => {
       let ds = new DS(e);
 
@@ -557,7 +557,7 @@ async function ea_datasets_init(id, inputs, pack, callback) {
     "df.active": "eq.true"
   };
 
-  await ea_api("datasets", p)
+  await ea_api.get("datasets", p)
     .then(r => r.filter(d => d.category.name !== 'boundaries'))
     .then(r => r.map(e => new DS(e, inputs.includes(e.category.name))));
 

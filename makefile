@@ -59,13 +59,13 @@ build-a:
 		${LIB}/nanny.js \
 		${LIB}/selectlist.js \
 		${LIB}/dropdown.js \
+		${LIB}/pgrest.js \
 		> ${DIST}/a/libs.js
 
 	@echo -n "const ea_settings = " | cat - \
 		settings.json \
 		${SRC}/utils.js \
 		${SRC}/shared.js \
-		${SRC}/api.js \
 		${SRC}/analysis.js \
 		${SRC}/a.js \
 		${SRC}/timeline.js \
@@ -116,11 +116,11 @@ build-s:
 		${LIB}/flash.js \
 		${LIB}/modal.js \
 		${LIB}/selectlist.js \
+		${LIB}/pgrest.js \
 		> ${DIST}/s/libs.js
 
 	@echo -n "const ea_settings = " | cat - \
 		settings.json \
-		${SRC}/api.js \
 		${SRC}/svg.js \
 		${SRC}/ui.js \
 		${SRC}/s.js \

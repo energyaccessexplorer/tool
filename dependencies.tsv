@@ -10,6 +10,7 @@ helpers.js	https://git.carajo.no/web-toolbelt/plain/helpers.js
 flash.js	https://git.carajo.no/web-toolbelt/plain/flash.js
 modal.js	https://git.carajo.no/web-toolbelt/plain/modal.js
 nanny.js	https://git.carajo.no/web-toolbelt/plain/nanny.js
+nanny.js	https://git.carajo.no/web-toolbelt/plain/pgrest.js
 selectlist.js	https://git.carajo.no/web-toolbelt/plain/selectlist.js
 jspdf.js	https://unpkg.com/jspdf@latest/dist/jspdf.min.js
 jspdf-autotable.js	https://unpkg.com/jspdf-autotable@latest/dist/jspdf.plugin.autotable.js

@@ -288,6 +288,55 @@ function ea_overlord_map_click(e) {
   const i = maybe(inputs, 0);
   let t;
 
+  function vectors_click(callback) {
+    const et = MAPBOX.queryRenderedFeatures(e.point)[0];
+    if (!et) return;
+
+    if (et.source === i) {
+      if (typeof callback === 'function') callback(et);
+
+      ea_datasets_polygons_feature_info.call(t, et, e);
+    }
+  };
+
+  function raster_click() {
+    const rc = ea_coordinates_in_raster(
+      [e.lngLat.lng, e.lngLat.lat],
+      MAPBOX.coords,
+      {
+        data: t.raster.data,
+        width: t.raster.width,
+        height: t.raster.height,
+        nodata: nodata
+      }
+    );
+
+    if (typeof maybe(rc, 'value') === 'number' &&
+        rc.value !== t.raster.nodata) {
+      const v = rc.value;
+
+      const vv = (v%1 === 0) ? v : v.toFixed(2);
+
+      const td = table_data([{
+        "target": t.name,
+        "dataset": "value"
+      }], {
+        "value": `${vv} <code>${t.category.unit || ''}</code>`
+      });
+
+      table_add_lnglat(td, [e.lngLat.lng, e.lngLat.lat]);
+
+      mapbox_pointer(
+        td,
+        e.originalEvent.pageX,
+        e.originalEvent.pageY
+      );
+    }
+    else {
+      log("No value (or nodata value) on raster.", rc);
+    }
+  };
+
   if (view === "outputs") {
     t = {
       raster: {
@@ -327,6 +376,7 @@ function ea_overlord_map_click(e) {
         e.originalEvent.pageY
       );
     }
+
     else {
       log("No value on raster.", o);
     }
@@ -337,52 +387,9 @@ function ea_overlord_map_click(e) {
 
     if (!t) return;
 
-    if (t.vectors) {
-      const et = MAPBOX.queryRenderedFeatures(e.point)[0];
-      if (!et) return;
+    if (t.vectors) vectors_click();
 
-      if (et.source === i)
-        ea_datasets_polygons_feature_info.call(t, et, e);
-
-      return;
-    }
-    else if (t.raster.data) {
-      const rc = ea_coordinates_in_raster(
-        [e.lngLat.lng, e.lngLat.lat],
-        MAPBOX.coords,
-        {
-          data: t.raster.data,
-          width: t.raster.width,
-          height: t.raster.height,
-          nodata: nodata
-        }
-      );
-
-      if (typeof maybe(rc, 'value') === 'number' &&
-          rc.value !== t.raster.nodata) {
-        v = rc.value;
-
-        const vv = (v%1 === 0) ? v : v.toFixed(2);
-
-        const td = table_data([{
-          "target": t.name,
-          "dataset": "value"
-        }], {
-          "value": `${vv} <code>${t.category.unit || ''}</code>`
-        });
-
-        table_add_lnglat(td, [e.lngLat.lng, e.lngLat.lat]);
-
-        mapbox_pointer(
-          td,
-          e.originalEvent.pageX,
-          e.originalEvent.pageY
-        );
-      }
-      else {
-        log("No value (or nodata value) on raster.", rc);
-      }
-    }
+    else if (t.raster.data) rasters_click();
   }
 
   else if (view === "timeline") {
@@ -390,16 +397,12 @@ function ea_overlord_map_click(e) {
 
     if (!t) return;
 
-    if (t.vectors) {
-      const et = MAPBOX.queryRenderedFeatures(e.point)[0];
-      if (!et) return;
+    if (t.vectors) vectors_click(p => {
+      if (p.properties['District']) U.subgeoname = p.properties['District'];
+      ea_timeline_lines_draw();
+    });
 
-      if (et.source === i) {
-        if (et.properties['District']) U.subgeoname = et.properties['District'];
-        ea_timeline_lines_draw();
-        ea_datasets_polygons_feature_info.call(t, et, e);
-      }
-    }
+    else if (t.raster.data) raster_click();
   }
 };
 

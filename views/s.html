@@ -91,10 +91,10 @@
   </body>
 
   <script>
+    ea_modal = new modal("ea-modal", {});
+    ea_flash = new flash();
+	ea_api = new pgrest(ea_settings.database, ea_flash);
     ea_select_setup();
-
-    window.ea_modal = new modal("ea-modal", {});
-    window.ea_flash = new flash();
   </script>
 
   <script src="/javascripts/gapps.js"></script>

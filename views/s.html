@@ -24,78 +24,19 @@
   </head>
 
   <body>
-    <nav>
-      <input id="toggle"
-             class="no-desktop"
-             type="checkbox">
-
-      <a href="#"
-         class="no-desktop">
-        <label for="toggle">
-          <svg style="width:24px;height:24px" viewBox="0 0 24 14">
-            <path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" />
-          </svg>&nbsp;
-        </label>
-      </a>
-
-      <a id="energy-access-link"
-         href="/">
-        Energy Access Explorer
-      </a>
-
-      <div id="navigation-links">
-        <a href="/tool/s"
-           class="toggleable">
-          Tool
-        </a>
-
-        <a href="/methodology"
-           class="toggleable">
-          Methodology
-        </a>
-
-        <a href="/about"
-           class="toggleable">
-          About
-        </a>
-
-        <a href="/get-involved"
-           class="toggleable">
-          Get Involved
-        </a>
-
-        <a href="/user-stories"
-           class="toggleable">
-          User Stories
-        </a>
-      </div>
-    </nav>
-
-    <script>
-      (function() {
-        var links = document.querySelectorAll('nav #navigation-links a');
-
-        for (var l of links) {
-          if (location.pathname.match(new RegExp(l.getAttribute('href'))))
-            l.classList.add("active");
-        }
-      })();
-    </script>
+	{{> views/nav}}
 
     <div id="playground"></div>
 
-    <div id="app-loading" class="loading">
-      <div class="spinner"></div>
-      <p>Loading data...</p>
-    </div>
+	{{> views/loading}}
   </body>
 
   <script>
     ea_modal = new modal("ea-modal", {});
     ea_flash = new flash();
-	ea_api = new pgrest(ea_settings.database, ea_flash);
+    ea_api = new pgrest(ea_settings.database, ea_flash);
     ea_select_setup();
   </script>
 
-  <script src="/javascripts/gapps.js"></script>
+  {{> views/gapps}}
 </html>

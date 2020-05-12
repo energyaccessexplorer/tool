@@ -44,7 +44,9 @@ stop:
 build-a:
 	@echo "Building a"
 	@mkdir -p ${DIST}/a
-	@cp ${VIEWS}/a.html ${DIST}/a/index.html
+
+	@mustache /dev/null ${VIEWS}/a.html > ${DIST}/a/index.html
+
 	@sed -ri 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/a/index.html
 
 	@cp ${CSS}/ripple.css ${DIST}/a/ripple.css
@@ -111,7 +113,9 @@ build-a:
 build-s:
 	@echo "Building s"
 	@mkdir -p ${DIST}/s
-	@cp ${VIEWS}/s.html ${DIST}/s/index.html
+
+	@mustache /dev/null ${VIEWS}/s.html > ${DIST}/s/index.html
+
 	@sed -ri 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/s/index.html
 
 	@cat \

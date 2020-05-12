@@ -1,0 +1,452 @@
+<template id="ds-controls-template">
+  <style>
+    @import "./ripple.css";
+
+    main {
+      background-color: var(--the-darker-white);
+      border-bottom: solid 1px #d9d9d9;
+      color: var(--the-color);
+      position: relative;
+    }
+
+    main.active {
+      background-color: white;
+    }
+
+    main.disabled {
+      color: #9ca9b5;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+
+      padding: 0.7em;
+      padding-right: 0.4em;
+
+      cursor: pointer;
+    }
+
+    [name=name] {
+      flex: 1;
+      display: block;
+      margin: auto 0.5em;
+      line-height: 1.5em;
+    }
+
+    [name=info],
+    [name=checkbox] {
+      flex: 0;
+      display: block;
+    }
+
+    [name=checkbox] {
+      margin-bottom: -4px;
+      transform: scale(0.6);
+    }
+
+    content {
+      display: none;
+      padding: 0.7em;
+    }
+
+    .manual-controls {
+      display: none;
+      justify-content: space-around;
+      border-top: solid 1px #dfdfdf;
+      padding-top: 1em;
+    }
+
+    .manual-controls input {
+      font-family: monospace;
+      width: 6em;
+    }
+
+    .advanced-controls {
+      display: none;
+      border-top: solid 1px #dfdfdf;
+      margin-top: 1em;
+      padding-top: 1em;
+    }
+
+    .weight-group,
+    .range-group {
+      display: block;
+      padding: 0.9em 1.5em 0.9em 1.5em;
+    }
+
+    .ramp {
+      font-size: 0.8em;
+    }
+
+    .unit-ramp {
+      font-weight: bold;
+      color: darkgray;
+    }
+
+    .control-option {
+      margin-left: 1.5em;
+      margin-right: 2.5em;
+      margin-bottom: 0.9em;
+    }
+
+    .collection {
+      font-size: 0.85em;
+      margin-bottom: 1em;
+      margin-top: 0;
+      color: #666;
+    }
+
+    select {
+      border: none;
+      box-sizing: content-box;
+
+      padding: 0.65em;
+
+      width: 100%;
+
+      background-color: white;
+    }
+
+    .loading {
+      position: absolute;
+      display: none;
+      background-color: rgba(0,0,0,0.15);
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 100%;
+      text-align: left;
+      z-index: 1;
+    }
+
+    .loading .spinner {
+      display: block;
+      position: relative;
+      top: 4px;
+      left: 10px;
+      border: 1px solid #333;
+      border-radius: 50%;
+      border-top: 1px solid white;
+      background-color: #D0D0D0;
+      animation: spin 2s linear infinite;
+      width: 24px;
+      height: 24px;
+      margin: 0.5em;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+
+  <main>
+    <div class="loading"><div class="spinner"></div></div>
+
+    <header ripple>
+      <slot name="checkbox"></slot>
+      <slot name="name"></slot>
+      <slot name="dropdown"></slot>
+    </header>
+
+    <content>
+      <div class="group">
+        <slot name="collection-list"></slot>
+        <slot name="mutant-options"></slot>
+      </div>
+
+      <div class="group range-group">
+        <slot name="range-slider"></slot>
+      </div>
+
+      <div class="group manual-controls">
+        min: <input type="number" bind="min">
+        max: <input type="number" bind="max">
+      </div>
+
+      <div class="advanced-controls">
+        <div class="group weight-group">
+          <slot name="weight-slider"></slot>
+        </div>
+      </div>
+    </content>
+  </main>
+</template>
+
+<template id="ds-card-template">
+  <style>
+    @import "./svg.css";
+
+    :host {
+      background-color: var(--the-white);
+      display: flex;
+
+      color: var(--the-gray);
+      fill: var(--the-gray);
+
+      line-height: 1.8em;
+      padding: 5px;
+
+      border-bottom: solid 1px #d9d9d9;
+      position: relative;
+    }
+
+    header {
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: space-between;
+
+      flex: 1;
+      user-select: none;
+    }
+
+    main {
+      display: block;
+      padding: 0.5em;
+      width: 100%;
+      color: var(--the-color);
+    }
+
+    content {
+      flex: 1;
+      display: block;
+      padding: 0.5em;
+    }
+
+    [layout=title] {
+      flex: 1;
+    }
+
+    [layout=info],
+    [layout=opacity] {
+      flex: 0 1 auto;
+      width: 24px;
+    }
+
+    [name=info] svg {
+      width: 18px;
+      margin-top: -2px;
+    }
+
+    [name=unit] {
+      display: inline-block;
+      font-weight: bold;
+      font-size: small;
+      color: gray;
+    }
+
+    [name=handle] {
+      display: block;
+      width: 24px;
+      margin-top: 10px;
+      margin-left: 5px;
+
+      fill: #aaa;
+      fill-opacity: 1;
+      stroke: none;
+
+      cursor: grab;
+      cursor: -webkit-grab;
+    }
+
+    [name=ramp] {
+      font-size: 0.8em;
+    }
+
+    .collection {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .collection div,
+    .collection svg {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .collection svg {
+      transform: scale(0.7);
+      margin-right: 0.7em;
+    }
+
+    .subheader {
+      font-size: 0.7em;
+    }
+
+    .opacity-box {
+      position: absolute;
+      top: 0px;
+      right: 0px;
+      display: none;
+      background-color: white;
+      box-shadow: 0 20px 30px 0 rgba(0,0,0,0.2);
+      padding: 16px;
+      padding-bottom: 4px;
+      z-index: 1;
+    }
+  </style>
+
+  <slot name="handle"></slot>
+
+  <main>
+    <header>
+      <div layout="title">
+        <slot name="name"></slot>
+        <slot name="unit"></slot>
+      </div>
+
+      <div layout="opacity">
+        <slot name="opacity"></slot>
+      </div>
+
+      <div layout="info">
+        <slot name="info"></slot>
+      </div>
+    </header>
+
+    <content>
+      <slot name="svg"></slot>
+      <slot name="ramp"></slot>
+    </content>
+  </main>
+</template>
+
+<template id="ds-info-modal">
+  <div style="display:flex; flex-flow: row nowrap;">
+    <div class="left" style="flex: 1;">
+      <section bind-cond="description">
+        <h3>Description</h3><pre class="description-text" bind="description"></pre>
+      </section>
+
+      <section bind-cond="why">
+        <h3>Why is this dataset used?</h3><pre class="description-text" bind="why"></pre>
+      </section>
+
+      <section bind-cond="suggested_citation">
+        <h3>Suggested Citation</h3><pre class="description-text" bind="suggested_citation"></pre>
+      </section>
+
+      <section bind-cond="cautions">
+        <h3>Cautions</h3><pre class="description-text" bind="cautions"></pre>
+      </section>
+    </div>
+
+    <div class="right" style="flex: 0 300px; padding-left: 3em;">
+      <section>
+        <a class="download-link" id="metadata-sources" target="_blank">Download from Source</a>
+      </section>
+
+      <section>
+        <a class="download-link" id="learn-more" target="_blank">Learn More</a>
+      </section>
+
+      <section bind-cond="sources">
+        <h3>Sources</h3>
+        <pre class="description-text" bind="sources"></pre>
+      </section>
+
+      <section bind-cond="spatial_resolution">
+        <h3>Spatial Resolution</h3>
+        <span bind="spatial_resolution"></span>
+      </section>
+
+      <section bind-cond="license">
+        <h3>License</h3>
+        <span bind="license"></span>
+      </section>
+
+      <section bind-cond="content_date">
+        <h3>Date of Content</h3>
+        <span bind="content_date"></span>
+      </section>
+    </div>
+  </div>
+</template>
+
+<template id="opacity-control">
+  <div>
+    <svg width="14px" height="14px" viewBox="0 0 14 14">
+      <path d="m 11,2.97011 v 6.05978 c -0.273319,0.48764 -0.610587,0.93247 -1,1.32235 V 1.64776 c 0.389413,0.38988 0.726681,0.83471 1,1.32235 z M 8,0.3303 V 11.6697 C 7.679203,11.79624 7.344927,11.89473 7,11.96227 V 0.03773 C 7.344927,0.10523 7.679203,0.20376 8,0.3303 Z M 5,12 C 2.169158,11.55685 0,9.03932 0,6 0,2.96068 2.169158,0.44315 5,0 Z" fill="#393f44" />
+    </svg>
+
+    <div class="opacity-box">
+      <div class="slider"></div>
+    </div>
+  </div>
+</template>
+
+<template id="ramp">
+  <div style="display: flex;
+              font-size: 0.8em;
+              flex-flow: row nowrap;
+              justify-content: space-between;">
+  </div>
+</template>
+
+<template id="country-overview">
+  <div class="country-overview">
+    <section>
+      <strong>Population:</strong> <span bind="population"></span> million
+    </section>
+
+    <section>
+      <strong>&nbsp;&nbsp;&nbsp;&nbsp; Urban:</strong> <span bind="urban_population"></span>%
+    </section>
+
+    <section>
+      <strong>&nbsp;&nbsp;&nbsp;&nbsp; Rural:</strong> <span bind="rural_population"></span>%
+    </section>
+
+    <section>
+      <strong>Area:</strong> <span bind="area"></span> km<sup>2</sup>
+    </section>
+
+    <section>
+      <strong>GDP per capita:</strong> USD <span bind="gdp_percapita"></span>
+    </section>
+
+    <section>
+      <strong>Electrification Rate:</strong> <span bind="electrification"></span>%
+    </section>
+
+    <section>
+      <div style="display: flex; justify-content: space-around;
+                  text-align: center;
+                  text-transform: uppercase;
+                  color: var(--the-green);">
+        <strong style="margin: 0.5em;">Urban</strong>
+        <strong style="margin: 0.5em;">Rural</strong>
+      </div>
+
+      <div style="display: flex; justify-content: space-around;
+                  margin-bottom: 30px;">
+        <div style="display: flex; justify-content: space-around; width: 240px; padding: 0 1em;
+                    border-right: 1px solid lightgray;">
+          <span class="small">
+            Electrified:&nbsp; <strong><span bind="urban_electrification"></span>%</strong>
+          </span>
+
+          <span bind="urban_electrification_pie"></span>
+        </div>
+
+        <div style="display: flex; justify-content: space-around; width: 240px; padding: 0 1em;">
+          <span class="small">
+            Electrified:&nbsp; <strong><span bind="rural_electrification"></span>%</strong>
+          </span>
+
+          <span bind="rural_electrification_pie"></span>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <strong>Energy intensity level of primary energy (MJ/$2011 PPP GDP):</strong> <span bind="primary_intensity"></span>
+    </section>
+
+    <section>
+      <strong>Power outages in firms in a typical month:</strong> <span bind="outages_average"></span>
+    </section>
+  </div>
+</template>

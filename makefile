@@ -22,6 +22,8 @@ VIEWS = ./views
 CSS = ./stylesheets
 LIB = ${DIST}/lib
 
+TIMESTAMP != date -u +'%Y-%m-%d--%T'
+
 default: build reload
 
 build: build-a build-s
@@ -43,6 +45,8 @@ build-a:
 	@echo "Building a"
 	@mkdir -p ${DIST}/a
 	@cp ${VIEWS}/a.html ${DIST}/a/index.html
+	@sed -ri 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/a/index.html
+
 	@cp ${CSS}/ripple.css ${DIST}/a/ripple.css
 	@cp ${CSS}/svg.css ${DIST}/a/svg.css
 
@@ -108,6 +112,7 @@ build-s:
 	@echo "Building s"
 	@mkdir -p ${DIST}/s
 	@cp ${VIEWS}/s.html ${DIST}/s/index.html
+	@sed -ri 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/s/index.html
 
 	@cat \
 		${LIB}/d3.js \

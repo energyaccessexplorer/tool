@@ -389,7 +389,7 @@ function ea_overlord_map_click(e) {
 
     if (t.vectors) vectors_click();
 
-    else if (t.raster.data) rasters_click();
+    else if (t.raster.data) raster_click();
   }
 
   else if (view === "timeline") {

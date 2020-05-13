@@ -908,12 +908,15 @@ function ea_datasets_polygons_feature_info(et, e) {
 
   let at = [];
 
-  at.push({
-    "target": DST['boundaries'].config.boundaries_name || "Geography Name",
-    "dataset": "_boundaries_name",
-  });
+  if (this.category.name === 'boundaries' ||
+      this.category.name.match(/^indicator/)) {
+    at.push({
+      "target": DST['boundaries'].config.boundaries_name || "Geography Name",
+      "dataset": "_boundaries_name",
+    });
 
-  et.properties["_boundaries_name"] = BOUNDARIES[et.properties[this.vectors.key]];
+    et.properties["_boundaries_name"] = BOUNDARIES[et.properties[this.vectors.key]];
+  }
 
   if (this.config.column) {
     at.push({

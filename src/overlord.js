@@ -133,6 +133,8 @@ async function ea_init() {
 
   MAPBOX = ea_mapbox();
 
+  INFOMODE = false;
+
   U = new Proxy({ url: url, params: ea_params[params] }, UProxyHandler);
   O = new Overlord();
 
@@ -295,7 +297,8 @@ function ea_overlord_map_click(e) {
     if (et.source === i) {
       if (typeof callback === 'function') callback(et);
 
-      ea_datasets_polygons_feature_info.call(t, et, e);
+      if (INFOMODE)
+        ea_datasets_polygons_feature_info.call(t, et, e);
     }
   };
 

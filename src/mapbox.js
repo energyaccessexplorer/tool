@@ -50,6 +50,33 @@ class MapboxThemeControl {
   };
 };
 
+class MapboxInfoControl {
+  onAdd(map) {
+    this._map = map;
+    this._container = document.createElement('div');
+    this._container.className = 'mapboxgl-ctrl';
+    this._container.classList.add('mapboxgl-ctrl-group');
+
+    let button = ce('button', ce('div', tmpl('#svg-info'), { style: "transform: scale(0.75)" }), { type: 'button', class: 'mapboxgl-ctrl-icon'});
+
+    this._container.append(button);
+
+    button.addEventListener('mouseup', e => {
+      INFOMODE = !INFOMODE;
+
+      if (INFOMODE) button.classList.add('active');
+      else button.classList.remove('active');
+    });
+
+    return this._container;
+  };
+
+  onRemove() {
+    this._container.parentNode.removeChild(this._container);
+    this._map = undefined;
+  };
+};
+
 function ea_mapbox() {
   mapboxgl.accessToken = ea_settings.mapbox_token;
 
@@ -63,6 +90,7 @@ function ea_mapbox() {
   mb.addControl(new mapboxgl.NavigationControl({ showCompass: false }));
 
   mb.addControl((new MapboxThemeControl()), 'top-right');
+  mb.addControl((new MapboxInfoControl()), 'top-right');
 
   mb.zoomTo(mb.getZoom() * 0.95, {duration: 0});
 
@@ -216,6 +244,8 @@ function mapbox_fit(bounds, animate = false) {
 
 function mapbox_dblclick(id) {
   MAPBOX.on('dblclick', id, function(e) {
+    if (INFOMODE) return;
+
     if (e.features.length > 0) {
       mapbox_fit(geojsonExtent(e.features[0]), true);
       MAPBOX.changing_target = true;

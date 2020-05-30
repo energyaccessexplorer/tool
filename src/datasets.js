@@ -854,6 +854,9 @@ function ea_datasets_polygons() {
           "fill-opacity": [ "case", [ "boolean", [ "get", "__hidden" ], false ], 0, 1 * this.vectors.opacity ]
         },
       });
+
+      mapbox_dblclick(this.id);
+      mapbox_zoomend(this.id);
     });
 };
 

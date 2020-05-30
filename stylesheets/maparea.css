@@ -6,6 +6,10 @@ canvas.mapboxgl-canvas {
   cursor: crosshair;
 }
 
+.mapboxgl-ctrl-icon.active {
+  background-color: rgba(0,0,0,.07);
+}
+
 #coord-tooltip {
   position: absolute;
   display: none;

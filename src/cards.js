@@ -52,6 +52,7 @@ class dscard extends HTMLElement {
       "info": this.info(),
       "unit": (this.ds.category.unit && ce('span', `[${this.ds.category.unit}]`, { style: "margin-left: 1em;" })),
       "opacity": this.opacity(),
+      "close": this.close(),
       "handle": tmpl("#svg-handle"),
     });
 
@@ -103,6 +104,13 @@ class dscard extends HTMLElement {
   info() {
     const e = tmpl('#svg-info');
     e.onclick = _ => ea_dataset_modal(this.ds);
+
+    return e;
+  };
+
+  close() {
+    const e = tmpl('#svg-close');
+    e.onclick = _ => O.dataset(this.ds, 'active', false);
 
     return e;
   };

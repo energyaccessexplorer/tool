@@ -204,6 +204,7 @@
     main {
       display: block;
       padding: 0.5em;
+      padding-right: 0.3em;
       width: 100%;
       color: var(--the-color);
     }
@@ -216,9 +217,11 @@
 
     [layout=title] {
       flex: 1;
+	  margin-right: 5px
     }
 
     [layout=info],
+    [layout=close],
     [layout=opacity] {
       flex: 0 1 auto;
       width: 24px;
@@ -303,6 +306,10 @@
 
       <div layout="info">
         <slot name="info"></slot>
+      </div>
+
+      <div layout="close">
+        <slot name="close"></slot>
       </div>
     </header>
 

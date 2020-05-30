@@ -14,7 +14,7 @@
 #
 # MAPBOX_DEFAULT_THEME=mapbox/basic-v9
 #
-.include <default.mk>
+.include <env.mk>
 
 DIST = ./dist
 SRC = ./src
@@ -24,7 +24,7 @@ LIB = ${DIST}/lib
 
 TIMESTAMP != date -u +'%Y-%m-%d--%T'
 
-default: build reload
+default: reconfig build reload
 
 build: build-a build-s
 
@@ -60,7 +60,6 @@ build-a:
 		${LIB}/helpers.js \
 		${LIB}/flash.js \
 		${LIB}/modal.js \
-		${LIB}/location.js \
 		${LIB}/htmlsortable.js \
 		${LIB}/nanny.js \
 		${LIB}/selectlist.js \
@@ -153,7 +152,7 @@ sync:
 		--exclude=.git \
 		--exclude=default.mk \
 		--exclude=makefile \
-		${DIST}/ ${SRV_USER}@${SRV_SERVER}:${TOOL_DEST}
+		${DIST}/ ${WEBSITE_SRV_USER}@${WEBSITE_SRV_SERVER}:${TOOL_DEST}
 
 synced:
 	@rsync -OPrv \
@@ -165,7 +164,7 @@ synced:
 		--exclude=.git \
 		--exclude=default.mk \
 		--exclude=makefile \
-		${DIST}/ ${SRV_USER}@${SRV_SERVER}:${TOOL_DEST}
+		${DIST}/ ${WEBSITE_SRV_USER}@${SRV_SERVER}:${TOOL_DEST}
 
 deploy:
 	make reconfig build sync env=${env}
@@ -177,5 +176,7 @@ reconfig:
 		| jq '.mapbox_token = ${MAPBOX_TOKEN}' \
 		| jq '.mapbox_theme = ${MAPBOX_THEME}' \
 		> settings.json
+
+	@cat settings.json
 
 .include <extras.mk>

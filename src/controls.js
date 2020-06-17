@@ -487,8 +487,8 @@ function ea_controls_sort_datasets(config) {
   const controls = qs('#controls');
   const controls_elements = qsa('ds-controls', controls);
 
-  if (sort_datasets)
-    for (let id of sort_datasets.reverse()) {
+  if (maybe(sort_datasets, 'length'))
+    for (let id of sort_datasets.slice(0).reverse()) {
       for (let el of controls_elements) {
         if (el.ds.id === id)
           el.closest('.controls-container').prepend(el);
@@ -497,8 +497,8 @@ function ea_controls_sort_datasets(config) {
 
   const subbranches_elements = qsa('.controls-subbranch', controls);
 
-  if (sort_subbranches)
-    for (let subbranch of sort_subbranches.reverse()) {
+  if (maybe(sort_subbranches, 'length'))
+    for (let subbranch of sort_subbranches.slice(0).reverse()) {
       for (let el of subbranches_elements) {
         if (el.id === 'controls-subbranch-' + subbranch) el.closest('.controls-branch').prepend(el);
       }
@@ -507,8 +507,8 @@ function ea_controls_sort_datasets(config) {
   const branches_elements = qsa('.controls-branch', controls);
   const branches_tabs = qsa('.controls-branch-tab', controls);
 
-  if (sort_branches)
-    for (let branch of sort_branches.reverse()) {
+  if (maybe(sort_branches, 'length'))
+    for (let branch of sort_branches.slice(0).reverse()) {
       for (let el of branches_elements) {
         if (el.id === 'controls-branch-' + branch) {
           qs('#controls-contents').prepend(el);

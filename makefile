@@ -60,7 +60,7 @@ build-a:
 		${LIB}/helpers.js \
 		${LIB}/flash.js \
 		${LIB}/modal.js \
-		${LIB}/htmlsortable.js \
+		${LIB}/html5sortable.js \
 		${LIB}/nanny.js \
 		${LIB}/selectlist.js \
 		${LIB}/dropdown.js \

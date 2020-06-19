@@ -64,8 +64,14 @@ class MapboxInfoControl {
     button.addEventListener('mouseup', e => {
       INFOMODE = !INFOMODE;
 
-      if (INFOMODE) button.classList.add('active');
-      else button.classList.remove('active');
+      if (INFOMODE) {
+        button.classList.add('active');
+        qs('canvas.mapboxgl-canvas').style.cursor = 'crosshair';
+      }
+      else {
+        button.classList.remove('active');
+        qs('canvas.mapboxgl-canvas').style.cursor = 'auto';
+      }
     });
 
     return this._container;

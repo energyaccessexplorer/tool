@@ -303,6 +303,8 @@ function ea_overlord_map_click(e) {
   };
 
   function raster_click() {
+    if (!INFOMODE) return;
+
     const rc = ea_coordinates_in_raster(
       [e.lngLat.lng, e.lngLat.lat],
       MAPBOX.coords,
@@ -341,6 +343,8 @@ function ea_overlord_map_click(e) {
   };
 
   if (view === "outputs") {
+    if (!INFOMODE) return;
+
     t = {
       raster: {
         data: MAPBOX.getSource('output-source').raster

@@ -3,7 +3,7 @@
 }
 
 canvas.mapboxgl-canvas {
-  cursor: crosshair;
+  cursor: auto;
 }
 
 .mapboxgl-ctrl-icon.active {

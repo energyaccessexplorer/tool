@@ -1,3 +1,6 @@
+import {polygons_csv,polygons_feature_info} from './dsparse.js';
+import * as indexes from './indexes.js';
+
 class Overlord {
   layers() {
     Promise.all(U.inputs.map(id => DST.get(id).active(true, ['inputs', 'timeline'].includes(U.view))));
@@ -53,7 +56,7 @@ class Overlord {
       break;
     }
 
-    ea_overlord_view();
+    view();
   };
 
   set datasets(arr) {
@@ -66,19 +69,19 @@ class Overlord {
 
     DS.array.forEach(async d => {
       if (d.on && d.datatype === 'polygons-timeline')
-        ea_datasets_polygons_csv.call(d, t);
+        polygons_csv.call(d, t);
     })
   };
 
   set index(t) {
     U.output = t;
-    ea_plot_active_analysis(t).then(raster => ea_indexes_graphs(raster));
+    ea_plot_active_analysis(t).then(raster => indexes.graphs(raster));
   };
 
   set view(t) {
     U.view = t;
     O.layers();
-    ea_overlord_view();
+    view();
 
     ea_view_buttons();
     ea_view_right_pane();
@@ -99,7 +102,7 @@ class Overlord {
 
   map(interaction, event) {
     if (interaction === "click")
-      ea_overlord_map_click(event);
+      map_click(event);
   };
 
   async sort() {
@@ -115,7 +118,80 @@ class Overlord {
   };
 }
 
-async function ea_init() {
+/*
+ * dsinit
+ *
+ * 1. fetch the datasets list from the API
+ * 2. generate DS objects
+ * 3. initialise mutants and collections
+ *
+ * @param "id" uuid
+ * @param "inputs" string[] with DS.id's
+ * @param "pack" string ("all" ...)
+ * @param "callback" function to run with the boundaries
+ *
+ * returns DS[]
+ */
+
+async function dsinit(id, inputs, pack, callback) {
+  let select = ["*", "category:categories(*)", "df:_datasets_files(*,file:files(*))"];
+
+  let bounds;
+  let boundaries_id;
+
+  await ea_api.get("geography_boundaries", { "geography_id": `eq.${id}` }, { one: true })
+    .then(r => boundaries_id = r.id);
+
+  const bp = {
+    "id": `eq.${boundaries_id}`,
+    "select": select,
+    "df.active": "eq.true"
+  };
+
+  await ea_api.get("datasets", bp, { one: true })
+    .then(async e => {
+      let ds = new DS(e);
+
+      ds.on = false;
+
+      await ds.load('csv');
+      await ds.load('vectors');
+      await ds.load('raster');
+
+      if (!(bounds = ds.vectors.bounds)) throw `'boundaries' dataset has no vectors.bounds`;
+
+      if (ds.config.column_name) {
+        for (let r of ds.csv.data)
+          BOUNDARIES[r[ds.config.column]] = r[ds.config.column_name];
+      }
+    });
+
+  pack = maybe(pack, 'length') ? pack : 'all';
+
+  const p = {
+    "geography_id": `eq.${id}`,
+    "select": select,
+    "pack": `eq.${pack}`,
+    "online": "eq.true",
+    "df.active": "eq.true"
+  };
+
+  await ea_api.get("datasets", p)
+    .then(r => r.filter(d => d.category.name !== 'boundaries'))
+    .then(r => r.map(e => new DS(e, inputs.includes(e.category.name))));
+
+  U.params.inputs = [...new Set(DS.array.map(e => e.id))];
+
+  // We need all the datasets to be initialised _before_ setting
+  // mutant/collection attributes (order is never guaranteed)
+  //
+  DS.array.filter(d => d.mutant).forEach(d => d.mutant_init());
+  DS.array.filter(d => d.items).forEach(d => d.items_init());
+
+  callback(bounds);
+};
+
+async function init() {
   const url = new URL(location);
   const id = url.searchParams.get('id');
 
@@ -133,12 +209,10 @@ async function ea_init() {
 
   MAPBOX = ea_mapbox();
 
-  INFOMODE = false;
-
   U = new Proxy({ url: url, params: ea_params[params] }, UProxyHandler);
   O = new Overlord();
 
-  await ea_datasets_init(GEOGRAPHY.id, U.inputs, U.pack, bounds => {
+  await dsinit(GEOGRAPHY.id, U.inputs, U.pack, bounds => {
     MAPBOX.coords = mapbox_fit(bounds);
     mapbox_change_theme(ea_settings.mapbox_theme);
   });
@@ -151,7 +225,7 @@ async function ea_init() {
   if (MOBILE) ea_mobile_init();
 
   ea_views_init();
-  ea_indexes_init();
+  indexes.init();
 
   until(_ => DS.array.filter(d => d.on).every(d => d.loading === false)).then(O.sort);
 
@@ -162,19 +236,19 @@ async function ea_init() {
   ea_loading(false);
 };
 
-function ea_overlord_view() {
+function view() {
   const timeline = qs('#timeline');
 
   const {view, output, inputs} = U;
 
-  ea_overlord_special_layers();
+  special_layers();
 
   switch (view) {
   case "outputs": {
-    ea_indexes_list();
+    indexes.list();
 
     ea_plot_active_analysis(output)
-      .then(raster => ea_indexes_graphs(raster))
+      .then(raster => indexes.graphs(raster))
       .then(_ => {
         if (timeline) timeline.style.display = 'none';
 
@@ -203,7 +277,7 @@ function ea_overlord_view() {
     MAPBOX.setLayoutProperty('output-layer', 'visibility', 'none');
 
     ea_plot_active_analysis(output)
-      .then(raster => ea_indexes_graphs(raster));
+      .then(raster => indexes.graphs(raster));
 
     ea_timeline_filter_valued_polygons();
     break;
@@ -228,7 +302,7 @@ function ea_overlord_view() {
   }
 };
 
-function ea_overlord_special_layers() {
+function special_layers() {
   if (!MAPBOX.getSource('output-source')) {
     MAPBOX.addSource('output-source', {
       "type": 'canvas',
@@ -281,7 +355,7 @@ function ea_overlord_special_layers() {
   }
 };
 
-function ea_overlord_map_click(e) {
+function map_click(e) {
   const b = DST.get('boundaries');
   let nodata = b.raster.nodata;
 
@@ -298,7 +372,7 @@ function ea_overlord_map_click(e) {
       if (typeof callback === 'function') callback(et);
 
       if (INFOMODE)
-        ea_datasets_polygons_feature_info.call(t, et, e);
+        polygons_feature_info.call(t, et, e);
     }
   };
 
@@ -483,4 +557,8 @@ const UProxyHandler = {
 
     return true;
   }
+};
+
+export {
+  init
 };

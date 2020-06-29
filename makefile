@@ -51,6 +51,7 @@ build-a:
 
 	@cp ${CSS}/ripple.css ${DIST}/a/ripple.css
 	@cp ${CSS}/svg.css ${DIST}/a/svg.css
+	@cp ${SRC}/{ds,overlord,dsparse,indexes}.js ${DIST}/a/
 
 	@cat \
 		${LIB}/d3.js \
@@ -67,7 +68,7 @@ build-a:
 		${LIB}/pgrest.js \
 		> ${DIST}/a/libs.js
 
-	@echo -n "const ea_settings = " | cat - \
+	@echo -n "window.ea_settings = " | cat - \
 		settings.json \
 		${SRC}/utils.js \
 		${SRC}/shared.js \
@@ -75,13 +76,10 @@ build-a:
 		${SRC}/a.js \
 		${SRC}/timeline.js \
 		${SRC}/plot.js \
-		${SRC}/overlord.js \
 		${SRC}/svg.js \
 		${SRC}/controls.js \
 		${SRC}/ui.js \
 		${SRC}/cards.js \
-		${SRC}/indexes.js \
-		${SRC}/datasets.js \
 		${SRC}/mapbox.js \
 		${SRC}/nanny-steps.js \
 		${SRC}/report.js \

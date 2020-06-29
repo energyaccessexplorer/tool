@@ -1,37 +1,41 @@
-async function ea_indexes_graphs(raster) {
+//TODO: why does this NOT work with out the window.PIES?  'strict' mode?
+window.PIES = {
+  'population': ea_svg_pie([[0], [0], [0], [0], [0]], 70, 0, ea_analysis_colorscale.stops, null),
+  'area': ea_svg_pie([[0], [0], [0], [0], [0]], 70, 0, ea_analysis_colorscale.stops, null),
+};
+
+async function graphs(raster) {
   const t = await ea_summary_analyse(raster);
   let g;
 
   if (g = maybe(t, 'population-density')) {
-    g['distribution']
-      .forEach((x,i) => POPULATION_PIE['data'][i].push(x));
+    g['distribution'].forEach((x,i) => PIES['population']['data'][i].push(x));
 
-    POPULATION_PIE.change(1);
+    PIES['population'].change(1);
 
     qs('#population-number').innerHTML = g['total'].toLocaleString() + "&nbsp;" + "people";
 
-    g['distribution'].forEach((x,i) => POPULATION_PIE['data'][i].shift());
+    g['distribution'].forEach((x,i) => PIES['population']['data'][i].shift());
   } else {
     const pn = qs('#population-number');
     if (pn) pn.closest('.index-graphs-group').remove();
   }
 
   if (g = maybe(t, 'area')) {
-    g['distribution']
-      .forEach((x,i) => AREA_PIE['data'][i].push(x));
+    g['distribution'].forEach((x,i) => PIES['area']['data'][i].push(x));
 
-    AREA_PIE.change(1);
+    PIES['area'].change(1);
 
     qs('#area-number').innerHTML = g['total'].toLocaleString() + "&nbsp;" + "km<sup>2</sup>";
 
-    g['distribution'].forEach((x,i) => AREA_PIE['data'][i].shift());
+    g['distribution'].forEach((x,i) => PIES['area']['data'][i].shift());
   } else {
     const an = qs('#area-number');
     if (an) an.closest('.index-graphs-group').remove();
   }
 };
 
-function ea_indexes_init() {
+function init() {
   const url = new URL(location);
 
   const ramp = tmpl("#ramp");
@@ -55,7 +59,7 @@ function ea_indexes_init() {
 
   const info = qs('#index-graphs-info');
   info.append(tmpl('#svg-info'));
-  info.onclick = _ => ea_indexes_modal();
+  info.onclick = _ => indexes.modal();
 
   const download = qs('#index-graphs-download');
   download.append(tmpl('#svg-download'));
@@ -63,30 +67,27 @@ function ea_indexes_init() {
 
   const code = qs('#index-graphs-code');
   code.append(tmpl('#svg-code'));
-  code.onclick = _ => ea_indexes_current_config();
-
-  window.POPULATION_PIE = ea_svg_pie([[0], [0], [0], [0], [0]], 70, 0, ea_analysis_colorscale.stops, null);
-  window.AREA_PIE = ea_svg_pie([[0], [0], [0], [0], [0]], 70, 0, ea_analysis_colorscale.stops, null);
+  code.onclick = _ => conf();
 
   qs('#index-graphs').append(el_tree(
     [ ce('div', null, { class: 'index-graphs-container' }), [
       [ ce('div', ce('div', "Area share"), { class: 'index-graphs-group' }),
         [
           ce('div', null, { id: 'area-number', class: 'indexes-pie-label' }),
-          AREA_PIE.svg
+          PIES['area'].svg
         ]
       ],
       [ ce('div', ce('div', "Population share"), { class: 'index-graphs-group' }),
         [
           ce('div', null, { id: 'population-number', class: 'indexes-pie-label' }),
-          POPULATION_PIE.svg
+          PIES['population'].svg
         ]
       ]
     ]]
   ), scale);
 };
 
-function ea_indexes_list() {
+function list() {
   const nodes = [];
 
   const indexes_list = qs('#indexes-list');
@@ -110,7 +111,7 @@ function ea_indexes_list() {
 
     let e = document.createEvent('HTMLEvents');
 
-    for (n of nodes) {
+    for (let n of nodes) {
       qs('.radio svg', n).dispatchEvent(new Event((this === n) ? "select" : "unselect"));
     }
 
@@ -131,7 +132,7 @@ function ea_indexes_list() {
   }
 };
 
-function ea_indexes_modal() {
+function modal() {
   const c = ce('div');
 
   for (let i in ea_indexes) {
@@ -154,7 +155,7 @@ function ea_indexes_modal() {
   }).show();
 };
 
-function ea_indexes_current_config() {
+function conf() {
   const config = {
     geography_id: GEOGRAPHY.id,
     analysis_type: U.output,
@@ -178,4 +179,11 @@ function ea_indexes_current_config() {
   fake_download(URL.createObjectURL(blob), `energyaccessexplorer-${U.output}.json`);
 
   return config;
+};
+
+export {
+  init,
+  list,
+  modal,
+  graphs,
 };

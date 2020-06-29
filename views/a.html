@@ -95,11 +95,35 @@
 	{{> views/loading}}
   </body>
 
-  <script>
-    ea_modal = new modal("ea-modal", {});
-    ea_flash = new flash();
-    ea_api = new pgrest(ea_settings.database, ea_flash);
-    ea_init();
+  <script type="module">
+	import * as overlord from './overlord.js?v=--TIMESTAMP--';
+	import * as parse from './dsparse.js?v=--TIMESTAMP--';
+	import * as indexes from './indexes.js?v=--TIMESTAMP--';
+	import './ds.js';
+
+    window.ea_modal = new modal("ea-modal", {});
+    window.ea_flash = new flash();
+    window.ea_api = new pgrest(ea_settings.database, ea_flash);
+
+	window.GEOGRAPHY = null;
+	window.MAPBOX = null;
+	window.INFOMODE = false;
+	window.MOBILE = false;
+	window.BOUNDARIES = {};
+	window.O = null;
+	window.U = null;
+	window.DST = new Map();
+
+	// These should not exist. WIP.
+	window.ea_datasets_csv = parse.csv;
+	window.ea_datasets_points = parse.points;
+	window.ea_datasets_lines = parse.lines;
+	window.ea_datasets_polygons = parse.polygons;
+	window.ea_datasets_tiff = parse.tiff;
+	window.ea_datasets_parse_fail = parse.parse_fail;
+	window.ea_indexes_graphs = indexes.graphs;
+
+	overlord.init();
   </script>
 
   {{> views/templates}}

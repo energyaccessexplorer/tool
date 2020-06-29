@@ -1,10 +1,6 @@
 async function ea_timeline_init() {
   await until(_ => GEOGRAPHY.timeline_dates.length > 0);
 
-  O.dataset('boundaries', 'active', true);
-  U.subgeoname = "";
-  U.subgeo = "";
-
   const steps = GEOGRAPHY.timeline_dates.map(x => parseInt(x.replace('(^[0-9]{4}-)', '\1')));
 
   const parent = qs('#timeline');

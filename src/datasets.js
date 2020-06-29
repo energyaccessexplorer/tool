@@ -672,7 +672,7 @@ function ea_datasets_tiff() {
 
   let t;
   if (maybe(this.raster, 'data')) {
-    t = new Promise((res, rej) => res());
+    t = Whatever;
   }
 
   else {
@@ -690,7 +690,7 @@ function ea_datasets_tiff() {
 
 function ea_datasets_geojson() {
   if (this.vectors.features)
-    return new Promise((res, rej) => res());
+    return Whatever;
 
   return fetch(this.vectors.endpoint)
     .catch(err => ea_datasets_fail.call(this, "GEOJSON"))
@@ -824,6 +824,7 @@ function ea_datasets_polygons() {
     .then(async _ => {
       if (this.csv) {
         let col = null;
+
         if (this.timeline) {
           await ea_timeline_datasets_polygons_csv.call(this);
           col = U.timeline;

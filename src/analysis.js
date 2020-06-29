@@ -1,16 +1,11 @@
 /*
  * ea_analysis
  *
- * Given a list of DS's, their weights, domains and scaling functions; create a
- * new DS whose raster is a "normalised weighted average".
+ * @param "type" string. That can be one of:
+ *   - ID of a dataset
+ *   - index name
  *
- * @param "list" []DS. List of datasets to be processed.
- *
- * @param "type" string. That can be:
- *   - ID of a dataset, or
- *   - an index name
- *
- * returns DS to be plotted onto a canvas
+ * returns a raster (FloatArray) to be plotted onto a canvas.
  */
 
 function ea_analysis(type) {
@@ -157,6 +152,19 @@ function ea_analysis(type) {
   return it;
 };
 
+/*
+ * ea_analysis_datasets
+ *
+ * Select from DS collection datasets that are elegible for being part of an
+ * analysis. Then, sort them to minimise calculation time.
+ *
+ * @param "type" string. That can be:
+ *   - ID of a dataset, or
+ *   - an index name
+ *
+ * returns DS to be plotted onto a canvas
+ */
+
 function ea_analysis_datasets(type) {
   return DS.array
     .filter(d => {
@@ -193,11 +201,12 @@ function ea_analysis_datasets(type) {
  *
  * Utility.
  *
- * @param "type" string. ID or index name.
- * @param "cs" string. Default color_theme to 'ea'.
+ * @param "type" string. That can be:
+ *   - ID of a dataset, or
+ *   - an index name
  */
 
-async function ea_plot_active_analysis(type, cs = 'ea') {
+async function ea_plot_active_analysis(type) {
   const raster = ea_analysis(type);
   ea_plot_outputcanvas(raster);
 

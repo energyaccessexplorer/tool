@@ -935,6 +935,8 @@ function ea_datasets_polygons_feature_info(et, e) {
     at = at.concat(this.config.features_attr_map);
   }
 
+  at = at.filter(x => x['dataset'] !== "_OBJECTID");
+
   let td = table_data(at, et.properties);
   table_add_lnglat(td, [e.lngLat.lng, e.lngLat.lat]);
 

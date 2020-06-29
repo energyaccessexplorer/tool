@@ -331,7 +331,7 @@ async function ea_controls_mutant_options() {
   select.value = this.host.id;
 
   select.onchange = async e => {
-    const host = DST[e.target.value];
+    const host = DST.get(e.target.value);
 
     await this.mutate(host);
 

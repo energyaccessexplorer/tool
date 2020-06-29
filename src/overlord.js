@@ -1,6 +1,6 @@
 class Overlord {
   layers() {
-    Promise.all(U.inputs.map(id => DST[id].active(true, ['inputs', 'timeline'].includes(U.view))));
+    Promise.all(U.inputs.map(id => DST.get(id).active(true, ['inputs', 'timeline'].includes(U.view))));
   };
 
   dataset(_ds, arg, data) {
@@ -12,7 +12,7 @@ class Overlord {
       break;
 
     case "String":
-      ds = DST[_ds];
+      ds = DST.get(_ds);
       break;
 
     default:
@@ -64,7 +64,7 @@ class Overlord {
   set timeline(t) {
     U.timeline = t;
 
-    DS.list.forEach(async d => {
+    DS.array.forEach(async d => {
       if (d.on && d.datatype === 'polygons-timeline')
         ea_datasets_polygons_csv.call(d, t);
     })
@@ -89,7 +89,7 @@ class Overlord {
   set subgeo(t) {
     if (!t) {
       U.subgeo = '';
-      O.dataset('boundaries', 'domain', DST['boundaries'].domain);
+      O.dataset('boundaries', 'domain', DST.get('boundaries').domain);
       return;
     }
 
@@ -153,7 +153,7 @@ async function ea_init() {
   ea_views_init();
   ea_indexes_init();
 
-  until(_ => DS.list.filter(d => d.on).every(d => d.loading === false)).then(O.sort);
+  until(_ => DS.array.filter(d => d.on).every(d => d.loading === false)).then(O.sort);
 
   if (GEOGRAPHY.timeline) ea_timeline_init();
 
@@ -257,7 +257,7 @@ function ea_overlord_special_layers() {
   if (!MAPBOX.getSource('filtered-source')) {
     MAPBOX.addSource('filtered-source', {
       "type": 'geojson',
-      "data": DST['boundaries'].vectors.features
+      "data": DST.get('boundaries').vectors.features
     });
   }
 
@@ -282,7 +282,7 @@ function ea_overlord_special_layers() {
 };
 
 function ea_overlord_map_click(e) {
-  const b = DST['boundaries'];
+  const b = DST.get('boundaries');
   let nodata = b.raster.nodata;
 
   const {view, inputs, output} = U;
@@ -390,7 +390,7 @@ function ea_overlord_map_click(e) {
   }
 
   else if (view === "inputs") {
-    t  = DST[i];
+    t  = DST.get(i);
 
     if (!t) return;
 
@@ -400,7 +400,7 @@ function ea_overlord_map_click(e) {
   }
 
   else if (view === "timeline") {
-    t  = DST[i];
+    t  = DST.get(i);
 
     if (!t) return;
 

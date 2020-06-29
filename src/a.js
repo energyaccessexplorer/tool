@@ -20,7 +20,7 @@ function ea_nanny_force_start() {
     view: 'inputs'
   };
 
-  DS.list.filter(d => d.on).forEach(d => d.active(false, false));
+  DS.array.filter(d => d.on).forEach(d => d.active(false, false));
 
   O.view = 'inputs';
   ea_controls_select_tab(qs('#controls-tab-census'), "census");

@@ -162,7 +162,7 @@ function ea_indexes_current_config() {
   };
 
   for (let i of U.inputs) {
-    let d = DST[i];
+    let d = DST.get(i);
     let c = {};
 
     c.id = d.dataset_id;

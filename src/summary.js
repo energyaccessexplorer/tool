@@ -9,7 +9,7 @@
  */
 
 async function ea_summary() {
-  const pop = DST['population-density'];
+  const pop = DST.get('population-density');
   await pop.load('raster');
   const p = pop.raster.data;
 
@@ -140,11 +140,11 @@ async function ea_summary() {
 };
 
 async function ea_summary_analyse(raster) {
-  let ds = DST['population-density'];
+  let ds = DST.get('population-density');
 
   if (!ds) {
     warn("No 'population-density' dataset present... Will use boundaries");
-    ds = DST['boundaries'];
+    ds = DST.get('boundaries');
   }
 
   await ds.load('raster');

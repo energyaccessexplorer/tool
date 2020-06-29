@@ -25,7 +25,7 @@ async function ea_timeline_init() {
 };
 
 function ea_timeline_lines_draw() {
-  const datasets = DS.list.filter(d => d.on && d.datatype === 'polygons-timeline');
+  const datasets = DS.array.filter(d => d.on && d.datatype === 'polygons-timeline');
 
   if (!datasets.length) return;
 
@@ -89,7 +89,7 @@ function ea_timeline_lines_draw() {
 async function ea_timeline_lines_update() {
   if (!GEOGRAPHY.timeline) return;
 
-  const datasets = DS.list.filter(d => d.on && d.datatype === 'polygons-timeline');
+  const datasets = DS.array.filter(d => d.on && d.datatype === 'polygons-timeline');
 
   if (datasets.length) {
     await Promise.all(datasets.map(d => until(_ => d.csv.data)));
@@ -117,9 +117,9 @@ function ea_timeline_filter_valued_polygons() {
   const ul = qs('#filtered-subgeographies');
   ul.innerHTML = "";
 
-  const datasets = DS.list.filter(d => d.on && d.datatype.match("polygons-(fixed|timeline)"));
+  const datasets = DS.array.filter(d => d.on && d.datatype.match("polygons-(fixed|timeline)"));
 
-  const b = DST['boundaries'];
+  const b = DST.get('boundaries');
   datasets.unshift(b);
 
   function matches(d) {

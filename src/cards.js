@@ -15,7 +15,7 @@ function ea_cards_init() {
 function ea_cards() {
   const cards_list = qs('#cards-pane #cards-list');
 
-  const ldc = U.inputs.reverse().map(i => DST[i].card);
+  const ldc = U.inputs.reverse().map(i => DST.get(i).card);
   const empty = cards_list.children.length === 0;
 
   if (!empty) sortable('#cards-list', 'disable');

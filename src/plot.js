@@ -34,7 +34,7 @@ function ea_plot(opts) {
  */
 
 function ea_plot_outputcanvas(data, canvas = null) {
-  const A = DST['boundaries'];
+  const A = DST.get('boundaries');
 
   if (!data.length) {
     warn("ea_plot_outputcanvas: no raster given. Filling up with a blank (transparent) one...");

@@ -16,7 +16,7 @@
 function ea_analysis(type) {
   const t0 = performance.now();
 
-  const boundaries = DST['boundaries'];
+  const boundaries = DST.get('boundaries');
   let list = ea_analysis_datasets(type);
 
   const it = new Float32Array(list.length ? boundaries.raster.data.length: 0).fill(-1);
@@ -158,7 +158,7 @@ function ea_analysis(type) {
 };
 
 function ea_analysis_datasets(type) {
-  return DS.list
+  return DS.array
     .filter(d => {
       return d.on
         && d.raster
@@ -230,7 +230,7 @@ async function ea_plot_active_analysis(type, cs = 'ea') {
 };
 
 async function raster_to_tiff(type) {
-  const b = DST['boundaries'];
+  const b = DST.get('boundaries');
 
   const raster = await ea_analysis(type);
 

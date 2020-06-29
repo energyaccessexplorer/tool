@@ -1,3 +1,5 @@
+const DST = new Map();
+
 class DS {
   constructor(o, on) {
     this.id = o.name || o.category.name;
@@ -57,7 +59,7 @@ class DS {
       this.controls = new dscontrols(this);
     }
 
-    DST[this.id] = this;
+    DST.set(this.id, this);
   };
 
   files_setup(o) {
@@ -123,7 +125,7 @@ class DS {
 
   init() {
     if (this.timeline) {
-      const b = DST['boundaries'];
+      const b = DST.get('boundaries');
       this.vectors = JSON.parse(JSON.stringify(b.vectors));
       this.vectors.endpoint = b.vectors.endpoint;
       this.vectors.parse = x => ea_datasets_polygons.call(x || this);
@@ -253,7 +255,7 @@ class DS {
     const arr = U.inputs; arr.splice(U.inputs.indexOf(this.id), 1);
     U.inputs = arr;
 
-    delete DST[this.id];
+    DST.delete(this.id);
   };
 
   add_source(opts) {
@@ -285,7 +287,7 @@ class DS {
   }
 
   mutant_init() {
-    this.hosts = this.config.mutant_targets.map(i => DST[i]);
+    this.hosts = this.config.mutant_targets.map(i => DST.get(i));
 
     const m = this.host = this.hosts[0];
 
@@ -318,7 +320,7 @@ class DS {
 
   items_init() {
     for (let i of this.config.collection) {
-      const d = DST[i];
+      const d = DST.get(i);
       d.card = d.card || new dscard(d);
       d.collection = this;
 
@@ -497,12 +499,10 @@ class DS {
     }
   };
 
-  static get list() {
-    return Object.keys(DST).map(i => DST[i]);
+  static get array() {
+    return Array.from(DST.values());
   };
 };
-
-const DST = {};
 
 /*
  * ea_datasets_init
@@ -568,13 +568,13 @@ async function ea_datasets_init(id, inputs, pack, callback) {
     .then(r => r.filter(d => d.category.name !== 'boundaries'))
     .then(r => r.map(e => new DS(e, inputs.includes(e.category.name))));
 
-  U.params.inputs = [...new Set(DS.list.map(e => e.id))];
+  U.params.inputs = [...new Set(DS.array.map(e => e.id))];
 
   // We need all the datasets to be initialised _before_ setting
   // mutant/collection attributes (order is never guaranteed)
   //
-  DS.list.filter(d => d.mutant).forEach(d => d.mutant_init());
-  DS.list.filter(d => d.items).forEach(d => d.items_init());
+  DS.array.filter(d => d.mutant).forEach(d => d.mutant_init());
+  DS.array.filter(d => d.items).forEach(d => d.items_init());
 
   callback(bounds);
 };
@@ -914,7 +914,7 @@ function ea_datasets_polygons_feature_info(et, e) {
   if (this.category.name === 'boundaries' ||
       this.category.name.match(/^indicator/)) {
     at.push({
-      "target": DST['boundaries'].config.boundaries_name || "Geography Name",
+      "target": DST.get('boundaries').config.boundaries_name || "Geography Name",
       "dataset": "_boundaries_name",
     });
 

@@ -1,3 +1,9 @@
+import {
+  zoomend as mapbox_zoomend,
+  dblclick as mapbox_dblclick,
+  pointer as mapbox_pointer,
+} from './mapbox.js';
+
 /*
  * The following functions fetch and load the different types of data to the
  * datasets geojsons (points, lines or polygons), CSV's or rasters.

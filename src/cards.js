@@ -1,4 +1,4 @@
-function ea_cards_init() {
+function init() {
   const list = qs('#cards-pane #cards-list');
 
   sortable('#cards-list', {
@@ -12,7 +12,7 @@ function ea_cards_init() {
     );
 };
 
-function ea_cards() {
+function update() {
   const cards_list = qs('#cards-pane #cards-list');
 
   const ldc = U.inputs.reverse().map(i => DST.get(i).card);
@@ -280,3 +280,9 @@ class dscard extends HTMLElement {
 }
 
 customElements.define('ds-card', dscard);
+
+export {
+  init,
+  update,
+  dscard,
+};

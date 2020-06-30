@@ -1,3 +1,5 @@
+import {dscard} from './cards.js';
+
 class DS {
   constructor(o, on) {
     this.id = o.name || o.category.name;

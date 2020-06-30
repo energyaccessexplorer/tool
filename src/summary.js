@@ -1,5 +1,5 @@
 /*
- * ea_summary
+ * summary
  *
  * Given the current dataset selection, calculate the population impact through
  * the 'population-density' dataset on all Indexes. Draw some pie graphs and a
@@ -8,7 +8,7 @@
  * This is triggered by the "Snapshot" button.
  */
 
-async function ea_summary() {
+async function summary() {
   const pop = DST.get('population-density');
   await pop.load('raster');
   const p = pop.raster.data;
@@ -42,7 +42,7 @@ async function ea_summary() {
   async function get_summaries(idxn) {
     let raster = ea_analysis(idxn);
 
-    summary[idxn] = await ea_summary_analyse(raster);
+    summary[idxn] = await analyse(raster);
 
     let ppie = ea_svg_pie(summary[idxn]['population-density']['distribution'].map(x => [x]), 75, 0, ea_analysis_colorscale.stops, null);
     let apie = ea_svg_pie(summary[idxn]['area']['distribution'].map(x => [x]), 75, 0, ea_analysis_colorscale.stops, null);
@@ -139,7 +139,7 @@ async function ea_summary() {
   return content;
 };
 
-async function ea_summary_analyse(raster) {
+async function analyse(raster) {
   let ds = DST.get('population-density');
 
   if (!ds) {
@@ -203,19 +203,27 @@ async function ea_summary_analyse(raster) {
 };
 
 /*
- * ea_summary_wrapper
+ * wrapper
  *
  * A hack. For javascript reasons, ea_loading does not get executed in a
  * blocking manner.
  */
 
-function ea_summary_wrapper() {
+function wrapper() {
   const prom = new Promise((resolve, rej) => {
     ea_loading(true);
     setTimeout(_ => resolve("Success!"), 100);
   });
 
   prom
-    .then(ea_summary)
+    .then(summary)
     .then(_ => ea_loading(false));
+};
+
+// TODO: fix this. (it is used by the "Snapshot" button as an onclick attribute)
+//
+window.ea_summary_wrapper = wrapper;
+
+export {
+  analyse,
 };

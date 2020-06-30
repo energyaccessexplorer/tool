@@ -1,4 +1,4 @@
-resourcewatch_styles = [{
+const resourcewatch_styles = [{
   "name": "Light Basemap with no labels",
   "value": "resourcewatch/cjhqgk77j0r7h2sqw220p7imy"
 }, {
@@ -15,7 +15,7 @@ resourcewatch_styles = [{
   "value": "resourcewatch/cjgcf8qdaai1x2rn6w3j4q805"
 }];
 
-default_styles = [{
+const default_styles = [{
   "name": "Light (default)",
   "value": "mapbox/basic-v9"
 }, {
@@ -26,7 +26,7 @@ default_styles = [{
   "value": "mapbox/dark-v9"
 }];
 
-mapbox_styles = default_styles;
+const styles = default_styles;
 
 class MapboxThemeControl {
   onAdd(map) {
@@ -39,7 +39,7 @@ class MapboxThemeControl {
 
     this._container.append(button);
 
-    button.addEventListener('mouseup', e => mapbox_theme_control_popup(e.target.closest('button')));
+    button.addEventListener('mouseup', e => theme_control_popup(e.target.closest('button')));
 
     return this._container;
   };
@@ -83,14 +83,14 @@ class MapboxInfoControl {
   };
 };
 
-function ea_mapbox() {
+function init() {
   mapboxgl.accessToken = ea_settings.mapbox_token;
 
   const mb = new mapboxgl.Map({
     "container": 'mapbox-container',
     "trackResize": true,
     "preserveDrawingBuffer": true, // this allows us to get canvas.toDataURL()
-    "style": mapbox_theme_pick("")
+    "style": theme_pick("")
   });
 
   mb.addControl(new mapboxgl.NavigationControl({ showCompass: false }));
@@ -109,11 +109,11 @@ function ea_mapbox() {
   return mb;
 };
 
-function mapbox_theme_control_popup(btn) {
+function theme_control_popup(btn) {
   let x = ce('div', null, { id: 'mapbox-theme-control-popup' });
   let radios = ce('div');
 
-  for (let t of mapbox_styles) {
+  for (let t of styles) {
     let e = ce('div', null, { class: 'radio-group' });
 
     e.append(
@@ -133,7 +133,7 @@ function mapbox_theme_control_popup(btn) {
   if (current) current.setAttribute('checked', true);
 
   qsa('input[name="mapbox_theme"]', radios)
-    .forEach(e => e.addEventListener('change', _ => mapbox_change_theme(e.value)));
+    .forEach(e => e.addEventListener('change', _ => change_theme(e.value)));
 
   x.addEventListener('mouseleave', _ => x.remove());
 
@@ -153,7 +153,7 @@ padding: 16px;`;
   qs('#playground #visual').append(x);
 };
 
-function mapbox_theme_pick(theme) {
+function theme_pick(theme) {
   let t = (theme === "" ? null : theme);
 
   return (t ? `mapbox://styles/${t}` : {
@@ -169,7 +169,7 @@ function mapbox_theme_pick(theme) {
   });
 };
 
-function mapbox_change_theme(theme) {
+function change_theme(theme) {
   function set_output() {
     const c = MAPBOX.getStyle().layers.find(l => l.type === 'symbol');
     MAPBOX.first_symbol = maybe(c, 'id');
@@ -177,12 +177,12 @@ function mapbox_change_theme(theme) {
   };
 
   MAPBOX.once('style.load', set_output);
-  MAPBOX.setStyle(mapbox_theme_pick(ea_settings.mapbox_theme = theme));
+  MAPBOX.setStyle(theme_pick(ea_settings.mapbox_theme = theme));
 
   if (theme === "") set_output();
 };
 
-function mapbox_pointer(content, x, y) {
+function pointer(content, x, y) {
   let p = qs('#mapbox-pointer');
 
   if (!p) {
@@ -232,7 +232,7 @@ background-color: transparent;
   }
 };
 
-function mapbox_fit(bounds, animate = false) {
+function fit(bounds, animate = false) {
   const rect = qs('#maparea').getBoundingClientRect();
 
   const hp = (rect.width > rect.height) ? 0 : (rect.width * 0.1);
@@ -248,19 +248,19 @@ function mapbox_fit(bounds, animate = false) {
   return [[l,u], [r,u], [r,d], [l,d]];
 };
 
-function mapbox_dblclick(id) {
+function dblclick(id) {
   MAPBOX.on('dblclick', id, function(e) {
     if (INFOMODE) return;
 
     if (e.features.length > 0) {
-      mapbox_fit(geojsonExtent(e.features[0]), true);
+      fit(geojsonExtent(e.features[0]), true);
       MAPBOX.changing_target = true;
       O.subgeo = e.features[0].id;
     }
   });
 };
 
-function mapbox_zoomend(id) {
+function zoomend(id) {
   let _zoom;
 
   MAPBOX.on('zoomend', id, function(e) {
@@ -272,4 +272,13 @@ function mapbox_zoomend(id) {
     MAPBOX.changing_target = false;
     _zoom = z;
   });
+};
+
+export {
+  change_theme,
+  pointer,
+  dblclick,
+  zoomend,
+  fit,
+  init,
 };

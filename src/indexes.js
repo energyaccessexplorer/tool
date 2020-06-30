@@ -1,11 +1,13 @@
-//TODO: why does this NOT work with out the window.PIES?  'strict' mode?
-window.PIES = {
+import {analyse as summary_analyse} from './summary.js'
+import {datasets as analysis_datasets} from './analysis.js'
+
+const PIES = {
   'population': ea_svg_pie([[0], [0], [0], [0], [0]], 70, 0, ea_analysis_colorscale.stops, null),
   'area': ea_svg_pie([[0], [0], [0], [0], [0]], 70, 0, ea_analysis_colorscale.stops, null),
 };
 
 async function graphs(raster) {
-  const t = await ea_summary_analyse(raster);
+  const t = await summary_analyse(raster);
   let g;
 
   if (g = maybe(t, 'population-density')) {
@@ -100,7 +102,7 @@ function list() {
       ce('span', v)
     );
 
-    if (ea_analysis_datasets(t) < 1)
+    if (analysis_datasets(t) < 1)
       d.setAttribute('disabled', "");
 
     return d;

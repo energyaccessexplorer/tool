@@ -1,5 +1,5 @@
 /*
- * ea_analysis
+ * run
  *
  * @param "type" string. That can be one of:
  *   - ID of a dataset
@@ -8,11 +8,11 @@
  * returns a raster (FloatArray) to be plotted onto a canvas.
  */
 
-function ea_analysis(type) {
+function run(type) {
   const t0 = performance.now();
 
   const boundaries = DST.get('boundaries');
-  let list = ea_analysis_datasets(type);
+  let list = datasets(type);
 
   const it = new Float32Array(list.length ? boundaries.raster.data.length: 0).fill(-1);
 
@@ -84,7 +84,7 @@ function ea_analysis(type) {
 
     O.wait_for(
       _ => nr.raster.data,
-      _ => ea_plot_active_analysis(U.output).then(raster => ea_indexes_graphs(raster))
+      _ => plot_active(U.output).then(raster => ea_indexes_graphs(raster))
     );
 
     return it;
@@ -147,13 +147,13 @@ function ea_analysis(type) {
     it[i] = (r === -1) ? -1 : f(r);
   }
 
-  log("Finished ea_analysis in:", performance.now() - t0, weights, tots);
+  log("Finished analysis.run in:", performance.now() - t0, weights, tots);
 
   return it;
 };
 
 /*
- * ea_analysis_datasets
+ * datasets
  *
  * Select from DS collection datasets that are elegible for being part of an
  * analysis. Then, sort them to minimise calculation time.
@@ -165,7 +165,7 @@ function ea_analysis(type) {
  * returns DS to be plotted onto a canvas
  */
 
-function ea_analysis_datasets(type) {
+function datasets(type) {
   return DS.array
     .filter(d => {
       return d.on
@@ -197,7 +197,7 @@ function ea_analysis_datasets(type) {
 };
 
 /*
- * ea_plot_active_analysis
+ * plot_active
  *
  * Utility.
  *
@@ -206,14 +206,14 @@ function ea_analysis_datasets(type) {
  *   - an index name
  */
 
-async function ea_plot_active_analysis(type) {
-  const raster = ea_analysis(type);
+async function plot_active(type) {
+  const raster = run(type);
   ea_plot_outputcanvas(raster);
 
   const index = ea_indexes[type];
 
   if (!type || !index) {
-    warn("ea_plot_active_analysis: Too early...",
+    warn("plot_active: Too early...",
          "This is an initialisation bug.",
          "Index type:", type);
 
@@ -241,7 +241,7 @@ async function ea_plot_active_analysis(type) {
 async function raster_to_tiff(type) {
   const b = DST.get('boundaries');
 
-  const raster = await ea_analysis(type);
+  const raster = await run(type);
 
   const scale = d3.scaleLinear().domain([0,1]).range([0,254]);
   const fn = function(x) {
@@ -273,4 +273,11 @@ async function raster_to_tiff(type) {
   fake_download(URL.createObjectURL(blob), `energyaccessexplorer-${type}.tif`);
 
   return blob;
+};
+
+export {
+  raster_to_tiff,
+  plot_active,
+  datasets,
+  run,
 };

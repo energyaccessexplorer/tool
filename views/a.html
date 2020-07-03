@@ -95,24 +95,25 @@
 	{{> views/loading}}
   </body>
 
+  <script>
+    ea_modal = new modal("ea-modal", {});
+    ea_flash = new flash();
+    ea_api = new pgrest(ea_settings.database, ea_flash);
+
+	GEOGRAPHY = null;
+	MAPBOX = null;
+	INFOMODE = false;
+	MOBILE = false;
+	BOUNDARIES = {};
+	O = null;
+	U = null;
+	DST = new Map();
+  </script>
+
   <script type="module">
-	import * as overlord from './overlord.js?v=--TIMESTAMP--';
-	import * as parse from './dsparse.js?v=--TIMESTAMP--';
-	import * as indexes from './indexes.js?v=--TIMESTAMP--';
-	import './ds.js';
-
-    window.ea_modal = new modal("ea-modal", {});
-    window.ea_flash = new flash();
-    window.ea_api = new pgrest(ea_settings.database, ea_flash);
-
-	window.GEOGRAPHY = null;
-	window.MAPBOX = null;
-	window.INFOMODE = false;
-	window.MOBILE = false;
-	window.BOUNDARIES = {};
-	window.O = null;
-	window.U = null;
-	window.DST = new Map();
+	import * as overlord from './overlord.js';
+	import * as parse from './dsparse.js';
+	import * as indexes from './indexes.js';
 
 	// These should not exist. WIP.
 	window.ea_datasets_csv = parse.csv;

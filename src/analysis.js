@@ -147,7 +147,7 @@ function run(type) {
     it[i] = (r === -1) ? -1 : f(r);
   }
 
-  log("Finished analysis.run in:", performance.now() - t0, weights, tots);
+  console.log("Finished analysis.run in:", performance.now() - t0, weights, tots);
 
   return it;
 };

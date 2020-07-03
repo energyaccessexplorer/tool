@@ -1,5 +1,5 @@
-import {analyse as summary_analyse} from './summary.js'
-import {datasets as analysis_datasets} from './analysis.js'
+import {analyse as summary_analyse} from './summary.js';
+import {datasets as analysis_datasets} from './analysis.js';
 
 const PIES = {
   'population': ea_svg_pie([[0], [0], [0], [0], [0]], 70, 0, ea_analysis_colorscale.stops, null),

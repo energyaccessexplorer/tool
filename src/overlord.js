@@ -1,12 +1,15 @@
-import {polygons_csv,polygons_feature_info} from './dsparse.js';
+import './ds.js';
 import * as indexes from './indexes.js';
 import * as cards from './cards.js';
+import {polygons_csv,polygons_feature_info} from './dsparse.js';
 import {plot_active as analysis_plot_active} from './analysis.js';
 import {
   fit as mapbox_fit,
   init as mapbox_init,
   change_theme as mapbox_change_theme,
   pointer as mapbox_pointer,
+  zoomend as mapbox_zoomend,
+  dblclick as mapbox_dblclick,
 } from './mapbox.js';
 
 class Overlord {
@@ -124,7 +127,7 @@ class Overlord {
   async wait_for(func, finish) {
     await until(func); finish();
   };
-}
+};
 
 /*
  * dsinit
@@ -420,7 +423,7 @@ function map_click(e) {
       );
     }
     else {
-      log("No value (or nodata value) on raster.", rc);
+      console.log("No value (or nodata value) on raster.", rc);
     }
   };
 
@@ -467,7 +470,7 @@ function map_click(e) {
     }
 
     else {
-      log("No value on raster.", o);
+      console.log("No value on raster.", o);
     }
   }
 

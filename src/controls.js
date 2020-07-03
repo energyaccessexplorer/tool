@@ -253,7 +253,7 @@ class dscontrols extends HTMLElement {
       break;
     }
   };
-}
+};
 
 customElements.define('ds-controls', dscontrols);
 

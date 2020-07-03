@@ -325,7 +325,7 @@ function table() {
 };
 
 function polygons_feature_info(et, e) {
-  log("Feature Properties:", et.properties);
+  console.log("Feature Properties:", et.properties);
 
   let at = [];
 

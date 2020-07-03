@@ -156,7 +156,7 @@ class dscard extends HTMLElement {
         }
 
         default:
-          console.warn("opacity: undecided", this.ds.id, this.ds.datatype);
+          warn("opacity: undecided", this.ds.id, this.ds.datatype);
           break;
         }
 
@@ -277,7 +277,7 @@ class dscard extends HTMLElement {
 
     return d;
   };
-}
+};
 
 customElements.define('ds-card', dscard);
 

@@ -1,38 +1,37 @@
 (function() {
   const support = {
-    IE: null,
+    "IE": null,
 
-    Firefox: {
-      min: 58,
-      reason: "Shadow DOM support",
-      note: "although suppported, the web browser needs to be configured"
+    "Firefox": {
+      "min": 63,
+      "reason": "import/export module support",
     },
 
-    Chrome: {
-      min: 53,
-      reason: "Shadow DOM support",
+    "Chrome": {
+      "min": 63,
+      "reason": "import/export module support",
     },
 
-    Opera: {
-      min: 54,
-      reason: "ES6 support",
+    "Opera": {
+      "min": 54,
+      "reason": "ES6 support",
     },
 
-    Safari: {
-      min: 11,
-      reason: "Shadow DOM support",
+    "Safari": {
+      "min": 11.1,
+      "reason": "import/export module support",
     },
 
-    Edge: {
-      min: 79,
-      reason: "EdgeHTML was never supported. Blink is now shipped."
+    "Edge": {
+      "min": 79,
+      "reason": "EdgeHTML was never supported. Blink is now shipped."
     }
   };
 
   function browser_version() {
-    let ua = navigator.userAgent
-    let tem;
+    const ua = navigator.userAgent
     let M = ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
+    let tem;
 
     if (/trident/i.test(M[1])) {
       tem=  /\brv[ :]+(\d+)/g.exec(ua) || [];
@@ -52,15 +51,15 @@
     return M.join(' ');
   };
 
-  var v = browser_version();
-  var m;
+  const v = browser_version();
+  let m;
 
-  var usethis = " Please use a recent version of Firefox, Chrome or Opera.";
-  var update = " Please update your browser to the latest version.";
+  const usethis = " Please use a recent version of Firefox, Chrome or Opera.";
+  const update = " Please update your browser to the latest version.";
 
   if (v.match(/IE/i)) {
     alert("This platform is known NOT to work on Internet Explorer." + usethis);
-    throw "Internet Explorer is unsupported. Hej då.";
+    throw "Internet Explorer is not supported. Hej då.";
   }
 
   else if (m = v.match(/(Edge|Firefox|Chrome|Opera|Safari) (.*)/i)) {

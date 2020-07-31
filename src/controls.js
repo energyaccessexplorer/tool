@@ -439,6 +439,7 @@ async function ea_controls_selectlist() {
     "online": "eq.true",
     "datasets_count": "gt.0",
     "parent_id": GEOGRAPHY.parent_id ? `eq.${GEOGRAPHY.parent_id}` : "is.null",
+    "adm": `eq.${GEOGRAPHY.adm}`,
     "order": "name.asc"
   };
 

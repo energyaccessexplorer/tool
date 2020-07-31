@@ -150,7 +150,7 @@ box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
 border-radius: 4px;
 padding: 16px;`;
 
-  qs('#playground #visual').append(x);
+  qs('#maparea').append(x);
 };
 
 function theme_pick(theme) {

@@ -51,7 +51,7 @@ build-a:
 
 	@cp ${CSS}/ripple.css ${DIST}/a/ripple.css
 	@cp ${CSS}/svg.css ${DIST}/a/svg.css
-	@cp ${SRC}/{ds,dsparse,indexes,mapbox,cards,analysis,overlord,plot,summary}.js ${DIST}/a/
+	@cp ${SRC}/{ds,dsparse,indexes,mapbox,cards,analysis,overlord,plot,report,summary}.js ${DIST}/a/
 
 	@cat \
 		${LIB}/d3.js \
@@ -78,7 +78,6 @@ build-a:
 		${SRC}/controls.js \
 		${SRC}/ui.js \
 		${SRC}/nanny-steps.js \
-		${SRC}/report.js \
 		${SRC}/mobile.js \
 		${SRC}/globals.js \
 		> ${DIST}/a/main.js

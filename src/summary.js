@@ -1,4 +1,7 @@
 import * as plot from './plot.js';
+import * as report from './report.js';
+import {run as ea_analysis} from './analysis.js';
+
 /*
  * summary
  *
@@ -121,15 +124,15 @@ async function summary() {
     this.innerText = ss ? "Summary Table" : "Summary Graphs";
   };
 
-  const report = ce('button', "Export PDF Report", { class: 'big-green-button' });
-  report.onclick = ea_report_pdf;
+  const pdf = ce('button', "Export PDF Report", { class: 'big-green-button' });
+  pdf.onclick = report.pdf;
 
   const csv = ce('button', "Export CSV Report", { class: 'big-green-button' });
-  csv.onclick = _ => ea_report_csv(summary);
+  csv.onclick = _ => report.csv(summary);
 
   content.append(graphs_tab, tables_tab);
 
-  const footer = ce('div', [switcher, report, csv], { style: "text-align: center;" });
+  const footer = ce('div', [switcher, pdf, csv], { style: "text-align: center;" });
 
   ea_modal.set({
     header: "Snapshot",

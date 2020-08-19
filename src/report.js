@@ -1,4 +1,4 @@
-function ea_report_pdf() {
+function pdf() {
   const canvas = DST.get('population-density').raster.canvas;
   const canvas_ratio = canvas.width/canvas.height;
 
@@ -10,7 +10,7 @@ function ea_report_pdf() {
   };
 
   let lpad = page.padding[3];
-  let c;
+  let c, y;
 
   const map_height = 100;
   const pie_size = 90;
@@ -180,11 +180,13 @@ contact our team at`;
 
     let url = URL.createObjectURL(blob);
 
-    load_image = u => new Promise((resolve, reject) => {
-      img.onload = _ => resolve(u);
-      img.onerror = _ => reject(u);
-      img.src = u;
-    });
+    function load_image(u) {
+      return new Promise((resolve, reject) => {
+        img.onload = _ => resolve(u);
+        img.onerror = _ => reject(u);
+        img.src = u;
+      });
+    }
 
     await load_image(url);
 
@@ -292,7 +294,7 @@ contact our team at`;
   };
 };
 
-function ea_report_csv(summary) {
+function csv(summary) {
   const csv = [];
 
   const datasets = DS.array
@@ -321,3 +323,8 @@ function ea_report_csv(summary) {
   const blob = new Blob([csv.join("\n") + "\n"], { type: "text/csv" });
   fake_download(URL.createObjectURL(blob), `energyaccessexplorer-report.csv`);
 };
+
+export {
+  csv,
+  pdf
+}

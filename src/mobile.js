@@ -58,7 +58,7 @@ function ea_mobile_switch(v) {
     for (let e of ['#right-pane'])
       qs(e).style.display = '';
 
-    ea_view_buttons();
+    ea_views_buttons();
     break;
   }
 

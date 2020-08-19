@@ -2,6 +2,7 @@ import './ds.js';
 import * as indexes from './indexes.js';
 import * as cards from './cards.js';
 import * as controls from './controls.js';
+import * as views from './views.js';
 import {
   init as timeline_init,
   lines_draw as timeline_lines_draw,
@@ -74,7 +75,7 @@ class Overlord {
       break;
     }
 
-    view();
+    load_view();
   };
 
   set datasets(arr) {
@@ -99,10 +100,10 @@ class Overlord {
   set view(t) {
     U.view = t;
     O.layers();
-    view();
+    load_view();
 
-    ea_view_buttons();
-    ea_view_right_pane();
+    views.buttons();
+    views.right_pane();
 
     window.dispatchEvent(new Event('resize'));
   };
@@ -242,7 +243,7 @@ async function init() {
 
   if (MOBILE) ea_mobile_init();
 
-  ea_views_init();
+  views.init();
   indexes.init();
 
   until(_ => DS.array.filter(d => d.on).every(d => d.loading === false)).then(O.sort);
@@ -254,7 +255,7 @@ async function init() {
   ea_loading(false);
 };
 
-function view() {
+function load_view() {
   const timeline = qs('#timeline');
 
   const {view, output, inputs} = U;

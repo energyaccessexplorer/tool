@@ -13,5 +13,6 @@ nanny.js	https://git.carajo.no/web-toolbelt/plain/nanny.js
 pgrest.js	https://git.carajo.no/web-toolbelt/plain/pgrest.js
 selectlist.js	https://git.carajo.no/web-toolbelt/plain/selectlist.js
 dropdown.js	https://git.carajo.no/web-toolbelt/plain/dropdown.js
+browsers.js	https://git.carajo.no/web-toolbelt/plain/browsers.js
 jspdf.js	https://unpkg.com/jspdf@latest/dist/jspdf.min.js
 jspdf-autotable.js	https://unpkg.com/jspdf-autotable@latest/dist/jspdf.plugin.autotable.js

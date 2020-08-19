@@ -120,6 +120,8 @@ build-s:
 		${SRC}/s.js \
 		> ${DIST}/s/main.js
 
+	@cp ${SRC}/browser.js ${DIST}/s/
+
 	@cat \
 		${CSS}/general.css \
 		${CSS}/s.css \

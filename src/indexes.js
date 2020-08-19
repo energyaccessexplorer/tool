@@ -1,5 +1,10 @@
-import {analyse as summary_analyse} from './summary.js';
-import {datasets as analysis_datasets} from './analysis.js';
+import {
+  analyse as summary_analyse,
+} from './summary.js';
+
+import {
+  datasets as analysis_datasets,
+} from './analysis.js';
 
 const PIES = {
   'population': ea_svg_pie([[0], [0], [0], [0], [0]], 70, 0, ea_analysis_colorscale.stops, null),
@@ -113,7 +118,7 @@ function init() {
 
   const info = qs('#index-graphs-info');
   info.append(tmpl('#svg-info'));
-  info.onclick = _ => indexes.modal();
+  info.onclick = _ => modal();
 
   const download = qs('#index-graphs-download');
   download.append(tmpl('#svg-download'));
@@ -228,9 +233,7 @@ function conf() {
     config.datasets.push(c);
   }
 
-  let blob = new Blob([JSON.stringify(config)], { type: "application/octet-stream;charset=utf-8" });
-
-  fake_download(URL.createObjectURL(blob), `energyaccessexplorer-${U.output}.json`);
+  fake_blob_download(JSON.stringify(config), `energyaccessexplorer-${U.output}.json`);
 
   return config;
 };

@@ -1,16 +1,18 @@
-import './ds.js';
+import {DS} from './ds.js';
 import * as indexes from './indexes.js';
 import * as cards from './cards.js';
 import * as controls from './controls.js';
 import * as views from './views.js';
-import {
-  init as timeline_init,
-  lines_draw as timeline_lines_draw,
-  lines_update as timeline_lines_update,
-} from './timeline.js';
 
-import {polygons_csv,polygons_feature_info} from './dsparse.js';
-import {plot_active as analysis_plot_active} from './analysis.js';
+import {
+  polygons_csv,
+  polygons_feature_info,
+} from './dsparse.js';
+
+import {
+  plot_active as analysis_plot_active,
+} from './analysis.js';
+
 import {
   fit as mapbox_fit,
   init as mapbox_init,
@@ -19,6 +21,14 @@ import {
   zoomend as mapbox_zoomend,
   dblclick as mapbox_dblclick,
 } from './mapbox.js';
+
+import {
+  init as timeline_init,
+  lines_draw as timeline_lines_draw,
+  lines_update as timeline_lines_update,
+  filter_valued_polygons as timeline_filter_valued_polygons,
+} from './timeline.js';
+
 
 class Overlord {
   layers() {
@@ -298,7 +308,7 @@ function load_view() {
     analysis_plot_active(output)
       .then(raster => indexes.graphs(raster));
 
-    ea_timeline_filter_valued_polygons();
+    timeline_filter_valued_polygons();
     break;
   }
 

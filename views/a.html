@@ -95,13 +95,13 @@
       </div>
     </div>
 
-	{{> views/loading}}
+    {{> views/loading}}
   </body>
 
   <script>
-    ea_modal = new modal("ea-modal", {});
-    ea_flash = new flash();
-    ea_api = new pgrest(ea_settings.database, ea_flash);
+	ea_modal = new modal("ea-modal", {});
+	ea_flash = new flash();
+	ea_api = new pgrest(ea_settings.database, ea_flash);
 
 	GEOGRAPHY = null;
 	MAPBOX = null;
@@ -114,20 +114,8 @@
   </script>
 
   <script type="module">
-	import * as overlord from './overlord.js';
-	import * as parse from './dsparse.js';
-	import * as indexes from './indexes.js';
-
-	// These should not exist. WIP.
-	window.ea_datasets_csv = parse.csv;
-	window.ea_datasets_points = parse.points;
-	window.ea_datasets_lines = parse.lines;
-	window.ea_datasets_polygons = parse.polygons;
-	window.ea_datasets_tiff = parse.tiff;
-	window.ea_datasets_parse_fail = parse.parse_fail;
-	window.ea_indexes_graphs = indexes.graphs;
-
-	overlord.init();
+	import {init} from './overlord.js';
+	init();
   </script>
 
   {{> views/templates}}

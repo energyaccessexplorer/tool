@@ -1,3 +1,5 @@
+import {DS} from './ds.js';
+
 function points_symbol(opts) {
   const {size,fill,stroke,strokewidth} = opts;
 
@@ -160,7 +162,7 @@ class dscard extends HTMLElement {
 
   info() {
     const e = tmpl('#svg-info');
-    e.onclick = _ => ea_dataset_modal(this.ds);
+    e.onclick = _ => this.ds.info_modal();
 
     return e;
   };

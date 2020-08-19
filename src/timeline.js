@@ -1,3 +1,5 @@
+import {DS} from './ds.js';
+
 function timeline_slider(opts) {
   const {steps, drag, width, init} = opts;
 
@@ -358,7 +360,7 @@ async function datasets_polygons_csv() {
   this.domain_init = JSON.parse(JSON.stringify(this.domain));
 };
 
-function ea_timeline_filter_valued_polygons() {
+function filter_valued_polygons() {
   const ul = qs('#filtered-subgeographies');
   ul.innerHTML = "";
 
@@ -406,5 +408,6 @@ export {
   init,
   lines_draw,
   lines_update,
-  datasets_polygons_csv
-}
+  datasets_polygons_csv,
+  filter_valued_polygons,
+};

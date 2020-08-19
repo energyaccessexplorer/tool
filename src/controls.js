@@ -1,3 +1,5 @@
+import {DS} from './ds.js';
+
 class dscontrols extends HTMLElement {
   constructor(d) {
     if (!(d instanceof DS)) throw Error(`dscontrols: Expected a DS. Got ${d}.`);
@@ -164,7 +166,7 @@ class dscontrols extends HTMLElement {
         conel = ce('div', null, { class: 'controls-container' })
       );
 
-      title.prepend(ce('span', collapse_triangle('s'), { class: 'collapse triangle' }));
+      title.prepend(ce('span', null, { class: 'collapse triangle' }));
       title.addEventListener('mouseup', e => elem_collapse(conel, el));
 
       elem_collapse(conel, el);
@@ -256,6 +258,14 @@ class dscontrols extends HTMLElement {
 };
 
 customElements.define('ds-controls', dscontrols);
+
+function humanformat(s) {
+  return s
+    .replace('_', ' ')
+    .replace('-', ' ')
+    .replace(/^([a-z])/, x => x.toUpperCase())
+    .replace(/\ ([a-z])/g, x => x.toUpperCase());
+};
 
 function toggle_switch(init, callback, opts = {}) {
   const radius = 10,
@@ -510,6 +520,69 @@ function collection_list() {
   return e;
 };
 
+async function overview(cca3) {
+  let r;
+
+  await fetch('https://wri-public-data.s3.amazonaws.com/EnergyAccess/Country%20indicators/eae_country_indicators.csv')
+    .then(r => r.text())
+    .then(t => d3.csvParse(t))
+    .then(d => {
+      return r = d.find(x => x.cca3 === GEOGRAPHY.cca3);
+    })
+
+  if (r) {
+    r['urban_population'] = (100 - r['rural_population']).toFixed(1);
+
+    if (r['urban_electrification'] > 0) {
+      let eru = ea_svg_pie(
+        [
+          [100 - r['urban_electrification']],
+          [r['urban_electrification']]
+        ],
+        50, 0,
+        [
+          getComputedStyle(document.body).getPropertyValue('--the-light-green'),
+          getComputedStyle(document.body).getPropertyValue('--the-green')
+        ],
+        "",
+        x => x
+      );
+
+      r['urban_electrification_pie'] = eru.svg;
+      eru.change(0);
+    }
+
+    if (r['rural_electrification'] > 0) {
+      let err = ea_svg_pie(
+        [
+          [100 - (r['rural_electrification'])],
+          [r['rural_electrification']]
+        ],
+        50, 0,
+        [
+          getComputedStyle(document.body).getPropertyValue('--the-light-green'),
+          getComputedStyle(document.body).getPropertyValue('--the-green')
+        ],
+        "",
+        x => x
+      );
+
+      r['rural_electrification_pie'] = err.svg;
+      err.change(0);
+    }
+
+    ea_modal.set({
+      header: r.name,
+      content: tmpl('#country-overview', r),
+      footer: ce(
+        'div',
+        "<strong>Source:</strong> World Bank, World Development Indicators (latest data) crosschecked with values reported by local stakeholders/partners.",
+        { style: "font-size: small; max-width: 30em; margin-left: auto; margin-right: 0;" }
+      ),
+    }).show();
+  }
+};
+
 async function _selectlist() {
   let data = {};
 
@@ -548,7 +621,7 @@ async function _selectlist() {
 
   const info = tmpl('#svg-info');
   info.querySelector('path').setAttribute('fill', 'rgba(255, 255, 255, 0.3)');
-  info.onclick = ea_overview;
+  info.onclick = overview;
   info.style = `
 display: inline-block;
 transform: scale(1.2);
@@ -607,7 +680,7 @@ function options() {
   if (!Object.keys(this.ds.metadata).every(k => !this.ds.metadata[k])) {
     dropdownlist.push({
       "content": "Dataset info",
-      "action": _ => ea_dataset_modal(this.ds)
+      "action": _ => this.ds.info_modal()
     });
   }
 

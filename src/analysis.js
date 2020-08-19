@@ -1,4 +1,10 @@
+import {DS} from './ds.js';
+
 import * as plot from './plot.js'
+
+import {
+  graphs as indexes_graphs,
+} from './indexes.js'
 
 /*
  * run
@@ -86,7 +92,7 @@ function run(type) {
 
     O.wait_for(
       _ => nr.raster.data,
-      _ => plot_active(U.output).then(raster => ea_indexes_graphs(raster))
+      _ => plot_active(U.output).then(raster => indexes_graphs(raster))
     );
 
     return it;
@@ -270,9 +276,7 @@ async function raster_to_tiff(type) {
 
   const arrayBuffer = await GeoTIFF.writeArrayBuffer(arr, metadata);
 
-  let blob = new Blob([arrayBuffer], { type: "application/octet-stream;charset=utf-8" });
-
-  fake_download(URL.createObjectURL(blob), `energyaccessexplorer-${type}.tif`);
+  fake_blob_download(arrayBuffer, `energyaccessexplorer-${type}.tif`);
 
   return blob;
 };

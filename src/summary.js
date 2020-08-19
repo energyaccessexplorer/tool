@@ -1,6 +1,9 @@
 import * as plot from './plot.js';
 import * as report from './report.js';
-import {run as ea_analysis} from './analysis.js';
+
+import {
+  run as ea_analysis,
+} from './analysis.js';
 
 /*
  * summary

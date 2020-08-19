@@ -337,7 +337,8 @@ function polygons_feature_info(et, e) {
   let at = [];
 
   if (this.category.name === 'boundaries' ||
-      this.category.name.match(/^indicator/)) {
+      this.category.name.match(/^indicator/) ||
+      this.category.name.match(/^timeline-indicator/)) {
     at.push({
       "target": DST.get('boundaries').config.boundaries_name || "Geography Name",
       "dataset": "_boundaries_name",

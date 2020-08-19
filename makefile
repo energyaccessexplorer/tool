@@ -71,7 +71,6 @@ build-a:
 	@echo -n "window.ea_settings = " | cat - \
 		settings.json \
 		${SRC}/utils.js \
-		${SRC}/shared.js \
 		${SRC}/a.js \
 		${SRC}/nanny-steps.js \
 		${SRC}/mobile.js \

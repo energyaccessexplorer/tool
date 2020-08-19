@@ -1,5 +1,8 @@
 import {dscard} from './cards.js';
+
 import {dscontrols} from './controls.js';
+
+import * as parse from './dsparse.js';
 
 class DS {
   constructor(o, on) {
@@ -72,17 +75,17 @@ class DS {
 
       switch (this.vectors.shape_type) {
       case 'points': {
-        this.vectors.parse = x => ea_datasets_points.call(x || this);
+        this.vectors.parse = x => parse.points.call(x || this);
         break;
       }
 
       case 'polygons': {
-        this.vectors.parse = x => ea_datasets_polygons.call(x || this);
+        this.vectors.parse = x => parse.polygons.call(x || this);
         break;
       }
 
       case 'lines': {
-        this.vectors.parse = x => ea_datasets_lines.call(x || this);
+        this.vectors.parse = x => parse.lines.call(x || this);
         break;
       }
       }
@@ -92,7 +95,7 @@ class DS {
     if (o.category.raster && r) {
       this.raster = JSON.parse(JSON.stringify(o.category.raster));
       this.raster.endpoint = r.endpoint;
-      this.raster.parse = _ => ea_datasets_tiff.call(this);
+      this.raster.parse = _ => parse.tiff.call(this);
 
       if (typeof maybe(this.raster, 'domain', 'min') === 'number' &&
           typeof maybe(this.raster, 'domain', 'max') === 'number') {
@@ -113,7 +116,7 @@ class DS {
       this.csv = JSON.parse(JSON.stringify(o.category.csv));
       this.csv.endpoint = c.endpoint;
       this.csv.key = maybe(c, 'configuration', 'key') || 'OBJECTID';
-      this.csv.parse = _ => ea_datasets_csv.call(this);
+      this.csv.parse = _ => parse.csv.call(this);
 
       if (typeof maybe(this.csv, 'domain', 'min') === 'number' &&
           typeof maybe(this.csv, 'domain', 'max') === 'number') {
@@ -129,7 +132,7 @@ class DS {
       const b = DST.get('boundaries');
       this.vectors = JSON.parse(JSON.stringify(b.vectors));
       this.vectors.endpoint = b.vectors.endpoint;
-      this.vectors.parse = x => ea_datasets_polygons.call(x || this);
+      this.vectors.parse = x => parse.polygons.call(x || this);
     }
 
     switch (this.datatype) {
@@ -441,6 +444,21 @@ This is not fatal. Dataset disabled.`
       });
   };
 
+  info_modal() {
+    const b = this.metadata;
+    b['why'] = this.category.metadata.why;
+
+    const content = tmpl('#ds-info-modal', b);
+    qs('#metadata-sources', content).href = this.metadata.download_original_url;
+    qs('#learn-more', content).href = this.metadata.learn_more_url;
+
+    ea_modal.set({
+      header: this.name,
+      content: content,
+      footer: null
+    }).show();
+  };
+
   async _active(v, draw) {
     this.on = v;
 
@@ -516,4 +534,6 @@ This is not fatal. Dataset disabled.`
   };
 };
 
-window.DS = DS;
+export {
+  DS
+}

@@ -23,12 +23,58 @@ function ea_colorscale(opts) {
       .clamp(true);
   }
 
+  function color_steps(steps, height) {
+    const h = height || 5;
+
+    const svg = d3.create("svg")
+          .attr('class', 'svg-interval');
+
+    const g = svg.append('g');
+
+    steps.forEach((v,i) => {
+      g.append('rect')
+        .attr('fill', v)
+        .attr('stroke', 'none')
+        .attr('x', `${(100/steps.length) * i}%`)
+        .attr('width', `${100/steps.length}%`)
+        .attr('height', h);
+    });
+
+    svg
+      .attr('width', "100%")
+      .attr('height', h);
+
+    return svg.node();
+  };
+
+  function rgba(str) {
+    let c;
+
+    if (!str) return [0, 0, 0, 255];
+
+    if (str.match(/^#([A-Fa-f0-9]{3}){1,2}$/)) {
+      c = str.substring(1).split('');
+
+      if (c.length === 3) c = [c[0], c[0], c[1], c[1], c[2], c[2]];
+
+      c = '0x' + c.join('');
+
+      return [(c>>16)&255, (c>>8)&255, c&255, 255];
+    }
+    else if (c = str.match(/^rgba?\(([0-9]{1,3}),\ ?([0-9]{1,3}),\ ?([0-9]{1,3}),?\ ?([0-9]{1,3})?\)$/)) {
+      return [+c[1], +c[2], +c[3], +c[4] || 255];
+    }
+
+    else
+      throw new Error(`rgba: argument ${str} doesn't match`);
+  };
+
   return {
     domain: domain,
-    fn: x => parseRGBA(s(x)),
+    fn: x => rgba(s(x)),
     stops: stops,
     intervals: intervals,
-    svg: ea_svg_color_steps(stops)
+    svg: color_steps(stops)
   };
 };
 
@@ -258,30 +304,6 @@ function ea_svg_interval(opts = {}) {
   };
 };
 
-function ea_svg_color_steps(steps, height) {
-  const h = height || 5;
-
-  const svg = d3.create("svg")
-        .attr('class', 'svg-interval');
-
-  const g = svg.append('g');
-
-  steps.forEach((v,i) => {
-    g.append('rect')
-      .attr('fill', v)
-      .attr('stroke', 'none')
-      .attr('x', `${(100/steps.length) * i}%`)
-      .attr('width', `${100/steps.length}%`)
-      .attr('height', h);
-  });
-
-  svg
-    .attr('width', "100%")
-    .attr('height', h);
-
-  return svg.node();
-};
-
 function ea_svg_checkbox(init, callback) { // this is not used anywhere
   const size = 24;
 
@@ -345,134 +367,65 @@ function ea_svg_checkbox(init, callback) { // this is not used anywhere
   };
 };
 
-function ea_dataset_modal(ds) {
-  const b = ds.metadata;
-  b['why'] = ds.category.metadata.why;
-
-  const content = tmpl('#ds-info-modal', b);
-  qs('#metadata-sources', content).href = ds.metadata.download_original_url;
-  qs('#learn-more', content).href = ds.metadata.learn_more_url;
-
-  ea_modal.set({
-    header: ds.name,
-    content: content,
-    footer: null
-  }).show();
-};
-
-async function ea_overview(cca3) {
-  let r;
-
-  await fetch('https://wri-public-data.s3.amazonaws.com/EnergyAccess/Country%20indicators/eae_country_indicators.csv')
-    .then(r => r.text())
-    .then(t => d3.csvParse(t))
-    .then(d => {
-      return r = d.find(x => x.cca3 === GEOGRAPHY.cca3);
-    })
-
-  if (r) {
-    r['urban_population'] = (100 - r['rural_population']).toFixed(1);
-
-    if (r['urban_electrification'] > 0) {
-      let eru = ea_svg_pie(
-        [
-          [100 - r['urban_electrification']],
-          [r['urban_electrification']]
-        ],
-        50, 0,
-        [
-          getComputedStyle(document.body).getPropertyValue('--the-light-green'),
-          getComputedStyle(document.body).getPropertyValue('--the-green')
-        ],
-        "",
-        x => x
-      );
-
-      r['urban_electrification_pie'] = eru.svg;
-      eru.change(0);
-    }
-
-    if (r['rural_electrification'] > 0) {
-      let err = ea_svg_pie(
-        [
-          [100 - (r['rural_electrification'])],
-          [r['rural_electrification']]
-        ],
-        50, 0,
-        [
-          getComputedStyle(document.body).getPropertyValue('--the-light-green'),
-          getComputedStyle(document.body).getPropertyValue('--the-green')
-        ],
-        "",
-        x => x
-      );
-
-      r['rural_electrification_pie'] = err.svg;
-      err.change(0);
-    }
-
-    ea_modal.set({
-      header: r.name,
-      content: tmpl('#country-overview', r),
-      footer: ce(
-        'div',
-        "<strong>Source:</strong> World Bank, World Development Indicators (latest data) crosschecked with values reported by local stakeholders/partners.",
-        { style: "font-size: small; max-width: 30em; margin-left: auto; margin-right: 0;" }
-      ),
-    }).show();
-  }
-};
-
-function collapse_triangle(d) {
-  let t;
-
-  switch (d) {
-  case 'e':
-    t = 'rotate(-45)translate(0,0)';
-    break;
-
-  case 's':
-    t = 'rotate(45)translate(0,-6)';
-    break;
-
-  case 'n':
-    t = 'rotate(-135)translate(0,-6)';
-    break;
-
-  case 'w':
-    t = 'rotate(135)translate(-2,0)';
-    break;
-
-  case 'ne':
-    t = 'rotate(-90)';
-    break;
-
-  case 'se':
-    t = '';
-    break;
-
-  default:
-    throw `collapse_triangle: e, ne, s, se, w. Got ${d}.`;
-  }
-
-  return `
-<svg width="12px" height="12px" viewBox="0 0 12 12" transform="${t}">
-  <polyline points="12,0 12,12 0,12 "/>
-</svg>`;
-};
-
 function elem_collapse(el, t) {
+  function triangle(d) {
+    let t;
+
+    switch (d) {
+    case 'e':
+      t = 'rotate(-45deg)translate(0,0)';
+      break;
+
+    case 's':
+      t = 'rotate(45deg)translate(0,-6px)';
+      break;
+
+    case 'n':
+      t = 'rotate(-135deg)translate(0,-6px)';
+      break;
+
+    case 'w':
+      t = 'rotate(135deg)translate(-2px,0)';
+      break;
+
+    case 'ne':
+      t = 'rotate(-90deg)';
+      break;
+
+    case 'se':
+      t = '';
+      break;
+
+    default:
+      throw `triangle: e, ne, s, se, w. Got ${d}.`;
+    }
+
+    const svg = d3.create('svg');
+    svg.attr('width', "12");
+    svg.attr('height', "12");
+    svg.attr('viewBox', "0 0 12 12");
+
+    const polyline = svg.append('polyline');
+    polyline.attr('points', "12,0 12,12 0,12 ");
+
+    svg.attr('style', `transform: ${t};`);
+
+    return svg.node();
+  };
+
   const d = el.style['display'];
   const c = qs('.collapse', t);
 
+  elem_empty(c);
+
   if (d === "none") {
     el.style['display'] = 'block';
-    c.innerHTML = collapse_triangle('s');
+    c.append(triangle('s'));
   }
 
   else {
     el.style['display'] = 'none';
-    c.innerHTML = collapse_triangle('e');
+    c.append(triangle('e'));
   }
 };
 
@@ -513,51 +466,39 @@ function table_add_lnglat(td, lnglat = [0, 0]) {
   ]));
 };
 
-async function fake_download(url, name) {
-  const a = document.createElement('a');
-  a.href = url;
-  a.target = "_blank";
-  a.download = name ? name : '';
-  a.style.display = 'none';
+/*
+ * ea_coordinates_raster
+ *
+ * Transform a set of coordinates to the "relative position" inside a raster
+ * that is bound to an area
+ *
+ * NOTE: mercator only.
+ *
+ * @param "coords" int[2]. Coordinates in Longitude/Latitude to be transformed.
+ * @param "bounds" int[2][2]. Bounding box containing the raster data.
+ * @param "raster" { width int, height int, novalue numeric, array numeric[] }
+ *        full description.
+ */
 
-  document.body.appendChild(a);
+function ea_coordinates_in_raster(coords, bounds, raster) {
+  if (coords.length !== 2)
+    throw Error(`ea_coordinates_raster: expected and array of length 2. Got ${coords}`);
 
-  await delay(0.1);
+  const hs = d3.scaleLinear().domain([bounds[0][0], bounds[1][0]]).range([0, raster.width]);
+  const vs = d3.scaleLinear().domain([bounds[1][1], bounds[2][1]]).range([0, raster.height]);
 
-  a.click();
-  a.remove();
-};
+  const plng = Math.floor(hs(coords[0]));
+  const plat = Math.floor(vs(coords[1]));
 
-function parseRGBA(str) {
-  let c;
+  let a = null;
 
-  if (!str) return [0, 0, 0, 255];
+  if ((plng > 0 && plng < raster.width &&
+       plat > 0 && plat < raster.height )) {
+    a = { x: coords[0], y: coords[1] };
 
-  if (str.match(/^#([A-Fa-f0-9]{3}){1,2}$/)) {
-    c = str.substring(1).split('');
-
-    if (c.length === 3) c = [c[0], c[0], c[1], c[1], c[2], c[2]];
-
-    c = '0x' + c.join('');
-
-    return [(c>>16)&255, (c>>8)&255, c&255, 255];
+    const v = raster.data[(plat * raster.width) + plng];
+    a.value = v === raster.nodata ? null : v;
   }
-  else if (c = str.match(/^rgba?\(([0-9]{1,3}),\ ?([0-9]{1,3}),\ ?([0-9]{1,3}),?\ ?([0-9]{1,3})?\)$/)) {
-    return [+c[1], +c[2], +c[3], +c[4] || 255];
-  }
 
-  else
-    throw new Error(`parseRGBA: argument ${str} doesn't match`);
-};
-
-function has(element, attr) {
-  return !(typeof element[attr] === 'undefined' || element[attr] === null);
-};
-
-function humanformat(s) {
-  return s
-    .replace('_', ' ')
-    .replace('-', ' ')
-    .replace(/^([a-z])/, x => x.toUpperCase())
-    .replace(/\ ([a-z])/g, x => x.toUpperCase());
+  return a;
 };

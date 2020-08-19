@@ -1,3 +1,5 @@
+import {DS} from './ds.js';
+
 function pdf() {
   const canvas = DST.get('population-density').raster.canvas;
   const canvas_ratio = canvas.width/canvas.height;
@@ -320,11 +322,10 @@ function csv(summary) {
     }
   }
 
-  const blob = new Blob([csv.join("\n") + "\n"], { type: "text/csv" });
-  fake_download(URL.createObjectURL(blob), `energyaccessexplorer-report.csv`);
+  fake_blob_download(csv.join("\n") + "\n", `energyaccessexplorer-report.csv`, "text/csv");
 };
 
 export {
   csv,
   pdf
-}
+};

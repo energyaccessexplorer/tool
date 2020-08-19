@@ -74,7 +74,6 @@ build-a:
 		${SRC}/shared.js \
 		${SRC}/a.js \
 		${SRC}/timeline.js \
-		${SRC}/svg.js \
 		${SRC}/controls.js \
 		${SRC}/ui.js \
 		${SRC}/nanny-steps.js \
@@ -121,7 +120,6 @@ build-s:
 
 	@echo -n "const ea_settings = " | cat - \
 		settings.json \
-		${SRC}/svg.js \
 		${SRC}/ui.js \
 		${SRC}/s.js \
 		> ${DIST}/s/main.js

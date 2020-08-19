@@ -1,3 +1,60 @@
+function points_symbol(opts) {
+  const {size,fill,stroke,strokewidth} = opts;
+
+  const svg = d3.create("svg")
+        .attr("class", 'svg-point')
+        .attr("width", size)
+        .attr("height", size);
+
+  svg
+    .append('circle')
+    .attr('r', (size/2) - 2)
+    .attr('cx', size/2)
+    .attr('cy', size/2)
+    .attr('fill', fill)
+    .attr('stroke', stroke)
+    .attr('stroke-width', strokewidth);
+
+  return svg.node();
+};
+
+function lines_symbol(opts) {
+  const {size,dasharray,stroke,width,fill} = opts;
+
+  const svg = d3.create("svg")
+        .attr("width", size)
+        .attr("height", size);
+
+  svg
+    .append('path')
+    .attr('d', "M 0.5625,23.71875 C 2.0625,8.0625 14.439788,10.706994 17.625,7.5 20.810212,4.2930056 23.71875,0.375 23.71875,0.375")
+    .attr('fill', fill)
+    .attr('stroke-dasharray', dasharray)
+    .attr('stroke', stroke)
+    .attr('stroke-width', width * 2);
+
+  return svg.node();
+};
+
+function polygons_symbol(opts) {
+  const {size,stroke,strokewidth,fill,opacity} = opts;
+
+  const svg = d3.create("svg")
+        .attr("class", 'svg-polygon')
+        .attr("width", size)
+        .attr("height", size);
+
+  svg
+    .append('path')
+    .attr('d', "M 5.5532202,7.3474994 24.062506,2.1642083 26.51526,25.827 1.3896115,25.827438 Z")
+    .attr('fill', fill)
+    .attr('fill-opacity', opacity)
+    .attr('stroke', stroke)
+    .attr('stroke-width', strokewidth);
+
+  return svg.node();
+};
+
 function init() {
   const list = qs('#cards-pane #cards-list');
 
@@ -193,7 +250,7 @@ class dscard extends HTMLElement {
 
     switch (ds.datatype) {
     case 'points': {
-      e = ea_svg_points_symbol({
+      e = points_symbol({
         size: 24,
         fill: ds.vectors.fill,
         stroke: ds.vectors.stroke,
@@ -203,7 +260,7 @@ class dscard extends HTMLElement {
     }
 
     case 'lines': {
-      e = ea_svg_lines_symbol({
+      e = lines_symbol({
         size: 28,
         dasharray: ds.vectors.dasharray,
         stroke: ds.vectors.stroke,
@@ -215,7 +272,7 @@ class dscard extends HTMLElement {
 
     case 'polygons-boundaries':
     case 'polygons': {
-      e = ea_svg_polygons_symbol({
+      e = polygons_symbol({
         size: 28,
         fill: ds.vectors.fill,
         opacity: ds.vectors.opacity,

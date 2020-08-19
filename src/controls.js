@@ -257,6 +257,85 @@ class dscontrols extends HTMLElement {
 
 customElements.define('ds-controls', dscontrols);
 
+function ea_svg_switch(init, callback, opts = {}) {
+  const radius = 10,
+        svgwidth = 38,
+        svgheight = (radius * 2) + 2,
+        linewidth = radius * 2,
+        svgmin = radius + 1,
+        svgmax = svgwidth - radius - 1;
+
+  const svg = d3.create("svg")
+        .attr('class', 'svg-checkbox');
+
+  const defs = svg.append('defs');
+
+  const g = svg.append('g');
+
+  const gutter = g.append('rect');
+
+  const c1 = g.append('circle');
+
+  let status = init || false;
+
+  const active = getComputedStyle(document.body).getPropertyValue('--the-yellow');
+
+  svg
+    .attr('width', svgwidth)
+    .attr('height', svgheight)
+    .style('cursor', 'pointer');
+
+  defs
+    .append('filter')
+    .attr('id', 'shadow-switch')
+    .append('feDropShadow')
+    .attr('dx', 0.2)
+    .attr('dy', 0.2)
+    .attr('stdDeviation', 0.8);
+
+  gutter
+    .attr('stroke', 'none')
+    .attr('stroke-width', 0.4)
+    .attr('fill', 'white')
+    .attr('fill-opacity', 0.6)
+    .attr('rx', (6/8) * radius)
+    .attr('x', 1)
+    .attr('y', (3/16) * svgheight)
+    .attr('width', svgwidth - 2)
+    .attr('height', (5/8) * svgheight);
+
+  c1
+    .attr('r', radius)
+    .attr('cy', svgheight/2)
+    .attr('stroke', 'black')
+    .attr('stroke-width', 0.2)
+    .attr('fill', 'white')
+    .attr('style', 'filter: url(#shadow-switch);')
+    .style('cursor', 'grab')
+    .raise();
+
+  function change(s,x) {
+    c1
+      .attr('fill', (s ? active : 'white'))
+      .attr('cx', (s ? svgmax : svgmin));
+
+    gutter
+      .attr('stroke', 'black')
+      .style('fill', (s ? active : '#f9f9f9'));
+
+    if ((typeof callback === 'function') && x) callback(s);
+  };
+
+  svg.on('click', _ => change(status = !status, true));
+
+  change(status, false);
+
+  return {
+    svg: svg.node(),
+    change: change
+  };
+};
+
 function ea_controls_init() {
   ea_controls_selectlist();
 

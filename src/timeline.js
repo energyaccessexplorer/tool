@@ -1,4 +1,4 @@
-function ea_svg_timeline_slider(opts) {
+function timeline_slider(opts) {
   const {steps, drag, width, init} = opts;
 
   let v;
@@ -74,7 +74,7 @@ function ea_svg_timeline_slider(opts) {
   };
 };
 
-function ea_svg_multiline(opts) {
+function multiline(opts) {
   const {domain, range, data, color, message} = opts;
 
   const strokewidth = 2.5;
@@ -247,15 +247,15 @@ function ea_svg_multiline(opts) {
   };
 };
 
-async function ea_timeline_init() {
+async function init() {
   await until(_ => GEOGRAPHY.timeline_dates.length > 0);
 
-  const steps = GEOGRAPHY.timeline_dates.map(x => parseInt(x.replace('(^[0-9]{4}-)', '\1')));
+  const steps = GEOGRAPHY.timeline_dates.map(x => parseInt(x.replace('(^[0-9]{4}-)', '\\1'))); // <- \/\/ due to strict mode in modules
 
   const parent = qs('#timeline');
   const padding = 100;
 
-  const tl = ea_svg_timeline_slider({
+  const tl = timeline_slider({
     steps: steps,
     width: qs('#maparea').clientWidth - padding,
     init: steps.length - 1,
@@ -269,7 +269,7 @@ async function ea_timeline_init() {
   return tl;
 };
 
-function ea_timeline_lines_draw() {
+function lines_draw() {
   const datasets = DS.array.filter(d => d.on && d.datatype === 'polygons-timeline');
 
   if (!datasets.length) return;
@@ -300,7 +300,7 @@ function ea_timeline_lines_draw() {
     }
   });
 
-  const ml = ea_svg_multiline({
+  const ml = multiline({
     data: {
       series: series,
       dates: GEOGRAPHY.timeline_dates.map(d3.utcParse("%Y-%m-%d"))
@@ -331,14 +331,14 @@ function ea_timeline_lines_draw() {
   qs('#district-graph', rp).append(ml.svg);
 };
 
-async function ea_timeline_lines_update() {
+async function lines_update() {
   if (!GEOGRAPHY.timeline) return;
 
   const datasets = DS.array.filter(d => d.on && d.datatype === 'polygons-timeline');
 
   if (datasets.length) {
     await Promise.all(datasets.map(d => until(_ => d.csv.data)));
-    if (U.subgeoname) ea_timeline_lines_draw();
+    if (U.subgeoname) lines_draw();
   } else {
     const rp = qs('#right-pane');
     qs('#district-header', rp).innerText = "";
@@ -348,7 +348,7 @@ async function ea_timeline_lines_update() {
   }
 };
 
-async function ea_timeline_datasets_polygons_csv() {
+async function datasets_polygons_csv() {
   await until(_ => this.csv.data);
 
   this.domain[0] = d3.min([].concat(...GEOGRAPHY.timeline_dates.map(d => this.csv.data.map(r => +r[d]))));
@@ -401,3 +401,10 @@ function ea_timeline_filter_valued_polygons() {
 
   source.setData(source._data);
 };
+
+export {
+  init,
+  lines_draw,
+  lines_update,
+  datasets_polygons_csv
+}

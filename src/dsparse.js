@@ -1,4 +1,9 @@
 import * as plot from './plot.js';
+
+import {
+  datasets_polygons_csv as timeline_datasets_polygons_csv
+} from './timeline.js';
+
 import {
   zoomend as mapbox_zoomend,
   dblclick as mapbox_dblclick,
@@ -245,7 +250,7 @@ function polygons() {
         let col = null;
 
         if (this.timeline) {
-          await ea_timeline_datasets_polygons_csv.call(this);
+          await timeline_datasets_polygons_csv.call(this);
           col = U.timeline;
         }
         else if (this.config.column)

@@ -1,6 +1,12 @@
 import './ds.js';
 import * as indexes from './indexes.js';
 import * as cards from './cards.js';
+import {
+  init as timeline_init,
+  lines_draw as timeline_lines_draw,
+  lines_update as timeline_lines_update,
+} from './timeline.js';
+
 import {polygons_csv,polygons_feature_info} from './dsparse.js';
 import {plot_active as analysis_plot_active} from './analysis.js';
 import {
@@ -55,7 +61,7 @@ class Overlord {
 
       O.datasets = arr;
 
-      ea_timeline_lines_update();
+      timeline_lines_update();
       break;
 
     case "mutate":
@@ -240,7 +246,7 @@ async function init() {
 
   until(_ => DS.array.filter(d => d.on).every(d => d.loading === false)).then(O.sort);
 
-  if (GEOGRAPHY.timeline) ea_timeline_init();
+  if (GEOGRAPHY.timeline) timeline_init();
 
   if (!MOBILE && !GEOGRAPHY.timeline) ea_nanny_init();
 
@@ -491,7 +497,7 @@ function map_click(e) {
 
     if (t.vectors) vectors_click(p => {
       if (p.properties['District']) U.subgeoname = p.properties['District'];
-      ea_timeline_lines_draw();
+      timeline_lines_draw();
     });
 
     else if (t.raster.data) raster_click();

@@ -1,4 +1,4 @@
-function ea_plot(opts) {
+function drawcanvas(opts) {
   const {canvas, data, width, height, nodata, colorscale} = opts;
 
   const ctx = canvas.getContext("2d");
@@ -8,7 +8,8 @@ function ea_plot(opts) {
   canvas.width = width;
   canvas.height = height;
 
-  for (let i = p = 0; i < data.length; i += 1, p += 4) {
+  let i, p;
+  for (i = p = 0; i < data.length; i += 1, p += 4) {
     if (data[i] === nodata) continue;
 
     const c = colorscale.fn(data[i]);
@@ -27,21 +28,21 @@ function ea_plot(opts) {
 };
 
 /*
- * ea_plot_outputcanvas
+ * outputcanvas
  *
  * @param "raster" []numbers
  * @param "canvas" a canvas element (if null, will default to canvas#output)
  */
 
-function ea_plot_outputcanvas(data, canvas = null) {
+function outputcanvas(data, canvas = null) {
   const A = DST.get('boundaries');
 
   if (!data.length) {
-    warn("ea_plot_outputcanvas: no raster given. Filling up with a blank (transparent) one...");
+    warn("plot.outputcanvas: no raster given. Filling up with a blank (transparent) one...");
     data = new Float32Array(A.raster.data.length).fill(-1);
   };
 
-  ea_plot({
+  drawcanvas({
     canvas: canvas || qs('canvas#output'),
     data: data,
     width: A.raster.width,
@@ -86,4 +87,9 @@ function ea_coordinates_in_raster(coords, bounds, raster) {
   }
 
   return a;
+};
+
+export {
+  drawcanvas,
+  outputcanvas
 };

@@ -1,3 +1,5 @@
+import * as plot from './plot.js'
+
 /*
  * run
  *
@@ -208,7 +210,7 @@ function datasets(type) {
 
 async function plot_active(type) {
   const raster = run(type);
-  ea_plot_outputcanvas(raster);
+  plot.outputcanvas(raster);
 
   const index = ea_indexes[type];
 

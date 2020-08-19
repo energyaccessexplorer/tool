@@ -1,8 +1,10 @@
+import * as plot from './plot.js';
 import {
   zoomend as mapbox_zoomend,
   dblclick as mapbox_dblclick,
   pointer as mapbox_pointer,
 } from './mapbox.js';
+
 
 /*
  * The following functions fetch and load the different types of data to the
@@ -40,7 +42,7 @@ function tiff() {
       const r = this.raster;
 
       if (!r.canvas) {
-        r.canvas = ea_plot({
+        r.canvas = plot.drawcanvas({
           canvas: ce('canvas'),
           data: r.data,
           width: r.width,

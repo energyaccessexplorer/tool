@@ -1,3 +1,4 @@
+import * as plot from './plot.js';
 /*
  * summary
  *
@@ -75,7 +76,7 @@ async function summary() {
     c.style.display = 'none';
     document.body.append(c);
 
-    ea_plot_outputcanvas(raster, c);
+    plot.outputcanvas(raster, c);
   };
 
   await Promise.all(Object.keys(ea_indexes).map(i => get_summaries(i)));

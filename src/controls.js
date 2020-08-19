@@ -24,22 +24,22 @@ class dscontrols extends HTMLElement {
   };
 
   init() {
-    this.checkbox = ea_controls_checkbox.call(this.ds);
+    this.checkbox = checkbox.call(this.ds);
     this.header.onclick = this.checkbox.click;
 
     const cat = this.ds.category;
     const c = cat.controls;
 
     if (c.weight)
-      this.weight_group = ea_controls_weight.call(this.ds);
+      this.weight_group = weight.call(this.ds);
 
     if (this.ds.items)
-      this.collection_list = ea_controls_collection_list.call(this.ds);
+      this.collection_list = collection_list.call(this.ds);
 
     if (this.ds.mutant)
-      ea_controls_mutant_options.call(this.ds);
+      mutant_options.call(this.ds);
 
-    this.dropdown = new dropdown(ea_controls_dropdown.call(this));
+    this.dropdown = new dropdown(options.call(this));
   };
 
   async range_group_controls() {
@@ -61,7 +61,7 @@ class dscontrols extends HTMLElement {
     case 'raster-mutant': {
       await until(_ => this.ds._domain);
 
-      this.range_group = ea_controls_range.call(this.ds, {
+      this.range_group = range.call(this.ds, {
         ramp: lr,
         steps: steps,
         sliders: cat.controls.range
@@ -76,7 +76,7 @@ class dscontrols extends HTMLElement {
 
       await until(_ => this.ds._domain);
 
-      this.range_group = ea_controls_range.call(this.ds, {
+      this.range_group = range.call(this.ds, {
         ramp: lr,
         steps: steps,
         sliders: cat.controls.range,
@@ -89,7 +89,7 @@ class dscontrols extends HTMLElement {
     case 'polygons-timeline': {
       await until(_ => this.ds._domain);
 
-      this.range_group = ea_controls_range.call(this.ds, {
+      this.range_group = range.call(this.ds, {
         ramp: lr,
         steps: steps,
         sliders: cat.controls.range,
@@ -175,7 +175,7 @@ class dscontrols extends HTMLElement {
     let t = qs(`#controls-tab-${path[0]}.controls-branch-tab`);
     if (!t) {
       t = create_tab(path[0]);
-      t.onclick = _ => ea_controls_select_tab(t, path[0]);
+      t.onclick = _ => select_tab(t, path[0]);
       controls_tabs_el.append(t);
     }
 
@@ -257,7 +257,7 @@ class dscontrols extends HTMLElement {
 
 customElements.define('ds-controls', dscontrols);
 
-function ea_svg_switch(init, callback, opts = {}) {
+function toggle_switch(init, callback, opts = {}) {
   const radius = 10,
         svgwidth = 38,
         svgheight = (radius * 2) + 2,
@@ -336,8 +336,8 @@ function ea_svg_switch(init, callback, opts = {}) {
   };
 };
 
-function ea_controls_init() {
-  ea_controls_selectlist();
+function init() {
+  _selectlist();
 
   const controls = qs('#controls-contents');
   const controls_tabs_el = qs('#controls-tabs');
@@ -355,13 +355,13 @@ function ea_controls_init() {
     tab_all.classList.add('active');
   };
 
-  ea_controls_sort_datasets(GEOGRAPHY.configuration);
+  sort_datasets(GEOGRAPHY.configuration);
 
   const first = qs('.controls-branch-tab', controls_tabs_el);
-  ea_controls_select_tab(first, first.id.replace('controls-tab-', ''));
+  select_tab(first, first.id.replace('controls-tab-', ''));
 };
 
-function ea_controls_select_tab(tab, name) {
+function select_tab(tab, name) {
   const controls_tabs_el = qs('#controls-tabs');
   const controls = qs('#controls-contents');
 
@@ -379,11 +379,11 @@ function ea_controls_select_tab(tab, name) {
   if (b) b.style.display = 'block';
 };
 
-function ea_controls_checkbox() {
-  const checkbox = ea_svg_switch(this.on);
-  const svg = checkbox.svg;
+function checkbox() {
+  const c = toggle_switch(this.on);
+  const svg = c.svg;
 
-  checkbox.click = e => {
+  c.click = e => {
     if (e.target.closest('svg') === svg)
       this.toggle();
 
@@ -396,10 +396,10 @@ function ea_controls_checkbox() {
     return this.on;
   };
 
-  return checkbox;
+  return c;
 };
 
-async function ea_controls_mutant_options() {
+async function mutant_options() {
   await until(_ => maybe(this.hosts, 'length') === this.config.mutant_targets.length);
 
   const container = ce('div', null, { class: 'control-option' });
@@ -426,7 +426,7 @@ async function ea_controls_mutant_options() {
   });
 };
 
-function ea_controls_range(opts = {}) {
+function range(opts = {}) {
   if (!opts.sliders) return null;
 
   const domain = [];
@@ -443,7 +443,7 @@ function ea_controls_range(opts = {}) {
   const v1 = ce('div', null, { bind: "v1" });
   const v2 = ce('div', null, { bind: "v2" });
 
-  l = tmpl('#ramp');
+  const l = tmpl('#ramp');
   l.className = 'ramp';
   l.append(v1, ce('div', opts.ramp || 'range', { class: "unit-ramp" }), v2);
 
@@ -469,7 +469,7 @@ function ea_controls_range(opts = {}) {
   };
 };
 
-function ea_controls_weight() {
+function weight() {
   const weights = [1,2,3,4,5];
 
   const ramp = tmpl('#ramp');
@@ -499,7 +499,7 @@ function ea_controls_weight() {
   };
 };
 
-function ea_controls_collection_list() {
+function collection_list() {
   if (!this.items) return;
 
   const e = ce('ul', null, { class: 'collection' });
@@ -510,7 +510,7 @@ function ea_controls_collection_list() {
   return e;
 };
 
-async function ea_controls_selectlist() {
+async function _selectlist() {
   let data = {};
 
   const p = {
@@ -561,7 +561,7 @@ cursor: pointer;
   set_default(sl.input);
 };
 
-function ea_controls_sort_datasets(config) {
+function sort_datasets(config) {
   const {sort_datasets, sort_subbranches, sort_branches} = config;
 
   const controls = qs('#controls');
@@ -601,7 +601,7 @@ function ea_controls_sort_datasets(config) {
     }
 };
 
-function ea_controls_dropdown() {
+function options() {
   const dropdownlist = [];
 
   if (!Object.keys(this.ds.metadata).every(k => !this.ds.metadata[k])) {
@@ -643,4 +643,12 @@ function ea_controls_dropdown() {
   // }
   //
   return dropdownlist;
+};
+
+window.ea_controls_select_tab = select_tab;
+
+export {
+  init,
+  select_tab,
+  dscontrols,
 };

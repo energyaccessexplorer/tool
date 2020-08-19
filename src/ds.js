@@ -1,4 +1,5 @@
 import {dscard} from './cards.js';
+import {dscontrols} from './controls.js';
 
 class DS {
   constructor(o, on) {

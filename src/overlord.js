@@ -1,6 +1,7 @@
 import './ds.js';
 import * as indexes from './indexes.js';
 import * as cards from './cards.js';
+import * as controls from './controls.js';
 import {
   init as timeline_init,
   lines_draw as timeline_lines_draw,
@@ -237,7 +238,7 @@ async function init() {
   O.index = U.output;
 
   cards.init();
-  ea_controls_init();
+  controls.init();
 
   if (MOBILE) ea_mobile_init();
 

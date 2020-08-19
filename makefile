@@ -75,7 +75,6 @@ build-a:
 		${SRC}/a.js \
 		${SRC}/timeline.js \
 		${SRC}/controls.js \
-		${SRC}/ui.js \
 		${SRC}/nanny-steps.js \
 		${SRC}/mobile.js \
 		${SRC}/globals.js \
@@ -120,7 +119,6 @@ build-s:
 
 	@echo -n "const ea_settings = " | cat - \
 		settings.json \
-		${SRC}/ui.js \
 		${SRC}/s.js \
 		> ${DIST}/s/main.js
 

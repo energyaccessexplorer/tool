@@ -1,5 +1,7 @@
 import {DS} from './ds.js';
 
+let slider_width;
+
 class dscontrols extends HTMLElement {
   constructor(d) {
     if (!(d instanceof DS)) throw Error(`dscontrols: Expected a DS. Got ${d}.`);
@@ -457,9 +459,12 @@ function range(opts = {}) {
   l.className = 'ramp';
   l.append(v1, ce('div', opts.ramp || 'range', { class: "unit-ramp" }), v2);
 
+  if (!slider_width)
+    slider_width = Math.max(qs('#controls-contents').clientWidth - 64, 256);
+
   const r = ea_svg_interval({
     sliders: opts.sliders,
-    width: opts.width || 256,
+    width: slider_width,
     init: this.domain_init,
     domain: this.domain,
     steps: opts.steps,
@@ -494,7 +499,7 @@ function weight() {
     init: [1, this.weight],
     domain: [1, 5],
     steps: weights,
-    width: 256,
+    width: slider_width,
     end_callback: x => O.dataset(this, 'weight', x)
   });
 

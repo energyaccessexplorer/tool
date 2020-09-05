@@ -83,7 +83,7 @@ function tiff() {
       this.raster.data = rasters[0];
       this.raster.width = image.getWidth();
       this.raster.height = image.getHeight();
-      this.raster.nodata = parseFloat(tiff.fileDirectories[0][0].GDAL_NODATA);
+      this.raster.nodata = parseFloat(image.fileDirectory.GDAL_NODATA);
     }
 
     if (this.datatype === 'raster') draw.call(this);

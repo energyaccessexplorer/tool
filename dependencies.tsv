@@ -1,8 +1,8 @@
 d3.js	https://d3js.org/d3.v5.min.js
 topojson.js	https://unpkg.com/topojson/dist/topojson
 geotiff.js	https://cdn.jsdelivr.net/npm/geotiff
-mapbox-gl.js	https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.js
-mapbox-gl.css	https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.css
+mapbox-gl.js	https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js
+mapbox-gl.css	https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css
 geojson-extent.js	https://raw.githubusercontent.com/mapbox/geojson-extent/master/geojson-extent.js
 html5sortable.js	https://unpkg.com/html5sortable/dist/html5sortable.js
 countries.json	https://raw.githubusercontent.com/mledoze/countries/master/dist/countries.json

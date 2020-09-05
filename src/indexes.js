@@ -4,6 +4,7 @@ import {
 
 import {
   datasets as analysis_datasets,
+  raster_to_tiff,
 } from './analysis.js';
 
 const PIES = {

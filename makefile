@@ -73,7 +73,6 @@ build-a:
 		${SRC}/utils.js \
 		${SRC}/a.js \
 		${SRC}/nanny-steps.js \
-		${SRC}/mobile.js \
 		${SRC}/globals.js \
 		> ${DIST}/a/main.js
 

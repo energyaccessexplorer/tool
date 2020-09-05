@@ -273,6 +273,7 @@ function ea_svg_interval(opts = {}) {
       .on('end', _ => {
         if (typeof end_callback === 'function') end_callback(norm(x_position));
       })
+      .touchable(MOBILE)
   );
 
   c2.call(
@@ -287,6 +288,7 @@ function ea_svg_interval(opts = {}) {
       .on('end', _ => {
         if (typeof end_callback === 'function') end_callback(norm(x_position));
       })
+      .touchable(MOBILE)
   );
 
   function change(a,b) {

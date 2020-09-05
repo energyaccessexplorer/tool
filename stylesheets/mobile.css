@@ -47,8 +47,9 @@
 
   #views {
     width: 100%;
-    position: initial;
+    position: fixed;
     top: unset;
+	bottom: 0;
   }
 
   #mapbox-container {

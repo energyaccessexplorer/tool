@@ -11,31 +11,40 @@ import {
 } from './mapbox.js';
 
 
-/*
- * The following functions fetch and load the different types of data to the
- * datasets geojsons (points, lines or polygons), CSV's or rasters.
- */
+async function fetchcheck(endpoint, format) {
+  return fetch(endpoint)
+    .catch(err => fail.call(this, `Could not fetch ${format}`))
+    .then(response => {
+      if (!(response.ok && response.status < 400))
+        fail.call(this, `${format} Endpoint gave ${response.status} response.`);
+      else
+        return response;
+    });
+};
 
-function fail(format) {
+function fail(msg) {
+  this.disable();
+
+  const err = msg || "";
+
   ea_flash.push({
     type: 'error',
     timeout: 5000,
-    title: "Network error",
+    title: "Dataset error",
     message: `
-Failed to process the ${format} for '${this.name}'.
-This is not fatal. Dataset disabled.`
+Failed to process dataset '${this.name}'.
+This is not fatal but the dataset is now disabled.
+
+${err}`
   });
 
-  this.disable();
-
-  throw Error(`"Dataset ${this.name} disabled. Failed to fetch ${format}.`);
+  console.error(`"Dataset '${this.name}' disabled.`);
 };
 
 function csv() {
   if (this.csv.data) return;
 
-  return fetch(this.csv.endpoint)
-    .catch(err => fail.call(this, "CSV"))
+  return fetchcheck(this.csv.endpoint, "CSV")
     .then(d => d.text())
     .then(r => d3.csvParse(r))
     .then(d => this.csv.data = d);
@@ -84,25 +93,27 @@ function tiff() {
       this.raster.width = image.getWidth();
       this.raster.height = image.getHeight();
       this.raster.nodata = parseFloat(image.fileDirectory.GDAL_NODATA);
+
+      if (this.id !== 'boundaries') {
+        const b = DST.get('boundaries');
+
+        if (this.raster.height !== b.raster.height
+            || this.raster.width !== b.raster.width) {
+          fail.call(this, "Raster resolution does not match the boundaries dataset.")
+        }
+      }
     }
 
     if (this.datatype === 'raster') draw.call(this);
   };
 
   let t;
-  if (maybe(this.raster, 'data')) {
+  if (maybe(this.raster, 'data'))
     t = Whatever;
-  }
 
-  else {
-    t = fetch(this.raster.endpoint)
-      .catch(err => fail.call(this, "TIFF"))
-      .then(r => {
-        if (!(r.ok && r.status < 400)) fail.call(this, "TIFF");
-        else return r;
-      })
+  else
+    t = fetchcheck(this.raster.endpoint, "TIFF")
       .then(r => r.blob())
-  }
 
   return t.then(b => run_it.call(this, b));
 };
@@ -111,12 +122,7 @@ function geojson() {
   if (this.vectors.features)
     return Whatever;
 
-  return fetch(this.vectors.endpoint)
-    .catch(err => fail.call(this, "GEOJSON"))
-    .then(r => {
-      if (!(r.ok && r.status < 400)) fail.call(this, "GEOJSON");
-      else return r;
-    })
+  return fetchcheck(this.vectors.endpoint, "GEOJSON")
     .then(r => r.json())
     .then(r => {
       this.vectors.features = r;
@@ -373,6 +379,7 @@ function polygons_feature_info(et, e) {
 };
 
 export {
+  fail,
   tiff,
   polygons,
   points,

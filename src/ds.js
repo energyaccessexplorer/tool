@@ -46,14 +46,8 @@ class DS {
       this.domain = this._domain = [-Infinity, Infinity];
 
     else if (undefined === this.domain) {
-      ea_flash.push({
-        title: `'${this.id}' ignored`,
-        message: `Cannot set dataset's domain`,
-        timeout: 5000,
-        type: 'error'
-      });
-      warn(`Could not set a domain for ${this.id}. Abort.`);
-      this.disable();
+      parse.fail.call(this, "Cannot set dataset's domain. This is likely a configuration error.");
+      return;
     }
 
     this.init();
@@ -184,17 +178,7 @@ class DS {
 
     case undefined:
     default: {
-      ea_flash.push({
-        title: `'${this.id}' disabled`,
-        message: `Cannot decide dataset's type`,
-        timeout: 5000,
-        type: 'error'
-      });
-
-      warn(`Datatype of ${this.id} is undefined. Disabling...`);
-
-      this.disable();
-
+      parse.fail.call(this, "Cannot decide dataset's type. This is likely a configuration error");
       break;
     }
     }
@@ -428,20 +412,7 @@ class DS {
   };
 
   active(d, draw) {
-    this
-      ._active(...arguments)
-      .catch(_ => {
-        ea_flash.push({
-          type: 'error',
-          timeout: 5000,
-          title: "Parse error",
-          message: `
-Failed to process '${this.name}', seems misconfigured.
-This is not fatal. Dataset disabled.`
-        });
-
-        this.disable();
-      });
+    this._active(...arguments)
   };
 
   info_modal() {
@@ -468,7 +439,10 @@ This is not fatal. Dataset disabled.`
         await this.load();
         this.controls.loading(false);
       }
-      else await this.load();
+      else
+        await this.load();
+
+      if (this.disabled) return;
 
       if (draw) this.raise();
     }

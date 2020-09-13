@@ -170,23 +170,11 @@ async function dsinit(id, inputs, pack, callback) {
 
   await ea_api.get("geography_boundaries", { "geography_id": `eq.${id}` }, { one: true })
     .catch(_ => {
-      ea_flash.push({
-        type: 'error',
-        timeout: 10000,
-        title: "Geography error",
-        message: `
-Failed to get the 'boundaries' dataset.
-This is fatal.
+      const m = `
+Failed to get the geography's 'boundaries' dataset.
+This is fatal. Thanks for all the fish.`;
 
-Thanks for all the fish.`
-      });
-
-      const l = qs('#app-loading');
-      qs('.spinner', l).style.animation = 'none';
-      qs('.spinner', l).style.borderTop = 'none';
-      qs('p', l).innerHTML = "Failed &nbsp; <code>:(</code>";
-
-      qs('#playground').remove();
+      ea_super_error("Geography error", m);
 
       throw Error("No 'boundaries' dataset. Ciao.");
     })

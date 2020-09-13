@@ -169,3 +169,19 @@ function ea_nanny_force_start() {
 
   ea_nanny.start();
 };
+
+function ea_super_error(t, m) {
+  ea_flash.push({
+    type: 'error',
+    timeout: 0,
+    title: t,
+    message: m
+  });
+
+  const l = qs('#app-loading');
+  qs('.spinner', l).style.animation = 'none';
+  qs('.spinner', l).style.borderTop = 'none';
+  qs('p', l).innerHTML = "Failed &nbsp; <code>:(</code>";
+
+  qs('#playground').remove();
+};

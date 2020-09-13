@@ -15,10 +15,9 @@ async function fetchcheck(endpoint, format) {
   return fetch(endpoint)
     .catch(err => fail.call(this, `Could not fetch ${format}`))
     .then(response => {
-      if (!(response.ok && response.status < 400))
-        fail.call(this, `${format} Endpoint gave ${response.status} response.`);
-      else
-        return response;
+      if (response.ok && response.status < 400) return response;
+
+      fail.call(this, `${format} Endpoint gave ${response.status} response.`);
     });
 };
 
@@ -27,16 +26,27 @@ function fail(msg) {
 
   const err = msg || "";
 
-  ea_flash.push({
-    type: 'error',
-    timeout: 5000,
-    title: "Dataset error",
-    message: `
+  let m;
+  if (this.id === 'boundaries')
+    ea_super_error("Dataset error", `
+Failed to process dataset '${this.name}'.
+
+${err}
+
+This is fatal. Thanks for all the fish.`);
+
+  else {
+    ea_flash.push({
+      type: 'error',
+      timeout: 5000,
+      title: "Dataset error",
+      message: `
 Failed to process dataset '${this.name}'.
 This is not fatal but the dataset is now disabled.
 
 ${err}`
-  });
+    });
+  }
 
   console.error(`"Dataset '${this.name}' disabled.`);
 };
@@ -44,7 +54,7 @@ ${err}`
 function csv() {
   if (this.csv.data) return;
 
-  return fetchcheck(this.csv.endpoint, "CSV")
+  return fetchcheck.call(this, this.csv.endpoint, "CSV")
     .then(d => d.text())
     .then(r => d3.csvParse(r))
     .then(d => this.csv.data = d);
@@ -112,7 +122,7 @@ function tiff() {
     t = Whatever;
 
   else
-    t = fetchcheck(this.raster.endpoint, "TIFF")
+    t = fetchcheck.call(this, this.raster.endpoint, "TIFF")
       .then(r => r.blob())
 
   return t.then(b => run_it.call(this, b));
@@ -122,7 +132,7 @@ function geojson() {
   if (this.vectors.features)
     return Whatever;
 
-  return fetchcheck(this.vectors.endpoint, "GEOJSON")
+  return fetchcheck.call(this, this.vectors.endpoint, "GEOJSON")
     .then(r => r.json())
     .then(r => {
       this.vectors.features = r;

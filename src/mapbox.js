@@ -238,7 +238,23 @@ function fit(bounds, animate = false) {
   const hp = (rect.width > rect.height) ? 0 : (rect.width * 0.1);
   const vp = (rect.height > rect.width) ? 0 : (rect.height * 0.1);
 
-  MAPBOX.fitBounds(bounds, { animate: animate, padding: { top: vp, bottom: vp, left: hp, right: hp } });
+  try {
+    MAPBOX.fitBounds(bounds, { animate: animate, padding: { top: vp, bottom: vp, left: hp, right: hp } });
+  } catch (e) {
+    ea_super_error(
+      "Geography bounding box",
+      `
+Mapbox says:
+${e}
+
+Tried to fit to:
+	${JSON.stringify(bounds)}
+
+This is fatal. Thanks for all the fish.`
+    );
+
+    throw new Error("Could not set geography's bounds. Ciao.");
+  }
 
   const l = bounds[0];
   const r = bounds[2];

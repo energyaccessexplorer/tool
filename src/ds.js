@@ -246,7 +246,12 @@ class DS {
     DST.delete(this.id);
   };
 
-  add_source(opts) {
+  add_source(opts, as) {
+    if (as) {
+      MAPBOX.addSource(as, opts);
+      return;
+    }
+
     if (this.source && MAPBOX.getSource(this.id)) return;
 
     MAPBOX.addSource(this.id, opts);
@@ -254,7 +259,15 @@ class DS {
     this.source = MAPBOX.getSource(this.id);
   };
 
-  add_layer(opts) {
+  add_layer(opts, as) {
+    if (as) {
+      opts['id'] = as;
+      opts['source'] = as;
+
+      MAPBOX.addLayer(opts, MAPBOX.first_symbol);
+      return;
+    }
+
     if (this.layer && MAPBOX.getLayer(this.id)) return;
 
     opts['id'] = this.id;

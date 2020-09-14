@@ -62,7 +62,7 @@ function csv() {
 
 function tiff() {
   async function run_it(blob) {
-    function draw() {
+    function draw(overrideid) {
       const r = this.raster;
 
       if (!r.canvas) {
@@ -81,7 +81,7 @@ function tiff() {
         "canvas": r.canvas,
         "animate": false,
         "coordinates": MAPBOX.coords
-      });
+      }, overrideid);
 
       this.add_layer({
         "type": 'raster',
@@ -91,7 +91,7 @@ function tiff() {
         "paint": {
           "raster-resampling": "nearest"
         }
-      });
+      }, overrideid);
     };
 
     if (!maybe(this.raster, 'data')) {
@@ -113,6 +113,8 @@ function tiff() {
         }
       }
     }
+
+    this.drawraster = draw;
 
     if (this.datatype === 'raster') draw.call(this);
   };

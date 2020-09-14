@@ -22,8 +22,6 @@ async function fetchcheck(endpoint, format) {
 };
 
 function fail(msg) {
-  this.disable();
-
   const err = msg || "";
 
   let m;
@@ -48,7 +46,13 @@ ${err}`
     });
   }
 
+  this.disable();
   console.error(`"Dataset '${this.name}' disabled.`);
+
+  if (!U.inputs) return;
+
+  const arr = U.inputs; arr.splice(U.inputs.indexOf(this.id), 1);
+  U.inputs = arr;
 };
 
 function csv() {

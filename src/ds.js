@@ -226,6 +226,8 @@ class DS {
     this.on = false;
     this.disabled = true;
 
+    DST.delete(this.id);
+
     if (this.controls) this.controls.disable();
 
     if (this.card) this.card.disable();
@@ -239,11 +241,6 @@ class DS {
     }
 
     if (MAPBOX.getLayer(this.id)) MAPBOX.removeLayer(this.id);
-
-    const arr = U.inputs; arr.splice(U.inputs.indexOf(this.id), 1);
-    U.inputs = arr;
-
-    DST.delete(this.id);
   };
 
   add_source(opts, as) {
@@ -414,10 +411,6 @@ class DS {
       this.hosts.forEach(d => d.layer.setLayoutProperty(d.id, 'visibility', 'none'));
       this.host.layer.setLayoutProperty(this.host.id, 'visibility', t ? 'visible' : 'none');
     }
-  };
-
-  toggle() {
-    O.dataset(this, 'active', (this.on = !this.on));
   };
 
   set __domain(d) {

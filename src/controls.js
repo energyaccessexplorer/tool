@@ -5,6 +5,10 @@ let slider_width;
 const contents_el = qs('#controls-contents');
 const tabs_el = qs('#controls-tabs');
 
+function dstoggle() {
+  O.dataset(this, 'active', (this.on = !this.on));
+};
+
 class dscontrols extends HTMLElement {
   constructor(d) {
     if (!(d instanceof DS)) throw Error(`dscontrols: Expected a DS. Got ${d}.`);
@@ -393,7 +397,7 @@ function checkbox() {
 
   c.click = e => {
     if (e.target.closest('svg') === svg)
-      this.toggle();
+      dstoggle.call(this);
 
     else if (e.target.closest('.more-dropdown') === this.controls.dropdown)
       return;
@@ -688,7 +692,7 @@ function options() {
     dropdownlist.push({
       "content": "Toggle advanced controls",
       "action": _ => {
-        if (!this.ds.on) this.ds.toggle();
+        if (!this.ds.on) dstoggle.call(this.ds);
 
         qs('.advanced-controls', this).style.display = (this.show_advanced = !this.show_advanced) ? 'block' : 'none';
       }

@@ -5,10 +5,6 @@ let slider_width;
 const contents_el = qs('#controls-contents');
 const tabs_el = qs('#controls-tabs');
 
-function dstoggle() {
-  O.dataset(this, 'active', (this.on = !this.on));
-};
-
 class dscontrols extends HTMLElement {
   constructor(d) {
     if (!(d instanceof DS)) throw Error(`dscontrols: Expected a DS. Got ${d}.`);
@@ -150,11 +146,12 @@ class dscontrols extends HTMLElement {
   };
 
   inject() {
+    if (!tabs_el) return;
+
     const ds = this.ds;
     const path = maybe(ds.category, 'controls', 'path');
 
     if (!path.length) return;
-
 
     function create_tab(name) {
       return ce('div', humanformat(name), { id: 'controls-tab-' + name, class: 'controls-branch-tab up-title' });
@@ -265,6 +262,10 @@ class dscontrols extends HTMLElement {
 };
 
 customElements.define('ds-controls', dscontrols);
+
+function dstoggle() {
+  O.dataset(this, 'active', (this.on = !this.on));
+};
 
 function humanformat(s) {
   return s
@@ -460,7 +461,7 @@ function range(opts = {}) {
   l.append(v1, ce('div', opts.ramp || 'range', { class: "unit-ramp" }), v2);
 
   if (!slider_width)
-    slider_width = Math.max(contents_el.clientWidth - 64, 256);
+    slider_width = Math.max(coalesce(maybe(contents_el, 'clientWidth'), 0) - 64, 256);
 
   const r = ea_svg_interval({
     sliders: opts.sliders,
@@ -661,7 +662,7 @@ function sort_datasets(config) {
       }
     }
 
-  const branches_elements = qsa('.controls-branch', tabs_el);
+  const branches_elements = qsa('.controls-branch', contents_el);
   const branches_tabs = qsa('.controls-branch-tab', tabs_el);
 
   if (maybe(sort_branches, 'length'))

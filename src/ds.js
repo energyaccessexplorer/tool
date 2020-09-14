@@ -4,7 +4,7 @@ import {dscontrols} from './controls.js';
 
 import * as parse from './dsparse.js';
 
-class DS {
+export class DS {
   constructor(o, on) {
     this.id = o.name || o.category.name;
 
@@ -513,7 +513,3 @@ class DS {
     return Array.from(DST.values());
   };
 };
-
-export {
-  DS
-}

@@ -42,7 +42,7 @@ stop:
 	@stop-port ${TOOL_PORT}
 
 build-a:
-	@echo "Building a"
+	@echo "Building analysis screen"
 	@mkdir -p ${DIST}/a
 
 	@mustache /dev/null ${VIEWS}/a.html > ${DIST}/a/index.html
@@ -96,7 +96,7 @@ build-a:
 
 
 build-s:
-	@echo "Building s"
+	@echo "Building select screen"
 	@mkdir -p ${DIST}/s
 
 	@mustache /dev/null ${VIEWS}/s.html > ${DIST}/s/index.html

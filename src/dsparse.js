@@ -107,9 +107,12 @@ function tiff() {
       if (this.id !== 'boundaries') {
         const b = DST.get('boundaries');
 
-        if (this.raster.height !== b.raster.height
-            || this.raster.width !== b.raster.width) {
-          fail.call(this, "Raster resolution does not match the boundaries dataset.")
+        if (this.raster.width !== b.raster.width) {
+          fail.call(this, `
+Raster resolution does not match the boundaries dataset.
+${this.id}: ${this.raster.width} x ${this.raster.height}
+boundaries: ${b.raster.width} x ${b.raster.height}
+`)
         }
       }
     }

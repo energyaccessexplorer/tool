@@ -2,6 +2,9 @@ import {DS} from './ds.js';
 
 let slider_width;
 
+const contents_el = qs('#controls-contents');
+const tabs_el = qs('#controls-tabs');
+
 class dscontrols extends HTMLElement {
   constructor(d) {
     if (!(d instanceof DS)) throw Error(`dscontrols: Expected a DS. Got ${d}.`);
@@ -148,8 +151,6 @@ class dscontrols extends HTMLElement {
 
     if (!path.length) return;
 
-    const controls = qs('#controls-contents');
-    const controls_tabs_el = qs('#controls-tabs');
 
     function create_tab(name) {
       return ce('div', humanformat(name), { id: 'controls-tab-' + name, class: 'controls-branch-tab up-title' });
@@ -180,12 +181,12 @@ class dscontrols extends HTMLElement {
     if (!t) {
       t = create_tab(path[0]);
       t.onclick = _ => select_tab(t, path[0]);
-      controls_tabs_el.append(t);
+      tabs_el.append(t);
     }
 
-    let b = qs(`#controls-branch-${path[0]}.controls-branch`, controls);
+    let b = qs(`#controls-branch-${path[0]}.controls-branch`, contents_el);
     if (!b) b = create_branch(path[0]);
-    controls.append(b);
+    contents_el.append(b);
 
     let sb = qs(`#controls-subbranch-${path[1]}.controls-subbranch`, b);
     if (!sb) sb = create_subbranch(path[1]);
@@ -351,17 +352,15 @@ function toggle_switch(init, callback, opts = {}) {
 function init() {
   _selectlist();
 
-  const controls = qs('#controls-contents');
-  const controls_tabs_el = qs('#controls-tabs');
   const tab_all = ce('div', "all", { id: 'controls-tab-all', class: 'controls-branch-tab up-title' });
 
-  controls_tabs_el.append(tab_all);
+  tabs_el.append(tab_all);
 
   tab_all.onclick = function() {
-    for (let e of qsa('.controls-branch-tab', controls_tabs_el))
+    for (let e of qsa('.controls-branch-tab', tabs_el))
       e.classList.remove('active');
 
-    for (let e of qsa('.controls-branch', controls))
+    for (let e of qsa('.controls-branch', contents_el))
       e.style.display = '';
 
     tab_all.classList.add('active');
@@ -369,25 +368,22 @@ function init() {
 
   sort_datasets(GEOGRAPHY.configuration);
 
-  const first = qs('.controls-branch-tab', controls_tabs_el);
+  const first = qs('.controls-branch-tab', tabs_el);
   select_tab(first, first.id.replace('controls-tab-', ''));
 };
 
 function select_tab(tab, name) {
-  const controls_tabs_el = qs('#controls-tabs');
-  const controls = qs('#controls-contents');
-
-  for (let e of qsa('.controls-branch-tab', controls_tabs_el))
+  for (let e of qsa('.controls-branch-tab', tabs_el))
     e.classList.remove('active');
 
-  for (let e of qsa('.controls-branch', controls)) {
+  for (let e of qsa('.controls-branch', contents_el)) {
     let all = (name === 'all');
     e.style.display = all ? '' : 'none';
   }
 
   tab.classList.add('active');
 
-  const b = qs('#controls-branch-' + name, controls);
+  const b = qs('#controls-branch-' + name, contents_el);
   if (b) b.style.display = 'block';
 };
 
@@ -460,7 +456,7 @@ function range(opts = {}) {
   l.append(v1, ce('div', opts.ramp || 'range', { class: "unit-ramp" }), v2);
 
   if (!slider_width)
-    slider_width = Math.max(qs('#controls-contents').clientWidth - 64, 256);
+    slider_width = Math.max(contents_el.clientWidth - 64, 256);
 
   const r = ea_svg_interval({
     sliders: opts.sliders,
@@ -642,8 +638,7 @@ cursor: pointer;
 function sort_datasets(config) {
   const {sort_datasets, sort_subbranches, sort_branches} = config;
 
-  const controls = qs('#controls');
-  const controls_elements = qsa('ds-controls', controls);
+  const controls_elements = qsa('ds-controls', contents_el);
 
   if (maybe(sort_datasets, 'length'))
     for (let id of sort_datasets.slice(0).reverse()) {
@@ -653,7 +648,7 @@ function sort_datasets(config) {
       }
     }
 
-  const subbranches_elements = qsa('.controls-subbranch', controls);
+  const subbranches_elements = qsa('.controls-subbranch', tabs_el);
 
   if (maybe(sort_subbranches, 'length'))
     for (let subbranch of sort_subbranches.slice(0).reverse()) {
@@ -662,8 +657,8 @@ function sort_datasets(config) {
       }
     }
 
-  const branches_elements = qsa('.controls-branch', controls);
-  const branches_tabs = qsa('.controls-branch-tab', controls);
+  const branches_elements = qsa('.controls-branch', tabs_el);
+  const branches_tabs = qsa('.controls-branch-tab', tabs_el);
 
   if (maybe(sort_branches, 'length'))
     for (let branch of sort_branches.slice(0).reverse()) {

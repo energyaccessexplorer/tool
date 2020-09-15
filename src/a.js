@@ -32,19 +32,8 @@ function ea_layout_init() {
 
   if (MOBILE) m.style['width'] = screen.width + "px";
 
-  const oc = el_tree(
-    [ ce('div', null, { id: 'bottom-right-container-output', class: 'bottom-right-container' }), [
-      [ ce('select', null, { id: 'canvas-output-select' }) ],
-      [ ce('canvas', null, { id: 'output' }) ]
-    ]]
-  );
-
-  const gc = el_tree(
-    [ ce('div', null, { id: 'bottom-right-container-graphs', class: 'bottom-right-container' }), [
-      [ ce('h3', null, { id: 'district-header', class: "header" }) ],
-      [ ce('div', null, { id: 'district-graph', class: "graphs" }) ]
-    ]]
-  );
+  const oc = tmpl('#bottom-right-container-output-template');
+  const gc = tmpl('#bottom-right-container-graphs-template');
 
   if (GEOGRAPHY.timeline) {
     qs('#filtered-pane').append(oc);

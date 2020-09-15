@@ -1,0 +1,131 @@
+<template id="bottom-right-container-output-template">
+  <div id="bottom-right-container-output" class="bottom-right-container">
+	<select id="canvas-output-select"></select>
+	<canvas id="output"></canvas>
+  </div>
+</template>
+
+<template id="bottom-right-container-graphs-template">
+  <div id="bottom-right-container-graphs" class="bottom-right-container">
+	<h3 id="district-header" class="header"></h3>
+	<div id="district-graph" class="graphs"></div>
+  </div>
+</template>
+
+<template id="country-overview">
+  <div class="country-overview">
+    <section>
+      <strong>Population:</strong> <span bind="population"></span> million
+    </section>
+
+    <section>
+      <strong>&nbsp;&nbsp;&nbsp;&nbsp; Urban:</strong> <span bind="urban_population"></span>%
+    </section>
+
+    <section>
+      <strong>&nbsp;&nbsp;&nbsp;&nbsp; Rural:</strong> <span bind="rural_population"></span>%
+    </section>
+
+    <section>
+      <strong>Area:</strong> <span bind="area"></span> km<sup>2</sup>
+    </section>
+
+    <section>
+      <strong>GDP per capita:</strong> USD <span bind="gdp_percapita"></span>
+    </section>
+
+    <section>
+      <strong>Electrification Rate:</strong> <span bind="electrification"></span>%
+    </section>
+
+    <section>
+      <div style="display: flex; justify-content: space-around;
+                  text-align: center;
+                  text-transform: uppercase;
+                  color: var(--the-green);">
+        <strong style="margin: 0.5em;">Urban</strong>
+        <strong style="margin: 0.5em;">Rural</strong>
+      </div>
+
+      <div style="display: flex; justify-content: space-around;
+                  margin-bottom: 30px;">
+        <div style="display: flex; justify-content: space-around; width: 240px; padding: 0 1em;
+                    border-right: 1px solid lightgray;">
+          <span class="small">
+            Electrified:&nbsp; <strong><span bind="urban_electrification"></span>%</strong>
+          </span>
+
+          <span bind="urban_electrification_pie"></span>
+        </div>
+
+        <div style="display: flex; justify-content: space-around; width: 240px; padding: 0 1em;">
+          <span class="small">
+            Electrified:&nbsp; <strong><span bind="rural_electrification"></span>%</strong>
+          </span>
+
+          <span bind="rural_electrification_pie"></span>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <strong>Energy intensity level of primary energy (MJ/$2011 PPP GDP):</strong> <span bind="primary_intensity"></span>
+    </section>
+
+    <section>
+      <strong>Power outages in firms in a typical month:</strong> <span bind="outages_average"></span>
+    </section>
+  </div>
+</template>
+
+<template id="ds-info-modal">
+  <div style="display:flex; flex-flow: row nowrap;">
+    <div class="left" style="flex: 1;">
+      <section bind-cond="description">
+        <h3>Description</h3><pre class="description-text" bind="description"></pre>
+      </section>
+
+      <section bind-cond="why">
+        <h3>Why is this dataset used?</h3><pre class="description-text" bind="why"></pre>
+      </section>
+
+      <section bind-cond="suggested_citation">
+        <h3>Suggested Citation</h3><pre class="description-text" bind="suggested_citation"></pre>
+      </section>
+
+      <section bind-cond="cautions">
+        <h3>Cautions</h3><pre class="description-text" bind="cautions"></pre>
+      </section>
+    </div>
+
+    <div class="right" style="flex: 0 300px; padding-left: 3em;">
+      <section>
+        <a class="download-link" id="metadata-sources" target="_blank">Download from Source</a>
+      </section>
+
+      <section>
+        <a class="download-link" id="learn-more" target="_blank">Learn More</a>
+      </section>
+
+      <section bind-cond="sources">
+        <h3>Sources</h3>
+        <pre class="description-text" bind="sources"></pre>
+      </section>
+
+      <section bind-cond="spatial_resolution">
+        <h3>Spatial Resolution</h3>
+        <span bind="spatial_resolution"></span>
+      </section>
+
+      <section bind-cond="license">
+        <h3>License</h3>
+        <span bind="license"></span>
+      </section>
+
+      <section bind-cond="content_date">
+        <h3>Date of Content</h3>
+        <span bind="content_date"></span>
+      </section>
+    </div>
+  </div>
+</template>

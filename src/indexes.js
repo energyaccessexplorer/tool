@@ -1,6 +1,4 @@
-import {
-  analyse as summary_analyse,
-} from './summary.js';
+import summary_analyse from './summary.js';
 
 import {
   datasets as analysis_datasets,

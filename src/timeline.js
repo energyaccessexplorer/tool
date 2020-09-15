@@ -1,4 +1,4 @@
-import {DS} from './ds.js';
+import DS from './ds.js';
 
 function timeline_slider(opts) {
   const {steps, drag, width, init} = opts;

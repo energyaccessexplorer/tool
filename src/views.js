@@ -43,9 +43,6 @@ function init() {
   }
 };
 
-window.ea_views_buttons = buttons;
-window.right_pane = right_pane;
-
 export {
   init,
   buttons,

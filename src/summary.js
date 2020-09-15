@@ -1,9 +1,8 @@
 import * as plot from './plot.js';
+
 import * as report from './report.js';
 
-import {
-  run as ea_analysis,
-} from './analysis.js';
+import ea_analysis from './analysis.js';
 
 /*
  * summary
@@ -146,7 +145,7 @@ async function summary() {
   return content;
 };
 
-async function analyse(raster) {
+export default async function analyse(raster) {
   let ds = DST.get('population-density');
 
   if (!ds) {
@@ -227,10 +226,4 @@ function wrapper() {
     .then(_ => ea_loading(false));
 };
 
-// TODO: fix this. (it is used by the "Snapshot" button as an onclick attribute)
-//
-window.ea_summary_wrapper = wrapper;
-
-export {
-  analyse,
-};
+qs('#summary-button').onclick = wrapper;

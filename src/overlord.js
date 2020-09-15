@@ -1,6 +1,6 @@
-import {DS} from './ds.js';
+import DS from './ds.js';
 
-export class Overlord {
+export default class Overlord {
   layers() {
     Promise.all(U.inputs.map(id => DST.get(id).active(true, ['inputs', 'timeline'].includes(U.view))));
   };

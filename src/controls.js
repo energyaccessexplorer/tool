@@ -1,11 +1,11 @@
-import {DS} from './ds.js';
+import DS from './ds.js';
 
 let slider_width;
 
 const contents_el = qs('#controls-contents');
 const tabs_el = qs('#controls-tabs');
 
-class dscontrols extends HTMLElement {
+export default class dscontrols extends HTMLElement {
   constructor(d) {
     if (!(d instanceof DS)) throw Error(`dscontrols: Expected a DS. Got ${d}.`);
     super();
@@ -723,10 +723,7 @@ function options() {
   return dropdownlist;
 };
 
-window.ea_controls_select_tab = select_tab;
-
 export {
   init,
   select_tab,
-  dscontrols,
 };

@@ -31,9 +31,9 @@ import {
   polygons_feature_info,
 } from './dsparse.js';
 
-import {DS} from './ds.js';
+import DS from './ds.js';
 
-import {Overlord} from './overlord.js';
+import Overlord from './overlord.js';
 
 
 const UProxyHandler = {
@@ -157,7 +157,7 @@ function layout() {
 };
 
 function mobile() {
-  ea_controls_select_tab(qs('#controls-tab-all'), "all");
+  controls.select_tab(qs('#controls-tab-all'), "all");
 
   for (let el of qsa('.controls-subbranch')) {
     elem_collapse(qs('.controls-container', el), el);
@@ -165,12 +165,12 @@ function mobile() {
 
   const switcher = qs('#mobile-switcher');
 
-  const controls = ce('div', tmpl('#svg-controls'), { bind: 'controls', ripple: "" });
+  const svgcontrols = ce('div', tmpl('#svg-controls'), { bind: 'controls', ripple: "" });
   const map = ce('div', tmpl('#svg-map'), { bind: 'map', ripple: "" });
   const inputs = ce('div', tmpl('#svg-list'), { bind: 'inputs', ripple: "" });
   const outputs = ce('div', tmpl('#svg-pie'), { bind: 'outputs', ripple: "" });
 
-  const tabs = [controls, map, inputs, outputs];
+  const tabs = [svgcontrols, map, inputs, outputs];
 
   function mobile_switch(v) {
     switch (v) {
@@ -204,8 +204,8 @@ function mobile() {
 
       U.view = v;
 
-      right_pane();
-      ea_views_buttons();
+      views.right_pane();
+      views.buttons();
       break;
     }
 
@@ -636,7 +636,7 @@ function nanny_force() {
   DS.array.filter(d => d.on).forEach(d => d.active(false, false));
 
   O.view = 'inputs';
-  ea_controls_select_tab(qs('#controls-tab-census'), "census");
+  controls.select_tab(qs('#controls-tab-census'), "census");
   ea_modal.hide();
 
   O.view = U.view;

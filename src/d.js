@@ -1,6 +1,6 @@
 import * as mapbox from './mapbox.js';
 
-import {DS} from './ds.js';
+import DS from './ds.js';
 
 const url = new URL(location);
 const id = url.searchParams.get('id');

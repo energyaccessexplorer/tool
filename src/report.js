@@ -1,4 +1,4 @@
-import {DS} from './ds.js';
+import DS from './ds.js';
 
 function pdf() {
   const canvas = DST.get('population-density').raster.canvas;

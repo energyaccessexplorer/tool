@@ -1,4 +1,4 @@
-import {DS} from './ds.js';
+import DS from './ds.js';
 
 import * as plot from './plot.js'
 
@@ -16,7 +16,7 @@ import {
  * returns a raster (FloatArray) to be plotted onto a canvas.
  */
 
-function run(type) {
+export default function run(type) {
   const t0 = performance.now();
 
   const boundaries = DST.get('boundaries');
@@ -287,5 +287,4 @@ export {
   raster_to_tiff,
   plot_active,
   datasets,
-  run,
 };

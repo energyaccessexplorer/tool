@@ -1,10 +1,10 @@
-import {dscard} from './cards.js';
+import dscard from './cards.js';
 
-import {dscontrols} from './controls.js';
+import dscontrols from './controls.js';
 
 import * as parse from './dsparse.js';
 
-export class DS {
+export default class DS {
   constructor(o, on) {
     this.id = o.name || o.category.name;
 

@@ -1,4 +1,4 @@
-import {DS} from './ds.js';
+import DS from './ds.js';
 
 function points_symbol(opts) {
   const {size,fill,stroke,strokewidth} = opts;
@@ -85,7 +85,7 @@ function update() {
   if (!empty) sortable('#cards-list', 'enable');
 };
 
-class dscard extends HTMLElement {
+export default class dscard extends HTMLElement {
   constructor(d) {
     if (!(d instanceof DS)) throw Error(`dscard: Expected a DS. Got ${d}.`);
     super();
@@ -343,5 +343,4 @@ customElements.define('ds-card', dscard);
 export {
   init,
   update,
-  dscard,
 };

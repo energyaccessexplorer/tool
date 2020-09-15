@@ -435,6 +435,22 @@ function ea_loading(bool) {
   qs('#app-loading').style['display'] = bool ? 'block' : 'none';
 };
 
+function ea_super_error(t, m) {
+  ea_flash.push({
+    type: 'error',
+    timeout: 0,
+    title: t,
+    message: m
+  });
+
+  const l = qs('#app-loading');
+  qs('.spinner', l).style.animation = 'none';
+  qs('.spinner', l).style.borderTop = 'none';
+  qs('p', l).innerHTML = "Failed &nbsp; <code>:(</code>";
+
+  qs('#playground').remove();
+};
+
 function table_data(dict, prop) {
   const t = ce('table');
 

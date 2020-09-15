@@ -322,9 +322,7 @@ This is fatal. Thanks for all the fish.`;
 
   await ea_api.get("datasets", bp, { one: true })
     .then(async e => {
-      let ds = new DS(e);
-
-      ds.on = false;
+      let ds = new DS(e, false);
 
       await ds.load('csv');
       await ds.load('vectors');

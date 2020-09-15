@@ -435,9 +435,9 @@ function ea_loading(bool) {
   qs('#app-loading').style['display'] = bool ? 'block' : 'none';
 };
 
-function ea_super_error(t, m) {
+function ea_super_error(t, m, e = "error") {
   ea_flash.push({
-    type: 'error',
+    type: e,
     timeout: 0,
     title: t,
     message: m
@@ -446,7 +446,7 @@ function ea_super_error(t, m) {
   const l = qs('#app-loading');
   qs('.spinner', l).style.animation = 'none';
   qs('.spinner', l).style.borderTop = 'none';
-  qs('p', l).innerHTML = "Failed &nbsp; <code>:(</code>";
+  qs('p', l).innerHTML = "<code>:(</code>";
 
   qs('#playground').remove();
 };

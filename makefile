@@ -26,7 +26,7 @@ TIMESTAMP != date -u +'%Y-%m-%d--%T'
 
 default: reconfig build reload
 
-build: build-a build-s
+build: build-a build-s build-d
 
 reload:
 	@sleep 0.3
@@ -129,6 +129,42 @@ build-s:
 		> ${DIST}/s/main.css
 
 	@cp ${SRC}/browser.js ${DIST}/s/
+
+
+build-d:
+	@echo "Building test screen"
+	@mkdir -p ${DIST}/d
+
+	@mustache /dev/null ${VIEWS}/d.html > ${DIST}/d/index.html
+
+	@sed -ri 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/d/index.html
+
+	@cp ${CSS}/ripple.css ${DIST}/d/ripple.css
+	@cp ${CSS}/svg.css ${DIST}/d/svg.css
+	@cp ${SRC}/{cards,timeline,controls,ds,dsparse,mapbox,overlord,plot,d}.js ${DIST}/d/
+
+	@cat \
+		${LIB}/d3.js \
+		${LIB}/geotiff.js \
+		${LIB}/mapbox-gl.js \
+		${LIB}/geojson-extent.js \
+		${LIB}/helpers.js \
+		${LIB}/flash.js \
+		${LIB}/dropdown.js \
+		${LIB}/pgrest.js \
+		> ${DIST}/d/libs.js
+
+	@echo -n "window.ea_settings = " | cat - \
+		settings.json \
+		${SRC}/utils.js \
+		${SRC}/globals.js \
+		> ${DIST}/d/main.js
+
+	@cat \
+		${CSS}/general.css \
+		${CSS}/layout.css \
+		${CSS}/maparea.css \
+		> ${DIST}/d/main.css
 
 sync:
 	@rsync -OPrv \

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    <script src="./libs.js?v=--TIMESTAMP--"></script>
+    <script src="./main.js?v=--TIMESTAMP--"></script>
+
+    <link href="/tool/lib/mapbox-gl.css" rel="stylesheet" />
+    <link href="/stylesheets/style.css" rel="stylesheet" />
+    <link href="./main.css" rel="stylesheet" />
+  </head>
+
+  <body>
+    <div id="playground">
+      <div id="visual">
+        <div id="maparea">
+          <div id="mapbox-container"></div>
+        </div>
+      </div>
+    </div>
+
+    {{> views/loading}}
+  </body>
+
+  <script>
+	ea_flash = new flash();
+	ea_api = new pgrest(ea_settings.database, ea_flash);
+
+	GEOGRAPHY = null;
+	MAPBOX = null;
+	MOBILE = false;
+	DST = new Map();
+  </script>
+
+  <script type="module">
+	import {init} from './d.js';
+	init();
+  </script>
+
+  {{> views/templates}}
+
+  {{> views/svgs}}
+</html>

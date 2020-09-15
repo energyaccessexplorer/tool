@@ -83,8 +83,14 @@ class MapboxInfoControl {
   };
 };
 
-function init() {
+let _O;
+let _U;
+
+function init(overlord = {}, urlproxy = {}) {
   mapboxgl.accessToken = ea_settings.mapbox_token;
+
+  _O = overlord;
+  _U = urlproxy;
 
   const mb = new mapboxgl.Map({
     "container": 'mapbox-container',
@@ -95,16 +101,17 @@ function init() {
 
   mb.addControl(new mapboxgl.NavigationControl({ showCompass: false }));
 
-  mb.addControl((new MapboxThemeControl()), 'top-right');
-  mb.addControl((new MapboxInfoControl()), 'top-right');
-
   mb.zoomTo(mb.getZoom() * 0.95, {duration: 0});
-
   mb.doubleClickZoom.disable();
   mb.dragRotate.disable();
   mb.touchZoomRotate.disableRotation();
 
-  mb.on('click', e => O.map('click', e));
+  if (_O.map) {
+    mb.on('click', e => _O.map('click', e));
+
+    mb.addControl((new MapboxThemeControl()), 'top-right');
+    mb.addControl((new MapboxInfoControl()), 'top-right');
+  }
 
   return mb;
 };
@@ -173,7 +180,7 @@ function change_theme(theme) {
   function set_output() {
     const c = MAPBOX.getStyle().layers.find(l => l.type === 'symbol');
     MAPBOX.first_symbol = maybe(c, 'id');
-    O.view = U.view;
+    _O.view = _U.view;
   };
 
   MAPBOX.once('style.load', set_output);
@@ -271,7 +278,7 @@ function dblclick(id) {
     if (e.features.length > 0) {
       fit(geojsonExtent(e.features[0]), true);
       MAPBOX.changing_target = true;
-      O.subgeo = e.features[0].id;
+      _O.subgeo = e.features[0].id;
     }
   });
 };
@@ -283,7 +290,7 @@ function zoomend(id) {
     const z = MAPBOX.getZoom();
 
     if (!MAPBOX.changing_target)
-      if (_zoom > z && U.subgeo) O.subgeo = null;
+      if (_zoom > z && _U.subgeo) _O.subgeo = null;
 
     MAPBOX.changing_target = false;
     _zoom = z;

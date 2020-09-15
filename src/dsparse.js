@@ -369,7 +369,7 @@ function polygons_feature_info(et, e) {
       "dataset": "_boundaries_name",
     });
 
-    et.properties["_boundaries_name"] = BOUNDARIES[et.properties[this.vectors.key]];
+    et.properties["_boundaries_name"] = GEOGRAPHY.boundaries[et.properties[this.vectors.key]];
   }
 
   if (this.config.column) {

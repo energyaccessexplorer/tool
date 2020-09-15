@@ -214,7 +214,7 @@ function datasets(type) {
  *   - an index name
  */
 
-async function plot_active(type) {
+async function plot_active(type, doindexes) {
   const raster = run(type);
   plot.outputcanvas(raster);
 
@@ -242,6 +242,8 @@ async function plot_active(type) {
     canvas_source.play();
     canvas_source.pause();
   }
+
+  if (doindexes) indexes_graphs(raster);
 
   return raster;
 };

@@ -51,7 +51,7 @@ build-a:
 
 	@cp ${CSS}/ripple.css ${DIST}/a/ripple.css
 	@cp ${CSS}/svg.css ${DIST}/a/svg.css
-	@cp ${SRC}/{analysis,cards,controls,ds,dsparse,indexes,mapbox,overlord,plot,report,summary,timeline,views}.js ${DIST}/a/
+	@cp ${SRC}/{analysis,cards,controls,ds,dsparse,indexes,mapbox,overlord,plot,report,summary,timeline,views,a}.js ${DIST}/a/
 
 	@cat \
 		${LIB}/d3.js \
@@ -71,7 +71,6 @@ build-a:
 	@echo -n "window.ea_settings = " | cat - \
 		settings.json \
 		${SRC}/utils.js \
-		${SRC}/a.js \
 		${SRC}/nanny-steps.js \
 		${SRC}/globals.js \
 		> ${DIST}/a/main.js

@@ -121,18 +121,21 @@ function layout() {
   const v = qs('#views', m);
   const t = qs('#timeline');
 
-  const c = qs('#controls-wrapper', p);
-  const r = qs('#right-pane', p);
+  const l = qs('#left-pane', p);
+  const d = qs('#drawer', p);
+  const c = qs('#controls', p);
 
-  const d = qs('#drawer', r);
+  const r = qs('#right-pane', p);
 
   function set_heights() {
     const h = window.innerHeight - n.clientHeight - (MOBILE ? w.clientHeight : 0);
 
     p.style['height'] =
+      l.style['height'] =
       c.style['height'] =
       m.style['height'] =
       b.style['height'] =
+      d.style['height'] =
       r.style['height'] = h + "px";
 
     b.style['height'] = (h - (MOBILE ? v.clientHeight : 0)) + "px";
@@ -175,7 +178,7 @@ function mobile() {
   function mobile_switch(v) {
     switch (v) {
     case 'controls':{
-      for (let e of ['#controls-wrapper'])
+      for (let e of ['#left-pane'])
         qs(e).style.display = '';
 
       for (let e of ['#right-pane', '#views'])
@@ -185,7 +188,7 @@ function mobile() {
     }
 
     case 'right': {
-      for (let e of ['#controls-wrapper'])
+      for (let e of ['#left-pane'])
         qs(e).style.display = 'none';
 
       for (let e of ['#right-pane'])
@@ -196,7 +199,7 @@ function mobile() {
 
     case 'outputs':
     case 'inputs': {
-      for (let e of ['#controls-wrapper'])
+      for (let e of ['#left-pane'])
         qs(e).style.display = 'none';
 
       for (let e of ['#right-pane'])
@@ -211,7 +214,7 @@ function mobile() {
 
     case 'map':
     default: {
-      for (let e of ['#right-pane', '#controls-wrapper', '#views'])
+      for (let e of ['#right-pane', '#left-pane', '#views'])
         qs(e).style.display = 'none';
 
       for (let e of ['#views'])

@@ -1,6 +1,6 @@
 :root {
   --right-pane-width: 24em;
-  --controls-pane-width: 35em;
+  --left-pane-width: 35em;
 }
 
 body {
@@ -20,16 +20,18 @@ body {
   font-size: 0.9em;
 }
 
-#controls-wrapper {
-  min-width: var(--controls-pane-width);
+#left-pane {
+  min-width: var(--left-pane-width);
   display: flex;
-  flex-flow: column nowrap;
+  flex-flow: column wrap;
+  flex: 0;
+}
   flex: 0;
 }
 
 #controls {
   display: flex;
-  flex: 1 1 auto;
+  flex: 1;
   overflow: hidden;
 }
 
@@ -95,7 +97,7 @@ body {
   margin: 2em auto;
 }
 
-#drawer {
+#drawer-right-pane {
   border-top: 1px solid lightgray;
   width: inherit;
   box-sizing: border-box;
@@ -107,7 +109,7 @@ body {
   z-index: 2;
 }
 
-#drawer > div {
+#drawer-right-pane > div {
   display: block;
   width: 100%;
   text-align: center;
@@ -134,7 +136,7 @@ body {
   white-space: pre;
 }
 
-#drawer > div:hover #disclaimer-message {
+#drawer-right-pane > div:hover #disclaimer-message {
   display: block;
 }
 

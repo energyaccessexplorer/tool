@@ -635,7 +635,7 @@ width: 50px;
 cursor: pointer;
 `;
 
-  qsa('.controls-select-container')[0].append(sl.el, info);
+  qs('#search-input').append(sl.el, info);
 
   set_default(sl.input);
 };

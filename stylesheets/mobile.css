@@ -7,16 +7,19 @@
     display: none !important;
   }
 
-  .bottom-right-container,
-  .controls-select-container {
+  .bottom-right-container {
     display: none;
   }
 
-  #controls-wrapper {
+  #left-pane {
     min-width: unset;
     width: 100%;
     position: absolute;
     z-index: 1;
+  }
+
+  #search-input {
+	display: none;
   }
 
   #right-pane {

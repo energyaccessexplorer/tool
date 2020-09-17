@@ -67,7 +67,7 @@
   fill: var(--the-color);
 }
 
-#controls-wrapper select {
+#left-pane select {
   border: none;
   width: 100%;
 
@@ -75,7 +75,7 @@
   background-color: white;
 }
 
-.controls-select-container {
+#search-input {
   align-items: center;
 
   box-sizing: border-box;
@@ -88,12 +88,12 @@
   text-align: center;
 }
 
-.controls-select-container .selectlist-container {
+#search-input .selectlist-container {
   display: inline-block;
   width: calc(100% - 50px);
 }
 
-.controls-select-container .selectlist-input,
+#search-input .selectlist-input,
 input[list="controls-geography"] {
   box-sizing: border-box;
   font-size: 1.7em;

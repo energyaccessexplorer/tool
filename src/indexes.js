@@ -1,5 +1,7 @@
 import summary_analyse from './summary.js';
 
+import * as config from './config.js';
+
 import {
   datasets as analysis_datasets,
   raster_to_tiff,
@@ -125,7 +127,10 @@ function init() {
 
   const code = qs('#index-graphs-code');
   code.append(tmpl('#svg-code'));
-  code.onclick = _ => conf();
+  code.onclick = _ => {
+    const conf = config.generate();
+    fake_blob_download(JSON.stringify(conf), `energyaccessexplorer-config-${conf.id}.json`)
+  };
 
   qs('#index-graphs').append(el_tree(
     [ ce('div', null, { class: 'index-graphs-container' }), [
@@ -211,30 +216,6 @@ function modal() {
 </a>
 `)
   }).show();
-};
-
-function conf() {
-  const config = {
-    geography_id: GEOGRAPHY.id,
-    analysis_type: U.output,
-    datasets: []
-  };
-
-  for (let i of U.inputs) {
-    let d = DST.get(i);
-    let c = {};
-
-    c.id = d.dataset_id;
-    c.category = d.id;
-    c.weight = d.weight;
-    c.domain = d.domain.map(x => +x);
-
-    config.datasets.push(c);
-  }
-
-  fake_blob_download(JSON.stringify(config), `energyaccessexplorer-${U.output}.json`);
-
-  return config;
 };
 
 export {

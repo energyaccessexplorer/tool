@@ -1,3 +1,12 @@
+#left-pane #drawer {
+  background-color: lightgray;
+}
+
+#left-pane #drawer > div {
+  text-align: center;
+  border-bottom: 1px solid #aaa;
+}
+
 .number-labels {
   display: flex;
   flex-flow: row nowrap;

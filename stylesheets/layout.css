@@ -1,8 +1,3 @@
-:root {
-  --right-pane-width: 24em;
-  --left-pane-width: 35em;
-}
-
 body {
   overflow: hidden;
 }
@@ -21,18 +16,32 @@ body {
 }
 
 #left-pane {
-  min-width: var(--left-pane-width);
+  min-width: 36em; /* 40em */
   display: flex;
   flex-flow: column wrap;
   flex: 0;
 }
+
+#left-pane #drawer {
+  display: block;
+  flex: 1;
+  min-height: 100%;
+  width: 0em; /* 4em */
+}
+
+#left-pane #drawer .button {
   flex: 0;
+  margin: 0;
+  height: 4em;
+  line-height: 4em;
+  display: block;
 }
 
 #controls {
   display: flex;
   flex: 1;
   overflow: hidden;
+  width: 36em;
 }
 
 #visual {
@@ -61,7 +70,7 @@ body {
 #right-pane {
   position: relative;
   display: block;
-  width: var(--right-pane-width);
+  width: 24em;
 }
 
 #right-pane .header {

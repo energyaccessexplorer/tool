@@ -89,7 +89,7 @@ const UProxyHandler = {
     }
 
     case "params": {
-      for (p in v) {
+      for (let p in v) {
         if (!o.params[p].includes(v[p])) continue;
         o.url.searchParams.set(p, v[p]);
       }

@@ -64,6 +64,18 @@ function csv() {
     .then(d => this.csv.data = d);
 };
 
+function csv_table() {
+  const table = {};
+  const data = this.csv.data;
+
+  for (let i = 0; i < data.length; i++) {
+    const d = data[i];
+    table[d[this.csv.key]] = +d[this.config.column];
+  }
+
+  return table;
+};
+
 function tiff() {
   async function run_it(blob) {
     function draw(overrideid) {
@@ -114,8 +126,8 @@ function tiff() {
         if (this.raster.width !== b.raster.width) {
           fail.call(this, `
 Raster resolution does not match the boundaries dataset.
-${this.id}: ${this.raster.width} x ${this.raster.height}
-boundaries: ${b.raster.width} x ${b.raster.height}
+${this.id}: ${this.raster.width} × ${this.raster.height}
+boundaries: ${b.raster.width} × ${b.raster.height}
 `)
         }
       }
@@ -314,7 +326,7 @@ async function polygons_csv(col) {
   await until(_ => this.csv.data && this.vectors.features);
 
   if (this.config.column)
-    this.csv.table = table.call(this);
+    this.csv.table = csv_table.call(this);
 
   const data = this.csv.data;
   let s;
@@ -342,18 +354,6 @@ async function polygons_csv(col) {
   this.update_source(this.vectors.features);
 
   if (this.card) this.card.refresh();
-};
-
-function table() {
-  const table = {};
-  const data = this.csv.data;
-
-  for (let i = 0; i < data.length; i++) {
-    const d = data[i];
-    table[d[this.csv.key]] = +d[this.config.column];
-  }
-
-  return table;
 };
 
 function polygons_feature_info(et, e) {

@@ -161,6 +161,31 @@ function geojson() {
     });
 };
 
+function geojson_summary() {
+  const features = this.vectors.features.features;
+  const properties = Array.from(new Set(features.map(x => Object.keys(x.properties)).flat()));
+
+  const o = {
+    "__IGNORED": []
+  };
+
+  for (let p of properties) {
+    const values = Array.from(new Set(features.map(x => x.properties[p]).flat()));
+
+    if (values.length > 10) {
+      o["__IGNORED"].push(p)
+      continue;
+    }
+
+    o[p] = {};
+    for (let v of values)
+      o[p][v] = features.filter(x => x.properties[p] === v).length;
+  }
+
+  return o;
+};
+window.geojson_summary = geojson_summary;
+
 function points() {
   return geojson.call(this)
     .then(_ => {

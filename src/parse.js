@@ -302,7 +302,7 @@ function lines() {
 
 function polygons() {
   if (MAPBOX.getLayer(this.id)) {
-    console.log(this.id, "dsparse.polygons: layer already exists.");
+    console.log(this.id, "parse.polygons: layer already exists.");
     return;
   }
 

@@ -29,7 +29,7 @@ import {
 import {
   polygons_csv,
   polygons_feature_info,
-} from './dsparse.js';
+} from './parse.js';
 
 import DS from './ds.js';
 
@@ -658,6 +658,6 @@ window.map_click = map_click;
 
 window.timeline_lines_update = timeline_lines_update;
 
-window.dsparse_polygons_csv = polygons_csv;
+window.parse_polygons_csv = polygons_csv;
 
 window.analysis_plot_active = analysis_plot_active;

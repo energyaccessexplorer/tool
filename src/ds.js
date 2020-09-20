@@ -2,7 +2,7 @@ import dscard from './cards.js';
 
 import dscontrols from './controls.js';
 
-import * as parse from './dsparse.js';
+import * as parse from './parse.js';
 
 export default class DS {
   constructor(o, on) {

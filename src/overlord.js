@@ -72,7 +72,7 @@ export default class Overlord {
 
     DS.array.forEach(async d => {
       if (d.on && d.datatype === 'polygons-timeline')
-        dsparse_polygons_csv.call(d, t);
+        parse_polygons_csv.call(d, t);
     })
   };
 

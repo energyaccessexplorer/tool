@@ -1,6 +1,7 @@
 import * as mapbox from './mapbox.js';
 
 import DS from './ds.js';
+import {geojson_summary} from './parse.js';
 
 const url = new URL(location);
 const id = url.searchParams.get('id');

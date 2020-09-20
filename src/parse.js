@@ -184,7 +184,6 @@ function geojson_summary() {
 
   return o;
 };
-window.geojson_summary = geojson_summary;
 
 function points() {
   return geojson.call(this)
@@ -424,6 +423,7 @@ function polygons_feature_info(et, e) {
 
 export {
   fail,
+  geojson_summary,
   tiff,
   polygons,
   points,

@@ -229,7 +229,7 @@ function lines() {
       }
 
       const fs = this.vectors.features.features;
-      const specs = this.vectors.specs;
+      const specs = this.config.features_specs;
 
       const criteria = [];
 

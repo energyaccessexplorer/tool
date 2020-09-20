@@ -161,7 +161,9 @@ function geojson() {
     });
 };
 
-function geojson_summary() {
+async function geojson_summary() {
+  await until(_ => maybe(this.vectors.features, 'features'));
+
   const features = this.vectors.features.features;
   const properties = Array.from(new Set(features.map(x => Object.keys(x.properties)).flat()));
 

@@ -39,7 +39,7 @@ export async function init() {
     mapbox.change_theme(ea_settings.mapbox_theme);
   });
 
-  until(_ => DS.array.filter(d => d.on).every(d => d.loading === false));
+  await until(_ => DS.array.filter(d => d.on).every(d => d.loading === false));
 };
 
 async function dsinit(id, callback) {
@@ -94,7 +94,7 @@ This is fatal. Thanks for all the fish.`;
   callback(bounds);
 
   if (boundaries_id === dataset_id) {
-    await ploteverything.call(boundaries);
+    await plot.call(boundaries);
     boundaries.active(true, true);
     return;
   }
@@ -110,11 +110,11 @@ This is fatal. Thanks for all the fish.`;
     .then(e => {
       const ds = new DS(e, true);
       ds.active(true, true);
-      ploteverything.call(ds);
+      plot.call(ds);
     });
 };
 
-async function ploteverything() {
+async function plot() {
   if (this.raster)
     await until(_ => typeof this.drawraster === 'function')
 
@@ -250,4 +250,14 @@ I haven't done this yet...`);
   this.raise();
 
   ea_loading(false);
+
+  const fn = url.searchParams.get('fn');
+  if (fn) {
+    const body = qs('body');
+    body.innerHTML = "";
+    body.style.overflow = 'scroll';
+
+    const j = JSON.stringify(await eval(fn).call(this), null, 4);
+    body.append(ce('pre', j));
+  }
 };

@@ -407,8 +407,8 @@ function polygons_feature_info(et, e) {
     et.properties["_" + this.config.column] = this.csv.table[et.properties[this.vectors.key]];
   }
 
-  if (this.config.features_attr_map) {
-    at = at.concat(this.config.features_attr_map);
+  if (this.config.attributes_map) {
+    at = at.concat(this.config.attributes_map);
   }
 
   at = at.filter(x => x['dataset'] !== "_OBJECTID");

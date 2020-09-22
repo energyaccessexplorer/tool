@@ -391,7 +391,7 @@ function polygons_feature_info(et, e) {
       this.category.name.match(/^indicator/) ||
       this.category.name.match(/^timeline-indicator/)) {
     at.push({
-      "target": DST.get('boundaries').config.boundaries_name || "Geography Name",
+      "target": GEOGRAPHY.configuration.boundaries_name || "Geography Name",
       "dataset": "_boundaries_name",
     });
 

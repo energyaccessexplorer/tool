@@ -123,9 +123,7 @@ function ea_svg_pie(data, outer, inner, colors, inner_text, parse) {
       .each(function(d) { this._current = d });
 
   function change(v) {
-    let t = "";
-
-    pie.value(d => t = d[v]);
+    pie.value(d => d[v]);
     path = path.data(pie);
 
     path

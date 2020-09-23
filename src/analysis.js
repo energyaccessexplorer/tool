@@ -253,6 +253,8 @@ async function raster_to_tiff(type) {
 
   const raster = await run(type);
 
+  if (!raster.length) return;
+
   const scale = d3.scaleLinear().domain([0,1]).range([0,254]);
   const fn = function(x) {
     if (x === -1) return 255;
@@ -276,11 +278,7 @@ async function raster_to_tiff(type) {
     ModelPixelScale: [(b.vectors.bounds[2] - b.vectors.bounds[0]) / b.raster.width, (b.vectors.bounds[3] - b.vectors.bounds[1]) / b.raster.height, 0]
   };
 
-  const arrayBuffer = await GeoTIFF.writeArrayBuffer(arr, metadata);
-
-  fake_blob_download(arrayBuffer, `energyaccessexplorer-${type}.tif`);
-
-  return blob;
+  return (await GeoTIFF.writeArrayBuffer(arr, metadata));
 };
 
 export {

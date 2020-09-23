@@ -130,7 +130,7 @@ async function summary() {
   pdf.onclick = report.pdf;
 
   const csv = ce('button', "Export CSV Report", { class: 'big-green-button' });
-  csv.onclick = _ => report.csv(summary);
+  csv.onclick = _ => fake_blob_download(report.csv(summary), `energyaccessexplorer-report.csv`, "text/csv");
 
   content.append(graphs_tab, tables_tab);
 

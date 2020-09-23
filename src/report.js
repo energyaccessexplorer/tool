@@ -277,7 +277,7 @@ contact our team at`;
 
     add_about();
 
-    doc.save("report.pdf");
+    doc.save("energyaccessexplorer-report.pdf");
   };
 
   if (typeof jsPDF === 'undefined') {
@@ -322,7 +322,7 @@ function csv(summary) {
     }
   }
 
-  fake_blob_download(csv.join("\n") + "\n", `energyaccessexplorer-report.csv`, "text/csv");
+  return csv.join("\n") + "\n";
 };
 
 export {

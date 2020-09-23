@@ -123,7 +123,10 @@ function init() {
 
   const download = qs('#index-graphs-download');
   download.append(tmpl('#svg-download'));
-  download.onclick = _ => raster_to_tiff(url.searchParams.get('output'));
+  download.onclick = async _ => {
+    const type = url.searchParams.get('output');
+    fake_blob_download((await raster_to_tiff(type)), `energyaccessexplorer-${type}.tif`);
+  };
 
   const code = qs('#index-graphs-code');
   code.append(tmpl('#svg-code'));

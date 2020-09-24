@@ -1,6 +1,6 @@
 import DS from './ds.js';
 
-function load(conf) {
+export function load(conf) {
   const DSL = DS.array.filter(d => conf.datasets.find(t => t.id === d.dataset_id));
   conf.datasets.sort((a,b) => a.position < b.position ? 1 : -1);
 
@@ -18,7 +18,7 @@ function load(conf) {
   return conf;
 };
 
-function generate() {
+export function generate() {
   const tab = qs('#controls .controls-branch-tab.active');
   let tab_id = null;
   if (tab) tab_id = tab.id;
@@ -51,8 +51,3 @@ function generate() {
 
   return config;
 };
-
-export {
-  load,
-  generate
-}

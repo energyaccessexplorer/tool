@@ -57,7 +57,7 @@ function polygons_symbol(opts) {
   return svg.node();
 };
 
-function init() {
+export function init() {
   const list = qs('#cards-pane #cards-list');
 
   sortable('#cards-list', {
@@ -71,7 +71,7 @@ function init() {
     );
 };
 
-function update() {
+export function update() {
   const cards_list = qs('#cards-pane #cards-list');
 
   const ldc = U.inputs.reverse().map(i => DST.get(i).card);
@@ -339,8 +339,3 @@ export default class dscard extends HTMLElement {
 };
 
 customElements.define('ds-card', dscard);
-
-export {
-  init,
-  update,
-};

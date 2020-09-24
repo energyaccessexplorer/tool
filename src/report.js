@@ -1,6 +1,6 @@
 import DS from './ds.js';
 
-function pdf() {
+export function pdf() {
   const canvas = DST.get('population-density').raster.canvas;
   const canvas_ratio = canvas.width/canvas.height;
 
@@ -296,7 +296,7 @@ contact our team at`;
   };
 };
 
-function csv(summary) {
+export function csv(summary) {
   const csv = [];
 
   const datasets = DS.array
@@ -323,9 +323,4 @@ function csv(summary) {
   }
 
   return csv.join("\n") + "\n";
-};
-
-export {
-  csv,
-  pdf
 };

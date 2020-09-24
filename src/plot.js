@@ -1,4 +1,4 @@
-function drawcanvas(opts) {
+export function drawcanvas(opts) {
   const {canvas, data, width, height, nodata, colorscale} = opts;
 
   const ctx = canvas.getContext("2d");
@@ -34,7 +34,7 @@ function drawcanvas(opts) {
  * @param "canvas" a canvas element (if null, will default to canvas#output)
  */
 
-function outputcanvas(data, canvas = null) {
+export function outputcanvas(data, canvas = null) {
   const A = DST.get('boundaries');
 
   if (!data.length) {
@@ -50,9 +50,4 @@ function outputcanvas(data, canvas = null) {
     nodata: -1,
     colorscale: ea_analysis_colorscale,
   });
-};
-
-export {
-  drawcanvas,
-  outputcanvas
 };

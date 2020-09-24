@@ -354,44 +354,6 @@ function toggle_switch(init, callback, opts = {}) {
   };
 };
 
-function init() {
-  _selectlist();
-
-  const tab_all = ce('div', "all", { id: 'controls-tab-all', class: 'controls-branch-tab up-title' });
-
-  tabs_el.append(tab_all);
-
-  tab_all.onclick = function() {
-    for (let e of qsa('.controls-branch-tab', tabs_el))
-      e.classList.remove('active');
-
-    for (let e of qsa('.controls-branch', contents_el))
-      e.style.display = '';
-
-    tab_all.classList.add('active');
-  };
-
-  sort_datasets(GEOGRAPHY.configuration);
-
-  const first = qs('.controls-branch-tab', tabs_el);
-  select_tab(first, first.id.replace('controls-tab-', ''));
-};
-
-function select_tab(tab, name) {
-  for (let e of qsa('.controls-branch-tab', tabs_el))
-    e.classList.remove('active');
-
-  for (let e of qsa('.controls-branch', contents_el)) {
-    let all = (name === 'all');
-    e.style.display = all ? '' : 'none';
-  }
-
-  tab.classList.add('active');
-
-  const b = qs('#controls-branch-' + name, contents_el);
-  if (b) b.style.display = 'block';
-};
-
 function checkbox() {
   const c = toggle_switch(this.on);
   const svg = c.svg;
@@ -723,7 +685,40 @@ function options() {
   return dropdownlist;
 };
 
-export {
-  init,
-  select_tab,
+export function init() {
+  _selectlist();
+
+  const tab_all = ce('div', "all", { id: 'controls-tab-all', class: 'controls-branch-tab up-title' });
+
+  tabs_el.append(tab_all);
+
+  tab_all.onclick = function() {
+    for (let e of qsa('.controls-branch-tab', tabs_el))
+      e.classList.remove('active');
+
+    for (let e of qsa('.controls-branch', contents_el))
+      e.style.display = '';
+
+    tab_all.classList.add('active');
+  };
+
+  sort_datasets(GEOGRAPHY.configuration);
+
+  const first = qs('.controls-branch-tab', tabs_el);
+  select_tab(first, first.id.replace('controls-tab-', ''));
+};
+
+export function select_tab(tab, name) {
+  for (let e of qsa('.controls-branch-tab', tabs_el))
+    e.classList.remove('active');
+
+  for (let e of qsa('.controls-branch', contents_el)) {
+    let all = (name === 'all');
+    e.style.display = all ? '' : 'none';
+  }
+
+  tab.classList.add('active');
+
+  const b = qs('#controls-branch-' + name, contents_el);
+  if (b) b.style.display = 'block';
 };

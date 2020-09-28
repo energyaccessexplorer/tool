@@ -1,4 +1,12 @@
+/* global jspdf */
+
 import DS from './ds.js';
+
+import '../lib/jspdf.js';
+
+import '../lib/jspdf-autotable.js';
+
+const jsPDF = jspdf.jsPDF;
 
 export function pdf() {
 	const canvas = DST.get('population-density').raster.canvas;
@@ -23,8 +31,7 @@ export function pdf() {
 	let hhalf;
 
 	function reset_font() {
-		doc.setFont("helvetica");
-		doc.setFontType('normal');
+		doc.setFont("helvetica", "normal");
 		doc.setFontSize(font_size);
 		doc.setTextColor("#393f44");
 	};
@@ -37,8 +44,7 @@ export function pdf() {
 	function add_title(text, size) {
 		size = size || font_size + 2;
 
-		doc.setFont("helvetica");
-		doc.setFontType('normal');
+		doc.setFont("helvetica", "normal");
 		doc.setTextColor("#00794C");
 		doc.setFontSize(size);
 
@@ -52,8 +58,7 @@ export function pdf() {
 	};
 
 	function add_right_title() {
-		doc.setFont("helvetica");
-		doc.setFontType('normal');
+		doc.setFont("helvetica", "normal");
 		doc.setTextColor("#00794C");
 		doc.setFontSize(16);
 
@@ -201,7 +206,7 @@ contact our team at`;
 	};
 
 	async function images_block(indexname, x, y, p0, p1) {
-		doc.setFont("helvetica");
+		doc.setFont("helvetica", "normal");
 		doc.setFontSize(font_size);
 		doc.setTextColor("#00794C");
 
@@ -279,20 +284,7 @@ contact our team at`;
 		doc.save("energyaccessexplorer-report.pdf");
 	};
 
-	if (typeof jsPDF === 'undefined') {
-		const s0 = document.createElement('script');
-		const s1 = document.createElement('script');
-
-		s0.src = "/tool/lib/jspdf.js";
-		s1.src = "/tool/lib/jspdf-autotable.js";
-
-		s0.onload = _ => document.head.append(s1);
-		s1.onload = gen_pdf;
-
-		document.head.append(s0);
-	} else {
-		gen_pdf();
-	};
+	gen_pdf();
 };
 
 export function csv(summary) {

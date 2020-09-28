@@ -13,7 +13,7 @@ import {
 
 async function fetchcheck(endpoint, format) {
 	return fetch(endpoint)
-		.catch(err => fail.call(this, `Could not fetch ${format}`))
+		.catch(_ => fail.call(this, `Could not fetch ${format}`))
 		.then(response => {
 			if (response.ok && response.status < 400) return response;
 
@@ -24,7 +24,6 @@ async function fetchcheck(endpoint, format) {
 function fail(msg) {
 	const err = msg || "";
 
-	let m;
 	if (this.id === 'boundaries')
 		ea_super_error("Dataset error", `
 Failed to process dataset '${this.name}'.

@@ -114,8 +114,6 @@ function init() {
 	cos.value = U.output;
 	cos.onchange = x => { O.index = x.target.value; };
 
-	const toolbox = qs('#index-graphs-toolbox');
-
 	const info = qs('#index-graphs-info');
 	info.append(tmpl('#svg-info'));
 	info.onclick = _ => modal();
@@ -158,7 +156,7 @@ function list() {
 	const indexes_list = qs('#indexes-list');
 	elem_empty(indexes_list);
 
-	function i_elem(t, v, x) {
+	function i_elem(t, v) {
 		const d = ce('li',  null, { bind: t, class: 'element', ripple: "" });
 		d.append(
 			ce('div', null, { class: 'radio' }),
@@ -173,8 +171,6 @@ function list() {
 
 	function trigger_this() {
 		if (this.hasAttribute('disabled')) return false;
-
-		let e = document.createEvent('HTMLEvents');
 
 		for (let n of nodes) {
 			qs('.radio svg', n).dispatchEvent(new Event((this === n) ? "select" : "unselect"));
@@ -201,8 +197,6 @@ function modal() {
 	const c = ce('div');
 
 	for (let i in ea_indexes) {
-		const s = ce('section');
-
 		c.append(
 			ce('h3', ea_indexes[i]['name']),
 			ce('p', ea_indexes[i]['info'])

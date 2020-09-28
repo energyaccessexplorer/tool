@@ -8,7 +8,6 @@ function timeline_slider(opts) {
 	const radius = 16,
 		svgwidth = width,
 		svgheight = (radius * 2) + 3,
-		linewidth = radius * 3,
 		svgmin = radius + 2,
 		svgmax = svgwidth - radius - 2;
 
@@ -77,7 +76,7 @@ function timeline_slider(opts) {
 };
 
 function multiline(opts) {
-	const {domain, range, data, color, message} = opts;
+	const {data, color, message} = opts;
 
 	const strokewidth = 2.5;
 

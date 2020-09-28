@@ -17,23 +17,13 @@ import ea_analysis from './analysis.js';
 async function summary() {
 	const pop = DST.get('population-density');
 	await pop.load('raster');
-	const p = pop.raster.data;
 
 	const content = ce('div');
 
 	let graphs;
 	const graphs_tab = ce('div', graphs = ce('div', null, { id: "summary-graphs" }), { class: 'tab' });
 
-	const sizes = {
-		"eai": 100,
-		"ani": 100,
-		"demand": 50,
-		"supply": 50,
-	};
-
 	const summary = {};
-
-	const nodata = pop.nodata;
 
 	const ramp = tmpl("#ramp");
 	ramp.append(
@@ -216,7 +206,7 @@ export default async function analyse(raster) {
  */
 
 function wrapper() {
-	const prom = new Promise((resolve, rej) => {
+	const prom = new Promise((resolve, _) => {
 		ea_loading(true);
 		setTimeout(_ => resolve("Success!"), 100);
 	});

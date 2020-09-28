@@ -173,7 +173,6 @@ contact our team at`;
 		tc.height = height;
 
 		let context = tc.getContext("2d");
-		let i = 0;
 
 		svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
 

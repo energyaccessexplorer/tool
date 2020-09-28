@@ -1,20 +1,3 @@
-const resourcewatch_styles = [{
-	"name": "Light Basemap with no labels",
-	"value": "resourcewatch/cjhqgk77j0r7h2sqw220p7imy"
-}, {
-	"name": "Satellite",
-	"value": "resourcewatch/cjhqiecof53wv2rl9gw4cehmy"
-}, {
-	"name": "Light labels",
-	"value": "resourcewatch/cjgcf9rs05qnu2rrpp4qzucox"
-}, {
-	"name": "Dark labels",
-	"value": "resourcewatch/cjgcf9gqk9tmm2spd9zr0tml3"
-}, {
-	"name": "Boundaries",
-	"value": "resourcewatch/cjgcf8qdaai1x2rn6w3j4q805"
-}];
-
 const default_styles = [{
 	"name": "Light (default)",
 	"value": "mapbox/basic-v9"
@@ -61,7 +44,7 @@ class MapboxInfoControl {
 
 		this._container.append(button);
 
-		button.addEventListener('mouseup', e => {
+		button.addEventListener('mouseup', _ => {
 			INFOMODE = !INFOMODE;
 
 			if (INFOMODE) {
@@ -116,7 +99,7 @@ function init(overlord = {}, urlproxy = {}) {
 	return mb;
 };
 
-function theme_control_popup(btn) {
+function theme_control_popup(_) {
 	let x = ce('div', null, { id: 'mapbox-theme-control-popup' });
 	let radios = ce('div');
 
@@ -145,8 +128,6 @@ function theme_control_popup(btn) {
 	x.addEventListener('mouseleave', _ => x.remove());
 
 	x.append(radios);
-
-	const r = btn.getBoundingClientRect();
 
 	x.style = `
 position: absolute;
@@ -286,7 +267,7 @@ function dblclick(id) {
 function zoomend(id) {
 	let _zoom;
 
-	MAPBOX.on('zoomend', id, function(e) {
+	MAPBOX.on('zoomend', id, function(_) {
 		const z = MAPBOX.getZoom();
 
 		if (!MAPBOX.changing_target)

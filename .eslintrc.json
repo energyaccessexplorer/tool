@@ -100,6 +100,13 @@
     "ea_svg_interval": "readonly",
     "ea_svg_pie": "readonly",
     "ea_coordinates_in_raster": "readonly",
+    "ea_select_setup": "readonly",
+    "timeline_lines_update": "readonly",
+    "load_view": "readonly",
+    "parse_polygons_csv": "readonly",
+    "analysis_plot_active": "readonly",
+    "load_view": "readonly",
+    "map_click": "readonly",
 
     "fake_blob_download": "readonly",
     "table_add_lnglat": "readonly",

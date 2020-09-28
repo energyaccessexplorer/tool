@@ -1,3 +1,5 @@
+/* eslint no-unused-vars: "off" */
+
 NORM_STOPS = d3.range(0, 1.000000001, 0.25);
 
 function ea_colorscale(opts) {
@@ -177,9 +179,6 @@ function ea_svg_interval(opts = {}) {
 
 	const gutter = g.append('rect');
 	const marked = g.append('rect');
-
-	const umarked1 = g.append('rect');
-	const umarked2 = g.append('rect');
 
 	const c1 = g.append('circle');
 	const c2 = g.append('circle');

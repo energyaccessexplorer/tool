@@ -347,13 +347,12 @@ export default class DS {
 		if (!c) return null;
 
 		const t = this._domain;
-		const v = c.scale || this.analysis.scale;
 		const r = (c && c.invert) ? [1,0] : [0,1];
 
 		let s = null;
 		switch (c.scale) {
 		case 'key-delta': {
-			if (!maybe(this.csv, 'table')) return (s = x => 1);
+			if (!maybe(this.csv, 'table')) return (s = _ => 1);
 
 			s = x => {
 				let z = this.csv.table[x];
@@ -417,7 +416,7 @@ export default class DS {
 		this._domain = d;
 	};
 
-	active(d, draw) {
+	active() {
 		this._active(...arguments);
 	};
 

@@ -37,7 +37,13 @@
     ea_modal = new modal("ea-modal", {});
     ea_flash = new flash();
     ea_api = new pgrest(ea_settings.database, ea_flash);
-    ea_select_setup();
+
+	MOBILE = false;
+  </script>
+
+  <script type="module">
+	import {init} from './s.js';
+	init();
   </script>
 
   {{> views/gapps}}

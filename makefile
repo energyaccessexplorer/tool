@@ -105,6 +105,8 @@ build-s:
 
 	@sed -ri 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/s/index.html
 
+	@cp ${SRC}/s.js ${DIST}/s/
+
 	@cat \
 		${LIB}/d3.js \
 		${LIB}/topojson.js \
@@ -118,7 +120,6 @@ build-s:
 	@echo -n "const ea_settings = " | cat - \
 		settings.json \
 		${SRC}/utils.js \
-		${SRC}/s.js \
 		> ${DIST}/s/main.js
 
 	@cp ${SRC}/browser.js ${DIST}/s/

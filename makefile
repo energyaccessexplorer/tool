@@ -32,7 +32,6 @@ lint:
 	eslint ./src --fix
 
 reload:
-	@sleep 0.3
 	-@chrome-remote-reload
 
 deps:
@@ -54,7 +53,7 @@ build-a:
 
 	@cp ${CSS}/ripple.css ${DIST}/a/ripple.css
 	@cp ${CSS}/svg.css ${DIST}/a/svg.css
-	@cp ${SRC}/{analysis,cards,config,controls,ds,parse,indexes,mapbox,overlord,plot,report,summary,timeline,views,a}.js ${DIST}/a/
+	@cp ${SRC}/{browser,analysis,cards,config,controls,ds,parse,indexes,mapbox,overlord,plot,report,summary,timeline,views,a}.js ${DIST}/a/
 
 	@cat \
 		${LIB}/d3.js \
@@ -94,9 +93,6 @@ build-a:
 		${CSS}/cards.css \
 		> ${DIST}/a/main.css
 
-	@cp ${SRC}/browser.js ${DIST}/a/
-
-
 build-s:
 	@echo "Building select screen"
 	@mkdir -p ${DIST}/s
@@ -105,7 +101,7 @@ build-s:
 
 	@sed -ri 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/s/index.html
 
-	@cp ${SRC}/s.js ${DIST}/s/
+	@cp ${SRC}/{browser,s}.js ${DIST}/s/
 
 	@cat \
 		${LIB}/d3.js \
@@ -122,8 +118,6 @@ build-s:
 		${SRC}/utils.js \
 		> ${DIST}/s/main.js
 
-	@cp ${SRC}/browser.js ${DIST}/s/
-
 	@cat \
 		${CSS}/general.css \
 		${CSS}/s.css \
@@ -131,9 +125,6 @@ build-s:
 		${CSS}/views.css \
 		${CSS}/ripple.css \
 		> ${DIST}/s/main.css
-
-	@cp ${SRC}/browser.js ${DIST}/s/
-
 
 build-d:
 	@echo "Building test screen"

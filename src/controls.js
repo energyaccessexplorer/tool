@@ -277,13 +277,13 @@ function humanformat(s) {
 
 function toggle_switch(init, callback) {
 	const radius = 10,
-		svgwidth = 38,
-		svgheight = (radius * 2) + 2,
-		svgmin = radius + 1,
-		svgmax = svgwidth - radius - 1;
+		    svgwidth = 38,
+		    svgheight = (radius * 2) + 2,
+		    svgmin = radius + 1,
+		    svgmax = svgwidth - radius - 1;
 
 	const svg = d3.create("svg")
-		.attr('class', 'svg-checkbox');
+		    .attr('class', 'svg-checkbox');
 
 	const defs = svg.append('defs');
 

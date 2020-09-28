@@ -4,9 +4,9 @@ function points_symbol(opts) {
 	const {size,fill,stroke,strokewidth} = opts;
 
 	const svg = d3.create("svg")
-		.attr("class", 'svg-point')
-		.attr("width", size)
-		.attr("height", size);
+		    .attr("class", 'svg-point')
+		    .attr("width", size)
+		    .attr("height", size);
 
 	svg
 		.append('circle')
@@ -24,8 +24,8 @@ function lines_symbol(opts) {
 	const {size,dasharray,stroke,width,fill} = opts;
 
 	const svg = d3.create("svg")
-		.attr("width", size)
-		.attr("height", size);
+		    .attr("width", size)
+		    .attr("height", size);
 
 	svg
 		.append('path')
@@ -42,9 +42,9 @@ function polygons_symbol(opts) {
 	const {size,stroke,strokewidth,fill,opacity} = opts;
 
 	const svg = d3.create("svg")
-		.attr("class", 'svg-polygon')
-		.attr("width", size)
-		.attr("height", size);
+		    .attr("class", 'svg-polygon')
+		    .attr("width", size)
+		    .attr("height", size);
 
 	svg
 		.append('path')
@@ -139,10 +139,10 @@ export default class dscard extends HTMLElement {
 
 		for (let l of legends) {
 			const svg = d3.create("svg")
-				.attr("width", 24)
-				.attr("height", 24)
-				.attr("style", "vertical-align: middle;")
-				.attr("viewBox", "-3 0 32 32");
+				    .attr("width", 24)
+				    .attr("height", 24)
+				    .attr("style", "vertical-align: middle;")
+				    .attr("viewBox", "-3 0 32 32");
 
 			svg
 				.append('path')

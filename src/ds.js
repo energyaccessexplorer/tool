@@ -373,8 +373,8 @@ export default class DS {
 
 		case 'intervals': {
 			const q = d3.scaleQuantile()
-				.domain(this.analysis.intervals)
-				.range(NORM_STOPS);
+				    .domain(this.analysis.intervals)
+				    .range(NORM_STOPS);
 
 			s = x => (x >= t[0]) && (x <= t[1]) ? q(x) : -1;
 

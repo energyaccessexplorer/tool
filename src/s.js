@@ -5,11 +5,11 @@ function topo_flag(features, flagurl, config) {
 	const id = flagurl.substr(flagurl.length - 12);
 
 	const svg = d3.select(document.createElementNS("http://www.w3.org/2000/svg", "svg"))
-		.attr('width', width)
-		.attr('height', width);
+		    .attr('width', width)
+		    .attr('height', width);
 
 	const geopath = d3.geoPath()
-		.projection(d3.geoMercator());
+		    .projection(d3.geoMercator());
 
 	svg.append('defs')
 		.append('pattern')
@@ -31,10 +31,10 @@ function topo_flag(features, flagurl, config) {
 
 	Whatever.then(_ => {
 		const path = g.selectAll(`path`)
-			.data(features)
-			.enter().append('path')
-			.attr('fill', `url(#flag-${id})`)
-			.attr('d', geopath);
+			    .data(features)
+			    .enter().append('path')
+			    .attr('fill', `url(#flag-${id})`)
+			    .attr('d', geopath);
 
 		const box = path.node().getBBox();
 		const s = (box.height > box.width) ? (box.height - box.width)/2 : 0;

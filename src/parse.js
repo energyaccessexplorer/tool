@@ -143,7 +143,7 @@ boundaries: ${b.raster.width} × ${b.raster.height}
 
 	else
 		t = fetchcheck.call(this, this.raster.endpoint, "TIFF")
-			.then(r => r.blob());
+		.then(r => r.blob());
 
 	return t.then(b => run_it.call(this, b));
 };

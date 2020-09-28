@@ -211,11 +211,11 @@ contact our team at`;
     const image_width = map_height * canvas_ratio;
 
     doc.addImage(qs('#canvas-' + indexname).toDataURL("image/png"),
-                 "PNG",
-                 x + (block_width/2) - (image_width/2),
-                 y += 20,
-                 image_width,
-                 map_height);
+      "PNG",
+      x + (block_width/2) - (image_width/2),
+      y += 20,
+      image_width,
+      map_height);
 
     y += (map_height + 30) + 10;
 
@@ -230,18 +230,18 @@ contact our team at`;
     const s = pie_size * 8;
 
     await doc.addImage((await svg_png(p0, s, s)),
-                       "PNG",
-                       x + (block_width/4) - (pie_size/2),
-                       y,
-                       pie_size,
-                       pie_size);
+      "PNG",
+      x + (block_width/4) - (pie_size/2),
+      y,
+      pie_size,
+      pie_size);
 
     await doc.addImage((await svg_png(p1, s, s)),
-                       "PNG",
-                       x + (3*block_width/4) - (pie_size/2),
-                       y,
-                       pie_size,
-                       pie_size);
+      "PNG",
+      x + (3*block_width/4) - (pie_size/2),
+      y,
+      pie_size,
+      pie_size);
 
     y += pie_size + font_size;
   };
@@ -300,9 +300,9 @@ export function csv(summary) {
   const csv = [];
 
   const datasets = DS.array
-        .filter(d => d.on)
-        .map(d => d.id + ":" + d.domain)
-        .join(";");
+    .filter(d => d.on)
+    .map(d => d.id + ":" + d.domain)
+    .join(";");
 
   csv.push("# Selected datasets:min,max -- " + datasets);
 

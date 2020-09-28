@@ -116,10 +116,10 @@ This is fatal. Thanks for all the fish.`;
 
 async function plot() {
   if (this.raster)
-    await until(_ => typeof this.drawraster === 'function')
+    await until(_ => typeof this.drawraster === 'function');
 
   if (this.csv)
-    await until(_ => this.csv.data)
+    await until(_ => this.csv.data);
 
   switch (this.datatype) {
   case 'raster': {
@@ -239,7 +239,6 @@ Testing '${this.datatype}'
 
 I haven't done this yet...`);
     throw new Error("WIP");
-    break;
   }
 
   if (this.raster) {

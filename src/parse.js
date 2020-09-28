@@ -128,7 +128,7 @@ function tiff() {
 Raster resolution does not match the boundaries dataset.
 ${this.id}: ${this.raster.width} × ${this.raster.height}
 boundaries: ${b.raster.width} × ${b.raster.height}
-`)
+`);
         }
       }
     }
@@ -144,7 +144,7 @@ boundaries: ${b.raster.width} × ${b.raster.height}
 
   else
     t = fetchcheck.call(this, this.raster.endpoint, "TIFF")
-      .then(r => r.blob())
+      .then(r => r.blob());
 
   return t.then(b => run_it.call(this, b));
 };
@@ -175,7 +175,7 @@ async function geojson_summary() {
     const values = Array.from(new Set(features.map(x => x.properties[p]).flat()));
 
     if (values.length > 10) {
-      o["__IGNORED"].push(p)
+      o["__IGNORED"].push(p);
       continue;
     }
 
@@ -358,7 +358,7 @@ async function polygons_csv(col) {
   let s;
 
   if (this.colorscale) {
-    if (!data) warn(this.id, "has no csv.data");
+    if (!data) console.warn(this.id, "has no csv.data");
 
     const l = d3.scaleQuantize().domain(this.domain).range(this.colorscale.stops);
     s = x => (null === x || undefined === x || x === "") ? "rgba(155,155,155,1)" : l(+x);
@@ -367,7 +367,7 @@ async function polygons_csv(col) {
   }
 
   if (!data) {
-    warn("No data for", this.id);
+    console.warn("No data for", this.id);
     return;
   }
 

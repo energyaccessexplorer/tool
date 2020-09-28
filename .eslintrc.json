@@ -1,0 +1,109 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "extends": "eslint:recommended",
+  "parserOptions": {
+    "ecmaVersion": 12,
+    "sourceType": "module"
+  },
+  "rules": {
+    "indent": [
+      "error",
+      2
+    ],
+    "linebreak-style": [
+      "error",
+      "unix"
+    ],
+    "quotes": [
+      "off",
+      "double"
+    ],
+    "semi": [
+      "error",
+      "always"
+    ],
+    "no-console": "off",
+    "no-extra-semi": [
+      "off"
+    ],
+    "no-prototype-builtins": [
+      "off"
+    ],
+    "no-unused-vars": [
+      "warn",
+      {
+        "varsIgnorePattern": "^_$",
+        "argsIgnorePattern": "^_$"
+      }
+    ]
+  },
+  "globals": {
+    "d3": "readonly",
+    "sortable": "readonly",
+    "mapboxgl": "readonly",
+    "GeoTIFF": "readonly",
+    "geojsonExtent": "readonly",
+    "jsPDF": "readonly",
+
+    "DST": "readonly",
+    "GEOGRAPHY": "writable",
+    "MAPBOX": "writable",
+    "INFOMODE": "writable",
+    "NORM_STOPS": "writable",
+    "MOBILE": "writable",
+    "U": "writable",
+    "O": "writable",
+
+    "qs": "readonly",
+    "qsa": "readonly",
+    "ce": "readonly",
+    "elem": "readonly",
+    "delay": "readonly",
+    "until": "readonly",
+    "maybe": "readonly",
+    "has": "readonly",
+    "coalesce": "readonly",
+    "elem_empty": "readonly",
+    "el_tree": "readonly",
+    "attach": "readonly",
+    "tmpl": "readonly",
+    "shadow_tmpl": "readonly",
+    "slot_populate": "readonly",
+    "Whatever": "readonly",
+
+    "browsers": "readonly",
+    "nanny": "readonly",
+    "selectlist": "readonly",
+    "dropdown": "readonly",
+
+    "elem_collapse": "readonly",
+
+    "ea_flash": "readonly",
+    "ea_modal": "readonly",
+    "ea_super_error": "readonly",
+
+    "ea_nanny": "readonly",
+    "ea_nanny_steps": "readonly",
+    "ea_api": "readonly",
+    "ea_settings": "readonly",
+    "ea_loading": "readonly",
+    "ea_indexes": "writable",
+    "ea_params": "writable",
+    "ea_default_colorscale": "writable",
+    "ea_analysis_colorscale": "writable",
+    "ea_colorscale": "readonly",
+    "ea_filters": "writable",
+    "ea_views": "writable",
+    "ea_svg_interval": "readonly",
+    "ea_svg_pie": "readonly",
+    "ea_coordinates_in_raster": "readonly",
+
+    "fake_blob_download": "readonly",
+    "table_add_lnglat": "readonly",
+    "table_data": "readonly",
+    "XXX": "readonly"
+  }
+}

@@ -12,11 +12,11 @@ function ea_select_topo_flag(c) {
   };
 
   const svg = d3.select(document.createElementNS("http://www.w3.org/2000/svg", "svg"))
-        .attr('width',  width)
-        .attr('height',  width);
+    .attr('width',  width)
+    .attr('height',  width);
 
   const geopath = d3.geoPath()
-        .projection(d3.geoMercator());
+    .projection(d3.geoMercator());
 
   svg.append('defs')
     .append('pattern')

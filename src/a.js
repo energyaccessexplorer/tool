@@ -98,7 +98,6 @@ const UProxyHandler = {
 
     default: {
       throw TypeError(`U: I'm not allowed to set '${t}'`);
-      break;
     }
     }
 
@@ -479,7 +478,6 @@ function load_view() {
 
   default: {
     throw `Argument Error: Overlord: Could not set/find the view '${view}'.`;
-    break;
   }
   }
 

@@ -6,17 +6,17 @@ function timeline_slider(opts) {
   let v;
 
   const radius = 16,
-        svgwidth = width,
-        svgheight = (radius * 2) + 3,
-        linewidth = radius * 3,
-        svgmin = radius + 2,
-        svgmax = svgwidth - radius - 2;
+    svgwidth = width,
+    svgheight = (radius * 2) + 3,
+    linewidth = radius * 3,
+    svgmin = radius + 2,
+    svgmax = svgwidth - radius - 2;
 
   const norm = d3.scaleQuantize().domain([svgmin, svgmax]).range(steps);
   const denorm = d3.scaleLinear().domain([steps[0], steps[steps.length-1]]).range([svgmin, svgmax]);
 
   const svg = d3.create("svg")
-        .attr('class', 'svg-timeline');
+    .attr('class', 'svg-timeline');
 
   const g = svg.append('g');
 
@@ -31,7 +31,7 @@ function timeline_slider(opts) {
   steps.forEach(x => {
     g.append('text').text(x)
       .attr('transform', `translate(${denorm(x) - 16}, ${svgheight + 32})`)
-      .style('font-family', 'monospace')
+      .style('font-family', 'monospace');
   });
 
   gutter
@@ -62,7 +62,7 @@ function timeline_slider(opts) {
   };
 
   const behaviour = d3.drag()
-        .on('drag', _ => _drag(d3.event.x));
+    .on('drag', _ => _drag(d3.event.x));
 
   circle.call(behaviour);
 
@@ -87,19 +87,19 @@ function multiline(opts) {
   const margin = { top: 20, right: 20, bottom: 30, left: 40 };
 
   const svg = d3.create("svg")
-        .attr("viewBox", [0, 0, width, height]);
+    .attr("viewBox", [0, 0, width, height]);
 
   const x = d3.scaleUtc()
-        .domain(d3.extent(data.dates))
-        .range([margin.left, width - margin.right]);
+    .domain(d3.extent(data.dates))
+    .range([margin.left, width - margin.right]);
 
   const xAxis = g => g
-        .attr("transform", `translate(0,${height - margin.bottom})`)
-        .call(d3.axisBottom(x).ticks(width / 80).tickSizeOuter(0));
+    .attr("transform", `translate(0,${height - margin.bottom})`)
+    .call(d3.axisBottom(x).ticks(width / 80).tickSizeOuter(0));
 
   const y = d3.scaleLinear()
-        .range([height - margin.bottom, margin.top])
-        .nice();
+    .range([height - margin.bottom, margin.top])
+    .nice();
 
   let active_series;
 
@@ -116,28 +116,28 @@ function multiline(opts) {
   };
 
   const yAxis = g => g
-        .attr("transform", `translate(${margin.left},0)`)
-        .call(d3.axisLeft(y));
+    .attr("transform", `translate(${margin.left},0)`)
+    .call(d3.axisLeft(y));
 
   const dot = svg.append("g")
-        .attr("display", "none");
+    .attr("display", "none");
 
   dot.append("circle")
     .attr("r", 5)
     .attr("fill", 'transparent');
 
   const path = svg.append("g")
-        .attr("fill", "none")
-        .attr("stroke-width", strokewidth)
-        .attr("stroke-linejoin", "round")
-        .attr("stroke-linecap", "round")
-        .selectAll("path")
-        .data(data.series)
-        .join("path")
-        .style("mix-blend-mode", "multiply")
-        .attr("id", (d,i) => 'line-' + i)
-        .attr("stroke", d => d.color || color)
-        .attr("d", (d,i) => line(i)(d.values));
+    .attr("fill", "none")
+    .attr("stroke-width", strokewidth)
+    .attr("stroke-linejoin", "round")
+    .attr("stroke-linecap", "round")
+    .selectAll("path")
+    .data(data.series)
+    .join("path")
+    .style("mix-blend-mode", "multiply")
+    .attr("id", (d,i) => 'line-' + i)
+    .attr("stroke", d => d.color || color)
+    .attr("d", (d,i) => line(i)(d.values));
 
   svg.append("g")
     .call(xAxis);
@@ -299,7 +299,7 @@ function lines_draw() {
     return {
       id: i['id'],
       values: GEOGRAPHY.timeline_dates.map(d => i.csv.data.map(r => +r[d])).map(x => x.reduce((a,c) => a + c, 0) / x.length)
-    }
+    };
   });
 
   const ml = multiline({

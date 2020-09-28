@@ -16,7 +16,7 @@ function radio(init, callback) {
   const size = 20;
 
   const svg = d3.create("svg")
-        .attr('class', 'svg-radio');
+    .attr('class', 'svg-radio');
 
   const g = svg.append('g');
   const gutter = g.append('circle');
@@ -66,9 +66,8 @@ function radio(init, callback) {
 
 async function graphs(raster) {
   const t = await summary_analyse(raster);
-  let g;
 
-  if (g = maybe(t, 'population-density')) {
+  let g = maybe(t, 'population-density'); if (g) {
     g['distribution'].forEach((x,i) => PIES['population']['data'][i].push(x));
 
     PIES['population'].change(1);
@@ -81,7 +80,7 @@ async function graphs(raster) {
     if (pn) pn.closest('.index-graphs-group').remove();
   }
 
-  if (g = maybe(t, 'area')) {
+  g = maybe(t, 'area'); if (g) {
     g['distribution'].forEach((x,i) => PIES['area']['data'][i].push(x));
 
     PIES['area'].change(1);
@@ -113,7 +112,7 @@ function init() {
     cos.append(ce('option', ea_indexes[i]['name'], { value: i }));
 
   cos.value = U.output;
-  cos.onchange = x => { O.index = x.target.value };
+  cos.onchange = x => { O.index = x.target.value; };
 
   const toolbox = qs('#index-graphs-toolbox');
 
@@ -132,7 +131,7 @@ function init() {
   code.append(tmpl('#svg-code'));
   code.onclick = _ => {
     const conf = config.generate();
-    fake_blob_download(JSON.stringify(conf), `energyaccessexplorer-config-${conf.id}.json`)
+    fake_blob_download(JSON.stringify(conf), `energyaccessexplorer-config-${conf.id}.json`);
   };
 
   qs('#index-graphs').append(el_tree(

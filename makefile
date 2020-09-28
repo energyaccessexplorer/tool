@@ -26,7 +26,10 @@ TIMESTAMP != date -u +'%Y-%m-%d--%T'
 
 default: reconfig build reload
 
-build: build-a build-s build-d
+build: lint build-a build-s build-d
+
+lint:
+	eslint ./src --fix
 
 reload:
 	@sleep 0.3

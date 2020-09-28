@@ -27,7 +27,7 @@ function ea_colorscale(opts) {
     const h = height || 5;
 
     const svg = d3.create("svg")
-          .attr('class', 'svg-interval');
+      .attr('class', 'svg-interval');
 
     const g = svg.append('g');
 
@@ -61,7 +61,7 @@ function ea_colorscale(opts) {
 
       return [(c>>16)&255, (c>>8)&255, c&255, 255];
     }
-    else if (c = str.match(/^rgba?\(([0-9]{1,3}),\ ?([0-9]{1,3}),\ ?([0-9]{1,3}),?\ ?([0-9]{1,3})?\)$/)) {
+    else if ((c = str.match(/^rgba?\(([0-9]{1,3}), ?([0-9]{1,3}), ?([0-9]{1,3}),? ?([0-9]{1,3})?\)$/))) {
       return [+c[1], +c[2], +c[3], +c[4] || 255];
     }
 
@@ -83,44 +83,44 @@ function ea_svg_pie(data, outer, inner, colors, inner_text, parse) {
     parse = x => (x * 100).toFixed(2);
 
   const width =  outer * 2,
-        height = outer * 2;
+    height = outer * 2;
 
   const pie = d3.pie()
-        .value(d => d[0])
-        .sort(null);
+    .value(d => d[0])
+    .sort(null);
 
   const arc = d3.arc()
-        .innerRadius(typeof inner !== 'number' ? outer - (outer/4) : inner)
-        .outerRadius(outer - (outer/15));
+    .innerRadius(typeof inner !== 'number' ? outer - (outer/4) : inner)
+    .outerRadius(outer - (outer/15));
 
   const svg = d3.create("svg")
-      .attr('class', 'svg-pie')
-      .attr("width", width)
-      .attr("height", height);
+    .attr('class', 'svg-pie')
+    .attr("width", width)
+    .attr("height", height);
 
   const g = svg.append("g")
-      .attr("transform", `translate(${ width / 2 }, ${ height / 2 })`);
+    .attr("transform", `translate(${ width / 2 }, ${ height / 2 })`);
 
   let n;
 
   const outline = svg.append('circle')
-      .attr('cx', width / 2)
-      .attr('cy', height / 2)
-      .attr('r', outer - (outer/15) - 1)
-      .attr('stroke', 'gray')
-      .attr('stroke-width', 0)
-      .attr('fill', 'none');
+    .attr('cx', width / 2)
+    .attr('cy', height / 2)
+    .attr('r', outer - (outer/15) - 1)
+    .attr('stroke', 'gray')
+    .attr('stroke-width', 0)
+    .attr('fill', 'none');
 
   let path = g
-      .datum(data)
-      .selectAll("path")
-      .data(pie).enter()
-      .append("path")
-      .attr("fill", (d,i) => colors[i])
-      .attr("d", arc)
-      .on("mouseenter", function(d) { n = nanny.pick_element(this, { message: parse(d.value) + "%", position: "W", close: false }); })
-      .on("mouseleave", function(d) { if (n) n.remove(); })
-      .each(function(d) { this._current = d });
+    .datum(data)
+    .selectAll("path")
+    .data(pie).enter()
+    .append("path")
+    .attr("fill", (d,i) => colors[i])
+    .attr("d", arc)
+    .on("mouseenter", function(d) { n = nanny.pick_element(this, { message: parse(d.value) + "%", position: "W", close: false }); })
+    .on("mouseleave", function(_) { if (n) n.remove(); })
+    .each(function(d) { this._current = d; });
 
   function change(v) {
     pie.value(d => d[v]);
@@ -153,11 +153,11 @@ function ea_svg_interval(opts = {}) {
   const {sliders, domain, init, steps, width, callback1, callback2, end_callback} = opts;
 
   const radius = 6,
-        svgwidth = width || 256,
-        svgheight = (radius * 2) + 2,
-        linewidth = radius * 2,
-        svgmin = radius + 1,
-        svgmax = svgwidth - radius - 1;
+    svgwidth = width || 256,
+    svgheight = (radius * 2) + 2,
+    linewidth = radius * 2,
+    svgmin = radius + 1,
+    svgmax = svgwidth - radius - 1;
 
   let norm = d3.scaleLinear().domain([svgmin, svgmax]).range(domain);
   let denorm = norm.invert;
@@ -168,7 +168,7 @@ function ea_svg_interval(opts = {}) {
   }
 
   const svg = d3.create("svg")
-        .attr('class', 'svg-interval');
+    .attr('class', 'svg-interval');
 
   const defs = svg.append('defs');
 
@@ -308,7 +308,7 @@ function ea_svg_checkbox(init, callback) { // this is not used anywhere
   const size = 24;
 
   const svg = d3.create("svg")
-        .attr('class', 'svg-checkbox');
+    .attr('class', 'svg-checkbox');
 
   const g = svg.append('g');
 

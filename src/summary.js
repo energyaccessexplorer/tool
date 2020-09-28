@@ -149,7 +149,7 @@ export default async function analyse(raster) {
   let ds = DST.get('population-density');
 
   if (!ds) {
-    warn("No 'population-density' dataset present... Will use boundaries");
+    console.warn("No 'population-density' dataset present... Will use boundaries");
     ds = DST.get('boundaries');
   }
 
@@ -188,7 +188,7 @@ export default async function analyse(raster) {
     }
   }
 
-  const ptotal = population_groups.reduce((a,b) => a + b, 0)
+  const ptotal = population_groups.reduce((a,b) => a + b, 0);
   const atotal = area_groups.reduce((a,b) => a + b, 0);
 
   const o = {};
@@ -197,13 +197,13 @@ export default async function analyse(raster) {
       total: ptotal,
       amounts: population_groups,
       distribution: population_groups.reduce((a,b) => { a.push(b/ptotal); return a; }, [])
-    }
+    };
 
   o['area'] = {
     total: atotal,
     amounts: area_groups,
     distribution: area_groups.reduce((a,b) => { a.push(b/atotal); return a; }, [])
-  }
+  };
 
   return o;
 };

@@ -20,7 +20,6 @@ export default class Overlord {
     default:
       console.error("O.dataset: Do not know what to do with", _ds);
       throw Error("O.dataset: ArgumentError.");
-      break;
     }
 
     if (!ds) throw Error("ds was never set...");
@@ -73,7 +72,7 @@ export default class Overlord {
     DS.array.forEach(async d => {
       if (d.on && d.datatype === 'polygons-timeline')
         parse_polygons_csv.call(d, t);
-    })
+    });
   };
 
   set index(t) {

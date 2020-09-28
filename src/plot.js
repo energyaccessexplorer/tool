@@ -38,7 +38,7 @@ export function outputcanvas(data, canvas = null) {
   const A = DST.get('boundaries');
 
   if (!data.length) {
-    warn("plot.outputcanvas: no raster given. Filling up with a blank (transparent) one...");
+    console.warn("plot.outputcanvas: no raster given. Filling up with a blank (transparent) one...");
     data = new Float32Array(A.raster.data.length).fill(-1);
   };
 

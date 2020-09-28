@@ -272,19 +272,19 @@ function humanformat(s) {
     .replace('_', ' ')
     .replace('-', ' ')
     .replace(/^([a-z])/, x => x.toUpperCase())
-    .replace(/\ ([a-z])/g, x => x.toUpperCase());
+    .replace(/ ([a-z])/g, x => x.toUpperCase());
 };
 
 function toggle_switch(init, callback, opts = {}) {
   const radius = 10,
-        svgwidth = 38,
-        svgheight = (radius * 2) + 2,
-        linewidth = radius * 2,
-        svgmin = radius + 1,
-        svgmax = svgwidth - radius - 1;
+    svgwidth = 38,
+    svgheight = (radius * 2) + 2,
+    linewidth = radius * 2,
+    svgmin = radius + 1,
+    svgmax = svgwidth - radius - 1;
 
   const svg = d3.create("svg")
-        .attr('class', 'svg-checkbox');
+    .attr('class', 'svg-checkbox');
 
   const defs = svg.append('defs');
 
@@ -496,7 +496,7 @@ async function overview(cca3) {
     .then(t => d3.csvParse(t))
     .then(d => {
       return r = d.find(x => x.cca3 === GEOGRAPHY.cca3);
-    })
+    });
 
   if (r) {
     r['urban_population'] = (100 - r['rural_population']).toFixed(1);
@@ -635,7 +635,7 @@ function sort_datasets(config) {
 
           const t = qs('#controls-tab-' + branch);
           if (t) qs('#controls-tabs').prepend(t);
-          else warn("nope...");
+          else console.warn("nope...");
         }
       }
     }
@@ -657,7 +657,7 @@ function options() {
       "action": _ => {
         if (!this.ds.on) dstoggle.call(this.ds);
 
-        qs('.advanced-controls', this).style.display = (this.show_advanced = !this.show_advanced) ? 'block' : 'none';
+        qs('.advanced-controls', this).style.display = ((this.show_advanced = !this.show_advanced)) ? 'block' : 'none';
       }
     });
   }

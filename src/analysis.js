@@ -1,10 +1,10 @@
 import DS from './ds.js';
 
-import * as plot from './plot.js'
+import * as plot from './plot.js';
 
 import {
   graphs as indexes_graphs,
-} from './indexes.js'
+} from './indexes.js';
 
 /*
  * run
@@ -82,13 +82,13 @@ export default function run(type) {
   // instead.
   //
   const full_weight = list
-        .reduce((a,c) => ((c.analysis_scale(type) === "key-delta") ? a : c.weight + a), 0);
+    .reduce((a,c) => ((c.analysis_scale(type) === "key-delta") ? a : c.weight + a), 0);
 
   let nr = list.find(l => !maybe(l, 'raster', 'data'));
   if (nr) {
-    warn(`Dataset '${nr.id}' has no raster.data (yet).`,
-         "Skipping this analysis since I suspect a race condition.",
-         "Telling O to wait for it...");
+    console.warn(`Dataset '${nr.id}' has no raster.data (yet).`,
+      "Skipping this analysis since I suspect a race condition.",
+      "Telling O to wait for it...");
 
     O.wait_for(
       _ => nr.raster.data,
@@ -221,9 +221,9 @@ async function plot_active(type, doindexes) {
   const index = ea_indexes[type];
 
   if (!type || !index) {
-    warn("plot_active: Too early...",
-         "This is an initialisation bug.",
-         "Index type:", type);
+    console.warn("plot_active: Too early...",
+      "This is an initialisation bug.",
+      "Index type:", type);
 
     return raster;
   }

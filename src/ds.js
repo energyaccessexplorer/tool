@@ -36,7 +36,7 @@ export default class DS {
 
     this.mutant = !!config.mutant;
 
-    this.items = !!config.collection ? [] : undefined;
+    this.items = config.collection ? [] : undefined;
 
     this.files_setup(o);
 
@@ -280,7 +280,7 @@ export default class DS {
       // TODO: find out what this error is when changing mapbox's themes.
       //       it is not fatal, so we just report it.
       //
-      warn(err);
+      console.warn(err);
     }
   }
 
@@ -374,8 +374,8 @@ export default class DS {
 
     case 'intervals': {
       const q = d3.scaleQuantile()
-            .domain(this.analysis.intervals)
-            .range(NORM_STOPS);
+        .domain(this.analysis.intervals)
+        .range(NORM_STOPS);
 
       s = x => (x >= t[0]) && (x <= t[1]) ? q(x) : -1;
 
@@ -418,7 +418,7 @@ export default class DS {
   };
 
   active(d, draw) {
-    this._active(...arguments)
+    this._active(...arguments);
   };
 
   info_modal() {

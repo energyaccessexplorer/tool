@@ -95,23 +95,11 @@ export function init() {
 
 	MOBILE = window.innerWidth < 1152;
 
-	function hextostring(hex) {
-		var s = "";
-
-		//             ________________ careful there
-		//            /
-		//           V
-		for (let i = 2; i < hex.length; i += 2)
-			s += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
-
-		return s;
-	};
-
 	ea_api.get("geographies", { "online": "eq.true", "adm": "eq.0" })
 		.then(countries_online => {
 			for (let co of countries_online) {
 				const d = ce('div', ce('h2', co.name, { class: 'country-name' }), { class: 'country-item', ripple: "" });
-				d.onclick = _ => setTimeout(_ => ea_select_geography(co), 350);
+				d.onclick = _ => setTimeout(_ => geography(co), 350);
 
 				Promise.all([
 					fetch(`/tool/mledoze-countries/data/${co.cca3.toLowerCase()}.geo.json`),
@@ -120,7 +108,7 @@ export function init() {
 					const topo = await responses[0].json();
 					const flag = await responses[1].text();
 
-					d.append(ea_select_topo_flag(
+					d.append(topo_flag(
 						topo.features,
 						URL.createObjectURL((new Blob([flag], {type: 'image/svg+xml'}))),
 						config

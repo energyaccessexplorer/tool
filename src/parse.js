@@ -138,12 +138,8 @@ boundaries: ${b.raster.width} × ${b.raster.height}
 	};
 
 	let t;
-	if (maybe(this.raster, 'data'))
-		t = Whatever;
-
-	else
-		t = fetchcheck.call(this, this.raster.endpoint, "TIFF")
-		.then(r => r.blob());
+	if (maybe(this.raster, 'data')) t = Whatever;
+	else t = fetchcheck.call(this, this.raster.endpoint, "TIFF").then(r => r.blob());
 
 	return t.then(b => run_it.call(this, b));
 };

@@ -29,7 +29,7 @@ default: reconfig build reload
 build: lint build-a build-s build-d
 
 lint:
-	eslint ./src --fix
+	@lintit src EA
 
 reload:
 	-@chrome-remote-reload

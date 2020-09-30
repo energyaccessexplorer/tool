@@ -13,28 +13,19 @@
       "error",
       "tab"
     ],
-    "no-mixed-spaces-and-tabs": [
-      "off"
-    ],
+    "no-mixed-spaces-and-tabs": "off",
     "linebreak-style": [
       "error",
       "unix"
     ],
-    "quotes": [
-      "off",
-      "double"
-    ],
+    "quotes": "off",
     "semi": [
       "error",
       "always"
     ],
     "no-console": "off",
-    "no-extra-semi": [
-      "off"
-    ],
-    "no-prototype-builtins": [
-      "off"
-    ],
+    "no-extra-semi": "off",
+    "no-prototype-builtins": "off",
     "no-unused-vars": [
       "warn",
       {

@@ -190,6 +190,7 @@ deploy:
 reconfig:
 	@echo '{}' \
 		| jq '.database = ${API_URL}' \
+		| jq '.storage = ${STORAGE_URL}' \
 		| jq '.mapbox_token = ${MAPBOX_TOKEN}' \
 		| jq '.mapbox_theme = ${MAPBOX_THEME}' \
 		> settings.json

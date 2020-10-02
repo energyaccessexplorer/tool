@@ -66,6 +66,7 @@ export default class DS {
 			this.vectors = JSON.parse(JSON.stringify(o.category.vectors));
 			this.vectors.endpoint = v.endpoint;
 			this.vectors.key = maybe(v, 'configuration', 'key') || 'OBJECTID';
+			this.vectors.fileid = v.id;
 
 			switch (this.vectors.shape_type) {
 			case 'points': {
@@ -90,6 +91,7 @@ export default class DS {
 			this.raster = JSON.parse(JSON.stringify(o.category.raster));
 			this.raster.endpoint = r.endpoint;
 			this.raster.parse = _ => parse.tiff.call(this);
+			this.raster.fileid = r.id;
 
 			if (typeof maybe(this.raster, 'domain', 'min') === 'number' &&
           typeof maybe(this.raster, 'domain', 'max') === 'number') {
@@ -111,6 +113,7 @@ export default class DS {
 			this.csv.endpoint = c.endpoint;
 			this.csv.key = maybe(c, 'configuration', 'key') || 'OBJECTID';
 			this.csv.parse = _ => parse.csv.call(this);
+			this.csv.fileid = c.id;
 
 			if (typeof maybe(this.csv, 'domain', 'min') === 'number' &&
           typeof maybe(this.csv, 'domain', 'max') === 'number') {

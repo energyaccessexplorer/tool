@@ -12,12 +12,15 @@ import {
 
 
 async function fetchcheck(endpoint, format) {
+	if (!endpoint.match(/^http/))
+		endpoint = ea_settings.storage + endpoint;
+
 	return fetch(endpoint)
 		.catch(_ => fail.call(this, `Could not fetch ${format}`))
-		.then(response => {
-			if (response.ok && response.status < 400) return response;
+		.then(r => {
+			if (r.ok && r.status < 400) return r;
 
-			fail.call(this, `${format} Endpoint gave ${response.status} response.`);
+			fail.call(this, `${format} Endpoint gave ${r.status} response.`);
 		});
 };
 

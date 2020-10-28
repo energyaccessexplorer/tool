@@ -10,7 +10,7 @@ ea_views = {
 	},
 
 	"filtered": {
-		"name": "Target Areas",
+		"name": "Filtered Areas",
 		"description": "Filtered areas"
 	},
 

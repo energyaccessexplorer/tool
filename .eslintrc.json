@@ -9,30 +9,19 @@
     "sourceType": "module"
   },
   "rules": {
-    "indent": [
-      "error",
-      "tab"
-    ],
-    "no-mixed-spaces-and-tabs": "off",
-    "linebreak-style": [
-      "error",
-      "unix"
-    ],
+    "indent": ["error", "tab"],
+    "linebreak-style": ["error", "unix"],
     "quotes": "off",
-    "semi": [
-      "error",
-      "always"
-    ],
+    "semi": ["error", "always"],
     "no-console": "off",
     "no-extra-semi": "off",
+    "no-mixed-spaces-and-tabs": "off",
     "no-prototype-builtins": "off",
-    "no-unused-vars": [
-      "warn",
-      {
-        "varsIgnorePattern": "^_$",
-        "argsIgnorePattern": "^_$"
-      }
-    ]
+    "no-unused-vars": ["warn", {
+      "varsIgnorePattern": "^_$",
+      "argsIgnorePattern": "^_$"
+    }]
+
   },
   "globals": {
     "d3": "readonly",

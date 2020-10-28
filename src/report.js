@@ -119,7 +119,12 @@ contact our team at`;
 	function add_selected_datasets() {
 		add_title("Selected Datasets");
 
-		const body = DS.array.filter(d => d.on).map(d => [d.name, d.category.unit, (d.domain || []).join(' - '), d.weight]);
+		const body = DS.array.filter(d => d.on)
+			.map(d => ([
+				d.name,
+				d.category.unit || "proximity in km",
+				(d._domain || []).join(' - '), d.weight
+			]));
 
 		doc.autoTable({
 			head: [['Dataset', 'Unit', 'Range', 'Importance']],

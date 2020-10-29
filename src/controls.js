@@ -211,14 +211,14 @@ export default class dscontrols extends HTMLElement {
 
 	reset_defaults() {
 		if (this.weight_group) {
-			this.weight_group.change(2);
-			O.dataset(this, 'weight', 2);
+			this.weight_group.change(0,2);
+			O.dataset(this.ds, 'weight', 2);
 		}
 
 		if (this.range_group) {
 			const d = this.ds.raster.init;
 			this.range_group.change(d.min, d.max);
-			O.dataset(this, 'domain', d);
+			O.dataset(this.ds, 'domain', d);
 		}
 	};
 

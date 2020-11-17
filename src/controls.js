@@ -614,7 +614,7 @@ function sort_datasets(config) {
 			}
 		}
 
-	const subbranches_elements = qsa('.controls-subbranch', tabs_el);
+	const subbranches_elements = qsa('.controls-subbranch', contents_el);
 
 	if (maybe(sort_subbranches, 'length'))
 		for (let subbranch of sort_subbranches.slice(0).reverse()) {

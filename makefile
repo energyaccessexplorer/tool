@@ -184,8 +184,8 @@ synced:
 		${DIST}/ ${WEBSITE_SRV_USER}@${SRV_SERVER}:${TOOL_DEST}
 
 deploy:
-	make reconfig build sync env=${env}
-	make reconfig build reload env=development
+	bmake reconfig build sync env=${env}
+	bmake reconfig build reload env=development
 
 reconfig:
 	@echo '{}' \

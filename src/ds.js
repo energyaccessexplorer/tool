@@ -60,12 +60,18 @@ export default class DS {
 	};
 
 	files_setup(o) {
-		const v = maybe(o.df.find(x => x.func === 'vectors'), 'file');
+		const b = DST.get('boundaries');
+
+		const v = this.category.name.match(/^(timeline-)?indicator/) ?
+			b.vectors :
+			maybe(o.df.find(x => x.func === 'vectors'), 'file');
+
 		if (o.category.vectors && v) {
 			this.vectors = JSON.parse(JSON.stringify(o.category.vectors));
 			this.vectors.endpoint = v.endpoint;
-			this.vectors.key = maybe(v, 'configuration', 'key') || 'OBJECTID';
+			this.vectors.key = maybe(v, 'configuration', 'key') || v.key || 'OBJECTID';
 			this.vectors.fileid = v.id;
+			this.vectors.features = v.features;
 
 			let p; switch (this.vectors.shape_type) {
 			case 'points': {
@@ -87,7 +93,10 @@ export default class DS {
 			this.vectors.parse = p;
 		}
 
-		const r = maybe(o.df.find(x => x.func === 'raster'), 'file');
+		const r = this.category.name.match(/^indicator/) ?
+			b.raster :
+			maybe(o.df.find(x => x.func === 'raster'), 'file');
+
 		if (o.category.raster && r) {
 			this.raster = JSON.parse(JSON.stringify(o.category.raster));
 			this.raster.endpoint = r.endpoint;

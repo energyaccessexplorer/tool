@@ -102,19 +102,6 @@ export default class DS {
 			this.raster.endpoint = r.endpoint;
 			this.raster.parse = _ => parse.tiff.call(this);
 			this.raster.fileid = r.id;
-
-			if (typeof maybe(this.raster, 'domain', 'min') === 'number' &&
-					typeof maybe(this.raster, 'domain', 'max') === 'number') {
-				this.domain = [this.raster.domain.min, this.raster.domain.max];
-				this._domain = JSON.parse(JSON.stringify(this.domain));
-				this.domain_init = JSON.parse(JSON.stringify(this.domain));
-			}
-
-			if (typeof maybe(this.raster, 'init', 'min') === 'number' &&
-					typeof maybe(this.raster, 'init', 'max') === 'number') {
-				this._domain = [this.raster.init.min, this.raster.init.max];
-				this.domain_init = JSON.parse(JSON.stringify(this._domain));
-			}
 		}
 
 		const c = maybe(o.df.find(x => x.func === 'csv'), 'file');
@@ -125,13 +112,6 @@ export default class DS {
 			this.csv.key = maybe(c, 'configuration', 'key') || 'OBJECTID';
 			this.csv.parse = _ => parse.csv.call(this);
 			this.csv.fileid = c.id;
-
-			if (typeof maybe(this.csv, 'domain', 'min') === 'number' &&
-					typeof maybe(this.csv, 'domain', 'max') === 'number') {
-				this.domain = [this.csv.domain.min, this.csv.domain.max];
-				this._domain = JSON.parse(JSON.stringify(this.domain));
-				this.domain_init = JSON.parse(JSON.stringify(this.domain));
-			}
 		}
 	};
 
@@ -149,7 +129,7 @@ export default class DS {
 
 			this.colorscale = ea_colorscale({
 				stops: this.category.colorstops,
-				domain: this.raster.domain,
+				domain: this.category.domain || this.domain,
 				intervals: this.raster.intervals,
 			});
 
@@ -434,7 +414,14 @@ export default class DS {
 	};
 
 	get domain() {
-		return this.__domain;
+		const d = this.__domain;
+
+		return {
+			0: d[0],
+			1: d[1],
+			min: d[0],
+			max: d[1]
+		};
 	};
 
 	active() {

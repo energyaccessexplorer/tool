@@ -189,9 +189,7 @@ function datasets(type) {
 			// Discard datasets which are filters and use the entire domain (useless).
 			//
 			if (ea_filters.includes(d.analysis_scale(type)) &&
-          d.raster.domain &&
-          (d._domain[0] === d.raster.domain.min &&
-           d._domain[1] === d.raster.domain.max))
+					(d._domain && (d._domain.min === d.domain.min && d._domain.max === d.domain.max)))
 				return false;
 
 			return true;

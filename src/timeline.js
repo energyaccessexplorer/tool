@@ -352,7 +352,7 @@ async function lines_update() {
 async function datasets_polygons_csv() {
 	await until(_ => this.csv.data);
 
-	if (!this.csv.domain) {
+	if (!this.domain) {
 		this.domain = [
 			d3.min([].concat(...GEOGRAPHY.timeline_dates.map(d => this.csv.data.map(r => +r[d])))),
 			d3.max([].concat(...GEOGRAPHY.timeline_dates.map(d => this.csv.data.map(r => +r[d]))))

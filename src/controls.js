@@ -55,10 +55,10 @@ export default class dscontrols extends HTMLElement {
 		let steps;
 		if (cat.controls.range_steps) {
 			steps = [];
-			const s = (this.ds.raster.domain.max - this.ds.raster.domain.min) / (cat.controls.range_steps - 1);
+			const s = (this.ds.domain.max - this.ds.domain.min) / (cat.controls.range_steps - 1);
 
 			for (let i = 0; i < cat.controls.range_steps; i += 1)
-				steps[i] = this.ds.raster.domain.min + (s * i);
+				steps[i] = this.ds.domain.min + (s * i);
 		}
 
 		const lr = cat.controls.range_label || cat.unit || 'range';

@@ -290,7 +290,7 @@ export default class dscard extends HTMLElement {
 
 			if (typeof maybe(ds, 'domain', 0) === 'number' &&
           typeof maybe(ds, 'domain', 1) === 'number') {
-				r.append(...ramp_values(ds.domain[0], ds.domain[1]));
+				r.append(...ramp_values(ds.domain.min, ds.domain.max));
 			}
 
 			d.append(
@@ -304,9 +304,9 @@ export default class dscard extends HTMLElement {
 
 		case 'raster': {
 			let r = tmpl("#ramp");
-			if (typeof maybe(ds, 'raster', 'domain', 'min') === 'number' &&
-          typeof maybe(ds, 'raster', 'domain', 'max') === 'number') {
-				r.append(...ramp_values(ds.raster.domain.min, ds.raster.domain.max));
+
+			if (ds.domain) {
+				r.append(...ramp_values(ds.domain.min, ds.domain.max));
 				d.append(r);
 			}
 

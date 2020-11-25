@@ -26,7 +26,7 @@ export default class Overlord {
 
 		switch (arg) {
 		case "domain": {
-			ds.__domain = data;
+			ds._domain = data;
 			break;
 		}
 

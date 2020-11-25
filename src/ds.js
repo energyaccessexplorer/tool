@@ -16,7 +16,6 @@ export default class DS {
 
 		this.on = on || false;
 
-		this._domain = null;
 
 		let config = o.configuration || {};
 
@@ -68,22 +67,24 @@ export default class DS {
 			this.vectors.key = maybe(v, 'configuration', 'key') || 'OBJECTID';
 			this.vectors.fileid = v.id;
 
-			switch (this.vectors.shape_type) {
+			let p; switch (this.vectors.shape_type) {
 			case 'points': {
-				this.vectors.parse = x => parse.points.call(x || this);
+				p = x => parse.points.call(x || this);
 				break;
 			}
 
 			case 'polygons': {
-				this.vectors.parse = x => parse.polygons.call(x || this);
+				p = x => parse.polygons.call(x || this);
 				break;
 			}
 
 			case 'lines': {
-				this.vectors.parse = x => parse.lines.call(x || this);
+				p = x => parse.lines.call(x || this);
 				break;
 			}
 			}
+
+			this.vectors.parse = p;
 		}
 
 		const r = maybe(o.df.find(x => x.func === 'raster'), 'file');
@@ -94,20 +95,21 @@ export default class DS {
 			this.raster.fileid = r.id;
 
 			if (typeof maybe(this.raster, 'domain', 'min') === 'number' &&
-          typeof maybe(this.raster, 'domain', 'max') === 'number') {
+					typeof maybe(this.raster, 'domain', 'max') === 'number') {
 				this.domain = [this.raster.domain.min, this.raster.domain.max];
 				this._domain = JSON.parse(JSON.stringify(this.domain));
 				this.domain_init = JSON.parse(JSON.stringify(this.domain));
 			}
 
 			if (typeof maybe(this.raster, 'init', 'min') === 'number' &&
-          typeof maybe(this.raster, 'init', 'max') === 'number') {
+					typeof maybe(this.raster, 'init', 'max') === 'number') {
 				this._domain = [this.raster.init.min, this.raster.init.max];
 				this.domain_init = JSON.parse(JSON.stringify(this._domain));
 			}
 		}
 
 		const c = maybe(o.df.find(x => x.func === 'csv'), 'file');
+
 		if (o.category.csv && c) {
 			this.csv = JSON.parse(JSON.stringify(o.category.csv));
 			this.csv.endpoint = c.endpoint;
@@ -116,7 +118,7 @@ export default class DS {
 			this.csv.fileid = c.id;
 
 			if (typeof maybe(this.csv, 'domain', 'min') === 'number' &&
-          typeof maybe(this.csv, 'domain', 'max') === 'number') {
+					typeof maybe(this.csv, 'domain', 'max') === 'number') {
 				this.domain = [this.csv.domain.min, this.csv.domain.max];
 				this._domain = JSON.parse(JSON.stringify(this.domain));
 				this.domain_init = JSON.parse(JSON.stringify(this.domain));
@@ -398,7 +400,7 @@ export default class DS {
 	analysis_scale(type) {
 		if (!maybe(this, 'analysis', 'indexes')) return null;
 		return this.analysis.indexes.find(i => i.index === type).scale;
-	}
+	};
 
 	async visibility(t) {
 		if (this.items) {
@@ -415,8 +417,15 @@ export default class DS {
 		}
 	};
 
-	set __domain(d) {
-		this._domain = d;
+	set domain(arr) {
+		if (!this.mutant && this.__domain)
+			throw new Error(`domain: cannot change existing domain '${this.__domain}' -> '${arr}' on non-mutant dataset '${this.id}'`);
+		else
+			this.__domain = arr;
+	};
+
+	get domain() {
+		return this.__domain;
 	};
 
 	active() {

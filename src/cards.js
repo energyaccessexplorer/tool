@@ -183,8 +183,8 @@ export default class dscard extends HTMLElement {
 		qs('.opacity-box', e).append(r);
 
 		const grad = ea_svg_interval({
-			init: [0, 100],
-			domain: [0, 100],
+			init: { min: 0, max: 100 },
+			domain: { min: 0, max: 100 },
 			sliders: "single",
 			callback2: x => o = x/100,
 			end_callback: _ => {
@@ -238,15 +238,15 @@ export default class dscard extends HTMLElement {
 		let d = ce('div');
 		let e = maybe(ds.colorscale, 'svg') || ce('div');
 
-		function ramp_values(a, b) {
-			const diff = Math.abs(b - a);
+		function ramp_values({min, max}) {
+			const diff = Math.abs(max - min);
 			let i = 3 - Math.ceil(Math.log10(diff || 1));
 			if (i < 0) i = 0;
 
 			return [
-				ce('div', a.toFixed(i) + ""),
-				ce('div', ((a + b) / 2).toFixed(i)),
-				ce('div', b.toFixed(i) + "")
+				ce('div', min.toFixed(i) + ""),
+				ce('div', ((min + max) / 2).toFixed(i)),
+				ce('div', max.toFixed(i) + "")
 			];
 		}
 
@@ -288,9 +288,8 @@ export default class dscard extends HTMLElement {
 		case 'polygons-timeline': {
 			const r = tmpl("#ramp");
 
-			if (typeof maybe(ds, 'domain', 0) === 'number' &&
-          typeof maybe(ds, 'domain', 1) === 'number') {
-				r.append(...ramp_values(ds.domain.min, ds.domain.max));
+			if (ds.domain) {
+				r.append(...ramp_values(ds.domain));
 			}
 
 			d.append(
@@ -306,7 +305,7 @@ export default class dscard extends HTMLElement {
 			let r = tmpl("#ramp");
 
 			if (ds.domain) {
-				r.append(...ramp_values(ds.domain.min, ds.domain.max));
+				r.append(...ramp_values(ds.domain));
 				d.append(r);
 			}
 

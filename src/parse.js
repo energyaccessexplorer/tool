@@ -358,7 +358,7 @@ async function polygons_csv(col) {
 	if (this.colorscale) {
 		if (!data) console.warn(this.id, "has no csv.data");
 
-		const l = d3.scaleQuantize().domain(this.domain).range(this.colorscale.stops);
+		const l = d3.scaleQuantize().domain([this.domain.min, this.domain.max]).range(this.colorscale.stops);
 		s = x => (null === x || undefined === x || x === "") ? "rgba(155,155,155,1)" : l(+x);
 
 		this.csv.scale = l;

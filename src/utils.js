@@ -10,8 +10,7 @@ function ea_colorscale(opts) {
 	if (!stops || !stops.length)
 		stops = ea_default_colorscale.stops;
 
-	if (!domain || domain.length < 2)
-		domain = NORM_STOPS;
+	if (!domain) domain = NORM_STOPS;
 
 	if (maybe(intervals, 'length')) {
 		s = d3.scaleQuantile()
@@ -161,7 +160,7 @@ function ea_svg_interval(opts = {}) {
 		    svgmin = radius + 1,
 		    svgmax = svgwidth - radius - 1;
 
-	let norm = d3.scaleLinear().domain([svgmin, svgmax]).range(domain);
+	let norm = d3.scaleLinear().domain([svgmin, svgmax]).range([domain.min, domain.max]);
 	let denorm = norm.invert;
 
 	if (steps) {
@@ -288,12 +287,12 @@ function ea_svg_interval(opts = {}) {
 			.touchable(MOBILE)
 	);
 
-	function change(a,b) {
-		dragged(c1, denorm(a), callback1);
-		dragged(c2, denorm(b), callback2);
+	function change({min,max}) {
+		dragged(c1, denorm(min), callback1);
+		dragged(c2, denorm(max), callback2);
 	};
 
-	if (init) change(init[0], init[1]);
+	if (init) change(init);
 
 	if (sliders === "single") c1.remove();
 

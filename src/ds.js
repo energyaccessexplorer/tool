@@ -340,7 +340,7 @@ export default class DS {
 		const c = this.analysis.indexes.find(i => i.index === type);
 		if (!c) return null;
 
-		const t = this._domain;
+		const {min,max} = this._domain;
 		const r = (c && c.invert) ? [1,0] : [0,1];
 
 		let s = null;
@@ -350,18 +350,18 @@ export default class DS {
 
 			s = x => {
 				let z = this.csv.table[x];
-				return ((undefined === z) || z < t[0] || z > t[1]) ? -1 : 1;
+				return ((undefined === z) || z < min || z > max) ? -1 : 1;
 			};
 			break;
 		}
 
 		case 'exclusion-buffer': {
-			s = x => (x < t[0] || x > t[1]) ? 1 : -1;
+			s = x => (x < min || x > max) ? 1 : -1;
 			break;
 		}
 
 		case 'inclusion-buffer': {
-			s = x => (x >= t[0] && x <= t[1]) ? 1 : -1;
+			s = x => (x >= min && x <= max) ? 1 : -1;
 			break;
 		}
 
@@ -370,15 +370,15 @@ export default class DS {
 				    .domain(this.analysis.intervals)
 				    .range(NORM_STOPS);
 
-			s = x => (x >= t[0]) && (x <= t[1]) ? q(x) : -1;
+			s = x => (x >= min) && (x <= max) ? q(x) : -1;
 
 			break;
 		}
 
 		case 'linear':
 		default: {
-			if (t[0] === t[1]) return s = x => (x === +t[0]) ? 1 : -1;
-			s = d3.scaleLinear().domain(t).range(r).clamp(this.analysis.clamp);
+			if (min === max) return s = x => (x === +min) ? 1 : -1;
+			s = d3.scaleLinear().domain([min,max]).range(r).clamp(this.analysis.clamp);
 			break;
 		}
 		}
@@ -406,22 +406,15 @@ export default class DS {
 		}
 	};
 
-	set domain(arr) {
+	set domain(o) {
 		if (!this.mutant && this.__domain)
-			throw new Error(`domain: cannot change existing domain '${this.__domain}' -> '${arr}' on non-mutant dataset '${this.id}'`);
+			throw new Error(`domain: cannot change existing domain '${this.__domain}' -> '${o}' on non-mutant dataset '${this.id}'`);
 		else
-			this.__domain = arr;
+			this.__domain = o;
 	};
 
 	get domain() {
-		const d = this.__domain;
-
-		return {
-			0: d[0],
-			1: d[1],
-			min: d[0],
-			max: d[1]
-		};
+		return this.__domain;
 	};
 
 	active() {

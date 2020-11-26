@@ -216,7 +216,7 @@ export default class dscontrols extends HTMLElement {
 		}
 
 		if (this.range_group) {
-			const d = this.ds.raster.init;
+			const d = this.ds.domain_init;
 			this.range_group.change(d.min, d.max);
 			O.dataset(this.ds, 'domain', d);
 		}
@@ -225,26 +225,31 @@ export default class dscontrols extends HTMLElement {
 	manual_setup() {
 		if (!this.manual_min || !this.manual_max) return;
 
-		this.manual_min.value = maybe(this.ds, 'domain', 0) || "";
-		this.manual_max.value = maybe(this.ds, 'domain', 1) || "";
+		this.manual_min.value = this.ds.domain.min;
+		this.manual_max.value = this.ds.domain.max;
 
 		const change = (e,i) => {
 			let v = +e.target.value;
 
-			if (v > this.ds.domain[(i+1)%2]) {
-				e.target.value = this.ds.domain[(i+1)%2];
+			if (i === 'max' && v > this.ds.domain.max) {
+				e.target.value = this.ds.domain.max;
 			}
 
-			const d = [this.ds._domain[0], this.ds._domain[1]];
-			d[i] = v;
+			if (i === 'min' && v < this.ds.domain.min) {
+				e.target.value = this.ds.domain.min;
+			}
 
-			this.range_group.change(...d);
+			const d = this.ds._domain;
+			d[i] = +v;
+			console.warn(d);
+
+			this.range_group.change(d);
 
 			O.dataset(this.ds, 'domain', d);
 		};
 
-		this.manual_min.onchange = e => change(e, 0);
-		this.manual_max.onchange = e => change(e, 1);
+		this.manual_min.onchange = e => change(e, 'min');
+		this.manual_max.onchange = e => change(e, 'max');
 
 		switch (maybe(this.ds, 'category', 'controls', 'range')) {
 		case 'single':
@@ -403,7 +408,7 @@ async function mutant_options() {
 function range(opts = {}) {
 	if (!opts.sliders) return null;
 
-	const domain = [];
+	const domain = {};
 
 	const update = (x, i, el) => {
 		el.innerText = (+x).toFixed(maybe(this, 'raster', 'precision') || 0);
@@ -430,8 +435,8 @@ function range(opts = {}) {
 		init: this.domain_init,
 		domain: this.domain,
 		steps: opts.steps,
-		callback1: x => update(x, 0, v1),
-		callback2: x => update(x, 1, v2),
+		callback1: x => update(x, 'min', v1),
+		callback2: x => update(x, 'max', v2),
 		end_callback: _ => O.dataset(this, 'domain', domain),
 	});
 

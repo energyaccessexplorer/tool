@@ -353,10 +353,10 @@ async function datasets_polygons_csv() {
 	await until(_ => this.csv.data);
 
 	if (!this.domain) {
-		this.domain = [
-			d3.min([].concat(...GEOGRAPHY.timeline_dates.map(d => this.csv.data.map(r => +r[d])))),
-			d3.max([].concat(...GEOGRAPHY.timeline_dates.map(d => this.csv.data.map(r => +r[d]))))
-		];
+		this.domain = {
+			min: d3.min([].concat(...GEOGRAPHY.timeline_dates.map(d => this.csv.data.map(r => +r[d])))),
+			max: d3.max([].concat(...GEOGRAPHY.timeline_dates.map(d => this.csv.data.map(r => +r[d]))))
+		};
 
 		this._domain = JSON.parse(JSON.stringify(this.domain));
 		this.domain_init = JSON.parse(JSON.stringify(this.domain));
@@ -381,7 +381,7 @@ function filter_valued_polygons() {
 				else if (d.datatype.match("polygons-(fixed|boundaries)"))
 					c = d.config.column;
 
-				return +r[c] >= d._domain[0] && +r[c] <= d._domain[1];
+				return +r[c] >= d._domain.min && +r[c] <= d._domain.max;
 			})
 			.map(r => +r[d.csv.key]);
 	};

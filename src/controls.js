@@ -216,7 +216,7 @@ export default class dscontrols extends HTMLElement {
 		}
 
 		if (this.range_group) {
-			const d = this.ds.domain_init;
+			const d = this.ds._domain;
 			this.range_group.change(d.min, d.max);
 			O.dataset(this.ds, 'domain', d);
 		}
@@ -432,7 +432,7 @@ function range(opts = {}) {
 	const r = ea_svg_interval({
 		sliders: opts.sliders,
 		width: slider_width,
-		init: this.domain_init,
+		init: this._domain,
 		domain: this.domain,
 		steps: opts.steps,
 		callback1: x => update(x, 'min', v1),

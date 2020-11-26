@@ -16,6 +16,12 @@ export default class DS {
 
 		this.on = on || false;
 
+		if (this.id === 'boundaries')
+			this.__domain = [-Infinity, Infinity];
+		else
+			this.__domain = o.category.domain; // will be set by csv/raster data
+
+		this._domain = o.category.domain_init || JSON.parse(JSON.stringify(this.__domain));
 
 		let config = o.configuration || {};
 
@@ -38,16 +44,6 @@ export default class DS {
 		this.items = config.collection ? [] : undefined;
 
 		this.files_setup(o);
-
-		if (this.mutant) ;
-
-		else if (this.id === 'boundaries')
-			this.domain = this._domain = [-Infinity, Infinity];
-
-		else if (undefined === this.domain) {
-			parse.fail.call(this, "Cannot set dataset's domain. This is likely a configuration error.");
-			return;
-		}
 
 		this.init();
 
@@ -276,7 +272,7 @@ export default class DS {
 			//
 			console.warn(err);
 		}
-	}
+	};
 
 	mutant_init() {
 		this.hosts = this.config.mutant_targets.map(i => DST.get(i));
@@ -289,7 +285,6 @@ export default class DS {
 
 		this.domain = m.domain;
 		this._domain = m._domain;
-		this.domain_init = m.domain_init;
 	};
 
 	async mutate(host) {
@@ -303,7 +298,6 @@ export default class DS {
 
 		this.domain = host.domain;
 		this._domain = host._domain;
-		this.domain_init = host.domain_init;
 
 		this.card.refresh();
 

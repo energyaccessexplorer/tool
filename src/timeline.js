@@ -357,9 +357,6 @@ async function datasets_polygons_csv() {
 			min: d3.min([].concat(...GEOGRAPHY.timeline_dates.map(d => this.csv.data.map(r => +r[d])))),
 			max: d3.max([].concat(...GEOGRAPHY.timeline_dates.map(d => this.csv.data.map(r => +r[d]))))
 		};
-
-		this._domain = JSON.parse(JSON.stringify(this.domain));
-		this.domain_init = JSON.parse(JSON.stringify(this.domain));
 	}
 };
 

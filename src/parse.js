@@ -78,7 +78,7 @@ function csv_table() {
 	return table;
 };
 
-function tiff() {
+function raster() {
 	async function run_it(blob) {
 		function draw(overrideid) {
 			const r = this.raster;
@@ -423,7 +423,7 @@ function polygons_feature_info(et, e) {
 export {
 	fail,
 	geojson_summary,
-	tiff,
+	raster,
 	polygons,
 	points,
 	lines,

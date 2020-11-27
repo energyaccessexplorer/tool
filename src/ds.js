@@ -96,7 +96,7 @@ export default class DS {
 		if (o.category.raster && r) {
 			this.raster = JSON.parse(JSON.stringify(o.category.raster));
 			this.raster.endpoint = r.endpoint;
-			this.raster.parse = _ => parse.tiff.call(this);
+			this.raster.parse = _ => parse.raster.call(this);
 			this.raster.fileid = r.id;
 		}
 

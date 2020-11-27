@@ -63,7 +63,19 @@ function csv() {
 	return fetchcheck.call(this, this.csv.endpoint, "CSV")
 		.then(d => d.text())
 		.then(r => d3.csvParse(r))
-		.then(d => this.csv.data = d);
+		.then(d => this.csv.data = d)
+		.then(_ => this.csv.table = this.config.column ? csv_table.call(this) : undefined)
+		.then(_ => {
+			if (this.domain || !this.csv.table) return;
+
+			const arr = [];
+			for (let i in this.csv.table) arr[i] = this.csv.table[i];
+
+			this.domain = {
+				min: d3.min(arr),
+				max: d3.max(arr)
+			};
+		});
 };
 
 function csv_table() {
@@ -121,6 +133,20 @@ function raster() {
 			this.raster.width = image.getWidth();
 			this.raster.height = image.getHeight();
 			this.raster.nodata = parseFloat(image.fileDirectory.GDAL_NODATA);
+
+			if (this.datatype === 'raster' && !this.domain) {
+				let min, max; min = max = this.raster.nodata;
+				for (let v of this.raster.data) {
+					if (v === this.raster.nodata) continue;
+					if (min === this.raster.nodata) min = v;
+					if (max === this.raster.nodata) max = v;
+
+					if (v > max) max = v;
+					if (v < min) min = v;
+				}
+
+				this.domain = { min, max };
+			}
 
 			if (this.id !== 'boundaries') {
 				const b = DST.get('boundaries');
@@ -348,9 +374,6 @@ function polygons() {
 
 async function polygons_csv(col) {
 	await until(_ => this.csv.data && this.vectors.features);
-
-	if (this.config.column)
-		this.csv.table = csv_table.call(this);
 
 	const data = this.csv.data;
 	let s;

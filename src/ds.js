@@ -16,13 +16,6 @@ export default class DS {
 
 		this.on = on || false;
 
-		if (this.id === 'boundaries')
-			this.__domain = [-Infinity, Infinity];
-		else
-			this.__domain = o.category.domain; // will be set by csv/raster data
-
-		this._domain = o.category.domain_init || JSON.parse(JSON.stringify(this.__domain));
-
 		let config = o.configuration || {};
 
 		this.config = config;
@@ -44,6 +37,16 @@ export default class DS {
 		this.items = config.collection ? [] : undefined;
 
 		this.files_setup(o);
+
+		if (this.id === 'boundaries')
+			this.__domain = { min: -Infinity, max: Infinity };
+
+		if (o.category.domain)
+			this.domain = o.category.domain; // will be set by csv/raster data
+		else
+			this.__domain = null;
+
+		this._domain = o.category.domain_init || JSON.parse(JSON.stringify(this.__domain));
 
 		this.init();
 
@@ -123,45 +126,19 @@ export default class DS {
 		case 'raster': {
 			this.download = this.raster.endpoint;
 
-			this.colorscale = ea_colorscale({
-				stops: this.category.colorstops,
-				domain: this.category.domain || this.domain,
-				intervals: this.raster.intervals,
-			});
-
-			break;
-		}
-
-		case 'raster-mutant': {
 			break;
 		}
 
 		case 'points':
 		case 'lines':
-		case 'polygons': {
-			this.download = this.vectors.endpoint;
-			break;
-		}
-
+		case 'polygons':
 		case 'polygons-fixed': {
 			this.download = this.vectors.endpoint;
-
-			if (this.config.column) {
-				this.colorscale = ea_colorscale({
-					stops: this.category.colorstops,
-				});
-			}
 			break;
 		}
 
-		case 'polygons-timeline': {
-			this.colorscale = ea_colorscale({
-				stops: this.category.colorstops,
-			});
-
-			break;
-		}
-
+		case 'raster-mutant':
+		case 'polygons-timeline':
 		case 'polygons-boundaries': {
 			break;
 		}
@@ -405,10 +382,52 @@ export default class DS {
 			throw new Error(`domain: cannot change existing domain '${this.__domain}' -> '${o}' on non-mutant dataset '${this.id}'`);
 		else
 			this.__domain = o;
+
+		this._domain = this._domain || { min: o.min, max: o.max };
+
+		this.set_colorscale();
+
+		if (this.card) this.card.refresh();
 	};
 
 	get domain() {
 		return this.__domain;
+	};
+
+	set_colorscale() {
+		if (this.colorscale) return;
+
+		switch (this.datatype) {
+		case 'raster': {
+			this.colorscale = ea_colorscale({
+				stops: this.category.colorstops,
+				domain: this.domain,
+				intervals: this.raster.intervals
+			});
+
+			break;
+		}
+
+		case 'polygons-fixed': {
+			if (this.config.column) {
+				this.colorscale = ea_colorscale({
+					stops: this.category.colorstops,
+				});
+			}
+			break;
+		}
+
+		case 'polygons-timeline': {
+			this.colorscale = ea_colorscale({
+				stops: this.category.colorstops,
+			});
+
+			break;
+		}
+
+		default:
+			break;
+		}
 	};
 
 	active() {

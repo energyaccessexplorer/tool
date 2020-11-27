@@ -241,7 +241,6 @@ export default class dscontrols extends HTMLElement {
 
 			const d = this.ds._domain;
 			d[i] = +v;
-			console.warn(d);
 
 			this.range_group.change(d);
 

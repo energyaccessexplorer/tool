@@ -92,12 +92,12 @@ export default class DS {
 			this.vectors.parse = p;
 		}
 
-		const r = this.category.name.match(/^indicator/) ?
-			b.raster :
+		const r = this.category.name.match(/^(timeline-)?indicator/) ?
+		  (this.raster = b.raster) :
 			maybe(o.df.find(x => x.func === 'raster'), 'file');
 
 		if (o.category.raster && r) {
-			this.raster = JSON.parse(JSON.stringify(o.category.raster));
+			this.raster = r;
 			this.raster.endpoint = r.endpoint;
 			this.raster.parse = _ => parse.raster.call(this);
 			this.raster.fileid = r.id;
@@ -317,12 +317,17 @@ export default class DS {
 		let s = null;
 		switch (c.scale) {
 		case 'key-delta': {
-			if (!maybe(this.csv, 'table')) return (s = _ => 1);
+			if (!maybe(this.csv, 'table')) {
+				s = _ => 1;
+			}
 
-			s = x => {
-				let z = this.csv.table[x];
-				return ((undefined === z) || z < min || z > max) ? -1 : 1;
-			};
+			else {
+				s = x => {
+					let z = this.csv.table[x];
+					return ((undefined === z) || z < min || z > max) ? -1 : 1;
+				};
+			}
+
 			break;
 		}
 

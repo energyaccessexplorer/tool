@@ -1,5 +1,17 @@
 import DS from './ds.js';
 
+import {
+	polygons_csv as parse_polygons_csv,
+} from './parse.js';
+
+import {
+	lines_update as timeline_lines_update,
+} from './timeline.js';
+
+import {
+	plot_active as analysis_plot_active,
+} from './analysis.js';
+
 export default class Overlord {
 	layers() {
 		Promise.all(U.inputs.map(id => DST.get(id).active(true, ['inputs', 'timeline'].includes(U.view))));

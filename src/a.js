@@ -9,7 +9,6 @@ import * as indexes from './indexes.js';
 import {
 	init as timeline_init,
 	lines_draw as timeline_lines_draw,
-	lines_update as timeline_lines_update,
 	filter_valued_polygons as timeline_filter_valued_polygons,
 } from './timeline.js';
 
@@ -27,7 +26,6 @@ import {
 } from './analysis.js';
 
 import {
-	polygons_csv,
 	polygons_feature_info,
 } from './parse.js';
 
@@ -649,13 +647,5 @@ function nanny_force() {
 window.ea_nanny_force_start = nanny_force;
 
 // TODO: the following are used by overlord. delete them.
-
 window.load_view = load_view;
-
 window.map_click = map_click;
-
-window.timeline_lines_update = timeline_lines_update;
-
-window.parse_polygons_csv = polygons_csv;
-
-window.analysis_plot_active = analysis_plot_active;

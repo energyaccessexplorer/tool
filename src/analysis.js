@@ -25,7 +25,7 @@ export default function run(type) {
 	const it = new Float32Array(list.length ? boundaries.raster.data.length: 0).fill(-1);
 
 	// There's nothing interesting about an analysis with only filters. Also,
-	// filters return 1 so an silly (single-valued) analysis would be plotted.
+	// filters return 1 so a silly (single-valued) analysis would be plotted.
 	//
 	if (list.every(d => ea_filters.includes(d.analysis_scale(type)))) return it;
 

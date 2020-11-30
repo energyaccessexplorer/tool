@@ -64,7 +64,7 @@ function csv() {
 		.then(d => d.text())
 		.then(r => d3.csvParse(r))
 		.then(d => this.csv.data = d)
-		.then(_ => this.csv.table = this.config.column ? csv_table.call(this) : undefined)
+		.then(_ => this.csv.table = this.config.column ? csv_table.call(this, this.config.column) : undefined)
 		.then(_ => {
 			if (this.domain || !this.csv.table) return;
 
@@ -78,13 +78,13 @@ function csv() {
 		});
 };
 
-function csv_table() {
+function csv_table(c) {
 	const table = {};
 	const data = this.csv.data;
 
 	for (let i = 0; i < data.length; i++) {
 		const d = data[i];
-		table[d[this.csv.key]] = +d[this.config.column];
+		table[d[this.csv.key]] = +d[c];
 	}
 
 	return table;
@@ -391,6 +391,9 @@ async function polygons_csv(col) {
 		console.warn("No data for", this.id);
 		return;
 	}
+
+	if (this.timeline)
+		this.csv.table = csv_table.call(this, col);
 
 	const fs = this.vectors.features.features;
 	for (let i = 0; i < fs.length; i += 1) {

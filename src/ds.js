@@ -59,58 +59,83 @@ export default class DS {
 	};
 
 	files_setup(o) {
-		const b = DST.get('boundaries');
+		const ferr = t => {
+			ea_flash.push({
+				type: 'error',
+				timeout: 5000,
+				title: "Dataset/File error",
+				message: `
+'${this.name}' has category '${this.category.name}' which requires a ${t} file.
 
-		const v = this.category.name.match(/^(timeline-)?indicator/) ?
-			b.vectors :
-			maybe(o.df.find(x => x.func === 'vectors'), 'file');
+This is not fatal but the dataset is now disabled.`
+			});
+			this.disable();
+		};
 
-		if (o.category.vectors && v) {
-			this.vectors = JSON.parse(JSON.stringify(o.category.vectors));
-			this.vectors.endpoint = v.endpoint;
-			this.vectors.key = maybe(v, 'configuration', 'key') || v.key || 'OBJECTID';
-			this.vectors.fileid = v.id;
-			this.vectors.features = v.features;
-
-			let p; switch (this.vectors.shape_type) {
-			case 'points': {
-				p = x => parse.points.call(x || this);
-				break;
-			}
-
-			case 'polygons': {
-				p = x => parse.polygons.call(x || this);
-				break;
-			}
-
-			case 'lines': {
-				p = x => parse.lines.call(x || this);
-				break;
-			}
-			}
-
-			this.vectors.parse = p;
+		if (this.category.name.match(/^(timeline-)?indicator/)) {
+			const b = DST.get('boundaries');
+			this.raster = b.raster;
+			this.vectors = b.vectors;
 		}
 
-		const r = this.category.name.match(/^(timeline-)?indicator/) ?
-		  (this.raster = b.raster) :
-			maybe(o.df.find(x => x.func === 'raster'), 'file');
+		if (o.category.vectors) {
+			const f = maybe(o.df.find(x => x.func === 'vectors'), 'file');
 
-		if (o.category.raster && r) {
-			this.raster = r;
-			this.raster.endpoint = r.endpoint;
-			this.raster.parse = _ => parse.raster.call(this);
-			this.raster.fileid = r.id;
+			if (!f) ferr('vectors');
+			else {
+				this.vectors = {};
+				Object.assign(this.vectors, o.category.vectors, f);
+
+				this.vectors.key = maybe(f, 'configuration', 'key') || f.key || 'OBJECTID';
+				this.vectors.fileid = f.id;
+				this.vectors.features = f.features;
+
+				let p; switch (this.vectors.shape_type) {
+				case 'points': {
+					p = x => parse.points.call(x || this);
+					break;
+				}
+
+				case 'polygons': {
+					p = x => parse.polygons.call(x || this);
+					break;
+				}
+
+				case 'lines': {
+					p = x => parse.lines.call(x || this);
+					break;
+				}
+				}
+
+				this.vectors.parse = p;
+			}
 		}
 
-		const c = maybe(o.df.find(x => x.func === 'csv'), 'file');
+		if (o.category.raster) {
+			const f = maybe(o.df.find(x => x.func === 'raster'), 'file');
 
-		if (o.category.csv && c) {
-			this.csv = JSON.parse(JSON.stringify(o.category.csv));
-			this.csv.endpoint = c.endpoint;
-			this.csv.key = maybe(c, 'configuration', 'key') || 'OBJECTID';
-			this.csv.parse = _ => parse.csv.call(this);
-			this.csv.fileid = c.id;
+			if (!f) ferr('raster');
+			else {
+				this.raster = {};
+				Object.assign(this.raster, o.category.raster, f);
+
+				this.raster.parse = _ => parse.raster.call(this);
+				this.raster.fileid = f.id;
+			}
+		}
+
+		if (o.category.csv) {
+			const f = maybe(o.df.find(x => x.func === 'csv'), 'file');
+
+			if (!f) ferr('csv');
+			else {
+				this.csv = {};
+				Object.assign(this.csv, o.category.csv, f);
+
+				this.csv.key = maybe(f, 'configuration', 'key') || 'OBJECTID';
+				this.csv.parse = _ => parse.csv.call(this);
+				this.csv.fileid = f.id;
+			}
 		}
 	};
 

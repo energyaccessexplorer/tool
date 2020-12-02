@@ -59,7 +59,9 @@ export default class DS {
 	};
 
 	files_setup(o) {
-		const ferr = t => {
+		const ferr = (t,i) => {
+			if (i && ['vectors', 'raster'].includes(t)) return;
+
 			ea_flash.push({
 				type: 'error',
 				timeout: 5000,
@@ -72,16 +74,20 @@ This is not fatal but the dataset is now disabled.`
 			this.disable();
 		};
 
+		let indicator = false;
+
 		if (this.category.name.match(/^(timeline-)?indicator/)) {
 			const b = DST.get('boundaries');
 			this.raster = b.raster;
 			this.vectors = b.vectors;
+
+			indicator = true;
 		}
 
 		if (o.category.vectors) {
 			const f = maybe(o.df.find(x => x.func === 'vectors'), 'file');
 
-			if (!f) ferr('vectors');
+			if (!f) ferr('vectors', indicator);
 			else {
 				this.vectors = {};
 				Object.assign(this.vectors, o.category.vectors, f);
@@ -114,7 +120,7 @@ This is not fatal but the dataset is now disabled.`
 		if (o.category.raster) {
 			const f = maybe(o.df.find(x => x.func === 'raster'), 'file');
 
-			if (!f) ferr('raster');
+			if (!f) ferr('raster', indicator);
 			else {
 				this.raster = {};
 				Object.assign(this.raster, o.category.raster, f);

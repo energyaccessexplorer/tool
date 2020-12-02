@@ -101,14 +101,12 @@ export default class Overlord {
 	};
 
 	set subgeo(t) {
-		if (!t) {
-			U.subgeo = '';
-			O.dataset('boundaries', 'domain', DST.get('boundaries').domain);
-			return;
-		}
+		U.subgeo = t || '';
 
-		U.subgeo = t;
-		O.dataset('boundaries', 'domain', [t, t]);
+		Promise.all(DS.array.map(d => {
+			if (d.on && d.datatype === 'polygons-timeline')
+				return parse_polygons_csv.call(d, U.timeline);
+		})).then(_ => O.view = U.view);
 	};
 
 	map(interaction, event) {

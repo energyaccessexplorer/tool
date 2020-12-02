@@ -77,10 +77,14 @@ function csv() {
 function csv_table(c) {
 	const table = {};
 	const data = this.csv.data;
+	const k = this.csv.key;
+	const u = U.subgeo;
 
 	for (let i = 0; i < data.length; i++) {
 		const d = data[i];
-		table[d[this.csv.key]] = +d[c];
+		if (u && +d[k] !== +u) continue;
+
+		table[d[k]] = +d[c];
 	}
 
 	return table;
@@ -379,9 +383,11 @@ function polygons() {
 async function polygons_csv(col) {
 	await until(_ => this.csv.data && this.vectors.features);
 
-	const data = this.csv.data;
-	let s;
+	if (this.timeline)
+		this.csv.table = csv_table.call(this, col);
 
+	let s;
+	const data = this.csv.data;
 	if (this.colorscale) {
 		if (!data) console.warn(this.id, "has no csv.data");
 
@@ -395,9 +401,6 @@ async function polygons_csv(col) {
 		console.warn("No data for", this.id);
 		return;
 	}
-
-	if (this.timeline)
-		this.csv.table = csv_table.call(this, col);
 
 	const fs = this.vectors.features.features;
 	for (let i = 0; i < fs.length; i += 1) {

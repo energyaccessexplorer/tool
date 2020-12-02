@@ -123,7 +123,8 @@ contact our team at`;
 			.map(d => ([
 				d.name,
 				d.category.unit || "proximity in km",
-				(d._domain || []).join(' - '), d.weight
+				JSON.stringify(d._domain || {}).replace(/"/g, '').replace(/([:,])/g, '$1 '),
+				d.weight
 			]));
 
 		doc.autoTable({
@@ -297,7 +298,7 @@ export function csv(summary) {
 
 	const datasets = DS.array
 		    .filter(d => d.on)
-		    .map(d => d.id + ":" + d.domain)
+		    .map(d => d.id + ":" + JSON.stringify(d._domain).replace(/"/g, ''))
 		    .join(";");
 
 	csv.push("# Selected datasets:min,max -- " + datasets);

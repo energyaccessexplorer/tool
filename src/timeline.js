@@ -349,17 +349,6 @@ async function lines_update() {
 	}
 };
 
-async function datasets_polygons_csv() {
-	await until(_ => this.csv.data);
-
-	if (!this.domain) {
-		this.domain = {
-			min: d3.min([].concat(...GEOGRAPHY.timeline_dates.map(d => this.csv.data.map(r => +r[d])))),
-			max: d3.max([].concat(...GEOGRAPHY.timeline_dates.map(d => this.csv.data.map(r => +r[d]))))
-		};
-	}
-};
-
 function filter_valued_polygons() {
 	const ul = qs('#filtered-subgeographies');
 	ul.innerHTML = "";
@@ -408,6 +397,5 @@ export {
 	init,
 	lines_draw,
 	lines_update,
-	datasets_polygons_csv,
 	filter_valued_polygons,
 };

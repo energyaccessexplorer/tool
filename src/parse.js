@@ -1,10 +1,6 @@
 import * as plot from './plot.js';
 
 import {
-	datasets_polygons_csv as timeline_datasets_polygons_csv
-} from './timeline.js';
-
-import {
 	zoomend as mapbox_zoomend,
 	dblclick as mapbox_dblclick,
 	pointer as mapbox_pointer,
@@ -337,7 +333,15 @@ function polygons() {
 				let col = null;
 
 				if (this.timeline) {
-					await timeline_datasets_polygons_csv.call(this);
+					await until(_ => this.csv.data);
+
+					if (!this.domain) {
+						this.domain = {
+							min: d3.min([].concat(...GEOGRAPHY.timeline_dates.map(d => this.csv.data.map(r => +r[d])))),
+							max: d3.max([].concat(...GEOGRAPHY.timeline_dates.map(d => this.csv.data.map(r => +r[d]))))
+						};
+					}
+
 					col = U.timeline;
 				}
 				else if (this.config.column)

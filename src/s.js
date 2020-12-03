@@ -95,31 +95,42 @@ export function init() {
 
 	MOBILE = window.innerWidth < 1152;
 
+	function hextostring(hex) {
+		var s = "";
+
+		//             ________________ careful there
+		//            /
+		//           V
+		for (let i = 2; i < hex.length; i += 2)
+			s += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+
+		return s;
+	};
+
 	ea_api.get("geographies", { "online": "eq.true", "adm": "eq.0" })
 		.then(countries_online => {
 			for (let co of countries_online) {
 				const d = ce('div', ce('h2', co.name, { class: 'country-name' }), { class: 'country-item', ripple: "" });
 				d.onclick = _ => setTimeout(_ => geography(co), 350);
 
-				Promise.all([
-					fetch(`/tool/mledoze-countries/data/${co.cca3.toLowerCase()}.geo.json`),
-					fetch(`/tool/mledoze-countries/data/${co.cca3.toLowerCase()}.svg`),
-				]).then(async responses => {
-					const topo = await responses[0].json();
-					const flag = await responses[1].text();
-
-					d.append(topo_flag(
-						topo.features,
-						URL.createObjectURL((new Blob([flag], {type: 'image/svg+xml'}))),
-						config
-					));
-				});
 				const config = co.configuration.flag || {
 					'x': 0,
 					'y': 0,
 					'height': 30,
 					'aspect-ratio': "xMidYMid slice"
 				};
+
+				fetch(`https://www.energyaccessexplorer.org/world/countries?select=flag,geojson&cca3=eq.${co.cca3}`)
+					.then(r => r.json())
+					.then(r => {
+						const data = r[0];
+
+						d.append(topo_flag(
+							JSON.parse(hextostring(data['geojson'])).features,
+							URL.createObjectURL((new Blob([hextostring(data['flag'])], {type: 'image/svg+xml'}))),
+							config
+						));
+					});
 
 				playground.append(d);
 			}

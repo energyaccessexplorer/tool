@@ -428,7 +428,7 @@ function polygons_feature_info(et, e) {
 		et.properties["_boundaries_name"] = GEOGRAPHY.boundaries[et.properties[this.vectors.key]];
 	}
 
-	if (this.config.column) {
+	if (this.config.column && this.category.name !== 'boundaries') {
 		at.push({
 			"target": this.name,
 			"dataset": "_" + this.config.column,
@@ -437,11 +437,8 @@ function polygons_feature_info(et, e) {
 		et.properties["_" + this.config.column] = this.csv.table[et.properties[this.vectors.key]];
 	}
 
-	if (this.config.attributes_map) {
+	if (this.config.attributes_map)
 		at = at.concat(this.config.attributes_map);
-	}
-
-	at = at.filter(x => x['dataset'] !== "_OBJECTID");
 
 	let td = table_data(at, et.properties);
 	table_add_lnglat(td, [e.lngLat.lng, e.lngLat.lat]);

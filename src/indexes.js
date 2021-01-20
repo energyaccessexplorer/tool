@@ -64,7 +64,7 @@ function radio(init, callback) {
 	return svg.node();
 };
 
-async function graphs(raster) {
+export async function graphs(raster) {
 	const t = await summary_analyse(raster);
 
 	let g = maybe(t, 'population-density'); if (g) {
@@ -94,7 +94,7 @@ async function graphs(raster) {
 	}
 };
 
-function init() {
+export function init() {
 	const url = new URL(location);
 
 	const ramp = tmpl("#ramp");
@@ -150,7 +150,7 @@ function init() {
 	), scale);
 };
 
-function list() {
+export function list() {
 	const nodes = [];
 
 	const indexes_list = qs('#indexes-list');
@@ -193,7 +193,7 @@ function list() {
 	}
 };
 
-function modal() {
+export function modal() {
 	const c = ce('div');
 
 	for (let i in ea_indexes) {
@@ -212,11 +212,4 @@ function modal() {
 </a>
 `)
 	}).show();
-};
-
-export {
-	init,
-	list,
-	modal,
-	graphs,
 };

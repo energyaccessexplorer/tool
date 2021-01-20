@@ -248,7 +248,7 @@ function multiline(opts) {
 	};
 };
 
-async function init() {
+export async function init() {
 	await until(_ => GEOGRAPHY.timeline_dates.length > 0);
 
 	const steps = GEOGRAPHY.timeline_dates.map(x => parseInt(x.replace('(^[0-9]{4}-)', '\\1'))); // <- \/\/ due to strict mode in modules
@@ -270,7 +270,7 @@ async function init() {
 	return tl;
 };
 
-function lines_draw() {
+export function lines_draw() {
 	const datasets = DS.array.filter(d => d.on && d.datatype === 'polygons-timeline');
 
 	if (!datasets.length) return;
@@ -332,7 +332,7 @@ function lines_draw() {
 	qs('#district-graph', rp).append(ml.svg);
 };
 
-async function lines_update() {
+export async function lines_update() {
 	if (!GEOGRAPHY.timeline) return;
 
 	const datasets = DS.array.filter(d => d.on && d.datatype === 'polygons-timeline');
@@ -349,7 +349,7 @@ async function lines_update() {
 	}
 };
 
-function filter_valued_polygons() {
+export function filter_valued_polygons() {
 	const ul = qs('#filtered-subgeographies');
 	ul.innerHTML = "";
 
@@ -391,11 +391,4 @@ function filter_valued_polygons() {
 	}
 
 	source.setData(source._data);
-};
-
-export {
-	init,
-	lines_draw,
-	lines_update,
-	filter_valued_polygons,
 };

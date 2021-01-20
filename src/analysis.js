@@ -173,7 +173,7 @@ export default function run(type) {
  * returns DS to be plotted onto a canvas
  */
 
-function datasets(type) {
+export function datasets(type) {
 	return DS.array
 		.filter(d => {
 			return d.on
@@ -212,7 +212,7 @@ function datasets(type) {
  *   - an index name
  */
 
-async function plot_active(type, doindexes) {
+export async function plot_active(type, doindexes) {
 	const raster = run(type);
 	plot.outputcanvas(raster);
 
@@ -246,7 +246,7 @@ async function plot_active(type, doindexes) {
 	return raster;
 };
 
-async function raster_to_tiff(type) {
+export async function raster_to_tiff(type) {
 	const b = DST.get('boundaries');
 
 	const raster = await run(type);
@@ -277,10 +277,4 @@ async function raster_to_tiff(type) {
 	};
 
 	return (await GeoTIFF.writeArrayBuffer(arr, metadata));
-};
-
-export {
-	raster_to_tiff,
-	plot_active,
-	datasets,
 };

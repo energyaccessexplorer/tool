@@ -69,7 +69,7 @@ class MapboxInfoControl {
 let _O;
 let _U;
 
-function init(overlord = {}, urlproxy = {}) {
+export function init(overlord = {}, urlproxy = {}) {
 	mapboxgl.accessToken = ea_settings.mapbox_token;
 
 	_O = overlord;
@@ -157,7 +157,7 @@ function theme_pick(theme) {
 	});
 };
 
-function change_theme(theme) {
+export function change_theme(theme) {
 	function set_output() {
 		const c = MAPBOX.getStyle().layers.find(l => l.type === 'symbol');
 		MAPBOX.first_symbol = maybe(c, 'id');
@@ -170,7 +170,7 @@ function change_theme(theme) {
 	if (theme === "") set_output();
 };
 
-function pointer(content, x, y) {
+export function pointer(content, x, y) {
 	let p = qs('#mapbox-pointer');
 
 	if (!p) {
@@ -220,7 +220,7 @@ background-color: transparent;
 	}
 };
 
-function fit(bounds, animate = false) {
+export function fit(bounds, animate = false) {
 	const rect = qs('#maparea').getBoundingClientRect();
 
 	const hp = (rect.width > rect.height) ? 0 : (rect.width * 0.1);
@@ -252,7 +252,7 @@ This is fatal. Thanks for all the fish.`
 	return [[l,u], [r,u], [r,d], [l,d]];
 };
 
-function dblclick(id) {
+export function dblclick(id) {
 	MAPBOX.on('dblclick', id, function(e) {
 		if (INFOMODE) return;
 
@@ -264,7 +264,7 @@ function dblclick(id) {
 	});
 };
 
-function zoomend(id) {
+export function zoomend(id) {
 	let _zoom;
 
 	MAPBOX.on('zoomend', id, function(_) {
@@ -276,13 +276,4 @@ function zoomend(id) {
 		MAPBOX.changing_target = false;
 		_zoom = z;
 	});
-};
-
-export {
-	change_theme,
-	pointer,
-	dblclick,
-	zoomend,
-	fit,
-	init,
 };

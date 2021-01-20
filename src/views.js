@@ -1,4 +1,4 @@
-function buttons() {
+export function buttons() {
 	const el = qs('#views');
 	const btns = qsa('#views .up-title', el);
 
@@ -8,7 +8,7 @@ function buttons() {
 	if (t) t.classList.add('active');
 };
 
-function right_pane() {
+export function right_pane() {
 	const panes = ["cards", "indexes", "filtered"];
 
 	const views = {
@@ -24,7 +24,7 @@ function right_pane() {
 	}
 };
 
-function init() {
+export function init() {
 	const el = qs('#views');
 
 	for (let v in ea_views) {
@@ -41,10 +41,4 @@ function init() {
 
 		el.append(btn);
 	}
-};
-
-export {
-	init,
-	buttons,
-	right_pane,
 };

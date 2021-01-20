@@ -20,7 +20,7 @@ async function fetchcheck(endpoint, format) {
 		});
 };
 
-function fail(msg) {
+export function fail(msg) {
 	const err = msg || "";
 
 	if (this.id === 'boundaries')
@@ -53,7 +53,7 @@ ${err}`
 	U.inputs = arr;
 };
 
-function csv() {
+export function csv() {
 	if (this.csv.data) return;
 
 	return fetchcheck.call(this, this.csv.endpoint, "CSV")
@@ -90,7 +90,7 @@ function csv_table(c) {
 	return table;
 };
 
-function raster() {
+export function raster() {
 	async function run_it(blob) {
 		function draw(overrideid) {
 			const r = this.raster;
@@ -185,7 +185,7 @@ function geojson() {
 		});
 };
 
-async function geojson_summary() {
+export async function geojson_summary() {
 	await until(_ => maybe(this.vectors.features, 'features'));
 
 	const features = this.vectors.features.features;
@@ -211,7 +211,7 @@ async function geojson_summary() {
 	return o;
 };
 
-function points() {
+export function points() {
 	return geojson.call(this)
 		.then(_ => {
 			const v = this.vectors;
@@ -237,7 +237,7 @@ function points() {
 		});
 };
 
-function lines() {
+export function lines() {
 	return geojson.call(this)
 		.then(_ => {
 			let da = [1];
@@ -325,7 +325,7 @@ function lines() {
 		});
 };
 
-function polygons() {
+export function polygons() {
 	if (MAPBOX.getLayer(this.id)) {
 		console.log(this.id, "parse.polygons: layer already exists.");
 		return;
@@ -380,7 +380,7 @@ function polygons() {
 		});
 };
 
-async function polygons_csv(col) {
+export async function polygons_csv(col) {
 	await until(_ => this.csv.data && this.vectors.features);
 
 	if (this.timeline)
@@ -413,7 +413,7 @@ async function polygons_csv(col) {
 	if (this.card) this.card.refresh();
 };
 
-function polygons_feature_info(et, e) {
+export function polygons_feature_info(et, e) {
 	console.log("Feature Properties:", et.properties);
 
 	let at = [];
@@ -448,16 +448,4 @@ function polygons_feature_info(et, e) {
 		e.originalEvent.pageX,
 		e.originalEvent.pageY
 	);
-};
-
-export {
-	fail,
-	geojson_summary,
-	raster,
-	polygons,
-	points,
-	lines,
-	csv,
-	polygons_csv,
-	polygons_feature_info
 };

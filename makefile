@@ -181,7 +181,7 @@ synced:
 		--exclude=.git \
 		--exclude=default.mk \
 		--exclude=makefile \
-		${DIST}/ ${WEBSITE_SRV_USER}@${SRV_SERVER}:${TOOL_DEST}
+		${DIST}/ ${WEBSITE_SSH_USER}@${WEBSITE_HOST}:${TOOL_DEST}
 
 deploy:
 	bmake reconfig build sync env=${env}

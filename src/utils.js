@@ -174,7 +174,7 @@ function ea_svg_interval(opts = {}) {
 	const defs = svg.append('defs');
 
 	const g = svg.append('g');
-	const ticks = g.append('g');
+	const ticks = g.append('g').attr('class', 'ticks');
 
 	const gutter = g.append('rect');
 	const marked = g.append('rect');
@@ -481,7 +481,7 @@ function table_add_lnglat(td, lnglat = [0, 0]) {
 };
 
 /*
- * ea_coordinates_raster
+ * ea_coordinates_in_raster
  *
  * Transform a set of coordinates to the "relative position" inside a raster
  * that is bound to an area

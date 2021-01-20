@@ -87,7 +87,7 @@ export default function run(type) {
 	let nr = list.find(l => !maybe(l, 'raster', 'data'));
 	if (nr) {
 		console.warn(`Dataset '${nr.id}' has no raster.data (yet).`,
-			           "Skipping this analysis since I suspect a race condition.",
+			           "Skipping this run.",
 			           "Telling O to wait for it...");
 
 		O.wait_for(

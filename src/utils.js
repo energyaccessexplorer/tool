@@ -450,14 +450,14 @@ function ea_super_error(t, m, e = "error") {
 function table_data(dict, prop) {
 	const t = ce('table');
 
-	dict.forEach(d => {
+	for (const e of dict) {
 		t.append(el_tree([
 			ce('tr'), [
-				ce('td', ce('strong', d.target + ": &nbsp;")),
-				ce('td', prop[d.dataset] ? prop[d.dataset].toString() : "")
+				ce('td', ce('strong', e[1] + ": &nbsp;")),
+				ce('td', prop[e[0]] ? prop[e[0]].toString() : "")
 			]
 		]));
-	});
+	};
 
 	return t;
 };

@@ -420,20 +420,12 @@ export function polygons_feature_info(et, e) {
 
 	if (this.category.name === 'boundaries' ||
 			this.category.name.match(/^(timeline-)?indicator/)) {
-		at.push({
-			"target": GEOGRAPHY.configuration.boundaries_name || "Geography Name",
-			"dataset": "_boundaries_name",
-		});
-
+		at.push(["_boundaries_name", GEOGRAPHY.configuration.boundaries_name || "Geography Name"]);
 		et.properties["_boundaries_name"] = GEOGRAPHY.boundaries[et.properties[this.vectors.key]];
 	}
 
 	if (this.config.column && this.category.name !== 'boundaries') {
-		at.push({
-			"target": this.name,
-			"dataset": "_" + this.config.column,
-		});
-
+		at.push(["_" + this.config.column, this.name]);
 		et.properties["_" + this.config.column] = this.csv.table[et.properties[this.vectors.key]];
 	}
 

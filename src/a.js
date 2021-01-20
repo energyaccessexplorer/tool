@@ -524,10 +524,9 @@ function map_click(e) {
 
 			const vv = (v%1 === 0) ? v : v.toFixed(2);
 
-			const td = table_data([{
-				"target": t.name,
-				"dataset": "value"
-			}], {
+			const td = table_data([
+				["value", t.name]
+			], {
 				"value": `${vv} <code>${t.category.unit || ''}</code>`
 			});
 
@@ -570,12 +569,13 @@ function map_click(e) {
 		if (typeof maybe(o, 'value') === 'number') {
 			let f = d3.scaleQuantize().domain([0,1]).range(["Low", "Low-Medium", "Medium", "Medium-High", "High"]);
 
-			let td = table_data([{
-				"target": t.name,
-				"dataset": "value"
-			}], {
-				"value": f(o.value)
-			});
+			const dict = [
+				["aname", t.name]
+			];
+
+			const props = {
+				"aname": f(o.value)
+			};
 
 			table_add_lnglat(td, [e.lngLat.lng, e.lngLat.lat]);
 

@@ -81,7 +81,7 @@ export default class dscontrols extends HTMLElement {
 		case 'polygons': {
 			if (!this.ds.raster) break;
 
-			await until(_ => this.ds._domain);
+			await until(_ => this.ds.domain);
 
 			this.range_group = range.call(this.ds, {
 				ramp: lr,
@@ -94,7 +94,7 @@ export default class dscontrols extends HTMLElement {
 
 		case 'polygons-fixed':
 		case 'polygons-timeline': {
-			await until(_ => this.ds._domain);
+			await until(_ => this.ds.domain);
 
 			this.range_group = range.call(this.ds, {
 				ramp: lr,

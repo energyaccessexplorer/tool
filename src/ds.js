@@ -339,10 +339,12 @@ This is not fatal but the dataset is now disabled.`
 	analysis_fn(type) {
 		if (!maybe(this, 'analysis', 'indexes')) return null;
 
+		if (!(this._domain || this.domain)) return null;
+
 		const c = this.analysis.indexes.find(i => i.index === type);
 		if (!c) return null;
 
-		const {min,max} = this._domain;
+		const {min,max} = this._domain || this.domain;
 		const r = (c && c.invert) ? [1,0] : [0,1];
 
 		let s = null;

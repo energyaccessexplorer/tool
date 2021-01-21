@@ -453,7 +453,7 @@ function table_data(dict, prop) {
 	for (const e of dict) {
 		t.append(el_tree([
 			ce('tr'), [
-				ce('td', ce('strong', e[1] + ": &nbsp;")),
+				ce('td', ce('strong', e[1] ? e[1] + ": &nbsp;" : "&nbsp;")),
 				ce('td', prop[e[0]] ? prop[e[0]].toString() : "")
 			]
 		]));
@@ -510,8 +510,11 @@ function ea_coordinates_in_raster(coords, bounds, raster) {
        plat > 0 && plat < raster.height )) {
 		a = { x: coords[0], y: coords[1] };
 
-		const v = raster.data[(plat * raster.width) + plng];
-		a.value = v === raster.nodata ? null : v;
+		const i = (plat * raster.width) + plng;
+		const v = raster.data[i];
+
+		a.value = (v === raster.nodata) ? null : v;
+		a.index = i;
 	}
 
 	return a;

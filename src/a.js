@@ -586,12 +586,33 @@ function map_click(e) {
 			let f = d3.scaleQuantize().domain([0,1]).range(["Low", "Low-Medium", "Medium", "Medium-High", "High"]);
 
 			const dict = [
-				["aname", t.name]
+				["aname", t.name],
+				["_empty", null]
 			];
 
 			const props = {
-				"aname": f(o.value)
+				"aname": f(o.value),
+				"_empty": ""
 			};
+
+			DS.array
+				.filter(d => d.on)
+				.forEach(d => {
+					if (d.datatype === 'raster') {
+						dict.push([d.id, d.name]);
+						props[d.id] = d.raster.data[o.index] + " " + d.category.unit;
+					}
+
+					else if (d.config.column && d.category.name !== 'boundaries') {
+						dict.push(["_" + d.config.column, d.name]);
+						props["_" + d.config.column] = d.csv.table[d.raster.data[o.index]] + " " + d.category.unit;
+					}
+
+					else if (d.raster) {
+						dict.push([d.id, d.name]);
+						props[d.id] = d.raster.data[o.index] + " " + "km (proximity to)";
+					}
+				});
 
 			let td = table_data(dict, props);
 

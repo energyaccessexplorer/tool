@@ -480,12 +480,10 @@ function load_view() {
 };
 
 function map_click(e) {
-	const b = DST.get('boundaries');
-	let nodata = b.raster.nodata;
-
 	const {view, inputs, output} = U;
 
 	const i = maybe(inputs, 0);
+
 	let t;
 
 	function feature_info(et, e) {
@@ -532,6 +530,8 @@ function map_click(e) {
 	function raster_click() {
 		if (!INFOMODE) return;
 
+		const b = DST.get('boundaries');
+
 		const rc = ea_coordinates_in_raster(
 			[e.lngLat.lng, e.lngLat.lat],
 			MAPBOX.coords,
@@ -539,7 +539,7 @@ function map_click(e) {
 				data: t.raster.data,
 				width: t.raster.width,
 				height: t.raster.height,
-				nodata: nodata
+				nodata: b.raster.nodata
 			}
 		);
 
@@ -568,17 +568,8 @@ function map_click(e) {
 		}
 	};
 
-	if (view === "outputs") {
-		if (!INFOMODE) return;
-
-		t = {
-			raster: {
-				data: MAPBOX.getSource('output-source').raster
-			},
-			category: {},
-			name: ea_indexes[output]['name']
-		};
-		nodata = -1;
+	function analysis_click() {
+		const b = DST.get('boundaries');
 
 		const o = ea_coordinates_in_raster(
 			[e.lngLat.lng, e.lngLat.lat],
@@ -587,7 +578,7 @@ function map_click(e) {
 				data: t.raster.data,
 				width: b.raster.width,
 				height: b.raster.height,
-				nodata: nodata
+				nodata: -1
 			}
 		);
 
@@ -602,6 +593,8 @@ function map_click(e) {
 				"aname": f(o.value)
 			};
 
+			let td = table_data(dict, props);
+
 			table_add_lnglat(td, [e.lngLat.lng, e.lngLat.lat]);
 
 			mapbox_pointer(
@@ -614,6 +607,20 @@ function map_click(e) {
 		else {
 			console.log("No value on raster.", o);
 		}
+	};
+
+	if (view === "outputs") {
+		if (!INFOMODE) return;
+
+		t = {
+			raster: {
+				data: MAPBOX.getSource('output-source').raster
+			},
+			category: {},
+			name: ea_indexes[output]['name']
+		};
+
+		analysis_click();
 	}
 
 	else if (view === "inputs") {

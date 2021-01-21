@@ -3,7 +3,6 @@ import * as plot from './plot.js';
 import {
 	zoomend as mapbox_zoomend,
 	dblclick as mapbox_dblclick,
-	pointer as mapbox_pointer,
 } from './mapbox.js';
 
 
@@ -411,33 +410,4 @@ export async function polygons_csv(col) {
 	this.update_source(this.vectors.features);
 
 	if (this.card) this.card.refresh();
-};
-
-export function polygons_feature_info(et, e) {
-	console.log("Feature Properties:", et.properties);
-
-	let at = [];
-
-	if (this.category.name === 'boundaries' ||
-			this.category.name.match(/^(timeline-)?indicator/)) {
-		at.push(["_boundaries_name", GEOGRAPHY.configuration.boundaries_name || "Geography Name"]);
-		et.properties["_boundaries_name"] = GEOGRAPHY.boundaries[et.properties[this.vectors.key]];
-	}
-
-	if (this.config.column && this.category.name !== 'boundaries') {
-		at.push(["_" + this.config.column, this.name]);
-		et.properties["_" + this.config.column] = this.csv.table[et.properties[this.vectors.key]];
-	}
-
-	if (this.config.attributes_map)
-		at = at.concat(this.config.attributes_map);
-
-	let td = table_data(at, et.properties);
-	table_add_lnglat(td, [e.lngLat.lng, e.lngLat.lat]);
-
-	mapbox_pointer(
-		td,
-		e.originalEvent.pageX,
-		e.originalEvent.pageY
-	);
 };

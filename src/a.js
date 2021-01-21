@@ -25,10 +25,6 @@ import {
 	plot_active as analysis_plot_active,
 } from './analysis.js';
 
-import {
-	polygons_feature_info,
-} from './parse.js';
-
 import DS from './ds.js';
 
 import Overlord from './overlord.js';
@@ -492,6 +488,35 @@ function map_click(e) {
 	const i = maybe(inputs, 0);
 	let t;
 
+	function feature_info(et, e) {
+		let at = [];
+
+		if (this.category.name === 'boundaries' ||
+				this.category.name.match(/^(timeline-)?indicator/)) {
+			at.push(["_boundaries_name", GEOGRAPHY.configuration.boundaries_name || "Geography Name"]);
+			et.properties["_boundaries_name"] = GEOGRAPHY.boundaries[et.properties[this.vectors.key]];
+		}
+
+		if (this.config.column && this.category.name !== 'boundaries') {
+			at.push(["_" + this.config.column, this.name]);
+			et.properties["_" + this.config.column] = this.csv.table[et.properties[this.vectors.key]];
+		}
+
+		if (this.config.attributes_map) {
+			at = at.concat(this.config.attributes_map.map(e => [e.dataset, e.target]));
+		}
+
+		let td = table_data(at, et.properties);
+
+		table_add_lnglat(td, [e.lngLat.lng, e.lngLat.lat]);
+
+		mapbox_pointer(
+			td,
+			e.originalEvent.pageX,
+			e.originalEvent.pageY
+		);
+	};
+
 	function vectors_click(callback) {
 		const et = MAPBOX.queryRenderedFeatures(e.point)[0];
 		if (!et) return;
@@ -500,7 +525,7 @@ function map_click(e) {
 			if (typeof callback === 'function') callback(et);
 
 			if (INFOMODE)
-				polygons_feature_info.call(t, et, e);
+				feature_info.call(t, et, e);
 		}
 	};
 

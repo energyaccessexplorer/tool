@@ -412,7 +412,7 @@ function range(opts = {}) {
 	const update = (x, i, el) => {
 		el.innerText = (+x).toFixed(maybe(this, 'raster', 'precision') || 0);
 
-		const man = maybe(this.controls, i ? 'manual_max' : 'manual_min');
+		const man = maybe(this.controls, 'manual_' + i);
 		if (man) man.value = x;
 
 		domain[i] = parseFloat(x);

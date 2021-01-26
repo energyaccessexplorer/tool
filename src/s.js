@@ -120,7 +120,7 @@ export function init() {
 					'aspect-ratio': "xMidYMid slice"
 				};
 
-				fetch(`https://www.energyaccessexplorer.org/world/countries?select=flag,geojson&cca3=eq.${co.cca3}`)
+				fetch(`https://world.energyaccessexplorer.org/countries?select=flag,geojson&cca3=eq.${co.cca3}`)
 					.then(r => r.json())
 					.then(r => {
 						const data = r[0];

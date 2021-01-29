@@ -268,8 +268,6 @@ export async function init() {
 	views.init();
 	indexes.init();
 
-	until(_ => DS.array.filter(d => d.on).every(d => d.loading === false)).then(O.sort);
-
 	if (GEOGRAPHY.timeline) timeline_init();
 
 	if (!MOBILE && !GEOGRAPHY.timeline) nanny_init();
@@ -441,8 +439,10 @@ function load_view() {
 			MAPBOX.setLayoutProperty('output-layer', 'visibility', 'none');
 
 		cards.update(inputs);
+		delay(1).then(O.sort); // TODO: remove/revisit this hack
 
 		analysis_plot_active(output, false);
+
 		break;
 	}
 
@@ -465,7 +465,7 @@ function load_view() {
 		MAPBOX.setLayoutProperty('output-layer', 'visibility', 'none');
 
 		cards.update(inputs);
-		O.sort();
+		delay(1).then(O.sort); // TODO: remove/revisit this hack
 
 		break;
 	}

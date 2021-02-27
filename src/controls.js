@@ -266,10 +266,6 @@ export default class dscontrols extends HTMLElement {
 
 customElements.define('ds-controls', dscontrols);
 
-function dstoggle() {
-	O.dataset(this, 'active', (this.on = !this.on));
-};
-
 function humanformat(s) {
 	return s
 		.replace('_', ' ')
@@ -362,7 +358,7 @@ function checkbox() {
 
 	c.click = e => {
 		if (e.target.closest('svg') === svg)
-			dstoggle.call(this);
+			this.toggle(O);
 
 		else if (e.target.closest('.more-dropdown') === this.controls.dropdown)
 			return;
@@ -656,7 +652,7 @@ function options() {
 		dropdownlist.push({
 			"content": "Toggle advanced controls",
 			"action": _ => {
-				if (!this.ds.on) dstoggle.call(this.ds);
+				if (!this.ds.on) this.ds.toggle(O);
 
 				qs('.advanced-controls', this).style.display = ((this.show_advanced = !this.show_advanced)) ? 'block' : 'none';
 			}

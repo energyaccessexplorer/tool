@@ -33,6 +33,8 @@ export async function init() {
 
 	MAPBOX = mapbox.init();
 
+	U = {};
+
 	await dsinit(GEOGRAPHY.id, bounds => {
 		MAPBOX.coords = mapbox.fit(bounds);
 		mapbox.change_theme(ea_settings.mapbox_theme);

@@ -216,9 +216,8 @@ export default class dscontrols extends HTMLElement {
 		}
 
 		if (this.range_group) {
-			const d = this.ds._domain;
-			this.range_group.change(d.min, d.max);
-			O.dataset(this.ds, 'domain', d);
+			this.range_group.change(this.ds.domain);
+			O.dataset(this.ds, 'domain', this.ds.domain);
 		}
 	};
 

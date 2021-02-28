@@ -6,6 +6,10 @@ a {
   cursor: pointer;
 }
 
+*:focus {
+    outline: none;
+}
+
 .big-green-button {
   text-align: center;
   margin: 1em;

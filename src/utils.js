@@ -365,7 +365,7 @@ function ea_svg_checkbox(init, callback) { // this is not used anywhere
 	};
 };
 
-function elem_collapse(el, t) {
+function elem_collapse(el, t, open) {
 	function triangle(d) {
 		let t;
 
@@ -416,12 +416,10 @@ function elem_collapse(el, t) {
 
 	elem_empty(c);
 
-	if (d === "none") {
+	if (open || d === 'none') {
 		el.style['display'] = 'block';
 		c.append(triangle('s'));
-	}
-
-	else {
+	} else {
 		el.style['display'] = 'none';
 		c.append(triangle('e'));
 	}

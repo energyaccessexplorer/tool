@@ -1,5 +1,9 @@
 import * as mapbox from './mapbox.js';
 
+import {
+	geojson_summary
+} from './parse.js';
+
 import DS from './ds.js';
 
 const url = new URL(location);
@@ -256,6 +260,8 @@ I haven't done this yet...`);
 		const body = qs('body');
 		body.innerHTML = "";
 		body.style.overflow = 'scroll';
+
+		console.log(geojson_summary);
 
 		const j = JSON.stringify(await eval(fn).call(this), null, 4);
 		body.append(ce('pre', j));

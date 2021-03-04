@@ -137,7 +137,7 @@ build-d:
 
 	@cp ${CSS}/ripple.css ${DIST}/d/ripple.css
 	@cp ${CSS}/svg.css ${DIST}/d/svg.css
-	@cp ${SRC}/{cards,timeline,controls,ds,parse,mapbox,overlord,plot,d}.js ${DIST}/d/
+	@cp ${SRC}/{cards,timeline,controls,geographies,ds,parse,mapbox,overlord,plot,d}.js ${DIST}/d/
 
 	@cat \
 		${LIB}/d3.js \

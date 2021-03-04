@@ -16,25 +16,10 @@ body {
 }
 
 #left-pane {
-  min-width: 36em; /* 40em */
   display: flex;
   flex-flow: column wrap;
   flex: 0;
-}
-
-#left-pane #drawer {
-  display: block;
-  flex: 1;
-  min-height: 100%;
-  width: 0em; /* 4em */
-}
-
-#left-pane #drawer .button {
-  flex: 0;
-  margin: 0;
-  height: 4em;
-  line-height: 4em;
-  display: block;
+  margin-top: -1px;
 }
 
 #controls {

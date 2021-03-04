@@ -573,7 +573,7 @@ async function _selectlist() {
 		return input;
 	};
 
-	const sl = new selectlist("controls-geography", data, {
+	const sl = new selectlist("geographies-search", data, {
 		'change': function(_) {
 			const c = list.find(x => x.name === this.value);
 
@@ -595,7 +595,7 @@ width: 50px;
 cursor: pointer;
 `;
 
-	qs('#search-input').append(sl.el, info);
+	qs('#geographies-search').append(sl.el, info);
 
 	set_default(sl.input);
 };

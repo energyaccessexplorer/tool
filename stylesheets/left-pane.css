@@ -1,0 +1,53 @@
+#left-pane select {
+  border: none;
+  width: 100%;
+  padding: 0.65em;
+  background-color: white;
+}
+
+#left-pane #drawer {
+  display: block;
+  flex: 1;
+  min-height: 100%;
+  width: 0em; /* 4em */
+}
+
+#left-pane #drawer a {
+  flex: 0;
+  margin: 0;
+  height: 4em;
+  line-height: 4em;
+  display: block;
+  text-align: center;
+}
+
+.search-input .selectlist-input,
+.search-input {
+  font-family: without-serif;
+  font-weight: lighter;
+  width: 100%;
+  align-items: center;
+  box-sizing: border-box;
+  font-size: 1.2em;
+  color: var(--the-white);
+  background-color: var(--the-green);
+  padding: 0.5em 1em;
+  text-align: center;
+  border: none;
+  border-bottom: 1px solid rgba(0,0,0,0.3);
+}
+
+.search-input .selectlist-container {
+  display: inline-block;
+}
+
+.search-input .selectlist-input {
+  box-sizing: border-box;
+  font-size: 1.7em;
+  padding: 0.5em 1em;
+  border: none;
+}
+
+input[list="selectlist-datalist-geographies-search"] {
+  width: calc(100% - 50px) !important;
+}

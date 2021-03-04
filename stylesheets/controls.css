@@ -3,7 +3,7 @@
   -ms-user-select: none;
   user-select: none;
   display: flex;
-  flex-flow: row nowrap;
+  flex-flow: row wrap;
   border-top: solid 1px var(--the-white);
 }
 
@@ -23,7 +23,7 @@
 
 #controls-contents {
   flex: 1;
-  height: 100%;
+  height: calc(100% - 6em);
   border-left: solid 1px #d9d9d9;
   background-color: var(--the-white);
 
@@ -65,47 +65,4 @@
 .collapse {
   cursor: pointer;
   fill: var(--the-color);
-}
-
-#left-pane select {
-  border: none;
-  width: 100%;
-
-  padding: 0.65em;
-  background-color: white;
-}
-
-#search-input {
-  align-items: center;
-
-  box-sizing: border-box;
-
-  font-size: 1.2em;
-
-  color: var(--the-white);
-  background-color: var(--the-green);
-  padding: 10px 0;
-  text-align: center;
-}
-
-#search-input .selectlist-container {
-  display: inline-block;
-  width: calc(100% - 50px);
-}
-
-#search-input .selectlist-input,
-input[list="controls-geography"] {
-  box-sizing: border-box;
-  font-size: 1.7em;
-  padding: 0.5em 1em;
-
-  font-family: without-serif;
-  font-weight: lighter;
-
-  text-align: center;
-
-  color: white;
-  background-color: var(--the-green);
-  border: none;
-  width: calc(100% - 50px);
 }

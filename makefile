@@ -53,7 +53,7 @@ build-a:
 
 	@cp ${CSS}/ripple.css ${DIST}/a/ripple.css
 	@cp ${CSS}/svg.css ${DIST}/a/svg.css
-	@cp ${SRC}/{browser,analysis,cards,config,controls,ds,parse,indexes,mapbox,overlord,plot,report,summary,timeline,views,a}.js ${DIST}/a/
+	@cp ${SRC}/{browser,analysis,cards,config,controls,geographies,ds,parse,indexes,mapbox,overlord,plot,report,summary,timeline,views,a}.js ${DIST}/a/
 
 	@cat \
 		${LIB}/d3.js \

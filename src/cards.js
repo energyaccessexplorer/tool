@@ -3,10 +3,10 @@ import DS from './ds.js';
 function points_symbol(opts) {
 	const {size,fill,stroke,strokewidth} = opts;
 
-	const svg = d3.create("svg")
-		    .attr("class", 'svg-point')
-		    .attr("width", size)
-		    .attr("height", size);
+	const svg = d3.create('svg')
+		.attr('class', 'svg-point')
+		.attr('width', size)
+		.attr('height', size);
 
 	svg
 		.append('circle')
@@ -23,9 +23,9 @@ function points_symbol(opts) {
 function lines_symbol(opts) {
 	const {size,dasharray,stroke,width,fill} = opts;
 
-	const svg = d3.create("svg")
-		    .attr("width", size)
-		    .attr("height", size);
+	const svg = d3.create('svg')
+		.attr('width', size)
+		.attr('height', size);
 
 	svg
 		.append('path')
@@ -41,10 +41,10 @@ function lines_symbol(opts) {
 function polygons_symbol(opts) {
 	const {size,stroke,strokewidth,fill,opacity} = opts;
 
-	const svg = d3.create("svg")
-		    .attr("class", 'svg-polygon')
-		    .attr("width", size)
-		    .attr("height", size);
+	const svg = d3.create('svg')
+		.attr('class', 'svg-polygon')
+		.attr('width', size)
+		.attr('height', size);
 
 	svg
 		.append('path')
@@ -61,9 +61,9 @@ export function init() {
 	const list = qs('#cards-pane #cards-list');
 
 	sortable(list, {
-		"items": 'ds-card',
-		"forcePlaceholderSize": true,
-		"placeholder": '<div style="margin: 1px; background-color: rgba(0,0,0,0.3);"></div>',
+		'items': 'ds-card',
+		'forcePlaceholderSize': true,
+		'placeholder': '<div style='margin: 1px; background-color: rgba(0,0,0,0.3);'></div>',
 	})[0]
 		.addEventListener(
 			'sortupdate',
@@ -107,12 +107,12 @@ export default class dscard extends HTMLElement {
 		this.setAttribute('bind', this.ds.id);
 
 		slot_populate.call(this, this.ds, {
-			"svg": this.svg_el,
-			"info": this.info(),
-			"unit": (this.ds.category.unit && ce('span', `[${this.ds.category.unit}]`, { style: "margin-left: 1em;" })),
-			"opacity": this.opacity(),
-			"close": this.close(),
-			"handle": tmpl("#svg-handle"),
+			'svg': this.svg_el,
+			'info': this.info(),
+			'unit': (this.ds.category.unit && ce('span', `[${this.ds.category.unit}]`, { style: "margin-left: 1em;" })),
+			'opacity': this.opacity(),
+			'close': this.close(),
+			'handle': tmpl('#svg-handle'),
 		});
 
 		return this;
@@ -138,11 +138,11 @@ export default class dscard extends HTMLElement {
 		const ul = ce('div', null, { style: "font-size: smaller;" });
 
 		for (let l of legends) {
-			const svg = d3.create("svg")
-				    .attr("width", 24)
-				    .attr("height", 24)
-				    .attr("style", "vertical-align: middle;")
-				    .attr("viewBox", "-3 0 32 32");
+			const svg = d3.create('svg')
+				.attr('width', 24)
+				.attr('height', 24)
+				.attr('style', "vertical-align: middle;")
+				.attr('viewBox', "-3 0 32 32");
 
 			svg
 				.append('path')
@@ -185,7 +185,7 @@ export default class dscard extends HTMLElement {
 		const grad = ea_svg_interval({
 			init: { min: 0, max: 100 },
 			domain: { min: 0, max: 100 },
-			sliders: "single",
+			sliders: 'single',
 			callback2: x => o = x/100,
 			end_callback: _ => {
 				let t = [];
@@ -267,7 +267,7 @@ export default class dscard extends HTMLElement {
 				dasharray: ds.vectors.dasharray,
 				stroke: ds.vectors.stroke,
 				width: ds.vectors.width * 2,
-				fill: "none"
+				fill: 'none'
 			});
 			break;
 		}
@@ -286,7 +286,7 @@ export default class dscard extends HTMLElement {
 
 		case 'polygons-fixed':
 		case 'polygons-timeline': {
-			const r = tmpl("#ramp");
+			const r = tmpl('#ramp');
 
 			if (ds.domain) {
 				r.append(...ramp_values(ds.domain));
@@ -302,7 +302,7 @@ export default class dscard extends HTMLElement {
 		}
 
 		case 'raster': {
-			let r = tmpl("#ramp");
+			let r = tmpl('#ramp');
 
 			if (ds.domain) {
 				r.append(...ramp_values(ds.domain));

@@ -210,10 +210,67 @@ export async function geojson_summary() {
 	return o;
 };
 
+function specs_set(fs, specs) {
+	const criteria = [];
+
+	for (let i = 0; i < fs.length; i += 1) {
+		fs[i].properties['__radius'] = this.vectors['radius'];
+		fs[i].properties['__stroke'] = this.vectors['stroke'];
+		fs[i].properties['__stroke-width'] = this.vectors['stroke-width'];
+
+		if (specs) {
+			const c = { params: [] };
+			let p = false;
+
+			for (let s of specs) {
+				let m;
+
+				const r = new RegExp(s.match);
+				const v = fs[i].properties[s.key];
+
+				if (!v) continue;
+
+				const vs = v + "";
+
+				if (vs === s.match || (m = vs.match(r))) {
+					c[s.key] = vs ? vs : m[1];
+
+					if (c.params.indexOf(s.key) < 0) c.params.push(s.key);
+
+					if (has(s, 'radius')) {
+						fs[i].properties['__radius'] = c['radius'] = s['radius'];
+					}
+
+					if (has(s, 'stroke')) {
+						fs[i].properties['__stroke'] = c['stroke'] = s['stroke'];
+					}
+
+					if (has(s, 'stroke-width')) {
+						fs[i].properties['__stroke-width'] = c['stroke-width'] = s['stroke-width'];
+					}
+
+					p = true;
+				}
+			}
+
+			if (p && criteria.indexOf(JSON.stringify(c)) < 0)
+				criteria.push(JSON.stringify(c));
+		}
+	}
+
+	return criteria;
+};
+
 export function points() {
 	return geojson.call(this)
 		.then(_ => {
 			const v = this.vectors;
+
+			const criteria = specs_set.call(
+				this,
+				this.vectors.features.features,
+				this.config.features_specs,
+			);
 
 			this.add_source({
 				"type": "geojson",
@@ -226,13 +283,25 @@ export function points() {
 					"visibility": "none",
 				},
 				"paint": {
-					"circle-radius": v.width || 3,
+					"circle-stroke-color": ['get', '__stroke'],
+					"circle-stroke-width": ['get', '__stroke-width'],
+					"circle-radius": ['get', '__radius'],
 					"circle-opacity": v.opacity,
-					"circle-color": v.fill || 'cyan',
-					"circle-stroke-width": v['stroke-width'] || 1,
-					"circle-stroke-color": v.stroke || 'black',
+					"circle-color": v.fill,
 				},
 			});
+
+			if (criteria.length) {
+				criteria.unshift(JSON.stringify({
+					"params": ["__name"],
+					"__name": this.name,
+					"radius": this.vectors['radius'],
+					"stroke": this.vectors['stroke'],
+					"stroke-width": this.vectors['stroke-width'],
+				}));
+
+				this.card.point_legends(criteria.map(x => JSON.parse(x)));
+			}
 		});
 };
 
@@ -253,51 +322,11 @@ export function lines() {
 				}
 			}
 
-			const fs = this.vectors.features.features;
-			const specs = this.config.features_specs;
-
-			const criteria = [];
-
-			for (let i = 0; i < fs.length; i += 1) {
-				if (specs) {
-					const c = { params: [] };
-					let p = false;
-
-					for (let s of specs) {
-						let m;
-
-						const r = new RegExp(s.match);
-						const v = fs[i].properties[s.key];
-
-						if (!v) continue;
-
-						const vs = v + "";
-
-						if (vs === s.match || (m = vs.match(r))) {
-							c[s.key] = vs ? vs : m[1];
-							if (c.params.indexOf(s.key) < 0) c.params.push(s.key);
-
-							if (has(s, 'stroke')) {
-								fs[i].properties['__color'] = s['stroke'];
-								c['stroke'] = s['stroke'];
-							}
-
-							if (has(s, 'stroke-width')) {
-								fs[i].properties['__width'] = s['stroke-width'];
-								c['stroke-width'] = s['stroke-width'];
-							}
-
-							p = true;
-						}
-					}
-
-					if (p && criteria.indexOf(JSON.stringify(c)) < 0) criteria.push(JSON.stringify(c));
-				}
-				else {
-					fs[i].properties['__color'] = this.vectors.stroke;
-					fs[i].properties['__width'] = this.vectors.width || 1;
-				}
-			}
+			const criteria = specs_set.call(
+				this,
+				this.vectors.features.features,
+				this.config.features_specs,
+			);
 
 			this.add_source({
 				"type": "geojson",
@@ -308,14 +337,13 @@ export function lines() {
 				"type": "line",
 				"layout": {
 					"visibility": "none",
+					"line-cap": 'round',
+					'line-join': 'round',
 				},
 				"paint": {
-					"line-color": ['get', '__color'],
-					"line-width": ['get', '__width'],
-					// Waiting for mapbox to do something about this...
-					//
-					// "line-dasharray": ['get', '__dasharray']
-					"line-dasharray": da,
+					"line-color": ['get', '__stroke'],
+					"line-width": ['get', '__stroke-width'],
+					"line-dasharray": da, // ['get', '__dasharray'] // Waiting for mapbox to do something about this...
 				},
 			});
 
@@ -357,6 +385,12 @@ export function polygons() {
 			for (let i = 0; i < fs.length; i += 1)
 				fs[i].id = fs[i].properties[this.vectors.key];
 
+			const criteria = specs_set.call(
+				this,
+				this.vectors.features.features,
+				this.config.features_specs,
+			);
+
 			this.add_source({
 				"type": "geojson",
 				"data": this.vectors.features
@@ -369,10 +403,20 @@ export function polygons() {
 				},
 				"paint": {
 					"fill-color": this.datatype.match("polygons-") ? ['get', '__color'] : this.vectors.fill,
-					"fill-outline-color": this.vectors.stroke,
-					"fill-opacity": [ "case", [ "boolean", [ "get", "__hidden" ], false ], 0, 1 * this.vectors.opacity ]
+					"fill-outline-color": ['get', '__stroke'],
+					"fill-opacity": [ "case", [ "boolean", [ "get", "__hidden" ], false ], 0, 1 * this.vectors.opacity ],
 				},
 			});
+
+			if (criteria.length) {
+				criteria.unshift(JSON.stringify({
+					"params": ["__name"],
+					"__name": this.name,
+					"stroke": this.vectors['stroke'],
+				}));
+
+				this.card.polygon_legends(criteria.map(x => JSON.parse(x)));
+			}
 
 			mapbox_dblclick(this.id);
 			mapbox_zoomend(this.id);

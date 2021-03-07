@@ -344,7 +344,6 @@ This is fatal. Thanks for all the fish.`;
 		"geography_id": `eq.${id}`,
 		"select": select,
 		"pack": `eq.${pack}`,
-		"online": "eq.true",
 		"df.active": "eq.true",
 		"envs": `cs.{${ENV}}`,
 	};

@@ -64,7 +64,6 @@ function topo_flag(features, flagurl, config) {
 
 async function geography(c) {
 	const coll = await ea_api.get("geographies", {
-		"online": "eq.true",
 		"datasets_count": "gt.0",
 		"parent_id": `eq.${c.id}`,
 	});
@@ -122,7 +121,6 @@ export function init() {
 		ENV = "staging";
 
 	ea_api.get("geographies", {
-		"online": "eq.true",
 		"adm": "eq.0",
 		"envs": `cs.{${ENV}}`,
 	})

@@ -240,6 +240,11 @@ export async function init() {
 	GEOGRAPHY.timeline = maybe(GEOGRAPHY, 'configuration', 'timeline');
 	GEOGRAPHY.timeline_dates = maybe(GEOGRAPHY, 'configuration', 'timeline_dates');
 
+	if (location.hostname.match(/^www/))
+		ENV = "production";
+	else if (location.hostname.match(/^staging/))
+		ENV = "staging";
+
 	let params = 'default';
 
 	if (GEOGRAPHY.timeline)
@@ -340,7 +345,8 @@ This is fatal. Thanks for all the fish.`;
 		"select": select,
 		"pack": `eq.${pack}`,
 		"online": "eq.true",
-		"df.active": "eq.true"
+		"df.active": "eq.true",
+		"envs": `cs.{${ENV}}`,
 	};
 
 	await ea_api.get("datasets", p)

@@ -39,6 +39,7 @@
     "MOBILE": "writable",
     "U": "writable",
     "O": "writable",
+    "ENV": "writable",
 
     "qs": "readonly",
     "qsa": "readonly",

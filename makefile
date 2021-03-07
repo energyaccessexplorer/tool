@@ -167,9 +167,7 @@ sync:
 		--checksum \
 		--copy-links \
 		--delete-before \
-		--exclude=.git \
-		--exclude=default.mk \
-		--exclude=makefile \
+		--exclude=files \
 		${DIST}/ ${WEBSITE_SSH_USER}@${WEBSITE_HOST}:${TOOL_DEST}
 
 synced:

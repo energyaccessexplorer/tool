@@ -2,14 +2,22 @@ function topo_flag(features, flagurl, config) {
 	const width = MOBILE ? 100 : 200;
 	const padding = 1;
 
+	config = config || {
+		'x': 0,
+		'y': 0,
+		'height': 24,
+		'width': 32,
+		'aspect-ratio': "xMidYMid"
+	};
+
 	const id = flagurl.substr(flagurl.length - 12);
 
 	const svg = d3.select(document.createElementNS("http://www.w3.org/2000/svg", "svg"))
-		    .attr('width', width)
-		    .attr('height', width);
+		.attr('width', width)
+		.attr('height', width);
 
 	const geopath = d3.geoPath()
-		    .projection(d3.geoMercator());
+		.projection(d3.geoMercator());
 
 	svg.append('defs')
 		.append('pattern')
@@ -25,16 +33,17 @@ function topo_flag(features, flagurl, config) {
 		.attr('x', config['x'] || 0)
 		.attr('y', config['y'] || 0)
 		.attr('width', config['width'])
-		.attr('height', config['height']);
+		.attr('height', config['height'])
+		.attr('preserveAspectRatio', config['aspect-ratio'] + " slice");
 
 	const g = svg.append('g');
 
 	Whatever.then(_ => {
 		const path = g.selectAll(`path`)
-			    .data(features)
-			    .enter().append('path')
-			    .attr('fill', `url(#flag-${id})`)
-			    .attr('d', geopath);
+			.data(features)
+			.enter().append('path')
+			.attr('fill', `url(#flag-${id})`)
+			.attr('d', geopath);
 
 		const box = path.node().getBBox();
 		const s = (box.height > box.width) ? (box.height - box.width)/2 : 0;
@@ -57,7 +66,7 @@ async function geography(c) {
 	const coll = await ea_api.get("geographies", {
 		"online": "eq.true",
 		"datasets_count": "gt.0",
-		"parent_id": `eq.${c.id}`
+		"parent_id": `eq.${c.id}`,
 	});
 
 	const data = {};
@@ -107,6 +116,11 @@ export function init() {
 		return s;
 	};
 
+	if (location.hostname.match(/^www/))
+		ENV = "production";
+	else if (location.hostname.match(/^staging/))
+		ENV = "staging";
+
 	ea_api.get("geographies", {
 		"online": "eq.true",
 		"adm": "eq.0",
@@ -117,13 +131,6 @@ export function init() {
 				const d = ce('div', ce('h2', co.name, { class: 'country-name' }), { class: 'country-item', ripple: "" });
 				d.onclick = _ => setTimeout(_ => geography(co), 350);
 
-				const config = co.configuration.flag || {
-					'x': 0,
-					'y': 0,
-					'height': 30,
-					'aspect-ratio': "xMidYMid slice"
-				};
-
 				fetch(`https://world.energyaccessexplorer.org/countries?select=flag,geojson&cca3=eq.${co.cca3}`)
 					.then(r => r.json())
 					.then(r => {
@@ -132,7 +139,7 @@ export function init() {
 						d.append(topo_flag(
 							JSON.parse(hextostring(data['geojson'])).features,
 							URL.createObjectURL((new Blob([hextostring(data['flag'])], {type: 'image/svg+xml'}))),
-							config
+							co.configuration.flag
 						));
 					});
 

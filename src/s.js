@@ -66,6 +66,7 @@ async function geography(c) {
 	const coll = await ea_api.get("geographies", {
 		"datasets_count": "gt.0",
 		"parent_id": `eq.${c.id}`,
+		"envs": `cs.{${ENV}}`,
 	});
 
 	const data = {};

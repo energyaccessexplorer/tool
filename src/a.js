@@ -280,11 +280,32 @@ export async function init() {
 	views.init();
 	indexes.init();
 
+	drawer_init();
+	toggle_left_panel();
+
 	if (GEOGRAPHY.timeline) timeline_init();
 
 	if (!MOBILE && !GEOGRAPHY.timeline) nanny_init();
 
 	ea_loading(false);
+};
+
+export function toggle_left_panel(t) {
+	for (const e of document.querySelector('#left-pane').children)
+		e.style.display = 'none';
+
+	if (t) document.getElementById(t).style.display = '';
+
+	window.dispatchEvent(new Event('resize'));
+};
+
+function drawer_init() {
+	for (const a of qsa('#drawer a'))
+		a.onclick = function() {
+			toggle_left_panel(this.getAttribute('for'));
+		};
+
+	toggle_left_panel();
 };
 
 /*

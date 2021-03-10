@@ -9,16 +9,17 @@
   display: block;
   flex: 1;
   min-height: 100%;
-  width: 0em; /* 4em */
+  width: 4em;
 }
 
 #left-pane #drawer a {
   flex: 0;
   margin: 0;
   height: 4em;
-  line-height: 4em;
+  line-height: 4.7em;
   display: block;
   text-align: center;
+  border-bottom: 1px solid gray;
 }
 
 .search-input .selectlist-input,

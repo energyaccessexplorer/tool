@@ -388,6 +388,9 @@ This is fatal. Thanks for all the fish.`;
 	DS.array.filter(d => d.mutant).forEach(d => d.mutant_init());
 	DS.array.filter(d => d.items).forEach(d => d.items_init());
 
+	const [left, bottom, right, top] = bounds;
+	GEOGRAPHY.bounds = { left, bottom, right, top };
+
 	callback(bounds);
 };
 
@@ -567,7 +570,7 @@ function map_click(e) {
 
 		const rc = ea_coordinates_in_raster(
 			[e.lngLat.lng, e.lngLat.lat],
-			MAPBOX.coords,
+			GEOGRAPHY.bounds,
 			{
 				data: t.raster.data,
 				width: t.raster.width,
@@ -606,7 +609,7 @@ function map_click(e) {
 
 		const o = ea_coordinates_in_raster(
 			[e.lngLat.lng, e.lngLat.lat],
-			MAPBOX.coords,
+			GEOGRAPHY.bounds,
 			{
 				data: t.raster.data,
 				width: b.raster.width,

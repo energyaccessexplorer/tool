@@ -487,17 +487,17 @@ function table_add_lnglat(td, lnglat = [0, 0]) {
  * NOTE: mercator only.
  *
  * @param "coords" int[2]. Coordinates in Longitude/Latitude to be transformed.
- * @param "bounds" int[2][2]. Bounding box containing the raster data.
+ * @param "bounds" {int,int,int,int}. Bounding box containing the raster data.
  * @param "raster" { width int, height int, novalue numeric, array numeric[] }
  *        full description.
  */
 
-function ea_coordinates_in_raster(coords, bounds, raster) {
+function ea_coordinates_in_raster(coords, {left,bottom,right,top}, raster) {
 	if (coords.length !== 2)
 		throw Error(`ea_coordinates_raster: expected and array of length 2. Got ${coords}`);
 
-	const hs = d3.scaleLinear().domain([bounds[0][0], bounds[1][0]]).range([0, raster.width]);
-	const vs = d3.scaleLinear().domain([bounds[1][1], bounds[2][1]]).range([0, raster.height]);
+	const hs = d3.scaleLinear().domain([left, right]).range([0, raster.width]);
+	const vs = d3.scaleLinear().domain([top, bottom]).range([0, raster.height]);
 
 	const plng = Math.floor(hs(coords[0]));
 	const plat = Math.floor(vs(coords[1]));

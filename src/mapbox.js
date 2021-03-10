@@ -244,12 +244,8 @@ This is fatal. Thanks for all the fish.`
 		throw new Error("Could not set geography's bounds. Ciao.");
 	}
 
-	const l = bounds[0];
-	const r = bounds[2];
-	const d = bounds[1];
-	const u = bounds[3];
-
-	return [[l,u], [r,u], [r,d], [l,d]];
+	const [left, bottom, right, top] = bounds;
+	return [[left,top], [right,top], [right,bottom], [left,bottom]];
 };
 
 export function dblclick(id) {

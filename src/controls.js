@@ -490,6 +490,44 @@ function collection_list() {
 	return e;
 };
 
+export async function search() {
+	const sl = new selectlist('controls-search', [], {});
+
+	const containers = qsa('.controls-container');
+
+	function openall() {
+		this.value = "";
+
+		sl.input.dispatchEvent(new Event('input'));
+
+		select_tab(qs('#controls-tab-all'), "all");
+		for (let sb of qsa('.controls-container')) {
+			elem_collapse(sb, sb.previousSibling, "open");
+		}
+	};
+
+	sl.input.setAttribute('placeholder', 'Filter datasets');
+
+	sl.input.addEventListener('focus', openall);
+
+	sl.input.addEventListener('blur', openall);
+
+	sl.input.addEventListener('input', function(_) {
+		for (let c of containers)
+			c.previousSibling.style.display = '';
+
+		const r = DS.array.filter(d => !d.disabled && (d.id + ";" + d.name).match(this.value));
+		DS.array.forEach(d => d.controls.style.display = r.indexOf(d) > -1 ? '' : 'none');
+
+		for (let c of containers) {
+			if (Array.from(qsa('ds-controls', c)).every(d => d.style.display === 'none'))
+				c.previousSibling.style.display = 'none';
+		}
+	});
+
+	qs('#controls-search').append(sl.el);
+};
+
 function sort_datasets(config) {
 	const {sort_datasets, sort_subbranches, sort_branches} = config;
 
@@ -574,6 +612,7 @@ function options() {
 
 export function init() {
 	geographies_search();
+	search();
 
 	const tab_all = ce('div', "all", { id: 'controls-tab-all', class: 'controls-branch-tab up-title' });
 

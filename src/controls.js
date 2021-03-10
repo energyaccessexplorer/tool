@@ -1,9 +1,5 @@
 import DS from './ds.js';
 
-import {
-	geographies_search
-} from './geographies.js';
-
 let slider_width;
 
 const contents_el = qs('#controls-contents');
@@ -611,7 +607,6 @@ function options() {
 };
 
 export function init() {
-	geographies_search();
 	search();
 
 	const tab_all = ce('div', "all", { id: 'controls-tab-all', class: 'controls-branch-tab up-title' });

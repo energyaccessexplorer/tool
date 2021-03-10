@@ -1,10 +1,11 @@
+#geographies,
 #controls {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
   display: flex;
   flex-flow: row wrap;
-  border-top: solid 1px var(--the-white);
+  border-top: solid 1px transparent;
 }
 
 .controls-branch,

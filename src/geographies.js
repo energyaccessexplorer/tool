@@ -61,7 +61,7 @@ async function overview() {
 	}
 };
 
-export async function geographies_search() {
+export async function search() {
 	let data = {};
 
 	const p = {
@@ -110,4 +110,8 @@ cursor: pointer;
 	qs('#geographies-search').append(sl.el, info);
 
 	set_default(sl.input);
+};
+
+export function init() {
+	search();
 };

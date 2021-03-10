@@ -66,7 +66,7 @@ async function geography(c) {
 	const coll = await ea_api.get("geographies", {
 		"datasets_count": "gt.0",
 		"parent_id": `eq.${c.id}`,
-		"envs": `cs.{${ENV}}`,
+		"envs": `ov.{${ENV}}`,
 	});
 
 	const data = {};
@@ -120,10 +120,12 @@ export function init() {
 		ENV = "production";
 	else if (location.hostname.match(/^staging/))
 		ENV = "staging";
+	else if (location.hostname.match(/localhost/))
+		ENV = ["production", "staging"];
 
 	ea_api.get("geographies", {
 		"adm": "eq.0",
-		"envs": `cs.{${ENV}}`,
+		"envs": `ov.{${ENV}}`,
 	})
 		.then(countries_online => {
 			for (let co of countries_online) {

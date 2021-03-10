@@ -244,6 +244,8 @@ export async function init() {
 		ENV = "production";
 	else if (location.hostname.match(/^staging/))
 		ENV = "staging";
+	else if (location.hostname.match(/localhost/))
+		ENV = ["production", "staging"];
 
 	let params = 'default';
 
@@ -345,7 +347,7 @@ This is fatal. Thanks for all the fish.`;
 		"select": select,
 		"pack": `eq.${pack}`,
 		"df.active": "eq.true",
-		"envs": `cs.{${ENV}}`,
+		"envs": `ov.{${ENV}}`,
 	};
 
 	await ea_api.get("datasets", p)

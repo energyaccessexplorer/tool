@@ -69,7 +69,7 @@ export async function geographies_search() {
 		"datasets_count": "gt.0",
 		"parent_id": GEOGRAPHY.parent_id ? `eq.${GEOGRAPHY.parent_id}` : "is.null",
 		"adm": `eq.${GEOGRAPHY.adm}`,
-		"envs": `cs.{${ENV}}`,
+		"envs": `ov.{${ENV}}`,
 		"order": "name.asc"
 	};
 

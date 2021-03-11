@@ -1,66 +1,3 @@
-async function overview() {
-	let r;
-
-	await fetch('https://wri-public-data.s3.amazonaws.com/EnergyAccess/Country%20indicators/eae_country_indicators.csv')
-		.then(r => r.text())
-		.then(t => d3.csvParse(t))
-		.then(d => {
-			return r = d.find(x => x.cca3 === GEOGRAPHY.cca3);
-		});
-
-	if (r) {
-		r['urban_population'] = (100 - r['rural_population']).toFixed(1);
-
-		if (r['urban_electrification'] > 0) {
-			let eru = ea_svg_pie(
-				[
-					[100 - r['urban_electrification']],
-					[r['urban_electrification']]
-				],
-				50, 0,
-				[
-					getComputedStyle(document.body).getPropertyValue('--the-light-green'),
-					getComputedStyle(document.body).getPropertyValue('--the-green')
-				],
-				"",
-				x => x
-			);
-
-			r['urban_electrification_pie'] = eru.svg;
-			eru.change(0);
-		}
-
-		if (r['rural_electrification'] > 0) {
-			let err = ea_svg_pie(
-				[
-					[100 - (r['rural_electrification'])],
-					[r['rural_electrification']]
-				],
-				50, 0,
-				[
-					getComputedStyle(document.body).getPropertyValue('--the-light-green'),
-					getComputedStyle(document.body).getPropertyValue('--the-green')
-				],
-				"",
-				x => x
-			);
-
-			r['rural_electrification_pie'] = err.svg;
-			err.change(0);
-		}
-
-		ea_modal.set({
-			header: r.name,
-			content: tmpl('#country-overview', r),
-			footer: ce(
-				'div',
-				"<strong>Source:</strong> World Bank, World Development Indicators (latest data) crosschecked with values reported by local stakeholders/partners.",
-				{ style: "font-size: small; max-width: 30em; margin-left: auto; margin-right: 0;" }
-			),
-		}).show();
-	}
-};
-
 export async function search() {
 	let data = {};
 
@@ -97,17 +34,7 @@ export async function search() {
 		}
 	});
 
-	const info = tmpl('#svg-info');
-	info.querySelector('path').setAttribute('fill', 'rgba(255, 255, 255, 0.3)');
-	info.onclick = overview;
-	info.style = `
-display: inline-block;
-transform: scale(1.2);
-width: 50px;
-cursor: pointer;
-`;
-
-	qs('#geographies-search').append(sl.el, info);
+	qs('#geographies-search').append(sl.el);
 
 	set_default(sl.input);
 };

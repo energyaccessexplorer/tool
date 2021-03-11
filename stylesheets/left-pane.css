@@ -49,10 +49,6 @@
   border: none;
 }
 
-input[list="selectlist-datalist-geographies-search"] {
-  width: calc(100% - 50px) !important;
-}
-
 .search-input input::placeholder {
   color: rgba(255,255,255,0.7);
 }

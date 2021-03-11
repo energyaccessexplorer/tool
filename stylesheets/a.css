@@ -1,10 +1,10 @@
 #left-pane #drawer {
-  background-color: lightgray;
+  border-right: 1px solid lightgray;
 }
 
 #left-pane #drawer > div {
   text-align: center;
-  border-bottom: 1px solid #aaa;
+  border-bottom: 1px solid lightgray;
 }
 
 .number-labels {

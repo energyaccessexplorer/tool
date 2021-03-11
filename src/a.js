@@ -291,18 +291,30 @@ export async function init() {
 };
 
 export function toggle_left_panel(t) {
-	for (const e of document.querySelector('#left-pane').children)
+	for (const e of qsa('#left-pane > div'))
 		e.style.display = 'none';
 
+	qs('#drawer').style.display = 'block';
+
 	if (t) document.getElementById(t).style.display = '';
+	document.querySelector('#left-pane').style['min-width'] = t ? '40em' : '';
 
 	window.dispatchEvent(new Event('resize'));
 };
 
 function drawer_init() {
-	for (const a of qsa('#drawer a'))
+	const as = qsa('#drawer a');
+
+	for (const a of as)
 		a.onclick = function() {
-			toggle_left_panel(this.getAttribute('for'));
+			for (const x of as) if (x !== this) x.classList.remove('active');
+
+			if (this.classList.contains('active')) {
+				toggle_left_panel();
+			} else {
+				toggle_left_panel(this.getAttribute('for'));
+				this.classList.add('active');
+			}
 		};
 
 	toggle_left_panel();

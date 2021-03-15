@@ -597,11 +597,19 @@ function map_click(e) {
 
 			const vv = (v%1 === 0) ? v : v.toFixed(2);
 
-			const td = table_data([
-				["value", t.name]
-			], {
-				"value": `${vv} <code>${t.category.unit || ''}</code>`
-			});
+			const dict = [
+				["value", t.name],
+				["_empty", null]
+			];
+
+			const props = {
+				"value": `${vv} <code>${t.category.unit || ''}</code>`,
+				"_empty": ""
+			};
+
+			analysis_context(rc, dict, props, t.id);
+
+			const td = table_data(dict, props);
 
 			table_add_lnglat(td, [e.lngLat.lng, e.lngLat.lat]);
 
@@ -616,10 +624,35 @@ function map_click(e) {
 		}
 	};
 
+	function analysis_context(rc, dict, props, skip = null) {
+		DS.array
+			.filter(d => d.on)
+			.forEach(d => {
+				if (d.id === skip) return;
+
+				if (d.datatype === 'raster') {
+					dict.push([d.id, d.name]);
+					props[d.id] = d.raster.data[rc.index] + " " + d.category.unit;
+				}
+
+				else if (d.config.column && d.category.name !== 'boundaries') {
+					dict.push(["_" + d.config.column, d.name]);
+					props["_" + d.config.column] = d.csv.table[d.raster.data[rc.index]] + " " + d.category.unit;
+				}
+
+				else if (d.raster) {
+					dict.push([d.id, d.name]);
+					props[d.id] = d.raster.data[rc.index] + " " + "km (proximity to)";
+				}
+			});
+
+		console.log("here");
+	};
+
 	function analysis_click() {
 		const b = DST.get('boundaries');
 
-		const o = ea_coordinates_in_raster(
+		const rc = ea_coordinates_in_raster(
 			[e.lngLat.lng, e.lngLat.lat],
 			GEOGRAPHY.bounds,
 			{
@@ -630,7 +663,7 @@ function map_click(e) {
 			}
 		);
 
-		if (typeof maybe(o, 'value') === 'number') {
+		if (typeof maybe(rc, 'value') === 'number') {
 			let f = d3.scaleQuantize().domain([0,1]).range(["Low", "Low-Medium", "Medium", "Medium-High", "High"]);
 
 			const dict = [
@@ -639,30 +672,13 @@ function map_click(e) {
 			];
 
 			const props = {
-				"aname": f(o.value),
+				"aname": f(rc.value),
 				"_empty": ""
 			};
 
-			DS.array
-				.filter(d => d.on)
-				.forEach(d => {
-					if (d.datatype === 'raster') {
-						dict.push([d.id, d.name]);
-						props[d.id] = d.raster.data[o.index] + " " + d.category.unit;
-					}
+			analysis_context(rc, dict, props);
 
-					else if (d.config.column && d.category.name !== 'boundaries') {
-						dict.push(["_" + d.config.column, d.name]);
-						props["_" + d.config.column] = d.csv.table[d.raster.data[o.index]] + " " + d.category.unit;
-					}
-
-					else if (d.raster) {
-						dict.push([d.id, d.name]);
-						props[d.id] = d.raster.data[o.index] + " " + "km (proximity to)";
-					}
-				});
-
-			let td = table_data(dict, props);
+			const td = table_data(dict, props);
 
 			table_add_lnglat(td, [e.lngLat.lng, e.lngLat.lat]);
 
@@ -674,7 +690,7 @@ function map_click(e) {
 		}
 
 		else {
-			console.log("No value on raster.", o);
+			console.log("No value on raster.", rc);
 		}
 	};
 

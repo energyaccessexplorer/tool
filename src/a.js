@@ -558,9 +558,7 @@ function map_click(e) {
 		return r;
 	};
 
-	function vectors_click(callback) {
-		const et = MAPBOX.queryRenderedFeatures(e.point)[0];
-
+	function click(fn) {
 		const b = DST.get('boundaries');
 
 		const rc = ea_coordinates_in_raster(
@@ -574,71 +572,85 @@ function map_click(e) {
 			}
 		);
 
-		const dict = [
+		const {dict, props, et} = fn(rc);
+
+		analysis_context(rc, dict, props, (maybe(et, 'source') === i) ? t.id : null);
+
+		const td = table_data(dict, props);
+
+		table_add_lnglat(td, [e.lngLat.lng, e.lngLat.lat]);
+
+		mapbox_pointer(
+			td,
+			e.originalEvent.pageX,
+			e.originalEvent.pageY
+		);
+	};
+
+	function vectors() {
+		if (!INFOMODE) return;
+
+		const et = MAPBOX.queryRenderedFeatures(e.point)[0];
+
+		let dict = [
 			["value", t.name],
 			["_empty", null]
 		];
 
+		let props = null;
+
 		if (!et || et.source !== i) {
-			const props = {
+			props = {
 				"value": `none under these coordinates`,
 				"_empty": ""
 			};
-
-			analysis_context(rc, dict, props);
-
-			const td = table_data(dict, props);
-
-			table_add_lnglat(td, [e.lngLat.lng, e.lngLat.lat]);
-
-			mapbox_pointer(
-				td,
-				e.originalEvent.pageX,
-				e.originalEvent.pageY
-			);
-
-			return;
 		}
 
-		if (et.source === i) {
-			if (typeof callback === 'function') callback(et);
+		else if (et.source === i) {
+			const fi = feature_info.call(t, et);
+			dict = fi.dict;
+			props = fi.props;
 
-			if (INFOMODE) {
-				const {dict, props} = feature_info.call(t, et);
-
-				dict.push(["_empty", null]);
-				props["_empty"] = "";
-
-				analysis_context(rc, dict, props, t.id);
-
-				const td = table_data(dict, props);
-
-				table_add_lnglat(td, [e.lngLat.lng, e.lngLat.lat]);
-
-				mapbox_pointer(
-					td,
-					e.originalEvent.pageX,
-					e.originalEvent.pageY
-				);
-			}
+			dict.push(["_empty", null]);
+			props["_empty"] = "";
 		}
+
+		return {dict, props, et};
 	};
 
-	function raster_click() {
+	function vectors_timeline() {
+		// TODO: refactor this to use vectors()
+		//
+		const et = MAPBOX.queryRenderedFeatures(e.point)[0];
+
+		let dict = [
+			["value", t.name],
+			["_empty", null]
+		];
+
+		let props = null;
+
+		if (maybe(et, 'properties', 'District'))
+			U.subgeoname = et.properties['District'];
+
+		timeline_lines_draw();
+
+		if (maybe(et, 'source') === i) {
+			const fi = feature_info.call(t, et);
+			dict = fi.dict;
+			props = fi.props;
+
+			dict.push(["_empty", null]);
+			props["_empty"] = "";
+		}
+
+		return {dict, props, et};
+	};
+
+	function raster(rc) {
 		if (!INFOMODE) return;
 
-		const b = DST.get('boundaries');
-
-		const rc = ea_coordinates_in_raster(
-			[e.lngLat.lng, e.lngLat.lat],
-			GEOGRAPHY.bounds,
-			{
-				data: t.raster.data,
-				width: t.raster.width,
-				height: t.raster.height,
-				nodata: b.raster.nodata
-			}
-		);
+		let dict, props;
 
 		if (typeof maybe(rc, 'value') === 'number' &&
         rc.value !== t.raster.nodata) {
@@ -646,31 +658,21 @@ function map_click(e) {
 
 			const vv = (v%1 === 0) ? v : v.toFixed(2);
 
-			const dict = [
+			dict = [
 				["value", t.name],
 				["_empty", null]
 			];
 
-			const props = {
+			props = {
 				"value": `${vv} <code>${t.category.unit || ''}</code>`,
 				"_empty": ""
 			};
-
-			analysis_context(rc, dict, props, t.id);
-
-			const td = table_data(dict, props);
-
-			table_add_lnglat(td, [e.lngLat.lng, e.lngLat.lat]);
-
-			mapbox_pointer(
-				td,
-				e.originalEvent.pageX,
-				e.originalEvent.pageY
-			);
 		}
 		else {
 			console.log("No value (or nodata value) on raster.", rc);
 		}
+
+		return {dict, props};
 	};
 
 	function analysis_context(rc, dict, props, skip = null) {
@@ -689,13 +691,13 @@ function map_click(e) {
 					props["_" + d.config.column] = d.csv.table[d.raster.data[rc.index]] + " " + d.category.unit;
 				}
 
-				else if (d.raster) {
+				else if (d.raster &&
+								 d.category.name !== 'boundaries' &&
+								 !d.category.name.match(/^(timeline-)?indicator/)) {
 					dict.push([d.id, d.name]);
 					props[d.id] = d.raster.data[rc.index] + " " + "km (proximity to)";
 				}
 			});
-
-		console.log("here");
 	};
 
 	function analysis_click() {
@@ -762,9 +764,8 @@ function map_click(e) {
 
 		if (!t) return;
 
-		if (t.vectors) vectors_click();
-
-		else if (t.raster.data) raster_click();
+		if (t.vectors) click(vectors);
+		else if (t.raster.data) click(raster);
 	}
 
 	else if (view === "timeline") {
@@ -772,12 +773,8 @@ function map_click(e) {
 
 		if (!t) return;
 
-		if (t.vectors) vectors_click(p => {
-			if (p.properties['District']) U.subgeoname = p.properties['District'];
-			timeline_lines_draw();
-		});
-
-		else if (t.raster.data) raster_click();
+		if (t.vectors) click(vectors_timeline);
+		else if (t.raster.data) click(raster);
 	}
 };
 

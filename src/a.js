@@ -534,44 +534,93 @@ function map_click(e) {
 
 	let t;
 
-	function feature_info(et, e) {
-		let at = [];
+	function feature_info(et) {
+		let r = {
+			dict: [],
+			props: et.properties,
+		};
 
 		if (this.category.name === 'boundaries' ||
 				this.category.name.match(/^(timeline-)?indicator/)) {
-			at.push(["_boundaries_name", GEOGRAPHY.configuration.boundaries_name || "Geography Name"]);
-			et.properties["_boundaries_name"] = GEOGRAPHY.boundaries[et.properties[this.vectors.key]];
+			r.dict.push(["_boundaries_name", GEOGRAPHY.configuration.boundaries_name || "Geography Name"]);
+			r.props["_boundaries_name"] = GEOGRAPHY.boundaries[et.properties[this.vectors.key]];
 		}
 
 		if (this.config.column && this.category.name !== 'boundaries') {
-			at.push(["_" + this.config.column, this.name]);
-			et.properties["_" + this.config.column] = this.csv.table[et.properties[this.vectors.key]];
+			r.dict.push(["_" + this.config.column, this.name]);
+			r.props["_" + this.config.column] = this.csv.table[et.properties[this.vectors.key]];
 		}
 
 		if (this.config.attributes_map) {
-			at = at.concat(this.config.attributes_map.map(e => [e.dataset, e.target]));
+			r.dict = r.dict.concat(this.config.attributes_map.map(e => [e.dataset, e.target]));
 		}
 
-		let td = table_data(at, et.properties);
-
-		table_add_lnglat(td, [e.lngLat.lng, e.lngLat.lat]);
-
-		mapbox_pointer(
-			td,
-			e.originalEvent.pageX,
-			e.originalEvent.pageY
-		);
+		return r;
 	};
 
 	function vectors_click(callback) {
 		const et = MAPBOX.queryRenderedFeatures(e.point)[0];
-		if (!et) return;
+
+		const b = DST.get('boundaries');
+
+		const rc = ea_coordinates_in_raster(
+			[e.lngLat.lng, e.lngLat.lat],
+			GEOGRAPHY.bounds,
+			{
+				data: t.raster.data,
+				width: t.raster.width,
+				height: t.raster.height,
+				nodata: b.raster.nodata
+			}
+		);
+
+		const dict = [
+			["value", t.name],
+			["_empty", null]
+		];
+
+		if (!et || et.source !== i) {
+			const props = {
+				"value": `none under these coordinates`,
+				"_empty": ""
+			};
+
+			analysis_context(rc, dict, props);
+
+			const td = table_data(dict, props);
+
+			table_add_lnglat(td, [e.lngLat.lng, e.lngLat.lat]);
+
+			mapbox_pointer(
+				td,
+				e.originalEvent.pageX,
+				e.originalEvent.pageY
+			);
+
+			return;
+		}
 
 		if (et.source === i) {
 			if (typeof callback === 'function') callback(et);
 
-			if (INFOMODE)
-				feature_info.call(t, et, e);
+			if (INFOMODE) {
+				const {dict, props} = feature_info.call(t, et);
+
+				dict.push(["_empty", null]);
+				props["_empty"] = "";
+
+				analysis_context(rc, dict, props, t.id);
+
+				const td = table_data(dict, props);
+
+				table_add_lnglat(td, [e.lngLat.lng, e.lngLat.lat]);
+
+				mapbox_pointer(
+					td,
+					e.originalEvent.pageX,
+					e.originalEvent.pageY
+				);
+			}
 		}
 	};
 

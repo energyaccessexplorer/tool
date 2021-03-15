@@ -310,6 +310,7 @@ function drawer_init() {
 			for (const x of as) if (x !== this) x.classList.remove('active');
 
 			if (this.classList.contains('active')) {
+				this.classList.remove('active');
 				toggle_left_panel();
 			} else {
 				toggle_left_panel(this.getAttribute('for'));

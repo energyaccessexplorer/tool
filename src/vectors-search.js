@@ -5,10 +5,12 @@ import {
 function setup() {
 	const sl = new selectlist('vectors-search', [], {});
 	const input = sl.el;
+	sl.el.setAttribute('placeholder', 'Search features');
 
 	const resultscontainer = qs('#vectors-results');
 	const ul = ce('ul');
 
+	let resultsinfo;
 	let ds;
 	let attr;
 	let searchable;
@@ -35,38 +37,43 @@ function setup() {
 
 	async function reset() {
 		ds = DST.get(U.inputs[0]);
-		ul.innerHTML = "";
+		elem_empty(ul);
+		if (pointer) pointer.drop();
 		resultscontainer.innerHTML = "";
-		resultscontainer.append(ce('p', `Searching <b>${ds.name}</b>`));
+
+		resultsinfo = ce('div', `<b>${ds.name}</b>.`, { class: 'vectors-results-info' });
+
+		resultscontainer.append(resultsinfo);
 
 		if (!ds || !ds.vectors) {
 			resultscontainer.innerHTML = "";
-			resultscontainer.append(ce('p', `<b>${ds.name}</b> is not searchable. Try a dataset with polygons, points or lines ;)`));
+			resultsinfo.innerHTML = `<b>${ds.name}</b> is not searchable. Try a dataset with polygons, points or lines ;)`;
 			searchable = false;
 			return;
 		}
-		else {
-			await until(_ => ds.vectors.features.features);
 
-			const first = ds.vectors.features.features[0];
+		await until(_ => ds.vectors.features.features);
 
-			for (const a of ['name', 'Name', 'NAME']) {
-				if (first.properties.hasOwnProperty(a)) { attr = a; break; }
-			}
+		const first = ds.vectors.features.features[0];
 
-			if (!(searchable = !!attr)) {
-				resultscontainer.append(ce('p', `<b>${ds.name}</b> is not searchable (for now...)`));
-				return;
-			}
+		for (const a of ['name', 'Name', 'NAME']) {
+			if (first.properties.hasOwnProperty(a)) { attr = a; break; }
+		}
 
-			for (const f of ds.vectors.features.features) {
-				const li = ce('li', f.properties[attr]);
-				li.onmouseenter = _ => {
-					if (pointer) pointer.drop();
-					pointto(f);
-				};
-				ul.append(li);
-			}
+		if (!(searchable = !!attr)) {
+			resultsinfo.innerHTML = `<b>${ds.name}</b> is not searchable (for now...)`;
+			return;
+		}
+
+		for (const f of ds.vectors.features.features) {
+			if (f['__li']) continue;
+
+			const li = ce('li', f.properties[attr]);
+			li.onmouseenter = _ => {
+				if (pointer) pointer.drop();
+				pointto(f);
+			};
+			f['__li'] = li;
 		}
 
 		resultscontainer.append(ul);
@@ -80,7 +87,16 @@ function setup() {
 
 		if (!searchable) return;
 
+		let count = 0;
+		elem_empty(ul);
 		for (let i = 0; i < ds.vectors.features.features.length; i++) {
+			if (count > 100) {
+				qs('div.vectors-results-info', resultscontainer).innerHTML = `Searching <b>${ds.name}</b>. Too many results. Showing first 101 <i>only</i>:`;
+				break;
+			}
+
+			resultsinfo.innerHTML = `Searching <b>${ds.name}</b>. ${count} results:`;
+
 			const f = ds.vectors.features.features[i];
 			let matches = false;
 
@@ -93,7 +109,10 @@ function setup() {
 				}
 			}
 
-			ul.children[i].style.display = matches ? '' : 'none';
+			if (matches) {
+				ul.append(f['__li']);
+				count += 1;
+			}
 		}
 	};
 

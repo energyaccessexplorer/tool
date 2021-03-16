@@ -68,7 +68,7 @@
 
 #vectors-results {
   width: 100%;
-  height: 100%;
+  height: calc(100% - 8em);
   background-color: white;
   padding: 1em;
   overflow-y: scroll;
@@ -77,9 +77,21 @@
 #vectors-results ul {
   list-style-type: none;
   margin: 0;
+  margin-top: 2em;
   padding: 0;
 }
 
 #vectors-results ul li {
   padding: 0.5em 1em;
+}
+
+.vectors-results-info {
+  display: block;
+  position: sticky;
+  top: -1em;
+  background-color: white;
+  border-bottom: 1px solid rgba(0,0,0,0.3);
+  padding: 1em;
+  margin: -1em;
+  margin-top: -1em;
 }

@@ -23,7 +23,14 @@ function setup() {
 		});
 
 		if (t[0]) {
-			const {x,y} = MAPBOX.project(t[0].geometry.coordinates);
+			const {x,y} = (_ => {
+				if (ds.datatype === 'points')
+					return MAPBOX.project(t[0].geometry.coordinates);
+				else {
+					const ext = geojsonExtent(t[0]);
+					return MAPBOX.project([((ext[0] + ext[2]) / 2), ((ext[1] + ext[3]) / 2)]);
+				}
+			})();
 
 			const dict = [[ "name", ds.name ]];
 			const props = { name: f.properties[attr] };

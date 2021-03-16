@@ -492,8 +492,6 @@ export async function search() {
 	const containers = qsa('.controls-container');
 
 	function openall() {
-		this.value = "";
-
 		sl.input.dispatchEvent(new Event('input'));
 
 		select_tab(qs('#controls-tab-all'), "all");
@@ -505,8 +503,6 @@ export async function search() {
 	sl.input.setAttribute('placeholder', 'Filter datasets');
 
 	sl.input.addEventListener('focus', openall);
-
-	sl.input.addEventListener('blur', openall);
 
 	sl.input.addEventListener('input', function(_) {
 		for (let c of containers)

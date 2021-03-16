@@ -577,7 +577,8 @@ function map_click(e) {
 
 		const {dict, props, et} = fn(rc);
 
-		analysis_context(rc, dict, props, (maybe(et, 'source') === i) ? t.id : null);
+		const s = maybe(et, 'source');
+		analysis_context(rc, dict, props, (!s || (s === i)) ? t.id : null);
 
 		const td = table_data(dict, props);
 
@@ -679,6 +680,8 @@ function map_click(e) {
 	};
 
 	function analysis_context(rc, dict, props, skip = null) {
+		if (!rc) return [];
+
 		DS.array
 			.filter(d => d.on)
 			.forEach(d => {

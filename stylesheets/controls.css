@@ -1,13 +1,3 @@
-#geographies,
-#controls {
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  display: flex;
-  flex-flow: row wrap;
-  border-top: solid 1px transparent;
-}
-
 .controls-branch,
 .controls-subbranch,
 .controls-container {

@@ -202,11 +202,13 @@ background-color: transparent;
 	let l;
 	let lo;
 
-	p.addEventListener('mouseleave', (l = function() {
+	function drop() {
 		p.remove();
 		mark.remove();
 		document.removeEventListener('mouseleave', l);
-	}));
+	};
+
+	p.addEventListener('mouseleave', (l = drop));
 
 	if (MOBILE) {
 		delay(0.01)
@@ -218,6 +220,10 @@ background-color: transparent;
 				}));
 			});
 	}
+
+	return {
+		drop: drop
+	};
 };
 
 export function fit(bounds, animate = false) {

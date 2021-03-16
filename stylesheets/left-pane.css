@@ -56,3 +56,30 @@
 .search-input input::placeholder {
   color: rgba(255,255,255,0.7);
 }
+
+#vectors,
+#geographies,
+#controls {
+  user-select: none;
+  display: flex;
+  flex-flow: row wrap;
+  border-top: solid 1px transparent;
+}
+
+#vectors-results {
+  width: 100%;
+  height: 100%;
+  background-color: white;
+  padding: 1em;
+  overflow-y: scroll;
+}
+
+#vectors-results ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+#vectors-results ul li {
+  padding: 0.5em 1em;
+}

@@ -4,6 +4,8 @@ import * as controls from './controls.js';
 
 import * as geographies from './geographies.js';
 
+import * as vectorssearch from './vectors-search.js';
+
 import * as views from './views.js';
 
 import * as indexes from './indexes.js';
@@ -30,7 +32,6 @@ import {
 import DS from './ds.js';
 
 import Overlord from './overlord.js';
-
 
 const UProxyHandler = {
 	get: function(o,p) {
@@ -274,6 +275,7 @@ export async function init() {
 	cards.init();
 	controls.init();
 	geographies.init();
+	vectorssearch.init();
 
 	if (MOBILE) mobile();
 

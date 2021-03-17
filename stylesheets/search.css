@@ -48,6 +48,10 @@
   padding: 0.5em 1em;
 }
 
+.search-results ul li:hover {
+  background-color: rgba(0,0,0,0.08);
+}
+
 .search-results-info {
   display: block;
   position: sticky;

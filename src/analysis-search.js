@@ -19,10 +19,7 @@ export function setup() {
 
 	const maparea = qs('#maparea');
 
-	let resultsinfo;
 	let pointer;
-
-	console.log(resultsinfo, resultscontainer, pointto, pointer);
 
 	function pointto(p) {
 		const {x,y} = MAPBOX.project(p.i);
@@ -41,7 +38,9 @@ export function setup() {
 	};
 
 	function li(p) {
-		const el = ce('li', Math.round((p.v).toFixed(2) * 100) + " " + JSON.stringify((p.i).map(c => +c.toFixed(3))), {});
+		const c = Math.round((p.v).toFixed(2) * 100) + " " + JSON.stringify((p.i).map(c => +c.toFixed(3)));
+
+		const el = ce('li', `<code>${c}</code>`, {});
 		el.onmouseenter = _ => {
 			if (pointer) pointer.drop();
 			pointer = pointto(p);
@@ -68,7 +67,7 @@ export function setup() {
 
 async function getpoints(threshold) {
 	const raster = await analysis_plot_active(U.output, false);
-	const points = raster.reduce(function(a,v,i) { if (v > threshold) a.push({i,v}); return a; }, []);
+	const points = raster.reduce(function(a,v,i) { if (v >= threshold) a.push({i,v}); return a; }, []);
 
 	const ref = DST.get('boundaries').raster;
 

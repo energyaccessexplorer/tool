@@ -82,6 +82,7 @@ build-a:
 		${CSS}/a.css \
 		${CSS}/layout.css \
 		${CSS}/left-pane.css \
+		${CSS}/search.css \
 		${CSS}/controls.css \
 		${CSS}/maparea.css \
 		${CSS}/indexes.css \

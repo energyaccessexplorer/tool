@@ -487,12 +487,14 @@ function collection_list() {
 };
 
 export async function search() {
-	const sl = new selectlist('controls-search', [], {});
+	const root = qs('#controls.search-panel');
+	const input = ce('input', null, { id: 'controls-search', autocomplete: 'off', class: 'search-input' });
+	root.prepend(input);
 
 	const containers = qsa('.controls-container');
 
 	function openall() {
-		sl.input.dispatchEvent(new Event('input'));
+		input.dispatchEvent(new Event('input'));
 
 		select_tab(qs('#controls-tab-all'), "all");
 		for (let sb of qsa('.controls-container')) {
@@ -500,11 +502,11 @@ export async function search() {
 		}
 	};
 
-	sl.input.setAttribute('placeholder', 'Filter datasets');
+	input.setAttribute('placeholder', 'Filter datasets');
 
-	sl.input.addEventListener('focus', openall);
+	input.addEventListener('focus', openall);
 
-	sl.input.addEventListener('input', function(_) {
+	input.addEventListener('input', function(_) {
 		for (let c of containers)
 			c.previousSibling.style.display = '';
 
@@ -516,8 +518,6 @@ export async function search() {
 				c.previousSibling.style.display = 'none';
 		}
 	});
-
-	qs('#controls-search').append(sl.el);
 };
 
 function sort_datasets(config) {

@@ -1,4 +1,8 @@
 export async function search() {
+	const root = qs('#geographies.search-panel');
+	const input = ce('input', null, { id: 'geographies-search', autocomplete: 'off', class: 'search-input' });
+	root.prepend(input);
+
 	let data = {};
 
 	const p = {
@@ -15,11 +19,11 @@ export async function search() {
 		return j;
 	});
 
-	function set_default(input) {
+	function set_default(i) {
 		const g = list.find(x => x.id === GEOGRAPHY.id);
-		if (g) input.value = g.name;
+		if (g) i.value = g.name;
 
-		return input;
+		return i;
 	};
 
 	const sl = new selectlist("geographies-search", data, {
@@ -33,8 +37,6 @@ export async function search() {
 			}
 		}
 	});
-
-	qs('#geographies-search').append(sl.el);
 
 	set_default(sl.input);
 };

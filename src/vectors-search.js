@@ -3,11 +3,14 @@ import {
 } from './mapbox.js';
 
 function setup() {
-	const sl = new selectlist('vectors-search', [], {});
-	const input = sl.el;
-	sl.el.setAttribute('placeholder', 'Search features');
+	const root = qs('#vectors.search-panel');
+	const input = ce('input', null, { id: 'vectors-search', autocomplete: 'off', class: 'search-input' });
+	input.setAttribute('placeholder', 'Search features');
 
-	const resultscontainer = qs('#vectors-results');
+	root.prepend(input);
+
+	const resultscontainer = qs('#vectors .search-results');
+	const maparea = qs('#maparea');
 	const ul = ce('ul');
 
 	let resultsinfo;
@@ -15,7 +18,6 @@ function setup() {
 	let attr;
 	let searchable;
 	let pointer;
-	const maparea = qs('#maparea');
 
 	function pointto(f) {
 		const t = MAPBOX.querySourceFeatures(ds.source.id, {
@@ -44,11 +46,14 @@ function setup() {
 
 	async function reset() {
 		ds = DST.get(U.inputs[0]);
+
+		if (!ds) return;
+
 		elem_empty(ul);
 		if (pointer) pointer.drop();
 		resultscontainer.innerHTML = "";
 
-		resultsinfo = ce('div', `<b>${ds.name}</b>.`, { class: 'vectors-results-info' });
+		resultsinfo = ce('div', `<b>${ds.name}</b>.`, { class: 'search-results-info' });
 
 		resultscontainer.append(resultsinfo);
 
@@ -98,7 +103,7 @@ function setup() {
 		elem_empty(ul);
 		for (let i = 0; i < ds.vectors.features.features.length; i++) {
 			if (count > 100) {
-				qs('div.vectors-results-info', resultscontainer).innerHTML = `Searching <b>${ds.name}</b>. Too many results. Showing first 101 <i>only</i>:`;
+				qs('div.search-results-info', resultscontainer).innerHTML = `Searching <b>${ds.name}</b>. Too many results. Showing first 101 <i>only</i>:`;
 				break;
 			}
 
@@ -126,8 +131,6 @@ function setup() {
 	input.onfocus = function() {
 		input.dispatchEvent(new Event('input'));
 	};
-
-	qs('#vectors-search').append(input);
 };
 
 export function init() {

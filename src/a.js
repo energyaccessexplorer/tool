@@ -119,7 +119,6 @@ function layout() {
 
 	const l = qs('#left-pane', p);
 	const d = qs('#drawer', p);
-	const c = qs('#controls', p);
 	const g = qs('#geographies', p);
 
 	const r = qs('#right-pane', p);
@@ -129,7 +128,6 @@ function layout() {
 
 		p.style['height'] =
       l.style['height'] =
-      c.style['height'] =
       g.style['height'] =
       m.style['height'] =
       b.style['height'] =

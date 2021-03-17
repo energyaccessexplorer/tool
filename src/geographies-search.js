@@ -1,9 +1,13 @@
-export async function search() {
+export async function setup() {
 	const root = qs('#geographies.search-panel');
 	const input = ce('input', null, { id: 'geographies-search', autocomplete: 'off', class: 'search-input' });
+	input.setAttribute('placeholder', 'Geographies search');
+
 	root.prepend(input);
 
-	let data = {};
+	const resultscontainer = qs('#geographies .search-results');
+	const ul = ce('ul');
+	resultscontainer.append(ul);
 
 	const p = {
 		"select": ["id", "name"],
@@ -14,8 +18,22 @@ export async function search() {
 		"order": "name.asc"
 	};
 
+	function li(g) {
+		const el = ce('li', g.name);
+		el.onclick = function() {
+			const url = new URL(location);
+			url.searchParams.set('id', g.id);
+			location = url;
+		};
+
+		return el;
+	};
+
 	const list = await ea_api.get("geographies", p).then(j => {
-		j.forEach(g => data[g.name] = g.name);
+		j.forEach(g => {
+			g.li = li(g);
+			ul.append(g.li);
+		});
 		return j;
 	});
 
@@ -26,21 +44,18 @@ export async function search() {
 		return i;
 	};
 
-	const sl = new selectlist("geographies-search", data, {
-		'change': function(_) {
-			const c = list.find(x => x.name === this.value);
+	input.oninput = function(_) {
+		for (const i of list)
+			i.li.style.display = i.name.match(new RegExp(this.value, 'i')) ? "" : "none";
+	};
 
-			if (maybe(c, 'id') && GEOGRAPHY.id !== c.id) {
-				const url = new URL(location);
-				url.searchParams.set('id', c.id);
-				location = url;
-			}
-		}
-	});
+	input.onfocus = function(_) {
+		this.value = "";
+	};
 
-	set_default(sl.input);
+	set_default(input);
 };
 
 export function init() {
-	search();
+	setup();
 };

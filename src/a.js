@@ -2,7 +2,7 @@ import * as cards from './cards.js';
 
 import * as controls from './controls.js';
 
-import * as geographies from './geographies.js';
+import * as geographiessearch from './geographies-search.js';
 
 import * as vectorssearch from './vectors-search.js';
 
@@ -274,7 +274,7 @@ export async function init() {
 
 	cards.init();
 	controls.init();
-	geographies.init();
+	geographiessearch.init();
 	vectorssearch.init();
 
 	if (MOBILE) mobile();

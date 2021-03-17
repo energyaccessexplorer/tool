@@ -517,3 +517,8 @@ function ea_coordinates_in_raster(coords, {left,bottom,right,top}, raster) {
 
 	return a;
 };
+
+function ea_raster_in_coordinates(i, reference, bounds) {
+	const [x,y] = [i%reference.width, Math.floor(i/reference.width)];
+	return GEOGRAPHY.raster_coords(x,y);
+};

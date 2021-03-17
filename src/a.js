@@ -6,6 +6,8 @@ import * as geographiessearch from './geographies-search.js';
 
 import * as vectorssearch from './vectors-search.js';
 
+import * as analysissearch from './analysis-search.js';
+
 import * as views from './views.js';
 
 import * as indexes from './indexes.js';
@@ -274,6 +276,7 @@ export async function init() {
 	controls.init();
 	geographiessearch.init();
 	vectorssearch.init();
+	analysissearch.init();
 
 	if (MOBILE) mobile();
 
@@ -403,6 +406,12 @@ This is fatal. Thanks for all the fish.`;
 
 	const [left, bottom, right, top] = bounds;
 	GEOGRAPHY.bounds = { left, bottom, right, top };
+
+	const r = DST.get('boundaries').raster;
+	const w = d3.scaleLinear().domain([0,r.width]).range([left,right]);
+	const h = d3.scaleLinear().domain([0,r.height]).range([top,bottom]);
+
+	GEOGRAPHY.raster_coords = (x,y) => [w(x), h(y)];
 
 	callback(bounds);
 };

@@ -5,16 +5,14 @@
 }
 
 #controls-tabs {
-  height: 100%;
   display: flex;
   flex-flow: column nowrap;
   background-color: white;
-  height: 100vh;
 }
 
 #controls-contents {
   flex: 1;
-  height: calc(100% - 6em);
+  flex-grow: 1;
   border-left: solid 1px #d9d9d9;
   background-color: var(--the-white);
 
@@ -56,4 +54,12 @@
 .collapse {
   cursor: pointer;
   fill: var(--the-color);
+}
+
+#controls .search-results {
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-flow: row nowrap;
+  overflow: hidden;
 }

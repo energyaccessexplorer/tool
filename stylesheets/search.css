@@ -4,7 +4,7 @@
   overflow: hidden;
   width: 36em;
   user-select: none;
-  flex-flow: row wrap;
+  flex-flow: column;
   border-top: solid 1px transparent;
 }
 
@@ -12,13 +12,11 @@
   font-family: without-serif;
   font-weight: lighter;
   font-size: 1.7em;
-  width: 100%;
-  height: 3em;
   align-items: center;
   box-sizing: border-box;
   color: var(--the-white);
   background-color: var(--the-green);
-  padding: 0.5em 1em;
+  padding: 1em 1em;
   text-align: center;
   border: none;
   border-bottom: 1px solid rgba(0,0,0,0.3);
@@ -29,7 +27,7 @@
 }
 
 .search-results {
-  width: 100%;
+  flex-grow: 1;
   height: -webkit-fill-available;
   height: -moz-available;
   background-color: white;

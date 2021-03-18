@@ -2,6 +2,8 @@ import * as cards from './cards.js';
 
 import * as controls from './controls.js';
 
+import * as controlssearch from './controls-search.js';
+
 import * as geographiessearch from './geographies-search.js';
 
 import * as vectorssearch from './vectors-search.js';
@@ -273,7 +275,7 @@ export async function init() {
 	O.index = U.output;
 
 	cards.init();
-	controls.init();
+	controlssearch.init();
 	geographiessearch.init();
 	vectorssearch.init();
 	analysissearch.init();

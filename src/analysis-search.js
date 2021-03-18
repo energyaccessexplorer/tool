@@ -8,6 +8,8 @@ import {
 
 let root, ul, maparea, input, resultscontainer, pointer;
 
+let resultsinfo;
+
 async function getpoints(threshold) {
 	const raster = await analysis_plot_active(U.output, false);
 	const points = raster.reduce(function(a,v,i) { if (v >= threshold) a.push({i,v}); return a; }, []);
@@ -50,10 +52,17 @@ async function trigger(value) {
 
 	const results = await getpoints(value/100);
 
+	const count = results.length;
+
+	resultsinfo.innerHTML = `Searching <b>analysis coordinates</b>. ${count} results:`;
+
 	results
 		.sort((a,b) => a.v > b.v ? 1 : -1)
 		.slice(0, 100)
 		.forEach(t => ul.append(li(t)));
+
+	if (count > 100)
+		qs('div.search-results-info', resultscontainer).innerHTML = `Searching <b>analysis coordinates</b>. Too many results. Showing first 100 <i>only</i>:`;
 };
 
 export function init() {
@@ -68,6 +77,9 @@ export function init() {
 	resultscontainer = qs('#analysis .search-results');
 	ul = ce('ul');
 	resultscontainer.append(ul);
+
+	resultsinfo = ce('div', `<b>Analysis coordinates</b>.`, { class: 'search-results-info' });
+	resultscontainer.prepend(resultsinfo);
 
 	input.oninput = function(_) {
 		const v = parseFloat(this.value);

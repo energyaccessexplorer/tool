@@ -10,8 +10,14 @@ let root, ul, maparea, input, resultscontainer, pointer;
 
 let resultsinfo;
 
-async function getpoints(threshold) {
+const n = 20;
+
+async function getpoints() {
 	const a = await analysis_plot_active(U.output, false);
+
+	const threshold = a.raster.slice(0)
+		.sort((a,b) => a > b ? -1 : 1)
+		.slice(0, n)[n-1];
 
 	const points = a.raster.reduce(function(t,v,i) { if (v >= threshold) t.push({i,v}); return t; }, []);
 
@@ -48,30 +54,29 @@ function li(p) {
 	return el;
 };
 
-async function trigger(value) {
+async function trigger() {
 	elem_empty(ul);
 
-	const results = await getpoints(value/100);
+	const results = await getpoints();
 
 	const count = results.length;
 
-	resultsinfo.innerHTML = `Searching <b>analysis coordinates</b>. ${count} results:`;
+	resultsinfo.innerHTML = `Searching <b>analysis coordinates</b>. Top ${count} results:`;
 
 	results
-		.sort((a,b) => a.v > b.v ? 1 : -1)
-		.slice(0, 100)
+		.sort((a,b) => a.v > b.v ? -1 : 1)
 		.forEach(t => ul.append(li(t)));
 
-	if (count > 100)
-		qs('div.search-results-info', resultscontainer).innerHTML = `Searching <b>analysis coordinates</b>. Too many results. Showing first 100 <i>only</i>:`;
+	if (count > n)
+		qs('div.search-results-info', resultscontainer).innerHTML = `Searching <b>analysis coordinates</b>. Showing first ${n} of ${count}:`;
 };
 
 export function init() {
 	maparea = qs('#maparea');
 
 	root = qs('#analysis.search-panel');
-	input = ce('input', null, { id: 'analysis-search', autocomplete: 'off', class: 'search-input' });
-	input.setAttribute('placeholder', "Analysis range: 50 - 100");
+	input = ce('button', "Click for top locations",
+						 { id: 'analysis-search', autocomplete: 'off', class: 'search-input', style: "cursor: pointer;" });
 
 	root.prepend(input);
 
@@ -82,11 +87,7 @@ export function init() {
 	resultsinfo = ce('div', `<b>Analysis coordinates</b>.`, { class: 'search-results-info' });
 	resultscontainer.prepend(resultsinfo);
 
-	input.oninput = function(_) {
-		const v = parseFloat(this.value);
-		if (isNaN(v)) return;
-		if (v < 50 || v > 100) return;
-
-		trigger(v);
+	input.onclick = function(_) {
+		trigger();
 	};
 };

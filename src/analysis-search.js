@@ -11,8 +11,9 @@ let root, ul, maparea, input, resultscontainer, pointer;
 let resultsinfo;
 
 async function getpoints(threshold) {
-	const raster = await analysis_plot_active(U.output, false);
-	const points = raster.reduce(function(a,v,i) { if (v >= threshold) a.push({i,v}); return a; }, []);
+	const a = await analysis_plot_active(U.output, false);
+
+	const points = a.raster.reduce(function(t,v,i) { if (v >= threshold) t.push({i,v}); return t; }, []);
 
 	const ref = DST.get('boundaries').raster;
 

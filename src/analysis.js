@@ -13,7 +13,7 @@ import {
  *   - ID of a dataset
  *   - index name
  *
- * returns a raster (FloatArray) to be plotted onto a canvas.
+ * returns an object {min, max, raster (FloatArray)}
  */
 
 export default function run(type) {
@@ -27,7 +27,7 @@ export default function run(type) {
 	// There's nothing interesting about an analysis with only filters. Also,
 	// filters return 1 so a silly (single-valued) analysis would be plotted.
 	//
-	if (list.every(d => ea_filters.includes(d.analysis_scale(type)))) return it;
+	if (list.every(d => ea_filters.includes(d.analysis_scale(type)))) return { raster: it };
 
 	// Add up how much non-compound indexes datasets will account for. Then, just
 	// below, these values will be split into equal proportions of the total
@@ -64,7 +64,7 @@ export default function run(type) {
 	// If the total weight is 0, ciao.
 	//
 	if (Object.keys(weights).reduce((a,c) => (weights[c] || 0) + a, 0) === 0)
-		return it;
+		return { raster: it };
 
 	// Each dataset has a different scaling function. We cache these to optimise
 	// the huge loop we are about to do.
@@ -95,10 +95,10 @@ export default function run(type) {
 			_ => plot_active(U.output).then(raster => indexes_graphs(raster))
 		);
 
-		return it;
+		return { raster: it };
 	}
 
-	if (list.length === 1 && full_weight === 0) return it;
+	if (list.length === 1 && full_weight === 0) return { raster: it };
 
 	for (let i = 0; i < it.length; i += 1) {
 		let a = 0;
@@ -157,7 +157,11 @@ export default function run(type) {
 
 	console.log("Finished analysis.run in:", performance.now() - t0, weights, tots);
 
-	return it;
+	return {
+		min,
+		max,
+		raster: it,
+	};
 };
 
 /*
@@ -213,8 +217,8 @@ export function datasets(type) {
  */
 
 export async function plot_active(type, doindexes) {
-	const raster = run(type);
-	plot.outputcanvas(raster);
+	const a = run(type);
+	plot.outputcanvas(a.raster);
 
 	const index = ea_indexes[type];
 
@@ -223,7 +227,7 @@ export async function plot_active(type, doindexes) {
 			           "This is an initialisation bug.",
 			           "Index type:", type);
 
-		return raster;
+		return a;
 	}
 
 	qs('#canvas-output-select').value = type;
@@ -235,15 +239,15 @@ export async function plot_active(type, doindexes) {
 	//
 	let canvas_source = MAPBOX.getSource('output-source');
 	if (canvas_source) {
-		canvas_source.raster = raster;
+		canvas_source.raster = a.raster;
 
 		canvas_source.play();
 		canvas_source.pause();
 	}
 
-	if (doindexes) indexes_graphs(raster);
+	if (doindexes) indexes_graphs(a.raster);
 
-	return raster;
+	return a;
 };
 
 export async function raster_to_tiff(type) {

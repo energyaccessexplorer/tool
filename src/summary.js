@@ -2,7 +2,7 @@ import * as plot from './plot.js';
 
 import * as report from './report.js';
 
-import ea_analysis from './analysis.js';
+import analysis_plot_active from './analysis.js';
 
 /*
  * summary
@@ -36,7 +36,7 @@ async function summary() {
 	scale.append(ea_analysis_colorscale.svg.cloneNode(true), ramp);
 
 	async function get_summaries(idxn) {
-		let raster = ea_analysis(idxn);
+		let raster = analysis_plot_active(idxn).raster;
 
 		summary[idxn] = await analyse(raster);
 

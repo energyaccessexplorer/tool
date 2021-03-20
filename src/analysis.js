@@ -282,3 +282,30 @@ export async function raster_to_tiff(type) {
 
 	return (await GeoTIFF.writeArrayBuffer(arr, metadata));
 };
+
+export function context(rc, dict, props, skip = null) {
+	if (!rc) return [];
+
+	DS.array
+		.filter(d => d.on)
+		.forEach(d => {
+			if (d.id === skip) return;
+
+			if (d.datatype === 'raster') {
+				dict.push([d.id, d.name]);
+				props[d.id] = d.raster.data[rc.index] + " " + d.category.unit;
+			}
+
+			else if (d.config.column && d.category.name !== 'boundaries') {
+				dict.push(["_" + d.config.column, d.name]);
+				props["_" + d.config.column] = d.csv.table[d.raster.data[rc.index]] + " " + d.category.unit;
+			}
+
+			else if (d.raster &&
+							 d.category.name !== 'boundaries' &&
+							 !d.category.name.match(/^(timeline-)?indicator/)) {
+				dict.push([d.id, d.name]);
+				props[d.id] = d.raster.data[rc.index] + " " + "km (proximity to)";
+			}
+		});
+};

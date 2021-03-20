@@ -10,6 +10,8 @@ import * as vectorssearch from './vectors-search.js';
 
 import * as analysissearch from './analysis-search.js';
 
+import * as locationssearch from './locations-search.js';
+
 import * as views from './views.js';
 
 import * as indexes from './indexes.js';
@@ -30,6 +32,7 @@ import {
 } from './mapbox.js';
 
 import {
+	context as analysis_context,
 	plot_active as analysis_plot_active,
 } from './analysis.js';
 
@@ -247,6 +250,10 @@ export async function init() {
 	GEOGRAPHY.timeline = maybe(GEOGRAPHY, 'configuration', 'timeline');
 	GEOGRAPHY.timeline_dates = maybe(GEOGRAPHY, 'configuration', 'timeline_dates');
 
+	fetch(`https://world.energyaccessexplorer.org/countries?select=cca2&cca3=eq.${GEOGRAPHY.cca3}`)
+		.then(r => r.json())
+		.then(r => GEOGRAPHY.cca2 = r[0]['cca2']);
+
 	if (location.hostname.match(/^www/))
 		ENV = "production";
 	else if (location.hostname.match(/^staging/))
@@ -279,6 +286,7 @@ export async function init() {
 	geographiessearch.init();
 	vectorssearch.init();
 	analysissearch.init();
+	locationssearch.init();
 
 	if (MOBILE) mobile();
 
@@ -584,7 +592,10 @@ function map_click(e) {
 			}
 		);
 
-		const {dict, props, et} = fn(rc);
+		let f = fn(rc);
+		if (!f) return;
+
+		const {dict, props, et} = f;
 
 		const s = maybe(et, 'source');
 		analysis_context(rc, dict, props, (!s || (s === i)) ? t.id : null);
@@ -686,33 +697,6 @@ function map_click(e) {
 		}
 
 		return {dict, props};
-	};
-
-	function analysis_context(rc, dict, props, skip = null) {
-		if (!rc) return [];
-
-		DS.array
-			.filter(d => d.on)
-			.forEach(d => {
-				if (d.id === skip) return;
-
-				if (d.datatype === 'raster') {
-					dict.push([d.id, d.name]);
-					props[d.id] = d.raster.data[rc.index] + " " + d.category.unit;
-				}
-
-				else if (d.config.column && d.category.name !== 'boundaries') {
-					dict.push(["_" + d.config.column, d.name]);
-					props["_" + d.config.column] = d.csv.table[d.raster.data[rc.index]] + " " + d.category.unit;
-				}
-
-				else if (d.raster &&
-								 d.category.name !== 'boundaries' &&
-								 !d.category.name.match(/^(timeline-)?indicator/)) {
-					dict.push([d.id, d.name]);
-					props[d.id] = d.raster.data[rc.index] + " " + "km (proximity to)";
-				}
-			});
 	};
 
 	function analysis_click() {

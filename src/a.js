@@ -304,6 +304,8 @@ export async function init() {
 };
 
 export function toggle_left_panel(t) {
+	for (const m of qsa('.nanny-marker')) m.remove();
+
 	for (const e of qsa('#left-pane > div'))
 		e.style.display = 'none';
 

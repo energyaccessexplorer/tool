@@ -1,61 +1,21 @@
 import {
-	fit as mapbox_fit,
-	pointer as mapbox_pointer,
-} from './mapbox.js';
+	pointto as search_pointto,
+	zoom,
+} from './search.js';
 
-import {
-	context as analysis_context,
-} from './analysis.js';
-
-let root, ul, maparea, input, resultscontainer, pointer;
+let root, ul, input, resultscontainer;
 
 let resultsinfo;
 
 function pointto(p, a = false) {
-	const {x,y} = MAPBOX.project(p.center);
-
 	const dict = [[ "name", "Name" ]];
 	const props = { name: p._name };
 
-	const b = DST.get('boundaries');
-
-	const rc = ea_coordinates_in_raster(
-		p.center,
-		GEOGRAPHY.bounds,
-		{
-			data: b.raster.data,
-			width: b.raster.width,
-			height: b.raster.height,
-			nodata: b.raster.nodata
-		}
-	);
-
-	if (a) analysis_context(rc, dict, props, null);
-
-	const td = table_data(dict, props);
-
-	table_add_lnglat(td, p.center);
-
-	const box = maparea.getBoundingClientRect();
-
-	if (pointer) pointer.drop();
-	pointer = mapbox_pointer(td, box.x + x, box.y + y);
-};
-
-function zoom(p) {
-	if (pointer) pointer.drop();
-
-	if (p.bbox)
-		mapbox_fit(p.bbox, true);
-	else if (p.center)
-		MAPBOX.flyTo({ center: p.center, zoom: 12, speed: 2 });
-
-	MAPBOX.once('moveend', _ => pointto(p, true));
+	search_pointto(p.center, dict, props, a);
 };
 
 async function reset() {
 	elem_empty(ul);
-	if (pointer) pointer.drop();
 
 	resultsinfo.innerHTML = "<b>Location search</b>.";
 };
@@ -95,7 +55,7 @@ function li(p) {
 
 	el.onmouseenter = _ => pointto(p);
 
-	el.onclick = _ => zoom(p);
+	el.onclick = _ => zoom(p, _ => pointto(p, true));
 
 	return el;
 };
@@ -121,8 +81,6 @@ function trigger(value) {
 };
 
 export function init() {
-	maparea = qs('#maparea');
-
 	root = qs('#locations.search-panel');
 	input = ce('input', null, { id: 'locations-search', autocomplete: 'off', class: 'search-input' });
 	input.setAttribute('placeholder', 'Search for a location');

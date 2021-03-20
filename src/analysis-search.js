@@ -1,12 +1,13 @@
 import {
-	pointer as mapbox_pointer,
-} from './mapbox.js';
-
-import {
-	plot_active as analysis_plot_active
+	plot_active as analysis_plot_active,
 } from './analysis.js';
 
-let root, ul, maparea, input, resultscontainer, pointer;
+import {
+	pointto as search_pointto,
+	zoom,
+} from './search.js';
+
+let root, ul, input, resultscontainer;
 
 let resultsinfo;
 
@@ -23,33 +24,27 @@ async function getpoints() {
 
 	const ref = DST.get('boundaries').raster;
 
-	return points.map(t => ({ v: t.v, i: ea_raster_in_coordinates(t.i, ref, GEOGRAPHY.bounds)}));
+	return points.map(t => ({ v: t.v, i: ea_raster_in_coordinates(t.i, ref, GEOGRAPHY.bounds) }));
 };
 
-function pointto(p) {
-	const {x,y} = MAPBOX.project(p.i);
+function pointto(p, a = false) {
 	const e = ce('div', null);
 	e.style = `background-color: rgb(${ea_analysis_colorscale.fn(p.v)}); width: 1em; height: 1em;`;
 
 	const dict = [[ "v", "" ]];
 	const props = { v: e.outerHTML };
 
-	const td = table_data(dict, props);
-
-	const box = maparea.getBoundingClientRect();
-	const mbp = mapbox_pointer(td, box.x + x, box.y + y);
-
-	return mbp;
+	search_pointto(p.i, dict, props, a);
 };
 
 function li(p) {
 	const c = Math.round((p.v).toFixed(2) * 100) + " " + JSON.stringify((p.i).map(c => +c.toFixed(3)));
 
 	const el = ce('li', `<code>${c}</code>`, {});
-	el.onmouseenter = _ => {
-		if (pointer) pointer.drop();
-		pointer = pointto(p);
-	};
+
+	el.onmouseenter = _ => pointto(p);
+
+	el.onclick = _ => zoom(p, _ => pointto(p, true));
 
 	return el;
 };
@@ -72,8 +67,6 @@ async function trigger() {
 };
 
 export function init() {
-	maparea = qs('#maparea');
-
 	root = qs('#analysis.search-panel');
 	input = ce('button', "Click for top locations",
 						 { id: 'analysis-search', autocomplete: 'off', class: 'search-input', style: "cursor: pointer;" });

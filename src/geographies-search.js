@@ -4,6 +4,7 @@ let list;
 
 function li(g) {
 	const el = ce('li', g.name);
+
 	el.onclick = function() {
 		const url = new URL(location);
 		url.searchParams.set('id', g.id);

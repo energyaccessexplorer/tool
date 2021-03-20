@@ -1,34 +1,32 @@
 import {
-	pointer as mapbox_pointer,
-} from './mapbox.js';
+	pointto as search_pointto,
+	zoom,
+} from './search.js';
 
-let root, ul, maparea, input, resultscontainer, pointer;
+let root, ul, input, resultscontainer;
 
 let ds, resultsinfo, attr, searchable;
 
-function pointto(f) {
+function pointto(f, a = false) {
 	const t = MAPBOX.querySourceFeatures(ds.source.id, {
 		filter: ['==', attr, f.properties[attr] || "<justnotnull>"]
 	});
 
-	if (t[0]) {
-		const {x,y} = (_ => {
-			if (ds.datatype === 'points')
-				return MAPBOX.project(t[0].geometry.coordinates);
-			else {
-				const ext = geojsonExtent(t[0]);
-				return MAPBOX.project([((ext[0] + ext[2]) / 2), ((ext[1] + ext[3]) / 2)]);
-			}
-		})();
+	if (!t[0]) return;
 
-		const dict = [[ "name", ds.name ]];
-		const props = { name: f.properties[attr] };
+	const [x,y] = (_ => {
+		if (ds.datatype === 'points')
+			return t[0].geometry.coordinates;
+		else {
+			const ext = geojsonExtent(t[0]);
+			return [((ext[0] + ext[2]) / 2), ((ext[1] + ext[3]) / 2)];
+		}
+	})();
 
-		const td = table_data(dict, props);
+	const dict = [[ "name", ds.name ]];
+	const props = { name: f.properties[attr] };
 
-		const box = maparea.getBoundingClientRect();
-		pointer = mapbox_pointer(td, box.x + x, box.y + y);
-	};
+	search_pointto([x,y], dict, props, a);
 };
 
 async function reset() {
@@ -37,7 +35,6 @@ async function reset() {
 	if (!ds) return;
 
 	elem_empty(ul);
-	if (pointer) pointer.drop();
 	resultscontainer.innerHTML = "";
 
 	resultsinfo = ce('div', `<b>${ds.name}</b>.`, { class: 'search-results-info' });
@@ -68,10 +65,19 @@ async function reset() {
 		if (f['__li']) continue;
 
 		const li = ce('li', f.properties[attr]);
-		li.onmouseenter = _ => {
-			if (pointer) pointer.drop();
-			pointto(f);
+		li.onmouseenter = _ => pointto(f, false);
+		li.onclick = _ => {
+			const p = (_ => {
+				if (ds.datatype === 'points')
+					return { center: f.geometry.coordinates };
+				else {
+					return { bbox: geojsonExtent(f) };
+				}
+			})();
+
+			zoom(p, _ => pointto(f, true));
 		};
+
 		f['__li'] = li;
 	}
 
@@ -112,8 +118,6 @@ function trigger(value) {
 };
 
 export function init() {
-	maparea = qs('#maparea');
-
 	root = qs('#vectors.search-panel');
 	input = ce('input', null, { id: 'vectors-search', autocomplete: 'off', class: 'search-input' });
 	input.setAttribute('placeholder', 'Search features');

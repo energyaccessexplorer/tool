@@ -60,6 +60,7 @@ async function trigger() {
 
 	results
 		.sort((a,b) => a.v > b.v ? -1 : 1)
+		.slice(0,n)
 		.forEach(t => ul.append(li(t)));
 
 	if (count > n)

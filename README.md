@@ -52,3 +52,9 @@ set the PostgREST endpoint (something like `http://localhost:{PGREST_PORT}` or
 Now you can run in development mode with:
 
     $ make build start watch
+
+## License
+
+This project is licensed under MIT. Additionally, please read the
+[attribution page](https://www.energyaccessexplorer.org/attribution)
+before using any part of this project.

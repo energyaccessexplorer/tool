@@ -305,7 +305,11 @@ export function context(rc, dict, props, skip = null) {
 							 d.category.name !== 'boundaries' &&
 							 !d.category.name.match(/^(timeline-)?indicator/)) {
 				dict.push([d.id, d.name]);
-				props[d.id] = d.raster.data[rc.index] + " " + "km (proximity to)";
+
+				if (d.category.unit)
+					props[d.id] = d.raster.data[rc.index] + " " + d.category.unit;
+				else
+					props[d.id] = d.raster.data[rc.index] + " " + "km (proximity to)";
 			}
 		});
 };

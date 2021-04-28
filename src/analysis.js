@@ -69,7 +69,7 @@ export default function run(type) {
 	// Each dataset has a different scaling function. We cache these to optimise
 	// the huge loop we are about to do.
 	//
-	const afns = list.map(d => d.analysis_fn(type));
+	const afns = list.map(d => d._afn(type));
 
 	// The values will be normalised. Initialise the values:
 	//
@@ -182,13 +182,15 @@ export function datasets(type) {
 		.filter(d => {
 			return d.on
         && d.raster
-        && d.analysis
-        && d.analysis.indexes.find(i => i.index === type);
+        && d.analysis;
 		})
 		.filter(d => {
+			d._afn = d.analysis_fn;
+
 			// Discard datasets which have no analysis_fn (eg. boundaries).
 			//
-			if (typeof d.analysis_fn(type) !== 'function') return false;
+			if (typeof d.analysis_fn(type) !== 'function')
+				d._afn = _ => x => (x < d._domain.min || x > d.domain.max) ? -1 : 1;
 
 			// Discard datasets which are filters and use the entire domain (useless).
 			//

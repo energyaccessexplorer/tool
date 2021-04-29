@@ -151,6 +151,10 @@ export function raster() {
 				const b = DST.get('boundaries');
 
 				if (this.raster.width !== b.raster.width) {
+					// TODO: enable this when paver is ready
+					//
+					// || this.raster.height !== b.raster.height
+
 					fail.call(this, `
 Raster resolution does not match the boundaries dataset.
 ${this.id}: ${this.raster.width} × ${this.raster.height}
@@ -353,11 +357,6 @@ export function lines() {
 };
 
 export function polygons() {
-	if (MAPBOX.getLayer(this.id)) {
-		console.log(this.id, "parse.polygons: layer already exists.");
-		return;
-	}
-
 	return geojson.call(this)
 		.then(async _ => {
 			if (this.csv) {

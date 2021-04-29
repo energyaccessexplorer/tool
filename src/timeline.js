@@ -276,6 +276,11 @@ export function lines_draw() {
 	if (!datasets.length) return;
 
 	const series = datasets.reduce((a,c) => {
+		if (!maybe(c, 'csv', 'data')) {
+			console.error(c, c.id, "no csv data yet... first run?");
+			return a;
+		}
+
 		return a.concat(c.csv.data.filter(r => r['District'] === U.subgeoname).map(r => {
 			return {
 				values: GEOGRAPHY.timeline_dates.map(k => (r[k] === "" ? undefined : +r[k])),

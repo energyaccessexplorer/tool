@@ -53,6 +53,11 @@ export default class dscontrols extends HTMLElement {
 	};
 
 	async range_group_controls() {
+		if (!this.ds.domain) {
+			console.error(this.ds.id, "Dataset has no domain yet... skipping controls range.");
+			return;
+		}
+
 		const cat = this.ds.category;
 
 		let steps;

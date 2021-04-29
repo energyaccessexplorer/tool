@@ -185,12 +185,12 @@ export function datasets(type) {
         && d.analysis;
 		})
 		.filter(d => {
-			d._afn = d.analysis_fn;
-
 			// Discard datasets which have no analysis_fn (eg. boundaries).
 			//
 			if (typeof d.analysis_fn(type) !== 'function')
-				d._afn = _ => x => (x < d._domain.min || x > d.domain.max) ? -1 : 1;
+				d._afn = _ => x => (x < d._domain.min || x > d._domain.max) ? -1 : 1;
+			else
+				d._afn = d.analysis_fn;
 
 			// Discard datasets which are filters and use the entire domain (useless).
 			//

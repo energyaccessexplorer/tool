@@ -121,8 +121,4 @@ export default class Overlord {
 		for (let i = 0; i < a.length; i++)
 			MAPBOX.moveLayer(a[i], a[i-1] || MAPBOX.first_symbol);
 	};
-
-	async wait_for(func, finish) {
-		await until(func); finish();
-	};
 };

@@ -86,15 +86,7 @@ export default function run(type) {
 
 	let nr = list.find(l => !maybe(l, 'raster', 'data'));
 	if (nr) {
-		console.warn(`Dataset '${nr.id}' has no raster.data (yet).`,
-			           "Skipping this run.",
-			           "Telling O to wait for it...");
-
-		O.wait_for(
-			_ => nr.raster.data,
-			_ => plot_active(U.output).then(raster => indexes_graphs(raster))
-		);
-
+		wait_for_rasters(nr.id);
 		return { raster: it };
 	}
 
@@ -314,4 +306,17 @@ export function context(rc, dict, props, skip = null) {
 					props[d.id] = d.raster.data[rc.index] + " " + "km (proximity to)";
 			}
 		});
+};
+
+function wait_for_rasters(id) {
+	console.log(`Dataset '${id}' has no raster.data (yet). Waiting for it`);
+
+	until(_ => DS.array.filter(d => {
+		return d.on
+			&& d.raster
+			&& d.analysis
+			&& !d.raster.data;
+	}).length === 0)
+		.then(_ => plot_active(U.output))
+		.then(_ => O.sort());
 };

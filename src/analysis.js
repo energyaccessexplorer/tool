@@ -173,8 +173,8 @@ export function datasets(type) {
 	return DS.array
 		.filter(d => {
 			return d.on
-        && d.raster
-        && d.analysis;
+				&& d.raster
+				&& d.analysis;
 		})
 		.filter(d => {
 			// Discard datasets which have no analysis_fn (eg. boundaries).

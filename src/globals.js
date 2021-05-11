@@ -17,7 +17,7 @@ ea_views = {
 	"outputs": {
 		"name": "Analysis",
 		"description": "Results of the analysis"
-	}
+	},
 };
 
 ea_params = {
@@ -35,7 +35,7 @@ ea_params = {
 		"output": ['eai', 'ani', 'demand', 'supply'],
 		"pack": [],
 		"subgeo": [],
-	}
+	},
 };
 
 ea_indexes = {
@@ -48,6 +48,7 @@ The Energy Access Potential Index indentifies areas with higher energy demand an
 which are characterized with higher index values. It is an aggregated measure of all selected
 data sets under both Demand and Supply categories.`
 	},
+
 	"demand": {
 		"name": "Demand Index",
 		"compound": null,
@@ -57,6 +58,7 @@ The Demand Index identifies areas with higher energy demand which are characteri
 higher index values. It is an aggregated and weighted measure of all selected data sets
 under Demographics and Socio-economic activities.`
 	},
+
 	"supply": {
 		"name": "Supply Index",
 		"compound": null,
@@ -66,6 +68,7 @@ The Supply Index identifies areas with higher energy supply which are characteri
 higher index values. It is an aggregated and weighted measure of all selected data sets
 under Resource Availability and Infrastructure.`
 	},
+
 	"ani": {
 		"name": "Assistance Need Index",
 		"compound": null,
@@ -75,7 +78,7 @@ The Assistance Need Index identifies areas where market assistance is needed the
 which are characterized with higher index values. It is an aggregated and weighted
 measure of selected data sets under both Demand and Supply categories indicating high
 energy demand, low economic activity, and low access to infrastructure and resources.`
-	}
+	},
 };
 
 ea_filters = ["key-delta", "exclusion-buffer", "inclusion-buffer"];

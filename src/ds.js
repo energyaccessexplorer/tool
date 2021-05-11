@@ -156,7 +156,6 @@ This is not fatal but the dataset is now disabled.`
 		switch (this.datatype) {
 		case 'raster': {
 			this.download = this.raster.endpoint;
-
 			break;
 		}
 
@@ -531,7 +530,6 @@ This is not fatal but the dataset is now disabled.`
 			// Collections will (as of now) always share rasters.
 			//
 			if (this.raster) this.raster.parse();
-
 			await Promise.all(this.items.map(d => d.load(arg)));
 		}
 

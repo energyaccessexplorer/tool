@@ -38,6 +38,8 @@ export default class DS {
 
 		this.files_setup(o);
 
+		this.loaded = false;
+
 		if (this.id === 'boundaries')
 			this.__domain = { min: -Infinity, max: Infinity };
 
@@ -494,13 +496,11 @@ This is not fatal but the dataset is now disabled.`
 		this.on = v;
 
 		if (v) {
-			if (this.controls) {
-				this.controls.loading(true);
-				await this.load();
-				this.controls.loading(false);
-			}
-			else
-				await this.load();
+			if (this.controls) this.controls.loading(true);
+
+			await this.loadall();
+
+			if (this.controls) this.controls.loading(false);
 
 			if (this.disabled) return;
 
@@ -523,6 +523,13 @@ This is not fatal but the dataset is now disabled.`
 		if (!v && this.card) this.card.remove();
 	};
 
+	loadall() {
+		if (this.loaded) return;
+
+		return Promise.all(['vectors', 'csv', 'raster'].map(i => this[i] ? this.load(i) : null))
+			.then(_ => (this.loaded = true));
+	}
+
 	async load(arg) {
 		this.loading = true;
 
@@ -538,11 +545,7 @@ This is not fatal but the dataset is now disabled.`
 			return Promise.all(this.hosts.map(d => d.load(arg)));
 		}
 
-		if (!arg)
-			await Promise.all(['vectors', 'csv', 'raster'].map(i => this[i] ? this.load(i) : null));
-		else {
-			if (this[arg]) await this[arg].parse();
-		}
+		await this[arg].parse();
 
 		this.loading = false;
 	};

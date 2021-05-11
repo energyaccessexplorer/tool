@@ -78,6 +78,7 @@
     "ea_params": "writable",
     "ea_default_colorscale": "writable",
     "ea_analysis_colorscale": "writable",
+    "ea_lowmedhigh_scale": "writable",
     "ea_colorscale": "readonly",
     "ea_filters": "writable",
     "ea_views": "writable",

@@ -28,11 +28,8 @@ async function getpoints() {
 };
 
 function pointto(p, a = false) {
-	const e = ce('div', null);
-	e.style = `background-color: rgb(${ea_analysis_colorscale.fn(p.v)}); width: 1em; height: 1em;`;
-
-	const dict = [[ "v", "" ]];
-	const props = { v: e.outerHTML };
+	const dict = [[ "v", ea_indexes[U.output]['name'] ]];
+	const props = { v: ea_lowmedhigh_scale(p.v) };
 
 	search_pointto(p.i, dict, props, a);
 };

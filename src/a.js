@@ -716,15 +716,13 @@ function map_click(e) {
 		);
 
 		if (typeof maybe(rc, 'value') === 'number') {
-			let f = d3.scaleQuantize().domain([0,1]).range(["Low", "Low-Medium", "Medium", "Medium-High", "High"]);
-
 			const dict = [
 				["aname", t.name],
 				["_empty", null]
 			];
 
 			const props = {
-				"aname": f(rc.value),
+				"aname": ea_lowmedhigh_scale(rc.value),
 				"_empty": ""
 			};
 

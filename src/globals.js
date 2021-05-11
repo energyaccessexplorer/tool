@@ -92,3 +92,5 @@ ea_analysis_colorscale = ea_colorscale({
 	stops: NORM_STOPS.map(x => d3.interpolateMagma(x)),
 	domain: { min: 0, max: 1 },
 });
+
+ea_lowmedhigh_scale = d3.scaleQuantize().domain([0,1]).range(["Low", "Low-Medium", "Medium", "Medium-High", "High"]);

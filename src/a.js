@@ -57,6 +57,12 @@ const UProxyHandler = {
 			break;
 		}
 
+		case "subgeo": {
+			const x = parseInt(i);
+			v = (isNaN(x)) ? null : x;
+			break;
+		}
+
 		default: {
 			v = (i === "" ? null : i);
 			break;

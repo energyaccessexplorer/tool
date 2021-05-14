@@ -308,6 +308,7 @@ This is not fatal but the dataset is now disabled.`
 		this.domain = host.domain;
 		this._domain = host._domain;
 
+		this.opacity(1);
 		this.card.refresh();
 
 		return this;
@@ -563,6 +564,47 @@ This is not fatal but the dataset is now disabled.`
 		if (this.host) {
 			this.host.raise();
 		}
+	};
+
+	opacity(v) {
+		let t = [];
+
+		switch (this.datatype) {
+		case 'points': {
+			t = ['circle-opacity', 'circle-stroke-opacity'];
+			break;
+		}
+
+		case 'lines': {
+			t = ['line-opacity'];
+			break;
+		}
+
+		case 'polygons-fixed':
+		case 'polygons-timeline':
+		case 'polygons-boundaries':
+		case 'polygons': {
+			t = ['fill-opacity'];
+			break;
+		}
+
+		case 'raster': {
+			t = ['raster-opacity'];
+			break;
+		}
+
+		case 'raster-mutant': {
+			MAPBOX.setPaintProperty(this.host.id, 'raster-opacity', v);
+			return;
+		}
+
+		default:
+			console.warn("ds.opacity: undecided datatype", this.id, this.datatype);
+			break;
+		}
+
+		for (let a of t)
+			MAPBOX.setPaintProperty(this.id, a, v);
 	};
 
 	static get array() {

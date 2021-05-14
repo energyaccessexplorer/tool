@@ -97,6 +97,7 @@ export default class dscard extends HTMLElement {
 		attach.call(this, shadow_tmpl('#ds-card-template'));
 
 		this.svg_el = this.svg();
+		this.opacity_value = 1;
 
 		this.render();
 
@@ -123,11 +124,14 @@ export default class dscard extends HTMLElement {
 	};
 
 	refresh() {
-		const tmp = this.svg();
-		const it = qs('[slot=svg]', this);
+		const s = qs('[slot=svg]', this);
+		elem_empty(s);
+		s.append(this.svg_el = this.svg());
 
-		elem_empty(it);
-		it.append(this.svg_el = tmp);
+		const o = qs('[slot=opacity]', this);
+		elem_empty(o);
+		this.opacity_value = 1;
+		o.append(this.opacity());
 	};
 
 	line_legends(legends) {
@@ -235,7 +239,6 @@ export default class dscard extends HTMLElement {
 	};
 
 	opacity() {
-		let o = 1;
 		const e = tmpl('#opacity-control');
 		const r = tmpl('#ramp');
 		r.append(ce('div', '0%'), ce('div', 'Opacity'), ce('div', '100%'));
@@ -243,45 +246,11 @@ export default class dscard extends HTMLElement {
 		qs('.opacity-box', e).append(r);
 
 		const grad = ea_svg_interval({
-			init: { min: 0, max: 100 },
-			domain: { min: 0, max: 100 },
+			init: { min: 0, max: this.opacity_value },
+			domain: { min: 0, max: 1 },
 			sliders: 'single',
-			callback2: x => o = x/100,
-			end_callback: _ => {
-				let t = [];
-
-				switch (this.ds.datatype) {
-				case 'points': {
-					t = ['circle-opacity', 'circle-stroke-opacity'];
-					break;
-				}
-
-				case 'lines': {
-					t = ['line-opacity'];
-					break;
-				}
-
-				case 'polygons-fixed':
-				case 'polygons-timeline':
-				case 'polygons-boundaries':
-				case 'polygons': {
-					t = ['fill-opacity'];
-					break;
-				}
-
-				case 'raster': {
-					t = ['raster-opacity'];
-					break;
-				}
-
-				default:
-					console.warn("opacity: undecided", this.ds.id, this.ds.datatype);
-					break;
-				}
-
-				for (let i of t)
-					MAPBOX.setPaintProperty(this.ds.id, i, parseFloat(o));
-			}
+			callback2: x => this.opacity_value = x,
+			end_callback: _ => this.ds.opacity(parseFloat(this.opacity_value)),
 		});
 
 		const b = qs('.opacity-box', e);
@@ -361,6 +330,7 @@ export default class dscard extends HTMLElement {
 			break;
 		}
 
+		case 'raster-mutant':
 		case 'raster': {
 			let r = tmpl('#ramp');
 

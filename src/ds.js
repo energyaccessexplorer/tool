@@ -32,7 +32,7 @@ export default class DS {
 
 		this.metadata = o.metadata;
 
-		this.mutant = maybe(config.mutant_targets, 'length');
+		this.mutant = !!maybe(config.mutant_targets, 'length');
 
 		this.items = config.collection ? [] : undefined;
 

@@ -50,6 +50,10 @@
       padding: 0.7em;
     }
 
+    .svg-interval {
+      filter: drop-shadow( 0px 1px 1px rgba(0, 0, 0, 0.3));
+    }
+
     .manual-controls {
       display: none;
       justify-content: space-around;
@@ -178,8 +182,6 @@
   <style>
     @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css");
 
-    @import "./svg.css";
-
     :host {
       background-color: var(--the-white);
       display: flex;
@@ -215,6 +217,13 @@
       flex: 1;
       display: block;
       padding: 0.5em;
+    }
+
+    .svg-interval,
+    .svg-point,
+    .svg-polygon,
+    .svg-pie {
+      filter: drop-shadow( 0px 1px 1px rgba(0, 0, 0, 0.3));
     }
 
     [layout=title] {
@@ -348,4 +357,20 @@
               flex-flow: row nowrap;
               justify-content: space-between;">
   </div>
+</template>
+
+<template id="svg-handle">
+  <svg width="14" height="14" viewBox="0 0 32 32">
+    <g>
+      <circle cx="28.063301" cy="28.25821" r="3.6749561" />
+      <circle cx="28.196936" cy="3.936680" r="3.6749561" />
+      <circle cx="28.063301" cy="16.23151" r="3.6749561" />
+      <circle cx="3.6749566" cy="28.25824" r="3.6749561" />
+      <circle cx="3.8085892" cy="3.936710" r="3.6749561" />
+      <circle cx="3.6749566" cy="16.23154" r="3.6749561" />
+      <circle cx="16.108364" cy="28.25821" r="3.6749561" />
+      <circle cx="16.241997" cy="3.936680" r="3.6749561" />
+      <circle cx="16.108364" cy="16.23151" r="3.6749561" />
+    </g>
+  </svg>
 </template>

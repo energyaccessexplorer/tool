@@ -26,6 +26,6 @@
 }
 
 #left-pane #drawer a.active {
-  box-shadow: inset 0px 1px 5px rgba(0, 0, 0, 0.2);
+  box-shadow: inset 0px 0px 5px rgba(0, 0, 0, 0.05);
   background-color: rgba(0, 0, 0, 0.07);
 }

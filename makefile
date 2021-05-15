@@ -52,7 +52,6 @@ build-a:
 	@sed -ri 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/a/index.html
 
 	@cp ${CSS}/ripple.css ${DIST}/a/ripple.css
-	@cp ${CSS}/svg.css ${DIST}/a/svg.css
 	@cp ${SRC}/{browser,analysis,cards,config,controls,search,controls-search,geographies-search,vectors-search,analysis-search,locations-search,ds,parse,indexes,mapbox,overlord,plot,report,summary,timeline,views,a}.js ${DIST}/a/
 
 	@cat \
@@ -89,7 +88,6 @@ build-a:
 		${CSS}/views.css \
 		${CSS}/filtered.css \
 		${CSS}/ripple.css \
-		${CSS}/svg.css \
 		${CSS}/summary.css \
 		${CSS}/mobile.css \
 		${CSS}/cards.css \
@@ -137,7 +135,6 @@ build-d:
 	@sed -ri 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/d/index.html
 
 	@cp ${CSS}/ripple.css ${DIST}/d/ripple.css
-	@cp ${CSS}/svg.css ${DIST}/d/svg.css
 	@cp ${SRC}/{cards,timeline,controls,ds,parse,mapbox,overlord,plot,d}.js ${DIST}/d/
 
 	@cat \

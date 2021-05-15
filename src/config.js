@@ -43,6 +43,7 @@ export function generate() {
 		"zoom": MAPBOX.getZoom(),
 		"center": MAPBOX.getCenter(),
 		"view": U.view,
+		"subgeo": U.subgeo,
 		"tab": tab_id,
 		"output": U.output,
 		"theme": ea_settings.mapbox_theme,

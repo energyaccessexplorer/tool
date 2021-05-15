@@ -69,6 +69,8 @@ class MapboxInfoControl {
 let _O;
 let _U;
 
+let changing_target = false;
+
 export function init(overlord = {}, urlproxy = {}) {
 	mapboxgl.accessToken = ea_settings.mapbox_token;
 
@@ -260,7 +262,14 @@ export function dblclick(id) {
 
 		if (e.features.length > 0) {
 			fit(geojsonExtent(e.features[0]), true);
-			MAPBOX.changing_target = true;
+			changing_target = true;
+
+			const d = DST.get(id);
+
+			d._domain = (U.subgeo === null) ?
+				Object.assign({}, d.domain) :
+				{ min: U.subgeo, max: U.subgeo };
+
 			_O.subgeo = e.features[0].id;
 		}
 	});
@@ -272,10 +281,16 @@ export function zoomend(id) {
 	MAPBOX.on('zoomend', id, function(_) {
 		const z = MAPBOX.getZoom();
 
-		if (!MAPBOX.changing_target)
-			if (_zoom > z && _U.subgeo) _O.subgeo = null;
+		if (!changing_target) {
+			const d = DST.get(id);
 
-		MAPBOX.changing_target = false;
+			if (_zoom > z && !same(d._domain, d.domain)) {
+				d._domain = Object.assign({}, d.domain);
+				_O.subgeo = null;
+			}
+		}
+
+		changing_target = false;
 		_zoom = z;
 	});
 };

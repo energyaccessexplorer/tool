@@ -57,6 +57,7 @@
     "shadow_tmpl": "readonly",
     "slot_populate": "readonly",
     "Whatever": "readonly",
+    "same": "readonly",
 
     "browsers": "readonly",
     "nanny": "readonly",

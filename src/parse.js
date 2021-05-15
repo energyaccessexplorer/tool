@@ -77,12 +77,9 @@ function csv_table(c) {
 	const table = {};
 	const data = this.csv.data;
 	const k = this.csv.key;
-	const u = U.subgeo;
 
 	for (let i = 0; i < data.length; i++) {
 		const d = data[i];
-		if (u && +d[k] !== +u) continue;
-
 		table[d[k]] = +d[c];
 	}
 

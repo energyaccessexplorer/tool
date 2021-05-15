@@ -102,6 +102,12 @@
 }
 
 #index-graphs-toolbox a {
+  color: var(--the-color);
+  font-size: 1.4em;
+  margin-right: 5px;
+}
+
+#index-graphs-toolbox a {
   padding-right: 0.5em;
   cursor: pointer;
 }

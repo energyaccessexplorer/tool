@@ -177,10 +177,10 @@ function mobile() {
 
 	const switcher = qs('#mobile-switcher');
 
-	const svgcontrols = ce('div', tmpl('#svg-controls'), { bind: 'controls', ripple: "" });
-	const map = ce('div', tmpl('#svg-map'), { bind: 'map', ripple: "" });
-	const inputs = ce('div', tmpl('#svg-list'), { bind: 'inputs', ripple: "" });
-	const outputs = ce('div', tmpl('#svg-pie'), { bind: 'outputs', ripple: "" });
+	const svgcontrols = ce('div', font_icon('list-task'), { bind: 'controls', ripple: "" });
+	const map = ce('div', font_icon('globe'), { bind: 'map', ripple: "" });
+	const inputs = ce('div', font_icon('layers-fill'), { bind: 'inputs', ripple: "" });
+	const outputs = ce('div', font_icon('pie-chart-fill'), { bind: 'outputs', ripple: "" });
 
 	const tabs = [svgcontrols, map, inputs, outputs];
 

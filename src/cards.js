@@ -225,14 +225,14 @@ export default class dscard extends HTMLElement {
 	};
 
 	info() {
-		const e = tmpl('#svg-info');
+		const e = font_icon('info-circle');
 		e.onclick = _ => this.ds.info_modal();
 
 		return e;
 	};
 
 	close() {
-		const e = tmpl('#svg-close');
+		const e = font_icon('x-lg');
 		e.onclick = _ => O.dataset(this.ds, 'active', false);
 
 		return e;

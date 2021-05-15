@@ -58,6 +58,7 @@
     "slot_populate": "readonly",
     "Whatever": "readonly",
     "same": "readonly",
+    "font_icon": "readonly",
 
     "browsers": "readonly",
     "nanny": "readonly",

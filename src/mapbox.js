@@ -18,7 +18,7 @@ class MapboxThemeControl {
 		this._container.className = 'mapboxgl-ctrl';
 		this._container.classList.add('mapboxgl-ctrl-group');
 
-		let button = ce('button', ce('div', tmpl('#svg-layers'), { style: "transform: scale(0.75)" }), { type: 'button', class: 'mapboxgl-ctrl-icon'});
+		let button = ce('button', ce('div', font_icon('layers-fill'), { style: "transform: scale(0.75)" }), { type: 'button', class: 'mapboxgl-ctrl-icon'});
 
 		this._container.append(button);
 
@@ -40,7 +40,7 @@ class MapboxInfoControl {
 		this._container.className = 'mapboxgl-ctrl';
 		this._container.classList.add('mapboxgl-ctrl-group');
 
-		let button = ce('button', ce('div', tmpl('#svg-info'), { style: "transform: scale(0.75)" }), { type: 'button', class: 'mapboxgl-ctrl-icon'});
+		let button = ce('button', ce('div', font_icon('info-circle'), { style: "transform: scale(0.75)" }), { type: 'button', class: 'mapboxgl-ctrl-icon'});
 
 		this._container.append(button);
 

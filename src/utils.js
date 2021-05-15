@@ -379,7 +379,7 @@ function ea_opacity_control({ fn }) {
 
 	const b = qs('.opacity-box', o);
 	qs('.slider', o).append(grad.svg);
-	qs('svg', o).onclick = _ => b.style.display = 'block';
+	qs('i', o).onclick = _ => b.style.display = 'block';
 	b.onmouseleave = _ => b.style.display = 'none';
 
 	return o;

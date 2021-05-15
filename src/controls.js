@@ -129,7 +129,6 @@ export default class dscontrols extends HTMLElement {
 	render() {
 		slot_populate.call(this, this.ds, {
 			"dropdown": this.dropdown,
-			"info": this.info,
 			"checkbox": this.checkbox.svg,
 			"collection-list": this.collection_list,
 			"weight-slider": maybe(this.weight_group, 'el'),

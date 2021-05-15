@@ -6,6 +6,11 @@ canvas.mapboxgl-canvas {
   cursor: auto;
 }
 
+.mapboxgl-ctrl button {
+  font-size: 1.6em;
+  color: var(--the-color);
+}
+
 .mapboxgl-ctrl-icon.active {
   background-color: rgba(0,0,0,.07);
 }

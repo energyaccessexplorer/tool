@@ -120,18 +120,18 @@ export function init() {
 	}));
 
 	const info = qs('#index-graphs-info');
-	info.append(tmpl('#svg-info'));
+	info.append(font_icon('info-circle'));
 	info.onclick = _ => modal();
 
 	const download = qs('#index-graphs-download');
-	download.append(tmpl('#svg-download'));
+	download.append(font_icon('image'));
 	download.onclick = async _ => {
 		const type = url.searchParams.get('output');
 		fake_blob_download((await raster_to_tiff(type)), `energyaccessexplorer-${type}.tif`);
 	};
 
 	const code = qs('#index-graphs-code');
-	code.append(tmpl('#svg-code'));
+	code.append(font_icon('braces'));
 	code.onclick = _ => {
 		const conf = config.generate();
 		fake_blob_download(JSON.stringify(conf), `energyaccessexplorer-config-${conf.id}.json`);

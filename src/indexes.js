@@ -114,6 +114,11 @@ export function init() {
 	cos.value = U.output;
 	cos.onchange = x => { O.index = x.target.value; };
 
+	const opacity = qs('#index-graphs-opacity');
+	opacity.append(ea_opacity_control({
+		fn: x => MAPBOX.setPaintProperty('output-layer', 'raster-opacity', x),
+	}));
+
 	const info = qs('#index-graphs-info');
 	info.append(tmpl('#svg-info'));
 	info.onclick = _ => modal();

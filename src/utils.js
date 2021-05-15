@@ -365,6 +365,26 @@ function ea_svg_checkbox(init, callback) { // this is not used anywhere
 	};
 };
 
+function ea_opacity_control({ fn }) {
+	const o = tmpl('#opacity-control');
+	let opacity_value = 1;
+
+	const grad = ea_svg_interval({
+		init: { min: 0, max: 1 },
+		domain: { min: 0, max: 1 },
+		sliders: 'single',
+		callback2: x => opacity_value = x,
+		end_callback: _ => fn(+opacity_value),
+	});
+
+	const b = qs('.opacity-box', o);
+	qs('.slider', o).append(grad.svg);
+	qs('svg', o).onclick = _ => b.style.display = 'block';
+	b.onmouseleave = _ => b.style.display = 'none';
+
+	return o;
+};
+
 function elem_collapse(el, t, open) {
 	function triangle(d) {
 		let t;

@@ -239,27 +239,12 @@ export default class dscard extends HTMLElement {
 	};
 
 	opacity() {
-		const e = tmpl('#opacity-control');
-		const r = tmpl('#ramp');
-		r.append(ce('div', '0%'), ce('div', 'Opacity'), ce('div', '100%'));
-
-		qs('.opacity-box', e).append(r);
-
-		const grad = ea_svg_interval({
-			init: { min: 0, max: this.opacity_value },
-			domain: { min: 0, max: 1 },
-			sliders: 'single',
-			callback2: x => this.opacity_value = x,
-			end_callback: _ => this.ds.opacity(parseFloat(this.opacity_value)),
+		return ea_opacity_control({
+			fn: x => {
+				this.opacity_value = x;
+				this.ds.opacity(x);
+			},
 		});
-
-		const b = qs('.opacity-box', e);
-
-		qs('.slider', e).append(grad.svg);
-		qs('svg', e).onclick = _ => b.style.display = 'block';
-		b.onmouseleave = _ => b.style.display = 'none';
-
-		return e;
 	};
 
 	svg() {

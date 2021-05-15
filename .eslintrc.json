@@ -85,6 +85,7 @@
     "ea_views": "writable",
     "ea_svg_interval": "readonly",
     "ea_svg_pie": "readonly",
+    "ea_opacity_control": "readonly",
     "ea_coordinates_in_raster": "readonly",
     "ea_raster_in_coordinates": "readonly",
     "ea_select_setup": "readonly",

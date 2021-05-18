@@ -137,22 +137,12 @@ export function init() {
 		fake_blob_download(JSON.stringify(conf), `energyaccessexplorer-config-${conf.id}.json`);
 	};
 
-	qs('#index-graphs').append(el_tree(
-		[ ce('div', null, { class: 'index-graphs-container' }), [
-			[ ce('div', ce('div', "Area share"), { class: 'index-graphs-group' }),
-				[
-					ce('div', null, { id: 'area-number', class: 'indexes-pie-label' }),
-					PIES['area'].svg
-				]
-			],
-			[ ce('div', ce('div', "Population share"), { class: 'index-graphs-group' }),
-				[
-					ce('div', null, { id: 'population-number', class: 'indexes-pie-label' }),
-					PIES['population'].svg
-				]
-			]
-		]]
-	), scale);
+	const graphs = tmpl('#index-graphs-container-template');
+
+	qs('.index-graphs-group #area-number', graphs).parentElement.append(PIES['area'].svg);
+	qs('.index-graphs-group #population-number', graphs).parentElement.append(PIES['population'].svg);
+
+	qs('#index-graphs').append(graphs, scale);
 };
 
 export function list() {

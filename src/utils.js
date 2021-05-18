@@ -469,32 +469,29 @@ function table_data(dict, prop) {
 	const t = ce('table');
 
 	for (const e of dict) {
-		t.append(el_tree([
-			ce('tr'), [
-				ce('td', ce('strong', e[1] ? e[1] + ": &nbsp;" : "&nbsp;")),
-				ce('td', prop[e[0]] ? prop[e[0]].toString() : "")
-			]
+		t.append(ce('tr', [
+			ce('td', ce('strong', e[1] ? e[1] + ": &nbsp;" : "&nbsp;")),
+			ce('td', prop[e[0]] ? prop[e[0]].toString() : ""),
 		]));
 	};
 
 	return t;
 };
 
-function table_add_lnglat(td, lnglat = [0, 0]) {
-	td.append(el_tree([ce('tr'), [ce('td', "&nbsp;"), ce('td', "&nbsp;")]]));
-
-	td.append(el_tree([
-		ce('tr'), [
-			ce('td', "longitude"),
-			ce('td', ce('code', lnglat[0].toFixed(2)))
-		]
+function table_add_lnglat(d, lnglat = [0, 0]) {
+	d.append(ce('tr', [
+		ce('td', "&nbsp;"),
+		ce('td', "&nbsp;"),
 	]));
 
-	td.append(el_tree([
-		ce('tr'), [
-			ce('td', "latitude"),
-			ce('td', ce('code', lnglat[1].toFixed(2)))
-		]
+	d.append(ce('tr', [
+		ce('td', "longitude"),
+		ce('td', ce('code', lnglat[0].toFixed(2))),
+	]));
+
+	d.append(ce('tr', [
+		ce('td', "latitude"),
+		ce('td', ce('code', lnglat[1].toFixed(2))),
 	]));
 };
 

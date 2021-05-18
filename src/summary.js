@@ -20,8 +20,8 @@ async function summary() {
 
 	const content = ce('div');
 
-	let graphs;
-	const graphs_tab = ce('div', graphs = ce('div', null, { id: "summary-graphs" }), { class: 'tab' });
+	const graphs = ce('div', null, { id: "summary-graphs" });
+	const graphs_tab = ce('div', graphs, { class: 'tab' });
 
 	const summary = {};
 
@@ -43,26 +43,18 @@ async function summary() {
 		let ppie = ea_svg_pie(summary[idxn]['population-density']['distribution'].map(x => [x]), 75, 0, ea_analysis_colorscale.stops, null);
 		let apie = ea_svg_pie(summary[idxn]['area']['distribution'].map(x => [x]), 75, 0, ea_analysis_colorscale.stops, null);
 
-		graphs.append(el_tree(
-			[ ce('div', null, { class: 'index-group' }), [
-				[ ce('div', ea_indexes[idxn]['name'], { class: 'up-title' }) ],
-				[ ce('div', null, { class: 'index-graphs-container' }), [
-					[ ce('div', null, { class: 'index-graphs-group' }),
-						[
-							ce('div', "Area share"),
-							apie.svg
-						]
-					],
-					[ ce('div', null, { class: 'index-graphs-group' }),
-						[
-							ce('div', "Population share"),
-							ppie.svg
-						]
-					]
-				]
-				],
-				[ ce('div', (summary[idxn]['area']['total'] === 0) ? "<code>(No datasets selected)</code>" : null, { style: "text-align: center; font-size: smaller;" }) ]
-			]]));
+		const container = tmpl('#index-graphs-container-template');
+		qs('.index-graphs-group #area-number', container).parentElement.append(apie.svg);
+		qs('.index-graphs-group #population-number', container).parentElement.append(ppie.svg);
+
+		graphs.append(
+			ce('div',
+				 [
+					 ce('div', ea_indexes[idxn]['name'], { class: 'up-title' }),
+					 container,
+					 ce('div', (summary[idxn]['area']['total'] === 0) ? "<code>(No datasets selected)</code>" : null, { style: "text-align: center; font-size: smaller;" }),
+				 ],
+				 { class: 'index-group' }));
 
 		ppie.change(0);
 		apie.change(0);

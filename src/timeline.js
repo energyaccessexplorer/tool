@@ -285,11 +285,9 @@ export function lines_draw() {
 			return {
 				values: GEOGRAPHY.timeline_dates.map(k => (r[k] === "" ? undefined : +r[k])),
 				id: c.id,
-				name: el_tree([
-					ce('span'), [
-						ce('span', c.name),
-						ce('span', "[" + c.category.unit + "]", { style: "margin-left: 1em; font-size: 0.8em;" }),
-					]
+				name: ce('span', [
+					ce('span', c.name),
+					ce('span', "[" + c.category.unit + "]", { style: "margin-left: 1em; font-size: 0.8em;" }),
 				]),
 				color: c.colorscale.stops.slice(-1)
 			};

@@ -1,16 +1,9 @@
 # Copy and customise these in a default.mk
 #
 # TOOL_PORT = 4231
-#
-# SRV_USER = someuser
-# SRV_SERVER = example.org
 # TOOL_DEST = /srv/http/energyaccessexplorer
 #
 # API_URL = http://api-example.localhost
-# DB_SERV_DEPLOY = https://api.example.org
-#
-# STATIC_SERVER = python3 -m http.server ${TOOL_PORT}
-# WATCH = <whatever daemon you use observe code changes>
 #
 # MAPBOX_DEFAULT_THEME=mapbox/basic-v9
 #
@@ -38,7 +31,7 @@ deps:
 	DEST=${DIST}/lib deps
 
 start:
-	cd ${DIST} && ${STATIC_SERVER}
+	httpserver -port ${TOOL_PORT} -dir ${DIST}
 
 stop:
 	@stop-port ${TOOL_PORT}

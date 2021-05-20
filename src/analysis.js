@@ -280,8 +280,18 @@ export async function raster_to_tiff(type) {
 export function context(rc, dict, props, skip = null) {
 	if (!rc) return [];
 
+	const controls = Array.from(document.querySelectorAll('ds-controls')).map(c => c.ds.id);
+
 	DS.array
 		.filter(d => d.on)
+		.sort((a,b) => {
+			const bi = controls.indexOf(b.id);
+			const ai = controls.indexOf(a.id);
+
+			if (ai > bi) return 1;
+			else if (ai < bi) return -1;
+			else return 0;
+		})
 		.forEach(d => {
 			if (d.id === skip) return;
 

@@ -291,8 +291,6 @@ function toggle_switch(init, callback) {
 	const svg = d3.create("svg")
 		    .attr('class', 'svg-checkbox');
 
-	const defs = svg.append('defs');
-
 	const g = svg.append('g');
 
 	const gutter = g.append('rect');
@@ -307,14 +305,6 @@ function toggle_switch(init, callback) {
 		.attr('width', svgwidth)
 		.attr('height', svgheight)
 		.style('cursor', 'pointer');
-
-	defs
-		.append('filter')
-		.attr('id', 'shadow-switch')
-		.append('feDropShadow')
-		.attr('dx', 0.2)
-		.attr('dy', 0.2)
-		.attr('stdDeviation', 0.8);
 
 	gutter
 		.attr('stroke', 'none')
@@ -333,7 +323,6 @@ function toggle_switch(init, callback) {
 		.attr('stroke', 'black')
 		.attr('stroke-width', 0.2)
 		.attr('fill', 'white')
-		.attr('style', 'filter: url(#shadow-switch);')
 		.style('cursor', 'grab')
 		.raise();
 

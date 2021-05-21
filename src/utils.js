@@ -171,8 +171,6 @@ function ea_svg_interval(opts = {}) {
 	const svg = d3.create("svg")
 		    .attr('class', 'svg-interval');
 
-	const defs = svg.append('defs');
-
 	const g = svg.append('g');
 	const ticks = g.append('g').attr('class', 'ticks');
 
@@ -187,14 +185,6 @@ function ea_svg_interval(opts = {}) {
 	svg
 		.attr('width', svgwidth + 2)
 		.attr('height', svgheight + 2);
-
-	defs
-		.append('filter')
-		.attr('id', 'shadow-interval')
-		.append('feDropShadow')
-		.attr('dx', 0.1)
-		.attr('dy', 0.1)
-		.attr('stdDeviation', 0.8);
 
 	gutter
 		.attr('stroke', 'black')
@@ -229,16 +219,16 @@ function ea_svg_interval(opts = {}) {
 		.attr('r', radius)
 		.attr('cy', svgheight/2)
 		.attr('fill', 'white')
-		.attr('style', 'filter: url(#shadow-interval);')
-		.attr('stroke-width', 'none')
+		.attr('stroke', 'gray')
+		.attr('stroke-width', 0.2)
 		.style('cursor', 'grab');
 
 	c2
 		.attr('r', radius)
 		.attr('cy', svgheight/2)
 		.attr('fill', 'white')
-		.attr('style', 'filter: url(#shadow-interval);')
-		.attr('stroke-width', 'none')
+		.attr('stroke', 'gray')
+		.attr('stroke-width', 0.2)
 		.style('cursor', 'grab');
 
 	function dragged(c, cx, callback) {
@@ -310,8 +300,6 @@ function ea_svg_checkbox(init, callback) { // this is not used anywhere
 
 	const g = svg.append('g');
 
-	const defs = svg.append('defs');
-
 	const gutter = g.append('rect');
 
 	const check = g.append('path');
@@ -325,20 +313,13 @@ function ea_svg_checkbox(init, callback) { // this is not used anywhere
 		.attr('height', size)
 		.style('cursor', 'pointer');
 
-	defs
-		.append('filter')
-		.attr('id', 'shadow-checkbox')
-		.append('feDropShadow')
-		.attr('dx', 0.1)
-		.attr('dy', 0.1)
-		.attr('stdDeviation', 0.8);
-
 	gutter
 		.attr('x', 0)
 		.attr('y', 0)
 		.attr('rx', 1)
 		.attr('ry', 1)
-		.attr('style', 'filter: url(#shadow-checkbox);')
+		.attr('stroke', 'gray')
+		.attr('stroke-width', 0.2)
 		.attr('width', size)
 		.attr('height', size);
 

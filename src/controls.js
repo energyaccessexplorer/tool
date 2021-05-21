@@ -14,42 +14,12 @@ export default class dscontrols extends HTMLElement {
 		super();
 
 		this.ds = d;
-		attach.call(this, shadow_tmpl('#ds-controls-template'));
-
-		this.main = qs('main', this);
-		this.header = qs('header', this);
-		this.content = qs('content', this);
-		this.spinner = qs('.loading', this);
-
-		this.manual_min = qs('.manual-controls input[bind=min]', this);
-		this.manual_max = qs('.manual-controls input[bind=max]', this);
 
 		this.show_advanced = false;
-
-		this.init();
 
 		this.render();
 
 		return this;
-	};
-
-	init() {
-		this.checkbox = checkbox.call(this.ds);
-		this.header.onclick = this.checkbox.click;
-
-		const cat = this.ds.category;
-		const c = cat.controls;
-
-		if (c.weight)
-			this.weight_group = weight.call(this.ds);
-
-		if (this.ds.items)
-			this.collection_list = collection_list.call(this.ds);
-
-		if (this.ds.mutant)
-			mutant_options.call(this.ds);
-
-		this.dropdown = new dropdown(options.call(this));
 	};
 
 	async range_group_controls() {
@@ -127,6 +97,31 @@ export default class dscontrols extends HTMLElement {
 	};
 
 	render() {
+		this.checkbox = checkbox.call(this.ds);
+
+		if (this.ds.category.controls.weight)
+			this.weight_group = weight.call(this.ds);
+
+		if (this.ds.items)
+			this.collection_list = collection_list.call(this.ds);
+
+		if (this.ds.mutant)
+			mutant_options.call(this.ds);
+
+		this.dropdown = new dropdown(options.call(this));
+
+		attach.call(this, shadow_tmpl('#ds-controls-template'));
+
+		this.main = qs('main', this);
+		this.header = qs('header', this);
+		this.content = qs('content', this);
+		this.spinner = qs('.loading', this);
+
+		this.header.onclick = this.checkbox.click;
+
+		this.manual_min = qs('.manual-controls input[bind=min]', this);
+		this.manual_max = qs('.manual-controls input[bind=max]', this);
+
 		slot_populate.call(this, this.ds);
 
 		slot_populate.call(this, {
@@ -415,8 +410,7 @@ function range(opts = {}) {
 	const v2 = ce('div', null, { bind: "v2" });
 
 	const l = tmpl('#ramp');
-	l.className = 'ramp';
-	l.append(v1, ce('div', opts.ramp || 'range', { class: "unit-ramp" }), v2);
+	l.querySelector('.ramp').append(v1, ce('div', opts.ramp || 'range', { class: "unit-ramp" }), v2);
 
 	if (!slider_width)
 		slider_width = Math.max(coalesce(maybe(contents_el, 'clientWidth'), 0) - 64, 256);
@@ -447,7 +441,7 @@ function weight() {
 	const weights = [1,2,3,4,5];
 
 	const ramp = tmpl('#ramp');
-	ramp.append(
+	ramp.querySelector('.ramp').append(
 		ce('div', weights[0] + ""),
 		ce('div', "importance", { class: "unit-ramp" }),
 		ce('div', weights[weights.length - 1] + "")

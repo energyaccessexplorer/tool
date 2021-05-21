@@ -90,13 +90,10 @@ export default class dscard extends HTMLElement {
 		if (!(d instanceof DS)) throw Error(`dscard: Expected a DS. Got ${d}.`);
 		super();
 
-		this.ds = d;
-
 		if (d.disabled) return undefined;
 
-		attach.call(this, shadow_tmpl('#ds-card-template'));
+		this.ds = d;
 
-		this.svg_el = this.svg();
 		this.opacity_value = 1;
 
 		this.render();
@@ -106,6 +103,10 @@ export default class dscard extends HTMLElement {
 
 	render() {
 		this.setAttribute('bind', this.ds.id);
+
+		this.svg_el = this.svg();
+
+		attach.call(this, shadow_tmpl('#ds-card-template'));
 
 		slot_populate.call(this, this.ds);
 
@@ -126,18 +127,18 @@ export default class dscard extends HTMLElement {
 	};
 
 	refresh() {
-		const s = qs('[slot=svg]', this);
+		const s = this.querySelector('[slot=svg]');
 		elem_empty(s);
 		s.append(this.svg_el = this.svg());
 
-		const o = qs('[slot=opacity]', this);
+		const o = this.querySelector('[slot=opacity]');
 		elem_empty(o);
 		this.opacity_value = 1;
 		o.append(this.opacity());
 	};
 
 	line_legends(legends) {
-		const it = qs('[slot=svg]', this);
+		const it = this.querySelector('[slot=svg]');
 
 		elem_empty(it);
 
@@ -167,7 +168,7 @@ export default class dscard extends HTMLElement {
 	};
 
 	point_legends(legends) {
-		const it = qs('[slot=svg]', this);
+		const it = this.querySelector('[slot=svg]');
 
 		elem_empty(it);
 
@@ -198,7 +199,7 @@ export default class dscard extends HTMLElement {
 	};
 
 	polygon_legends(legends) {
-		const it = qs('[slot=svg]', this);
+		const it = this.querySelector('[slot=svg]');
 
 		elem_empty(it);
 
@@ -305,7 +306,7 @@ export default class dscard extends HTMLElement {
 			const r = tmpl('#ramp');
 
 			if (ds.domain) {
-				r.append(...ramp_values(ds.domain));
+				r.querySelector('.ramp').append(...ramp_values(ds.domain));
 			}
 
 			d.append(
@@ -322,7 +323,7 @@ export default class dscard extends HTMLElement {
 			let r = tmpl('#ramp');
 
 			if (ds.domain) {
-				r.append(...ramp_values(ds.domain));
+				r.querySelector('.ramp').append(...ramp_values(ds.domain));
 				d.append(r);
 			}
 

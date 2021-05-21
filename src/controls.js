@@ -121,13 +121,15 @@ export default class dscontrols extends HTMLElement {
 
 		this.manual_setup();
 
-		slot_populate.call(this, {}, {
+		slot_populate.call(this, {
 			"range-slider": maybe(this.range_group, 'el'),
 		});
 	};
 
 	render() {
-		slot_populate.call(this, this.ds, {
+		slot_populate.call(this, this.ds);
+
+		slot_populate.call(this, {
 			"dropdown": this.dropdown,
 			"checkbox": this.checkbox.svg,
 			"collection-list": this.collection_list,
@@ -390,7 +392,7 @@ async function mutant_options() {
 
 	this.mutant_options = container;
 
-	slot_populate.call(this.controls, null, {
+	slot_populate.call(this.controls, {
 		"mutant-options": this.mutant_options,
 	});
 };

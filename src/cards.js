@@ -107,7 +107,9 @@ export default class dscard extends HTMLElement {
 	render() {
 		this.setAttribute('bind', this.ds.id);
 
-		slot_populate.call(this, this.ds, {
+		slot_populate.call(this, this.ds);
+
+		slot_populate.call(this, {
 			'svg': this.svg_el,
 			'info': this.info(),
 			'unit': (this.ds.category.unit && ce('span', `[${this.ds.category.unit}]`, { style: "margin-left: 1em;" })),

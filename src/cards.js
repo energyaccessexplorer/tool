@@ -116,7 +116,6 @@ export default class dscard extends HTMLElement {
 			'unit': (this.ds.category.unit && ce('span', `[${this.ds.category.unit}]`, { style: "margin-left: 1em;" })),
 			'opacity': this.opacity(),
 			'close': this.close(),
-			'handle': tmpl('#svg-handle'),
 		});
 
 		return this;

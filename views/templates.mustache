@@ -242,15 +242,14 @@
       color: gray;
     }
 
-    [name=handle] {
+    .handle {
       display: block;
-      width: 24px;
+      width: 22px;
       margin-top: 10px;
-      margin-left: 5px;
+      margin-left: 2px;
 
-      fill: #aaa;
-      fill-opacity: 1;
-      stroke: none;
+      color: #aaa;
+      font-size: 1.8em;
 
       cursor: grab;
       cursor: -webkit-grab;
@@ -282,7 +281,9 @@
     }
   </style>
 
-  <slot name="handle"></slot>
+  <div class="handle">
+    <i class="bi bi-grip-vertical"></i>
+  </div>
 
   <main>
     <header>
@@ -370,20 +371,4 @@
 
     <div class="ramp"></div>
   </div>
-</template>
-
-<template id="svg-handle">
-  <svg width="14" height="14" viewBox="0 0 32 32">
-    <g>
-      <circle cx="28.063301" cy="28.25821" r="3.6749561" />
-      <circle cx="28.196936" cy="3.936680" r="3.6749561" />
-      <circle cx="28.063301" cy="16.23151" r="3.6749561" />
-      <circle cx="3.6749566" cy="28.25824" r="3.6749561" />
-      <circle cx="3.8085892" cy="3.936710" r="3.6749561" />
-      <circle cx="3.6749566" cy="16.23154" r="3.6749561" />
-      <circle cx="16.108364" cy="28.25821" r="3.6749561" />
-      <circle cx="16.241997" cy="3.936680" r="3.6749561" />
-      <circle cx="16.108364" cy="16.23151" r="3.6749561" />
-    </g>
-  </svg>
 </template>

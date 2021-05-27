@@ -128,7 +128,7 @@ build-d:
 	@sed -ri 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/d/index.html
 
 	@cp ${CSS}/ripple.css ${DIST}/d/ripple.css
-	@cp ${SRC}/{cards,timeline,controls,ds,parse,mapbox,overlord,plot,d}.js ${DIST}/d/
+	@cp ${SRC}/{cards,timeline,controls,controls-search,ds,parse,mapbox,overlord,plot,d}.js ${DIST}/d/
 
 	@cat \
 		${LIB}/d3.js \

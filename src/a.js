@@ -365,11 +365,11 @@ async function dsinit(id, inputs, pack, callback) {
 
 	await ea_api.get("geography_boundaries", { "geography_id": `eq.${id}` }, { one: true })
 		.catch(_ => {
-			const m = `
-Failed to get the geography's 'boundaries' dataset.
+		const m = `
+Failed to get the geography's BOUNDARIES.
 This is fatal. Thanks for all the fish.`;
 
-			ea_super_error("Geography error", m);
+		ea_super_error("Geography error", m);
 
 			throw Error("No 'boundaries' dataset. Ciao.");
 		})
@@ -390,13 +390,14 @@ This is fatal. Thanks for all the fish.`;
 			await ds.load('vectors');
 			await ds.load('raster');
 
-			if (!(bounds = ds.vectors.bounds)) throw `'boundaries' dataset has no vectors.bounds`;
+			if (!(bounds = ds.vectors.bounds))
+				throw `'BOUNDARIES' has no vectors.bounds`;
 
 			const c = ds.config;
 			if (c.column_name) {
 				GEOGRAPHY.boundaries = {};
 
-				for (let r of ds.csv.data)
+				for (const r of ds.csv.data)
 					GEOGRAPHY.boundaries[r[c.column]] = r[c.column_name];
 			}
 		});

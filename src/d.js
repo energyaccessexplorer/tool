@@ -52,7 +52,6 @@ async function dsinit(id, callback) {
 
 	let bounds;
 	let boundaries_id;
-	let boundaries;
 
 	await ea_api.get(
 		"geography_boundaries",
@@ -68,24 +67,23 @@ This is fatal. Thanks for all the fish.`;
 			throw Error("No 'boundaries' dataset. Ciao.");
 		})
 		.then(r => boundaries_id = r.id);
+	const bp = {
+		"id": `eq.${boundaries_id}`,
+		"select": select,
+		"df.active": "eq.true"
+	};
 
-	await ea_api.get(
-		"datasets",
-		{
-			"id": `eq.${boundaries_id}`,
-			"select": select,
-			"df.active": "eq.true"
-		},
-		{ one: true })
+	await ea_api.get("datasets", bp, { one: true })
 		.then(async e => {
 			let ds = new DS(e, false);
-			boundaries = ds;
+			BOUNDARIES = ds;
 
 			await ds.load('csv');
 			await ds.load('vectors');
 			await ds.load('raster');
 
-			if (!(bounds = ds.vectors.bounds)) throw `'boundaries' dataset has no vectors.bounds`;
+			if (!(bounds = ds.vectors.bounds))
+				throw `'BOUNDARIES' has no vectors.bounds`;
 
 			const c = ds.config;
 			if (c.column_name) {
@@ -99,19 +97,18 @@ This is fatal. Thanks for all the fish.`;
 	callback(bounds);
 
 	if (boundaries_id === dataset_id) {
-		await plot.call(boundaries);
-		boundaries.active(true, true);
+		await plot.call(BOUNDARIES);
+		BOUNDARIES.active(true, true);
 		return;
 	}
 
-	await ea_api.get(
-		"datasets",
-		{
-			"geography_id": `eq.${id}`,
-			"id": `eq.${dataset_id}`,
-			"select": select
-		},
-		{ one: true })
+	const p = {
+		"geography_id": `eq.${id}`,
+		"id": `eq.${dataset_id}`,
+		"select": select
+	};
+
+	await ea_api.get("datasets", p, { one: true })
 		.then(e => {
 			const ds = new DS(e, true);
 			ds.active(true, true);

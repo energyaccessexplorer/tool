@@ -19,16 +19,14 @@ async function fetchcheck(endpoint, format) {
 		});
 };
 
-export function fail(msg) {
-	const err = msg || "";
-
-	if (this.id === 'boundaries')
+export function fail(msg = "") {
+	if (this === BOUNDARIES) {
 		ea_super_error("Dataset error", `
 Failed to process dataset '${this.name}'.
+This is fatal. Thanks for all the fish.
 
-${err}
-
-This is fatal. Thanks for all the fish.`);
+${msg}`);
+	}
 
 	else {
 		ea_flash.push({
@@ -39,7 +37,7 @@ This is fatal. Thanks for all the fish.`);
 Failed to process dataset '${this.name}'.
 This is not fatal but the dataset is now disabled.
 
-${err}`
+${msg}`
 		});
 	}
 
@@ -151,12 +149,10 @@ export function raster() {
 					// TODO: enable this when paver is ready
 					//
 					// || this.raster.height !== b.raster.height
-
-					fail.call(this, `
-Raster resolution does not match the boundaries dataset.
+					//
+					fail.call(this, `Raster resolution does not match BOUNDARIES.
 ${this.id}: ${this.raster.width} × ${this.raster.height}
-boundaries: ${b.raster.width} × ${b.raster.height}
-`);
+BOUNDARIES: ${b.raster.width} × ${b.raster.height}`);
 				}
 			}
 		}

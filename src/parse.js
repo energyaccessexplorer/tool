@@ -145,7 +145,7 @@ export function raster() {
 			}
 
 			if (this.id !== 'boundaries') {
-				const b = DST.get('boundaries');
+				const b = BOUNDARIES;
 
 				if (this.raster.width !== b.raster.width) {
 					// TODO: enable this when paver is ready

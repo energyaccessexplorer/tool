@@ -14,7 +14,7 @@ export function pointto(coords, dict, props, a = false) {
 
 	const {x,y} = MAPBOX.project(coords);
 
-	const b = DST.get('boundaries');
+	const b = BOUNDARIES;
 
 	const rc = ea_coordinates_in_raster(
 		coords,

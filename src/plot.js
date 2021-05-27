@@ -35,7 +35,7 @@ export function drawcanvas(opts) {
  */
 
 export function outputcanvas(data, canvas = null) {
-	const A = DST.get('boundaries');
+	const A = BOUNDARIES;
 
 	if (!data.length) {
 		console.warn("plot.outputcanvas: no raster given. Filling up with a blank (transparent) one...");

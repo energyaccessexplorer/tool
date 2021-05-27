@@ -358,7 +358,7 @@ export function filter_valued_polygons() {
 
 	const datasets = DS.array.filter(d => d.on && d.datatype.match("polygons-(fixed|timeline)"));
 
-	const b = DST.get('boundaries');
+	const b = BOUNDARIES;
 	datasets.unshift(b);
 
 	function matches(d) {

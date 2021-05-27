@@ -383,7 +383,8 @@ This is fatal. Thanks for all the fish.`;
 
 	await ea_api.get("datasets", bp, { one: true })
 		.then(async e => {
-			let ds = new DS(e, false);
+			const ds = new DS(e, false);
+			BOUNDARIES = ds;
 
 			await ds.load('csv');
 			await ds.load('vectors');
@@ -425,7 +426,7 @@ This is fatal. Thanks for all the fish.`;
 	const [left, bottom, right, top] = bounds;
 	GEOGRAPHY.bounds = { left, bottom, right, top };
 
-	const r = DST.get('boundaries').raster;
+	const r = BOUNDARIES.raster;
 	const w = d3.scaleLinear().domain([0,r.width]).range([left,right]);
 	const h = d3.scaleLinear().domain([0,r.height]).range([top,bottom]);
 
@@ -468,7 +469,7 @@ function load_view() {
 		if (!MAPBOX.getSource('filtered-source')) {
 			MAPBOX.addSource('filtered-source', {
 				"type": 'geojson',
-				"data": DST.get('boundaries').vectors.features
+				"data": BOUNDARIES.vectors.features
 			});
 		}
 
@@ -587,7 +588,7 @@ function map_click(e) {
 	};
 
 	function click(fn) {
-		const b = DST.get('boundaries');
+		const b = BOUNDARIES;
 
 		const rc = ea_coordinates_in_raster(
 			[e.lngLat.lng, e.lngLat.lat],
@@ -708,7 +709,7 @@ function map_click(e) {
 	};
 
 	function analysis_click() {
-		const b = DST.get('boundaries');
+		const b = BOUNDARIES;
 
 		const rc = ea_coordinates_in_raster(
 			[e.lngLat.lng, e.lngLat.lat],

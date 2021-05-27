@@ -79,7 +79,7 @@ This is not fatal but the dataset is now disabled.`
 		let indicator = false;
 
 		if (this.category.name.match(/^(timeline-)?indicator/)) {
-			const b = DST.get('boundaries');
+			const b = BOUNDARIES;
 			this.raster = b.raster;
 			this.vectors = b.vectors;
 
@@ -149,7 +149,7 @@ This is not fatal but the dataset is now disabled.`
 
 	init() {
 		if (this.timeline) {
-			const b = DST.get('boundaries');
+			const b = BOUNDARIES;
 			this.vectors = JSON.parse(JSON.stringify(b.vectors));
 			this.vectors.endpoint = b.vectors.endpoint;
 			this.vectors.parse = x => parse.polygons.call(x || this);

@@ -19,7 +19,7 @@ import {
 export default function run(type) {
 	const t0 = performance.now();
 
-	const boundaries = DST.get('boundaries');
+	const boundaries = BOUNDARIES;
 	let list = datasets(type);
 
 	const it = new Float32Array(list.length ? boundaries.raster.data.length: 0).fill(-1);
@@ -245,7 +245,7 @@ export async function plot_active(type, doindexes) {
 };
 
 export async function raster_to_tiff(type) {
-	const b = DST.get('boundaries');
+	const b = BOUNDARIES;
 
 	const raster = await run(type);
 

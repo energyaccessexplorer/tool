@@ -33,6 +33,7 @@
 
     "DST": "readonly",
     "GEOGRAPHY": "writable",
+    "BOUNDARIES": "writable",
     "MAPBOX": "writable",
     "INFOMODE": "writable",
     "NORM_STOPS": "writable",

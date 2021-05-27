@@ -132,7 +132,7 @@ export default async function analyse(raster) {
 
 	if (!ds) {
 		console.warn("No 'population-density' dataset present... Will use boundaries");
-		ds = DST.get('boundaries');
+		ds = BOUNDARIES;
 	}
 
 	await ds.load('raster');

@@ -361,19 +361,17 @@ async function dsinit(id, inputs, pack, callback) {
 	let select = ["*", "category:categories(*)", "df:_datasets_files(*,file:files(*))"];
 
 	let bounds;
-	let boundaries_id;
+	const boundaries_id = maybe(GEOGRAPHY.configuration, 'boundaries', 0, 'dataset_id');
 
-	await ea_api.get("geography_boundaries", { "geography_id": `eq.${id}` }, { one: true })
-		.catch(_ => {
+	if (!boundaries_id) {
 		const m = `
 Failed to get the geography's BOUNDARIES.
 This is fatal. Thanks for all the fish.`;
 
 		ea_super_error("Geography error", m);
 
-			throw Error("No 'boundaries' dataset. Ciao.");
-		})
-		.then(r => boundaries_id = r.id);
+		throw Error("No BOUNDARIES. Ciao.");
+	}
 
 	const bp = {
 		"id": `eq.${boundaries_id}`,

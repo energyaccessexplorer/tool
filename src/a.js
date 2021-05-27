@@ -413,7 +413,7 @@ This is fatal. Thanks for all the fish.`;
 	};
 
 	await ea_api.get("datasets", p)
-		.then(r => r.filter(d => d.category.name !== 'boundaries'))
+		.then(r => r.filter(d => d.id !== BOUNDARIES.dataset_id))
 		.then(r => r.map(e => new DS(e, inputs.includes(e.category.name))));
 
 	U.params.inputs = [...new Set(DS.array.map(e => e.id))];

@@ -142,7 +142,7 @@ export function raster() {
 				this.domain = { min, max };
 			}
 
-			if (this.id !== 'boundaries') {
+			if (this !== BOUNDARIES) {
 				const b = BOUNDARIES;
 
 				if (this.raster.width !== b.raster.width) {
@@ -177,7 +177,7 @@ function geojson() {
 		.then(r => r.json())
 		.then(r => {
 			this.vectors.features = r;
-			if (this.id === 'boundaries') this.vectors.bounds = geojsonExtent(r);
+			if (this === BOUNDARIES) this.vectors.bounds = geojsonExtent(r);
 		});
 };
 

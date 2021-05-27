@@ -40,7 +40,7 @@ export default class DS {
 
 		this.loaded = false;
 
-		if (this.id === 'boundaries')
+		if (this.category.name === 'boundaries')
 			this.__domain = { min: -Infinity, max: Infinity };
 
 		if (o.category.domain)
@@ -214,7 +214,7 @@ This is not fatal but the dataset is now disabled.`
 		if (this.config.column) t += "-fixed";
 		else if (this.timeline) t += "-timeline";
 
-		if (this.id === 'boundaries') t = "polygons-boundaries";
+		if (this.category.name === 'boundaries') t = "polygons-boundaries";
 
 		if (this.mutant) t = "raster-mutant";
 

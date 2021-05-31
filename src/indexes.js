@@ -98,7 +98,7 @@ export function init() {
 	const url = new URL(location);
 
 	const ramp = tmpl("#ramp");
-	ramp.append(
+	ramp.querySelector('.ramp').append(
 		ce('div', "Low"),
 		ce('div', "Medium"),
 		ce('div', "High")

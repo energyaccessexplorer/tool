@@ -73,7 +73,8 @@ export default class DS {
 
 This is not fatal but the dataset is now disabled.`
 			});
-			this.disable();
+
+			this.disable(`Missing ${t}`);
 		};
 
 		let indicator = false;
@@ -221,7 +222,9 @@ This is not fatal but the dataset is now disabled.`
 		return t;
 	};
 
-	disable() {
+	disable(msg) {
+		console.error(`Disabling ${this.id}.`, msg);
+
 		this.on = false;
 		this.disabled = true;
 
@@ -231,9 +234,7 @@ This is not fatal but the dataset is now disabled.`
 
 		if (this.card) this.card.disable();
 
-		if (this.items) {
-			for (let d of this.items) { d.disable(); }
-		}
+		if (this.items) this.items.map(d => d.disable());
 
 		if (this.collection) {
 			if (!this.collection.disabled) this.collection.disable();

@@ -41,8 +41,7 @@ ${msg}`
 		});
 	}
 
-	this.disable();
-	console.error(`"Dataset '${this.name}' disabled.`);
+	this.disable(msg);
 
 	if (!U.inputs) return;
 

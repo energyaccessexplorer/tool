@@ -574,9 +574,9 @@ function map_click(e) {
 			r.props["_boundaries_name"] = GEOGRAPHY.boundaries[et.properties[this.vectors.key]];
 		}
 
-		if (this.config.column && this.category.name !== 'boundaries') {
-			r.dict.push(["_" + this.config.column, this.name]);
-			r.props["_" + this.config.column] = this.csv.table[et.properties[this.vectors.key]];
+		if (this.config.csv_columns && this.category.name !== 'boundaries') {
+			r.dict.push(["_" + this.config.csv_columns.id, this.name]);
+			r.props["_" + this.config.csv_columns.id] = this.csv.table[et.properties[this.vectors.key]];
 		}
 
 		if (this.config.attributes_map) {

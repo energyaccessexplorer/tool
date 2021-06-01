@@ -56,7 +56,7 @@ export function csv() {
 		.then(d => d.text())
 		.then(r => d3.csvParse(r))
 		.then(d => this.csv.data = d)
-		.then(_ => this.csv.table = this.config.column ? csv_table.call(this, this.config.column) : undefined)
+		.then(_ => this.csv.table = this.config.csv_columns ? csv_table.call(this, this.config.csv_columns.value) : undefined)
 		.then(_ => {
 			if (this.domain || !this.csv.table) return;
 
@@ -366,8 +366,8 @@ export function polygons() {
 
 					col = U.timeline;
 				}
-				else if (this.config.column)
-					col = this.config.column;
+				else if (this.config.csv_columns)
+					col = this.config.csv_columns.id;
 
 				polygons_csv.call(this, col);
 			}

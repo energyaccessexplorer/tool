@@ -368,7 +368,7 @@ export function filter_valued_polygons() {
 				if (d.datatype.match("polygons-(timeline)"))
 					c = GEOGRAPHY.timeline_dates.slice(0).reverse().find(x => +r[x] > 0);
 				else if (d.datatype.match("polygons-(fixed|boundaries)"))
-					c = d.config.column;
+					c = d.config.csv_columns.id;
 
 				return +r[c] >= d._domain.min && +r[c] <= d._domain.max;
 			})

@@ -212,7 +212,7 @@ This is not fatal but the dataset is now disabled.`
 		else if (this.raster) t = "raster";
 		else if (this.csv) t = "table";
 
-		if (this.config.column) t += "-fixed";
+		if (this.config.csv_columns) t += "-fixed";
 		else if (this.timeline) t += "-timeline";
 
 		if (this.category.name === 'boundaries') t = "polygons-boundaries";
@@ -454,7 +454,7 @@ This is not fatal but the dataset is now disabled.`
 		}
 
 		case 'polygons-fixed': {
-			if (this.config.column) {
+			if (this.config.csv_columns) {
 				this.colorscale = ea_colorscale({
 					stops: this.category.colorstops,
 				});

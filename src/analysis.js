@@ -300,9 +300,9 @@ export function context(rc, dict, props, skip = null) {
 				props[d.id] = d.raster.data[rc.index] + " " + d.category.unit;
 			}
 
-			else if (d.config.column && d.category.name !== 'boundaries') {
-				dict.push(["_" + d.config.column, d.name]);
-				props["_" + d.config.column] = d.csv.table[d.raster.data[rc.index]] + " " + d.category.unit;
+			else if (d.config.csv_columns && d.category.name !== 'boundaries') {
+				dict.push(["_" + d.config.csv_columns.id, d.name]);
+				props["_" + d.config.csv_columns.id] = d.csv.table[d.raster.data[rc.index]] + " " + d.category.unit;
 			}
 
 			else if (d.raster &&

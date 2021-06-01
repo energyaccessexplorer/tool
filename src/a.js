@@ -16,20 +16,13 @@ import * as views from './views.js';
 
 import * as indexes from './indexes.js';
 
+import * as mapbox from './mapbox.js';
+
 import {
 	init as timeline_init,
 	lines_draw as timeline_lines_draw,
 	filter_valued_polygons as timeline_filter_valued_polygons,
 } from './timeline.js';
-
-import {
-	fit as mapbox_fit,
-	init as mapbox_init,
-	change_theme as mapbox_change_theme,
-	pointer as mapbox_pointer,
-	zoomend as mapbox_zoomend,
-	dblclick as mapbox_dblclick,
-} from './mapbox.js';
 
 import {
 	context as analysis_context,
@@ -278,11 +271,11 @@ export async function init() {
 	U = new Proxy({ url: url, params: ea_params[params] }, UProxyHandler);
 	O = new Overlord();
 
-	MAPBOX = mapbox_init(O);
+	MAPBOX = mapbox.init(O);
 
 	await dsinit(GEOGRAPHY.id, U.inputs, U.pack, bounds => {
-		MAPBOX.coords = mapbox_fit(bounds);
-		mapbox_change_theme(ea_settings.mapbox_theme);
+		MAPBOX.coords = mapbox.fit(bounds);
+		mapbox.change_theme(ea_settings.mapbox_theme);
 	});
 
 	O.index = U.output;
@@ -487,8 +480,8 @@ function load_view() {
 				},
 			}, MAPBOX.first_symbol);
 
-			mapbox_dblclick('filtered-layer');
-			mapbox_zoomend('filtered-layer');
+			mapbox.dblclick('filtered-layer');
+			mapbox.zoomend('filtered-layer');
 		}
 	};
 
@@ -612,7 +605,7 @@ function map_click(e) {
 
 		table_add_lnglat(td, [e.lngLat.lng, e.lngLat.lat]);
 
-		mapbox_pointer(
+		mapbox.pointer(
 			td,
 			e.originalEvent.pageX,
 			e.originalEvent.pageY
@@ -738,7 +731,7 @@ function map_click(e) {
 
 			table_add_lnglat(td, [e.lngLat.lng, e.lngLat.lat]);
 
-			mapbox_pointer(
+			mapbox.pointer(
 				td,
 				e.originalEvent.pageX,
 				e.originalEvent.pageY

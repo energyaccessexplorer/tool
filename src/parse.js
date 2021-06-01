@@ -367,7 +367,7 @@ export function polygons() {
 					col = U.timeline;
 				}
 				else if (this.config.csv_columns)
-					col = this.config.csv_columns.id;
+					col = this.config.csv_columns.value;
 
 				polygons_csv.call(this, col);
 			}

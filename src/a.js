@@ -383,14 +383,6 @@ This is fatal. Thanks for all the fish.`;
 
 			if (!(bounds = ds.vectors.bounds))
 				throw `'BOUNDARIES' has no vectors.bounds`;
-
-			const c = ds.config;
-			if (c.column_name) {
-				GEOGRAPHY.boundaries = {};
-
-				for (const r of ds.csv.data)
-					GEOGRAPHY.boundaries[r[c.column]] = r[c.column_name];
-			}
 		});
 
 	pack = maybe(pack, 'length') ? pack : 'all';
@@ -561,11 +553,17 @@ function map_click(e) {
 			props: et.properties,
 		};
 
-		if (this.category.name === 'boundaries' ||
-				this.category.name.match(/^(timeline-)?indicator/)) {
-			r.dict.push(["_boundaries_name", GEOGRAPHY.configuration.boundaries_name || "Geography Name"]);
-			r.props["_boundaries_name"] = GEOGRAPHY.boundaries[et.properties[this.vectors.key]];
-		}
+		GEOGRAPHY.configuration.divisions
+			.filter((b,i) => (i !== 0) && b.dataset_id === this.dataset_id)
+			.forEach(b => {
+				const ds = DS.array.find(d => d.dataset_id === b.dataset_id);
+
+				const t = ds.csv.data.find(e => +e[ds.config.csv_columns.id] === +et.properties[this.vectors.key]);
+				if (!t) return;
+
+				r.dict.push(["_" + b.name, b.name]);
+				r.props["_" + b.name] = t[ds.config.csv_columns.value];
+			});
 
 		if (this.config.csv_columns && this.category.name !== 'boundaries') {
 			r.dict.push(["_" + this.config.csv_columns.id, this.name]);

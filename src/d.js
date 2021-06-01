@@ -80,14 +80,6 @@ This is fatal. Thanks for all the fish.`;
 
 			if (!(bounds = ds.vectors.bounds))
 				throw `'BOUNDARIES' has no vectors.bounds`;
-
-			const c = ds.config;
-			if (c.column_name) {
-				GEOGRAPHY.boundaries = {};
-
-				for (let r of ds.csv.data)
-					GEOGRAPHY.boundaries[r[c.column]] = r[c.column_name];
-			}
 		});
 
 	callback(bounds);

@@ -67,15 +67,13 @@ class MapboxInfoControl {
 };
 
 let _O;
-let _U;
 
 let changing_target = false;
 
-export function init(overlord = {}, urlproxy = {}) {
+export function init(overlord = {}) {
 	mapboxgl.accessToken = ea_settings.mapbox_token;
 
 	_O = overlord;
-	_U = urlproxy;
 
 	const mb = new mapboxgl.Map({
 		"container": 'mapbox-container',
@@ -160,16 +158,17 @@ function theme_pick(theme) {
 };
 
 export function change_theme(theme) {
-	function set_output() {
+	function go() {
 		const c = MAPBOX.getStyle().layers.find(l => l.type === 'symbol');
 		MAPBOX.first_symbol = maybe(c, 'id');
-		_O.view = _U.view;
+
+		if (_O.theme_changed) _O.theme_changed();
 	};
 
-	MAPBOX.once('style.load', set_output);
+	MAPBOX.once('style.load', go);
 	MAPBOX.setStyle(theme_pick(ea_settings.mapbox_theme = theme));
 
-	if (theme === "") set_output();
+	if (theme === "") go();
 };
 
 export function pointer(content, x, y) {

@@ -125,4 +125,17 @@ export default class Overlord {
 		for (let i = 0; i < ds.length; i++)
 			MAPBOX.moveLayer(ds[i], ds[i-1] || MAPBOX.first_symbol);
 	};
+
+	async theme_changed() {
+		await until(_ => MAPBOX.isStyleLoaded());
+
+		await DS.array
+			.filter(d => d.on)
+			.forEach(d => {
+				d.loaded = false;
+				d.loadall();
+			});
+
+		O.view = U.view;
+	};
 };

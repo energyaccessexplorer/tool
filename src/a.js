@@ -278,7 +278,7 @@ export async function init() {
 	U = new Proxy({ url: url, params: ea_params[params] }, UProxyHandler);
 	O = new Overlord();
 
-	MAPBOX = mapbox_init(O, U);
+	MAPBOX = mapbox_init(O);
 
 	await dsinit(GEOGRAPHY.id, U.inputs, U.pack, bounds => {
 		MAPBOX.coords = mapbox_fit(bounds);

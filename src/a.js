@@ -354,7 +354,7 @@ async function dsinit(id, inputs, pack, callback) {
 	let select = ["*", "category:categories(*)", "df:_datasets_files(*,file:files(*))"];
 
 	let bounds;
-	const boundaries_id = maybe(GEOGRAPHY.configuration, 'boundaries', 0, 'dataset_id');
+	const boundaries_id = maybe(GEOGRAPHY.configuration, 'divisions', 1, 'dataset_id');
 
 	if (!boundaries_id) {
 		const m = `

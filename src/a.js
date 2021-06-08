@@ -543,7 +543,7 @@ function load_view() {
 function map_click(e) {
 	const {view, inputs, output} = U;
 
-	const i = maybe(inputs, 0);
+	const inp = maybe(inputs, 0);
 
 	let t;
 
@@ -553,26 +553,21 @@ function map_click(e) {
 			props: et.properties,
 		};
 
-		GEOGRAPHY.configuration.divisions
-			.filter((b,i) => (i !== 0) && b.dataset_id === this.dataset_id)
-			.forEach(b => {
-				const ds = DS.array.find(d => d.dataset_id === b.dataset_id);
-
-				const t = ds.csv.data.find(e => +e[ds.config.csv_columns.id] === +et.properties[this.vectors.key]);
-				if (!t) return;
-
-				r.dict.push(["_" + b.name, b.name]);
-				r.props["_" + b.name] = t[ds.config.csv_columns.value];
-			});
-
-		if (this.config.csv_columns && this.category.name !== 'boundaries') {
+		if (this.config.csv_columns) {
 			r.dict.push(["_" + this.config.csv_columns.id, this.name]);
-			r.props["_" + this.config.csv_columns.id] = this.csv.table[et.properties[this.vectors.key]];
+
+			if (this.category.name === 'boundaries')
+				r.props["_" + this.config.csv_columns.id] = this.csv.data[et.properties[this.vectors.key]][this.config.csv_columns.value];
+			else
+				r.props["_" + this.config.csv_columns.id] = this.csv.table[et.properties[this.vectors.key]] + " " + this.category.unit;
+
+			r.dict.push(null);
 		}
 
-		if (this.config.attributes_map) {
-			r.dict = r.dict.concat(this.config.attributes_map.map(e => [e.dataset, e.target]));
-		}
+		divisions_rows_tier.call(this, r, et);
+
+		if (this.config.attributes_map)
+			this.config.attributes_map.forEach(e => r.dict.push([e.dataset, e.target]));
 
 		return r;
 	};
@@ -597,7 +592,7 @@ function map_click(e) {
 		const {dict, props, et} = f;
 
 		const s = maybe(et, 'source');
-		analysis_context(rc, dict, props, (!s || (s === i)) ? t.id : null);
+		analysis_context(rc, dict, props, (!s || (s === inp)) ? t.id : null);
 
 		const td = table_data(dict, props);
 
@@ -617,25 +612,18 @@ function map_click(e) {
 
 		let dict = [
 			["value", t.name],
-			["_empty", null]
 		];
 
-		let props = null;
+		let props = {};
 
-		if (!et || et.source !== i) {
-			props = {
-				"value": `none under these coordinates`,
-				"_empty": ""
-			};
+		if (!et || et.source !== inp) {
+			props['value'] = "none under these coordinates";
 		}
 
-		else if (et.source === i) {
+		else if (et.source === inp) {
 			const fi = feature_info.call(t, et);
 			dict = fi.dict;
 			props = fi.props;
-
-			dict.push(["_empty", null]);
-			props["_empty"] = "";
 		}
 
 		return {dict, props, et};
@@ -648,23 +636,21 @@ function map_click(e) {
 
 		let dict = [
 			["value", t.name],
-			["_empty", null]
 		];
 
-		let props = null;
+		let props = {};
 
 		if (maybe(et, 'properties', 'District'))
 			U.subgeoname = et.properties['District'];
 
 		timeline_lines_draw();
 
-		if (maybe(et, 'source') === i) {
+		if (maybe(et, 'source') === inp) {
 			const fi = feature_info.call(t, et);
 			dict = fi.dict;
 			props = fi.props;
 
-			dict.push(["_empty", null]);
-			props["_empty"] = "";
+			dict.push(null);
 		}
 
 		return {dict, props, et};
@@ -673,7 +659,8 @@ function map_click(e) {
 	function raster(rc) {
 		if (!INFOMODE) return;
 
-		let dict, props;
+		let dict;
+		let props = {};
 
 		if (typeof maybe(rc, 'value') === 'number' &&
         rc.value !== t.raster.nodata) {
@@ -683,13 +670,10 @@ function map_click(e) {
 
 			dict = [
 				["value", t.name],
-				["_empty", null]
+				null
 			];
 
-			props = {
-				"value": `${vv} <code>${t.category.unit || ''}</code>`,
-				"_empty": ""
-			};
+			props["value"] = `${vv} <code>${t.category.unit || ''}</code>`;
 		}
 		else {
 			console.log("No value (or nodata value) on raster.", rc);
@@ -715,12 +699,11 @@ function map_click(e) {
 		if (typeof maybe(rc, 'value') === 'number') {
 			const dict = [
 				["aname", t.name],
-				["_empty", null]
+				null
 			];
 
 			const props = {
 				"aname": ea_lowmedhigh_scale(rc.value),
-				"_empty": ""
 			};
 
 			analysis_context(rc, dict, props);
@@ -756,7 +739,7 @@ function map_click(e) {
 	}
 
 	else if (view === "inputs") {
-		t  = DST.get(i);
+		t  = DST.get(inp);
 
 		if (!t) return;
 
@@ -765,13 +748,32 @@ function map_click(e) {
 	}
 
 	else if (view === "timeline") {
-		t  = DST.get(i);
+		t  = DST.get(inp);
 
 		if (!t) return;
 
 		if (t.vectors) click(vectors_timeline);
 		else if (t.raster.data) click(raster);
 	}
+};
+
+export function divisions_rows_tier(r, et) {
+	GEOGRAPHY.configuration.divisions
+		.filter((b,i) => (i !== 0) && i === maybe(this.config, 'divisions_tier'))
+		.forEach((b,i) => {
+			const ds = DS.array.find(d => d.dataset_id === b.dataset_id);
+
+			if (!maybe(ds, 'csv', 'data')) {
+				console.warn("TODO: fetch'em");
+				return;
+			}
+
+			const t = ds.csv.data.find(e => +e[ds.config.csv_columns.id] === +et.properties[this.vectors.key]);
+			if (!t) return;
+
+			r.dict.push(["_" + b.name, b.name]);
+			r.props["_" + b.name] = t[ds.config.csv_columns.value] + ` (${i+1})`;
+		});
 };
 
 function nanny_init() {

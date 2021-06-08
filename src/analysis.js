@@ -301,8 +301,8 @@ export function context(rc, dict, props, skip = null) {
 			}
 
 			else if (d.config.csv_columns && d.category.name !== 'boundaries') {
-				dict.push(["_" + d.config.csv_columns.id, d.name]);
-				props["_" + d.config.csv_columns.id] = d.csv.table[d.raster.data[rc.index]] + " " + d.category.unit;
+				dict.push(["_analysis_" + d.id + "_" + d.config.csv_columns.id, d.name]);
+				props["_analysis_" + d.id + "_" + d.config.csv_columns.id] = d.csv.table[d.raster.data[rc.index]] + " " + d.category.unit;
 			}
 
 			else if (d.raster &&

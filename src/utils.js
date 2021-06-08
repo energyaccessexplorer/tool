@@ -446,13 +446,18 @@ function ea_super_error(t, m, e = "error") {
 	qs('#playground').remove();
 };
 
-function table_data(dict, prop) {
+function table_data(dict, props) {
 	const t = ce('table');
 
 	for (const e of dict) {
+		if (!e) {
+			t.append(ce('tr', [ ce('td', "&nbsp;"), ce('td', "&nbsp;") ]));
+			continue;
+		}
+
 		t.append(ce('tr', [
-			ce('td', ce('strong', e[1] ? e[1] + ": &nbsp;" : "&nbsp;")),
-			ce('td', prop[e[0]] ? prop[e[0]].toString() : ""),
+			ce('td', ce('strong', e.hasOwnProperty(1) ? e[1] + ": &nbsp;" : "&nbsp;")),
+			ce('td', (e.hasOwnProperty(0) && props[e[0]]) ? props[e[0]].toString() : ""),
 		]));
 	};
 

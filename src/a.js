@@ -300,6 +300,24 @@ export async function init() {
 	if (!MOBILE && !GEOGRAPHY.timeline) nanny_init();
 
 	ea_loading(false);
+
+	GEOGRAPHY.configuration.divisions.slice(1).forEach(d => {
+		const ds = DS.array.find(x => x.dataset_id === d.dataset_id);
+
+		if (ds) ds.loadall();
+		else {
+			const m = `
+Failed setting the geography's: '${d.name}'.
+This is a configuration error. Not fatal (yet).`;
+
+			ea_flash.push({
+				type: "error",
+				timeout: 10000,
+				title: "Divisions error",
+				message: m
+			});
+		}
+	});
 };
 
 export function toggle_left_panel(t) {
@@ -763,10 +781,7 @@ export function divisions_rows_tier(r, et) {
 		.forEach((b,i) => {
 			const ds = DS.array.find(d => d.dataset_id === b.dataset_id);
 
-			if (!maybe(ds, 'csv', 'data')) {
-				console.warn("TODO: fetch'em");
-				return;
-			}
+			if (!maybe(ds, 'csv', 'data')) return;
 
 			const t = ds.csv.data.find(e => +e[ds.config.csv_columns.id] === +et.properties[this.vectors.key]);
 			if (!t) return;

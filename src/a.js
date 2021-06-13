@@ -302,6 +302,8 @@ export async function init() {
 	ea_loading(false);
 
 	GEOGRAPHY.configuration.divisions.slice(1).forEach(d => {
+		if (!d.dataset_id) return;
+
 		const ds = DS.array.find(x => x.dataset_id === d.dataset_id);
 
 		if (ds) ds.loadall();
@@ -372,7 +374,8 @@ async function dsinit(id, inputs, pack, callback) {
 	let select = ["*", "category:categories(*)", "df:_datasets_files(*,file:files(*))"];
 
 	let bounds;
-	const boundaries_id = maybe(GEOGRAPHY.configuration, 'divisions', 1, 'dataset_id');
+	const divisions = maybe(GEOGRAPHY.configuration, 'divisions');
+	const boundaries_id = maybe(divisions.find(d => d.dataset_id), 'dataset_id');
 
 	if (!boundaries_id) {
 		const m = `

@@ -781,7 +781,7 @@ function map_click(e) {
 export function divisions_rows_tier(r, et) {
 	GEOGRAPHY.configuration.divisions
 		.filter((b,i) => (i !== 0) && i === maybe(this.config, 'divisions_tier'))
-		.forEach((b,i) => {
+		.forEach(b => {
 			const ds = DS.array.find(d => d.dataset_id === b.dataset_id);
 
 			if (!maybe(ds, 'csv', 'data')) return;
@@ -790,7 +790,7 @@ export function divisions_rows_tier(r, et) {
 			if (!t) return;
 
 			r.dict.push(["_" + b.name, b.name]);
-			r.props["_" + b.name] = t[ds.config.csv_columns.value] + ` (${i+1})`;
+			r.props["_" + b.name] = t[ds.config.csv_columns.value];
 		});
 };
 

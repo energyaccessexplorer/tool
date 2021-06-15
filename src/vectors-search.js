@@ -5,7 +5,7 @@ import {
 
 let root, ul, input, resultscontainer;
 
-let ds, resultsinfo, attr, searchable;
+let ds, resultsinfo, attr, searchable, searchable_attrs;
 
 function pointto(f, a = false) {
 	const t = MAPBOX.querySourceFeatures(ds.source.id, {
@@ -50,10 +50,16 @@ async function reset() {
 
 	await until(_ => ds.vectors.features.features);
 
-	const first = ds.vectors.features.features[0];
+	if (maybe(ds.config, 'properties_search', 'length')) {
+		const first = ds.vectors.features.features[0];
 
-	for (const a of ['name', 'Name', 'NAME']) {
-		if (first.properties.hasOwnProperty(a)) { attr = a; break; }
+		for (const a of ds.config.properties_search) {
+			if (!first.properties.hasOwnProperty(a))
+				console.warn(`${ds.id}'s properties_search is misconfigured. Features' missing '${a}'`);
+		}
+
+		attr = ds.config.properties_search[0];
+		searchable_attrs = ds.config.properties_search;
 	}
 
 	if (!(searchable = !!attr)) {
@@ -102,7 +108,7 @@ function trigger(value) {
 		let matches = false;
 
 		for (const [k,v] of Object.entries(f.properties)) {
-			if (k !== attr) continue;
+			if (!searchable_attrs.includes(k)) continue;
 
 			if (v && v.match(new RegExp(value, 'i'))) {
 				matches = true;

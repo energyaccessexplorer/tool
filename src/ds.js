@@ -43,12 +43,12 @@ export default class DS {
 		if (this.category.name === 'boundaries')
 			this.__domain = { min: -Infinity, max: Infinity };
 
-		if (o.category.domain)
-			this.domain = o.category.domain; // will be set by csv/raster data
+		if (this.category.domain)
+			this.domain = o.category.domain;
 		else
 			this.__domain = null;
 
-		this._domain = o.category.domain_init || JSON.parse(JSON.stringify(this.__domain));
+		this._domain = this.category.domain_init || JSON.parse(JSON.stringify(this.__domain));
 
 		this.init();
 
@@ -187,13 +187,17 @@ This is not fatal but the dataset is now disabled.`
 	category_overrides(ovrr) {
 		if (!ovrr) return;
 
-		const configs = ['raster', 'vectors', 'csv', 'analysis', 'timeline', 'controls'];
+		const configs = ['domain', 'domain_init', 'raster', 'vectors', 'csv', 'analysis', 'timeline', 'controls'];
 
 		for (let c of configs) {
-			if (!ovrr[c]) continue;
+			if (!ovrr.hasOwnProperty(c)) continue;
+
+			if (!maybe(this.category, c)) {
+				this.category[c] = JSON.parse(JSON.stringify(ovrr[c]));
+				continue;
+			}
 
 			for (let a in ovrr[c]) {
-				if (!maybe(this.category, c)) continue;
 				this.category[c][a] = ovrr[c][a];
 			}
 		}

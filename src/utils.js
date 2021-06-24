@@ -495,23 +495,27 @@ function table_add_lnglat(d, lnglat = [0, 0]) {
  *        full description.
  */
 
-function ea_coordinates_in_raster(coords, {left,bottom,right,top}, raster) {
+function ea_coordinates_in_raster(coords, raster) {
+	const b = BOUNDARIES;
+
+	const {left,bottom,right,top} = GEOGRAPHY.bounds;
+
 	if (coords.length !== 2)
 		throw Error(`ea_coordinates_raster: expected and array of length 2. Got ${coords}`);
 
-	const hs = d3.scaleLinear().domain([left, right]).range([0, raster.width]);
-	const vs = d3.scaleLinear().domain([top, bottom]).range([0, raster.height]);
+	const hs = d3.scaleLinear().domain([left, right]).range([0, b.width]);
+	const vs = d3.scaleLinear().domain([top, bottom]).range([0, b.height]);
 
 	const plng = Math.floor(hs(coords[0]));
 	const plat = Math.floor(vs(coords[1]));
 
 	let a = null;
 
-	if ((plng > 0 && plng < raster.width &&
-       plat > 0 && plat < raster.height )) {
+	if ((plng > 0 && plng < b.width &&
+       plat > 0 && plat < b.height )) {
 		a = { x: coords[0], y: coords[1] };
 
-		const i = (plat * raster.width) + plng;
+		const i = (plat * b.width) + plng;
 		const v = raster.data[i];
 
 		a.value = (v === raster.nodata) ? null : v;

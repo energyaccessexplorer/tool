@@ -14,18 +14,7 @@ export function pointto(coords, dict, props, a = false) {
 
 	const {x,y} = MAPBOX.project(coords);
 
-	const b = BOUNDARIES;
-
-	const rc = ea_coordinates_in_raster(
-		coords,
-		GEOGRAPHY.bounds,
-		{
-			data: b.raster.data,
-			width: b.raster.width,
-			height: b.raster.height,
-			nodata: b.raster.nodata
-		}
-	);
+	const rc = ea_coordinates_in_raster(coords, BOUNDARIES.raster);
 
 	if (a) analysis_context(rc, dict, props, null);
 

@@ -594,18 +594,7 @@ function map_click(e) {
 	};
 
 	function click(fn) {
-		const b = BOUNDARIES;
-
-		const rc = ea_coordinates_in_raster(
-			[e.lngLat.lng, e.lngLat.lat],
-			GEOGRAPHY.bounds,
-			{
-				data: t.raster.data,
-				width: t.raster.width,
-				height: t.raster.height,
-				nodata: b.raster.nodata
-			}
-		);
+		const rc = ea_coordinates_in_raster([e.lngLat.lng, e.lngLat.lat], t.raster);
 
 		let f = fn(rc);
 		if (!f) return;
@@ -703,19 +692,7 @@ function map_click(e) {
 		return {dict, props};
 	};
 
-	function analysis_click() {
-		const b = BOUNDARIES;
-
-		const rc = ea_coordinates_in_raster(
-			[e.lngLat.lng, e.lngLat.lat],
-			GEOGRAPHY.bounds,
-			{
-				data: t.raster.data,
-				width: b.raster.width,
-				height: b.raster.height,
-				nodata: -1
-			}
-		);
+	function analysis(rc) {
 
 		if (typeof maybe(rc, 'value') === 'number') {
 			const dict = [
@@ -728,16 +705,6 @@ function map_click(e) {
 			};
 
 			analysis_context(rc, dict, props);
-
-			const td = table_data(dict, props);
-
-			table_add_lnglat(td, [e.lngLat.lng, e.lngLat.lat]);
-
-			mapbox.pointer(
-				td,
-				e.originalEvent.pageX,
-				e.originalEvent.pageY
-			);
 		}
 
 		else {
@@ -750,13 +717,14 @@ function map_click(e) {
 
 		t = {
 			raster: {
-				data: MAPBOX.getSource('output-source').raster
+				data: MAPBOX.getSource('output-source').raster,
+				nodata: -1,
 			},
 			category: {},
 			name: ea_indexes[output]['name']
 		};
 
-		analysis_click();
+		click(analysis);
 	}
 
 	else if (view === "inputs") {

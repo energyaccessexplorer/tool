@@ -534,7 +534,7 @@ This is not fatal but the dataset is now disabled.`
 
 		return Promise.all(['vectors', 'csv', 'raster'].map(i => this[i] ? this.load(i) : null))
 			.then(_ => (this.loaded = true));
-	}
+	};
 
 	async load(arg) {
 		this.loading = true;

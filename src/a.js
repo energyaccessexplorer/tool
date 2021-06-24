@@ -306,7 +306,8 @@ export async function init() {
 
 		const ds = DS.array.find(x => x.dataset_id === d.dataset_id);
 
-		if (ds) ds.loadall();
+		// TODO: remove this HACK ds.loaded hack
+		if (ds) ds.loadall().then(_ => ds.loaded = false);
 		else {
 			const m = `
 Failed setting the geography's: '${d.name}'.

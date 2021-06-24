@@ -596,10 +596,7 @@ function map_click(e) {
 	function click(fn) {
 		const rc = ea_coordinates_in_raster([e.lngLat.lng, e.lngLat.lat], t.raster);
 
-		let f = fn(rc);
-		if (!f) return;
-
-		const {dict, props, et} = f;
+		const {dict, props, et} = fn(rc);
 
 		const s = maybe(et, 'source');
 		analysis_context(rc, dict, props, (!s || (s === inp)) ? t.id : null);
@@ -669,7 +666,7 @@ function map_click(e) {
 	function raster(rc) {
 		if (!INFOMODE) return;
 
-		let dict;
+		let dict = [];
 		let props = {};
 
 		if (typeof maybe(rc, 'value') === 'number' &&
@@ -678,10 +675,10 @@ function map_click(e) {
 
 			const vv = (v%1 === 0) ? v : v.toFixed(2);
 
-			dict = [
+			dict = dict.concat([
 				["value", t.name],
 				null
-			];
+			]);
 
 			props["value"] = `${vv} <code>${t.category.unit || ''}</code>`;
 		}
@@ -693,14 +690,16 @@ function map_click(e) {
 	};
 
 	function analysis(rc) {
+		let dict = [];
+		let props = {};
 
 		if (typeof maybe(rc, 'value') === 'number') {
-			const dict = [
+			dict = dict.concat([
 				["aname", t.name],
 				null
-			];
+			]);
 
-			const props = {
+			props = {
 				"aname": ea_lowmedhigh_scale(rc.value),
 			};
 
@@ -710,6 +709,8 @@ function map_click(e) {
 		else {
 			console.log("No value on raster.", rc);
 		}
+
+		return {dict, props};
 	};
 
 	if (view === "outputs") {

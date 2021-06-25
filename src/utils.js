@@ -496,7 +496,7 @@ function table_add_lnglat(d, lnglat = [0, 0]) {
  */
 
 function ea_coordinates_in_raster(coords, raster) {
-	const b = BOUNDARIES;
+	const b = BOUNDARIES.raster;
 
 	const {left,bottom,right,top} = GEOGRAPHY.bounds;
 

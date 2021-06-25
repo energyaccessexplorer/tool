@@ -595,6 +595,8 @@ function map_click(e) {
 	};
 
 	function click(fn) {
+		if (!INFOMODE) return;
+
 		const rc = ea_coordinates_in_raster([e.lngLat.lng, e.lngLat.lat], t.raster);
 
 		const {dict, props, et} = fn(rc);
@@ -614,8 +616,6 @@ function map_click(e) {
 	};
 
 	function vectors() {
-		if (!INFOMODE) return;
-
 		const et = MAPBOX.queryRenderedFeatures(e.point)[0];
 
 		let dict = [
@@ -665,8 +665,6 @@ function map_click(e) {
 	};
 
 	function raster(rc) {
-		if (!INFOMODE) return;
-
 		let dict = [];
 		let props = {};
 
@@ -678,7 +676,6 @@ function map_click(e) {
 
 			dict = dict.concat([
 				["value", t.name],
-				null
 			]);
 
 			props["value"] = `${vv} <code>${t.category.unit || ''}</code>`;
@@ -703,8 +700,6 @@ function map_click(e) {
 			props = {
 				"aname": ea_lowmedhigh_scale(rc.value),
 			};
-
-			analysis_context(rc, dict, props);
 		}
 
 		else {

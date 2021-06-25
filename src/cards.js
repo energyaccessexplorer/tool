@@ -261,7 +261,6 @@ export default class dscard extends HTMLElement {
 
 			return [
 				ce('div', min.toFixed(i) + ""),
-				ce('div', ((min + max) / 2).toFixed(i)),
 				ce('div', max.toFixed(i) + "")
 			];
 		}

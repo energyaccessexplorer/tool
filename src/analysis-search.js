@@ -22,9 +22,7 @@ async function getpoints() {
 
 	const points = a.raster.reduce(function(t,v,i) { if (v >= threshold) t.push({i,v}); return t; }, []);
 
-	const ref = BOUNDARIES.raster;
-
-	return points.map(t => ({ v: t.v, i: ea_raster_in_coordinates(t.i, ref, GEOGRAPHY.bounds) }));
+	return points.map(t => ({ v: t.v, i: raster_pixel_to_coordinates(t.i) }));
 };
 
 function pointto(p, a = false) {

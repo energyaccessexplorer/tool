@@ -526,7 +526,16 @@ function coordinates_to_raster_pixel(coords, raster) {
 	return a;
 };
 
-function ea_raster_in_coordinates(i, reference, bounds) {
-	const [x,y] = [i%reference.width, Math.floor(i/reference.width)];
-	return GEOGRAPHY.raster_coords(x,y);
+function raster_pixel_to_coordinates(i) {
+	const r = BOUNDARIES.raster;
+	const g = GEOGRAPHY.bounds;
+
+	const merc = new SphericalMercator({ size: 1 });
+
+	const x = i%r.width;
+	const y = Math.floor(i/r.width);
+
+	const o = merc.forward([g.left, g.top]);
+
+	return merc.inverse([o[0] + (x * 1000), o[1] - (y * 1000)]);
 };

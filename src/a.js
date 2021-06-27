@@ -432,12 +432,6 @@ This is fatal. Thanks for all the fish.`;
 	const [left, bottom, right, top] = bounds;
 	GEOGRAPHY.bounds = { left, bottom, right, top };
 
-	const r = BOUNDARIES.raster;
-	const w = d3.scaleLinear().domain([0,r.width]).range([left,right]);
-	const h = d3.scaleLinear().domain([0,r.height]).range([top,bottom]);
-
-	GEOGRAPHY.raster_coords = (x,y) => [w(x), h(y)];
-
 	callback(bounds);
 };
 

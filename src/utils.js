@@ -482,7 +482,7 @@ function table_add_lnglat(d, lnglat = [0, 0]) {
 };
 
 /*
- * ea_coordinates_in_raster
+ * coordinates_to_raster_pixel
  *
  * Transform a set of coordinates to the "relative position" inside a raster
  * that is bound to an area
@@ -490,12 +490,11 @@ function table_add_lnglat(d, lnglat = [0, 0]) {
  * NOTE: mercator only.
  *
  * @param "coords" int[2]. Coordinates in Longitude/Latitude to be transformed.
- * @param "bounds" {int,int,int,int}. Bounding box containing the raster data.
  * @param "raster" { width int, height int, novalue numeric, array numeric[] }
  *        full description.
  */
 
-function ea_coordinates_in_raster(coords, raster) {
+function coordinates_to_raster_pixel(coords, raster) {
 	const b = BOUNDARIES.raster;
 
 	const {left,bottom,right,top} = GEOGRAPHY.bounds;
@@ -503,16 +502,18 @@ function ea_coordinates_in_raster(coords, raster) {
 	if (coords.length !== 2)
 		throw Error(`ea_coordinates_raster: expected and array of length 2. Got ${coords}`);
 
-	const hs = d3.scaleLinear().domain([left, right]).range([0, b.width]);
-	const vs = d3.scaleLinear().domain([top, bottom]).range([0, b.height]);
+	const merc = new SphericalMercator({ size: 1 });
 
-	const plng = Math.floor(hs(coords[0]));
-	const plat = Math.floor(vs(coords[1]));
+	const [mx,my] = merc.forward([coords[0], coords[1]]);
+	const [bx,by] = merc.forward([BOUNDARIES.vectors.bounds[0], BOUNDARIES.vectors.bounds[3]]);
+
+	const plng = Math.round(Math.abs(mx - bx) / 1000);
+	const plat = Math.round(Math.abs(my - by) / 1000);
 
 	let a = null;
 
 	if ((plng > 0 && plng < b.width &&
-       plat > 0 && plat < b.height )) {
+       plat > 0 && plat < b.height)) {
 		a = { x: coords[0], y: coords[1] };
 
 		const i = (plat * b.width) + plng;

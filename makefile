@@ -52,6 +52,7 @@ build-a:
 		${LIB}/geotiff.js \
 		${LIB}/mapbox-gl.js \
 		${LIB}/geojson-extent.js \
+		${LIB}/sphericalmercator.js \
 		${LIB}/helpers.js \
 		${LIB}/flash.js \
 		${LIB}/modal.js \

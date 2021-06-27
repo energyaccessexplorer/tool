@@ -14,7 +14,7 @@ export function pointto(coords, dict, props, a = false) {
 
 	const {x,y} = MAPBOX.project(coords);
 
-	const rc = ea_coordinates_in_raster(coords, BOUNDARIES.raster);
+	const rc = coordinates_to_raster_pixel(coords, BOUNDARIES.raster);
 
 	if (a) analysis_context(rc, dict, props, null);
 

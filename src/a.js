@@ -597,7 +597,7 @@ function map_click(e) {
 	function click(fn) {
 		if (!INFOMODE) return;
 
-		const rc = ea_coordinates_in_raster([e.lngLat.lng, e.lngLat.lat], t.raster);
+		const rc = coordinates_to_raster_pixel([e.lngLat.lng, e.lngLat.lat], t.raster);
 
 		const {dict, props, et} = fn(rc);
 

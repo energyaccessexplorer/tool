@@ -30,6 +30,7 @@
     "GeoTIFF": "readonly",
     "geojsonExtent": "readonly",
     "jsPDF": "readonly",
+    "SphericalMercator": "readonly",
 
     "DST": "readonly",
     "GEOGRAPHY": "writable",
@@ -88,8 +89,8 @@
     "ea_svg_interval": "readonly",
     "ea_svg_pie": "readonly",
     "ea_opacity_control": "readonly",
-    "ea_coordinates_in_raster": "readonly",
     "ea_raster_in_coordinates": "readonly",
+    "coordinates_to_raster_pixel": "readonly",
     "ea_select_setup": "readonly",
     "timeline_lines_update": "readonly",
     "load_view": "readonly",

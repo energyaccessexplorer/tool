@@ -4,3 +4,4 @@
 /settings.json
 /postgrest.conf
 /extras.mk
+/*.diff

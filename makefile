@@ -175,7 +175,10 @@ synced:
 		${DIST}/ ${WEBSITE_SSH_USER}@${WEBSITE_HOST}:${TOOL_DEST}
 
 deploy:
+	patch -p1 <${env}.diff
 	bmake reconfig build sync env=${env}
+
+	patch -p1 --reverse <${env}.diff
 	bmake reconfig build reload env=development
 
 reconfig:

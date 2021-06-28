@@ -331,7 +331,17 @@ export function toggle_left_panel(t) {
 
 	qs('#drawer').style.display = 'block';
 
-	if (t) document.getElementById(t).style.display = '';
+	if (t) {
+		const p = document.getElementById(t);
+		p.style.display = '';
+
+		const i = p.querySelector('.search-input');
+		if (i) i.focus();
+
+		const e = new Event('activate');
+		p.dispatchEvent(e);
+	}
+
 	document.querySelector('#left-pane').style['min-width'] = t ? '40em' : '';
 
 	window.dispatchEvent(new Event('resize'));

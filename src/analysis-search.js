@@ -20,7 +20,12 @@ async function getpoints() {
 		.sort((a,b) => a > b ? -1 : 1)
 		.slice(0, n)[n-1];
 
-	const points = a.raster.reduce(function(t,v,i) { if (v >= threshold) t.push({i,v}); return t; }, []);
+	const points = a.raster.reduce((t,v,i) => {
+		if (v > 0 && v >= threshold)
+			t.push({i,v});
+
+		return t;
+	}, []);
 
 	return points.map(t => ({ v: t.v, i: raster_pixel_to_coordinates(t.i) }));
 };
@@ -64,8 +69,10 @@ async function trigger() {
 
 export function init() {
 	root = qs('#analysis.search-panel');
-	input = ce('button', "Click for top locations",
-						 { id: 'analysis-search', autocomplete: 'off', class: 'search-input', style: "cursor: pointer;" });
+	input = ce('span', "Analysis top locations",
+						 { id: 'analysis-search', class: 'search-input' });
+
+	root.addEventListener('activate', trigger);
 
 	root.prepend(input);
 

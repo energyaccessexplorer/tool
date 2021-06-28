@@ -14,10 +14,10 @@ function pointto(p, a = false) {
 	search_pointto(p.center, dict, props, a);
 };
 
-async function reset() {
+async function reset(v) {
 	elem_empty(ul);
 
-	resultsinfo.innerHTML = "<b>Location search</b>.";
+	resultsinfo.innerHTML = `<b>Results</b> for "${v}":`;
 };
 
 function icon(t) {
@@ -60,9 +60,9 @@ function li(p) {
 	return el;
 };
 
-function trigger(value) {
+function trigger(v) {
 	const token = mapboxgl.accessToken;
-	const q = encodeURI(value);
+	const q = encodeURI(v);
 
 	const {left, top, right, bottom} = GEOGRAPHY.bounds;
 	const box = [left, bottom, right, top];
@@ -76,7 +76,7 @@ function trigger(value) {
 			if (r.features.length)
 				r.features.forEach(t => ul.append(li(t)));
 			else
-				resultsinfo.innerHTML = `No results`;
+				resultsinfo.innerHTML = `No results for "${v}".`;
 		});
 };
 
@@ -91,11 +91,11 @@ export function init() {
 	ul = ce('ul');
 	resultscontainer.append(ul);
 
-	resultsinfo = ce('div', `<b>Location search</b>.`, { class: 'search-results-info' });
+	resultsinfo = ce('div', `<i>City, region, park...</i>`, { class: 'search-results-info' });
 	resultscontainer.prepend(resultsinfo);
 
 	input.onchange = function(_) {
-		reset();
+		reset(input.value);
 
 		if (this.value === "") return;
 

@@ -251,7 +251,7 @@ export async function init() {
 
 	fetch(`https://world.energyaccessexplorer.org/countries?select=cca2&cca3=eq.${GEOGRAPHY.cca3}`)
 		.then(r => r.json())
-		.then(r => GEOGRAPHY.cca2 = r[0]['cca2']);
+		.then(r => GEOGRAPHY.cca2 = maybe(r, 0, 'cca2'));
 
 	if (location.hostname.match(/^www/))
 		ENV = "production";

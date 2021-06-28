@@ -91,19 +91,14 @@
     "ea_opacity_control": "readonly",
 
     "coordinates_to_raster_pixel": "readonly",
-    "ea_select_setup": "readonly",
-    "timeline_lines_update": "readonly",
     "raster_pixel_to_coordinates": "readonly",
 
     "load_view": "readonly",
-    "parse_polygons_csv": "readonly",
-    "analysis_plot_active": "readonly",
     "load_view": "readonly",
     "map_click": "readonly",
 
     "fake_blob_download": "readonly",
     "table_add_lnglat": "readonly",
-    "table_data": "readonly",
-    "XXX": "readonly"
+    "table_data": "readonly"
   }
 }

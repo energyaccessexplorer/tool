@@ -1,7 +1,5 @@
 import * as cards from './cards.js';
 
-import * as controls from './controls.js';
-
 import * as controlssearch from './controls-search.js';
 
 import * as geographiessearch from './geographies-search.js';
@@ -162,7 +160,7 @@ function layout() {
 };
 
 function mobile() {
-	controls.select_tab(qs('#controls-tab-all'), "all");
+	controlssearch.select_tab(qs('#controls-tab-all'), "all");
 
 	for (let el of qsa('.controls-subbranch')) {
 		elem_collapse(qs('.controls-container', el), el);
@@ -783,7 +781,7 @@ function nanny_force() {
 	DS.array.filter(d => d.on).forEach(d => d.active(false, false));
 
 	O.view = 'inputs';
-	controls.select_tab(qs('#controls-tab-census'), "census");
+	controlssearch.select_tab(qs('#controls-tab-census'), "census");
 	ea_modal.hide();
 
 	O.view = U.view;

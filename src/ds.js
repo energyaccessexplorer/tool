@@ -221,7 +221,12 @@ This is not fatal but the dataset is now disabled.`
 
 		if (this.category.name === 'boundaries') t = "polygons-boundaries";
 
-		if (this.mutant) t = "raster-mutant";
+		if (this.mutant) {
+			const m = maybe(this.config, 'mutant_targets', 0);
+			if (!m) this.disable(`Missing targets.`);
+
+			t = DST.get(m).datatype + "-mutant";
+		}
 
 		return t;
 	};

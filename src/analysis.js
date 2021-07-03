@@ -283,7 +283,7 @@ export function context(rc, dict, props, skip = null) {
 	const controls = Array.from(document.querySelectorAll('ds-controls')).map(c => c.ds.id);
 
 	DS.array
-		.filter(d => d.on)
+		.filter(d => d.on && d.category.name !== 'boundaries' && d.id !== skip)
 		.sort((a,b) => {
 			const bi = controls.indexOf(b.id);
 			const ai = controls.indexOf(a.id);
@@ -293,28 +293,18 @@ export function context(rc, dict, props, skip = null) {
 			else return 0;
 		})
 		.forEach(d => {
-			if (d.id === skip) return;
+			let v = d.raster.data[rc.index];
+			let p = d.id;
 
-			if (d.datatype === 'raster') {
-				dict.push([d.id, d.name]);
-				props[d.id] = d.raster.data[rc.index] + " " + d.category.unit;
+			if (v === d.raster.nodata) return;
+
+			if (d.config.csv_columns) { // (!d.category.name.match(/^(timeline-)?indicator/))
+				p = "_analysis_" + p + "_" + d.config.csv_columns.id;
+				v = d.csv.table[v];
 			}
 
-			else if (d.config.csv_columns && d.category.name !== 'boundaries') {
-				dict.push(["_analysis_" + d.id + "_" + d.config.csv_columns.id, d.name]);
-				props["_analysis_" + d.id + "_" + d.config.csv_columns.id] = d.csv.table[d.raster.data[rc.index]] + " " + d.category.unit;
-			}
-
-			else if (d.raster &&
-							 d.category.name !== 'boundaries' &&
-							 !d.category.name.match(/^(timeline-)?indicator/)) {
-				dict.push([d.id, d.name]);
-
-				if (d.category.unit)
-					props[d.id] = d.raster.data[rc.index] + " " + d.category.unit;
-				else
-					props[d.id] = d.raster.data[rc.index] + " " + "km (proximity to)";
-			}
+			dict.push([p, d.name]);
+			props[p] = v + " " + (d.category.unit || "km (proximity to)");
 		});
 };
 

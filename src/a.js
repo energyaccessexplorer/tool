@@ -682,9 +682,6 @@ function map_click(e) {
 
 			props["value"] = `${vv} <code>${t.category.unit || ''}</code>`;
 		}
-		else {
-			console.log("No value (or nodata value) on raster.", rc);
-		}
 
 		return {dict, props};
 	};
@@ -702,10 +699,6 @@ function map_click(e) {
 			props = {
 				"aname": ea_lowmedhigh_scale(rc.value),
 			};
-		}
-
-		else {
-			console.log("No value on raster.", rc);
 		}
 
 		return {dict, props};

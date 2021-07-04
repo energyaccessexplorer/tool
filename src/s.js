@@ -66,7 +66,7 @@ async function geography(c) {
 	const coll = await ea_api.get("geographies", {
 		"datasets_count": "gt.0",
 		"parent_id": `eq.${c.id}`,
-		"envs": `ov.{${ENV}}`,
+		"deployment": `ov.{${ENV}}`,
 	});
 
 	const data = {};
@@ -188,7 +188,7 @@ export function init() {
 
 	ea_api.get("geographies", {
 		"adm": "eq.0",
-		"envs": `ov.{${ENV}}`,
+		"deployment": `ov.{${ENV}}`,
 	})
 		.then(countries_online => {
 			for (let co of countries_online) {

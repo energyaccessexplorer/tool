@@ -422,7 +422,7 @@ This is fatal. Thanks for all the fish.`;
 		"select": select,
 		"pack": `eq.${pack}`,
 		"df.active": "eq.true",
-		"envs": `ov.{${ENV}}`,
+		"deployment": `ov.{${ENV}}`,
 	};
 
 	await ea_api.get("datasets", p)

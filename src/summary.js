@@ -26,7 +26,7 @@ async function summary() {
 	const summary = {};
 
 	const ramp = tmpl("#ramp");
-	ramp.append(
+	ramp.querySelector('.ramp').append(
 		ce('div', "Low"),
 		ce('div', "Medium"),
 		ce('div', "High")

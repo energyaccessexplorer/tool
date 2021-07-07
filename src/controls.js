@@ -42,18 +42,6 @@ export default class dscontrols extends HTMLElement {
 		const lr = cat.controls.range_label || cat.unit || 'range';
 
 		switch (this.ds.datatype) {
-		case 'raster':
-		case 'raster-mutant': {
-			await until(_ => this.ds._domain);
-
-			this.range_group = range.call(this.ds, {
-				ramp: lr,
-				steps: steps,
-				sliders: cat.controls.range
-			});
-			break;
-		}
-
 		case 'points':
 		case 'lines':
 		case 'polygons': {
@@ -79,6 +67,18 @@ export default class dscontrols extends HTMLElement {
 				steps: steps,
 				sliders: cat.controls.range,
 				domain: this.ds.domain
+			});
+			break;
+		}
+
+		case 'raster':
+		case 'raster-mutant': {
+			await until(_ => this.ds._domain);
+
+			this.range_group = range.call(this.ds, {
+				ramp: lr,
+				steps: steps,
+				sliders: cat.controls.range
 			});
 			break;
 		}

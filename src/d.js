@@ -113,23 +113,6 @@ async function plot() {
 		await until(_ => this.csv.data);
 
 	switch (this.datatype) {
-	case 'raster': {
-		break;
-	}
-
-	case 'raster-mutant': {
-		ea_super_error(
-			"Pseudo-dataset",
-			`Nothing to see for a '${this.datatype}'
-
-Instead, see:
-  ${this.config.mutant_targets.join("\n  ")}`,
-			'warning'
-		);
-
-		return;
-	}
-
 	case 'points':
 	case 'lines':
 	case 'polygons': {
@@ -222,6 +205,23 @@ CSV has ${empties} empty cells.`
 		});
 
 		break;
+	}
+
+	case 'raster': {
+		break;
+	}
+
+	case 'raster-mutant': {
+		ea_super_error(
+			"Pseudo-dataset",
+			`Nothing to see for a '${this.datatype}'
+
+Instead, see:
+  ${this.config.mutant_targets.join("\n  ")}`,
+			'warning'
+		);
+
+		return;
 	}
 
 	default:

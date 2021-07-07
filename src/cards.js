@@ -287,8 +287,8 @@ export default class dscard extends HTMLElement {
 			break;
 		}
 
-		case 'polygons-boundaries':
-		case 'polygons': {
+		case 'polygons':
+		case 'polygons-boundaries': {
 			e = polygons_symbol({
 				size: 28,
 				fill: ds.vectors.fill,

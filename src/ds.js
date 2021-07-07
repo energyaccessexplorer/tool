@@ -12,6 +12,8 @@ export default class DS {
 
 		this.category = o.category;
 
+		this.datatype = o.datatype;
+
 		this.category_overrides(o.category_overrides);
 
 		this.on = on || false;
@@ -105,13 +107,13 @@ This is not fatal but the dataset is now disabled.`
 					break;
 				}
 
-				case 'polygons': {
-					p = x => parse.polygons.call(x || this);
+				case 'lines': {
+					p = x => parse.lines.call(x || this);
 					break;
 				}
 
-				case 'lines': {
-					p = x => parse.lines.call(x || this);
+				case 'polygons': {
+					p = x => parse.polygons.call(x || this);
 					break;
 				}
 				}
@@ -157,16 +159,16 @@ This is not fatal but the dataset is now disabled.`
 		}
 
 		switch (this.datatype) {
-		case 'raster': {
-			this.download = this.raster.endpoint;
-			break;
-		}
-
 		case 'points':
 		case 'lines':
 		case 'polygons':
 		case 'polygons-fixed': {
 			this.download = this.vectors.endpoint;
+			break;
+		}
+
+		case 'raster': {
+			this.download = this.raster.endpoint;
 			break;
 		}
 
@@ -207,28 +209,6 @@ This is not fatal but the dataset is now disabled.`
 			if (!ovrr[a]) continue;
 			this.category[a] = ovrr[a];
 		}
-	};
-
-	get datatype() {
-		let t;
-
-		if (this.vectors) t = this.vectors.shape_type;
-		else if (this.raster) t = "raster";
-		else if (this.csv) t = "table";
-
-		if (this.config.csv_columns) t += "-fixed";
-		else if (this.timeline) t += "-timeline";
-
-		if (this.category.name === 'boundaries') t = "polygons-boundaries";
-
-		if (this.mutant) {
-			const m = maybe(this.config, 'mutant_targets', 0);
-			if (!m) this.disable(`Missing targets.`);
-
-			t = DST.get(m).datatype + "-mutant";
-		}
-
-		return t;
 	};
 
 	disable(msg) {
@@ -452,16 +432,6 @@ This is not fatal but the dataset is now disabled.`
 		if (this.colorscale) return;
 
 		switch (this.datatype) {
-		case 'raster': {
-			this.colorscale = ea_colorscale({
-				stops: this.category.colorstops,
-				domain: this.domain,
-				intervals: this.raster.intervals
-			});
-
-			break;
-		}
-
 		case 'polygons-fixed': {
 			if (this.config.csv_columns) {
 				this.colorscale = ea_colorscale({
@@ -474,6 +444,16 @@ This is not fatal but the dataset is now disabled.`
 		case 'polygons-timeline': {
 			this.colorscale = ea_colorscale({
 				stops: this.category.colorstops,
+			});
+
+			break;
+		}
+
+		case 'raster': {
+			this.colorscale = ea_colorscale({
+				stops: this.category.colorstops,
+				domain: this.domain,
+				intervals: this.raster.intervals
 			});
 
 			break;
@@ -590,10 +570,10 @@ This is not fatal but the dataset is now disabled.`
 			break;
 		}
 
+		case 'polygons':
 		case 'polygons-fixed':
 		case 'polygons-timeline':
-		case 'polygons-boundaries':
-		case 'polygons': {
+		case 'polygons-boundaries': {
 			t = ['fill-opacity'];
 			break;
 		}

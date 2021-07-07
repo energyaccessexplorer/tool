@@ -380,7 +380,7 @@ function drawer_init() {
  */
 
 async function dsinit(id, inputs, pack, callback) {
-	let select = ["*", "category:categories(*)", "df:_datasets_files(*,file:files(*))"];
+	let select = ["*", "datatype", "category:categories(*)", "df:_datasets_files(*,file:files(*))"];
 
 	let bounds;
 	const divisions = maybe(GEOGRAPHY.configuration, 'divisions');

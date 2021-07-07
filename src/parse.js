@@ -26,6 +26,8 @@ Failed to process dataset '${this.name}'.
 This is fatal. Thanks for all the fish.
 
 ${msg}`);
+
+		throw new Error(msg);
 	}
 
 	else {

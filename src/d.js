@@ -97,12 +97,11 @@ This is fatal. Thanks for all the fish.`;
 		"select": select
 	};
 
-	await ea_api.get("datasets", p, { one: true })
-		.then(e => {
-			const ds = new DS(e, true);
-			ds.active(true, true);
-			plot.call(ds);
-		});
+	const e = await ea_api.get("datasets", p, { one: true });
+	const ds = new DS(e, true);
+
+	await ds.active(true, true);
+	plot.call(ds);
 };
 
 async function plot() {

@@ -467,10 +467,6 @@ This is not fatal but the dataset is now disabled.`
 		}
 	};
 
-	active() {
-		this._active(...arguments);
-	};
-
 	info_modal() {
 		const b = this.metadata;
 		b['why'] = this.category.metadata.why;
@@ -486,7 +482,7 @@ This is not fatal but the dataset is now disabled.`
 		}).show();
 	};
 
-	async _active(v, draw) {
+	async active(v, draw) {
 		this.on = v;
 
 		if (v) {

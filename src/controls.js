@@ -39,7 +39,7 @@ export default class dscontrols extends HTMLElement {
 				steps[i] = this.ds.domain.min + (s * i);
 		}
 
-		const lr = or(cat.controls.range_label, cat.unit, 'range');
+		const lr = coalesce(cat.controls.range_label, cat.unit, 'range');
 
 		switch (this.ds.datatype) {
 		case 'points':

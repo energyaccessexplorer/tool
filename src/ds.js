@@ -30,10 +30,10 @@ export default class DS {
 
 		this.timeline = this.category.timeline;
 
-		this.name = or(o.name_long,
-									 o.name,
-									 this.category.name_long,
-									 this.category.name);
+		this.name = coalesce(o.name_long,
+		                     o.name,
+		                     this.category.name_long,
+		                     this.category.name);
 
 		this.metadata = o.metadata;
 

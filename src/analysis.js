@@ -180,12 +180,16 @@ export function datasets(type) {
 			else
 				d._afn = d.analysis_fn;
 
+			if (!and(d.domain, d._domain)) {
+				console.warn(`Discarding '${d.id}'. Domain is not set yet...`);
+				return false;
+			}
+
 			// Discard datasets which are filters and use the entire domain (useless).
 			//
 			if (and(ea_filters.includes(d.analysis_scale(type)),
-							(and(d.domain, d._domain,
-									 and(d._domain.min === d.domain.min,
-											 d._domain.max === d.domain.max)))))
+			        and(d._domain.min === d.domain.min,
+			            d._domain.max === d.domain.max)))
 				return false;
 
 			return true;
@@ -307,7 +311,7 @@ export function context(rc, dict, props, skip = null) {
 };
 
 function wait_for_rasters(id) {
-	console.log(`Dataset '${id}' has no raster.data (yet). Waiting for it`);
+	console.warn(`Dataset '${id}' has no raster.data (yet). Waiting for it`);
 
 	until(_ => DS.array.filter(d => and(d.on, d.raster, d.analysis, !d.raster.data)).length === 0)
 		.then(_ => plot_active(U.output))

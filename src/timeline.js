@@ -170,12 +170,9 @@ function multiline(opts) {
 			const i = xm - data.dates[i0] > data.dates[i1] - xm ? i1 : i0;
 			const s = data.series.reduce((a, b) => Math.abs(a.values[i] - ym) < Math.abs(b.values[i] - ym) ? a : b, []);
 
-			if (!(
-				active_series &&
-          has(s.values,i) &&
-          has(data.dates, i)
-			)) return;
-
+			if (!and(active_series,
+							 has(s.values,i),
+							 has(data.dates, i))) return;
 
 			dot.attr("transform", `translate(${x(data.dates[i])},${y(active_series.values[i])})`);
 

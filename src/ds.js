@@ -30,7 +30,10 @@ export default class DS {
 
 		this.timeline = this.category.timeline;
 
-		this.name = o.name_long || o.name || this.category.name_long || this.category.name;
+		this.name = or(o.name_long,
+									 o.name,
+									 this.category.name_long,
+									 this.category.name);
 
 		this.metadata = o.metadata;
 
@@ -353,7 +356,7 @@ This is not fatal but the dataset is now disabled.`
 			else {
 				s = x => {
 					let z = this.csv.table[x];
-					return ((undefined === z) || z < min || z > max) ? -1 : 1;
+					return or(undefined === z, z < min, z > max) ? -1 : 1;
 				};
 			}
 

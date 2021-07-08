@@ -171,11 +171,7 @@ export default function run(type) {
 
 export function datasets(type) {
 	return DS.array
-		.filter(d => {
-			return d.on
-				&& d.raster
-				&& d.analysis;
-		})
+		.filter(d => and(d.on, d.raster, d.analysis))
 		.filter(d => {
 			// Discard datasets which have no analysis_fn (eg. boundaries).
 			//
@@ -186,8 +182,10 @@ export function datasets(type) {
 
 			// Discard datasets which are filters and use the entire domain (useless).
 			//
-			if (ea_filters.includes(d.analysis_scale(type)) &&
-					(d._domain && d.domain && (d._domain.min === d.domain.min && d._domain.max === d.domain.max)))
+			if (and(ea_filters.includes(d.analysis_scale(type)),
+							(and(d.domain, d._domain,
+									 and(d._domain.min === d.domain.min,
+											 d._domain.max === d.domain.max)))))
 				return false;
 
 			return true;
@@ -311,12 +309,7 @@ export function context(rc, dict, props, skip = null) {
 function wait_for_rasters(id) {
 	console.log(`Dataset '${id}' has no raster.data (yet). Waiting for it`);
 
-	until(_ => DS.array.filter(d => {
-		return d.on
-			&& d.raster
-			&& d.analysis
-			&& !d.raster.data;
-	}).length === 0)
+	until(_ => DS.array.filter(d => and(d.on, d.raster, d.analysis, !d.raster.data)).length === 0)
 		.then(_ => plot_active(U.output))
 		.then(_ => O.sort());
 };

@@ -51,6 +51,8 @@
     "until": "readonly",
     "maybe": "readonly",
     "has": "readonly",
+    "and": "readonly",
+    "or": "readonly",
     "coalesce": "readonly",
     "elem_empty": "readonly",
     "el_tree": "readonly",

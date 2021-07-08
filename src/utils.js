@@ -512,8 +512,10 @@ function coordinates_to_raster_pixel(coords, raster) {
 
 	let a = null;
 
-	if ((plng > 0 && plng < b.width &&
-       plat > 0 && plat < b.height)) {
+	if (and(plng > 0,
+					plng < b.width,
+					plat > 0,
+					plat < b.height)) {
 		a = { x: coords[0], y: coords[1] };
 
 		const i = (plat * b.width) + plng;

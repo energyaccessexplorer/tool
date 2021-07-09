@@ -48,16 +48,15 @@ export default class Overlord {
 		}
 
 		case "active": {
-			ds.active(data, ['inputs', 'timeline'].includes(U.view))
-				.then(_ => {
-					let arr = U.inputs;
-					if (ds.on) arr.unshift(ds.id);
-					else arr.splice(arr.indexOf(ds.id), 1);
+			ds.active(data, ['inputs', 'timeline'].includes(U.view));
 
-					O.datasets = arr;
-					timeline_lines_update();
-				});
+			let arr = U.inputs;
+			if (ds.on) arr.unshift(ds.id);
+			else arr.splice(arr.indexOf(ds.id), 1);
 
+			O.datasets = arr;
+
+			timeline_lines_update();
 			break;
 		}
 

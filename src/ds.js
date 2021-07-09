@@ -482,7 +482,11 @@ This is not fatal but the dataset is now disabled.`
 		}).show();
 	};
 
-	async active(v, draw) {
+	active() {
+		this._active(...arguments);
+	};
+
+	async _active(v, draw) {
 		this.on = v;
 
 		if (v) {
@@ -514,7 +518,7 @@ This is not fatal but the dataset is now disabled.`
 	};
 
 	loadall() {
-		if (this.loaded) return;
+		if (this.loaded) return Whatever;
 
 		return Promise.all(['vectors', 'csv', 'raster'].map(i => this[i] ? this.load(i) : null))
 			.then(_ => (this.loaded = true));

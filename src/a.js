@@ -384,22 +384,22 @@ async function dsinit(id, inputs, pack, callback) {
 
 	let bounds;
 
-	// TODO: this should be more strict divisions 0/contour
+	// TODO: this should be more strict divisions 0/outline
 	const divisions = maybe(GEOGRAPHY.configuration, 'divisions');
-	const boundaries_id = maybe(divisions.find(d => d.dataset_id), 'dataset_id');
+	const outline_id = maybe(divisions.find(d => d.dataset_id), 'dataset_id');
 
-	if (!boundaries_id) {
+	if (!outline_id) {
 		const m = `
-Failed to get the geography's BOUNDARIES.
+Failed to get the geography's OUTLINE.
 This is fatal. Thanks for all the fish.`;
 
 		ea_super_error("Geography error", m);
 
-		throw Error("No BOUNDARIES. Ciao.");
+		throw Error("No OUTLINE. Ciao.");
 	}
 
 	const bp = {
-		"id": `eq.${boundaries_id}`,
+		"id": `eq.${outline_id}`,
 		"select": select,
 		"df.active": "eq.true"
 	};
@@ -407,14 +407,14 @@ This is fatal. Thanks for all the fish.`;
 	await ea_api.get("datasets", bp, { one: true })
 		.then(async e => {
 			const ds = new DS(e, false);
-			BOUNDARIES = ds;
+			OUTLINE = ds;
 
 			await ds.load('csv');
 			await ds.load('vectors');
 			await ds.load('raster');
 
 			if (!(bounds = ds.vectors.bounds))
-				throw `'BOUNDARIES' has no vectors.bounds`;
+				throw `'OUTLINE' has no vectors.bounds`;
 		});
 
 	await Promise.all(
@@ -442,7 +442,7 @@ This is fatal. Thanks for all the fish.`;
 	};
 
 	await ea_api.get("datasets", p)
-		.then(r => r.filter(d => and(d.id !== BOUNDARIES.dataset_id, !DST.get(d.dataset_id))))
+		.then(r => r.filter(d => and(d.id !== OUTLINE.dataset_id, !DST.get(d.dataset_id))))
 		.then(r => r.map(e => new DS(e, inputs.includes(e.category.name))));
 
 	U.params.inputs = [...new Set(DS.array.map(e => e.id))];
@@ -493,7 +493,7 @@ function load_view() {
 		if (!MAPBOX.getSource('filtered-source')) {
 			MAPBOX.addSource('filtered-source', {
 				"type": 'geojson',
-				"data": BOUNDARIES.vectors.features
+				"data": OUTLINE.vectors.features
 			});
 		}
 

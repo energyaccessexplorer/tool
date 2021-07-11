@@ -19,10 +19,9 @@ import {
 export default function run(type) {
 	const t0 = performance.now();
 
-	const boundaries = BOUNDARIES;
 	let list = datasets(type);
 
-	const it = new Float32Array(list.length ? boundaries.raster.data.length: 0).fill(-1);
+	const it = new Float32Array(list.length ? OUTLINE.raster.data.length: 0).fill(-1);
 
 	// There's nothing interesting about an analysis with only filters. Also,
 	// filters return 1 so a silly (single-valued) analysis would be plotted.
@@ -173,7 +172,7 @@ export function datasets(type) {
 	return DS.array
 		.filter(d => and(d.on, d.raster, d.analysis))
 		.filter(d => {
-			// Discard datasets which have no analysis_fn (eg. boundaries).
+			// Discard datasets which have no analysis_fn (eg. outline).
 			//
 			if (typeof d.analysis_fn(type) !== 'function')
 				d._afn = _ => x => (x < d._domain.min || x > d._domain.max) ? -1 : 1;
@@ -247,7 +246,7 @@ export async function plot_active(type, doindexes) {
 };
 
 export async function raster_to_tiff(type) {
-	const b = BOUNDARIES;
+	const b = OUTLINE;
 
 	const raster = await run(type);
 

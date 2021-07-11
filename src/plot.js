@@ -35,18 +35,16 @@ export function drawcanvas(opts) {
  */
 
 export function outputcanvas(data, canvas = null) {
-	const A = BOUNDARIES;
-
 	if (!data.length) {
 		console.warn("plot.outputcanvas: no raster given. Filling up with a blank (transparent) one...");
-		data = new Float32Array(A.raster.data.length).fill(-1);
+		data = new Float32Array(OUTLINE.raster.data.length).fill(-1);
 	};
 
 	drawcanvas({
 		canvas: canvas || qs('canvas#output'),
 		data: data,
-		width: A.raster.width,
-		height: A.raster.height,
+		width: OUTLINE.raster.width,
+		height: OUTLINE.raster.height,
 		nodata: -1,
 		colorscale: ea_analysis_colorscale,
 	});

@@ -52,20 +52,20 @@ async function dsinit(id, callback) {
 
 	let bounds;
 	const divisions = maybe(GEOGRAPHY.configuration, 'divisions');
-	const boundaries_id = maybe(divisions.find(d => d.dataset_id), 'dataset_id');
+	const outline_id = maybe(divisions.find(d => d.dataset_id), 'dataset_id');
 
-	if (!boundaries_id) {
+	if (!outline_id) {
 		const m = `
-Failed to get the geography's BOUNDARIES.
+Failed to get the geography's OUTLINE.
 This is fatal. Thanks for all the fish.`;
 
 		ea_super_error("Geography error", m);
 
-		throw Error("No BOUNDARIES. Ciao.");
+		throw Error("No OUTLINE. Ciao.");
 	}
 
 	const bp = {
-		"id": `eq.${boundaries_id}`,
+		"id": `eq.${outline_id}`,
 		"select": select,
 		"df.active": "eq.true"
 	};
@@ -73,21 +73,21 @@ This is fatal. Thanks for all the fish.`;
 	await ea_api.get("datasets", bp, { one: true })
 		.then(async e => {
 			let ds = new DS(e, false);
-			BOUNDARIES = ds;
+			OUTLINE = ds;
 
 			await ds.load('csv');
 			await ds.load('vectors');
 			await ds.load('raster');
 
 			if (!(bounds = ds.vectors.bounds))
-				throw `'BOUNDARIES' has no vectors.bounds`;
+				throw `'OUTLINE' has no vectors.bounds`;
 		});
 
 	callback(bounds);
 
-	if (boundaries_id === dataset_id) {
-		await plot.call(BOUNDARIES);
-		BOUNDARIES.active(true, true);
+	if (outline_id === dataset_id) {
+		await plot.call(OUTLINE);
+		OUTLINE.active(true, true);
 		return;
 	}
 

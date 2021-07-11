@@ -34,7 +34,7 @@
 
     "DST": "readonly",
     "GEOGRAPHY": "writable",
-    "BOUNDARIES": "writable",
+    "OUTLINE": "writable",
     "MAPBOX": "writable",
     "INFOMODE": "writable",
     "NORM_STOPS": "writable",

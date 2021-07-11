@@ -20,7 +20,7 @@ async function fetchcheck(endpoint, format) {
 };
 
 export function fail(msg = "") {
-	if (this === BOUNDARIES) {
+	if (this === OUTLINE) {
 		ea_super_error("Dataset error", `
 Failed to process dataset '${this.name}'.
 This is fatal. Thanks for all the fish.
@@ -143,17 +143,15 @@ export function raster() {
 				this.domain = { min, max };
 			}
 
-			if (this !== BOUNDARIES) {
-				const b = BOUNDARIES;
-
-				if (this.raster.width !== b.raster.width) {
+			if (this !== OUTLINE) {
+				if (this.raster.width !== OUTLINE.raster.width) {
 					// TODO: enable this when paver is ready
 					//
-					// || this.raster.height !== b.raster.height
+					// || this.raster.height !== OUTLINE.raster.height
 					//
-					fail.call(this, `Raster resolution does not match BOUNDARIES.
+					fail.call(this, `Raster resolution does not match OUTLINE.
 ${this.id}: ${this.raster.width} × ${this.raster.height}
-BOUNDARIES: ${b.raster.width} × ${b.raster.height}`);
+OUTLINE: ${OUTLINE.raster.width} × ${OUTLINE.raster.height}`);
 				}
 			}
 		}
@@ -178,7 +176,7 @@ function geojson() {
 		.then(r => r.json())
 		.then(r => {
 			this.vectors.features = r;
-			if (this === BOUNDARIES) this.vectors.bounds = geojsonExtent(r);
+			if (this === OUTLINE) this.vectors.bounds = geojsonExtent(r);
 		});
 };
 

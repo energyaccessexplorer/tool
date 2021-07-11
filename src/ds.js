@@ -158,7 +158,7 @@ This is not fatal but the dataset is now disabled.`
 
 	init() {
 		if (this.timeline) {
-			const b = BOUNDARIES;
+			const b = OUTLINE;
 			this.vectors = JSON.parse(JSON.stringify(b.vectors));
 			this.vectors.endpoint = b.vectors.endpoint;
 			this.vectors.parse = x => parse.polygons.call(x || this);

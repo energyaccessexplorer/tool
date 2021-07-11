@@ -39,18 +39,14 @@ export async function init() {
 
 	U = {};
 
-	await dsinit(GEOGRAPHY.id, bounds => {
-		MAPBOX.coords = mapbox.fit(bounds);
-		mapbox.change_theme(ea_settings.mapbox_theme);
-	});
+	await dsinit(GEOGRAPHY.id);
 
 	await until(_ => DS.array.filter(d => d.on).every(d => d.loading === false));
 };
 
-async function dsinit(id, callback) {
-	let select = ["*", "category:categories(*)", "df:_datasets_files(*,file:files(*))"];
+async function dsinit(_) {
+	let select = ["*", "datatype", "category:categories(*)", "df:_datasets_files(*,file:files(*))"];
 
-	let bounds;
 	const divisions = maybe(GEOGRAPHY.configuration, 'divisions');
 	const outline_id = maybe(divisions.find(d => d.dataset_id), 'dataset_id');
 
@@ -64,26 +60,44 @@ This is fatal. Thanks for all the fish.`;
 		throw Error("No OUTLINE. Ciao.");
 	}
 
-	const bp = {
-		"id": `eq.${outline_id}`,
-		"select": select,
-		"df.active": "eq.true"
-	};
+	await (function fetch_outline() {
+		if (!outline_id) {
+			const m = `
+Failed to get the geography's OUTLINE.
+This is fatal. Thanks for all the fish.`;
 
-	await ea_api.get("datasets", bp, { one: true })
-		.then(async e => {
-			let ds = new DS(e, false);
-			OUTLINE = ds;
+			ea_super_error("Geography error", m);
 
-			await ds.load('csv');
-			await ds.load('vectors');
-			await ds.load('raster');
+			throw Error("No OUTLINE. Ciao.");
+		}
 
-			if (!(bounds = ds.vectors.bounds))
-				throw `'OUTLINE' has no vectors.bounds`;
-		});
+		const bp = {
+			"id": `eq.${outline_id}`,
+			"select": select,
+			"df.active": "eq.true"
+		};
 
-	callback(bounds);
+		return ea_api.get("datasets", bp, { one: true })
+			.then(async e => {
+				const ds = OUTLINE = new DS(e, false);
+
+				await ds.load('csv');
+				await ds.load('vectors');
+				await ds.load('raster');
+
+				if (!ds.vectors.bounds)
+					throw `'OUTLINE' has no vectors.bounds`;
+				else {
+					const b = ds.vectors.bounds;
+
+					const [left, bottom, right, top] = b;
+					GEOGRAPHY.bounds = { left, bottom, right, top };
+
+					MAPBOX.coords = mapbox.fit(b);
+					mapbox.change_theme(ea_settings.mapbox_theme);
+				}
+			});
+	})();
 
 	if (outline_id === dataset_id) {
 		await plot.call(OUTLINE);

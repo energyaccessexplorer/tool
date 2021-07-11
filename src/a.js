@@ -271,10 +271,7 @@ export async function init() {
 
 	MAPBOX = mapbox.init(O);
 
-	await dsinit(GEOGRAPHY.id, U.inputs, U.pack, bounds => {
-		MAPBOX.coords = mapbox.fit(bounds);
-		mapbox.change_theme(ea_settings.mapbox_theme);
-	});
+	await dsinit(GEOGRAPHY.id, U.inputs, U.pack);
 
 	O.index = U.output;
 
@@ -298,27 +295,6 @@ export async function init() {
 	if (!MOBILE && !GEOGRAPHY.timeline) nanny_init();
 
 	ea_loading(false);
-
-	GEOGRAPHY.configuration.divisions.slice(1).forEach(d => {
-		if (!d.dataset_id) return;
-
-		const ds = DS.array.find(x => x.dataset_id === d.dataset_id);
-
-		// TODO: remove this HACK ds.loaded hack
-		if (ds) ds.loadall().then(_ => ds.loaded = false);
-		else {
-			const m = `
-Failed setting the geography's: '${d.name}'.
-This is a configuration error. Not fatal (yet).`;
-
-			ea_flash.push({
-				type: "error",
-				timeout: 10000,
-				title: "Divisions error",
-				message: m
-			});
-		}
-	});
 };
 
 export function toggle_left_panel(t) {
@@ -374,76 +350,94 @@ function drawer_init() {
  * @param "id" uuid
  * @param "inputs" string[] with DS.id's
  * @param "pack" string ("all" ...)
- * @param "callback" function to run with the boundaries
  *
  * returns DS[]
  */
 
-async function dsinit(id, inputs, pack, callback) {
+async function dsinit(id, inputs, pack) {
 	let select = ["*", "datatype", "category:categories(*)", "df:_datasets_files(*,file:files(*))"];
 
-	let bounds;
-
-	// TODO: this should be more strict divisions 0/outline
 	const divisions = maybe(GEOGRAPHY.configuration, 'divisions');
-	const outline_id = maybe(divisions.find(d => d.dataset_id), 'dataset_id');
 
-	if (!outline_id) {
-		const m = `
+	await (function fetch_outline() {
+		// TODO: this should be more strict divisions 0/outline
+		const outline_id = maybe(divisions.find(d => d.dataset_id), 'dataset_id');
+
+		if (!outline_id) {
+			const m = `
 Failed to get the geography's OUTLINE.
 This is fatal. Thanks for all the fish.`;
 
-		ea_super_error("Geography error", m);
+			ea_super_error("Geography error", m);
 
-		throw Error("No OUTLINE. Ciao.");
-	}
+			throw Error("No OUTLINE. Ciao.");
+		}
 
-	const bp = {
-		"id": `eq.${outline_id}`,
-		"select": select,
-		"df.active": "eq.true"
-	};
+		const bp = {
+			"id": `eq.${outline_id}`,
+			"select": select,
+			"df.active": "eq.true"
+		};
 
-	await ea_api.get("datasets", bp, { one: true })
-		.then(async e => {
-			const ds = new DS(e, false);
-			OUTLINE = ds;
+		return ea_api.get("datasets", bp, { one: true })
+			.then(async e => {
+				const ds = OUTLINE = new DS(e, false);
 
-			await ds.load('csv');
-			await ds.load('vectors');
-			await ds.load('raster');
+				await ds.load('csv');
+				await ds.load('vectors');
+				await ds.load('raster');
 
-			if (!(bounds = ds.vectors.bounds))
-				throw `'OUTLINE' has no vectors.bounds`;
-		});
+				if (!ds.vectors.bounds)
+					throw `'OUTLINE' has no vectors.bounds`;
+				else {
+					const b = ds.vectors.bounds;
 
-	await Promise.all(
-		divisions
-			.filter(x => and(x.dataset_id, !DST.get(x.dataset_id)))
-			.map(x => {
-				const dp = {
-					"id": `eq.${x.dataset_id}`,
-					"select": select,
-				};
+					const [left, bottom, right, top] = b;
+					GEOGRAPHY.bounds = { left, bottom, right, top };
 
-				return ea_api.get("datasets", dp, { one: true })
-					.then(e => new DS(e, false));
-			})
-	);
+					MAPBOX.coords = mapbox.fit(b);
+					mapbox.change_theme(ea_settings.mapbox_theme);
+				}
+			});
+	})();
 
-	pack = maybe(pack, 'length') ? pack : 'all';
+	(function fetch_divisions() {
+		return Promise.all(
+			divisions
+				.filter(x => and(x.dataset_id, !DST.get(x.dataset_id)))
+				.map(x => {
+					const dp = {
+						"id": `eq.${x.dataset_id}`,
+						"select": select,
+					};
 
-	const p = {
-		"geography_id": `eq.${id}`,
-		"select": select,
-		"pack": `eq.${pack}`,
-		"df.active": "eq.true",
-		"deployment": `ov.{${ENV}}`,
-	};
+					return ea_api.get("datasets", dp, { one: true })
+						.then(async e => {
+							const ds = new DS(e, false);
 
-	await ea_api.get("datasets", p)
-		.then(r => r.filter(d => and(d.id !== OUTLINE.dataset_id, !DST.get(d.dataset_id))))
-		.then(r => r.map(e => new DS(e, inputs.includes(e.category.name))));
+							await ds.load('csv');
+							await ds.load('vectors');
+							await ds.load('raster');
+						});
+				})
+		);
+	})();
+
+	await (function fetch_datasets() {
+		pack = maybe(pack, 'length') ? pack : 'all';
+
+		const p = {
+			"geography_id": `eq.${id}`,
+			"select": select,
+			"pack": `eq.${pack}`,
+			"df.active": "eq.true",
+			"deployment": `ov.{${ENV}}`,
+		};
+
+		return ea_api.get("datasets", p)
+			.then(r => r.filter(d => and(d.id !== OUTLINE.dataset_id, !DST.get(d.dataset_id))))
+			.then(r => r.map(e => new DS(e, inputs.includes(e.category.name))));
+	})();
 
 	U.params.inputs = [...new Set(DS.array.map(e => e.id))];
 
@@ -452,11 +446,6 @@ This is fatal. Thanks for all the fish.`;
 	//
 	DS.array.filter(d => d.mutant).forEach(d => d.mutant_init());
 	DS.array.filter(d => d.items).forEach(d => d.items_init());
-
-	const [left, bottom, right, top] = bounds;
-	GEOGRAPHY.bounds = { left, bottom, right, top };
-
-	callback(bounds);
 };
 
 function load_view() {
@@ -464,7 +453,7 @@ function load_view() {
 
 	const {view, output, inputs} = U;
 
-	function special_layers() {
+	(function special_layers() {
 		if (!MAPBOX.getSource('output-source')) {
 			MAPBOX.addSource('output-source', {
 				"type": 'canvas',
@@ -515,9 +504,7 @@ function load_view() {
 			mapbox.dblclick('filtered-layer');
 			mapbox.zoomend('filtered-layer');
 		}
-	};
-
-	special_layers();
+	})();
 
 	switch (view) {
 	case "outputs": {

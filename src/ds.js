@@ -67,8 +67,12 @@ export default class DS {
 	};
 
 	files_setup(o) {
-		const ferr = (t,i) => {
-			if (i && ['vectors', 'raster'].includes(t)) return;
+		let indicator = false;
+
+		const ferr = t => {
+			if (indicator && ['vectors', 'raster'].includes(t)) return;
+
+			if (this.id === 'contour') return;
 
 			ea_flash.push({
 				type: 'error',
@@ -83,8 +87,6 @@ This is not fatal but the dataset is now disabled.`
 			this.disable(`Missing ${t}`);
 		};
 
-		let indicator = false;
-
 		if (this.category.name.match(/^(timeline-)?indicator/)) {
 			const did = GEOGRAPHY.configuration.divisions[this.config.divisions_tier]['dataset_id'];
 
@@ -98,7 +100,7 @@ This is not fatal but the dataset is now disabled.`
 		if (o.category.vectors) {
 			const f = maybe(o.df.find(x => x.func === 'vectors'), 'file');
 
-			if (!f) ferr('vectors', indicator);
+			if (!f) ferr('vectors');
 			else {
 				this.vectors = {};
 				Object.assign(this.vectors, o.category.vectors, f);
@@ -131,7 +133,7 @@ This is not fatal but the dataset is now disabled.`
 		if (o.category.raster) {
 			const f = maybe(o.df.find(x => x.func === 'raster'), 'file');
 
-			if (!f) ferr('raster', indicator);
+			if (!f) ferr('raster');
 			else {
 				this.raster = {};
 				Object.assign(this.raster, o.category.raster, f);

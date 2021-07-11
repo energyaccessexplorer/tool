@@ -63,6 +63,7 @@ export default class DS {
 		}
 
 		DST.set(this.id, this);
+		DST.set(this.dataset_id, this);
 	};
 
 	files_setup(o) {
@@ -85,7 +86,9 @@ This is not fatal but the dataset is now disabled.`
 		let indicator = false;
 
 		if (this.category.name.match(/^(timeline-)?indicator/)) {
-			const b = BOUNDARIES;
+			const did = GEOGRAPHY.configuration.divisions[this.config.divisions_tier]['dataset_id'];
+
+			const b = DST.get(did);
 			this.raster = b.raster;
 			this.vectors = b.vectors;
 

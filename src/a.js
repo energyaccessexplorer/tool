@@ -383,6 +383,8 @@ async function dsinit(id, inputs, pack, callback) {
 	let select = ["*", "datatype", "category:categories(*)", "df:_datasets_files(*,file:files(*))"];
 
 	let bounds;
+
+	// TODO: this should be more strict divisions 0/contour
 	const divisions = maybe(GEOGRAPHY.configuration, 'divisions');
 	const boundaries_id = maybe(divisions.find(d => d.dataset_id), 'dataset_id');
 
@@ -415,6 +417,20 @@ This is fatal. Thanks for all the fish.`;
 				throw `'BOUNDARIES' has no vectors.bounds`;
 		});
 
+	await Promise.all(
+		divisions
+			.filter(x => and(x.dataset_id, !DST.get(x.dataset_id)))
+			.map(x => {
+				const dp = {
+					"id": `eq.${x.dataset_id}`,
+					"select": select,
+				};
+
+				return ea_api.get("datasets", dp, { one: true })
+					.then(e => new DS(e, false));
+			})
+	);
+
 	pack = maybe(pack, 'length') ? pack : 'all';
 
 	const p = {
@@ -426,7 +442,7 @@ This is fatal. Thanks for all the fish.`;
 	};
 
 	await ea_api.get("datasets", p)
-		.then(r => r.filter(d => d.id !== BOUNDARIES.dataset_id))
+		.then(r => r.filter(d => and(d.id !== BOUNDARIES.dataset_id, !DST.get(d.dataset_id))))
 		.then(r => r.map(e => new DS(e, inputs.includes(e.category.name))));
 
 	U.params.inputs = [...new Set(DS.array.map(e => e.id))];

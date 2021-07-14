@@ -64,8 +64,7 @@ function trigger(v) {
 	const token = mapboxgl.accessToken;
 	const q = encodeURI(v);
 
-	const {left, top, right, bottom} = GEOGRAPHY.bounds;
-	const box = [left, bottom, right, top];
+	const box = GEOGRAPHY.envelope;
 
 	const types = ['region', 'district', 'place', 'locality', 'neighborhood', 'poi'];
 	const search = `?limit=10&country=${GEOGRAPHY.cca2}&types=${types}&bbox=${box}&access_token=${token}`;

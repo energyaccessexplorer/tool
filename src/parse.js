@@ -173,11 +173,7 @@ function geojson() {
 		return Whatever;
 
 	return fetchcheck.call(this, this.vectors.endpoint, "GEOJSON")
-		.then(r => r.json())
-		.then(r => {
-			this.vectors.features = r;
-			if (this === OUTLINE) this.vectors.bounds = geojsonExtent(r);
-		});
+		.then(async r => this.vectors.features = await r.json());
 };
 
 export async function geojson_summary() {

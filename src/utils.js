@@ -497,7 +497,7 @@ function table_add_lnglat(d, lnglat = [0, 0]) {
 function coordinates_to_raster_pixel(coords, raster) {
 	const b = OUTLINE.raster;
 
-	const {left,bottom,right,top} = GEOGRAPHY.bounds;
+	const {left,bottom,right,top} = GEOGRAPHY.envelope;
 
 	if (coords.length !== 2)
 		throw Error(`ea_coordinates_raster: expected and array of length 2. Got ${coords}`);
@@ -530,7 +530,7 @@ function coordinates_to_raster_pixel(coords, raster) {
 
 function raster_pixel_to_coordinates(i) {
 	const r = OUTLINE.raster;
-	const g = GEOGRAPHY.bounds;
+	const g = GEOGRAPHY.envelope;
 
 	const merc = new SphericalMercator({ size: 1 });
 

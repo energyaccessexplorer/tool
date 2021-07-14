@@ -359,6 +359,9 @@ async function dsinit(id, inputs, pack) {
 
 	const divisions = maybe(GEOGRAPHY.configuration, 'divisions');
 
+	MAPBOX.coords = mapbox.fit(GEOGRAPHY.envelope);
+	mapbox.change_theme(ea_settings.mapbox_theme);
+
 	await (function fetch_outline() {
 		// TODO: this should be more strict divisions 0/outline
 		const outline_id = maybe(divisions.find(d => d.dataset_id), 'dataset_id');
@@ -384,18 +387,6 @@ This is fatal. Thanks for all the fish.`;
 
 				await ds.load('vectors');
 				await ds.load('raster');
-
-				if (!ds.vectors.bounds)
-					throw `'OUTLINE' has no vectors.bounds`;
-				else {
-					const b = ds.vectors.bounds;
-
-					const [left, bottom, right, top] = b;
-					GEOGRAPHY.bounds = { left, bottom, right, top };
-
-					MAPBOX.coords = mapbox.fit(b);
-					mapbox.change_theme(ea_settings.mapbox_theme);
-				}
 			});
 	})();
 

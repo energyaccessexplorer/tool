@@ -355,7 +355,7 @@ function drawer_init() {
  */
 
 async function dsinit(id, inputs, pack) {
-	let select = ["*", "datatype", "category:categories(*)", "df:_datasets_files(*,file:files(*))"];
+	let select = ["*", "datatype", "category:categories(*)"];
 
 	const divisions = maybe(GEOGRAPHY.configuration, 'divisions');
 
@@ -376,14 +376,12 @@ This is fatal. Thanks for all the fish.`;
 		const bp = {
 			"id": `eq.${outline_id}`,
 			"select": select,
-			"df.active": "eq.true"
 		};
 
 		return ea_api.get("datasets", bp, { one: true })
 			.then(async e => {
 				const ds = OUTLINE = new DS(e, false);
 
-				await ds.load('csv');
 				await ds.load('vectors');
 				await ds.load('raster');
 
@@ -430,7 +428,6 @@ This is fatal. Thanks for all the fish.`;
 			"geography_id": `eq.${id}`,
 			"select": select,
 			"pack": `eq.${pack}`,
-			"df.active": "eq.true",
 			"deployment": `ov.{${ENV}}`,
 		};
 

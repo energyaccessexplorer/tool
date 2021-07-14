@@ -45,7 +45,7 @@ export async function init() {
 };
 
 async function dsinit(_) {
-	let select = ["*", "datatype", "category:categories(*)", "df:_datasets_files(*,file:files(*))"];
+	let select = ["*", "datatype", "category:categories(*)"];
 
 	const divisions = maybe(GEOGRAPHY.configuration, 'divisions');
 	const outline_id = maybe(divisions.find(d => d.dataset_id), 'dataset_id');
@@ -74,14 +74,12 @@ This is fatal. Thanks for all the fish.`;
 		const bp = {
 			"id": `eq.${outline_id}`,
 			"select": select,
-			"df.active": "eq.true"
 		};
 
 		return ea_api.get("datasets", bp, { one: true })
 			.then(async e => {
 				const ds = OUTLINE = new DS(e, false);
 
-				await ds.load('csv');
 				await ds.load('vectors');
 				await ds.load('raster');
 

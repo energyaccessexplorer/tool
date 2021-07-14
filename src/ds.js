@@ -98,7 +98,7 @@ This is not fatal but the dataset is now disabled.`
 		}
 
 		if (o.category.vectors) {
-			const f = maybe(o.df.find(x => x.func === 'vectors'), 'file');
+			const f = o.processed_files.find(x => x.func === 'vectors');
 
 			if (!f) ferr('vectors');
 			else {
@@ -131,7 +131,7 @@ This is not fatal but the dataset is now disabled.`
 		}
 
 		if (o.category.raster) {
-			const f = maybe(o.df.find(x => x.func === 'raster'), 'file');
+			const f = o.processed_files.find(x => x.func === 'raster');
 
 			if (!f) ferr('raster');
 			else {
@@ -144,7 +144,7 @@ This is not fatal but the dataset is now disabled.`
 		}
 
 		if (o.category.csv) {
-			const f = maybe(o.df.find(x => x.func === 'csv'), 'file');
+			const f = o.source_files.find(x => x.func === 'csv');
 
 			if (!f) ferr('csv');
 			else {

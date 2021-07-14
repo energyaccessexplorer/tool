@@ -72,7 +72,7 @@ export default class DS {
 		const ferr = t => {
 			if (indicator && ['vectors', 'raster'].includes(t)) return;
 
-			if (this.id === 'contour') return;
+			if (this.category.name === 'outline') return;
 
 			ea_flash.push({
 				type: 'error',
@@ -159,18 +159,27 @@ This is not fatal but the dataset is now disabled.`
 	};
 
 	init() {
-		if (this.timeline) {
-			const b = OUTLINE;
-			this.vectors = JSON.parse(JSON.stringify(b.vectors));
-			this.vectors.endpoint = b.vectors.endpoint;
+		function clone_vectors() {
 			this.vectors.parse = x => parse.polygons.call(x || this);
-		}
+
+			if (this === OUTLINE) return;
+
+			this.vectors = JSON.parse(JSON.stringify(OUTLINE.vectors));
+			this.vectors.endpoint = OUTLINE.vectors.endpoint;
+		};
+
+		if (this.timeline) clone_vectors.call(this);
 
 		switch (this.datatype) {
 		case 'points':
 		case 'lines':
-		case 'polygons':
+		case 'polygons': {
+			this.download = this.vectors.endpoint;
+			break;
+		}
+
 		case 'polygons-fixed': {
+			clone_vectors.call(this);
 			this.download = this.vectors.endpoint;
 			break;
 		}
@@ -544,7 +553,8 @@ This is not fatal but the dataset is now disabled.`
 			return Promise.all(this.hosts.map(d => d.load(arg)));
 		}
 
-		await this[arg].parse();
+		if (maybe(this, arg)) await this[arg].parse();
+		else throw new Error(`Loading Error: '${this.id}' tried to load '${arg}', but failed`);
 
 		this.loading = false;
 	};

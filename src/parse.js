@@ -169,8 +169,7 @@ OUTLINE: ${OUTLINE.raster.width} × ${OUTLINE.raster.height}`);
 };
 
 function geojson() {
-	if (this.vectors.features)
-		return Whatever;
+	if (this.vectors.features) return Whatever;
 
 	return fetchcheck.call(this, this.vectors.endpoint, "GEOJSON")
 		.then(async r => this.vectors.features = await r.json());
@@ -383,13 +382,15 @@ export function polygons() {
 				"data": this.vectors.features
 			});
 
+			const c = and(this.datatype.match("polygons-"), this.category.name !== 'outline') ? ['get', '__color'] : this.vectors.fill;
+
 			this.add_layer({
 				"type": "fill",
 				"layout": {
 					"visibility": "none",
 				},
 				"paint": {
-					"fill-color": this.datatype.match("polygons-") ? ['get', '__color'] : this.vectors.fill,
+					"fill-color": c,
 					"fill-outline-color": ['get', '__stroke'],
 					"fill-opacity": [ "case", [ "boolean", [ "get", "__hidden" ], false ], 0, 1 * this.vectors.opacity ],
 				},

@@ -390,7 +390,7 @@ This is fatal. Thanks for all the fish.`;
 			});
 	})();
 
-	(function fetch_divisions() {
+	await (function fetch_divisions() {
 		return Promise.all(
 			divisions
 				.filter(x => and(x.dataset_id, !DST.get(x.dataset_id)))
@@ -415,15 +415,16 @@ This is fatal. Thanks for all the fish.`;
 	await (function fetch_datasets() {
 		pack = maybe(pack, 'length') ? pack : 'all';
 
+		const nd = divisions.map(d => d.dataset_id).concat(OUTLINE.dataset_id);
 		const p = {
 			"geography_id": `eq.${id}`,
 			"select": select,
 			"pack": `eq.${pack}`,
 			"deployment": `ov.{${ENV}}`,
+			"id": `not.in.(${nd})`,
 		};
 
 		return ea_api.get("datasets", p)
-			.then(r => r.filter(d => and(d.id !== OUTLINE.dataset_id, !DST.get(d.dataset_id))))
 			.then(r => r.map(e => new DS(e, inputs.includes(e.category.name))));
 	})();
 

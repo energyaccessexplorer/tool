@@ -497,15 +497,13 @@ function table_add_lnglat(d, lnglat = [0, 0]) {
 function coordinates_to_raster_pixel(coords, raster) {
 	const b = OUTLINE.raster;
 
-	const {left,bottom,right,top} = GEOGRAPHY.envelope;
-
 	if (coords.length !== 2)
 		throw Error(`ea_coordinates_raster: expected and array of length 2. Got ${coords}`);
 
 	const merc = new SphericalMercator({ size: 1 });
 
 	const [mx,my] = merc.forward([coords[0], coords[1]]);
-	const [bx,by] = merc.forward([OUTLINE.vectors.bounds[0], OUTLINE.vectors.bounds[3]]);
+	const [bx,by] = merc.forward([GEOGRAPHY.envelope[0], GEOGRAPHY.envelope[3]]);
 
 	const plng = Math.round(Math.abs(mx - bx) / 1000);
 	const plat = Math.round(Math.abs(my - by) / 1000);
@@ -530,14 +528,14 @@ function coordinates_to_raster_pixel(coords, raster) {
 
 function raster_pixel_to_coordinates(i) {
 	const r = OUTLINE.raster;
-	const g = GEOGRAPHY.envelope;
+	const [left,bottom,right,top] = GEOGRAPHY.envelope;
 
 	const merc = new SphericalMercator({ size: 1 });
 
 	const x = i%r.width;
 	const y = Math.floor(i/r.width);
 
-	const o = merc.forward([g.left, g.top]);
+	const o = merc.forward([left, top]);
 
 	return merc.inverse([o[0] + (x * 1000), o[1] - (y * 1000)]);
 };

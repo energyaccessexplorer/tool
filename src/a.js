@@ -392,30 +392,28 @@ This is fatal. Thanks for all the fish.`;
 
 	await (function fetch_divisions() {
 		return Promise.all(
-			divisions
-				.filter(x => and(x.dataset_id, !DST.get(x.dataset_id)))
-				.map(x => {
-					const dp = {
-						"id": `eq.${x.dataset_id}`,
-						"select": select,
-					};
+			divisions.filter(x => x.dataset_id).slice(1).map(x => {
+				const dp = {
+					"id": `eq.${x.dataset_id}`,
+					"select": select,
+				};
 
-					return ea_api.get("datasets", dp, { one: true })
-						.then(async e => {
-							const ds = new DS(e, false);
+				return ea_api.get("datasets", dp, { one: true })
+					.then(async e => {
+						const ds = new DS(e, false);
 
-							await ds.load('csv');
-							await ds.load('vectors');
-							await ds.load('raster');
-						});
-				})
+						await ds.load('csv');
+						await ds.load('vectors');
+						await ds.load('raster');
+					});
+			})
 		);
 	})();
 
 	await (function fetch_datasets() {
 		pack = maybe(pack, 'length') ? pack : 'all';
 
-		const nd = divisions.map(d => d.dataset_id).concat(OUTLINE.dataset_id);
+		const nd = divisions.filter(d => d.dataset_id).map(d => d.dataset_id).concat(OUTLINE.dataset_id);
 		const p = {
 			"geography_id": `eq.${id}`,
 			"select": select,

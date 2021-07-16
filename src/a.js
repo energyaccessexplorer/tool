@@ -270,6 +270,7 @@ export async function init() {
 	O = new Overlord();
 
 	MAPBOX = mapbox.init(O);
+	MAPBOX.coords = mapbox.fit(GEOGRAPHY.envelope);
 
 	await dsinit(GEOGRAPHY.id, U.inputs, U.pack);
 
@@ -293,6 +294,14 @@ export async function init() {
 	if (GEOGRAPHY.timeline) timeline_init();
 
 	if (!MOBILE && !GEOGRAPHY.timeline) nanny_init();
+
+	await Promise.all(U.inputs.map(i => {
+		const d = DST.get(i);
+		return d._active(true, false);
+	})).then(_ => {
+		cards.update();
+		mapbox.change_theme(ea_settings.mapbox_theme, false);
+	});
 
 	ea_loading(false);
 };
@@ -359,9 +368,6 @@ async function dsinit(id, inputs, pack) {
 
 	const divisions = maybe(GEOGRAPHY.configuration, 'divisions');
 
-	MAPBOX.coords = mapbox.fit(GEOGRAPHY.envelope);
-	mapbox.change_theme(ea_settings.mapbox_theme);
-
 	await (function fetch_outline() {
 		// TODO: this should be more strict divisions 0/outline
 		const outline_id = maybe(divisions.find(d => d.dataset_id), 'dataset_id');
@@ -383,7 +389,7 @@ This is fatal. Thanks for all the fish.`;
 
 		return ea_api.get("datasets", bp, { one: true })
 			.then(async e => {
-				const ds = OUTLINE = new DS(e, false);
+				const ds = OUTLINE = new DS(e);
 
 				await ds.load('vectors');
 				await ds.load('raster');
@@ -400,7 +406,7 @@ This is fatal. Thanks for all the fish.`;
 
 				return ea_api.get("datasets", dp, { one: true })
 					.then(async e => {
-						const ds = new DS(e, false);
+						const ds = new DS(e);
 
 						await ds.load('csv');
 						await ds.load('vectors');
@@ -423,7 +429,7 @@ This is fatal. Thanks for all the fish.`;
 		};
 
 		return ea_api.get("datasets", p)
-			.then(r => r.map(e => new DS(e, inputs.includes(e.category.name))));
+			.then(r => r.map(e => new DS(e)));
 	})();
 
 	U.params.inputs = [...new Set(DS.array.map(e => e.id))];

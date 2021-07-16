@@ -157,7 +157,7 @@ function theme_pick(theme) {
 	});
 };
 
-export function change_theme(theme) {
+export function change_theme(theme, soft) {
 	function go() {
 		const c = MAPBOX.getStyle().layers.find(l => l.type === 'symbol');
 		MAPBOX.first_symbol = maybe(c, 'id');
@@ -166,7 +166,9 @@ export function change_theme(theme) {
 	};
 
 	MAPBOX.once('style.load', go);
-	MAPBOX.setStyle(theme_pick(ea_settings.mapbox_theme = theme));
+
+	if (!soft)
+		MAPBOX.setStyle(theme_pick(ea_settings.mapbox_theme = theme));
 
 	if (theme === "") go();
 };

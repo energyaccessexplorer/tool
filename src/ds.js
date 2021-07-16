@@ -5,7 +5,7 @@ import dscontrols from './controls.js';
 import * as parse from './parse.js';
 
 export default class DS {
-	constructor(o, on) {
+	constructor(o) {
 		this.id = o.name || o.category.name;
 
 		this.dataset_id = o.id;
@@ -20,7 +20,7 @@ export default class DS {
 
 		this.category_overrides(o.category_overrides);
 
-		this.on = on || false;
+		this.on = false;
 
 		let config = o.configuration || {};
 

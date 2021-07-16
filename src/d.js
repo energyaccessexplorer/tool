@@ -81,7 +81,7 @@ This is fatal. Thanks for all the fish.`;
 
 		return ea_api.get("datasets", bp, { one: true })
 			.then(async e => {
-				const ds = OUTLINE = new DS(e, false);
+				const ds = OUTLINE = new DS(e);
 
 				await ds.load('vectors');
 				await ds.load('raster');
@@ -101,7 +101,7 @@ This is fatal. Thanks for all the fish.`;
 	};
 
 	const e = await ea_api.get("datasets", p, { one: true });
-	const ds = new DS(e, true);
+	const ds = new DS(e);
 
 	await ds.active(true, true);
 	plot.call(ds);

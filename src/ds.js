@@ -14,6 +14,10 @@ export default class DS {
 
 		this.datatype = o.datatype;
 
+		this.source_files = o.source_files;
+
+		this.processed_files = o.processed_files;
+
 		this.category_overrides(o.category_overrides);
 
 		this.on = on || false;
@@ -41,7 +45,7 @@ export default class DS {
 
 		this.items = config.collection ? [] : undefined;
 
-		this.files_setup(o);
+		this.initialise(o);
 
 		this.loaded = false;
 
@@ -55,8 +59,6 @@ export default class DS {
 
 		this._domain = this.category.domain_init || JSON.parse(JSON.stringify(this.__domain));
 
-		this.init();
-
 		if (!this.disabled) {
 			this.card = new dscard(this);
 			this.controls = new dscontrols(this);
@@ -65,7 +67,7 @@ export default class DS {
 		DST.set(this.id, this);
 	};
 
-	files_setup(o) {
+	initialise(o) {
 		let indicator = false;
 
 		const ferr = t => {
@@ -89,23 +91,28 @@ This is not fatal but the dataset is now disabled.`
 		if (this.category.name.match(/^(timeline-)?indicator/)) {
 			const did = GEOGRAPHY.configuration.divisions[this.config.divisions_tier]['dataset_id'];
 			const b = DS.array.find(d => d.dataset_id === did);
+
 			this.raster = b.raster;
-			this.vectors = b.vectors;
+			this.vectors = JSON.parse(JSON.stringify(b.vectors));
+			this.vectors.parse = x => parse.polygons.call(x || this);
+
+			for (const p in this.vectors.features.features[0].properties) {
+				if (['OBJECTID', 'FID', 'Id', 'Code'].map(t => t.toLowerCase()).includes(p.toLowerCase())) {
+					this.vectors.key = p;
+					break;
+				}
+			}
 
 			indicator = true;
 		}
 
 		if (o.category.vectors) {
-			const f = o.processed_files.find(x => x.func === 'vectors');
+			let f = this.processed_files.find(x => x.func === 'vectors');
 
 			if (!f) ferr('vectors');
 			else {
 				this.vectors = {};
 				Object.assign(this.vectors, o.category.vectors, f);
-
-				this.vectors.key = maybe(f, 'configuration', 'key') || f.key || 'OBJECTID';
-				this.vectors.fileid = f.id;
-				this.vectors.features = f.features;
 
 				let p; switch (this.vectors.shape_type) {
 				case 'points': {
@@ -129,44 +136,28 @@ This is not fatal but the dataset is now disabled.`
 		}
 
 		if (o.category.raster) {
-			const f = o.processed_files.find(x => x.func === 'raster');
+			const f = this.processed_files.find(x => x.func === 'raster');
 
 			if (!f) ferr('raster');
 			else {
 				this.raster = {};
 				Object.assign(this.raster, o.category.raster, f);
-
 				this.raster.parse = _ => parse.raster.call(this);
-				this.raster.fileid = f.id;
 			}
 		}
 
 		if (o.category.csv) {
-			const f = o.source_files.find(x => x.func === 'csv');
+			const f = this.source_files.find(x => x.func === 'csv');
 
 			if (!f) ferr('csv');
 			else {
 				this.csv = {};
 				Object.assign(this.csv, o.category.csv, f);
 
-				this.csv.key = maybe(f, 'configuration', 'key') || 'OBJECTID';
+				this.csv.key = 'OBJECTID';
 				this.csv.parse = _ => parse.csv.call(this);
-				this.csv.fileid = f.id;
 			}
 		}
-	};
-
-	init() {
-		function clone_vectors() {
-			this.vectors.parse = x => parse.polygons.call(x || this);
-
-			if (this === OUTLINE) return;
-
-			this.vectors = JSON.parse(JSON.stringify(OUTLINE.vectors));
-			this.vectors.endpoint = OUTLINE.vectors.endpoint;
-		};
-
-		if (this.timeline) clone_vectors.call(this);
 
 		switch (this.datatype) {
 		case 'points':
@@ -177,7 +168,6 @@ This is not fatal but the dataset is now disabled.`
 		}
 
 		case 'polygons-fixed': {
-			clone_vectors.call(this);
 			this.download = this.vectors.endpoint;
 			break;
 		}

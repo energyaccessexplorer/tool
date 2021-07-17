@@ -155,7 +155,8 @@ export function list() {
 		const d = ce('li',  null, { bind: t, class: 'element', ripple: "" });
 		d.append(
 			ce('div', null, { class: 'radio' }),
-			ce('span', v)
+			ce('span', v, { class: 'name' }),
+			ce('span', font_icon('collection'), { class: 'analysis-to-dataset' }),
 		);
 
 		if (analysis_datasets(t) < 1)
@@ -180,6 +181,8 @@ export function list() {
 		qs('.radio', node).append(radio(t === U.output));
 
 		node.onclick = _ => setTimeout(_ => trigger_this.call(node), 10);
+
+		qs('.analysis-to-dataset', node).onclick = _ => O.analysis_to_dataset(t);
 
 		indexes_list.append(node);
 

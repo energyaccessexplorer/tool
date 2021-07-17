@@ -7,8 +7,8 @@ import {
 
 
 async function fetchcheck(endpoint, format) {
-	if (!endpoint.match(/^http/))
-		endpoint = ea_settings.storage + endpoint;
+	if (endpoint.match(/^(blob:)?http/)) ;
+	else endpoint = ea_settings.storage + endpoint;
 
 	return fetch(endpoint)
 		.catch(_ => fail.call(this, `Could not fetch ${format}`))

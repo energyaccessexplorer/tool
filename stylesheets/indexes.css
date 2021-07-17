@@ -15,6 +15,7 @@
 #indexes-list .element {
   background-color: var(--the-white);
   display: flex;
+  justify-content: space-between;
 
   padding: 0.5em;
   line-height: 1.8em;
@@ -35,8 +36,9 @@
   margin-left: 3em;
 }
 
-#indexes-list .element span {
+#indexes-list .element span.name {
   padding: 0.5em;
+  flex: 1;
 }
 
 #indexes-list .element .radio {
@@ -51,6 +53,10 @@
   content: ' ';
   border-right: solid 1px #d9d9d9;
   margin-right: 0.5em;
+}
+
+#indexes-list .element .analysis-to-dataset {
+  padding: 0.5em;
 }
 
 #index-graphs {

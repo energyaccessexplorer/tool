@@ -175,12 +175,11 @@ export function list() {
 	};
 
 	for (let t in ea_indexes) {
-		let node = i_elem(t, ea_indexes[t]['name'], ea_indexes[t]['description']);
+		const node = i_elem(t, ea_indexes[t]['name'], ea_indexes[t]['description']);
 
-		let ler = qs('.radio', node);
-		ler.append(radio(t === U.output));
+		qs('.radio', node).append(radio(t === U.output));
 
-		node.addEventListener('mouseup', _ => setTimeout(_ => trigger_this.call(node), 10));
+		node.onclick = _ => setTimeout(_ => trigger_this.call(node), 10);
 
 		indexes_list.append(node);
 

@@ -245,12 +245,14 @@ export async function plot_active(type, doindexes) {
 	return a;
 };
 
-export async function raster_to_tiff(type) {
+export function raster_to_tiff(type) {
 	const b = OUTLINE;
+	const env = GEOGRAPHY.envelope;
 
-	const raster = await run(type);
+	const a = run(type);
+	const r = a.raster;
 
-	if (!raster.length) return;
+	if (!r.length) return;
 
 	const scale = d3.scaleLinear().domain([0,1]).range([0,254]);
 	const fn = function(x) {
@@ -258,24 +260,24 @@ export async function raster_to_tiff(type) {
 		return scale(x);
 	};
 
-	const arr = new Uint8Array(raster.length).fill(255);
-	for (let i = 0; i < raster.length; i += 1)
-		arr[i] = fn(raster[i]);
+	const arr = new Uint8Array(r.length).fill(255);
+	for (let i = 0; i < r.length; i += 1)
+		arr[i] = fn(r[i]);
 
 	const metadata = {
 		ImageWidth: b.raster.width,
 		ImageLength: b.raster.height,
 		ResolutionUnit: "1",
-		XPosition: b.vectors.bounds[0],
-		YPosition: b.vectors.bounds[1],
-		ModelTiepoint: [ 0, 0, 0, b.vectors.bounds[0], b.vectors.bounds[3], 0 ],
+		XPosition: env[0],
+		YPosition: env[1],
+		ModelTiepoint: [ 0, 0, 0, env[0], env[3], 0 ],
 		XResolution: "1",
 		YResolution: "1",
 		GDAL_NODATA: "255",
-		ModelPixelScale: [(b.vectors.bounds[2] - b.vectors.bounds[0]) / b.raster.width, (b.vectors.bounds[3] - b.vectors.bounds[1]) / b.raster.height, 0]
+		ModelPixelScale: [(env[2] - env[0]) / b.raster.width, (env[3] - env[1]) / b.raster.height, 0]
 	};
 
-	return (await GeoTIFF.writeArrayBuffer(arr, metadata));
+	return GeoTIFF.writeArrayBuffer(arr, metadata);
 };
 
 export function context(rc, dict, props, skip = null) {

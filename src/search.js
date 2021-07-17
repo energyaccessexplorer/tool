@@ -42,5 +42,5 @@ export function zoom(p, fn) {
 	}
 
 	if (typeof fn === 'function')
-		MAPBOX.once('moveend', _ => fn(p, true));
+		MAPBOX.once('moveend', fn);
 };

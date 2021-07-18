@@ -97,15 +97,15 @@ export async function graphs(raster) {
 export function init() {
 	const url = new URL(location);
 
-	const ramp = tmpl("#ramp");
-	ramp.querySelector('.ramp').append(
+	const r = tmpl("#ramp");
+	qs('.ramp', r).append(
 		ce('div', "Low"),
 		ce('div', "Medium"),
 		ce('div', "High")
 	);
 
 	const scale = ce('div', null, { class: 'index-graphs-scale' });
-	scale.append(ea_analysis_colorscale.svg, ramp);
+	scale.append(ea_analysis_colorscale.svg, r);
 
 	const cos = qs('#canvas-output-select');
 	for (let i in ea_indexes)
@@ -180,7 +180,7 @@ export function list() {
 
 		qs('.radio', node).append(radio(t === U.output));
 
-		node.onclick = _ => setTimeout(_ => trigger_this.call(node), 10);
+		node.onclick = _ => trigger_this.call(node);
 
 		qs('.analysis-to-dataset', node).onclick = _ => O.analysis_to_dataset(t);
 
@@ -209,4 +209,10 @@ export function modal() {
 </a>
 `)
 	}).show();
+};
+
+export function updated_plot(type, index) {
+	qs('#canvas-output-select').value = type;
+	qs('#index-graphs-title').innerText = index['name'];
+	qs('#index-graphs-description').innerText = index['description'];
 };

@@ -115,16 +115,17 @@ export default class Overlord {
 			map_click(event);
 	};
 
-	async sort() {
-		const ds = U.inputs.map(y => {
-			const d = DST.get(y);
+	sort() {
+		const ds = U.inputs.map(i => {
+			const d = DST.get(i);
 			return d.mutant ? d.host.id : d.id;
 		});
 
-		await Promise.all(ds.map(d => until(_ => DST.get(d).layer)));
-
-		for (let i = 0; i < ds.length; i++)
-			MAPBOX.moveLayer(ds[i], ds[i-1] || MAPBOX.first_symbol);
+		Promise.all(ds.map(d => until(_ => DST.get(d).layer)))
+			.then(_ => {
+				for (let i = 0; i < ds.length; i++)
+					MAPBOX.moveLayer(ds[i], ds[i-1] || MAPBOX.first_symbol);
+			});
 	};
 
 	async theme_changed() {

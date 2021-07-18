@@ -307,9 +307,9 @@ export async function init() {
 };
 
 export function toggle_left_panel(t) {
-	for (const m of qsa('.nanny-marker')) m.remove();
+	for (let m of qsa('.nanny-marker')) m.remove();
 
-	for (const e of qsa('#left-pane > div'))
+	for (let e of qsa('#left-pane > div'))
 		e.style.display = 'none';
 
 	qs('#drawer').style.display = 'block';
@@ -318,14 +318,14 @@ export function toggle_left_panel(t) {
 		const p = document.getElementById(t);
 		p.style.display = '';
 
-		const i = p.querySelector('.search-input');
+		const i = qs('.search-input', p);
 		if (i) i.focus();
 
 		const e = new Event('activate');
 		p.dispatchEvent(e);
 	}
 
-	document.querySelector('#left-pane').style['min-width'] = t ? '40em' : '';
+	qs('#left-pane').style['min-width'] = t ? '40em' : '';
 
 	window.dispatchEvent(new Event('resize'));
 };
@@ -333,9 +333,9 @@ export function toggle_left_panel(t) {
 function drawer_init() {
 	const as = qsa('#drawer a');
 
-	for (const a of as)
+	for (let a of as)
 		a.onclick = function() {
-			for (const x of as) if (x !== this) x.classList.remove('active');
+			for (let x of as) if (x !== this) x.classList.remove('active');
 
 			if (this.classList.contains('active')) {
 				this.classList.remove('active');

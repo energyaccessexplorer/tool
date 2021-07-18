@@ -126,18 +126,19 @@ export default class dscard extends HTMLElement {
 	};
 
 	refresh() {
-		const s = this.querySelector('[slot=svg]');
+		const s = qs('[slot=svg]', this);
+
 		elem_empty(s);
 		s.append(this.svg_el = this.svg());
 
-		const o = this.querySelector('[slot=opacity]');
+		const o = qs('[slot=opacity]', this);
 		elem_empty(o);
 		this.opacity_value = 1;
 		o.append(this.opacity());
 	};
 
 	line_legends(legends) {
-		const it = this.querySelector('[slot=svg]');
+		const it = qs('[slot=svg]', this);
 
 		elem_empty(it);
 
@@ -167,7 +168,7 @@ export default class dscard extends HTMLElement {
 	};
 
 	point_legends(legends) {
-		const it = this.querySelector('[slot=svg]');
+		const it = qs('[slot=svg]', this);
 
 		elem_empty(it);
 
@@ -198,7 +199,7 @@ export default class dscard extends HTMLElement {
 	};
 
 	polygon_legends(legends) {
-		const it = this.querySelector('[slot=svg]');
+		const it = qs('[slot=svg]', this);
 
 		elem_empty(it);
 
@@ -304,7 +305,7 @@ export default class dscard extends HTMLElement {
 			const r = tmpl('#ramp');
 
 			if (ds.domain) {
-				r.querySelector('.ramp').append(...ramp_values(ds.domain));
+				qs('.ramp', r).append(...ramp_values(ds.domain));
 			}
 
 			d.append(
@@ -321,7 +322,7 @@ export default class dscard extends HTMLElement {
 			let r = tmpl('#ramp');
 
 			if (ds.domain) {
-				r.querySelector('.ramp').append(...ramp_values(ds.domain));
+				qs('.ramp', r).append(...ramp_values(ds.domain));
 				d.append(r);
 			}
 

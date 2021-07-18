@@ -449,7 +449,7 @@ function ea_super_error(t, m, e = "error") {
 function table_data(dict, props) {
 	const t = ce('table');
 
-	for (const e of dict) {
+	for (let e of dict) {
 		if (!e) {
 			t.append(ce('tr', [ ce('td', "&nbsp;"), ce('td', "&nbsp;") ]));
 			continue;

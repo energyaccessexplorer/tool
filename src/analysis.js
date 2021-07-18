@@ -3,7 +3,12 @@ import DS from './ds.js';
 import * as plot from './plot.js';
 
 import {
+	list as controls_list,
+} from './controls.js';
+
+import {
 	graphs as indexes_graphs,
+	updated_plot as indexes_updated_plot,
 } from './indexes.js';
 
 /*
@@ -16,12 +21,12 @@ import {
  * returns an object {min, max, raster (FloatArray)}
  */
 
-export default function run(type) {
+export default async function run(type) {
 	const t0 = performance.now();
 
-	let list = datasets(type);
+	const list = datasets(type);
 
-	const it = new Float32Array(list.length ? OUTLINE.raster.data.length: 0).fill(-1);
+	const it = new Float32Array(OUTLINE.raster.data.length).fill(-1);
 
 	// There's nothing interesting about an analysis with only filters. Also,
 	// filters return 1 so a silly (single-valued) analysis would be plotted.
@@ -81,13 +86,10 @@ export default function run(type) {
 	// instead.
 	//
 	const full_weight = list
-		    .reduce((a,c) => ((c.analysis_scale(type) === "key-delta") ? a : c.weight + a), 0);
+		.reduce((a,c) => ((c.analysis_scale(type) === "key-delta") ? a : c.weight + a), 0);
 
-	let nr = list.find(l => !maybe(l, 'raster', 'data'));
-	if (nr) {
-		wait_for_rasters(nr.id);
-		return { raster: it };
-	}
+	if (list.find(l => !maybe(l, 'raster', 'data')))
+		await until(_ => list.filter(d => and(d.on, d.raster, d.analysis, !d.raster.data)).length === 0);
 
 	if (list.length === 1 && full_weight === 0) return { raster: it };
 
@@ -139,7 +141,7 @@ export default function run(type) {
 		it[i] = a;
 	}
 
-	var f = d3.scaleLinear().domain([min,max]).range([0,1]);
+	const f = d3.scaleLinear().domain([min,max]).range([0,1]);
 
 	for (let i = 0; i < it.length; i += 1) {
 		const r = it[i];
@@ -180,7 +182,7 @@ export function datasets(type) {
 				d._afn = d.analysis_fn;
 
 			if (!and(d.domain, d._domain)) {
-				console.warn(`Discarding '${d.id}'. Domain is not set yet...`);
+				console.log(`Discarding '${d.id}'. Domain is not set yet...`);
 				return false;
 			}
 
@@ -212,7 +214,7 @@ export function datasets(type) {
  */
 
 export async function plot_active(type, doindexes) {
-	const a = run(type);
+	const a = await run(type);
 	plot.outputcanvas(a.raster);
 
 	const index = ea_indexes[type];
@@ -225,14 +227,12 @@ export async function plot_active(type, doindexes) {
 		return a;
 	}
 
-	qs('#canvas-output-select').value = type;
-	qs('#index-graphs-title').innerText = index['name'];
-	qs('#index-graphs-description').innerText = index['description'];
+	indexes_updated_plot(type, index);
 
 	// 'animate' is set to false on mapbox's configuration, since we don't want
 	// mapbox eating the CPU at 60FPS for nothing.
 	//
-	let canvas_source = MAPBOX.getSource('output-source');
+	const canvas_source = MAPBOX.getSource('output-source');
 	if (canvas_source) {
 		canvas_source.raster = a.raster;
 
@@ -245,11 +245,11 @@ export async function plot_active(type, doindexes) {
 	return a;
 };
 
-export function raster_to_tiff(type) {
+export async function raster_to_tiff(type) {
 	const b = OUTLINE;
 	const env = GEOGRAPHY.envelope;
 
-	const a = run(type);
+	const a = await run(type);
 	const r = a.raster;
 
 	if (!r.length) return;
@@ -283,7 +283,7 @@ export function raster_to_tiff(type) {
 export function context(rc, dict, props, skip = null) {
 	if (!rc) return [];
 
-	const controls = Array.from(document.querySelectorAll('ds-controls')).map(c => c.ds.id);
+	const controls = controls_list();
 
 	DS.array
 		.filter(d => d.on && d.category.name !== 'boundaries' && d.id !== skip)
@@ -309,12 +309,4 @@ export function context(rc, dict, props, skip = null) {
 			dict.push([p, d.name]);
 			props[p] = v + " " + (d.category.unit || "km (proximity to)");
 		});
-};
-
-function wait_for_rasters(id) {
-	console.warn(`Dataset '${id}' has no raster.data (yet). Waiting for it`);
-
-	until(_ => DS.array.filter(d => and(d.on, d.raster, d.analysis, !d.raster.data)).length === 0)
-		.then(_ => plot_active(U.output))
-		.then(_ => O.sort());
 };

@@ -168,7 +168,7 @@ export function init() {
 	MOBILE = window.innerWidth < 1152;
 
 	function hextostring(hex) {
-		var s = "";
+		let s = "";
 
 		//             ________________ careful there
 		//            /

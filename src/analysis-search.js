@@ -7,7 +7,7 @@ import {
 	zoom,
 } from './search.js';
 
-let root, ul, input, resultscontainer;
+let ul, input, resultscontainer;
 
 let resultsinfo;
 
@@ -68,13 +68,13 @@ async function trigger() {
 };
 
 export function init() {
-	root = qs('#analysis.search-panel');
+	const panel = qs('#analysis.search-panel');
 	input = ce('span', "Analysis top locations",
 						 { id: 'analysis-search', class: 'search-input' });
 
-	root.addEventListener('activate', trigger);
+	panel.addEventListener('activate', trigger);
 
-	root.prepend(input);
+	panel.prepend(input);
 
 	resultscontainer = qs('#analysis .search-results');
 	ul = ce('ul');

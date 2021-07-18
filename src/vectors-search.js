@@ -3,7 +3,7 @@ import {
 	zoom,
 } from './search.js';
 
-let root, ul, input, resultscontainer;
+let ul, input, resultscontainer;
 
 let ds, resultsinfo, attr, searchable, searchable_attrs;
 
@@ -53,7 +53,7 @@ async function reset() {
 	if (maybe(ds.config, 'properties_search', 'length')) {
 		const first = ds.vectors.features.features[0];
 
-		for (const a of ds.config.properties_search) {
+		for (let a of ds.config.properties_search) {
 			if (!first.properties.hasOwnProperty(a))
 				console.warn(`${ds.id}'s properties_search is misconfigured. Features' missing '${a}'`);
 		}
@@ -67,7 +67,7 @@ async function reset() {
 		return;
 	}
 
-	for (const f of ds.vectors.features.features) {
+	for (let f of ds.vectors.features.features) {
 		if (f['__li']) continue;
 
 		const li = ce('li', f.properties[attr]);
@@ -107,7 +107,7 @@ function trigger(value) {
 		const f = ds.vectors.features.features[i];
 		let matches = false;
 
-		for (const [k,v] of Object.entries(f.properties)) {
+		for (let [k,v] of Object.entries(f.properties)) {
 			if (!searchable_attrs.includes(k)) continue;
 
 			if (v && v.match(new RegExp(value, 'i'))) {
@@ -124,11 +124,11 @@ function trigger(value) {
 };
 
 export function init() {
-	root = qs('#vectors.search-panel');
+	const panel = qs('#vectors.search-panel');
 	input = ce('input', null, { id: 'vectors-search', autocomplete: 'off', class: 'search-input' });
 	input.setAttribute('placeholder', 'Search features');
 
-	root.prepend(input);
+	panel.prepend(input);
 
 	resultscontainer = qs('#vectors .search-results');
 	ul = ce('ul');

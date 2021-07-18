@@ -25,18 +25,18 @@ async function summary() {
 
 	const summary = {};
 
-	const ramp = tmpl("#ramp");
-	ramp.querySelector('.ramp').append(
+	const r = tmpl("#ramp");
+	qs('.ramp', r).append(
 		ce('div', "Low"),
 		ce('div', "Medium"),
 		ce('div', "High")
 	);
 
 	const scale = ce('div');
-	scale.append(ea_analysis_colorscale.svg.cloneNode(true), ramp);
+	scale.append(ea_analysis_colorscale.svg.cloneNode(true), r);
 
 	async function get_summaries(idxn) {
-		let raster = analysis_plot_active(idxn).raster;
+		let raster = (await analysis_plot_active(idxn)).raster;
 
 		summary[idxn] = await analyse(raster);
 

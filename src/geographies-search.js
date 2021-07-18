@@ -1,4 +1,4 @@
-let root, ul, input, resultscontainer;
+let ul, input, resultscontainer;
 
 let list;
 
@@ -15,16 +15,16 @@ function li(g) {
 };
 
 function trigger(value) {
-	for (const i of list)
+	for (let i of list)
 		i.li.style.display = i.name.match(new RegExp(value, 'i')) ? "" : "none";
 };
 
 export async function init() {
-	root = qs('#geographies.search-panel');
+	const panel = qs('#geographies.search-panel');
 	input = ce('input', null, { id: 'geographies-search', autocomplete: 'off', class: 'search-input' });
 	input.setAttribute('placeholder', 'Geographies search');
 
-	root.prepend(input);
+	panel.prepend(input);
 
 	resultscontainer = qs('#geographies .search-results');
 	ul = ce('ul');

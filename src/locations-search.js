@@ -3,7 +3,7 @@ import {
 	zoom,
 } from './search.js';
 
-let root, ul, input, resultscontainer;
+let ul, input, resultscontainer;
 
 let resultsinfo;
 
@@ -80,11 +80,11 @@ function trigger(v) {
 };
 
 export function init() {
-	root = qs('#locations.search-panel');
+	const panel = qs('#locations.search-panel');
 	input = ce('input', null, { id: 'locations-search', autocomplete: 'off', class: 'search-input' });
 	input.setAttribute('placeholder', 'Search for a location');
 
-	root.prepend(input);
+	panel.prepend(input);
 
 	resultscontainer = qs('#locations .search-results');
 	ul = ce('ul');

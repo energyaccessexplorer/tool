@@ -96,7 +96,7 @@ This is not fatal but the dataset is now disabled.`
 			this.vectors = JSON.parse(JSON.stringify(b.vectors));
 			this.vectors.parse = x => parse.polygons.call(x || this);
 
-			for (const p in this.vectors.features.features[0].properties) {
+			for (let p in this.vectors.features.features[0].properties) {
 				if (['OBJECTID', 'FID', 'Id', 'Code'].map(t => t.toLowerCase()).includes(p.toLowerCase())) {
 					this.vectors.key = p;
 					break;
@@ -547,19 +547,15 @@ This is not fatal but the dataset is now disabled.`
 		this.loading = false;
 	};
 
-	async raise() {
-		if (this.layer) {
-			await until(_ => MAPBOX.getLayer(this.id));
+	raise() {
+		if (this.layer)
 			MAPBOX.moveLayer(this.id, MAPBOX.first_symbol);
-		}
 
-		if (this.items) {
+		if (this.items)
 			for (let d of this.items) d.raise();
-		}
 
-		if (this.host) {
+		if (this.host)
 			this.host.raise();
-		}
 	};
 
 	opacity(v) {

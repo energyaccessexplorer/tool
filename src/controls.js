@@ -22,12 +22,7 @@ export default class dscontrols extends HTMLElement {
 		return this;
 	};
 
-	async range_group_controls() {
-		if (!this.ds.domain) {
-			console.error(this.ds.id, "Dataset has no domain yet... skipping controls range.");
-			return;
-		}
-
+	range_group_controls() {
 		const cat = this.ds.category;
 
 		let steps;
@@ -47,8 +42,6 @@ export default class dscontrols extends HTMLElement {
 		case 'polygons': {
 			if (!this.ds.raster) break;
 
-			await until(_ => this.ds.domain);
-
 			this.range_group = range.call(this.ds, {
 				ramp: lr,
 				steps: steps,
@@ -60,8 +53,6 @@ export default class dscontrols extends HTMLElement {
 
 		case 'polygons-fixed':
 		case 'polygons-timeline': {
-			await until(_ => this.ds.domain);
-
 			this.range_group = range.call(this.ds, {
 				ramp: lr,
 				steps: steps,
@@ -73,8 +64,6 @@ export default class dscontrols extends HTMLElement {
 
 		case 'raster':
 		case 'raster-mutant': {
-			await until(_ => this.ds._domain);
-
 			this.range_group = range.call(this.ds, {
 				ramp: lr,
 				steps: steps,
@@ -409,13 +398,13 @@ function range(opts = {}) {
 	const v1 = ce('div', null, { bind: "v1" });
 	const v2 = ce('div', null, { bind: "v2" });
 
-	const l = tmpl('#ramp');
-	l.querySelector('.ramp').append(v1, ce('div', opts.ramp || 'range', { class: "unit-ramp" }), v2);
+	const r = tmpl('#ramp');
+	qs('.ramp', r).append(v1, ce('div', opts.ramp || 'range', { class: "unit-ramp" }), v2);
 
 	if (!slider_width)
 		slider_width = Math.max(coalesce(maybe(contents_el, 'clientWidth'), 0) - 64, 256);
 
-	const r = ea_svg_interval({
+	const s = ea_svg_interval({
 		sliders: opts.sliders,
 		width: slider_width,
 		init: this._domain,
@@ -427,21 +416,21 @@ function range(opts = {}) {
 	});
 
 	const el = ce('div');
-	el.append(r.svg, l);
+	el.append(s.svg, r);
 
 	return {
 		el: el,
-		svg: r.svg,
-		change: r.change,
-		ramp: l
+		svg: s.svg,
+		change: s.change,
+		ramp: r
 	};
 };
 
 function weight() {
 	const weights = [1,2,3,4,5];
 
-	const ramp = tmpl('#ramp');
-	ramp.querySelector('.ramp').append(
+	const r = tmpl('#ramp');
+	qs('.ramp', r).append(
 		ce('div', weights[0] + ""),
 		ce('div', "importance", { class: "unit-ramp" }),
 		ce('div', weights[weights.length - 1] + "")
@@ -457,13 +446,13 @@ function weight() {
 	});
 
 	const el = ce('div');
-	el.append(w.svg, ramp);
+	el.append(w.svg, r);
 
 	return {
 		el: el,
 		svg: w.svg,
 		change: w.change,
-		ramp: ramp,
+		ramp: r,
 	};
 };
 
@@ -521,3 +510,7 @@ function options() {
 	//
 	return dropdownlist;
 };
+
+export function list() {
+	return Array.from(qs('ds-controls', contents_el)).map(c => c.ds.id);
+}

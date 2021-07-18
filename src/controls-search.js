@@ -4,7 +4,7 @@ const contents_el = qs('#controls-contents');
 
 const tabs_el = qs('#controls-tabs');
 
-let root, input;
+let input;
 
 function openall() {
 	input.dispatchEvent(new Event('input'));
@@ -87,11 +87,11 @@ async function trigger(value) {
 };
 
 export function init() {
-	root = qs('#controls.search-panel');
+	const panel = qs('#controls.search-panel');
 	input = ce('input', null, { id: 'controls-search', autocomplete: 'off', class: 'search-input' });
 	input.setAttribute('placeholder', 'Filter datasets');
 
-	root.prepend(input);
+	panel.prepend(input);
 
 	input.onfocus = function(_) {
 		openall();

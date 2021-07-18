@@ -88,6 +88,26 @@ This is fatal. Thanks for all the fish.`;
 			});
 	})();
 
+	await (function fetch_divisions() {
+		return Promise.all(
+			divisions.filter(x => x.dataset_id).slice(1).map(x => {
+				const dp = {
+					"id": `eq.${x.dataset_id}`,
+					"select": select,
+				};
+
+				return ea_api.get("datasets", dp, { one: true })
+					.then(async e => {
+						const ds = new DS(e);
+
+						await ds.load('csv');
+						await ds.load('vectors');
+						await ds.load('raster');
+					});
+			})
+		);
+	})();
+
 	if (outline_id === dataset_id) {
 		await plot.call(OUTLINE);
 		OUTLINE.active(true, true);
@@ -108,7 +128,8 @@ This is fatal. Thanks for all the fish.`;
 };
 
 async function plot() {
-	if (this.raster)
+	if (this.datatype === 'polygons-fixed') ;
+	else if (this.raster)
 		await until(_ => typeof this.drawraster === 'function');
 
 	if (this.csv)
@@ -156,10 +177,15 @@ async function plot() {
 	}
 
 	case 'polygons-boundaries': {
-		const ids = this.csv.data.map(x => parseInt(x[this.csv.key]));
+		let min, max;
 
-		const max = Math.max.apply(null, ids);
-		const min = Math.min.apply(null, ids);
+		if (this.category.name === 'outline') {
+			min = max = 1;
+		} else {
+			const ids = this.csv.data.map(x => parseInt(x[this.csv.key]));
+			max = Math.max.apply(null, ids);
+			min = Math.min.apply(null, ids);
+		}
 
 		this.vectors.opacity = 0.2;
 
@@ -234,7 +260,8 @@ I haven't done this yet...`);
 		throw new Error("WIP");
 	}
 
-	if (this.raster) {
+	if (this.datatype === 'polygons-fixed') ;
+	else if (this.raster) {
 		this.drawraster(this.id + "-raster");
 		MAPBOX.setLayoutProperty(this.id + "-raster", 'visibility', 'visible');
 	}

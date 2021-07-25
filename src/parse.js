@@ -291,7 +291,7 @@ export function points() {
 					"stroke-width": this.vectors['stroke-width'],
 				}));
 
-				this.card.point_legends(criteria.map(x => JSON.parse(x)));
+				this.card.legends(criteria.map(x => JSON.parse(x)), "points");
 			}
 		});
 };
@@ -339,7 +339,7 @@ export function lines() {
 			});
 
 			if (criteria.length)
-				this.card.line_legends(criteria.map(x => JSON.parse(x)));
+				this.card.legends(criteria.map(x => JSON.parse(x)), "lines");
 		});
 };
 
@@ -403,7 +403,7 @@ export function polygons() {
 					"stroke": this.vectors['stroke'],
 				}));
 
-				this.card.polygon_legends(criteria.map(x => JSON.parse(x)));
+				this.card.legends(criteria.map(x => JSON.parse(x)), "polygons");
 			}
 
 			mapbox_dblclick(this.id);

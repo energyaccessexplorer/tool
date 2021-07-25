@@ -57,6 +57,57 @@ function polygons_symbol(opts) {
 	return svg.node();
 };
 
+function lines_legends_svg(l) {
+	const svg = d3.create('svg')
+		.attr('width', 24)
+		.attr('height', 24)
+		.attr('style', "vertical-align: middle;")
+		.attr('viewBox', "-3 0 32 32");
+
+	svg
+		.append('path')
+		.attr('d', "M 0.5625,23.71875 C 2.0625,8.0625 14.439788,10.706994 17.625,7.5 20.810212,4.2930056 23.71875,0.375 23.71875,0.375")
+		.attr('fill', 'none')
+		.attr('stroke', l['stroke'] || 'black')
+		.attr('stroke-width', l['stroke-width']);
+
+	return svg.node();
+};
+
+function points_legends_svg(l) {
+	const svg = d3.create('svg')
+		.attr('width', 24)
+		.attr('height', 24)
+		.attr('style', "vertical-align: middle;")
+		.attr('viewBox', "-3 0 32 32");
+
+	svg.append('circle')
+		.attr('r', 10)
+		.attr('cx', 12)
+		.attr('cy', 12)
+		.attr('fill', this.ds.vectors.fill)
+		.attr('stroke', l['stroke'] || 'black')
+		.attr('stroke-width', l['stroke-width']);
+
+	return svg.node();
+}
+
+function polygons_legends_svg(l) {
+	const svg = d3.create('svg')
+		.attr('width', 24)
+		.attr('height', 24)
+		.attr('style', "vertical-align: middle;")
+		.attr('viewBox', "-3 0 32 32");
+
+	svg
+		.append('path')
+		.attr('d', "M 5.5532202,7.3474994 24.062506,2.1642083 26.51526,25.827 1.3896115,25.827438 Z")
+		.attr('fill', this.ds.vectors.fill)
+		.attr('stroke', l['stroke']);
+
+	return svg.node();
+}
+
 export function init() {
 	const list = qs('#cards-pane #cards-list');
 
@@ -127,99 +178,45 @@ export default class dscard extends HTMLElement {
 
 	refresh() {
 		const s = qs('[slot=svg]', this);
-
 		elem_empty(s);
+
 		s.append(this.svg_el = this.svg());
 
+		this.opacity_value = 1;
 		const o = qs('[slot=opacity]', this);
 		elem_empty(o);
-		this.opacity_value = 1;
+
 		o.append(this.opacity());
 	};
 
-	line_legends(legends) {
+	legends(ls, t) {
 		const it = qs('[slot=svg]', this);
 
 		elem_empty(it);
 
 		const ul = ce('div', null, { style: "font-size: smaller;" });
 
-		for (let l of legends) {
-			const svg = d3.create('svg')
-				.attr('width', 24)
-				.attr('height', 24)
-				.attr('style', "vertical-align: middle;")
-				.attr('viewBox', "-3 0 32 32");
+		let f;
+		switch (t) {
+		case "lines":
+			f = lines_legends_svg;
+			break;
 
-			svg
-				.append('path')
-				.attr('d', "M 0.5625,23.71875 C 2.0625,8.0625 14.439788,10.706994 17.625,7.5 20.810212,4.2930056 23.71875,0.375 23.71875,0.375")
-				.attr('fill', 'none')
-				.attr('stroke', l['stroke'] || 'black')
-				.attr('stroke-width', l['stroke-width']);
+		case "points":
+			f = points_legends_svg;
+			break;
 
-			const li = ce('div');
-			li.append(svg.node(), ce('span', '&nbsp;&nbsp;&nbsp;'), l.params.map(p => l[p]).join(", "));
+		case "polygons":
+			f = polygons_legends_svg;
+			break;
 
-			ul.append(li);
+		default:
+			break;
 		}
 
-		it.append(ul);
-	};
-
-	point_legends(legends) {
-		const it = qs('[slot=svg]', this);
-
-		elem_empty(it);
-
-		const ul = ce('div', null, { style: "font-size: smaller;" });
-
-		for (let l of legends) {
-			const svg = d3.create('svg')
-				.attr('width', 24)
-				.attr('height', 24)
-				.attr('style', "vertical-align: middle;")
-				.attr('viewBox', "-3 0 32 32");
-
-			svg.append('circle')
-				.attr('r', 10)
-				.attr('cx', 12)
-				.attr('cy', 12)
-				.attr('fill', this.ds.vectors.fill)
-				.attr('stroke', l['stroke'] || 'black')
-				.attr('stroke-width', l['stroke-width']);
-
+		for (let l of ls) {
 			const li = ce('div');
-			li.append(svg.node(), ce('span', '&nbsp;&nbsp;&nbsp;'), l.params.map(p => l[p]).join(", "));
-
-			ul.append(li);
-		}
-
-		it.append(ul);
-	};
-
-	polygon_legends(legends) {
-		const it = qs('[slot=svg]', this);
-
-		elem_empty(it);
-
-		const ul = ce('div', null, { style: "font-size: smaller;" });
-
-		for (let l of legends) {
-			const svg = d3.create('svg')
-				.attr('width', 24)
-				.attr('height', 24)
-				.attr('style', "vertical-align: middle;")
-				.attr('viewBox', "-3 0 32 32");
-
-			svg
-				.append('path')
-				.attr('d', "M 5.5532202,7.3474994 24.062506,2.1642083 26.51526,25.827 1.3896115,25.827438 Z")
-				.attr('fill', this.ds.vectors.fill)
-				.attr('stroke', l['stroke']);
-
-			const li = ce('div');
-			li.append(svg.node(), ce('span', '&nbsp;&nbsp;&nbsp;'), l.params.map(p => l[p]).join(", "));
+			li.append(f.call(this, l), ce('span', '&nbsp;&nbsp;&nbsp;'), l.params.map(p => l[p]).join(", "));
 
 			ul.append(li);
 		}

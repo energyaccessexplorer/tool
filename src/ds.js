@@ -434,32 +434,37 @@ This is not fatal but the dataset is now disabled.`
 	};
 
 	set_colorscale() {
-		if (this.colorscale) return;
+		if (this.colorscale) {
+			console.log(this.id, "has a colorscale already");
+			return;
+		}
+
+		let opts;
 
 		switch (this.datatype) {
 		case 'polygons-fixed': {
 			if (this.config.csv_columns) {
-				this.colorscale = ea_colorscale({
+				opts = {
 					stops: this.category.colorstops,
-				});
+				};
 			}
 			break;
 		}
 
 		case 'polygons-timeline': {
-			this.colorscale = ea_colorscale({
+			opts = {
 				stops: this.category.colorstops,
-			});
+			};
 
 			break;
 		}
 
 		case 'raster': {
-			this.colorscale = ea_colorscale({
+			opts = {
 				stops: this.category.colorstops,
 				domain: this.domain,
 				intervals: this.raster.intervals
-			});
+			};
 
 			break;
 		}
@@ -467,6 +472,8 @@ This is not fatal but the dataset is now disabled.`
 		default:
 			break;
 		}
+
+		if (opts) this.colorscale = ea_colorscale(opts);
 	};
 
 	info_modal() {

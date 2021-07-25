@@ -477,12 +477,11 @@ This is not fatal but the dataset is now disabled.`
 	};
 
 	info_modal() {
-		const b = this.metadata;
-		b['why'] = this.category.metadata.why;
+		const m = Object.assign({}, this.metadata, { "category-description": this.category.description });
+		const content = tmpl('#ds-info-modal', m);
 
-		const content = tmpl('#ds-info-modal', b);
-		qs('#metadata-sources', content).href = this.metadata.download_original_url;
-		qs('#learn-more', content).href = this.metadata.learn_more_url;
+		qs('#metadata-sources', content).href = m.download_original_url;
+		qs('#learn-more', content).href = m.learn_more_url;
 
 		ea_modal.set({
 			header: this.name,

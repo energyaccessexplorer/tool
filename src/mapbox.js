@@ -176,10 +176,11 @@ export function change_theme(theme, soft) {
 export function pointer(content, x, y) {
 	let p = qs('#mapbox-pointer');
 
-	if (!p) {
-		p = ce('div', null, {
-			id: "mapbox-pointer",
-			style: `
+	if (p) p.remove();
+
+	p = ce('div', null, {
+		id: "mapbox-pointer",
+		style: `
 position: absolute;
 left: ${x - 10}px;
 top: ${y - 10}px;
@@ -187,10 +188,12 @@ height: 20px;
 width: 20px;
 background-color: transparent;
 `
-		});
-	}
+	});
 
 	document.body.append(p);
+
+	for (const e of qsa('.nanny-marker'))
+		e.remove();
 
 	let cls = false;
 	let pos = "W";
@@ -202,27 +205,20 @@ background-color: transparent;
 
 	const mark = nanny.pick_element((MOBILE ? document.body : p), { position: pos, message: content, close: cls });
 
-	let l;
-	let lo;
-
 	function drop() {
 		p.remove();
 		mark.remove();
-		document.removeEventListener('mouseleave', l);
 	};
 
-	p.addEventListener('mouseleave', (l = drop));
+	p.addEventListener('mouseleave', drop);
 
-	if (MOBILE) {
-		delay(0.01)
-			.then(_ => {
-				document.body.addEventListener('click', (lo = function() {
-					p.remove();
-					mark.remove();
-					document.removeEventListener('click', lo);
-				}));
-			});
-	}
+	let clk;
+	function c() {
+		drop();
+		document.removeEventListener('click', clk);
+	};
+
+	document.addEventListener('click', (clk = c));
 
 	return {
 		drop: drop

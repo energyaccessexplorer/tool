@@ -351,16 +351,10 @@ This is not fatal but the dataset is now disabled.`
 		let s = null;
 		switch (c.scale) {
 		case 'key-delta': {
-			if (!maybe(this.csv, 'table')) {
+			if (!maybe(this.csv, 'table'))
 				s = _ => 1;
-			}
-
-			else {
-				s = x => {
-					let z = this.csv.table[x];
-					return or(undefined === z, z < min, z > max) ? -1 : 1;
-				};
-			}
+			else
+				s = x => and(x === min, x === max) ? 1 : -1;
 
 			break;
 		}

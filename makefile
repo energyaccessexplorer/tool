@@ -17,6 +17,9 @@ LIB = ${DIST}/lib
 
 TIMESTAMP != date -u +'%Y-%m-%d--%T'
 
+GITSHA != git log -n1 --format=format:"%H" | head -c 8
+GITCLEAN != [ "`git diff --stat`" = '' ] || echo "-dirty"
+
 default: reconfig build reload
 
 build: lint build-a build-s build-d
@@ -155,6 +158,8 @@ build-d:
 		> ${DIST}/d/main.css
 
 sync:
+	@echo ${GITSHA}${GITCLEAN} > ${DIST}/.sync-${env}
+
 	@rsync -OPrv \
 		--checksum \
 		--copy-links \
@@ -169,9 +174,7 @@ synced:
 		--checksum \
 		--copy-links \
 		--delete-before \
-		--exclude=.git \
-		--exclude=default.mk \
-		--exclude=makefile \
+		--exclude=files \
 		${DIST}/ ${WEBSITE_SSH_USER}@${WEBSITE_HOST}:${TOOL_DEST}
 
 deploy:

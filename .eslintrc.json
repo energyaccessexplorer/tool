@@ -95,10 +95,6 @@
     "coordinates_to_raster_pixel": "readonly",
     "raster_pixel_to_coordinates": "readonly",
 
-    "load_view": "readonly",
-    "load_view": "readonly",
-    "map_click": "readonly",
-
     "fake_blob_download": "readonly",
     "table_add_lnglat": "readonly",
     "table_data": "readonly"

@@ -101,18 +101,25 @@ export default class Overlord {
 		window.dispatchEvent(new Event('resize'));
 	};
 
-	set subgeo(t) {
-		U.subgeo = t || '';
+	map(interaction, event, id) {
+		const ds = DST.get(id);
 
-		Promise.all(DS.array.map(d => {
-			if (d.on && d.datatype === 'polygons-timeline')
-				return parse_polygons_csv.call(d, U.timeline);
-		})).then(_ => O.view = U.view);
-	};
+		switch (interaction) {
+		case "click":
+			map_click.call(ds, event);
+			break;
 
-	map(interaction, event) {
-		if (interaction === "click")
-			map_click(event);
+		case "dblclick":
+			map_dblclick.call(ds, event);
+			break;
+
+		case "zoomend":
+			map_zoomend.call(ds, event);
+			break;
+
+		default:
+			break;
+		}
 	};
 
 	sort() {

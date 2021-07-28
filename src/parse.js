@@ -406,8 +406,10 @@ export function polygons() {
 				this.card.legends(criteria.map(x => JSON.parse(x)), "polygons");
 			}
 
-			mapbox_dblclick(this.id);
-			mapbox_zoomend(this.id);
+			if (this.datatype.match('polygons-(fixed|boundaries)')) {
+				mapbox_dblclick(this.id);
+				mapbox_zoomend(this.id);
+			}
 		});
 };
 

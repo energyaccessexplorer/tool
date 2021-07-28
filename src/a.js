@@ -734,6 +734,30 @@ function map_click(e) {
 	}
 };
 
+function map_dblclick(e) {
+	if (INFOMODE) return;
+
+	if (e.features.length > 0) {
+		mapbox.fit(geojsonExtent(e.features[0]), true);
+
+		const s = U.subgeo = e.features[0].id;
+
+		this._domain = s === null ?
+			Object.assign({}, this.domain) :
+			{ min: s, max: s };
+
+		O.view = U.view;
+	}
+};
+
+function map_zoomend(_) {
+	if (same(this._domain, this.domain)) return;
+
+	this._domain = Object.assign({}, this.domain);
+	U.subgeo = '';
+	O.view = U.view;
+};
+
 export function divisions_rows_tier(r, et) {
 	GEOGRAPHY.configuration.divisions
 		.filter((b,i) => (i !== 0) && i === maybe(this.config, 'divisions_tier'))
@@ -784,3 +808,5 @@ window.ea_nanny_force_start = nanny_force;
 // TODO: the following are used by overlord. delete them.
 window.load_view = load_view;
 window.map_click = map_click;
+window.map_dblclick = map_dblclick;
+window.map_zoomend = map_zoomend;

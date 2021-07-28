@@ -68,7 +68,9 @@ class MapboxInfoControl {
 
 let _O;
 
-let changing_target = false;
+let _changing_target = false;
+
+let _zoom;
 
 export function init(overlord = {}) {
 	mapboxgl.accessToken = ea_settings.mapbox_token;
@@ -233,6 +235,7 @@ export function fit(bounds, animate = false) {
 
 	try {
 		MAPBOX.fitBounds(bounds, { animate: animate, padding: { top: vp, bottom: vp, left: hp, right: hp } });
+		_zoom = MAPBOX.getZoom();
 	} catch (e) {
 		ea_super_error(
 			"Geography bounding box",
@@ -250,44 +253,28 @@ This is fatal. Thanks for all the fish.`
 	}
 
 	const [left, bottom, right, top] = bounds;
+
 	return [[left,top], [right,top], [right,bottom], [left,bottom]];
 };
 
 export function dblclick(id) {
-	MAPBOX.on('dblclick', id, function(e) {
-		if (INFOMODE) return;
+	MAPBOX.on('dblclick', id, e => {
+		if (_changing_target) return;
 
-		if (e.features.length > 0) {
-			fit(geojsonExtent(e.features[0]), true);
-			changing_target = true;
-
-			const d = DST.get(id);
-
-			d._domain = (U.subgeo === null) ?
-				Object.assign({}, d.domain) :
-				{ min: U.subgeo, max: U.subgeo };
-
-			_O.subgeo = e.features[0].id;
-		}
+		_changing_target = true;
+		_O.map('dblclick', e, id);
 	});
 };
 
 export function zoomend(id) {
-	let _zoom;
-
-	MAPBOX.on('zoomend', id, function(_) {
+	MAPBOX.on('zoomend', id, e => {
 		const z = MAPBOX.getZoom();
 
-		if (!changing_target) {
-			const d = DST.get(id);
+		if (or(_changing_target, z >= _zoom)) ;
+		else _O.map('zoomend', e, id);
 
-			if (_zoom > z && !same(d._domain, d.domain)) {
-				d._domain = Object.assign({}, d.domain);
-				_O.subgeo = null;
-			}
-		}
+		_changing_target = false;
 
-		changing_target = false;
 		_zoom = z;
 	});
 };

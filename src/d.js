@@ -7,30 +7,10 @@ import {
 import DS from './ds.js';
 
 const url = new URL(location);
-const id = url.searchParams.get('id');
-const dataset_id = url.searchParams.get('dataset_id');
-
-function layout() {
-	if (maybe(GEOGRAPHY, 'timeline'))
-		qs('#visual').append(ce('div', null, { id: 'timeline' }));
-
-	const p = qs('#playground');
-	const m = qs('#maparea', p);
-	const b = qs('#mapbox-container', m);
-
-	function set_heights() {
-		const h = window.innerHeight;
-
-		p.style['height'] =
-      m.style['height'] =
-      b.style['height'] = h + "px";
-	};
-
-	document.body.onresize = set_heights;
-	set_heights();
-};
 
 export async function init() {
+	const id = url.searchParams.get('id');
+
 	GEOGRAPHY = await ea_api.get("geographies", { "id": `eq.${id}` }, { one: true });
 
 	layout();
@@ -108,6 +88,9 @@ This is fatal. Thanks for all the fish.`;
 		);
 	})();
 
+	const dataset_id = url.searchParams.get('dataset_id');
+	const geography_id = url.searchParams.get('id');
+
 	if (outline_id === dataset_id) {
 		await plot.call(OUTLINE);
 		OUTLINE.active(true, true);
@@ -115,7 +98,7 @@ This is fatal. Thanks for all the fish.`;
 	}
 
 	const p = {
-		"geography_id": `eq.${id}`,
+		"geography_id": `eq.${geography_id}`,
 		"id": `eq.${dataset_id}`,
 		"select": select
 	};
@@ -281,4 +264,24 @@ I haven't done this yet...`);
 		const j = JSON.stringify(await eval(fn).call(this), null, 4);
 		body.append(ce('pre', j));
 	}
+};
+
+function layout() {
+	if (maybe(GEOGRAPHY, 'timeline'))
+		qs('#visual').append(ce('div', null, { id: 'timeline' }));
+
+	const p = qs('#playground');
+	const m = qs('#maparea', p);
+	const b = qs('#mapbox-container', m);
+
+	function set_heights() {
+		const h = window.innerHeight;
+
+		p.style['height'] =
+			m.style['height'] =
+			b.style['height'] = h + "px";
+	};
+
+	document.body.onresize = set_heights;
+	set_heights();
 };

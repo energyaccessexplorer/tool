@@ -44,11 +44,6 @@ ${msg}`
 	}
 
 	this.disable(msg);
-
-	if (!U.inputs) return;
-
-	const arr = U.inputs; arr.splice(U.inputs.indexOf(this.id), 1);
-	U.inputs = arr;
 };
 
 export function csv() {
@@ -344,7 +339,8 @@ export function lines() {
 };
 
 export function polygons() {
-	return geojson.call(this)
+	return geojson
+		.call(this)
 		.then(async _ => {
 			if (this.csv) {
 				let col = null;

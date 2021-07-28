@@ -101,6 +101,167 @@ const UProxyHandler = {
 	}
 };
 
+export async function init() {
+	const url = new URL(location);
+	const id = url.searchParams.get('id');
+
+	GEOGRAPHY = await ea_api.get("geographies", { "id": `eq.${id}` }, { one: true });
+	GEOGRAPHY.timeline = maybe(GEOGRAPHY, 'configuration', 'timeline');
+	GEOGRAPHY.timeline_dates = maybe(GEOGRAPHY, 'configuration', 'timeline_dates');
+
+	fetch(`https://world.energyaccessexplorer.org/countries?select=cca2&cca3=eq.${GEOGRAPHY.cca3}`)
+		.then(r => r.json())
+		.then(r => GEOGRAPHY.cca2 = maybe(r, 0, 'cca2'));
+
+	if (location.hostname.match(/^www/))
+		ENV = "production";
+	else if (location.hostname.match(/^staging/))
+		ENV = "staging";
+	else if (location.hostname.match(/localhost/))
+		ENV = ["production", "staging"];
+
+	let params = 'default';
+
+	if (GEOGRAPHY.timeline)
+		params = 'timeline';
+
+	MOBILE = screen.width < 1152;
+	layout();
+
+	U = new Proxy({ url: url, params: ea_params[params] }, UProxyHandler);
+	O = new Overlord();
+
+	MAPBOX = mapbox.init(O);
+	MAPBOX.coords = mapbox.fit(GEOGRAPHY.envelope);
+
+	await dsinit(GEOGRAPHY.id, U.pack);
+
+	U.inputs = U.inputs.slice(0); // cleanup non-existent ids
+
+	O.index = U.output;
+
+	cards.init();
+	controlssearch.init();
+	geographiessearch.init();
+	vectorssearch.init();
+	analysissearch.init();
+	locationssearch.init();
+
+	if (MOBILE) mobile();
+
+	views.init();
+	indexes.init();
+
+	drawer_init();
+	toggle_left_panel();
+
+	if (GEOGRAPHY.timeline) timeline_init();
+
+	if (!MOBILE && !GEOGRAPHY.timeline) nanny_init();
+
+	await Promise.all(U.inputs.map(i => {
+		const d = DST.get(i);
+		return d._active(true, false);
+	})).then(_ => {
+		cards.update();
+		mapbox.change_theme(ea_settings.mapbox_theme, false);
+	});
+
+	ea_loading(false);
+};
+
+/*
+ * dsinit
+ *
+ * 1. fetch the datasets list from the API
+ * 2. generate DS objects
+ * 3. initialise mutants and collections
+ *
+ * @param "id" uuid
+ * @param "inputs" string[] with DS.id's
+ * @param "pack" string ("all" ...)
+ *
+ * returns DS[]
+ */
+
+async function dsinit(id, pack) {
+	let select = ["*", "datatype", "category:categories(*)"];
+
+	const divisions = maybe(GEOGRAPHY.configuration, 'divisions');
+
+	await (function fetch_outline() {
+		// TODO: this should be more strict divisions 0/outline
+		const outline_id = maybe(divisions.find(d => d.dataset_id), 'dataset_id');
+
+		if (!outline_id) {
+			const m = `
+Failed to get the geography's OUTLINE.
+This is fatal. Thanks for all the fish.`;
+
+			ea_super_error("Geography error", m);
+
+			throw Error("No OUTLINE. Ciao.");
+		}
+
+		const bp = {
+			"id": `eq.${outline_id}`,
+			"select": select,
+		};
+
+		return ea_api.get("datasets", bp, { one: true })
+			.then(async e => {
+				const ds = OUTLINE = new DS(e);
+
+				await ds.load('vectors');
+				await ds.load('raster');
+			});
+	})();
+
+	await (function fetch_divisions() {
+		return Promise.all(
+			divisions.filter(x => x.dataset_id).slice(1).map(x => {
+				const dp = {
+					"id": `eq.${x.dataset_id}`,
+					"select": select,
+				};
+
+				return ea_api.get("datasets", dp, { one: true })
+					.then(async e => {
+						const ds = new DS(e);
+
+						await ds.load('csv');
+						await ds.load('vectors');
+						await ds.load('raster');
+					});
+			})
+		);
+	})();
+
+	await (function fetch_datasets() {
+		pack = maybe(pack, 'length') ? pack : 'all';
+
+		const nd = divisions.filter(d => d.dataset_id).map(d => d.dataset_id).concat(OUTLINE.dataset_id);
+		const p = {
+			"geography_id": `eq.${id}`,
+			"select": select,
+			"pack": `eq.${pack}`,
+			"deployment": `ov.{${ENV}}`,
+			"id": `not.in.(${nd})`,
+		};
+
+		return ea_api.get("datasets", p)
+			.then(r => r.map(e => new DS(e)));
+	})();
+
+	U.params.inputs = [...new Set(DS.array.map(e => e.id))];
+
+	// We need all the datasets to be initialised _before_ setting
+	// mutant/collection attributes (order is never guaranteed)
+	//
+	DS.array.filter(d => d.mutant).forEach(d => d.mutant_init());
+	DS.array.filter(d => d.items).forEach(d => d.items_init());
+};
+
 function layout() {
 	if (maybe(GEOGRAPHY, 'timeline'))
 		qs('#visual').append(ce('div', null, { id: 'timeline' }));
@@ -232,73 +393,6 @@ function mobile() {
 	map.click();
 };
 
-export async function init() {
-	const url = new URL(location);
-	const id = url.searchParams.get('id');
-
-	GEOGRAPHY = await ea_api.get("geographies", { "id": `eq.${id}` }, { one: true });
-	GEOGRAPHY.timeline = maybe(GEOGRAPHY, 'configuration', 'timeline');
-	GEOGRAPHY.timeline_dates = maybe(GEOGRAPHY, 'configuration', 'timeline_dates');
-
-	fetch(`https://world.energyaccessexplorer.org/countries?select=cca2&cca3=eq.${GEOGRAPHY.cca3}`)
-		.then(r => r.json())
-		.then(r => GEOGRAPHY.cca2 = maybe(r, 0, 'cca2'));
-
-	if (location.hostname.match(/^www/))
-		ENV = "production";
-	else if (location.hostname.match(/^staging/))
-		ENV = "staging";
-	else if (location.hostname.match(/localhost/))
-		ENV = ["production", "staging"];
-
-	let params = 'default';
-
-	if (GEOGRAPHY.timeline)
-		params = 'timeline';
-
-	MOBILE = screen.width < 1152;
-	layout();
-
-	U = new Proxy({ url: url, params: ea_params[params] }, UProxyHandler);
-	O = new Overlord();
-
-	MAPBOX = mapbox.init(O);
-	MAPBOX.coords = mapbox.fit(GEOGRAPHY.envelope);
-
-	await dsinit(GEOGRAPHY.id, U.inputs, U.pack);
-
-	O.index = U.output;
-
-	cards.init();
-	controlssearch.init();
-	geographiessearch.init();
-	vectorssearch.init();
-	analysissearch.init();
-	locationssearch.init();
-
-	if (MOBILE) mobile();
-
-	views.init();
-	indexes.init();
-
-	drawer_init();
-	toggle_left_panel();
-
-	if (GEOGRAPHY.timeline) timeline_init();
-
-	if (!MOBILE && !GEOGRAPHY.timeline) nanny_init();
-
-	await Promise.all(U.inputs.map(i => {
-		const d = DST.get(i);
-		return d._active(true, false);
-	})).then(_ => {
-		cards.update();
-		mapbox.change_theme(ea_settings.mapbox_theme, false);
-	});
-
-	ea_loading(false);
-};
-
 export function toggle_left_panel(t) {
 	for (let m of qsa('.nanny-marker')) m.remove();
 
@@ -340,98 +434,6 @@ function drawer_init() {
 		};
 
 	toggle_left_panel();
-};
-
-/*
- * dsinit
- *
- * 1. fetch the datasets list from the API
- * 2. generate DS objects
- * 3. initialise mutants and collections
- *
- * @param "id" uuid
- * @param "inputs" string[] with DS.id's
- * @param "pack" string ("all" ...)
- *
- * returns DS[]
- */
-
-async function dsinit(id, inputs, pack) {
-	let select = ["*", "datatype", "category:categories(*)"];
-
-	const divisions = maybe(GEOGRAPHY.configuration, 'divisions');
-
-	await (function fetch_outline() {
-		// TODO: this should be more strict divisions 0/outline
-		const outline_id = maybe(divisions.find(d => d.dataset_id), 'dataset_id');
-
-		if (!outline_id) {
-			const m = `
-Failed to get the geography's OUTLINE.
-This is fatal. Thanks for all the fish.`;
-
-			ea_super_error("Geography error", m);
-
-			throw Error("No OUTLINE. Ciao.");
-		}
-
-		const bp = {
-			"id": `eq.${outline_id}`,
-			"select": select,
-		};
-
-		return ea_api.get("datasets", bp, { one: true })
-			.then(async e => {
-				const ds = OUTLINE = new DS(e);
-
-				await ds.load('vectors');
-				await ds.load('raster');
-			});
-	})();
-
-	await (function fetch_divisions() {
-		return Promise.all(
-			divisions.filter(x => x.dataset_id).slice(1).map(x => {
-				const dp = {
-					"id": `eq.${x.dataset_id}`,
-					"select": select,
-				};
-
-				return ea_api.get("datasets", dp, { one: true })
-					.then(async e => {
-						const ds = new DS(e);
-
-						await ds.load('csv');
-						await ds.load('vectors');
-						await ds.load('raster');
-					});
-			})
-		);
-	})();
-
-	await (function fetch_datasets() {
-		pack = maybe(pack, 'length') ? pack : 'all';
-
-		const nd = divisions.filter(d => d.dataset_id).map(d => d.dataset_id).concat(OUTLINE.dataset_id);
-		const p = {
-			"geography_id": `eq.${id}`,
-			"select": select,
-			"pack": `eq.${pack}`,
-			"deployment": `ov.{${ENV}}`,
-			"id": `not.in.(${nd})`,
-		};
-
-		return ea_api.get("datasets", p)
-			.then(r => r.map(e => new DS(e)));
-	})();
-
-	U.params.inputs = [...new Set(DS.array.map(e => e.id))];
-
-	// We need all the datasets to be initialised _before_ setting
-	// mutant/collection attributes (order is never guaranteed)
-	//
-	DS.array.filter(d => d.mutant).forEach(d => d.mutant_init());
-	DS.array.filter(d => d.items).forEach(d => d.items_init());
 };
 
 function nanny_init() {

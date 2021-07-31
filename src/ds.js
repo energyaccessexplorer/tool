@@ -96,13 +96,6 @@ This is not fatal but the dataset is now disabled.`
 			this.vectors = JSON.parse(JSON.stringify(b.vectors));
 			this.vectors.parse = x => parse.polygons.call(x || this);
 
-			for (let p in this.vectors.features.features[0].properties) {
-				if (['OBJECTID', 'FID', 'Id', 'Code'].map(t => t.toLowerCase()).includes(p.toLowerCase())) {
-					this.vectors.key = p;
-					break;
-				}
-			}
-
 			indicator = true;
 		}
 

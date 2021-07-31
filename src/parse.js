@@ -342,30 +342,7 @@ export function polygons() {
 	return geojson
 		.call(this)
 		.then(async _ => {
-			if (this.csv) {
-				let col = null;
-
-				if (this.timeline) {
-					await until(_ => this.csv.data);
-
-					if (!this.domain) {
-						this.domain = {
-							min: d3.min([].concat(...GEOGRAPHY.timeline_dates.map(d => this.csv.data.map(r => +r[d])))),
-							max: d3.max([].concat(...GEOGRAPHY.timeline_dates.map(d => this.csv.data.map(r => +r[d]))))
-						};
-					}
-
-					col = U.timeline;
-				}
-				else if (this.config.csv_columns)
-					col = this.config.csv_columns.value;
-
-				polygons_csv.call(this, col);
-			}
-
-			const fs = this.vectors.features.features;
-			for (let i = 0; i < fs.length; i += 1)
-				fs[i].id = fs[i].properties[this.vectors.key];
+			if (this.csv) polygons_csv.call(this);
 
 			const criteria = specs_set.call(
 				this,
@@ -409,11 +386,21 @@ export function polygons() {
 		});
 };
 
-export async function polygons_csv(col) {
+export async function polygons_csv() {
 	await until(_ => this.csv.data && this.vectors.features);
 
-	if (this.timeline)
+	const col = coalesce(U.timeline, this.config.csv_columns.value);
+
+	if (this.timeline) {
+		if (!this.domain) {
+			this.domain = {
+				min: d3.min([].concat(...GEOGRAPHY.timeline_dates.map(d => this.csv.data.map(r => +r[d])))),
+				max: d3.max([].concat(...GEOGRAPHY.timeline_dates.map(d => this.csv.data.map(r => +r[d]))))
+			};
+		}
+
 		this.csv.table = csv_table.call(this, col);
+	}
 
 	let s;
 	const data = this.csv.data;
@@ -431,10 +418,18 @@ export async function polygons_csv(col) {
 		return;
 	}
 
+	for (const x in this.vectors.features.features[0].properties) {
+		if (['OBJECTID', 'FID', 'Id', 'Code'].map(t => t.toLowerCase()).includes(x.toLowerCase())) {
+			this.vectors.key = x;
+			break;
+		}
+	}
+
 	const fs = this.vectors.features.features;
 	for (let i = 0; i < fs.length; i += 1) {
 		let row = data.find(r => +r[this.csv.key] === +fs[i].properties[this.vectors.key]);
 		fs[i].properties.__color = (this.colorscale && row) ? s(row[col]) : this.vectors.fill || "white";
+		fs[i].id = fs[i].properties[this.vectors.key];
 	}
 
 	this.update_source(this.vectors.features);

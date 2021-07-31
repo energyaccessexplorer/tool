@@ -312,10 +312,6 @@ This is not fatal but the dataset is now disabled.`
 		}
 	};
 
-	toggle(_O) {
-		_O.dataset(this, 'active', (this.on = !this.on));
-	};
-
 	/*
    * analysis_fn
    *

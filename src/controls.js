@@ -334,13 +334,17 @@ function toggle_switch(init, callback) {
 	};
 };
 
+function toggle_ds() {
+	O.dataset(this, 'active', (this.on = !this.on));
+};
+
 function checkbox() {
 	const c = toggle_switch(this.on);
 	const svg = c.svg;
 
 	c.click = e => {
 		if (e.target.closest('svg') === svg)
-			this.toggle(O);
+			toggle_ds.call(this);
 
 		else if (e.target.closest('.more-dropdown') === this.controls.dropdown)
 			return;
@@ -481,7 +485,7 @@ function options() {
 		dropdownlist.push({
 			"content": "Toggle advanced controls",
 			"action": _ => {
-				if (!this.ds.on) this.ds.toggle(O);
+				if (!this.ds.on) toggle_ds.call(this.ds);
 
 				qs('.advanced-controls', this).style.display = ((this.show_advanced = !this.show_advanced)) ? 'block' : 'none';
 			}

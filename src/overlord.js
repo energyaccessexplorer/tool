@@ -360,7 +360,7 @@ function map_click(e) {
 
 		table_add_lnglat(td, [e.lngLat.lng, e.lngLat.lat]);
 
-		mapbox.pointer(
+		map_pointer(
 			td,
 			e.originalEvent.pageX,
 			e.originalEvent.pageY

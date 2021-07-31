@@ -175,58 +175,6 @@ export function change_theme(theme, soft) {
 	if (theme === "") go();
 };
 
-export function pointer(content, x, y) {
-	let p = qs('#mapbox-pointer');
-
-	if (p) p.remove();
-
-	p = ce('div', null, {
-		id: "mapbox-pointer",
-		style: `
-position: absolute;
-left: ${x - 10}px;
-top: ${y - 10}px;
-height: 20px;
-width: 20px;
-background-color: transparent;
-`
-	});
-
-	document.body.append(p);
-
-	for (const e of qsa('.nanny-marker'))
-		e.remove();
-
-	let cls = false;
-	let pos = "W";
-
-	if (MOBILE) {
-		cls = true;
-		pos = "C";
-	}
-
-	const mark = nanny.pick_element((MOBILE ? document.body : p), { position: pos, message: content, close: cls });
-
-	function drop() {
-		p.remove();
-		mark.remove();
-	};
-
-	p.addEventListener('mouseleave', drop);
-
-	let clk;
-	function c() {
-		drop();
-		document.removeEventListener('click', clk);
-	};
-
-	document.addEventListener('click', (clk = c));
-
-	return {
-		drop: drop
-	};
-};
-
 export function fit(bounds, animate = false) {
 	const rect = qs('#maparea').getBoundingClientRect();
 

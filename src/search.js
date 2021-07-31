@@ -3,7 +3,6 @@ import {
 } from './analysis.js';
 
 import {
-	pointer as mapbox_pointer,
 	fit as mapbox_fit,
 } from './mapbox.js';
 
@@ -25,7 +24,7 @@ export function pointto(coords, dict, props, a = false) {
 	const box = maparea.getBoundingClientRect();
 
 	if (pointer) pointer.drop();
-	pointer = mapbox_pointer(td, box.x + x, box.y + y);
+	pointer = map_pointer(td, box.x + x, box.y + y);
 };
 
 export function zoom(p, fn) {

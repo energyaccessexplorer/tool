@@ -86,7 +86,7 @@ export default class dscontrols extends HTMLElement {
 	};
 
 	render() {
-		this.checkbox = checkbox.call(this.ds);
+		this.checkbox = toggle_switch.call(this.ds, this.on);
 
 		if (this.ds.category.controls.weight)
 			this.weight_group = weight.call(this.ds);
@@ -106,7 +106,7 @@ export default class dscontrols extends HTMLElement {
 		this.content = qs('content', this);
 		this.spinner = qs('.loading', this);
 
-		this.header.onclick = this.checkbox.click;
+		this.header.onclick = header_click.call(this);
 
 		this.manual_min = qs('.manual-controls input[bind=min]', this);
 		this.manual_max = qs('.manual-controls input[bind=max]', this);
@@ -267,6 +267,10 @@ function humanformat(s) {
 		.replace(/ ([a-z])/g, x => x.toUpperCase());
 };
 
+function toggle_ds() {
+	O.dataset(this, 'active', (this.on = !this.on));
+};
+
 function toggle_switch(init, callback) {
 	const radius = 10,
 		    svgwidth = 38,
@@ -330,32 +334,23 @@ function toggle_switch(init, callback) {
 
 	return {
 		svg: svg.node(),
-		change: change
+		change,
 	};
 };
 
-function toggle_ds() {
-	O.dataset(this, 'active', (this.on = !this.on));
-};
+function header_click() {
+	return e => {
+		const svg = this.checkbox.svg;
 
-function checkbox() {
-	const c = toggle_switch(this.on);
-	const svg = c.svg;
-
-	c.click = e => {
 		if (e.target.closest('svg') === svg)
-			toggle_ds.call(this);
+			toggle_ds.call(this.ds);
 
-		else if (e.target.closest('.more-dropdown') === this.controls.dropdown)
+		else if (e.target.closest('.more-dropdown') === this.ds.controls.dropdown)
 			return;
 
 		else
 			svg.dispatchEvent(new Event('click', { bubbles: true }));
-
-		return this.on;
 	};
-
-	return c;
 };
 
 async function mutant_options() {

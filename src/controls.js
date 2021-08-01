@@ -2,7 +2,7 @@ import DS from './ds.js';
 
 import { select_tab } from './controls-search.js';
 
-let slider_width;
+const slider_width = 256;
 
 const contents_el = qs('#controls-contents');
 
@@ -400,8 +400,8 @@ function range(opts = {}) {
 	const r = tmpl('#ramp');
 	qs('.ramp', r).append(v1, ce('div', opts.ramp || 'range', { class: "unit-ramp" }), v2);
 
-	if (!slider_width)
-		slider_width = Math.max(coalesce(maybe(contents_el, 'clientWidth'), 0) - 64, 256);
+	r.style['width'] = `${slider_width + 2}px`;
+	r.style['margin'] = 'auto';
 
 	const s = ea_svg_interval({
 		sliders: opts.sliders,
@@ -414,11 +414,10 @@ function range(opts = {}) {
 		end_callback: _ => O.dataset(this, 'domain', domain),
 	});
 
-	const el = ce('div');
-	el.append(s.svg, r);
+	const el = ce('div', [s.svg, r], { style: "text-align: center;" });
 
 	return {
-		el: el,
+		el,
 		svg: s.svg,
 		change: s.change,
 		ramp: r

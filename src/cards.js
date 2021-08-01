@@ -108,6 +108,109 @@ function polygons_legends_svg(l) {
 	return svg.node();
 }
 
+function svg_el() {
+	const ds = this.ds;
+	let d = ce('div');
+	let e = maybe(ds.colorscale, 'svg') || ce('div');
+
+	function ramp_values({min, max}) {
+		const diff = Math.abs(max - min);
+		let i = 3 - Math.ceil(Math.log10(diff || 1));
+		if (i < 0) i = 0;
+
+		return [
+			ce('div', min.toFixed(i) + ""),
+			ce('div', max.toFixed(i) + "")
+		];
+	}
+
+	switch (ds.datatype) {
+	case 'points': {
+		e = points_symbol({
+			size: 24,
+			fill: ds.vectors.fill,
+			stroke: ds.vectors.stroke,
+			strokewidth: 2,
+		});
+		break;
+	}
+
+	case 'lines': {
+		e = lines_symbol({
+			size: 28,
+			dasharray: ds.vectors.dasharray,
+			stroke: ds.vectors.stroke,
+			width: ds.vectors.width * 2,
+			fill: 'none'
+		});
+		break;
+	}
+
+	case 'polygons':
+	case 'polygons-boundaries': {
+		e = polygons_symbol({
+			size: 28,
+			fill: ds.vectors.fill,
+			opacity: ds.vectors.opacity,
+			stroke: ds.vectors.stroke,
+			strokewidth: (ds.vectors.width - 1) || 1
+		});
+		break;
+	}
+
+	case 'polygons-fixed':
+	case 'polygons-timeline': {
+		const r = tmpl('#ramp');
+
+		if (ds.domain) {
+			qs('.ramp', r).append(...ramp_values(ds.domain));
+		}
+
+		d.append(
+			r,
+			ce('div', null, { style: "display: inline-block; width: 64px; height: 5px; background-color: rgba(155,155,155,1); margin: 15px 15px 0 0;" }),
+			ce('div', "Not Available", { style: "display: inline-block; font-size: x-small;" })
+		);
+
+		break;
+	}
+
+	case 'raster-mutant':
+	case 'raster': {
+		let r = tmpl('#ramp');
+
+		if (ds.domain) {
+			qs('.ramp', r).append(...ramp_values(ds.domain));
+			d.append(r);
+		}
+
+		break;
+	}
+
+	default: {
+		console.warn("dscard.svg could not be set.", ds.id);
+		break;
+	}
+	}
+
+	if (ds.items) {
+		const el = ce('ul', null, { class: 'collection' });
+
+		for (let d of ds.items) {
+			let li = ce('li');
+
+			li.append(d.card.svg_el, ce('div', d.name, { class: 'subheader' }));
+			el.append(li);
+		}
+
+		return el;
+	}
+
+	d.prepend(e);
+
+	return d;
+}
+
 export function init() {
 	const list = qs('#cards-pane #cards-list');
 
@@ -155,7 +258,7 @@ export default class dscard extends HTMLElement {
 	render() {
 		this.setAttribute('bind', this.ds.id);
 
-		this.svg_el = this.svg();
+		this.svg_el = svg_el.call(this);
 
 		attach.call(this, shadow_tmpl('#ds-card-template'));
 
@@ -180,7 +283,7 @@ export default class dscard extends HTMLElement {
 		const s = qs('[slot=svg]', this);
 		elem_empty(s);
 
-		s.append(this.svg_el = this.svg());
+		s.append(this.svg_el = svg_el.call(this));
 
 		this.opacity_value = 1;
 		const o = qs('[slot=opacity]', this);
@@ -245,109 +348,6 @@ export default class dscard extends HTMLElement {
 				this.ds.opacity(x);
 			},
 		});
-	};
-
-	svg() {
-		const ds = this.ds;
-		let d = ce('div');
-		let e = maybe(ds.colorscale, 'svg') || ce('div');
-
-		function ramp_values({min, max}) {
-			const diff = Math.abs(max - min);
-			let i = 3 - Math.ceil(Math.log10(diff || 1));
-			if (i < 0) i = 0;
-
-			return [
-				ce('div', min.toFixed(i) + ""),
-				ce('div', max.toFixed(i) + "")
-			];
-		}
-
-		switch (ds.datatype) {
-		case 'points': {
-			e = points_symbol({
-				size: 24,
-				fill: ds.vectors.fill,
-				stroke: ds.vectors.stroke,
-				strokewidth: 2,
-			});
-			break;
-		}
-
-		case 'lines': {
-			e = lines_symbol({
-				size: 28,
-				dasharray: ds.vectors.dasharray,
-				stroke: ds.vectors.stroke,
-				width: ds.vectors.width * 2,
-				fill: 'none'
-			});
-			break;
-		}
-
-		case 'polygons':
-		case 'polygons-boundaries': {
-			e = polygons_symbol({
-				size: 28,
-				fill: ds.vectors.fill,
-				opacity: ds.vectors.opacity,
-				stroke: ds.vectors.stroke,
-				strokewidth: (ds.vectors.width - 1) || 1
-			});
-			break;
-		}
-
-		case 'polygons-fixed':
-		case 'polygons-timeline': {
-			const r = tmpl('#ramp');
-
-			if (ds.domain) {
-				qs('.ramp', r).append(...ramp_values(ds.domain));
-			}
-
-			d.append(
-				r,
-				ce('div', null, { style: "display: inline-block; width: 64px; height: 5px; background-color: rgba(155,155,155,1); margin: 15px 15px 0 0;" }),
-				ce('div', "Not Available", { style: "display: inline-block; font-size: x-small;" })
-			);
-
-			break;
-		}
-
-		case 'raster-mutant':
-		case 'raster': {
-			let r = tmpl('#ramp');
-
-			if (ds.domain) {
-				qs('.ramp', r).append(...ramp_values(ds.domain));
-				d.append(r);
-			}
-
-			break;
-		}
-
-		default: {
-			console.warn("dscard.svg could not be set.", ds.id);
-			break;
-		}
-		}
-
-		if (ds.items) {
-			const el = ce('ul', null, { class: 'collection' });
-
-			for (let d of ds.items) {
-				let li = ce('li');
-
-				li.append(d.card.svg_el, ce('div', d.name, { class: 'subheader' }));
-				el.append(li);
-			}
-
-			return el;
-		}
-
-		d.prepend(e);
-
-		return d;
 	};
 };
 

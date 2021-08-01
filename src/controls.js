@@ -437,8 +437,8 @@ function weight() {
 
 	const w = ea_svg_interval({
 		sliders: "single",
-		init: [1, this.weight],
-		domain: [1, 5],
+		init: { min: 1, max: this.weight },
+		domain: { min: 1, max: 5 },
 		steps: weights,
 		width: slider_width,
 		end_callback: x => O.dataset(this, 'weight', x)

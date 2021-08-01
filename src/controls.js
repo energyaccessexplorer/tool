@@ -22,69 +22,6 @@ export default class dscontrols extends HTMLElement {
 		return this;
 	};
 
-	range_group_controls() {
-		const cat = this.ds.category;
-
-		let steps;
-		if (cat.controls.range_steps) {
-			steps = [];
-			const s = (this.ds.domain.max - this.ds.domain.min) / (cat.controls.range_steps - 1);
-
-			for (let i = 0; i < cat.controls.range_steps; i += 1)
-				steps[i] = this.ds.domain.min + (s * i);
-		}
-
-		const lr = coalesce(cat.controls.range_label, cat.unit, 'range');
-
-		switch (this.ds.datatype) {
-		case 'points':
-		case 'lines':
-		case 'polygons': {
-			if (!this.ds.raster) break;
-
-			this.range_group = range.call(this.ds, {
-				ramp: lr,
-				steps: steps,
-				sliders: cat.controls.range,
-				domain: this.ds.domain
-			});
-			break;
-		}
-
-		case 'polygons-fixed':
-		case 'polygons-timeline': {
-			this.range_group = range.call(this.ds, {
-				ramp: lr,
-				steps: steps,
-				sliders: cat.controls.range,
-				domain: this.ds.domain
-			});
-			break;
-		}
-
-		case 'raster':
-		case 'raster-mutant': {
-			this.range_group = range.call(this.ds, {
-				ramp: lr,
-				steps: steps,
-				sliders: cat.controls.range
-			});
-			break;
-		}
-
-		default: {
-			this.range_group = null;
-			break;
-		}
-		}
-
-		this.manual_setup();
-
-		slot_populate.call(this, {
-			"range-slider": maybe(this.range_group, 'el'),
-		});
-	};
-
 	render() {
 		this.checkbox = toggle_switch.call(this.ds, this.on);
 
@@ -135,7 +72,7 @@ export default class dscontrols extends HTMLElement {
 
 		if (this.checkbox) this.checkbox.change(t);
 
-		if (t && !this.range_group) this.range_group_controls();
+		if (t && !this.range_group) range_group_controls.call(this);
 	};
 
 	inject() {
@@ -213,48 +150,6 @@ export default class dscontrols extends HTMLElement {
 			O.dataset(this.ds, 'domain', this.ds.domain);
 		}
 	};
-
-	manual_setup() {
-		if (!this.manual_min || !this.manual_max) return;
-
-		this.manual_min.value = this.ds.domain.min;
-		this.manual_max.value = this.ds.domain.max;
-
-		const change = (e,i) => {
-			let v = +e.target.value;
-
-			if (i === 'max' && v > this.ds.domain.max) {
-				e.target.value = this.ds.domain.max;
-			}
-
-			if (i === 'min' && v < this.ds.domain.min) {
-				e.target.value = this.ds.domain.min;
-			}
-
-			const d = this.ds._domain;
-			d[i] = +v;
-
-			this.range_group.change(d);
-
-			O.dataset(this.ds, 'domain', d);
-		};
-
-		this.manual_min.onchange = e => change(e, 'min');
-		this.manual_max.onchange = e => change(e, 'max');
-
-		switch (maybe(this.ds, 'category', 'controls', 'range')) {
-		case 'single':
-			this.manual_min.setAttribute('disabled', true);
-			break;
-
-		case 'double':
-			break;
-
-		case null:
-		default:
-			break;
-		}
-	};
 };
 
 customElements.define('ds-controls', dscontrols);
@@ -272,14 +167,14 @@ function toggle_ds() {
 };
 
 function toggle_switch(init, callback) {
-	const radius = 10,
-		    svgwidth = 38,
-		    svgheight = (radius * 2) + 2,
-		    svgmin = radius + 1,
-		    svgmax = svgwidth - radius - 1;
+	const radius = 10;
+	const svgwidth = 38;
+	const svgheight = (radius * 2) + 2;
+	const svgmin = radius + 1;
+	const svgmax = svgwidth - radius - 1;
 
 	const svg = d3.create("svg")
-		    .attr('class', 'svg-checkbox');
+		.attr('class', 'svg-checkbox');
 
 	const g = svg.append('g');
 
@@ -507,6 +402,111 @@ function options() {
 	// }
 	//
 	return dropdownlist;
+};
+
+function manual_setup() {
+	if (!this.manual_min || !this.manual_max) return;
+
+	this.manual_min.value = this.ds.domain.min;
+	this.manual_max.value = this.ds.domain.max;
+
+	const change = (e,i) => {
+		let v = +e.target.value;
+
+		if (i === 'max' && v > this.ds.domain.max) {
+			e.target.value = this.ds.domain.max;
+		}
+
+		if (i === 'min' && v < this.ds.domain.min) {
+			e.target.value = this.ds.domain.min;
+		}
+
+		const d = this.ds._domain;
+		d[i] = +v;
+
+		this.range_group.change(d);
+
+		O.dataset(this.ds, 'domain', d);
+	};
+
+	this.manual_min.onchange = e => change(e, 'min');
+	this.manual_max.onchange = e => change(e, 'max');
+
+	switch (maybe(this.ds, 'category', 'controls', 'range')) {
+	case 'single':
+		this.manual_min.setAttribute('disabled', true);
+		break;
+
+	case 'double':
+		break;
+
+	case null:
+	default:
+		break;
+	}
+};
+
+function range_group_controls() {
+	const cat = this.ds.category;
+
+	let steps;
+	if (cat.controls.range_steps) {
+		steps = [];
+		const s = (this.ds.domain.max - this.ds.domain.min) / (cat.controls.range_steps - 1);
+
+		for (let i = 0; i < cat.controls.range_steps; i += 1)
+			steps[i] = this.ds.domain.min + (s * i);
+	}
+
+	const lr = coalesce(cat.controls.range_label, cat.unit, 'range');
+
+	switch (this.ds.datatype) {
+	case 'points':
+	case 'lines':
+	case 'polygons': {
+		if (!this.ds.raster) break;
+
+		this.range_group = range.call(this.ds, {
+			ramp: lr,
+			steps: steps,
+			sliders: cat.controls.range,
+			domain: this.ds.domain
+		});
+		break;
+	}
+
+	case 'polygons-fixed':
+	case 'polygons-timeline': {
+		this.range_group = range.call(this.ds, {
+			ramp: lr,
+			steps: steps,
+			sliders: cat.controls.range,
+			domain: this.ds.domain
+		});
+		break;
+	}
+
+	case 'raster':
+	case 'raster-mutant': {
+		this.range_group = range.call(this.ds, {
+			ramp: lr,
+			steps: steps,
+			sliders: cat.controls.range
+		});
+		break;
+	}
+
+	default: {
+		this.range_group = null;
+		break;
+	}
+	}
+
+	manual_setup.call(this);
+
+	slot_populate.call(this, {
+		"range-slider": maybe(this.range_group, 'el'),
+	});
 };
 
 export function list() {

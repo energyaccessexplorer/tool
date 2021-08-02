@@ -182,7 +182,7 @@ export function list() {
 
 		node.onclick = _ => trigger_this.call(node);
 
-		qs('.analysis-to-dataset', node).onclick = _ => O.analysis_to_dataset(t);
+		qs('.analysis-to-dataset', node).onclick = _ => analysis_to_dataset(t);
 
 		indexes_list.append(node);
 

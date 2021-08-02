@@ -92,6 +92,8 @@
     "ea_svg_pie": "readonly",
     "ea_opacity_control": "readonly",
 
+    "analysis_to_dataset": "readonly",
+
     "coordinates_to_raster_pixel": "readonly",
     "raster_pixel_to_coordinates": "readonly",
 

@@ -572,10 +572,12 @@ function coordinates_to_raster_pixel(coords, raster) {
 	        a = { x: coords[0], y: coords[1] };
 
 		const i = (plat * b.width) + plng;
-		const v = raster.data[i];
-
-		a.value = (v === raster.nodata) ? null : v;
 		a.index = i;
+
+		if (raster) {
+			const v = raster.data[i];
+			a.value = (v === raster.nodata) ? null : v;
+		}
 	}
 
 	return a;

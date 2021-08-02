@@ -11,7 +11,6 @@ import {
 } from './timeline.js';
 
 import {
-	raster_to_tiff,
 	plot_active as analysis_plot_active,
 	context as analysis_context,
 } from './analysis.js';
@@ -157,41 +156,6 @@ export default class Overlord {
 			});
 
 		O.view = U.view;
-	};
-
-	async analysis_to_dataset(t) {
-		const category = await ea_api.get("categories", { "select": "*", "name": "eq.analysis" }, { one: true });
-
-		const timestamp = (new Date()).getTime().toString().slice(-8);
-
-		const tif = await raster_to_tiff(t);
-
-		const url = URL.createObjectURL(new Blob([tif], { type: "application/octet-stream;charset=utf-8" }));
-
-		const d = new DS({
-			"name": `analysis-${t}-` + timestamp,
-			"name_long": `Analysis ${t.toUpperCase()} - ` + timestamp,
-			"datatype": "raster",
-			"category": category,
-			"processed_files": [{
-				"func": "raster",
-				"endpoint": url
-			}],
-			"source_files": [],
-			"metadata": {},
-		});
-
-		d._active(true, true);
-
-		const x = U.params.inputs.slice(0);
-		x.push(d.id);
-
-		U.params.inputs = x;
-
-		U.inputs = [d.id].concat(U.inputs);
-		O.view = 'inputs';
-
-		qs('#cards-pane #cards-list').prepend(d.card);
 	};
 };
 

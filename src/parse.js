@@ -250,7 +250,6 @@ function specs_set(fs, specs) {
 export function points() {
 	return geojson.call(this)
 		.then(_ => {
-			const v = this.vectors;
 
 			const criteria = specs_set.call(
 				this,
@@ -272,8 +271,8 @@ export function points() {
 					"circle-stroke-color": ['get', '__stroke'],
 					"circle-stroke-width": ['get', '__stroke-width'],
 					"circle-radius": ['get', '__radius'],
-					"circle-opacity": v.opacity,
-					"circle-color": v.fill,
+					"circle-opacity": this.vectors.opacity,
+					"circle-color": this.vectors.fill,
 				},
 			});
 

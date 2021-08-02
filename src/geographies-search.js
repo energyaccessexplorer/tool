@@ -55,6 +55,14 @@ export async function init() {
 		this.value = "";
 	};
 
+	input.onkeypress = function(e) {
+		if (e.key !== 'Enter') return;
+
+		const c = Array.from(qsa('li', ul)).find(x => x.style.display !== 'none');
+
+		if (c) c.dispatchEvent(new Event('click'));
+	};
+
 	const g = list.find(x => x.id === GEOGRAPHY.id);
 	if (g) input.value = g.name;
 };

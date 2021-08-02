@@ -162,7 +162,7 @@ function humanformat(s) {
 		.replace(/ ([a-z])/g, x => x.toUpperCase());
 };
 
-function toggle_ds() {
+export function toggle_ds() {
 	O.dataset(this, 'active', (this.on = !this.on));
 };
 

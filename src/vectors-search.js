@@ -145,4 +145,12 @@ export function init() {
 	input.onfocus = function() {
 		input.dispatchEvent(new Event('input'));
 	};
+
+	input.onkeypress = function(e) {
+		if (e.key !== 'Enter') return;
+
+		const c = qs('li', ul);
+
+		if (c) c.dispatchEvent(new Event('click'));
+	};
 };

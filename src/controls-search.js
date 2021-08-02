@@ -1,5 +1,9 @@
 import DS from './ds.js';
 
+import {
+	toggle_ds
+} from './controls.js';
+
 const contents_el = qs('#controls-contents');
 
 const tabs_el = qs('#controls-tabs');
@@ -100,6 +104,14 @@ export function init() {
 	input.oninput = function(_) {
 		const r = new RegExp(this.value, 'i');
 		trigger(r);
+	};
+
+	input.onkeypress = function(e) {
+		if (e.key !== 'Enter') return;
+
+		const c = Array.from(qsa('ds-controls', contents_el)).find(d => d.style.display !== 'none');
+
+		if (c) toggle_ds.call(c.ds);
 	};
 
 	const tab_all = ce('div', "all", { id: 'controls-tab-all', class: 'controls-branch-tab up-title' });

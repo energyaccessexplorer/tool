@@ -475,6 +475,33 @@ async function analysis_to_dataset(t) {
 	O.view = 'inputs';
 
 	qs('#cards-pane #cards-list').prepend(d.card);
+
+	await until(_ => maybe(d, 'raster', 'data'));
+
+	for (const i of d.metadata.inputs) {
+		const ds = DST.get(i);
+		analysis_dataset_intersect.call(ds, d.raster);
+	}
+};
+
+function analysis_dataset_intersect({ data, nodata }) {
+	if (this.datatype === 'raster') return;
+
+	const fn = i => {
+		if (this.datatype === 'polygons')
+			return true;
+
+		else if (this.datatype === 'lines')
+			return true;
+
+		else if (this.datatype === 'points')
+			return (data[i] !== nodata);
+	};
+
+	for (const p of this.vectors.features.features)
+		p.properties['__visible'] = fn(p.properties['__rasterindex']);
+
+	MAPBOX.getSource(this.id).setData(DST.get(this.id).vectors.features);
 };
 
 function nanny_init() {

@@ -250,7 +250,14 @@ function specs_set(fs, specs) {
 export function points() {
 	return geojson.call(this)
 		.then(_ => {
+			for (const p of this.vectors.features.features) {
+				const rp = coordinates_to_raster_pixel(p.geometry.coordinates);
 
+				p.properties['__rasterindex'] = maybe(rp, 'index');
+				p.properties['__visible'] = !!rp;
+			}
+		})
+		.then(_ => {
 			const criteria = specs_set.call(
 				this,
 				this.vectors.features.features,
@@ -264,6 +271,7 @@ export function points() {
 
 			this.add_layer({
 				"type": "circle",
+				"filter": ['get', '__visible'],
 				"layout": {
 					"visibility": "none",
 				},

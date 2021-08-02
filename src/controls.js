@@ -329,6 +329,9 @@ function weight() {
 		ce('div', weights[weights.length - 1] + "")
 	);
 
+	r.style['width'] = `${slider_width + 2}px`;
+	r.style['margin'] = 'auto';
+
 	const w = ea_svg_interval({
 		sliders: "single",
 		init: { min: 1, max: this.weight },
@@ -338,11 +341,10 @@ function weight() {
 		end_callback: x => O.dataset(this, 'weight', x)
 	});
 
-	const el = ce('div');
-	el.append(w.svg, r);
+	const el = ce('div', [w.svg, r], { style: "text-align: center;" });
 
 	return {
-		el: el,
+		el,
 		svg: w.svg,
 		change: w.change,
 		ramp: r,

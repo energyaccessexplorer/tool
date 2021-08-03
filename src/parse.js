@@ -5,7 +5,6 @@ import {
 	dblclick as mapbox_dblclick,
 } from './mapbox.js';
 
-
 async function fetchcheck(endpoint, format) {
 	if (endpoint.match(/^(blob:)?http/)) ;
 	else endpoint = ea_settings.storage + endpoint;
@@ -346,8 +345,7 @@ export function lines() {
 };
 
 export function polygons() {
-	return geojson
-		.call(this)
+	return geojson.call(this)
 		.then(async _ => {
 			if (this.csv) polygons_csv.call(this);
 

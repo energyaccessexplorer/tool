@@ -484,22 +484,23 @@ async function analysis_to_dataset(t) {
 	}
 };
 
-function analysis_dataset_intersect({ data, nodata }) {
+function analysis_dataset_intersect(raster) {
+	const { data, nodata } = raster;
+
 	if (this.datatype === 'raster') return;
 
-	const fn = i => {
-		if (this.datatype === 'polygons')
-			return true;
+	let fn;
+	if (this.datatype === 'polygons')
+		fn = _ => true;
 
-		else if (this.datatype === 'lines')
-			return true;
+	else if (this.datatype === 'lines')
+		fn = _ => true;
 
-		else if (this.datatype === 'points')
-			return (data[i] !== nodata);
-	};
+	else if (this.datatype === 'points')
+		fn = p => (data[p.properties['__rasterindex']] !== nodata);
 
 	for (const p of this.vectors.features.features)
-		p.properties['__visible'] = fn(p.properties['__rasterindex']);
+		p.properties['__visible'] = fn(p);
 
 	MAPBOX.getSource(this.id).setData(DST.get(this.id).vectors.features);
 };

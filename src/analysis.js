@@ -11,6 +11,8 @@ import {
 	updated_plot as indexes_updated_plot,
 } from './indexes.js';
 
+const filter_types = ["key-delta", "exclusion-buffer", "inclusion-buffer"];
+
 /*
  * run
  *
@@ -31,7 +33,7 @@ export default async function run(type) {
 	// There's nothing interesting about an analysis with only filters. Also,
 	// filters return 1 so a silly (single-valued) analysis would be plotted.
 	//
-	if (list.every(d => ea_filters.includes(d.analysis_scale(type)))) return { raster: it };
+	if (list.every(d => filter_types.includes(d.analysis_scale(type)))) return { raster: it };
 
 	// Add up how much non-compound indexes datasets will account for. Then, just
 	// below, these values will be split into equal proportions of the total
@@ -41,7 +43,7 @@ export default async function run(type) {
 	for (let i in ea_indexes) if (!ea_indexes[i].compound) singles[i] = 0;
 
 	const tots = list.reduce((a,d) => {
-		if (ea_filters.indexOf(d.analysis_scale(type)) > -1) ;
+		if (filter_types.indexOf(d.analysis_scale(type)) > -1) ;
 		else if (d.index) a[d.index] += d.weight;
 
 		return a;
@@ -51,7 +53,7 @@ export default async function run(type) {
 
 	const weights = {};
 	list.forEach(d => {
-		if (ea_filters.indexOf(d.analysis_scale(type)) > -1) weights[d.id] = 0;
+		if (filter_types.indexOf(d.analysis_scale(type)) > -1) weights[d.id] = 0;
 		else {
 			switch (type) {
 			case "ani":
@@ -204,7 +206,7 @@ export function datasets(type) {
 
 			// Discard datasets which are filters and use the entire domain (useless).
 			//
-			if (and(ea_filters.includes(d.analysis_scale(type)),
+			if (and(filter_types.includes(d.analysis_scale(type)),
 			        and(d._domain.min === d.domain.min,
 			            d._domain.max === d.domain.max)))
 				return false;
@@ -215,7 +217,7 @@ export function datasets(type) {
 			// Place the filters first. They will return -1's sooner and make our
 			// loops faster.
 			//
-			return (ea_filters.includes(x.analysis_scale(type))) ? 1 : -1;
+			return (filter_types.includes(x.analysis_scale(type))) ? 1 : -1;
 		});
 };
 

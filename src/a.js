@@ -494,12 +494,12 @@ function analysis_dataset_intersect(raster) {
 	let fn;
 	if (this.datatype === 'polygons')
 		fn = p => extent_contained(p.properties['__extent'], raster);
-
 	else if (this.datatype === 'lines')
 		fn = p => extent_contained(p.properties['__extent'], raster);
-
 	else if (this.datatype === 'points')
 		fn = p => (data[p.properties['__rasterindex']] !== nodata);
+	else
+		fn = _ => true;
 
 	for (const p of this.vectors.features.features)
 		p.properties['__visible'] = fn(p);

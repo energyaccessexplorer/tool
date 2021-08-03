@@ -86,7 +86,6 @@
     "ea_analysis_colorscale": "writable",
     "ea_lowmedhigh_scale": "writable",
     "ea_colorscale": "readonly",
-    "ea_filters": "writable",
     "ea_views": "writable",
     "ea_svg_interval": "readonly",
     "ea_svg_pie": "readonly",

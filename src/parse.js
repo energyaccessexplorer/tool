@@ -346,6 +346,12 @@ export function lines() {
 
 export function polygons() {
 	return geojson.call(this)
+		.then(_ => {
+			for (const p of this.vectors.features.features) {
+				p.properties['__extent'] = geojsonExtent(p);
+				p.properties['__visible'] = true;
+			}
+		})
 		.then(async _ => {
 			if (this.csv) polygons_csv.call(this);
 
@@ -364,6 +370,7 @@ export function polygons() {
 
 			this.add_layer({
 				"type": "fill",
+				"filter": ['get', '__visible'],
 				"layout": {
 					"visibility": "none",
 				},

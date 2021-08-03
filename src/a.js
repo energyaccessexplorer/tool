@@ -491,7 +491,7 @@ function analysis_dataset_intersect(raster) {
 
 	let fn;
 	if (this.datatype === 'polygons')
-		fn = _ => true;
+		fn = p => extent_contained(p.properties['__extent'], raster);
 
 	else if (this.datatype === 'lines')
 		fn = _ => true;
@@ -503,6 +503,21 @@ function analysis_dataset_intersect(raster) {
 		p.properties['__visible'] = fn(p);
 
 	MAPBOX.getSource(this.id).setData(DST.get(this.id).vectors.features);
+};
+
+function extent_contained(extent, raster) {
+	const [left,bottom,right,top] = extent;
+
+	const f = (x,y) => {
+		const v = maybe(coordinates_to_raster_pixel([x,y], raster), 'value');
+		return and(v, v !== raster.nodata);
+	};
+
+	return or(f(left, top),
+	          f(left, bottom),
+	          f(right, top),
+	          f(right, bottom),
+	          f((right - left) / 2, (top - bottom) / 2));
 };
 
 function nanny_init() {

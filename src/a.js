@@ -45,7 +45,8 @@ const UProxyHandler = {
 			break;
 		}
 
-		case "subgeo": {
+		case "subdiv":
+		case "divtier": {
 			const x = parseInt(i);
 			v = (isNaN(x)) ? null : x;
 			break;
@@ -74,7 +75,8 @@ const UProxyHandler = {
 			break;
 		}
 
-		case "subgeo":
+		case "subdiv":
+		case "divtier":
 		case "subgeoname":
 		case "pack": {
 			o.url.searchParams.set(t,v);

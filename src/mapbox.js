@@ -92,7 +92,7 @@ export function init(overlord = {}) {
 	mb.touchZoomRotate.disableRotation();
 
 	if (_O.map) {
-		mb.on('click', e => _O.map('click', e));
+		mb.on('click', e => _O.map('click', null, e));
 
 		mb.addControl((new MapboxThemeControl()), 'top-right');
 		mb.addControl((new MapboxInfoControl()), 'top-right');
@@ -210,7 +210,7 @@ export function dblclick(id) {
 		if (_changing_target) return;
 
 		_changing_target = true;
-		_O.map('dblclick', e, id);
+		_O.map('dblclick', id, e);
 	});
 };
 
@@ -219,7 +219,7 @@ export function zoomend(id) {
 		const z = MAPBOX.getZoom();
 
 		if (or(_changing_target, z >= _zoom)) ;
-		else _O.map('zoomend', e, id);
+		else _O.map('zoomend', id, e);
 
 		_changing_target = false;
 

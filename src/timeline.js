@@ -382,7 +382,7 @@ export function filter_valued_polygons() {
 	for (let i = 0; i < fs.length; i += 1) {
 		const x = result.includes(+fs[i].properties[b.vectors.key]);
 
-		fs[i].properties.__hidden = U.subgeo ? (fs[i].id !== +U.subgeo) : !x;
+		fs[i].properties.__hidden = U.subdiv ? (fs[i].id !== +U.subgeo) : !x;
 
 		if (x) {
 			ul.append(ce('li', fs[i].properties['District']));

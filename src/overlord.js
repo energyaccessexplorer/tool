@@ -111,21 +111,40 @@ export default class Overlord {
 		window.dispatchEvent(new Event('resize'));
 	};
 
-	map(interaction, event, id) {
+	map(interaction, id, event) {
 		const ds = DST.get(id);
 
 		switch (interaction) {
-		case "click":
-			map_click.call(ds, event);
+		case "click": {
+			mapclick.call(ds, event);
 			break;
+		}
 
-		case "dblclick":
-			map_dblclick.call(ds, event);
-			break;
+		case "dblclick": {
+			if (INFOMODE) break;
 
-		case "zoomend":
-			map_zoomend.call(ds, event);
+			const qfs = MAPBOX.queryRenderedFeatures(event.point);
+
+			const et = qfs.find(i => DST.get(i.source));
+			if (et) {
+				const ds = DST.get(et.source);
+				if (!ds) break;
+
+				mapbox.fit(geojsonExtent(et), true);
+
+				U.subdiv = et.id;
+				U.divtier = coalesce(maybe(ds, 'config', 'divisions_tier'), 0);
+				O.view = U.view;
+			}
 			break;
+		}
+
+		case "zoomend": {
+			U.subdiv = '';
+			U.divtier = 0;
+			O.view = U.view;
+			break;
+		}
 
 		default:
 			break;
@@ -278,7 +297,7 @@ function load_view() {
 	views.right_pane();
 };
 
-function map_click(e) {
+function mapclick(e) {
 	const {view, inputs, output} = U;
 
 	const inp = maybe(inputs, 0);
@@ -450,30 +469,6 @@ function map_click(e) {
 		if (t.vectors) click(vectors_timeline);
 		else if (t.raster.data) click(raster);
 	}
-};
-
-function map_dblclick(e) {
-	if (INFOMODE) return;
-
-	if (e.features.length > 0) {
-		mapbox.fit(geojsonExtent(e.features[0]), true);
-
-		const s = U.subgeo = e.features[0].id;
-
-		this._domain = s === null ?
-			Object.assign({}, this.domain) :
-			{ min: s, max: s };
-
-		O.view = U.view;
-	}
-};
-
-function map_zoomend(_) {
-	if (same(this._domain, this.domain)) return;
-
-	this._domain = Object.assign({}, this.domain);
-	U.subgeo = '';
-	O.view = U.view;
 };
 
 function divisions_rows_tier(r, et) {

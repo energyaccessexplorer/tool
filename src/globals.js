@@ -26,7 +26,8 @@ ea_params = {
 		"inputs": [],
 		"output": ['eai', 'ani', 'demand', 'supply'],
 		"pack": [],
-		"subgeo": [],
+		"subdiv": [],
+		"divtier": [],
 	},
 
 	"timeline": {
@@ -34,7 +35,8 @@ ea_params = {
 		"inputs": [],
 		"output": ['eai', 'ani', 'demand', 'supply'],
 		"pack": [],
-		"subgeo": [],
+		"subdiv": [],
+		"divtier": [],
 	},
 };
 

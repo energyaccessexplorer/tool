@@ -171,8 +171,24 @@ export default async function run(type) {
  */
 
 export function datasets(type) {
+	const s = U.subdiv;
+
 	return DS.array
 		.filter(d => and(d.on, d.raster, d.analysis))
+		.map(d => {
+			if (!(d.category.name === "indicator"))
+				return d;
+
+			if (d.config.divisions_tier === U.divtier) {
+				d._domain = s === null ?
+					Object.assign({}, d.domain) :
+					{ min: s, max: s };
+			} else {
+				d._domain = Object.assign({}, d.domain);
+			}
+
+			return d;
+		})
 		.filter(d => {
 			// Discard datasets which have no analysis_fn (eg. outline).
 			//

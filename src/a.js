@@ -494,7 +494,7 @@ function analysis_dataset_intersect(raster) {
 		fn = p => extent_contained(p.properties['__extent'], raster);
 
 	else if (this.datatype === 'lines')
-		fn = _ => true;
+		fn = p => extent_contained(p.properties['__extent'], raster);
 
 	else if (this.datatype === 'points')
 		fn = p => (data[p.properties['__rasterindex']] !== nodata);

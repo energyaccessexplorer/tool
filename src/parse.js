@@ -300,6 +300,12 @@ export function points() {
 export function lines() {
 	return geojson.call(this)
 		.then(_ => {
+			for (const p of this.vectors.features.features) {
+				p.properties['__extent'] = geojsonExtent(p);
+				p.properties['__visible'] = true;
+			}
+		})
+		.then(_ => {
 			let da = [1];
 
 			// mapbox-gl does not follow SVG's stroke-dasharray convention when it comes
@@ -327,6 +333,7 @@ export function lines() {
 
 			this.add_layer({
 				"type": "line",
+				"filter": ['get', '__visible'],
 				"layout": {
 					"visibility": "none",
 					"line-cap": 'round',

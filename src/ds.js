@@ -485,6 +485,11 @@ This is not fatal but the dataset is now disabled.`
 
 			await this.loadall();
 
+			// make sure polygons-fixed have decided their _domain
+			//
+			if (!maybe(this, '_domain', 'min'))
+				Object.assign(this._domain, this.domain);
+
 			if (this.controls) this.controls.loading(false);
 
 			if (this.disabled) return;

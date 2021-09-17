@@ -426,7 +426,9 @@ export function toggle_left_panel(t) {
 function drawer_init() {
 	const as = qsa('#drawer a');
 
-	for (let a of as)
+	let p;
+
+	for (let a of as) {
 		a.onclick = function() {
 			for (let x of as) if (x !== this) x.classList.remove('active');
 
@@ -438,6 +440,21 @@ function drawer_init() {
 				this.classList.add('active');
 			}
 		};
+
+		a.onmouseenter = function() {
+			if (p) p.remove();
+
+			p = nanny.pick_element(a, {
+				position: "E",
+				message: this.getAttribute('description'),
+				close: false
+			});
+		};
+
+		a.onmouseleave = function() {
+			if (p) p.remove();
+		};
+	}
 
 	toggle_left_panel();
 };

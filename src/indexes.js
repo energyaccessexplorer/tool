@@ -2,6 +2,8 @@ import summary_analyse from './summary.js';
 
 import * as config from './config.js';
 
+import * as user from './user.js';
+
 import {
 	datasets as analysis_datasets,
 	raster_to_tiff,
@@ -114,6 +116,20 @@ export function init() {
 	cos.value = U.output;
 	cos.onchange = x => { O.index = x.target.value; };
 
+	const toolbox = qs('#index-graphs-toolbox');
+	const tools = {
+		"index-graphs-opacity": "Change opacity of the analysis layer",
+		"index-graphs-info": "Info about different indexes",
+	};
+
+	const more_tools = {
+		"index-graphs-download": "Download TIFF image of the current analysis",
+		"index-graphs-code": "Download JSON file of the current analysis",
+	};
+
+	for (const i in tools)
+		toolbox.append(ce('a', null, { id: i, title: tools[i] }));
+
 	const opacity = qs('#index-graphs-opacity');
 	opacity.append(ea_opacity_control({
 		fn: x => MAPBOX.setPaintProperty('output-layer', 'raster-opacity', x),
@@ -123,19 +139,24 @@ export function init() {
 	info.append(font_icon('info-circle'));
 	info.onclick = _ => modal();
 
-	const download = qs('#index-graphs-download');
-	download.append(font_icon('image'));
-	download.onclick = async _ => {
-		const type = url.searchParams.get('output');
-		fake_blob_download((await raster_to_tiff(type)), `energyaccessexplorer-${type}.tif`);
-	};
+	if (user.logged_in()) {
+		for (const i in more_tools)
+			toolbox.append(ce('a', null, { id: i, title: more_tools[i] }));
 
-	const code = qs('#index-graphs-code');
-	code.append(font_icon('braces'));
-	code.onclick = _ => {
-		const conf = config.generate();
-		fake_blob_download(JSON.stringify(conf), `energyaccessexplorer-config-${conf.id}.json`);
-	};
+		const download = qs('#index-graphs-download');
+		download.append(font_icon('image'));
+		download.onclick = async _ => {
+			const type = url.searchParams.get('output');
+			fake_blob_download((await raster_to_tiff(type)), `energyaccessexplorer-${type}.tif`);
+		};
+
+		const code = qs('#index-graphs-code');
+		code.append(font_icon('braces'));
+		code.onclick = _ => {
+			const conf = config.generate();
+			fake_blob_download(JSON.stringify(conf), `energyaccessexplorer-config-${conf.id}.json`);
+		};
+	}
 
 	const graphs = tmpl('#index-graphs-container-template');
 

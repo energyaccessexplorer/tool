@@ -317,6 +317,9 @@ export function context(rc, dict, props, skip = null) {
 			let v = d.raster.data[rc.index];
 			let p = d.id;
 
+			if ((v + "").match('[0-9]\\.[0-9]{3}'))
+				v = v.toFixed(2);
+
 			if (v === d.raster.nodata) return;
 
 			if (d.config.csv_columns) { // (!d.category.name.match(/^(timeline-)?indicator/))

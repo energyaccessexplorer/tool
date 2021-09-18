@@ -58,7 +58,6 @@ function topo_flag(features, flagurl, config) {
 		URL.revokeObjectURL(flagurl);
 	});
 
-
 	return svg.node();
 };
 
@@ -75,12 +74,12 @@ async function geography(c) {
 	const sl = new selectlist(`geographies-select-` + c.id, data, {
 		'change': function(_) {
 			const x = coll.find(x => x.name === this.value);
-			if (x) location = location = `/tool/a?id=${x.id}`;
+			if (x) usertype(x.id);
 		}
 	});
 
 	if (coll.length === 0) {
-		location = `/tool/a?id=${c.id}`;
+		usertype(c.id);
 		return;
 	}
 
@@ -97,6 +96,30 @@ async function geography(c) {
 	}).show();
 
 	sl.input.focus();
+};
+
+async function usertype(gid) {
+	const types = {
+		"Solar cells": ['ghi', 'accessibility', 'protected-areas'],
+		"Social investment": ['schools', 'health', 'poverty'],
+		"Other (clean canvas)": [],
+	};
+
+	const content = ce('div');
+
+	const ul = ce('ul');
+	for (const t in types) {
+		const j = types[t].join(',');
+		ul.append(ce('li', ce('a', t, { "href": `/tool/a?id=${gid}&inputs=${j}` })));
+	}
+
+	content.append(ul);
+
+	ea_modal.set({
+		content,
+		"header": "Choose your area of interest",
+		footer: null,
+	}).show();
 };
 
 async function overview() {
@@ -186,10 +209,11 @@ export function init() {
 	else if (location.hostname.match(/localhost/))
 		ENV = ["production", "staging"];
 
-	ea_api.get("geographies", {
-		"adm": "eq.0",
-		"deployment": `ov.{${ENV}}`,
-	})
+	ea_api
+		.get("geographies", {
+			"adm": "eq.0",
+			"deployment": `ov.{${ENV}}`,
+		})
 		.then(countries_online => {
 			for (let co of countries_online) {
 				const d = ce('div', ce('h2', co.name, { class: 'country-name' }), { class: 'country-item', ripple: "" });

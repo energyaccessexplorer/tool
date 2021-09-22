@@ -13,6 +13,8 @@ import {
 
 const filter_types = ["key-delta", "exclusion-buffer", "inclusion-buffer"];
 
+const inclusion_filters = ["key-delta", "inclusion-buffer"];
+
 /*
  * run
  *
@@ -204,9 +206,10 @@ export function datasets(type) {
 				return false;
 			}
 
-			// Discard datasets which are filters and use the entire domain (useless).
+			// Discard datasets which are inclusive filters and use the entire domain
+			// (i.e., do nothing)
 			//
-			if (and(filter_types.includes(d.analysis_scale(type)),
+			if (and(inclusion_filters.includes(d.analysis_scale(type)),
 			        and(d._domain.min === d.domain.min,
 			            d._domain.max === d.domain.max)))
 				return false;

@@ -301,7 +301,7 @@ export function lines() {
 	return geojson.call(this)
 		.then(_ => {
 			for (const p of this.vectors.features.features) {
-				p.properties['__extent'] = geojsonExtent(p);
+				p.properties['__rasterindexes'] = p.geometry.coordinates.map(t => maybe(coordinates_to_raster_pixel(t), 'index')).sort();
 				p.properties['__visible'] = true;
 			}
 		})

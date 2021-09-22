@@ -459,18 +459,20 @@ function drawer_init() {
 	toggle_left_panel();
 };
 
+let analysis_count = 0;
+
 async function analysis_to_dataset(t) {
 	const category = await ea_api.get("categories", { "select": "*", "name": "eq.analysis" }, { one: true });
 
-	const timestamp = (new Date()).getTime().toString().slice(-8);
+	analysis_count++;
 
 	const tif = await raster_to_tiff(t);
 
 	const url = URL.createObjectURL(new Blob([tif], { type: "application/octet-stream;charset=utf-8" }));
 
 	const d = new DS({
-		"name": `analysis-${t}-` + timestamp,
-		"name_long": `Analysis ${t.toUpperCase()} - ` + timestamp,
+		"name": `analysis-${t}-` + analysis_count,
+		"name_long": `Analysis ${t.toUpperCase()} - ` + analysis_count,
 		"datatype": "raster",
 		"category": category,
 		"processed_files": [{

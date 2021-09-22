@@ -446,6 +446,19 @@ function ea_super_error(t, m, e = "error") {
 	qs('#playground').remove();
 };
 
+function table_keyvalue(obj) {
+	const table = ce('table');
+
+	for (const i in obj) {
+		table.append(ce('tr', [
+			ce('td', DST.get(i).name + ": &nbsp;"),
+			ce('td', [ ce('code', obj[i].toString()) ], { style: "text-align: right;" }),
+		]));
+	}
+
+	return table;
+};
+
 function table_data(dict, props) {
 	const t = ce('table');
 

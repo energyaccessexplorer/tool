@@ -499,9 +499,12 @@ async function analysis_to_dataset(t) {
 
 	await until(_ => maybe(d, 'raster', 'data'));
 
+	d['summary'] = {};
 	for (const i of d.metadata.inputs) {
 		const ds = DST.get(i);
-		analysis_dataset_intersect.call(ds, d.raster);
+		const x = analysis_dataset_intersect.call(ds, d.raster);
+
+		if (x) d['summary'][ds.id] = x;
 	}
 };
 
@@ -520,10 +523,17 @@ function analysis_dataset_intersect(raster) {
 	else
 		fn = _ => true;
 
-	for (const p of this.vectors.features.features)
-		p.properties['__visible'] = fn(p);
+	let count = 0;
+	for (const p of this.vectors.features.features) {
+		const x = fn(p);
+		p.properties['__visible'] = x;
+
+		if (x) count += 1;
+	}
 
 	MAPBOX.getSource(this.id).setData(DST.get(this.id).vectors.features);
+
+	return count;
 };
 
 function rasters_intersect(indexes, raster) {

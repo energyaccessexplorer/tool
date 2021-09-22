@@ -460,11 +460,19 @@ This is not fatal but the dataset is now disabled.`
 	};
 
 	info_modal() {
-		const m = Object.assign({}, this.metadata, { "category-description": this.category.description });
-		const content = tmpl('#ds-info-modal', m);
+		let content;
 
-		qs('#metadata-sources', content).href = m.download_original_url;
-		qs('#learn-more', content).href = m.learn_more_url;
+		if (this.summary) {
+			content = tmpl('#analysis-summary-modal', {});
+			content.append(table_keyvalue(this.summary));
+
+		} else {
+			const m = Object.assign({}, this.metadata, { "category-description": this.category.description });
+			content = tmpl('#ds-info-modal', m);
+
+			qs('#metadata-sources', content).href = m.download_original_url;
+			qs('#learn-more', content).href = m.learn_more_url;
+		}
 
 		ea_modal.set({
 			header: this.name,

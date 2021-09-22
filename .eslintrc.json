@@ -99,6 +99,7 @@
     "map_pointer": "readonly",
     "fake_blob_download": "readonly",
     "table_add_lnglat": "readonly",
+    "table_keyvalue": "readonly",
     "table_data": "readonly"
   }
 }

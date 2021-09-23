@@ -566,7 +566,7 @@ function coordinates_to_raster_pixel(coords, raster) {
 	const b = OUTLINE.raster;
 
 	if (coords.length !== 2)
-		throw Error(`ea_coordinates_raster: expected and array of length 2. Got ${coords}`);
+		throw Error(`ea_coordinates_raster_pixel: expected and array of length 2. Got ${coords}`);
 
 	const merc = new SphericalMercator({ size: 1 });
 

@@ -301,7 +301,19 @@ export function lines() {
 	return geojson.call(this)
 		.then(_ => {
 			for (const p of this.vectors.features.features) {
-				p.properties['__rasterindexes'] = p.geometry.coordinates.map(t => maybe(coordinates_to_raster_pixel(t), 'index')).sort();
+				if (p.geometry.type === "LineString") {
+					p.properties['__rasterindexes'] = p.geometry.coordinates.map(t => maybe(coordinates_to_raster_pixel(t), 'index')).sort();
+				} else {
+					const a = [];
+
+					p.geometry.coordinates.map(t => {
+						for (let i = 0; i < t.length; i++)
+							a[i] = maybe(coordinates_to_raster_pixel(t[i]), 'index');
+					});
+
+					p.properties['__rasterindexes'] = a.sort();
+				}
+
 				p.properties['__visible'] = true;
 			}
 		})

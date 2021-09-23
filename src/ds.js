@@ -49,15 +49,13 @@ export default class DS {
 
 		this.loaded = false;
 
-		if (this.category.name === 'boundaries')
-			this.__domain = { min: -Infinity, max: Infinity };
+		this.domain = o.category.domain;
 
-		if (this.category.domain)
-			this.domain = o.category.domain;
-		else
-			this.__domain = null;
+		this._domain = JSON.parse(JSON.stringify(this.category.domain_init)) || JSON.parse(JSON.stringify(this.domain));
 
-		this._domain = this.category.domain_init || JSON.parse(JSON.stringify(this.__domain));
+		this.set_colorscale();
+
+		if (this.card) this.card.refresh();
 
 		if (!this.disabled) {
 			this.card = new dscard(this);
@@ -399,23 +397,6 @@ This is not fatal but the dataset is now disabled.`
 		}
 	};
 
-	set domain(o) {
-		if (!this.mutant && this.__domain)
-			throw new Error(`domain: cannot change existing domain '${this.__domain}' -> '${o}' on non-mutant dataset '${this.id}'`);
-		else
-			this.__domain = o;
-
-		this._domain = this._domain || { min: o.min, max: o.max };
-
-		this.set_colorscale();
-
-		if (this.card) this.card.refresh();
-	};
-
-	get domain() {
-		return this.__domain;
-	};
-
 	set_colorscale() {
 		if (this.colorscale) {
 			console.log(this.id, "has a colorscale already");
@@ -495,7 +476,7 @@ This is not fatal but the dataset is now disabled.`
 
 			// make sure polygons-fixed have decided their _domain
 			//
-			if (!maybe(this, '_domain', 'min'))
+			if (maybe(this, '_domain', 'min') === undefined)
 				Object.assign(this._domain, this.domain);
 
 			if (this.controls) this.controls.loading(false);

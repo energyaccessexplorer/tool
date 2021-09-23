@@ -464,6 +464,8 @@ let analysis_count = 0;
 async function analysis_to_dataset(t) {
 	const category = await ea_api.get("categories", { "select": "*", "name": "eq.analysis" }, { one: true });
 
+	category.colorstops = ea_analysis_colorscale.stops;
+
 	analysis_count++;
 
 	const tif = await raster_to_tiff(t);

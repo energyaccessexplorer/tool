@@ -96,6 +96,8 @@
     "coordinates_to_raster_pixel": "readonly",
     "raster_pixel_to_coordinates": "readonly",
 
+    "jsonclone": "readonly",
+
     "map_pointer": "readonly",
     "fake_blob_download": "readonly",
     "table_add_lnglat": "readonly",

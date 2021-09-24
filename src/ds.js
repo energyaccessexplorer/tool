@@ -51,7 +51,7 @@ export default class DS {
 
 		this.domain = o.category.domain;
 
-		this._domain = JSON.parse(JSON.stringify(this.category.domain_init)) || JSON.parse(JSON.stringify(this.domain));
+		this._domain = jsonclone(this.category.domain_init) || jsonclone(this.domain);
 
 		this.set_colorscale();
 
@@ -91,7 +91,7 @@ This is not fatal but the dataset is now disabled.`
 			const b = DS.array.find(d => d.dataset_id === did);
 
 			this.raster = b.raster;
-			this.vectors = JSON.parse(JSON.stringify(b.vectors));
+			this.vectors = jsonclone(b.vectors);
 			this.vectors.parse = x => parse.polygons.call(x || this);
 
 			indicator = true;
@@ -191,7 +191,7 @@ This is not fatal but the dataset is now disabled.`
 			if (!ovrr.hasOwnProperty(c)) continue;
 
 			if (!maybe(this.category, c)) {
-				this.category[c] = JSON.parse(JSON.stringify(ovrr[c]));
+				this.category[c] = jsonclone(ovrr[c]);
 				continue;
 			}
 
@@ -347,12 +347,12 @@ This is not fatal but the dataset is now disabled.`
 		}
 
 		case 'exclusion-buffer': {
-			s = x => (x < min || x > max) ? 1 : -1;
+			s = x => or(x < min, x > max) ? 1 : -1;
 			break;
 		}
 
 		case 'inclusion-buffer': {
-			s = x => (x >= min && x <= max) ? 1 : -1;
+			s = x => and(x >= min, x <= max) ? 1 : -1;
 			break;
 		}
 
@@ -361,7 +361,7 @@ This is not fatal but the dataset is now disabled.`
 				    .domain(this.analysis.intervals)
 				    .range(NORM_STOPS);
 
-			s = x => (x >= min) && (x <= max) ? q(x) : -1;
+			s = x => and(x >= min, x <= max) ? q(x) : -1;
 
 			break;
 		}

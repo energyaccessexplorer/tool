@@ -49,7 +49,7 @@ export default class Overlord {
 
 		switch (arg) {
 		case "domain": {
-			ds._domain = data;
+			ds._domain = Object.assign(ds._domain, data);
 			break;
 		}
 

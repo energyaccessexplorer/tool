@@ -59,10 +59,11 @@ export function csv() {
 			const arr = [];
 			for (let i in this.csv.table) arr[i] = this.csv.table[i];
 
-			this.domain = {
-				min: d3.min(arr),
-				max: d3.max(arr)
-			};
+			const min = d3.min(arr);
+			const max = d3.max(arr);
+
+			this.domain = { min, max };
+			this._domain = { min, max };
 		});
 };
 

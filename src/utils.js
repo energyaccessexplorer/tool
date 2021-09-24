@@ -609,3 +609,7 @@ function raster_pixel_to_coordinates(i) {
 
 	return merc.inverse([o[0] + (x * 1000), o[1] - (y * 1000)]);
 };
+
+function jsonclone(o) {
+	return JSON.parse(JSON.stringify(o));
+};

@@ -70,8 +70,6 @@ let _O;
 
 let _changing_target = false;
 
-let _zoom;
-
 export function init(overlord = {}) {
 	mapboxgl.accessToken = ea_settings.mapbox_token;
 
@@ -183,7 +181,6 @@ export function fit(bounds, animate = false) {
 
 	try {
 		MAPBOX.fitBounds(bounds, { animate: animate, padding: { top: vp, bottom: vp, left: hp, right: hp } });
-		_zoom = MAPBOX.getZoom();
 	} catch (e) {
 		ea_super_error(
 			"Geography bounding box",
@@ -211,18 +208,5 @@ export function dblclick(id) {
 
 		_changing_target = true;
 		_O.map('dblclick', id, e);
-	});
-};
-
-export function zoomend(id) {
-	MAPBOX.on('zoomend', id, e => {
-		const z = MAPBOX.getZoom();
-
-		if (or(_changing_target, z >= _zoom)) ;
-		else _O.map('zoomend', id, e);
-
-		_changing_target = false;
-
-		_zoom = z;
 	});
 };

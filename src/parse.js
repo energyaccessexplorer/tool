@@ -1,7 +1,6 @@
 import * as plot from './plot.js';
 
 import {
-	zoomend as mapbox_zoomend,
 	dblclick as mapbox_dblclick,
 } from './mapbox.js';
 
@@ -413,7 +412,6 @@ export function polygons() {
 
 			if (this.datatype.match('polygons-(fixed|boundaries)')) {
 				mapbox_dblclick(this.id);
-				mapbox_zoomend(this.id);
 			}
 		});
 };

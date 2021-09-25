@@ -139,13 +139,6 @@ export default class Overlord {
 			break;
 		}
 
-		case "zoomend": {
-			U.subdiv = '';
-			U.divtier = 0;
-			O.view = U.view;
-			break;
-		}
-
 		default:
 			break;
 		}
@@ -232,7 +225,6 @@ function load_view() {
 			}, MAPBOX.first_symbol);
 
 			mapbox.dblclick('filtered-layer');
-			mapbox.zoomend('filtered-layer');
 		}
 	})();
 

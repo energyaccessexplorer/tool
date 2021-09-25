@@ -100,17 +100,32 @@ async function geography(c) {
 
 async function usertype(gid) {
 	const types = {
-		"Solar cells": ['ghi', 'accessibility', 'protected-areas'],
-		"Social investment": ['schools', 'health', 'poverty'],
-		"Other (clean canvas)": [],
+		"Electrification planning": {
+			"inputs": ['schools', 'health', 'minigrids', 'transmission-subs', 'distribution-subs', 'transmission-lines', 'distribution', 'population-density'],
+			"output": "eai",
+		},
+		"Clean energy enterprises": {
+			"inputs": ['distribution-lines', 'minigrids', 'population-density', 'poverty', 'ghi'],
+			"output": "eai",
+		},
+		"Investors and development finance institutions": {
+			"inputs": ['poverty', 'crops', 'transmission-subs', 'distribution-subs', 'transmission-lines', 'distribution'],
+			"output": "ani"
+		},
+		"Other (clean canvas)": {
+			"inputs": [],
+			"output": "eai"
+		},
 	};
 
 	const content = ce('div');
 
 	const ul = ce('ul');
 	for (const t in types) {
-		const j = types[t].join(',');
-		ul.append(ce('li', ce('a', t, { "href": `/tool/a?id=${gid}&inputs=${j}` })));
+		const inputs = types[t].inputs.join(',');
+		const output = types[t].output;
+
+		ul.append(ce('li', ce('a', t, { "href": `/tool/a?id=${gid}&inputs=${inputs}&output=${output}` })));
 	}
 
 	content.append(ul);

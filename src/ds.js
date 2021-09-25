@@ -340,9 +340,12 @@ This is not fatal but the dataset is now disabled.`
 		case 'key-delta': {
 			if (!maybe(this.csv, 'table'))
 				s = _ => 1;
-			else
-				s = x => and(x === min, x === max) ? 1 : -1;
-
+			else {
+				s = x => {
+					const t = this.csv.table[x];
+					return and(t >= min, t <= max) ? 1 : -1;
+				};
+			}
 			break;
 		}
 

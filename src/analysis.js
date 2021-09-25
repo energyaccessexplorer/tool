@@ -32,6 +32,13 @@ export default async function run(type) {
 
 	const it = new Float32Array(OUTLINE.raster.data.length).fill(-1);
 
+	const dt = U.divtier;
+	let divraster;
+	if (typeof dt === 'number') {
+		const did = maybe(GEOGRAPHY.configuration.divisions, dt, 'dataset_id');
+		divraster = maybe(DS.array.find(d => d.dataset_id === did), 'raster');
+	}
+
 	// There's nothing interesting about an analysis with only filters. Also,
 	// filters return 1 so a silly (single-valued) analysis would be plotted.
 	//
@@ -97,8 +104,13 @@ export default async function run(type) {
 
 	if (list.length === 1 && full_weight === 0) return { raster: it };
 
+	const sd = U.subdiv;
+	const subdiv = and(typeof sd === 'number', divraster);
+
 	for (let i = 0; i < it.length; i += 1) {
 		let a = 0;
+
+		if (subdiv && divraster.data[i] !== sd) a = -1;
 
 		for (let j = 0; j < list.length; j += 1) {
 			let c = list[j];
@@ -175,24 +187,8 @@ export default async function run(type) {
  */
 
 export function datasets(type) {
-	const s = U.subdiv;
-
 	return DS.array
 		.filter(d => and(d.on, d.raster, d.analysis))
-		.map(d => {
-			if (!(d.category.name === "indicator"))
-				return d;
-
-			if (d.config.divisions_tier === U.divtier) {
-				d._domain = s === null ?
-					Object.assign({}, d.domain) :
-					{ min: s, max: s };
-			} else {
-				d._domain = Object.assign({}, d.domain);
-			}
-
-			return d;
-		})
 		.filter(d => {
 			// Discard datasets which have no analysis_fn (eg. outline).
 			//

@@ -40,7 +40,7 @@ function pointto(p, a = false) {
 function li(p) {
 	const c = Math.round((p.v).toFixed(2) * 100) + " " + JSON.stringify((p.i).map(c => +c.toFixed(3)));
 
-	const el = ce('li', `<code>${c}</code>`, {});
+	const el = ce('li', ce('code', c), {});
 
 	el.onmouseenter = _ => pointto(p);
 
@@ -80,7 +80,7 @@ export function init() {
 	ul = ce('ul');
 	resultscontainer.append(ul);
 
-	resultsinfo = ce('div', `<b>Analysis coordinates</b>.`, { class: 'search-results-info' });
+	resultsinfo = ce('div', ce('b', "Analysis coordinates"), { class: 'search-results-info' });
 	resultscontainer.prepend(resultsinfo);
 
 	input.onclick = function(_) {

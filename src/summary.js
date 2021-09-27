@@ -52,7 +52,7 @@ async function summary() {
 				 [
 					 ce('div', ea_indexes[idxn]['name'], { class: 'up-title' }),
 					 container,
-					 ce('div', (summary[idxn]['area']['total'] === 0) ? "<code>(No datasets selected)</code>" : null, { style: "text-align: center; font-size: smaller;" }),
+					 ce('div', (summary[idxn]['area']['total'] === 0) ? ce('code', "(no datasets selected)") : null, { style: "text-align: center; font-size: smaller;" }),
 				 ],
 				 { class: 'index-group' }));
 

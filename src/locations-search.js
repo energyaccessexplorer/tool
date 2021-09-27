@@ -17,7 +17,7 @@ function pointto(p, a = false) {
 async function reset(v) {
 	elem_empty(ul);
 
-	resultsinfo.innerHTML = `<b>Results</b> for "${v}":`;
+	resultsinfo.replaceChildren(ce('b', "Results"), ` for "${v}":`);
 };
 
 function icon(t) {
@@ -90,7 +90,7 @@ export function init() {
 	ul = ce('ul');
 	resultscontainer.append(ul);
 
-	resultsinfo = ce('div', `<i>City, region, park...</i>`, { class: 'search-results-info' });
+	resultsinfo = ce('div', ce('i', "City, region, park..."), { class: 'search-results-info' });
 	resultscontainer.prepend(resultsinfo);
 
 	input.onchange = function(_) {

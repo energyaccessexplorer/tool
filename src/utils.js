@@ -441,18 +441,23 @@ function ea_super_error(t, m, e = "error") {
 	const l = qs('#app-loading');
 	qs('.spinner', l).style.animation = 'none';
 	qs('.spinner', l).style.borderTop = 'none';
-	qs('p', l).innerHTML = "<code>:(</code>";
+	qs('p', l).replaceChildren(ce('code', ":("));
 
 	qs('#playground').remove();
 };
 
-function table_keyvalue(obj) {
+function table_keyvalue(obj, fn) {
 	const table = ce('table');
 
 	for (const i in obj) {
+		let v = obj[i] + "";
+
+		if (typeof obj[i] === "object")
+			v = JSON.stringify(obj[i]);
+
 		table.append(ce('tr', [
-			ce('td', DST.get(i).name + ": &nbsp;"),
-			ce('td', [ ce('code', obj[i].toString()) ], { style: "text-align: right;" }),
+			ce('td', (fn ? fn(i) : i) + ": &nbsp;"),
+			ce('td', ce('code', v), { style: "text-align: right;" }),
 		]));
 	}
 

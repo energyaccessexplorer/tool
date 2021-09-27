@@ -37,13 +37,15 @@ async function reset() {
 	elem_empty(ul);
 	resultscontainer.innerHTML = "";
 
-	resultsinfo = ce('div', `<b>${ds.name}</b>.`, { class: 'search-results-info' });
+	resultsinfo = ce('div', ce('b', ds.name), { class: 'search-results-info' });
 
 	resultscontainer.append(resultsinfo);
 
 	if (!ds || !ds.vectors) {
-		resultscontainer.innerHTML = "";
-		resultsinfo.innerHTML = `<b>${ds.name}</b> is not searchable. Try a dataset with polygons, points or lines ;)`;
+		resultsinfo.replaceChildren(
+			ce('b', ds.name), "is not searchable.",
+			ce('br'), "Try a dataset with points, lines or polygons ;)",
+		);
 		searchable = false;
 		return;
 	}
@@ -63,7 +65,7 @@ async function reset() {
 	}
 
 	if (!(searchable = !!attr)) {
-		resultsinfo.innerHTML = `<b>${ds.name}</b> is not searchable (for now...)`;
+		resultsinfo.replaceChildren(ce('b', ds.name), " is not searchable (for now...)");
 		return;
 	}
 

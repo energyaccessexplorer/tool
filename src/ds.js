@@ -447,8 +447,9 @@ This is not fatal but the dataset is now disabled.`
 
 		if (this.summary) {
 			content = tmpl('#analysis-summary-modal', {});
-			content.append(table_keyvalue(this.summary));
 
+			content.append(ce('h3', "Intersections"));
+			content.append(table_keyvalue(this.summary, x => DST.get(x).name));
 		} else {
 			const m = Object.assign({}, this.metadata, { "category-description": this.category.description });
 			content = tmpl('#ds-info-modal', m);

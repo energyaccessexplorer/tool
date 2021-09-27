@@ -103,18 +103,22 @@ async function usertype(gid) {
 		"Electrification planning": {
 			"inputs": ['schools', 'health', 'minigrids', 'transmission-subs', 'distribution-subs', 'transmission-lines', 'distribution', 'population-density'],
 			"output": "eai",
+			"view": "outputs",
 		},
 		"Clean energy enterprises": {
 			"inputs": ['distribution-lines', 'minigrids', 'population-density', 'poverty', 'ghi'],
 			"output": "eai",
+			"view": "outputs",
 		},
 		"Investors and development finance institutions": {
 			"inputs": ['poverty', 'crops', 'transmission-subs', 'distribution-subs', 'transmission-lines', 'distribution'],
-			"output": "ani"
+			"output": "ani",
+			"view": "outputs",
 		},
 		"Other (clean canvas)": {
 			"inputs": [],
-			"output": "eai"
+			"output": "eai",
+			"view": "inputs",
 		},
 	};
 
@@ -124,8 +128,9 @@ async function usertype(gid) {
 	for (const t in types) {
 		const inputs = types[t].inputs.join(',');
 		const output = types[t].output;
+		const view = types[t].view;
 
-		ul.append(ce('li', ce('a', t, { "href": `/tool/a?id=${gid}&inputs=${inputs}&output=${output}` })));
+		ul.append(ce('li', ce('a', t, { "href": `/tool/a?id=${gid}&inputs=${inputs}&output=${output}&view=${view}` })));
 	}
 
 	content.append(ul);

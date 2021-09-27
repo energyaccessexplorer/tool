@@ -193,7 +193,7 @@ export async function init() {
 async function dsinit(id, pack) {
 	let select = ["*", "datatype", "category:categories(*)"];
 
-	const divisions = maybe(GEOGRAPHY.configuration, 'divisions');
+	const divisions = maybe(GEOGRAPHY.configuration, 'divisions').filter(d => d.dataset_id !== null);
 
 	await (function fetch_outline() {
 		// TODO: this should be more strict divisions 0/outline
@@ -242,6 +242,8 @@ This is fatal. Thanks for all the fish.`;
 			})
 		);
 	})();
+
+	GEOGRAPHY.divisions = divisions.map(d => DS.array.find(t => t.dataset_id === d.dataset_id));
 
 	await (function fetch_datasets() {
 		pack = maybe(pack, 'length') ? pack : 'all';

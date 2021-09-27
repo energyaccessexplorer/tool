@@ -87,8 +87,7 @@ This is not fatal but the dataset is now disabled.`
 		};
 
 		if (this.category.name.match(/^(timeline-)?indicator/)) {
-			const did = GEOGRAPHY.configuration.divisions[this.config.divisions_tier]['dataset_id'];
-			const b = DS.array.find(d => d.dataset_id === did);
+			let b = GEOGRAPHY.divisions[this.config.divisions_tier];
 
 			this.raster = b.raster;
 			this.vectors = jsonclone(b.vectors);

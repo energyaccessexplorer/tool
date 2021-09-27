@@ -464,17 +464,15 @@ function mapclick(e) {
 };
 
 function divisions_rows_tier(r, et) {
-	GEOGRAPHY.configuration.divisions
+	GEOGRAPHY.divisions
 		.filter((b,i) => (i !== 0) && i === maybe(this.config, 'divisions_tier'))
-		.forEach(b => {
-			const ds = DS.array.find(d => d.dataset_id === b.dataset_id);
-
+		.forEach(ds => {
 			if (!maybe(ds, 'csv', 'data')) return;
 
 			const t = ds.csv.data.find(e => +e[ds.config.csv_columns.id] === +et.properties[this.vectors.key]);
 			if (!t) return;
 
-			r.dict.push(["_" + b.name, b.name]);
-			r.props["_" + b.name] = t[ds.config.csv_columns.value];
+			r.dict.push(["_" + ds.name, ds.name]);
+			r.props["_" + ds.name] = t[ds.config.csv_columns.value];
 		});
 };

@@ -34,10 +34,8 @@ export default async function run(type) {
 
 	const dt = U.divtier;
 	let divraster;
-	if (typeof dt === 'number') {
-		const did = maybe(GEOGRAPHY.configuration.divisions, dt, 'dataset_id');
-		divraster = maybe(DS.array.find(d => d.dataset_id === did), 'raster');
-	}
+	if (dt > 0)
+		divraster = maybe(GEOGRAPHY.divisions, dt, 'dataset_id', 'raster');
 
 	// There's nothing interesting about an analysis with only filters. Also,
 	// filters return 1 so a silly (single-valued) analysis would be plotted.

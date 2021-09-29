@@ -102,6 +102,11 @@ async function load(x,y) {
 
 	d.vectors.features.features.forEach(f => f.properties.__visible = (f.id === y));
 	MAPBOX.getSource(d.id).setData(DST.get(d.id).vectors.features);
+
+	if (d.on) {
+		await delay(1);
+		d.raise();
+	}
 };
 
 export async function init() {

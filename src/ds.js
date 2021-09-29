@@ -167,6 +167,11 @@ This is not fatal but the dataset is now disabled.`
 			break;
 		}
 
+		case 'table': {
+			this.download = this.csv.endpoint;
+			break;
+		}
+
 		case 'raster-mutant':
 		case 'polygons-timeline':
 		case 'polygons-boundaries': {

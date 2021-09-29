@@ -62,7 +62,7 @@ function fetch_countries() {
 	});
 };
 
-function load(x,y) {
+async function load(x,y) {
 	U.divtier = x;
 	U.subdiv = y;
 	O.view = U.view;
@@ -74,9 +74,20 @@ function load(x,y) {
 	geometry_path[x] = y;
 
 	elem_empty(ul);
+	if (lists[x+1]) {
+		let tiers;
+		await until(_ => tiers = DST.get('admin-tiers').csv.data);
 
-	if (lists[x+1])
-		ul.append(...lists[x+1].map(i => i.li));
+		ul.append(...lists[x+1].filter(v => {
+			const t = tiers.find(r => +r['TIER' + (x+1)] === v.i);
+
+			if (!t) return true;
+
+			const e = t['TIER' + x];
+
+			return (t && e === undefined) ? true : +e === U.subdiv;
+		}).map(i => i.li));
+	}
 
 	if (geometry)
 		mapbox_fit(geojsonExtent(geometry), true);
@@ -95,7 +106,10 @@ export async function init() {
 
 	fetch_countries();
 
-	GEOGRAPHY.divisions
+	DST.get('admin-tiers').load('csv');
+
+	GEOGRAPHY
+		.divisions
 		.map(d => {
 			const v = maybe(d, 'config', 'csv_columns', 'value');
 			if (!v) return [];
@@ -114,7 +128,6 @@ export async function init() {
 	load(0,0);
 
 	resultsinfo.onclick = function(_) {
-		if (U.divtier < 0) return;
 		load(U.divtier - 1, geometry_path[U.divtier - 1]);
 	};
 

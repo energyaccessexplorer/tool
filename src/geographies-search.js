@@ -70,9 +70,7 @@ async function load(x,y) {
 	U.subdiv = y;
 	O.view = U.view;
 
-	const geometry = (x < 0) ?
-		OUTLINE.vectors.features.features[0] :
-		maybe(GEOGRAPHY.divisions, x, 'vectors', 'features', 'features').find(f => f['id'] === y);
+	const geometry = maybe(GEOGRAPHY.divisions, x, 'vectors', 'features', 'features').find(f => f['id'] === y);
 
 	geometry_path[x] = y;
 
@@ -98,6 +96,12 @@ async function load(x,y) {
 
 	if (geometry)
 		mapbox_fit(geojsonExtent(geometry), true);
+
+	const d = GEOGRAPHY.divisions[x];
+	await d.load('vectors');
+
+	d.vectors.features.features.forEach(f => f.properties.__visible = (f.id === y));
+	MAPBOX.getSource(d.id).setData(DST.get(d.id).vectors.features);
 };
 
 export async function init() {
@@ -135,10 +139,18 @@ export async function init() {
 	load(0,0);
 
 	resultsinfo.onclick = function(_) {
-		if (U.divtier < 0)
+		const x = U.divtier;
+
+		if (x < 1) {
 			ul.prepend(uplimit);
-		else
-			load(U.divtier - 1, geometry_path[U.divtier - 1]);
+			return;
+		}
+
+		const d = GEOGRAPHY.divisions[x];
+		d.vectors.features.features.forEach(f => f.properties.__visible = true);
+		MAPBOX.getSource(d.id).setData(DST.get(d.id).vectors.features);
+
+		load(x - 1, geometry_path[x - 1]);
 	};
 
 	input.oninput = function(_) {

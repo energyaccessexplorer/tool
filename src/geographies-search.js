@@ -7,6 +7,9 @@ let ul, input, resultscontainer;
 const lists = [];
 let geometry_path = [];
 
+const uplimit = ce('div', "We don't do planets (yet...)", { style: "margin-bottom: 1em; color: gray;" });
+const downlimit = ce('div', "No more subdivisions.", { style: "margin-bottom: 1em; color: gray;" });
+
 const resultsinfo = ce('div', [
 	font_icon('arrow-up'),
 	ce('span', "Up a level", { style: "margin-left: 1em;"})
@@ -73,10 +76,11 @@ async function load(x,y) {
 
 	geometry_path[x] = y;
 
-	elem_empty(ul);
 	if (lists[x+1]) {
 		let tiers;
 		await until(_ => tiers = DST.get('admin-tiers').csv.data);
+
+		elem_empty(ul);
 
 		ul.append(...lists[x+1].filter(v => {
 			const t = tiers.find(r => +r['TIER' + (x+1)] === v.i);
@@ -87,6 +91,9 @@ async function load(x,y) {
 
 			return (t && e === undefined) ? true : +e === U.subdiv;
 		}).map(i => i.li));
+	}
+	else {
+		ul.prepend(downlimit);
 	}
 
 	if (geometry)
@@ -128,7 +135,10 @@ export async function init() {
 	load(0,0);
 
 	resultsinfo.onclick = function(_) {
-		load(U.divtier - 1, geometry_path[U.divtier - 1]);
+		if (U.divtier < 0)
+			ul.prepend(uplimit);
+		else
+			load(U.divtier - 1, geometry_path[U.divtier - 1]);
 	};
 
 	input.oninput = function(_) {

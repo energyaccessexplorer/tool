@@ -453,8 +453,15 @@ This is not fatal but the dataset is now disabled.`
 		if (this.summary) {
 			content = tmpl('#analysis-summary-modal', {});
 
-			content.append(ce('h3', "Intersections"));
-			content.append(table_keyvalue(this.summary, x => DST.get(x).name));
+			delete this.summary.analysis.raster;
+
+			content.append(
+				ce('h3', "Intersections"),
+				table_keyvalue(this.summary.intersections, x => maybe(DST.get(x), 'name')),
+				ce('br'),
+				ce('h3', "Averages"),
+				table_keyvalue(this.summary.analysis, _ => _, x => x.toFixed(2)),
+			);
 		} else {
 			const m = Object.assign({}, this.metadata, { "category-description": this.category.description });
 			content = tmpl('#ds-info-modal', m);

@@ -446,18 +446,18 @@ function ea_super_error(t, m, e = "error") {
 	qs('#playground').remove();
 };
 
-function table_keyvalue(obj, fn) {
+function table_keyvalue(obj, kfn, vfn) {
 	const table = ce('table');
 
 	for (const i in obj) {
-		let v = obj[i] + "";
+		let v = obj[i];
 
 		if (typeof obj[i] === "object")
 			v = JSON.stringify(obj[i]);
 
 		table.append(ce('tr', [
-			ce('td', (fn ? fn(i) : i) + ": &nbsp;"),
-			ce('td', ce('code', v), { style: "text-align: right;" }),
+			ce('td', (kfn ? kfn(i) : i) + ": &nbsp;"),
+			ce('td', ce('code', (vfn ? vfn(v) : v + "")), { style: "text-align: right;" }),
 		]));
 	}
 

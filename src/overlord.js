@@ -67,6 +67,16 @@ export default class Overlord {
 
 			O.datasets = arr;
 
+			if (ds.summary) {
+				for (const i in ds.summary) {
+					const d = DST.get(i);
+					if (maybe(d, 'vectors', 'features')) {
+						d.vectors.features.features.forEach(f => f.properties.__visible = true);
+						MAPBOX.getSource(d.id).setData(DST.get(d.id).vectors.features);
+					}
+				}
+			}
+
 			timeline_lines_update();
 			break;
 		}

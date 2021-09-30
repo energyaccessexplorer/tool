@@ -505,12 +505,15 @@ async function analysis_to_dataset(t) {
 
 	await until(_ => maybe(d, 'raster', 'data'));
 
-	d['summary'] = {};
+	d['summary'] = {
+		'intersections': {}
+	};
+
 	for (const i of d.metadata.inputs) {
 		const ds = DST.get(i);
 		const x = analysis_dataset_intersect.call(ds, d.raster);
 
-		if (x) d['summary'][ds.id] = x;
+		if (x) d['summary']['intersections'][ds.id] = x;
 	}
 
 	d['summary']['analysis'] = a.analysis;

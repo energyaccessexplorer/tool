@@ -6,7 +6,7 @@ import * as user from './user.js';
 
 import {
 	datasets as analysis_datasets,
-	raster_to_tiff,
+	analysis,
 } from './analysis.js';
 
 const PIES = {
@@ -147,7 +147,7 @@ export function init() {
 		download.append(font_icon('image'));
 		download.onclick = async _ => {
 			const type = url.searchParams.get('output');
-			fake_blob_download((await raster_to_tiff(type)), `energyaccessexplorer-${type}.tif`);
+			fake_blob_download((await analysis(type)).tiff, `energyaccessexplorer-${type}.tif`);
 		};
 
 		const code = qs('#index-graphs-code');

@@ -89,6 +89,9 @@ export default async function run(type) {
 	let min = 1;
 	let max = 0;
 
+	let avg_sum = 0;
+	let avg_count = 0;
+
 	// NOTICE: if there is only one dataset which has no weight in calculations
 	// (boundaries with key-delta scale function, for example), we do NOT want an
 	// fully black raster to show as the result. We return the transparent raster.
@@ -150,6 +153,9 @@ export default async function run(type) {
 		if (a !== -1) {
 			if (a > max) max = a;
 			if (a < min) min = a;
+
+			avg_sum += a;
+			avg_count++;
 		}
 
 		it[i] = a;
@@ -167,6 +173,7 @@ export default async function run(type) {
 	return {
 		min,
 		max,
+		avg: avg_sum / avg_count,
 		raster: it,
 	};
 };
@@ -260,7 +267,7 @@ export async function plot_active(type, doindexes) {
 	return a;
 };
 
-export async function raster_to_tiff(type) {
+export async function analysis(type) {
 	const b = OUTLINE;
 	const env = GEOGRAPHY.envelope;
 
@@ -292,7 +299,10 @@ export async function raster_to_tiff(type) {
 		ModelPixelScale: [(env[2] - env[0]) / b.raster.width, (env[3] - env[1]) / b.raster.height, 0]
 	};
 
-	return GeoTIFF.writeArrayBuffer(arr, metadata);
+	return {
+		tiff: await GeoTIFF.writeArrayBuffer(arr, metadata),
+		analysis: a,
+	};
 };
 
 export function context(rc, dict, props, skip = null) {

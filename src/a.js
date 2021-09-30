@@ -21,7 +21,7 @@ import {
 } from './timeline.js';
 
 import {
-	raster_to_tiff,
+	analysis,
 } from './analysis.js';
 
 import DS from './ds.js';
@@ -472,9 +472,9 @@ async function analysis_to_dataset(t) {
 
 	analysis_count++;
 
-	const tif = await raster_to_tiff(t);
+	const a = await analysis(t);
 
-	const url = URL.createObjectURL(new Blob([tif], { type: "application/octet-stream;charset=utf-8" }));
+	const url = URL.createObjectURL(new Blob([a.tiff], { type: "application/octet-stream;charset=utf-8" }));
 
 	const d = new DS({
 		"name": `analysis-${t}-` + analysis_count,
@@ -512,6 +512,8 @@ async function analysis_to_dataset(t) {
 
 		if (x) d['summary'][ds.id] = x;
 	}
+
+	d['summary']['analysis'] = a.analysis;
 };
 
 function analysis_dataset_intersect(raster) {

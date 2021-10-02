@@ -42,52 +42,53 @@ async function geography(c) {
 	sl.input.focus();
 };
 
-async function usertype(gid) {
-	const types = {
-		"Strategic and Integrated Energy Planning": {
-			"inputs": ['schools', 'health', 'minigrids', 'transmission-subs', 'distribution-subs', 'transmission-lines', 'distribution', 'population-density'],
-			"output": "eai",
-			"view": "outputs",
-			"description": "Electrification planning agencies are able to link electrification and development outcomes.",
-		},
-		"The expansion of clean energy markets": {
-			"inputs": ['distribution-lines', 'minigrids', 'population-density', 'poverty', 'ghi'],
-			"output": "eai",
-			"view": "outputs",
-			"description": "Technology suppliers (whether mini grid developers or solar home system providers) can get a better understanding of aspects of affordability and level of service needed.",
-		},
-		"Impact investment": {
-			"inputs": ['poverty', 'crops', 'transmission-subs', 'distribution-subs', 'transmission-lines', 'distribution'],
-			"output": "ani",
-			"view": "outputs",
-			"description": "Donors and development finance institutions can identify areas where grants and support will have the most impact."
-		},
-		"Bottom-up assessment of energy needs": {
-			"inputs": ['schools', 'health', 'distribution-lines'],
-			"output": "demand",
-			"view": "outputs",
-			"description": "Service delivery institutions in the health, education and agriculture sectors are able to estimate energy needs associated to development services."
-		},
-		"Generate custom geospatial analysis based on your own criteria": {
-			"description": null,
-			"inputs": [],
-			"output": "eai",
-			"view": "inputs",
-		},
-	};
+const presets = [
+	{
+		"name": "Strategic and Integrated Energy Planning",
+		"output": "eai",
+		"view": "outputs",
+		"description": "Electrification planning agencies are able to link electrification and development outcomes.",
+	},
+	{
+		"name": "The expansion of clean energy markets",
+		"output": "eai",
+		"view": "outputs",
+		"description": "Technology suppliers (whether mini grid developers or solar home system providers) can get a better understanding of aspects of affordability and level of service needed.",
+	},
+	{
+		"name": "Impact investment",
+		"output": "ani",
+		"view": "outputs",
+		"description": "Donors and development finance institutions can identify areas where grants and support will have the most impact."
+	},
+	{
+		"name": "Bottom-up assessment of energy needs",
+		"output": "demand",
+		"view": "outputs",
+		"description": "Service delivery institutions in the health, education and agriculture sectors are able to estimate energy needs associated to development services."
+	},
+	{
+		"name": "Generate custom geospatial analysis based on your own criteria",
+		"description": null,
+		"output": "eai",
+		"view": "inputs",
+		"datasets": [],
+	},
+];
 
-	const content = ce('div');
-	content.append(ce('p', "What are you interested in?"));
+async function usertype(gid) {
+	const content = ce('div', ce('p', "What are you interested in?"), { "id": "presets" });
 
 	const ul = ce('ul');
-	for (const t in types) {
-		const inputs = types[t].inputs.join(',');
-		const output = types[t].output;
-		const view = types[t].view;
+	for (const t of presets) {
+		const inputs = t.datasets.map(x => x.name).join(',');
+		const output = t.output;
+		const view = t.view;
 
-		const p = ce('p', types[t].description, { "style": "color: gray;" });
+		const p = ce('p', t.description);
+		const li = ce('li', ce('a', [ce('h3', t.name), p], { "href": `/tool/a?id=${gid}&inputs=${inputs}&output=${output}&view=${view}` }));
 
-		ul.append(ce('li', ce('a', [ce('h3', t), p], { "href": `/tool/a?id=${gid}&inputs=${inputs}&output=${output}&view=${view}` })));
+		ul.append(li);
 	}
 
 	content.append(ul);

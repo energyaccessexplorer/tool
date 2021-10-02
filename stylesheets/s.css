@@ -38,6 +38,19 @@ body {
   border: none;
 }
 
+#presets li a {
+  display: block;
+  padding: 0.1em 1.5em;
+}
+
+#presets li:hover {
+  background-color: #efefef;
+}
+
+#presets li p {
+  color: dimgray;
+}
+
 @media (max-width: 72em) {
   #playground {
     flex-flow: column nowrap;

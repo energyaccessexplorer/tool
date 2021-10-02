@@ -77,6 +77,7 @@ async function usertype(gid) {
 	};
 
 	const content = ce('div');
+	content.append(ce('p', "What are you interested in?"));
 
 	const ul = ce('ul');
 	for (const t in types) {
@@ -84,7 +85,9 @@ async function usertype(gid) {
 		const output = types[t].output;
 		const view = types[t].view;
 
-		ul.append(ce('li', ce('a', t, { "href": `/tool/a?id=${gid}&inputs=${inputs}&output=${output}&view=${view}` })));
+		const p = ce('p', types[t].description, { "style": "color: gray;" });
+
+		ul.append(ce('li', ce('a', [ce('h3', t), p], { "href": `/tool/a?id=${gid}&inputs=${inputs}&output=${output}&view=${view}` })));
 	}
 
 	content.append(ul);

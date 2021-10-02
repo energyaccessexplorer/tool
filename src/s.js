@@ -228,7 +228,22 @@ export function init() {
 				const d = ce('div', ce('h2', co.name, { class: 'country-name' }), { class: 'country-item', ripple: "" });
 				d.onclick = _ => setTimeout(_ => geography(co), 350);
 
-				fetch(`https://world.energyaccessexplorer.org/countries?select=flag,geojson&cca3=eq.${co.cca3}`)
+				const intro = maybe(co, 'configuration', 'introduction');
+				if (intro) {
+					let p;
+					d.onmouseenter = _ => {
+						p = nanny.pick_element(d, {
+							message: ce('pre', intro),
+							close: false,
+							position: "C",
+						});
+					};
+					d.onmouseleave = _ => {
+						p.remove();
+					};
+				}
+
+				fetch(`https://world.energyaccessexplorer.org/countries?select=flag&cca3=eq.${co.cca3}`)
 					.then(r => r.json())
 					.then(r => {
 						const data = r[0];

@@ -51,6 +51,15 @@ body {
   color: dimgray;
 }
 
+.nanny-marker {
+  pointer-events: none;
+}
+
+.nanny-marker pre {
+  font-family: sans-serif;
+  white-space: pre-wrap;
+}
+
 @media (max-width: 72em) {
   #playground {
     flex-flow: column nowrap;

@@ -106,6 +106,7 @@ build-s:
 		${LIB}/helpers.js \
 		${LIB}/flash.js \
 		${LIB}/modal.js \
+		${LIB}/nanny.js \
 		${LIB}/selectlist.js \
 		${LIB}/pgrest.js \
 		> ${DIST}/s/libs.js

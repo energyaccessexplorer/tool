@@ -76,7 +76,11 @@ const UProxyHandler = {
 		}
 
 		case "subdiv":
-		case "divtier":
+		case "divtier": {
+			o.url.searchParams.set(t, parseInt(v) || 0);
+			break;
+		}
+
 		case "subgeoname":
 		case "pack": {
 			o.url.searchParams.set(t,v);

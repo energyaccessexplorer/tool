@@ -16,6 +16,8 @@ import * as indexes from './indexes.js';
 
 import * as mapbox from './mapbox.js';
 
+import * as config from './config.js';
+
 import {
 	init as timeline_init,
 } from './timeline.js';
@@ -145,6 +147,12 @@ export async function init() {
 	MAPBOX.coords = mapbox.fit(GEOGRAPHY.envelope);
 
 	await dsinit(GEOGRAPHY.id, U.pack);
+
+	const conf = localStorage.getItem('config');
+	if (conf) {
+		config.load(JSON.parse(conf));
+		localStorage.removeItem('config');
+	}
 
 	U.inputs = U.inputs.slice(0); // cleanup non-existent ids
 

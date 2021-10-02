@@ -87,6 +87,9 @@ async function usertype(gid) {
 
 		const p = ce('p', t.description);
 		const li = ce('li', ce('a', [ce('h3', t.name), p], { "href": `/tool/a?id=${gid}&inputs=${inputs}&output=${output}&view=${view}` }));
+		li.onclick = function() {
+			localStorage.setItem('config', JSON.stringify(t));
+		};
 
 		ul.append(li);
 	}
@@ -163,6 +166,34 @@ async function overview() {
 	}
 };
 
+async function presets_init() {
+	function intornot(str) {
+		const i = parseInt(str);
+		if (and((typeof i === 'number'), !isNaN(i)))
+			return parseInt(i);
+	};
+
+	d3.csv(ea_settings.storage + "presets.csv")
+		.then(function(rows) {
+			rows.forEach(r => {
+				const preset = presets[+r.preset_index];
+				if (!preset) return;
+				if (!preset.datasets) preset.datasets = [];
+
+				const ds = {
+					name: r['ds_name'],
+					weight: intornot(r['weight']),
+					domain: {
+						min: intornot(r['min']),
+						max: intornot(r['max']),
+					},
+				};
+
+				preset.datasets.push(ds);
+			});
+		});
+};
+
 export function init() {
 	const playground = qs('#playground');
 
@@ -221,6 +252,8 @@ export function init() {
 
 			throw error;
 		});
+
+	presets_init();
 
 	if (ENV === "nothing") overview();
 };

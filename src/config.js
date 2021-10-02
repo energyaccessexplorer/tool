@@ -1,19 +1,21 @@
 import DS from './ds.js';
 
 export function load(conf) {
-	const DSL = DS.array.filter(d => conf.datasets.find(t => t.id === d.dataset_id));
-	conf.datasets.sort((a,b) => a.position < b.position ? 1 : -1);
+	const list = DS.array.filter(d => conf.datasets.find(t => t.id === d.dataset_id || t.name === d.id));
 
 	conf.datasets.forEach(d => {
-		const t = DSL.find(x => x.dataset_id === d.id);
-		t._domain = d.domain;
-		t.weight = d.weight;
+		const ds = list.find(t => t.dataset_id === d.id || t.id === d.name);
+
+		if (!ds) {
+			console.error("config load: Failed to find dataset for preset/param:", d);
+			return;
+		}
+
+		if (typeof d.domain.min === 'number') ds._domain.min = d.domain.min;
+		if (typeof d.domain.max === 'number') ds._domain.max = d.domain.max;
+
+		if (typeof d.weight === 'number') ds.weight = d.weight;
 	});
-
-	U.inputs = conf.datasets.map(d => d.name);
-
-	U.view = conf.view;
-	U.output = O.output = conf.output;
 
 	return conf;
 };

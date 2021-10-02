@@ -76,11 +76,14 @@ async function load(x,y) {
 
 	if (lists[x+1]) {
 		let tiers;
-		await until(_ => tiers = DST.get('admin-tiers').csv.data);
+		const at = DST.get('admin-tiers');
+		if (at) await until(_ => tiers = at.csv.data);
 
 		elem_empty(ul);
 
 		ul.append(...lists[x+1].filter(v => {
+			if (!at) return true;
+
 			const t = tiers.find(r => +r['TIER' + (x+1)] === v.i);
 
 			if (!t) return true;
@@ -122,7 +125,8 @@ export async function init() {
 
 	fetch_countries();
 
-	DST.get('admin-tiers').load('csv');
+	const at = DST.get('admin-tiers');
+	if (at) at.load('csv');
 
 	GEOGRAPHY
 		.divisions

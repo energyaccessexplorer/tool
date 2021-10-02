@@ -100,22 +100,32 @@ async function geography(c) {
 
 async function usertype(gid) {
 	const types = {
-		"Electrification planning": {
+		"Strategic and Integrated Energy Planning": {
 			"inputs": ['schools', 'health', 'minigrids', 'transmission-subs', 'distribution-subs', 'transmission-lines', 'distribution', 'population-density'],
 			"output": "eai",
 			"view": "outputs",
+			"description": "Electrification planning agencies are able to link electrification and development outcomes.",
 		},
-		"Clean energy enterprises": {
+		"The expansion of clean energy markets": {
 			"inputs": ['distribution-lines', 'minigrids', 'population-density', 'poverty', 'ghi'],
 			"output": "eai",
 			"view": "outputs",
+			"description": "Technology suppliers (whether mini grid developers or solar home system providers) can get a better understanding of aspects of affordability and level of service needed.",
 		},
-		"Investors and development finance institutions": {
+		"Impact investment": {
 			"inputs": ['poverty', 'crops', 'transmission-subs', 'distribution-subs', 'transmission-lines', 'distribution'],
 			"output": "ani",
 			"view": "outputs",
+			"description": "Donors and development finance institutions can identify areas where grants and support will have the most impact."
 		},
-		"Other (clean canvas)": {
+		"Bottom-up assessment of energy needs": {
+			"inputs": ['schools', 'health', 'distribution-lines'],
+			"output": "demand",
+			"view": "outputs",
+			"description": "Service delivery institutions in the health, education and agriculture sectors are able to estimate energy needs associated to development services."
+		},
+		"Generate custom geospatial analysis based on your own criteria": {
+			"description": null,
 			"inputs": [],
 			"output": "eai",
 			"view": "inputs",

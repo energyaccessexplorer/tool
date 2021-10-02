@@ -1,64 +1,8 @@
-function topo_flag(features, flagurl, config) {
-	const width = MOBILE ? 100 : 200;
-	const padding = 1;
-
-	config = config || {
-		'x': 0,
-		'y': 0,
-		'height': 24,
-		'width': 32,
-		'aspect-ratio': "xMidYMid"
-	};
-
-	const id = flagurl.substr(flagurl.length - 12);
-
-	const svg = d3.select(document.createElementNS("http://www.w3.org/2000/svg", "svg"))
-		.attr('width', width)
-		.attr('height', width);
-
-	const geopath = d3.geoPath()
-		.projection(d3.geoMercator());
-
-	svg.append('defs')
-		.append('pattern')
-		.attr('id', `flag-${id}`)
-		.attr('patternUnits', 'objectBoundingBox')
-		.attr('x', 0)
-		.attr('y', 0)
-		.attr('width', 1)
-		.attr('height', 1)
-
-		.append('image')
-		.attr('href', flagurl)
-		.attr('x', config['x'] || 0)
-		.attr('y', config['y'] || 0)
-		.attr('width', config['width'])
-		.attr('height', config['height'])
-		.attr('preserveAspectRatio', config['aspect-ratio'] + " slice");
-
-	const g = svg.append('g');
-
-	Whatever.then(_ => {
-		const path = g.selectAll(`path`)
-			.data(features)
-			.enter().append('path')
-			.attr('fill', `url(#flag-${id})`)
-			.attr('d', geopath);
-
-		const box = path.node().getBBox();
-		const s = (box.height > box.width) ? (box.height - box.width)/2 : 0;
-
-		const factor = Math.min(
-			width / (box.width + (padding * 2)),
-			width / (box.height + (padding * 2))
-		);
-
-		g.attr('transform', `scale(${factor})translate(${(-box.x + padding + s)}, ${(-box.y + padding)})`);
-
-		URL.revokeObjectURL(flagurl);
+function ugly_flag(flagurl) {
+	return ce('img', null, {
+		src: flagurl,
+		width: MOBILE ? 100 : 200,
 	});
-
-	return svg.node();
 };
 
 async function geography(c) {
@@ -254,10 +198,8 @@ export function init() {
 					.then(r => {
 						const data = r[0];
 
-						d.append(topo_flag(
-							JSON.parse(hextostring(data['geojson'])).features,
-							URL.createObjectURL((new Blob([hextostring(data['flag'])], {type: 'image/svg+xml'}))),
-							co.configuration.flag
+						d.append(ugly_flag(
+							URL.createObjectURL((new Blob([hextostring(data['flag'])], {type: 'image/svg+xml'})))
 						));
 					});
 

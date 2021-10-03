@@ -6,6 +6,7 @@ let ul, input, resultscontainer;
 
 const lists = [];
 let geometry_path = [];
+let loaded_list = 1;
 
 const uplimit = ce('div', "We don't do planets (yet...)", { style: "margin-bottom: 1em; color: gray;" });
 const downlimit = ce('div', "No more subdivisions.", { style: "margin-bottom: 1em; color: gray;" });
@@ -95,6 +96,8 @@ async function load(x,y) {
 		ul.prepend(downlimit);
 	}
 
+	loaded_list = x+1;
+
 	if (geometry)
 		mapbox_fit(geojsonExtent(geometry), true);
 
@@ -148,8 +151,14 @@ export async function init() {
 	resultsinfo.onclick = function(_) {
 		const x = U.divtier;
 
-		if (x < 1) {
+		if (loaded_list === 0) {
 			ul.prepend(uplimit);
+			return;
+		}
+
+		if (x === 0) {
+			ul.replaceChildren(...lists[0].map(x => x.li));
+			loaded_list = 0;
 			return;
 		}
 

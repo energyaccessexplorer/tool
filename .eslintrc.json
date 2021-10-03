@@ -54,7 +54,6 @@
     "and": "readonly",
     "or": "readonly",
     "coalesce": "readonly",
-    "elem_empty": "readonly",
     "el_tree": "readonly",
     "attach": "readonly",
     "tmpl": "readonly",

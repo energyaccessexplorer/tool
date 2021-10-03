@@ -34,12 +34,9 @@ async function reset() {
 
 	if (!ds) return;
 
-	elem_empty(ul);
-	resultscontainer.innerHTML = "";
+	ul.replaceChildren();
 
 	resultsinfo = ce('div', ce('b', ds.name), { class: 'search-results-info' });
-
-	resultscontainer.append(resultsinfo);
 
 	if (!ds || !ds.vectors) {
 		resultsinfo.replaceChildren(
@@ -89,13 +86,13 @@ async function reset() {
 		f['__li'] = li;
 	}
 
-	resultscontainer.append(ul);
+	resultscontainer.replaceChildren(resultsinfo, ul);
 };
 
 function trigger(value) {
 	if (!searchable) return;
 
-	elem_empty(ul);
+	ul.replaceChildren();
 
 	let count = 0;
 	for (let i = 0; i < ds.vectors.features.features.length; i++) {

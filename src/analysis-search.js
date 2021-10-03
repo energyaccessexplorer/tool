@@ -50,7 +50,7 @@ function li(p) {
 };
 
 async function trigger() {
-	elem_empty(ul);
+	ul.replaceChildren();
 
 	const results = await getpoints();
 

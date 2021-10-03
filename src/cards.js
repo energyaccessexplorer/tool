@@ -293,22 +293,16 @@ export default class dscard extends HTMLElement {
 	};
 
 	refresh() {
-		const s = qs('[slot=svg]', this);
-		elem_empty(s);
-
-		s.append(this.svg_el = svg_el.call(this));
+		qs('[slot=svg]', this)
+			.replaceChildren(this.svg_el = svg_el.call(this));
 
 		this.opacity_value = 1;
-		const o = qs('[slot=opacity]', this);
-		elem_empty(o);
-
-		o.append(this.opacity());
+		qs('[slot=opacity]', this)
+			.replaceChildren(this.opacity());
 	};
 
 	legends(ls, t) {
 		const it = qs('[slot=svg]', this);
-
-		elem_empty(it);
 
 		const ul = ce('div', null, { style: "font-size: smaller;" });
 
@@ -337,7 +331,7 @@ export default class dscard extends HTMLElement {
 			ul.append(li);
 		}
 
-		it.append(ul);
+		it.replaceChildren(ul);
 	};
 
 	info() {

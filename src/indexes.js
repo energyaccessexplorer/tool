@@ -170,7 +170,7 @@ export function list() {
 	const nodes = [];
 
 	const indexes_list = qs('#indexes-list');
-	elem_empty(indexes_list);
+	indexes_list.replaceChildren();
 
 	function i_elem(t, v) {
 		const d = ce('li',  null, { bind: t, class: 'element', ripple: "" });

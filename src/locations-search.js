@@ -15,7 +15,7 @@ function pointto(p, a = false) {
 };
 
 async function reset(v) {
-	elem_empty(ul);
+	ul.replaceChildren();
 
 	resultsinfo.replaceChildren(ce('b', "Results"), ` for "${v}":`);
 };

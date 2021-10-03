@@ -415,14 +415,12 @@ function elem_collapse(el, t, open) {
 	const d = el.style['display'];
 	const c = qs('.collapse', t);
 
-	elem_empty(c);
-
 	if (open || d === 'none') {
 		el.style['display'] = 'block';
-		c.append(triangle('s'));
+		c.replaceChildren(triangle('s'));
 	} else {
 		el.style['display'] = 'none';
-		c.append(triangle('e'));
+		c.replaceChildren(triangle('e'));
 	}
 };
 

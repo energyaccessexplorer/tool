@@ -79,9 +79,7 @@ async function load(x,y) {
 		const at = DST.get('admin-tiers');
 		if (at) await until(_ => tiers = at.csv.data);
 
-		elem_empty(ul);
-
-		ul.append(...lists[x+1].filter(v => {
+		ul.replaceChildren(...lists[x+1].filter(v => {
 			if (!at) return true;
 
 			const t = tiers.find(r => +r['TIER' + (x+1)] === v.i);

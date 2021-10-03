@@ -167,6 +167,10 @@ export default class Overlord {
 			});
 	};
 
+	info_mode() {
+		mapbox.info_mode_change();
+	}
+
 	async theme_changed() {
 		await until(_ => MAPBOX.isStyleLoaded());
 

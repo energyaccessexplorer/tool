@@ -11,6 +11,8 @@ const default_styles = [{
 
 const styles = default_styles;
 
+let info_mode_button;
+
 class MapboxThemeControl {
 	onAdd(map) {
 		this._map = map;
@@ -44,18 +46,9 @@ class MapboxInfoControl {
 
 		this._container.append(button);
 
-		button.addEventListener('mouseup', _ => {
-			INFOMODE = !INFOMODE;
+		button.addEventListener('click', info_mode_change);
 
-			if (INFOMODE) {
-				button.classList.add('active');
-				qs('canvas.mapboxgl-canvas').style.cursor = 'crosshair';
-			}
-			else {
-				button.classList.remove('active');
-				qs('canvas.mapboxgl-canvas').style.cursor = 'auto';
-			}
-		});
+		info_mode_button = button;
 
 		return this._container;
 	};
@@ -155,6 +148,20 @@ function theme_pick(theme) {
 			}
 		}]
 	});
+};
+
+export function info_mode_change() {
+	INFOMODE = !INFOMODE;
+	const b = info_mode_button;
+
+	if (INFOMODE) {
+		b.classList.add('active');
+		qs('canvas.mapboxgl-canvas').style.cursor = 'crosshair';
+	}
+	else {
+		b.classList.remove('active');
+		qs('canvas.mapboxgl-canvas').style.cursor = 'auto';
+	}
 };
 
 export function change_theme(theme, soft) {

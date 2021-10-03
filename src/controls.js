@@ -150,6 +150,12 @@ export default class dscontrols extends HTMLElement {
 			O.dataset(this.ds, 'domain', this.ds.domain);
 		}
 	};
+
+	toggle_advanced() {
+		if (!this.ds.on) toggle_ds.call(this.ds);
+
+		qs('.advanced-controls', this).style.display = ((this.show_advanced = !this.show_advanced)) ? 'block' : 'none';
+	}
 };
 
 customElements.define('ds-controls', dscontrols);
@@ -375,11 +381,7 @@ function options() {
 	if (this.weight_group) {
 		dropdownlist.push({
 			"content": "Toggle advanced controls",
-			"action": _ => {
-				if (!this.ds.on) toggle_ds.call(this.ds);
-
-				qs('.advanced-controls', this).style.display = ((this.show_advanced = !this.show_advanced)) ? 'block' : 'none';
-			}
+			"action": _ => this.toggle_advanced()
 		});
 	}
 

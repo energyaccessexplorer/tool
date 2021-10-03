@@ -415,7 +415,7 @@ function mobile() {
 	map.click();
 };
 
-export function toggle_left_panel(t) {
+function toggle_left_panel(t) {
 	for (let m of qsa('.nanny-marker')) m.remove();
 
 	for (let e of qsa('#left-pane > div'))
@@ -612,3 +612,4 @@ function nanny_force() {
 // TODO: used in an onclick attribute
 window.ea_nanny_force_start = nanny_force;
 window.analysis_to_dataset = analysis_to_dataset;
+window.toggle_left_panel = toggle_left_panel;

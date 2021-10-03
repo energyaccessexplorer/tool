@@ -30,20 +30,15 @@ import DS from './ds.js';
 
 import Overlord from './overlord.js';
 
-const UProxyHandler = {
-	get: function(o,p) {
-		const i = o.url.searchParams.get(p);
+const Uproxy = {
+	get: function(url,p) {
+		const i = url.searchParams.get(p);
 
 		let v;
 		switch (p) {
-		case "params": {
-			v = o.params;
-			break;
-		}
-
 		case "inputs": {
 			if (!i || i === "") v = [];
-			else v = i.split(',').filter(e => o.params.inputs.indexOf(e) > -1);
+			else v = i.split(',').filter(e => PARAMS.inputs.indexOf(e) > -1);
 			break;
 		}
 
@@ -63,42 +58,34 @@ const UProxyHandler = {
 		return v;
 	},
 
-	set: function(o,t,v) {
+	set: function(url,t,v) {
 		switch (t) {
 		case "output":
 		case "view": {
-			if (!o.params[t].includes(v)) v = o.params[t][0];
-			o.url.searchParams.set(t,v);
+			if (!PARAMS[t].includes(v)) v = PARAMS[t][0];
+			url.searchParams.set(t,v);
 			break;
 		}
 
 		case "timeline": {
-			o.url.searchParams.set(t, v || GEOGRAPHY.timeline_dates.slice(-1)[0]);
+			url.searchParams.set(t, v || GEOGRAPHY.timeline_dates.slice(-1)[0]);
 			break;
 		}
 
 		case "subdiv":
 		case "divtier": {
-			o.url.searchParams.set(t, parseInt(v) || 0);
+			url.searchParams.set(t, parseInt(v) || 0);
 			break;
 		}
 
 		case "subgeoname":
 		case "pack": {
-			o.url.searchParams.set(t,v);
+			url.searchParams.set(t,v);
 			break;
 		}
 
 		case "inputs": {
-			o.url.searchParams.set(t, [...new Set(v)]);
-			break;
-		}
-
-		case "params": {
-			for (let p in v) {
-				if (!o.params[p].includes(v[p])) continue;
-				o.url.searchParams.set(p, v[p]);
-			}
+			url.searchParams.set(t, [...new Set(v)]);
 			break;
 		}
 
@@ -107,7 +94,7 @@ const UProxyHandler = {
 		}
 		}
 
-		history.replaceState(null, null, o.url);
+		history.replaceState(null, null, url);
 
 		return true;
 	}
@@ -132,15 +119,15 @@ export async function init() {
 	else if (location.hostname.match(/localhost/))
 		ENV = ["production", "staging"];
 
-	let params = 'default';
+	PARAMS = ea_params['default'];
 
 	if (GEOGRAPHY.timeline)
-		params = 'timeline';
+		PARAMS = ea_params['timeline'];
 
 	MOBILE = screen.width < 1152;
 	layout();
 
-	U = new Proxy({ url: url, params: ea_params[params] }, UProxyHandler);
+	U = new Proxy(url, Uproxy);
 	O = new Overlord();
 
 	MAPBOX = mapbox.init(O);
@@ -275,7 +262,7 @@ This is fatal. Thanks for all the fish.`;
 			.then(r => r.map(e => new DS(e)));
 	})();
 
-	U.params.inputs = [...new Set(DS.array.map(e => e.id))];
+	PARAMS.inputs = [...new Set(DS.array.map(e => e.id))];
 
 	// We need all the datasets to be initialised _before_ setting
 	// mutant/collection attributes (order is never guaranteed)
@@ -505,10 +492,7 @@ async function analysis_to_dataset(t) {
 
 	d._active(true, true);
 
-	const x = U.params.inputs.slice(0);
-	x.push(d.id);
-
-	U.params.inputs = x;
+	PARAMS.inputs.push(d.id);
 
 	U.inputs = [d.id].concat(U.inputs);
 	O.view = 'inputs';
@@ -592,11 +576,9 @@ function nanny_init() {
 };
 
 function nanny_force() {
-	U.params = {
-		inputs: [],
-		output: 'eai',
-		view: 'inputs'
-	};
+	U.inputs = [];
+	U.output = 'eai';
+	U.view = 'inputs';
 
 	DS.array.filter(d => d.on).forEach(d => d.active(false, false));
 

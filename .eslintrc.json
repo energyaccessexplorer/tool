@@ -42,6 +42,7 @@
     "U": "writable",
     "O": "writable",
     "ENV": "writable",
+    "PARAMS": "writable",
 
     "qs": "readonly",
     "qsa": "readonly",

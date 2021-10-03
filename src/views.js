@@ -28,7 +28,7 @@ export function init() {
 	const el = qs('#views');
 
 	for (let v in ea_views) {
-		if (!U.params.view.includes(v)) continue;
+		if (!PARAMS.view.includes(v)) continue;
 
 		const btn = ce('div', ea_views[v]['name'], { class: 'view up-title', id: 'view-' + v, ripple: '' });
 

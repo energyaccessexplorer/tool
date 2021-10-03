@@ -224,11 +224,10 @@ export function modal() {
 	ea_modal.set({
 		header: "Energy Access Explorer Indexes",
 		content: c,
-		footer: elem(`
-<a style="text-align: right; display: block;" href="https://www.wri.org/publication/energy-access-explorer-data-and-methods">
-  See technical note for more detailed methodology
-</a>
-`)
+		footer: ce('a', "See technical note for more detailed methodology", {
+			"style": "text-align: right; display: block;",
+			"href": "https://www.wri.org/publication/energy-access-explorer-data-and-methods",
+		})
 	}).show();
 };
 

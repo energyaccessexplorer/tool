@@ -46,7 +46,6 @@
     "qs": "readonly",
     "qsa": "readonly",
     "ce": "readonly",
-    "elem": "readonly",
     "delay": "readonly",
     "until": "readonly",
     "maybe": "readonly",

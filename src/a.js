@@ -26,6 +26,10 @@ import {
 	analysis,
 } from './analysis.js';
 
+import {
+	select_tab as controls_select_tab,
+} from './controls-search.js';
+
 import DS from './ds.js';
 
 import Overlord from './overlord.js';
@@ -334,7 +338,7 @@ function layout() {
 };
 
 function mobile() {
-	controlssearch.select_tab(qs('#controls-tab-all'), "all");
+	controls_select_tab(qs('#controls-tab-all'), "all");
 
 	for (let el of qsa('.controls-subbranch')) {
 		elem_collapse(qs('.controls-container', el), el);
@@ -594,10 +598,11 @@ function nanny_force() {
 	DS.array.filter(d => d.on).forEach(d => d.active(false, false));
 
 	O.view = 'inputs';
-	controlssearch.select_tab(qs('#controls-tab-census'), "census");
 	ea_modal.hide();
 
 	O.view = U.view;
+
+	controls_select_tab(qs('#controls-tab-census'), "census");
 
 	ea_nanny.start();
 };
@@ -606,3 +611,4 @@ function nanny_force() {
 window.ea_nanny_force_start = nanny_force;
 window.analysis_to_dataset = analysis_to_dataset;
 window.toggle_left_panel = toggle_left_panel;
+window.controls_select_tab = controls_select_tab;

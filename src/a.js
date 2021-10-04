@@ -193,6 +193,10 @@ async function dsinit(id, pack) {
 
 	const divisions = maybe(GEOGRAPHY.configuration, 'divisions').filter(d => d.dataset_id !== null);
 
+	function exists(e) {
+		return !!coalesce(DST.get(e.name), DST.get(e.category.name));
+	};
+
 	await (function fetch_outline() {
 		// TODO: this should be more strict divisions 0/outline
 		const outline_id = maybe(divisions.find(d => d.dataset_id), 'dataset_id');
@@ -214,6 +218,8 @@ This is fatal. Thanks for all the fish.`;
 
 		return ea_api.get("datasets", bp, { one: true })
 			.then(async e => {
+				if (exists(e)) return;
+
 				const ds = OUTLINE = new DS(e);
 
 				await ds.load('vectors');
@@ -233,6 +239,8 @@ This is fatal. Thanks for all the fish.`;
 
 				return ea_api.get("datasets", dp, { one: true })
 					.then(async e => {
+						if (exists(e)) return;
+
 						const ds = new DS(e);
 
 						await ds.load('csv');
@@ -258,7 +266,11 @@ This is fatal. Thanks for all the fish.`;
 		};
 
 		return ea_api.get("datasets", p)
-			.then(r => r.map(e => new DS(e)));
+			.then(r => r.map(e => {
+				if (exists(e)) return;
+
+				new DS(e);
+			}));
 	})();
 
 	PARAMS.inputs = [...new Set(DS.array.map(e => e.id))];

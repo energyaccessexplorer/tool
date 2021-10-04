@@ -8,15 +8,9 @@ const lists = [];
 let geometry_path = [];
 let loaded_list = 1;
 
-const uplimit = ce('div', "We don't do planets (yet...)", { style: "margin-bottom: 1em; color: gray;" });
-const downlimit = ce('div', "No more subdivisions.", { style: "margin-bottom: 1em; color: gray;" });
-
-const resultsinfo = ce('div', [
-	font_icon('arrow-up'),
-	ce('span', "Up a level", { style: "margin-left: 1em;"})
-], {
-	class: 'search-results-info',
-	style: "cursor: pointer;",
+const resultsinfo = ce('div', null, {
+	"class": 'search-results-info',
+	"style": "cursor: pointer;",
 });
 
 function li(g,i,j) {
@@ -75,6 +69,11 @@ async function load(x,y) {
 
 	geometry_path[x] = y;
 
+	resultsinfo.replaceChildren(
+		font_icon('arrow-up'),
+		ce('span', "Up a level", { "style": "margin-left: 1em;"})
+	);
+
 	if (lists[x+1]) {
 		let tiers;
 		const at = DST.get('admin-tiers');
@@ -91,9 +90,8 @@ async function load(x,y) {
 
 			return (t && e === undefined) ? true : +e === U.subdiv;
 		}).map(i => i.li));
-	}
-	else {
-		ul.prepend(downlimit);
+	} else {
+		resultsinfo.append(ce('span', "(No more subdivisions)", { "style": "margin-left: 1em; color: gray;" }));
 	}
 
 	loaded_list = x+1;
@@ -151,14 +149,12 @@ export async function init() {
 	resultsinfo.onclick = function(_) {
 		const x = U.divtier;
 
-		if (loaded_list === 0) {
-			ul.prepend(uplimit);
-			return;
-		}
+		if (loaded_list === 0) return;
 
 		if (x === 0) {
 			ul.replaceChildren(...lists[0].map(x => x.li));
 			loaded_list = 0;
+			resultsinfo.replaceChildren(ce('span', "Top level", { "style": "margin-left: 1em; color: gray;" }));
 			return;
 		}
 

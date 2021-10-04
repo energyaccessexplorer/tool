@@ -389,9 +389,6 @@ function mapclick(e) {
 
 		let props = {};
 
-		if (maybe(et, 'properties', 'District'))
-			U.subgeoname = et.properties['District'];
-
 		timeline_lines_draw();
 
 		if (maybe(et, 'source') === inp) {

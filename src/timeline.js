@@ -278,7 +278,7 @@ export function lines_draw() {
 			return a;
 		}
 
-		return a.concat(c.csv.data.filter(r => r['District'] === U.subgeoname).map(r => {
+		return a.concat(c.csv.data.filter(r => r['OBJECTID'] === U.subdiv).map(r => {
 			return {
 				values: GEOGRAPHY.timeline_dates.map(k => (r[k] === "" ? undefined : +r[k])),
 				id: c.id,
@@ -327,8 +327,9 @@ export function lines_draw() {
 	ml.svg.id = 'timeline-lines';
 
 	const rp = qs('#right-pane');
+	const rows = maybe(GEOGRAPHY.divisions, U.divtier, 'csv', 'data') || [];
 
-	qs('#district-header', rp).innerText = U.subgeoname;
+	qs('#district-header', rp).innerText = rows.find(r => r['OBJECTID'] === U.subdiv);
 	qs('#district-graph', rp).append(ml.svg);
 };
 
@@ -339,7 +340,7 @@ export async function lines_update() {
 
 	if (datasets.length) {
 		await Promise.all(datasets.map(d => until(_ => d.csv.data)));
-		if (U.subgeoname) lines_draw();
+		if (U.subdiv > -1) lines_draw();
 	} else {
 		const rp = qs('#right-pane');
 		qs('#district-header', rp).innerText = "";
@@ -382,7 +383,7 @@ export function filter_valued_polygons() {
 	for (let i = 0; i < fs.length; i += 1) {
 		const x = result.includes(+fs[i].properties[b.vectors.key]);
 
-		fs[i].properties.__hidden = U.subdiv ? (fs[i].id !== +U.subgeo) : !x;
+		fs[i].properties.__hidden = (U.subdiv > -1) ? (fs[i].id !== U.subdiv) : !x;
 
 		if (x) {
 			ul.append(ce('li', fs[i].properties['District']));

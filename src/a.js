@@ -78,7 +78,6 @@ const Uproxy = {
 			break;
 		}
 
-		case "subgeoname":
 		case "pack": {
 			url.searchParams.set(t,v);
 			break;

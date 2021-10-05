@@ -488,12 +488,12 @@ function table_add_lnglat(d, lnglat = [0, 0]) {
 
 	d.append(ce('tr', [
 		ce('td', "longitude"),
-		ce('td', ce('code', lnglat[0].toFixed(2))),
+		ce('td', ce('code', lnglat[0].toFixed(5))),
 	]));
 
 	d.append(ce('tr', [
 		ce('td', "latitude"),
-		ce('td', ce('code', lnglat[1].toFixed(2))),
+		ce('td', ce('code', lnglat[1].toFixed(5))),
 	]));
 };
 

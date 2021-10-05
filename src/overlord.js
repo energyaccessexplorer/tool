@@ -141,17 +141,20 @@ export default class Overlord {
 		}
 	};
 
-	sort() {
-		const ds = U.inputs.map(i => {
+	async sort() {
+		const arr = U.inputs.map(i => {
 			const d = DST.get(i);
-			return d.mutant ? d.host.id : d.id;
+			return d.mutant ? d.host : d;
 		});
 
-		Promise.all(ds.map(d => until(_ => DST.get(d).layer)))
-			.then(_ => {
-				for (let i = 0; i < ds.length; i++)
-					MAPBOX.moveLayer(ds[i], ds[i-1] || MAPBOX.first_symbol);
-			});
+		await Promise.all(arr.map(d => until(_ => d.layer)));
+
+		for (let i = 0; i < arr.length; i++) {
+			MAPBOX.moveLayer(
+				arr[i].id,
+				(i === 0) ? MAPBOX.first_symbol : arr[i-1].id
+			);
+		}
 	};
 
 	info_mode() {
@@ -250,7 +253,7 @@ function load_view() {
 			MAPBOX.setLayoutProperty('output-layer', 'visibility', 'none');
 
 		cards.update(inputs);
-		delay(1).then(O.sort); // TODO: remove/revisit this hack
+		O.sort();
 
 		analysis_plot_active(output, false);
 
@@ -276,7 +279,7 @@ function load_view() {
 		MAPBOX.setLayoutProperty('output-layer', 'visibility', 'none');
 
 		cards.update(inputs);
-		delay(1).then(O.sort); // TODO: remove/revisit this hack
+		O.sort();
 
 		break;
 	}

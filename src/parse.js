@@ -1,9 +1,5 @@
 import * as plot from './plot.js';
 
-import {
-	dblclick as mapbox_dblclick,
-} from './mapbox.js';
-
 async function fetchcheck(endpoint, format) {
 	if (endpoint.match(/^(blob:)?http/)) ;
 	else endpoint = ea_settings.storage + endpoint;
@@ -408,10 +404,6 @@ export function polygons() {
 				}));
 
 				this.card.legends(criteria.map(x => JSON.parse(x)), "polygons");
-			}
-
-			if (this.datatype.match('polygons-(fixed|boundaries)')) {
-				mapbox_dblclick(this.id);
 			}
 		});
 };

@@ -61,8 +61,6 @@ class MapboxInfoControl {
 
 let _O;
 
-let _changing_target = false;
-
 export function init(overlord = {}) {
 	mapboxgl.accessToken = ea_settings.mapbox_token;
 
@@ -83,7 +81,8 @@ export function init(overlord = {}) {
 	mb.touchZoomRotate.disableRotation();
 
 	if (_O.map) {
-		mb.on('click', e => _O.map('click', null, e));
+		mb.on('click', e => _O.map('click', e));
+		mb.on('dblclick', e => _O.map('dblclick', e));
 
 		mb.addControl((new MapboxThemeControl()), 'top-right');
 		mb.addControl((new MapboxInfoControl()), 'top-right');
@@ -207,13 +206,4 @@ This is fatal. Thanks for all the fish.`
 	const [left, bottom, right, top] = bounds;
 
 	return [[left,top], [right,top], [right,bottom], [left,bottom]];
-};
-
-export function dblclick(id) {
-	MAPBOX.on('dblclick', id, e => {
-		if (_changing_target) return;
-
-		_changing_target = true;
-		_O.map('dblclick', id, e);
-	});
 };

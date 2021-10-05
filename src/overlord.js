@@ -108,8 +108,12 @@ export default class Overlord {
 		window.dispatchEvent(new Event('resize'));
 	};
 
-	map(interaction, id, event) {
-		const ds = DST.get(id);
+	map(interaction, event) {
+		const et = MAPBOX.queryRenderedFeatures(event.point).find(i => DST.get(i.source));
+		if (!et) return;
+
+		const ds = DST.get(et.source);
+		if (!ds) return;
 
 		switch (interaction) {
 		case "click": {
@@ -120,19 +124,12 @@ export default class Overlord {
 		case "dblclick": {
 			if (INFOMODE) break;
 
-			const qfs = MAPBOX.queryRenderedFeatures(event.point);
+			mapbox.fit(geojsonExtent(et));
 
-			const et = qfs.find(i => DST.get(i.source));
-			if (et) {
-				const ds = DST.get(et.source);
-				if (!ds) break;
+			U.subdiv = et.id;
+			U.divtier = coalesce(maybe(ds, 'config', 'divisions_tier'), 0);
+			O.view = U.view;
 
-				mapbox.fit(geojsonExtent(et), true);
-
-				U.subdiv = et.id;
-				U.divtier = coalesce(maybe(ds, 'config', 'divisions_tier'), 0);
-				O.view = U.view;
-			}
 			break;
 		}
 
@@ -227,8 +224,6 @@ function load_view() {
 					"fill-opacity": [ "case", [ "boolean", [ "get", "__hidden" ], false ], 0, 1 ]
 				},
 			}, MAPBOX.first_symbol);
-
-			mapbox.dblclick('filtered-layer');
 		}
 	})();
 

@@ -276,15 +276,9 @@ export async function analysis(type) {
 
 	if (!r.length) return;
 
-	const scale = d3.scaleLinear().domain([0,1]).range([0,254]);
-	const fn = function(x) {
-		if (x === -1) return 255;
-		return scale(x);
-	};
-
-	const arr = new Uint8Array(r.length).fill(255);
+	const arr = new Uint8Array(r.length).fill(-1);
 	for (let i = 0; i < r.length; i += 1)
-		arr[i] = fn(r[i]);
+		arr[i] = (r[i] === -1) ? 0 : Math.floor(r[i] * 100);
 
 	const metadata = {
 		ImageWidth: b.raster.width,
@@ -295,7 +289,7 @@ export async function analysis(type) {
 		ModelTiepoint: [ 0, 0, 0, env[0], env[3], 0 ],
 		XResolution: "1",
 		YResolution: "1",
-		GDAL_NODATA: "255",
+		GDAL_NODATA: "0",
 		ModelPixelScale: [(env[2] - env[0]) / b.raster.width, (env[3] - env[1]) / b.raster.height, 0]
 	};
 

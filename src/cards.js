@@ -343,7 +343,7 @@ export default class dscard extends HTMLElement {
 
 	close() {
 		const e = font_icon('x-lg');
-		e.onclick = _ => O.dataset(this.ds, 'active', false);
+		e.onclick = _ => O.ds(this.ds, { 'active': false });
 
 		return e;
 	};

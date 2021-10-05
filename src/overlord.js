@@ -2,6 +2,7 @@ import DS from './ds.js';
 
 import {
 	polygons_csv as parse_polygons_csv,
+	reset_features_visibility,
 } from './parse.js';
 
 import {
@@ -28,67 +29,53 @@ export default class Overlord {
 		Promise.all(U.inputs.map(id => DST.get(id).active(true, ['inputs', 'timeline'].includes(U.view))));
 	};
 
-	dataset(_ds, arg, data) {
-		let ds;
+	ds(d, data) {
+		if (!(d instanceof DS))
+			throw Error("O.ds: Expected a DS as input:", d);
 
-		switch (_ds.constructor.name) {
-		case "DS":
-			ds = _ds;
-			break;
-
-		case "String":
-			ds = DST.get(_ds);
-			break;
-
-		default:
-			console.error("O.dataset: Do not know what to do with", _ds);
-			throw Error("O.dataset: ArgumentError.");
-		}
-
-		if (!ds) throw Error("ds was never set...");
-
-		switch (arg) {
-		case "domain": {
-			ds._domain = Object.assign(ds._domain, data);
-			break;
-		}
-
-		case "weight": {
-			ds.weight = data;
-			break;
-		}
-
-		case "active": {
-			ds.active(data, ['inputs', 'timeline'].includes(U.view));
-
-			let arr = U.inputs;
-			if (ds.on) arr.unshift(ds.id);
-			else arr.splice(arr.indexOf(ds.id), 1);
-
-			O.inputs = arr;
-
-			if (ds.summary) {
-				for (const i in ds.summary) {
-					const d = DST.get(i);
-					if (maybe(d, 'vectors', 'features')) {
-						d.vectors.features.features.forEach(f => f.properties.__visible = true);
-						MAPBOX.getSource(d.id).setData(DST.get(d.id).vectors.features);
-					}
-				}
+		for (const [k, v] of Object.entries(data)) {
+			switch (k) {
+			case "domain": {
+				d._domain = Object.assign(d._domain, v);
+				break;
 			}
 
-			timeline_lines_update();
-			break;
-		}
+			case "weight": {
+				d.weight = v;
+				break;
+			}
 
-		case "mutate": {
-			this.layers();
-			break;
-		}
+			case "active": {
+				const draw = ['inputs', 'timeline'].includes(U.view);
+				d.active(v, draw);
 
-		case "disable":
-		default:
-			break;
+				let arr = U.inputs;
+				if (d.on) arr.unshift(d.id);
+				else arr.splice(arr.indexOf(d.id), 1);
+
+				O.inputs = arr;
+
+				if (d.summary) {
+					for (const i in d.summary)
+						reset_features_visibility.call(DST.get(i));
+				}
+
+				timeline_lines_update();
+				break;
+			}
+
+			case "mutate": {
+				this.layers();
+				break;
+			}
+
+			case "disable":
+				break;
+
+			default:
+				console.warn(`O.ds: Ignoring garbage argument '${k}' for`, d);
+				break;
+			}
 		}
 
 		load_view();

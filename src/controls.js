@@ -142,12 +142,12 @@ export default class dscontrols extends HTMLElement {
 	reset_defaults() {
 		if (this.weight_group) {
 			this.weight_group.change(0,2);
-			O.dataset(this.ds, 'weight', 2);
+			O.ds(this.ds, { 'weight': 2 });
 		}
 
 		if (this.range_group) {
 			this.range_group.change(this.ds.domain);
-			O.dataset(this.ds, 'domain', this.ds.domain);
+			O.ds(this.ds, { 'domain': this.ds.domain });
 		}
 	};
 
@@ -169,7 +169,7 @@ function humanformat(s) {
 };
 
 export function toggle_ds() {
-	O.dataset(this, 'active', (this.on = !this.on));
+	O.ds(this, { 'active': (this.on = !this.on) });
 };
 
 function toggle_switch(init, callback) {
@@ -269,7 +269,7 @@ async function mutant_options() {
 
 		await this.mutate(host);
 
-		O.dataset(this, 'mutate', host);
+		O.ds(this, { 'mutate': host });
 	};
 
 	container.append(select);
@@ -312,7 +312,7 @@ function range(opts = {}) {
 		steps: opts.steps,
 		callback1: x => update(x, 'min', v1),
 		callback2: x => update(x, 'max', v2),
-		end_callback: _ => O.dataset(this, 'domain', domain),
+		end_callback: _ => O.ds(this, { 'domain': domain }),
 	});
 
 	const el = ce('div', [s.svg, r], { style: "text-align: center;" });
@@ -344,7 +344,7 @@ function weight() {
 		domain: { min: 1, max: 5 },
 		steps: weights,
 		width: slider_width,
-		end_callback: x => O.dataset(this, 'weight', x)
+		end_callback: x => O.ds(this, { 'weight': x })
 	});
 
 	const el = ce('div', [w.svg, r], { style: "text-align: center;" });
@@ -430,7 +430,7 @@ function manual_setup() {
 
 		this.range_group.change(d);
 
-		O.dataset(this.ds, 'domain', d);
+		O.ds(this.ds, { 'domain': d });
 	};
 
 	this.manual_min.onchange = e => change(e, 'min');

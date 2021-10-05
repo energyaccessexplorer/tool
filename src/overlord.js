@@ -65,7 +65,7 @@ export default class Overlord {
 			if (ds.on) arr.unshift(ds.id);
 			else arr.splice(arr.indexOf(ds.id), 1);
 
-			O.datasets = arr;
+			O.inputs = arr;
 
 			if (ds.summary) {
 				for (const i in ds.summary) {
@@ -94,7 +94,7 @@ export default class Overlord {
 		load_view();
 	};
 
-	set datasets(arr) {
+	set inputs(arr) {
 		U.inputs = arr;
 		O.sort();
 	};

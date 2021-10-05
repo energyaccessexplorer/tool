@@ -221,12 +221,12 @@ export function init() {
 	})[0]
 		.addEventListener(
 			'sortupdate',
-			e => O.datasets = e.detail.destination.items.map(i => i.getAttribute('bind'))
+			e => O.inputs = e.detail.destination.items.map(i => i.getAttribute('bind'))
 		);
 
 	const ca = ce('div', 'Clear all datasets', { "id": 'cards-clear-all' });
 	ca.onclick = _ => {
-		O.datasets = [];
+		O.inputs = [];
 
 		DS.array
 			.filter(x => x.on)

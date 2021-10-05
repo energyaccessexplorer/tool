@@ -47,7 +47,7 @@ export function csv() {
 		.then(d => d.text())
 		.then(r => d3.csvParse(r))
 		.then(d => this.csv.data = d)
-		.then(_ => this.csv.table = this.config.csv_columns ? csv_table.call(this, this.config.csv_columns.value) : undefined)
+		.then(_ => this.csv.table = this.config.csv_columns ? csv_table.call(this) : undefined)
 		.then(_ => {
 			if (this.domain || !this.csv.table) return;
 
@@ -65,12 +65,11 @@ export function csv() {
 function csv_table(c) {
 	const table = {};
 	const data = this.csv.data;
-	const k = this.csv.key;
+	const v = this.config.csv_columns.value;
+	const k = c || this.csv.key;
 
-	for (let i = 0; i < data.length; i++) {
-		const d = data[i];
-		table[d[k]] = +d[c];
-	}
+	for (let r of data)
+		table[r[k]] = +r[v] || r[v];
 
 	return table;
 };

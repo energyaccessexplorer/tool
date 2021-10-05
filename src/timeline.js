@@ -278,7 +278,7 @@ export function lines_draw() {
 			return a;
 		}
 
-		return a.concat(c.csv.data.filter(r => r['OBJECTID'] === U.subdiv).map(r => {
+		return a.concat(c.csv.data.filter(r => r[c.csv.key] === U.subdiv).map(r => {
 			return {
 				values: GEOGRAPHY.timeline_dates.map(k => (r[k] === "" ? undefined : +r[k])),
 				id: c.id,
@@ -328,8 +328,9 @@ export function lines_draw() {
 
 	const rp = qs('#right-pane');
 	const rows = maybe(GEOGRAPHY.divisions, U.divtier, 'csv', 'data') || [];
+	const k = maybe(GEOGRAPHY.divisions, U.divtier, 'csv', 'key');
 
-	qs('#district-header', rp).innerText = rows.find(r => r['OBJECTID'] === U.subdiv);
+	qs('#district-header', rp).innerText = rows.find(r => r[k] === U.subdiv);
 	qs('#district-graph', rp).append(ml.svg);
 };
 

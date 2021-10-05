@@ -147,7 +147,7 @@ This is not fatal but the dataset is now disabled.`
 				this.csv = {};
 				Object.assign(this.csv, o.category.csv, f);
 
-				this.csv.key = 'OBJECTID';
+				this.csv.key = maybe(this.config, 'csv_columns', 'id');
 				this.csv.parse = _ => parse.csv.call(this);
 			}
 		}

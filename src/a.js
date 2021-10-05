@@ -19,6 +19,10 @@ import * as mapbox from './mapbox.js';
 import * as config from './config.js';
 
 import {
+	init as nanny_init,
+} from './nanny-steps.js';
+
+import {
 	init as timeline_init,
 } from './timeline.js';
 
@@ -417,7 +421,7 @@ function mobile() {
 	map.click();
 };
 
-function toggle_left_panel(t) {
+export function toggle_left_panel(t) {
 	for (let m of qsa('.nanny-marker')) m.remove();
 
 	for (let e of qsa('#left-pane > div'))
@@ -479,7 +483,7 @@ function drawer_init() {
 
 let analysis_count = 0;
 
-async function analysis_to_dataset(t) {
+export async function analysis_to_dataset(t) {
 	const category = await ea_api.get("categories", { "select": "*", "name": "eq.analysis" }, { one: true });
 
 	category.colorstops = ea_analysis_colorscale.stops;
@@ -579,36 +583,3 @@ function extent_contained(extent, raster) {
 	          f(right, bottom),
 	          f((right - left) / 2, (top - bottom) / 2));
 };
-
-function nanny_init() {
-	window.ea_nanny = new nanny(ea_nanny_steps);
-
-	if (![null, "inputs"].includes(U.view)) return;
-	if (U.inputs.length > 0) return;
-
-	const w = localStorage.getItem('needs-nanny');
-	if (!w || !w.match(/false/)) ea_nanny.start();
-};
-
-function nanny_force() {
-	U.inputs = [];
-	U.output = 'eai';
-	U.view = 'inputs';
-
-	DS.array.filter(d => d.on).forEach(d => d.active(false, false));
-
-	O.view = 'inputs';
-	ea_modal.hide();
-
-	O.view = U.view;
-
-	controls_select_tab(qs('#controls-tab-census'), "census");
-
-	ea_nanny.start();
-};
-
-// TODO: used in an onclick attribute
-window.ea_nanny_force_start = nanny_force;
-window.analysis_to_dataset = analysis_to_dataset;
-window.toggle_left_panel = toggle_left_panel;
-window.controls_select_tab = controls_select_tab;

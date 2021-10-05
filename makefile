@@ -48,7 +48,7 @@ build-a:
 	@sed -ri 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/a/index.html
 
 	@cp ${CSS}/ripple.css ${DIST}/a/ripple.css
-	@cp ${SRC}/{browser,analysis,cards,config,controls,search,controls-search,geographies-search,vectors-search,analysis-search,locations-search,ds,parse,indexes,mapbox,overlord,plot,report,summary,timeline,user,views,a}.js ${DIST}/a/
+	@cp ${SRC}/{browser,analysis,cards,config,controls,search,controls-search,geographies-search,vectors-search,analysis-search,locations-search,ds,parse,indexes,mapbox,overlord,plot,report,summary,timeline,user,views,nanny-steps,a}.js ${DIST}/a/
 
 	@cat \
 		${LIB}/d3.js \
@@ -69,7 +69,6 @@ build-a:
 	@echo -n "window.ea_settings = " | cat - \
 		settings.json \
 		${SRC}/utils.js \
-		${SRC}/nanny-steps.js \
 		${SRC}/globals.js \
 		> ${DIST}/a/main.js
 

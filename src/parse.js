@@ -465,4 +465,4 @@ export function reset_features_visibility() {
 
 	fs.features.forEach(f => f.properties.__visible = true);
 	MAPBOX.getSource(this.id).setData(fs);
-}
+};

@@ -9,6 +9,11 @@ import {
 	analysis,
 } from './analysis.js';
 
+
+import {
+	analysis_to_dataset,
+} from './a.js';
+
 const PIES = {
 	'population': ea_svg_pie([[0], [0], [0], [0], [0]], 70, 0, ea_analysis_colorscale.stops, null),
 	'area': ea_svg_pie([[0], [0], [0], [0], [0]], 70, 0, ea_analysis_colorscale.stops, null),

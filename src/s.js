@@ -232,7 +232,7 @@ export function init() {
 				if (intro) {
 					let p;
 					d.onmouseenter = _ => {
-						p = nanny.pick_element(d, {
+						p = bubblearrow(d, {
 							message: ce('pre', intro),
 							close: false,
 							position: "C",

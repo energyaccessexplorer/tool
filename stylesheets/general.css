@@ -105,7 +105,7 @@ dialog pre {
   background-color: #cecece
 }
 
-aside.nanny-marker {
+aside.bubblearrow-marker {
   background-color: rgba(0,0,0,1);
   border-radius: 3px;
   box-shadow: 0 20px 30px 0 rgba(0,0,0,0.2);
@@ -118,26 +118,26 @@ aside.nanny-marker {
   z-index: 9999;
 }
 
-aside.nanny-marker * {
+aside.bubblearrow-marker * {
   color: white;
 }
 
-aside.nanny-marker main {
+aside.bubblearrow-marker main {
   padding: 1em;
 }
 
-aside.nanny-marker header {
+aside.bubblearrow-marker header {
   font-weight: bold;
   font-size: 1.05em;
   margin-bottom: 0.7em;
 }
 
-aside.nanny-marker .nanny-close-button::before {
+aside.bubblearrow-marker .bubblearrow-close-button::before {
   font-size: 1.5em;
   padding: 2px 7px;
 }
 
-aside.nanny-marker .nanny-close-button::before {
+aside.bubblearrow-marker .bubblearrow-close-button::before {
   content: '×';
 }
 

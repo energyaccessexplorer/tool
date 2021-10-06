@@ -422,7 +422,7 @@ function mobile() {
 };
 
 export function toggle_left_panel(t) {
-	for (let m of qsa('.nanny-marker')) m.remove();
+	for (let m of qsa('.bubblearrow-marker')) m.remove();
 
 	for (let e of qsa('#left-pane > div'))
 		e.style.display = 'none';
@@ -466,7 +466,7 @@ function drawer_init() {
 		a.onmouseenter = function() {
 			if (p) p.remove();
 
-			p = nanny.pick_element(a, {
+			p = bubblearrow(a, {
 				position: "E",
 				message: this.getAttribute('description'),
 				close: false

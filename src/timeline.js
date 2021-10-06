@@ -178,7 +178,7 @@ function multiline(opts) {
 
 			if (n) n.remove();
 
-			n = nanny.pick_element(dot.node(), {
+			n = bubblearrow(dot.node(), {
 				title: s.name,
 				message: typeof message === 'function' ? message(s, i, s.values[i]) : s.name,
 				position: "W",

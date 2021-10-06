@@ -65,6 +65,7 @@
 
     "browsers": "readonly",
     "nanny": "readonly",
+    "bubblearrow": "readonly",
     "selectlist": "readonly",
     "dropdown": "readonly",
 

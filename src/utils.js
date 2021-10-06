@@ -119,7 +119,7 @@ function ea_svg_pie(data, outer, inner, colors, inner_text, parse) {
 		  .append("path")
 		  .attr("fill", (d,i) => colors[i])
 		  .attr("d", arc)
-		  .on("mouseenter", function(d) { n = nanny.pick_element(this, { message: parse(d.value) + "%", position: "W", close: false }); })
+		  .on("mouseenter", function(d) { n = bubblearrow(this, { message: parse(d.value) + "%", position: "W", close: false }); })
 		  .on("mouseleave", function(_) { if (n) n.remove(); })
 		  .each(function(d) { this._current = d; });
 
@@ -514,7 +514,7 @@ background-color: transparent;
 `
 	});
 
-	for (const e of qsa('.nanny-marker'))
+	for (const e of qsa('.bubblearrow-marker'))
 		e.remove();
 
 	document.body.append(p);
@@ -527,7 +527,7 @@ background-color: transparent;
 		pos = "C";
 	}
 
-	const mark = nanny.pick_element((MOBILE ? document.body : p), { position: pos, message: content, close: cls });
+	const mark = bubblearrow((MOBILE ? document.body : p), { position: pos, message: content, close: cls });
 
 	function drop() {
 		p.remove();

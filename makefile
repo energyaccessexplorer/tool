@@ -61,6 +61,7 @@ build-a:
 		${LIB}/modal.js \
 		${LIB}/html5sortable.js \
 		${LIB}/nanny.js \
+		${LIB}/bubblearrow.js \
 		${LIB}/selectlist.js \
 		${LIB}/dropdown.js \
 		${LIB}/pgrest.js \
@@ -105,7 +106,7 @@ build-s:
 		${LIB}/helpers.js \
 		${LIB}/flash.js \
 		${LIB}/modal.js \
-		${LIB}/nanny.js \
+		${LIB}/bubblearrow.js \
 		${LIB}/selectlist.js \
 		${LIB}/pgrest.js \
 		> ${DIST}/s/libs.js

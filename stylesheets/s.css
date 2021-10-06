@@ -51,11 +51,11 @@ body {
   color: dimgray;
 }
 
-.nanny-marker {
+.bubblearrow-marker {
   pointer-events: none;
 }
 
-.nanny-marker pre {
+.bubblearrow-marker pre {
   font-family: sans-serif;
   white-space: pre-wrap;
 }

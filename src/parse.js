@@ -68,8 +68,10 @@ function csv_table(c) {
 	const v = this.config.csv_columns.value;
 	const k = c || this.csv.key;
 
-	for (let r of data)
-		table[r[k]] = +r[v] || r[v];
+	for (let r of data) {
+		const n = +r[v];
+		table[r[k]] = isNaN(n) ? r[v] : n;
+	}
 
 	return table;
 };

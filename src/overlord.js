@@ -298,13 +298,10 @@ function mapclick(e) {
 			props: et.properties,
 		};
 
-		if (this.config.csv_columns) {
-			r.dict.push(["_" + this.config.csv_columns.id, this.name]);
-
-			if (this.category.name === 'boundaries')
-				r.props["_" + this.config.csv_columns.id] = this.csv.data[et.properties[this.vectors.key]][this.config.csv_columns.value];
-			else
-				r.props["_" + this.config.csv_columns.id] = this.csv.table[et.properties[this.vectors.key]] + " " + this.category.unit;
+		if (and(maybe(this, 'csv', 'key'),
+		        this.category.name !== 'boundaries')) {
+			r.dict.push(["_" + this.csv.key, this.name]);
+			r.props["_" + this.csv.key] = this.csv.table[et.properties[this.vectors.key]] + " " + this.category.unit;
 
 			r.dict.push(null);
 		}

@@ -323,8 +323,8 @@ export function context(rc, dict, props, skip = null) {
 
 			if (v === d.raster.nodata) return;
 
-			if (d.config.csv_columns) { // (!d.category.name.match(/^(timeline-)?indicator/))
-				p = "_analysis_" + p + "_" + d.config.csv_columns.id;
+			if (maybe(d, 'csv', 'key')) { // (!d.category.name.match(/^(timeline-)?indicator/))
+				p = "_analysis_" + p + "_" + d.csv.key;
 				v = d.csv.table[v];
 			}
 

@@ -130,7 +130,7 @@ export async function init() {
 	GEOGRAPHY
 		.divisions
 		.map(d => {
-			const v = maybe(d, 'config', 'csv_columns', 'value');
+			const v = maybe(d, 'csv', 'value');
 			if (!v) return [];
 
 			return d.csv.data.map(x => x[v]);

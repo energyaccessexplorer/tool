@@ -148,6 +148,7 @@ This is not fatal but the dataset is now disabled.`
 				Object.assign(this.csv, o.category.csv, f);
 
 				this.csv.key = maybe(this.config, 'csv_columns', 'id');
+				this.csv.value = maybe(this.config, 'csv_columns', 'value');
 				this.csv.parse = _ => parse.csv.call(this);
 			}
 		}
@@ -417,7 +418,7 @@ This is not fatal but the dataset is now disabled.`
 
 		switch (this.datatype) {
 		case 'polygons-fixed': {
-			if (this.config.csv_columns) {
+			if (this.csv.key) {
 				opts = {
 					stops: this.category.colorstops,
 				};

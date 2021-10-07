@@ -47,7 +47,7 @@ export function csv() {
 		.then(d => d.text())
 		.then(r => d3.csvParse(r))
 		.then(d => this.csv.data = d)
-		.then(_ => this.csv.table = this.config.csv_columns ? csv_table.call(this) : undefined)
+		.then(_ => this.csv.table = this.csv.key ? csv_table.call(this) : undefined)
 		.then(_ => {
 			if (this.domain || !this.csv.table) return;
 
@@ -65,7 +65,7 @@ export function csv() {
 function csv_table(c) {
 	const table = {};
 	const data = this.csv.data;
-	const v = this.config.csv_columns.value;
+	const v = this.csv.value;
 	const k = c || this.csv.key;
 
 	for (let r of data) {
@@ -412,7 +412,7 @@ export function polygons() {
 export async function polygons_csv() {
 	await until(_ => this.csv.data && this.vectors.features);
 
-	const col = coalesce(U.timeline, this.config.csv_columns.value);
+	const col = coalesce(U.timeline, this.csv.value);
 
 	if (this.timeline) {
 		if (!this.domain) {

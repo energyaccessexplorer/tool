@@ -113,14 +113,20 @@ function svg_el() {
 	let d = ce('div');
 	let e = maybe(ds.colorscale, 'svg') || ce('div');
 
-	function ramp_values({min, max}) {
+	function ramp_domain() {
+		let {min,max} = this.ds.domain;
+
 		const diff = Math.abs(max - min);
 		let i = 3 - Math.ceil(Math.log10(diff || 1));
 		if (i < 0) i = 0;
 
+		if (and(this.ds.category.unit === "%",
+		        or(and(min === 0, max === 100),
+		           and(min === 100, max === 0)))) i = 0;
+
 		return [
-			ce('div', min.toFixed(i) + ""),
-			ce('div', max.toFixed(i) + "")
+			ce('div', min.toFixed(i)),
+			ce('div', max.toFixed(i))
 		];
 	}
 
@@ -163,7 +169,7 @@ function svg_el() {
 		const r = tmpl('#ramp');
 
 		if (ds.domain) {
-			qs('.ramp', r).append(...ramp_values(ds.domain));
+			qs('.ramp', r).append(...ramp_domain.call(this));
 		}
 
 		d.append(
@@ -180,7 +186,7 @@ function svg_el() {
 		let r = tmpl('#ramp');
 
 		if (ds.domain) {
-			qs('.ramp', r).append(...ramp_values(ds.domain));
+			qs('.ramp', r).append(...ramp_domain.call(this));
 			d.append(r);
 		}
 

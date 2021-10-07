@@ -305,7 +305,10 @@ export function context(rc, dict, props, skip = null) {
 	const controls = controls_list();
 
 	DS.array
-		.filter(d => d.on && d.category.name !== 'boundaries' && d.id !== skip)
+		.filter(d => and(d.on,
+		                 d.category.name !== 'outline',
+		                 d.category.name !== 'boundaries',
+		                 d.id !== skip))
 		.sort((a,b) => {
 			const bi = controls.indexOf(b.id);
 			const ai = controls.indexOf(a.id);

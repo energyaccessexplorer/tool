@@ -346,12 +346,12 @@ function ea_svg_checkbox(init, callback) { // this is not used anywhere
 	};
 };
 
-function ea_opacity_control({ fn }) {
+function ea_opacity_control({ fn, init }) {
 	const o = tmpl('#opacity-control');
-	let opacity_value = 1;
+	let opacity_value = init ?? 1;
 
 	const grad = ea_svg_interval({
-		init: { min: 0, max: 1 },
+		init: { min: 0, max: init ?? 1 },
 		domain: { min: 0, max: 1 },
 		sliders: 'single',
 		callback2: x => opacity_value = x,

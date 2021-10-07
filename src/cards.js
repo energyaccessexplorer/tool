@@ -360,6 +360,7 @@ export default class dscard extends HTMLElement {
 				this.opacity_value = x;
 				this.ds.opacity(x);
 			},
+			init: maybe(this.ds, 'vectors', 'opacity'),
 		});
 	};
 };

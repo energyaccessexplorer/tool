@@ -110,10 +110,7 @@ export default class Overlord {
 
 	map(interaction, event) {
 		const et = MAPBOX.queryRenderedFeatures(event.point).find(i => DST.get(i.source));
-		if (!et) return;
-
-		const ds = DST.get(et.source);
-		if (!ds) return;
+		const ds = DST.get(maybe(et, 'source'));
 
 		switch (interaction) {
 		case "click": {
@@ -312,12 +309,28 @@ function mapclick(e) {
 			r.dict.push(null);
 		}
 
-		divisions_rows_tier.call(this, r, et);
-
 		if (this.config.attributes_map)
 			this.config.attributes_map.forEach(e => r.dict.push([e.dataset, e.target]));
 
 		return r;
+	};
+
+	function tier_rows(v, dict, props) {
+		if (GEOGRAPHY.divisions.length < 2) return;
+
+		dict.push(null);
+
+		GEOGRAPHY
+			.divisions
+			.map((d,i) => {
+				if (i === 0) return;
+
+				const t = d.csv.table[d.raster.data[v]];
+				if (!t) return;
+
+				dict.push(["_" + d.name, d.name]);
+				props["_" + d.name] = t;
+			});
 	};
 
 	function click(fn) {
@@ -329,6 +342,8 @@ function mapclick(e) {
 
 		const s = maybe(et, 'source');
 		analysis_context(rc, dict, props, (!s || (s === inp)) ? t.id : null);
+
+		tier_rows(rc.index, dict, props);
 
 		const td = table_data(dict, props);
 
@@ -457,18 +472,4 @@ function mapclick(e) {
 		if (t.vectors) click(vectors_timeline);
 		else if (t.raster.data) click(raster);
 	}
-};
-
-function divisions_rows_tier(r, et) {
-	GEOGRAPHY.divisions
-		.filter((b,i) => (i !== 0) && i === maybe(this.config, 'divisions_tier'))
-		.forEach(ds => {
-			if (!maybe(ds, 'csv', 'data')) return;
-
-			const t = ds.csv.data.find(e => +e[ds.config.csv_columns.id] === +et.properties[this.vectors.key]);
-			if (!t) return;
-
-			r.dict.push(["_" + ds.name, ds.name]);
-			r.props["_" + ds.name] = t[ds.config.csv_columns.value];
-		});
 };

@@ -455,7 +455,7 @@ function table_keyvalue(obj, kfn, vfn) {
 
 		table.append(ce('tr', [
 			ce('td', (kfn ? kfn(i) : i) + ": &nbsp;"),
-			ce('td', ce('code', (vfn ? vfn(v) : v + "")), { style: "text-align: right;" }),
+			ce('td', ce('code', (vfn ? vfn(v) : v)), { style: "text-align: right;" }),
 		]));
 	}
 

@@ -109,7 +109,7 @@ function trigger(value) {
 		for (let [k,v] of Object.entries(f.properties)) {
 			if (!searchable_attrs.includes(k)) continue;
 
-			if (v && v.match(new RegExp(value, 'i'))) {
+			if (v && (v + "").match(new RegExp(value, 'i'))) {
 				matches = true;
 				continue;
 			}

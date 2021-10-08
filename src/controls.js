@@ -330,9 +330,9 @@ function weight() {
 
 	const r = tmpl('#ramp');
 	qs('.ramp', r).append(
-		ce('div', weights[0] + ""),
+		ce('div', weights[0]),
 		ce('div', "importance", { class: "unit-ramp" }),
-		ce('div', weights[weights.length - 1] + "")
+		ce('div', weights[weights.length - 1])
 	);
 
 	r.style['width'] = `${slider_width + 2}px`;

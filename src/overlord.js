@@ -292,27 +292,10 @@ function mapclick(e) {
 
 	let t;
 
-	function feature_info(et) {
-		let r = {
-			dict: [],
-			props: et.properties,
-		};
+	let dict = [];
+	let props = {};
 
-		if (and(maybe(this, 'csv', 'key'),
-		        this.category.name !== 'boundaries')) {
-			r.dict.push(["_" + this.csv.key, this.name]);
-			r.props["_" + this.csv.key] = this.csv.table[et.properties[this.vectors.key]] + " " + this.category.unit;
-
-			r.dict.push(null);
-		}
-
-		if (this.config.attributes_map)
-			this.config.attributes_map.forEach(e => r.dict.push([e.dataset, e.target]));
-
-		return r;
-	};
-
-	function tier_rows(v, dict, props) {
+	function tier_rows(v) {
 		if (GEOGRAPHY.divisions.length < 2) return;
 
 		dict.push(null);
@@ -333,14 +316,16 @@ function mapclick(e) {
 	function click(fn) {
 		if (!INFOMODE) return;
 
+		const et = MAPBOX.queryRenderedFeatures(e.point)[0];
+
 		const rc = coordinates_to_raster_pixel([e.lngLat.lng, e.lngLat.lat], t.raster);
 
-		const {dict, props, et} = fn(rc);
+		fn(rc, et);
 
 		const s = maybe(et, 'source');
 		analysis_context(rc, dict, props, (!s || (s === inp)) ? t.id : null);
 
-		tier_rows(rc.index, dict, props);
+		tier_rows(rc.index);
 
 		const td = table_data(dict, props);
 
@@ -353,76 +338,40 @@ function mapclick(e) {
 		);
 	};
 
-	function vectors() {
-		const et = MAPBOX.queryRenderedFeatures(e.point)[0];
-
-		let dict = [
-			["value", t.name],
-		];
-
-		let props = {};
-
-		if (!et || et.source !== inp) {
-			props['value'] = "none under these coordinates";
-		}
-
-		else if (et.source === inp) {
-			const fi = feature_info.call(t, et);
-			dict = fi.dict;
-			props = fi.props;
-		}
-
-		return {dict, props, et};
-	};
-
-	function vectors_timeline() {
-		// TODO: refactor this to use vectors()
-		//
-		const et = MAPBOX.queryRenderedFeatures(e.point)[0];
-
-		let dict = [
-			["value", t.name],
-		];
-
-		let props = {};
+	function vectors(_, et) {
+		if (et) Object.assign(props, et.properties);
 
 		timeline_lines_draw();
 
 		if (maybe(et, 'source') === inp) {
-			const fi = feature_info.call(t, et);
-			dict = fi.dict;
-			props = fi.props;
+			if (and(maybe(t, 'csv', 'key'), t.category.name !== 'boundaries')) {
+				dict.push(["_" + t.csv.key, t.name]);
+				props["_" + t.csv.key] = t.csv.table[et.properties[t.vectors.key]] + " " + t.category.unit;
+			}
 
-			dict.push(null);
+			if (t.config.attributes_map.length)
+				t.config.attributes_map.forEach(e => dict.push([e.dataset, e.target]));
+		} else {
+			dict.push(["value", t.name]);
+			props['value'] = "none under these coordinates";
 		}
 
-		return {dict, props, et};
+		dict.push(null);
 	};
 
-	function raster(rc) {
-		let dict = [];
-		let props = {};
-
+	function raster(rc, _) {
 		if (typeof maybe(rc, 'value') === 'number' &&
         rc.value !== t.raster.nodata) {
 			const v = rc.value;
 
 			const vv = (v%1 === 0) ? v : v.toFixed(2);
 
-			dict = dict.concat([
-				["value", t.name],
-			]);
-
+			dict.push(["value", t.name]);
 			props["value"] = `${vv} <code>${t.category.unit || ''}</code>`;
 		}
-
-		return {dict, props};
 	};
 
-	function analysis(rc) {
-		let dict = [];
-		let props = {};
-
+	function analysis(rc, _) {
 		if (typeof maybe(rc, 'value') === 'number') {
 			dict = dict.concat([
 				["aname", t.name],
@@ -433,8 +382,6 @@ function mapclick(e) {
 				"aname": ea_lowmedhigh_scale(rc.value),
 			};
 		}
-
-		return {dict, props};
 	};
 
 	if (view === "outputs") {
@@ -452,21 +399,13 @@ function mapclick(e) {
 		click(analysis);
 	}
 
-	else if (view === "inputs") {
-		t  = DST.get(inp);
+	else if (or(view === "timeline",
+	            view === "inputs")) {
+		t = DST.get(inp);
 
 		if (!t) return;
 
 		if (t.vectors) click(vectors);
-		else if (t.raster.data) click(raster);
-	}
-
-	else if (view === "timeline") {
-		t  = DST.get(inp);
-
-		if (!t) return;
-
-		if (t.vectors) click(vectors_timeline);
 		else if (t.raster.data) click(raster);
 	}
 };

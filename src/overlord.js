@@ -349,7 +349,7 @@ function mapclick(e) {
 				props["_" + t.csv.key] = t.csv.table[et.properties[t.vectors.key]] + " " + t.category.unit;
 			}
 
-			if (t.config.attributes_map.length)
+			if (maybe(t.config, 'attributes_map', 'length'))
 				t.config.attributes_map.forEach(e => dict.push([e.dataset, e.target]));
 		} else {
 			dict.push(["value", t.name]);

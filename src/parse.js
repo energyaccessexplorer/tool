@@ -65,8 +65,8 @@ export function csv() {
 function csv_table(c) {
 	const table = {};
 	const data = this.csv.data;
-	const v = this.csv.value;
-	const k = c || this.csv.key;
+	const v = c ?? this.csv.value;
+	const k = this.csv.key;
 
 	for (let r of data) {
 		const n = +r[v];

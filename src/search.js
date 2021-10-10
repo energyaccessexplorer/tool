@@ -1,8 +1,4 @@
 import {
-	context as analysis_context,
-} from './analysis.js';
-
-import {
 	fit as mapbox_fit,
 } from './mapbox.js';
 
@@ -15,7 +11,7 @@ export function pointto(coords, dict, props, a = false) {
 
 	const rc = coordinates_to_raster_pixel(coords, OUTLINE.raster);
 
-	if (a) analysis_context(rc, dict, props, null);
+	if (a) O.context(rc, dict, props, null);
 
 	const td = table_data(dict, props);
 

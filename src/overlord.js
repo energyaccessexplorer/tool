@@ -13,7 +13,6 @@ import {
 
 import {
 	plot_active as analysis_plot_active,
-	context as analysis_context,
 } from './analysis.js';
 
 import * as mapbox from './mapbox.js';
@@ -23,6 +22,10 @@ import * as indexes from './indexes.js';
 import * as cards from './cards.js';
 
 import * as views from './views.js';
+
+import {
+	list as controls_list,
+} from './controls.js';
 
 export default class Overlord {
 	layers() {
@@ -106,6 +109,10 @@ export default class Overlord {
 		load_view();
 
 		window.dispatchEvent(new Event('resize'));
+	};
+
+	context() {
+		return context(arguments);
 	};
 
 	map(interaction, event) {
@@ -323,7 +330,7 @@ function mapclick(e) {
 		fn(rc, et);
 
 		const s = maybe(et, 'source');
-		analysis_context(rc, dict, props, (!s || (s === inp)) ? t.id : null);
+		context(rc, dict, props, (!s || (s === inp)) ? t.id : null);
 
 		tier_rows(rc.index);
 
@@ -412,4 +419,43 @@ function mapclick(e) {
 		if (t.vectors) click(vectors);
 		else if (t.raster.data) click(raster);
 	}
+};
+
+function context(rc, dict, props, skip = null) {
+	if (!rc) return [];
+
+	const controls = controls_list();
+
+	DS.array
+		.filter(d => and(d.on,
+		                 d.category.name !== 'outline',
+		                 d.category.name !== 'boundaries',
+		                 d.id !== skip))
+		.sort((a,b) => {
+			const bi = controls.indexOf(b.id);
+			const ai = controls.indexOf(a.id);
+
+			if (ai > bi) return 1;
+			else if (ai < bi) return -1;
+			else return 0;
+		})
+		.forEach(d => {
+			let v = d.raster.data[rc.index];
+			let p = d.id;
+
+			if ((v + "").match('[0-9]\\.[0-9]{3}'))
+				v = v.toFixed(2);
+
+			if (v === d.raster.nodata) return;
+
+			if (maybe(d, 'csv', 'key')) { // (!d.category.name.match(/^(timeline-)?indicator/))
+				p = "_analysis_" + p + "_" + d.csv.key;
+				v = d.csv.table[v];
+			}
+
+			if (v ?? false) {
+				dict.push([p, d.name]);
+				props[p] = v + " " + (d.category.unit || "km (proximity to)");
+			}
+		});
 };

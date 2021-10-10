@@ -3,10 +3,6 @@ import DS from './ds.js';
 import * as plot from './plot.js';
 
 import {
-	list as controls_list,
-} from './controls.js';
-
-import {
 	graphs as indexes_graphs,
 	updated_plot as indexes_updated_plot,
 } from './indexes.js';
@@ -297,43 +293,4 @@ export async function analysis(type) {
 		tiff: await GeoTIFF.writeArrayBuffer(arr, metadata),
 		analysis: a,
 	};
-};
-
-export function context(rc, dict, props, skip = null) {
-	if (!rc) return [];
-
-	const controls = controls_list();
-
-	DS.array
-		.filter(d => and(d.on,
-		                 d.category.name !== 'outline',
-		                 d.category.name !== 'boundaries',
-		                 d.id !== skip))
-		.sort((a,b) => {
-			const bi = controls.indexOf(b.id);
-			const ai = controls.indexOf(a.id);
-
-			if (ai > bi) return 1;
-			else if (ai < bi) return -1;
-			else return 0;
-		})
-		.forEach(d => {
-			let v = d.raster.data[rc.index];
-			let p = d.id;
-
-			if ((v + "").match('[0-9]\\.[0-9]{3}'))
-				v = v.toFixed(2);
-
-			if (v === d.raster.nodata) return;
-
-			if (maybe(d, 'csv', 'key')) { // (!d.category.name.match(/^(timeline-)?indicator/))
-				p = "_analysis_" + p + "_" + d.csv.key;
-				v = d.csv.table[v];
-			}
-
-			if (v ?? false) {
-				dict.push([p, d.name]);
-				props[p] = v + " " + (d.category.unit || "km (proximity to)");
-			}
-		});
 };

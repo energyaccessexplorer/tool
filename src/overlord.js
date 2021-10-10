@@ -345,8 +345,12 @@ function mapclick(e) {
 
 		if (maybe(et, 'source') === inp) {
 			if (and(maybe(t, 'csv', 'key'), t.category.name !== 'boundaries')) {
-				dict.push(["_" + t.csv.key, t.name]);
-				props["_" + t.csv.key] = t.csv.table[et.properties[t.vectors.key]] + " " + t.category.unit;
+				const v = t.csv.table[et.properties[t.vectors.key]];
+
+				if (v ?? false) {
+					dict.push(["_" + t.csv.key, t.name]);
+					props["_" + t.csv.key] = v + " " + (t.category.unit || "km (proximity to)");
+				} else return;
 			}
 
 			if (maybe(t.config, 'attributes_map', 'length'))

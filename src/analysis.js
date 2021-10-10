@@ -331,7 +331,9 @@ export function context(rc, dict, props, skip = null) {
 				v = d.csv.table[v];
 			}
 
-			dict.push([p, d.name]);
-			props[p] = v + " " + (d.category.unit || "km (proximity to)");
+			if (v ?? false) {
+				dict.push([p, d.name]);
+				props[p] = v + " " + (d.category.unit || "km (proximity to)");
+			}
 		});
 };

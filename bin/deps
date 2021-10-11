@@ -1,0 +1,51 @@
+#!/bin/sh
+
+# This script reads ./dependencies.tsv and fetches the entries in the
+# second column into the first column. A poor man's package manager if
+# you will...
+
+function printline {
+	echo -en "\e[1A"
+	echo -e "\e[0K\r$1"
+}
+
+if [ ! -f dependencies.tsv ]; then
+	>&2 echo "No 'dependencies.tsv' file"
+	exit 1
+fi
+
+if [ -z $DEST ]; then
+	>&2 echo "DEST is not defined."
+	exit 1
+fi
+
+if [ ! -d $DEST ]; then
+	printf "%s\n\n" "Creating $DEST..."
+	mkdir -p $DEST
+fi
+
+while read -r line
+do
+	IFS=' ' read target origin <<EOF
+`echo $line`
+EOF
+	printline "Fetching $origin"
+
+	if [ -z "$origin" ]; then
+		>&2 echo "Could not parse line: '$line'. Skip."
+		exit 1
+	fi
+
+	if [ -f "$DEST/$target" ]; then
+		printline "$target exists. Skip."
+		continue
+	fi
+
+	if curl -L "$origin" --silent --fail --output "$DEST/$target"; then
+		printline "$target"
+	else
+		printf "%s\n\n" "FAILED to fetch $target!"
+	fi
+done <dependencies.tsv
+
+printline "deps finished"

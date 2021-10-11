@@ -2,6 +2,7 @@
 
 DIST = ./dist
 SRC = ./src
+BIN = ./bin
 VIEWS = ./views
 CSS = ./stylesheets
 LIB = ${DIST}/lib
@@ -16,13 +17,13 @@ default: reconfig build reload
 build: lint build-a build-s build-d
 
 lint:
-	@lintit src EA
+	@${BIN}/lint ${SRC}
 
 reload:
 	-@chrome-remote-reload
 
 deps:
-	DEST=${DIST}/lib deps
+	DEST=${DIST}/lib ${BIN}/deps
 
 start:
 	httpserver -port ${TOOL_PORT} -dir ${DIST}

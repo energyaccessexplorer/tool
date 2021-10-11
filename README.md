@@ -12,6 +12,7 @@ As usual, the directories contain
 - `src`: JavaScript code
 - `stylesheets`: CSS code
 - `views`: HTML documents
+- `bin`: scripts and executables
 
 ## Dependencies
 Libraries have been chosen very strictly. The big ones are:

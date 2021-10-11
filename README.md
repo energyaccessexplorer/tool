@@ -19,8 +19,6 @@ As usual, the directories contain
 - [geotiff](https://github.com/geotiffjs/geotiff.js) for raster parsing
 - [D3js](https://d3js.org) to generate interactive controls such as sliders,
   icons, pie-charts, checkboxes and radio buttons to fit the design needs.
-- [topojson](https://github.com/topojson/topojson) extension is also used for
-  the country selection screen
 
 A few plugins are used only for convinience. See `dependencies.tsv`.
 

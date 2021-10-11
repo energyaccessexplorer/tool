@@ -102,7 +102,6 @@ build-s:
 
 	@cat \
 		${LIB}/d3.js \
-		${LIB}/topojson.js \
 		${LIB}/helpers.js \
 		${LIB}/flash.js \
 		${LIB}/modal.js \

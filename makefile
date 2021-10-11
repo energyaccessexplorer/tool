@@ -20,16 +20,13 @@ lint:
 	@${BIN}/lint ${SRC}
 
 reload:
-	-@chrome-remote-reload
+	-${BROWSER_RELOAD}
 
 deps:
 	DEST=${DIST}/lib ${BIN}/deps
 
 start:
-	${HTTPSERVER} --port ${TOOL_PORT} --dir ${DIST}
-
-stop:
-	@stop-port ${TOOL_PORT}
+	${HTTP_SERVER} --port ${TOOL_PORT} --dir ${DIST}
 
 build-a:
 	@echo "Building analysis screen"
@@ -170,6 +167,8 @@ synced:
 		${DIST}/ ${WEBSITE_SSH_USER}@${WEBSITE_HOST}:${TOOL_DEST}
 
 deploy:
+	touch ${env}.diff
+
 	patch -p1 <${env}.diff
 	bmake reconfig build sync env=${env}
 

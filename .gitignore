@@ -5,3 +5,5 @@
 /postgrest.conf
 /extras.mk
 /*.diff
+*.orig
+*.rej

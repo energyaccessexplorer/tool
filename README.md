@@ -5,9 +5,8 @@ version found [here](https://energyaccessexplorer.org/).
 
 ## Development
 
-Is written in plain/modern Javascript (ES6). No framework was chosen. Instead
-traditional C-style programming pattern is enforced. Libraries have been chosen
-very strictly.
+Is written in plain/modern Javascript (ECMAScript 2020) for now. No framework,
+instead traditional C-style programming pattern is enforced.
 
 As usual, the directories contain
 - `src`: JavaScript code
@@ -15,39 +14,36 @@ As usual, the directories contain
 - `views`: HTML documents
 
 ## Dependencies
+Libraries have been chosen very strictly. The big ones are:
 - [Mapbox GL JS](https://github.com/mapbox/mapbox-gl-js)
 - [geotiff](https://github.com/geotiffjs/geotiff.js) for raster parsing
 - [D3js](https://d3js.org) to generate interactive controls such as sliders,
-  icons, pie-charts, checkboxes and radio buttons to fit the design needs.
+  pie-charts, etc.
+- [jspdf](https://parall.ax/products/jspdf) reports export
 
-A few plugins are used only for convinience. See `dependencies.tsv`.
+Other minor plugins/functions are used. See `dependencies.tsv`.
 
 ## Building & hacking
 
 Assumptions made:
 
-- development is in a Unix-like environment (cat, sed, echo, make...)
-- [PostgREST](https://postgrest.org) is installed.
-- an PostgreSQL instance is running and also the
-  [database](https://github.com/energyaccessexplorer/database)
-- a web server
-- (optionally) rsync
-- (optionally) the website is running. See the
+- standard Unix-like environment (cat, sed, echo, rsync, bmake...)
+- an Energy Access Explorer API is running. See
+  [database](https://github.com/energyaccessexplorer/database) and
+  [PostgREST](https://postgrest.org)
+- (optionally) the website is running. See
   [website](https://github.com/energyaccessexplorer/website)
 
 The `makefile` (BSDmake) contains basic tasks for development/deployment. To get
 started, you will need to set up a `.env` file with the necessary variables for
 `make` to work.
 
-set the PostgREST endpoint (something like `http://localhost:{PGREST_PORT}` or
-`https://some-api.example.org/`) and add your _mapbox token_.
+Now you can run in development mode with (maybe `bmake` if you are in Linux):
 
-Now you can run in development mode with:
-
-    $ make build start watch
+    $ make build start
 
 ## License
 
-This project is licensed under MIT. Additionally, please read the
+This project is licensed under MIT. Additionally, you must read the
 [attribution page](https://www.energyaccessexplorer.org/attribution)
 before using any part of this project.

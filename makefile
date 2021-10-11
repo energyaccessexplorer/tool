@@ -26,7 +26,7 @@ deps:
 	DEST=${DIST}/lib ${BIN}/deps
 
 start:
-	httpserver -port ${TOOL_PORT} -dir ${DIST}
+	${HTTPSERVER} --port ${TOOL_PORT} --dir ${DIST}
 
 stop:
 	@stop-port ${TOOL_PORT}

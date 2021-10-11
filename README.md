@@ -35,14 +35,9 @@ Assumptions made:
 - (optionally) the website is running. See the
   [website](https://github.com/energyaccessexplorer/website)
 
-The `makefile` contains basic tasks for development/deployment. To get
-started, you will need to
-
-    $ cp default.mk-sample default.mk
-
-and configure `default.mk` to your needs. Then
-
-    $ cp settings.json-sample settings.json
+The `makefile` (BSDmake) contains basic tasks for development/deployment. To get
+started, you will need to set up a `.env` file with the necessary variables for
+`make` to work.
 
 set the PostgREST endpoint (something like `http://localhost:{PGREST_PORT}` or
 `https://some-api.example.org/`) and add your _mapbox token_.

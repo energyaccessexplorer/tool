@@ -1,13 +1,4 @@
-# Copy and customise these in a default.mk
-#
-# TOOL_PORT = 4231
-# TOOL_DEST = /srv/http/energyaccessexplorer
-#
-# API_URL = http://api-example.localhost
-#
-# MAPBOX_DEFAULT_THEME=mapbox/basic-v9
-#
-.include <env.mk>
+.include ".env"
 
 DIST = ./dist
 SRC = ./src

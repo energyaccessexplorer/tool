@@ -34,6 +34,10 @@ import {
 	select_tab as controls_select_tab,
 } from './controls-search.js';
 
+import {
+	intersect,
+} from './rasters.js';
+
 import DS from './ds.js';
 
 import Overlord from './overlord.js';
@@ -543,7 +547,7 @@ function analysis_dataset_intersect(raster) {
 	if (this.datatype === 'polygons')
 		fn = p => extent_contained(p.properties['__extent'], raster);
 	else if (this.datatype === 'lines')
-		fn = p => rasters_intersect(p.properties['__rasterindexes'], raster);
+		fn = p => intersect(p.properties['__rasterindexes'], raster);
 	else if (this.datatype === 'points')
 		fn = p => (data[p.properties['__rasterindex']] !== nodata);
 	else
@@ -560,13 +564,6 @@ function analysis_dataset_intersect(raster) {
 	MAPBOX.getSource(this.id).setData(DST.get(this.id).vectors.features);
 
 	return count;
-};
-
-function rasters_intersect(indexes, raster) {
-	for (const i of indexes)
-		if (raster.data[i] !== raster.nodata) return true;
-
-	return false;
 };
 
 function extent_contained(extent, raster) {

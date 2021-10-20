@@ -37,7 +37,7 @@ build-a:
 	@sed -ri 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/a/index.html
 
 	@cp ${CSS}/ripple.css ${DIST}/a/ripple.css
-	@cp ${SRC}/{browser,analysis,cards,config,controls,search,controls-search,geographies-search,vectors-search,analysis-search,locations-search,ds,parse,indexes,mapbox,overlord,plot,report,summary,timeline,user,views,nanny-steps,a}.js ${DIST}/a/
+	@cp ${SRC}/{browser,analysis,cards,config,controls,search,controls-search,geographies-search,vectors-search,analysis-search,locations-search,ds,parse,indexes,mapbox,overlord,plot,rasters,report,summary,timeline,user,views,nanny-steps,a}.js ${DIST}/a/
 
 	@cat \
 		${LIB}/d3.js \

@@ -248,6 +248,8 @@ export function init() {
 					.then(r => {
 						const data = r[0];
 
+						if (!data) return;
+
 						d.append(ugly_flag(
 							URL.createObjectURL((new Blob([hextostring(data['flag'])], {type: 'image/svg+xml'})))
 						));

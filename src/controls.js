@@ -490,6 +490,10 @@ function range_group_controls() {
 		break;
 	}
 
+	case 'polygons-boundaries': {
+		return;
+	}
+
 	case 'raster':
 	case 'raster-mutant': {
 		this.range_group = range.call(this.ds, {

@@ -49,7 +49,11 @@ export function csv() {
 		.then(d => this.csv.data = d)
 		.then(_ => this.csv.table = this.csv.key ? csv_table.call(this) : undefined)
 		.then(_ => {
-			if (this.domain || !this.csv.table) return;
+			if (or(this.domain,
+			       !this.csv.table,
+			       this.datatype === 'polygons-boundaries'))
+				return;
+
 
 			const arr = [];
 			for (let i in this.csv.table) arr[i] = this.csv.table[i];

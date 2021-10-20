@@ -191,17 +191,17 @@ export function datasets(type) {
 	return DS.array
 		.filter(d => and(d.on, d.raster, d.analysis))
 		.filter(d => {
-			// Discard datasets which have no analysis_fn (eg. outline).
-			//
-			if (typeof d.analysis_fn(type) !== 'function')
-				d._afn = _ => x => (x < d._domain.min || x > d._domain.max) ? -1 : 1;
-			else
-				d._afn = d.analysis_fn;
+			if (d.datatype === 'polygons-boundaries') return false;
 
 			if (!and(d.domain, d._domain)) {
 				console.log(`Discarding '${d.id}'. Domain is not set yet...`);
 				return false;
 			}
+
+			if (typeof d.analysis_fn(type) !== 'function')
+				d._afn = _ => x => (x < d._domain.min || x > d._domain.max) ? -1 : 1;
+			else
+				d._afn = d.analysis_fn;
 
 			// Discard datasets which are inclusive filters and use the entire domain
 			// (i.e., do nothing)

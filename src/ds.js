@@ -4,6 +4,11 @@ import dscontrols from './controls.js';
 
 import * as parse from './parse.js';
 
+import {
+	average,
+	crop_to,
+} from './rasters.js';
+
 export default class DS {
 	constructor(o) {
 		this.id = o.name || o.category.name;
@@ -457,15 +462,49 @@ This is not fatal but the dataset is now disabled.`
 		if (this.summary) {
 			content = tmpl('#analysis-summary-modal', {});
 
-			delete this.summary.analysis.raster;
+			const datasets = this.summary.analysis.datasets.slice(0);
+			const averages = datasets
+				.filter(d => d.datatype === 'raster')
+				.map(d => ({
+					ds: d,
+					raster: average(crop_to(d.raster, { data: this.summary.analysis.raster, nodata: -1 }))
+				}));
 
-			content.append(
-				ce('h3', "Intersections"),
-				table_keyvalue(this.summary.intersections, x => maybe(DST.get(x), 'name')),
-				ce('br'),
-				ce('h3', "Averages"),
-				table_keyvalue(this.summary.analysis, _ => _, x => x.toFixed(2)),
-			);
+			Object
+				.keys(this.summary.analysis.totals)
+				.forEach(k => {
+					content.append(ce('h4', k));
+
+					const table = ce('table', null, { "style": "width: 100%;" });
+					content.append(table);
+
+					this.summary.analysis.datasets
+						.filter(d => d.analysis.index === k)
+						.forEach(d => {
+							switch (d.datatype) {
+							case 'raster': {
+								const f = averages.find(a => a.ds === d);
+								table.append(ce('tr', [
+									ce('td', d.name, { "style": "padding-right: 3em;" }),
+									ce('td', f.raster.avg.toFixed(2) + " " + d.category.unit, { "style": "font-family: monospace; text-align: right;" }),
+								]));
+								break;
+							}
+
+							case 'points': {
+								table.append(ce('tr', [
+									ce('td', d.name, { "style": "padding-right: 3em;" }),
+									ce('td', this.summary.intersections[d.id] + " (intersect)", { "style": "font-family: monospace; text-align: right;" }),
+								]));
+								break;
+							}
+
+							default:
+								break;
+							}
+						});
+				});
+
 		} else {
 			const m = Object.assign({}, this.metadata, { "category-description": this.category.description });
 			content = tmpl('#ds-info-modal', m);

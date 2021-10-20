@@ -171,6 +171,9 @@ export default async function run(type) {
 		max,
 		avg: avg_sum / avg_count,
 		raster: it,
+		datasets: list,
+		totals: tots,
+		weights,
 	};
 };
 

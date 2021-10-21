@@ -206,7 +206,7 @@ async function dsinit(id, pack) {
 	const divisions = maybe(GEOGRAPHY.configuration, 'divisions').filter(d => d.dataset_id !== null);
 
 	function exists(e) {
-		return !!coalesce(DST.get(e.name), DST.get(e.category.name));
+		return !!coalesce(DST.get(e.name));
 	};
 
 	await (function fetch_outline() {

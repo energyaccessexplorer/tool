@@ -419,7 +419,7 @@ export async function polygons_csv() {
 	const col = coalesce(U.timeline, this.csv.value);
 
 	if (this.timeline) {
-		if (!this.domain) {
+		if (or(this.datatype === 'polygons-timeline', !this.domain)) {
 			this.domain = {
 				min: d3.min([].concat(...GEOGRAPHY.timeline_dates.map(d => this.csv.data.map(r => +r[d])))),
 				max: d3.max([].concat(...GEOGRAPHY.timeline_dates.map(d => this.csv.data.map(r => +r[d]))))

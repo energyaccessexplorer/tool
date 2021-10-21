@@ -357,40 +357,41 @@ export function filter_valued_polygons() {
 
 	const datasets = DS.array.filter(d => d.on && d.datatype.match("polygons-(fixed|timeline)"));
 
-	const b = OUTLINE;
-	datasets.unshift(b);
-
 	function matches(d) {
 		return d.csv.data
 			.filter(r => {
 				let c;
 				if (d.datatype.match("polygons-(timeline)"))
-					c = GEOGRAPHY.timeline_dates.slice(0).reverse().find(x => +r[x] > 0);
+					c = U.timeline;
 				else if (d.datatype.match("polygons-(fixed|boundaries)"))
 					c = d.config.csv.key;
 
-				return +r[c] >= d._domain.min && +r[c] <= d._domain.max;
+				const v = +r[c];
+				return and(v >= d._domain.min, v <= d._domain.max);
 			})
 			.map(r => +r[d.csv.key]);
 	};
 
-	const arr = datasets.filter(d => maybe(d, 'csv', 'data')).map(matches);
+	const arr = datasets
+		.filter(d => maybe(d, 'csv', 'data'))
+		.map(d => matches(d));
+
 	const result = arr[0].filter(e => arr.every(a => a.includes(e)));
 
 	const source = MAPBOX.getSource('filtered-source');
 
-	const names = [];
 	const fs = source._data.features;
+
+	const lis = [];
 	for (let i = 0; i < fs.length; i += 1) {
-		const x = result.includes(+fs[i].properties[b.vectors.key]);
+		const x = result.includes(+fs[i].id);
 
-		fs[i].properties.__hidden = (U.subdiv > -1) ? (fs[i].id !== U.subdiv) : !x;
+		fs[i].properties.__visible = x;
 
-		if (x) {
-			ul.append(ce('li', fs[i].properties['District']));
-			names.push(fs[i].properties['District']);
-		}
+		if (x) lis.push(ce('li', fs[i].properties[GEOGRAPHY.divisions[1].config.column_name]));
 	}
+
+	ul.append(...lis);
 
 	source.setData(source._data);
 };

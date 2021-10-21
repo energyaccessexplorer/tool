@@ -397,7 +397,7 @@ export function polygons() {
 				"paint": {
 					"fill-color": c,
 					"fill-outline-color": ['get', '__stroke'],
-					"fill-opacity": [ "case", [ "boolean", [ "get", "__hidden" ], false ], 0, 1 * this.vectors.opacity ],
+					"fill-opacity": [ "case", [ "boolean", [ "get", "__visible" ], true ], 1 * this.vectors.opacity, 0 ],
 				},
 			});
 

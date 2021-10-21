@@ -210,7 +210,7 @@ function load_view() {
 		if (!MAPBOX.getSource('filtered-source')) {
 			MAPBOX.addSource('filtered-source', {
 				"type": 'geojson',
-				"data": OUTLINE.vectors.features
+				"data": GEOGRAPHY.divisions[1].vectors.features
 			});
 		}
 
@@ -225,7 +225,7 @@ function load_view() {
 				"paint": {
 					"fill-color": "#0571B0",
 					"fill-outline-color": "black",
-					"fill-opacity": [ "case", [ "boolean", [ "get", "__hidden" ], false ], 0, 1 ]
+					"fill-opacity": [ "case", [ "boolean", [ "get", "__visible" ], true ], 1, 0 ]
 				},
 			}, MAPBOX.first_symbol);
 		}

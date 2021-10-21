@@ -99,6 +99,8 @@ This is not fatal but the dataset is now disabled.`
 
 			this.raster = b.raster;
 			this.vectors = jsonclone(b.vectors);
+			Object.assign(this.vectors, this.category.vectors);
+
 			this.vectors.parse = x => parse.polygons.call(x || this);
 
 			indicator = true;

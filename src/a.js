@@ -341,7 +341,11 @@ function layout() {
 		qs('#cards-pane').append(oc);
 	}
 
-	document.body.onresize = set_heights;
+	document.body.onresize = function() {
+		set_heights();
+		if (t) t.dispatchEvent(new Event('resize'));
+	};
+
 	set_heights();
 };
 
@@ -446,7 +450,12 @@ export function toggle_left_panel(t) {
 
 	qs('#left-pane').style['min-width'] = t ? '40em' : '';
 
-	window.dispatchEvent(new Event('resize'));
+	const rs = new Event('resize');
+
+	window.dispatchEvent(rs);
+
+	const tl = qs('#timeline');
+	if (tl) tl.dispatchEvent(rs);
 };
 
 function drawer_init() {

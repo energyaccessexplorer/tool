@@ -11,9 +11,6 @@ function timeline_slider(opts) {
 		    svgmin = radius + 2,
 		    svgmax = svgwidth - radius - 2;
 
-	const norm = d3.scaleQuantize().domain([svgmin, svgmax]).range(steps);
-	const denorm = d3.scaleLinear().domain([steps[0], steps[steps.length-1]]).range([svgmin, svgmax]);
-
 	const svg = d3.create("svg")
 		    .attr('class', 'svg-timeline');
 
@@ -24,13 +21,16 @@ function timeline_slider(opts) {
 	const circle = g.append('circle');
 
 	svg
-		.attr('width', svgwidth + 2)
+		.attr('width', "100%")
 		.attr('height', svgheight + 2 + 30);
 
+	const parent = qs('#timeline');
+	const dates = ce('div', null, { "id": "timeline-dates-container" });
+	parent.append(dates);
+
 	steps.forEach(x => {
-		g.append('text').text(x)
-			.attr('transform', `translate(${denorm(x) - 16}, ${svgheight + 32})`)
-			.style('font-family', 'monospace');
+		const s = ce('span', x, { "font-family": "monospace" });
+		dates.append(s);
 	});
 
 	gutter
@@ -41,7 +41,7 @@ function timeline_slider(opts) {
 		.attr('y', 1)
 		.attr('rx', radius)
 		.attr('ry', radius)
-		.attr('width', svgwidth - 2)
+		.attr('width', "99.9%")
 		.attr('height', svgheight - 2);
 
 	circle
@@ -52,12 +52,25 @@ function timeline_slider(opts) {
 		.attr('stroke-width', 3)
 		.style('cursor', 'grab');
 
+	let norm = d3.scaleQuantize().domain([svgmin, svgmax]).range(steps);
+	let denorm = d3.scaleLinear().domain([steps[0], steps[steps.length-1]]).range([svgmin, svgmax]);
+	let current_step = init;
+
 	function _drag(cx) {
 		const nx = norm(cx);
 		const cx0 = denorm(nx);
 		circle.attr('cx', cx0);
 
 		if (nx !== v) drag(v = nx);
+	};
+
+	function set(y) {
+		const svgmax = svg.node().clientWidth - radius - 2;
+
+		norm = d3.scaleQuantize().domain([svgmin, svgmax]).range(steps);
+		denorm = d3.scaleLinear().domain([steps[0], steps[steps.length-1]]).range([svgmin, svgmax]);
+
+		_drag(denorm(y));
 	};
 
 	const behaviour = d3.drag()
@@ -67,11 +80,18 @@ function timeline_slider(opts) {
 
 	gutter.on('click', _ => _drag(d3.event.offsetX));
 
-	_drag(denorm(steps[init || 0]));
+	(async function() {
+		await until(_ => svg.node().clientWidth);
+		set(steps[init || 0]);
+	})();
+
+	parent.addEventListener('resize', function() {
+		set(current_step);
+	});
 
 	return {
 		svg: svg.node(),
-		set: x => _drag(denorm(x))
+		set,
 	};
 };
 

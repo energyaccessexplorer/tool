@@ -76,12 +76,25 @@ body {
 }
 
 #timeline {
+  display: flex;
+  flex-flow: column;
   text-align: center;
   height: 128px;
+  padding: 1em 2em;
 }
 
 #timeline svg {
-  margin: 2em auto;
+  order: 1;
+  margin: 2em auto 0 auto;
+}
+
+#timeline-dates-container {
+  order: 2;
+  display: flex;
+  flex-flow: row nowrap;
+  width: 100%;
+  font-family: monospace;
+  justify-content: space-between;
 }
 
 #drawer-right-pane {

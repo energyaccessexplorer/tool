@@ -376,6 +376,8 @@ export function filter_valued_polygons() {
 		.filter(d => maybe(d, 'csv', 'data'))
 		.map(d => matches(d));
 
+	if (!arr.length) return;
+
 	const result = arr[0].filter(e => arr.every(a => a.includes(e)));
 
 	const source = MAPBOX.getSource('filtered-source');

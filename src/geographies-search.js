@@ -129,18 +129,17 @@ export async function init() {
 
 	GEOGRAPHY
 		.divisions
-		.map(d => {
-			const v = maybe(d, 'csv', 'value');
-			if (!v) return [];
-
-			return d.csv.data.map(x => x[v]);
-		})
 		.map((d,i) => {
-			lists[i] = d.map((g,j) => ({
-				i: j,
-				li: li(g,i,j),
-				name: g,
-			}));
+			const v = maybe(d, 'csv', 'value');
+			const a = !v ? [] : d.csv.data.map(x => x[v]);
+
+			lists[i] = a.map((g,j) => {
+				return {
+					i: j,
+					li: li(g, i, +d.csv.data[j][d.csv.key]),
+					name: g,
+				};
+			});
 		});
 
 	resultscontainer.prepend(resultsinfo);

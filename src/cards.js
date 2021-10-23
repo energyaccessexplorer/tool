@@ -49,7 +49,7 @@ function polygons_symbol(opts) {
 	svg
 		.append('path')
 		.attr('d', "M 5.5532202,7.3474994 24.062506,2.1642083 26.51526,25.827 1.3896115,25.827438 Z")
-		.attr('fill', fill)
+		.attr('fill', fill ?? 'none')
 		.attr('fill-opacity', opacity)
 		.attr('stroke', stroke)
 		.attr('stroke-width', strokewidth);

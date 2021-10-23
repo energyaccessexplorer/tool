@@ -306,28 +306,24 @@ export function lines_draw() {
 			return a;
 		}
 
-		return a.concat(c.csv.data.filter(r => r[c.csv.key] === U.subdiv).map(r => {
-			return {
-				values: GEOGRAPHY.timeline_dates.map(k => (r[k] === "" ? undefined : +r[k])),
-				id: c.id,
-				name: ce('span', [
-					ce('span', c.name),
-					ce('span', "[" + c.category.unit + "]", { style: "margin-left: 1em; font-size: 0.8em;" }),
-				]),
-				color: c.colorscale.stops.slice(-1)
-			};
-		}));
+		return a.concat(c.csv.data.filter(r => +r[c.csv.key] === U.subdiv).map(r => ({
+			values: GEOGRAPHY.timeline_dates.map(k => (r[k] === "" ? undefined : +r[k])),
+			id: c.id,
+			name: ce('span', [
+				ce('span', c.name),
+				ce('span', "[" + c.category.unit + "]", { style: "margin-left: 1em; font-size: 0.8em;" }),
+			]),
+			color: c.colorscale.stops.slice(-1)
+		})));
 	}, []);
 
 	let lines = qs('#timeline-lines');
 	if (lines) lines.remove();
 
-	const average = datasets.map(i => {
-		return {
-			id: i['id'],
-			values: GEOGRAPHY.timeline_dates.map(d => i.csv.data.map(r => +r[d])).map(x => x.reduce((a,c) => a + c, 0) / x.length)
-		};
-	});
+	const average = datasets.map(i => ({
+		id: i['id'],
+		values: GEOGRAPHY.timeline_dates.map(d => i.csv.data.map(r => +r[d])).map(x => x.reduce((a,c) => a + c, 0) / x.length)
+	}));
 
 	const ml = multiline({
 		data: {
@@ -341,7 +337,7 @@ export function lines_draw() {
 			return el_tree([
 				document.createElement('table'), [
 					[ ce('tr'), [
-						ce('td', ce('strong', "District value: &nbsp;")),
+						ce('td', ce('strong', "Value: &nbsp;")),
 						ce('td', a.toString())
 					]],
 					[ ce('tr'), [
@@ -354,12 +350,12 @@ export function lines_draw() {
 	});
 	ml.svg.id = 'timeline-lines';
 
-	const rp = qs('#right-pane');
-	const rows = maybe(GEOGRAPHY.divisions, U.divtier, 'csv', 'data') || [];
-	const k = maybe(GEOGRAPHY.divisions, U.divtier, 'csv', 'key');
+	const CSV = GEOGRAPHY.divisions[U.divtier].csv;
 
-	qs('#district-header', rp).innerText = rows.find(r => r[k] === U.subdiv);
-	qs('#district-graph', rp).append(ml.svg);
+	const rp = qs('#right-pane');
+
+	qs('#lines-header', rp).innerText = maybe(CSV.data.find(r => +r[CSV.key] === U.subdiv), CSV.value);
+	qs('#lines-graph', rp).append(ml.svg);
 };
 
 export async function lines_update() {
@@ -368,11 +364,12 @@ export async function lines_update() {
 	const datasets = DS.array.filter(d => d.on && d.datatype === 'polygons-timeline');
 
 	if (datasets.length) {
-		await Promise.all(datasets.map(d => until(_ => d.csv.data)));
 		if (U.subdiv > -1) lines_draw();
-	} else {
+	}
+
+	if (or(U.divtier < 1, !datasets.length)) {
 		const rp = qs('#right-pane');
-		qs('#district-header', rp).innerText = "";
+		qs('#lines-header', rp).innerText = "";
 
 		let lines = qs('#timeline-lines');
 		if (lines) lines.remove();
@@ -418,7 +415,7 @@ export function filter_valued_polygons() {
 
 		fs[i].properties.__visible = x;
 
-		if (x) lis.push(ce('li', fs[i].properties[GEOGRAPHY.divisions[1].config.column_name]));
+		if (x) lis.push(ce('li', fs[i].properties[GEOGRAPHY.divisions[1].csv.value]));
 	}
 
 	ul.append(...lis);

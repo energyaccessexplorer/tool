@@ -63,7 +63,6 @@ export default class Overlord {
 						reset_features_visibility.call(DST.get(i));
 				}
 
-				timeline_lines_update();
 				break;
 			}
 
@@ -276,6 +275,8 @@ function load_view() {
 
 		MAPBOX.setLayoutProperty('filtered-layer', 'visibility', 'none');
 		MAPBOX.setLayoutProperty('output-layer', 'visibility', 'none');
+
+		timeline_lines_update();
 
 		cards.update(inputs);
 		O.sort();

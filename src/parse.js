@@ -386,7 +386,9 @@ export function polygons() {
 				"data": this.vectors.features
 			});
 
-			const c = and(this.datatype.match("polygons-"), this.category.name !== 'outline') ? ['get', '__color'] : this.vectors.fill;
+			const c = and(this.datatype.match("polygons-"), this.category.name !== 'outline') ?
+				['get', '__color'] :
+				this.vectors.fill;
 
 			this.add_layer({
 				"type": "fill",
@@ -455,7 +457,7 @@ export async function polygons_csv() {
 	const fs = this.vectors.features.features;
 	for (let i = 0; i < fs.length; i += 1) {
 		let row = data.find(r => +r[this.csv.key] === +fs[i].properties[this.vectors.key]);
-		fs[i].properties.__color = (this.colorscale && row) ? s(row[col]) : this.vectors.fill || "white";
+		fs[i].properties.__color = (this.colorscale && row) ? s(row[col]) : this.vectors.fill || "transparent";
 		fs[i].id = fs[i].properties[this.vectors.key];
 	}
 

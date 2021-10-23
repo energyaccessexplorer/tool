@@ -52,6 +52,7 @@ function timeline_slider(opts) {
 		.attr('stroke-width', 3)
 		.style('cursor', 'grab');
 
+	let w = svgwidth;
 	let norm = d3.scaleQuantize().domain([svgmin, svgmax]).range(steps);
 	let denorm = d3.scaleLinear().domain([steps[0], steps[steps.length-1]]).range([svgmin, svgmax]);
 	let current_step = init;
@@ -61,11 +62,13 @@ function timeline_slider(opts) {
 		const cx0 = denorm(nx);
 		circle.attr('cx', cx0);
 
+		current_step = nx;
+
 		if (nx !== v) drag(v = nx);
 	};
 
 	function set(y) {
-		const svgmax = svg.node().clientWidth - radius - 2;
+		const svgmax = w - radius - 2;
 
 		norm = d3.scaleQuantize().domain([svgmin, svgmax]).range(steps);
 		denorm = d3.scaleLinear().domain([steps[0], steps[steps.length-1]]).range([svgmin, svgmax]);
@@ -80,17 +83,22 @@ function timeline_slider(opts) {
 
 	gutter.on('click', _ => _drag(d3.event.offsetX));
 
+	const node = svg.node();
+
 	(async function() {
-		await until(_ => svg.node().clientWidth);
+		await until(_ => node.clientWidth);
 		set(steps[init || 0]);
 	})();
 
 	parent.addEventListener('resize', function() {
+		if (parent.style.display !== 'none')
+			w = node.clientWidth;
+
 		set(current_step);
 	});
 
 	return {
-		svg: svg.node(),
+		svg: node,
 		set,
 	};
 };

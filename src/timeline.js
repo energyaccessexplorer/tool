@@ -296,17 +296,15 @@ export async function init() {
 };
 
 export function lines_draw() {
+	const tiercsv = maybe(GEOGRAPHY.divisions, U.divtier, 'csv');
+	if (!tiercsv) return;
+
 	const datasets = DS.array
-		.filter(d => and(d.on, d.datatype === 'polygons-timeline'));
+		.filter(d => and(d.on, d.datatype === 'polygons-timeline', maybe(d, 'csv', 'data')));
 
 	if (!datasets.length) return;
 
 	const series = datasets.reduce((a,c) => {
-		if (!maybe(c, 'csv', 'data')) {
-			console.error(c, c.id, "no csv data yet... first run?");
-			return a;
-		}
-
 		return a.concat(c.csv.data.filter(r => +r[c.csv.key] === U.subdiv).map(r => ({
 			values: GEOGRAPHY.timeline_dates.map(k => (r[k] === "" ? undefined : +r[k])),
 			id: c.id,
@@ -351,15 +349,15 @@ export function lines_draw() {
 	});
 	ml.svg.id = 'timeline-lines';
 
-	const CSV = GEOGRAPHY.divisions[U.divtier].csv;
-
 	const rp = qs('#right-pane');
 
-	qs('#lines-header', rp).innerText = maybe(CSV.data.find(r => +r[CSV.key] === U.subdiv), CSV.value);
+	qs('#lines-header', rp).innerText = maybe(tiercsv.data.find(r => +r[tiercsv.key] === U.subdiv), tiercsv.value);
 	qs('#lines-graph', rp).append(ml.svg);
 };
 
 export async function lines_update() {
+	if (!(maybe(GEOGRAPHY.divisions, U.divtier, 'csv'))) return;
+
 	if (!GEOGRAPHY.timeline) return;
 
 	const datasets = DS.array.filter(d => and(d.on, d.datatype === 'polygons-timeline'));

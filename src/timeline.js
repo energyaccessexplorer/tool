@@ -108,8 +108,8 @@ function multiline(opts) {
 
 	const strokewidth = 2.5;
 
-	const width = opts.width || 600;
-	const height = opts.height || 400;
+	const width = opts.width ?? 600;
+	const height = opts.height ?? 400;
 
 	const margin = { top: 20, right: 20, bottom: 30, left: 40 };
 
@@ -163,7 +163,7 @@ function multiline(opts) {
 		    .join("path")
 		    .style("mix-blend-mode", "multiply")
 		    .attr("id", (d,i) => 'line-' + i)
-		    .attr("stroke", d => d.color || color)
+		    .attr("stroke", d => d.color ?? color)
 		    .attr("d", (d,i) => line(i)(d.values));
 
 	svg.append("g")
@@ -216,7 +216,7 @@ function multiline(opts) {
 
 		function left() {
 			path
-				.attr("stroke", d => d.color || color)
+				.attr("stroke", d => d.color ?? color)
 				.attr("stroke-width", strokewidth)
 				.style("mix-blend-mode", "multiply");
 
@@ -239,7 +239,7 @@ function multiline(opts) {
 
 		function entered() {
 			path
-				.attr("stroke", d => d.color || color)
+				.attr("stroke", d => d.color ?? color)
 				.attr("stroke-width", strokewidth)
 				.style("mix-blend-mode", "multiply");
 
@@ -250,7 +250,7 @@ function multiline(opts) {
 			active_series = data.series[j];
 
 			path
-				.attr("stroke", (d,i) => i === j ? (d.color || color) : "#ddd")
+				.attr("stroke", (d,i) => i === j ? (d.color ?? color) : "#ddd")
 				.attr("stroke-width", (d,i) => i === j ? 7 : strokewidth);
 
 			y.domain([
@@ -296,7 +296,8 @@ export async function init() {
 };
 
 export function lines_draw() {
-	const datasets = DS.array.filter(d => d.on && d.datatype === 'polygons-timeline');
+	const datasets = DS.array
+		.filter(d => and(d.on, d.datatype === 'polygons-timeline'));
 
 	if (!datasets.length) return;
 
@@ -361,7 +362,7 @@ export function lines_draw() {
 export async function lines_update() {
 	if (!GEOGRAPHY.timeline) return;
 
-	const datasets = DS.array.filter(d => d.on && d.datatype === 'polygons-timeline');
+	const datasets = DS.array.filter(d => and(d.on, d.datatype === 'polygons-timeline'));
 
 	if (datasets.length) {
 		if (U.subdiv > -1) lines_draw();
@@ -380,7 +381,7 @@ export function filter_valued_polygons() {
 	const ul = qs('#filtered-subgeographies');
 	ul.innerHTML = "";
 
-	const datasets = DS.array.filter(d => d.on && d.datatype.match("polygons-(fixed|timeline)"));
+	const datasets = DS.array.filter(d => and(d.on, d.datatype.match("polygons-(fixed|timeline)")));
 
 	function matches(d) {
 		return d.csv.data

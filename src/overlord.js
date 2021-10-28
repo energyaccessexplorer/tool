@@ -165,7 +165,7 @@ export default class Overlord {
 		await until(_ => MAPBOX.isStyleLoaded());
 
 		await DS.array
-			.filter(d => d.on)
+			.filter(d => d.source_config)
 			.forEach(d => {
 				d.loaded = false;
 				d.loadall();

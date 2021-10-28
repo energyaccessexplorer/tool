@@ -240,7 +240,11 @@ This is not fatal but the dataset is now disabled.`
 			if (!this.collection.disabled) this.collection.disable();
 		}
 
-		if (MAPBOX.getLayer(this.id)) MAPBOX.removeLayer(this.id);
+		if (this.layer) MAPBOX.removeLayer(this.id);
+	};
+
+	get source() {
+		return MAPBOX.getSource(this.id);
 	};
 
 	add_source(opts, as) {
@@ -249,11 +253,15 @@ This is not fatal but the dataset is now disabled.`
 			return;
 		}
 
-		if (this.source && MAPBOX.getSource(this.id)) return;
+		if (this.source) return;
 
 		MAPBOX.addSource(this.id, opts);
 
-		this.source = MAPBOX.getSource(this.id);
+		this.source_config = opts;
+	};
+
+	get layer() {
+		return MAPBOX.getLayer(this.id);
 	};
 
 	add_layer(opts, as) {
@@ -265,23 +273,16 @@ This is not fatal but the dataset is now disabled.`
 			return;
 		}
 
-		if (this.layer && MAPBOX.getLayer(this.id)) return;
+		if (this.layer) return;
 
 		opts['id'] = this.id;
 		opts['source'] = this.id;
 
-		this.layer = MAPBOX.addLayer(opts, MAPBOX.first_symbol);
+		MAPBOX.addLayer(opts, MAPBOX.first_symbol);
 	};
 
 	update_source(data) {
-		try {
-			if (this.source) this.source.setData(data);
-		} catch (err) {
-			// TODO: find out what this error is when changing mapbox's themes.
-			//       it is not fatal, so we just report it.
-			//
-			console.warn(err);
-		}
+		if (this.source) this.source.setData(data);
 	};
 
 	mutant_init() {
@@ -407,11 +408,11 @@ This is not fatal but the dataset is now disabled.`
 		}
 
 		if (this.layer)
-			this.layer.setLayoutProperty(this.id, 'visibility', t ? 'visible' : 'none');
+			MAPBOX.setLayoutProperty(this.id, 'visibility', t ? 'visible' : 'none');
 
 		if (this.host) {
-			this.hosts.forEach(d => d.layer.setLayoutProperty(d.id, 'visibility', 'none'));
-			this.host.layer.setLayoutProperty(this.host.id, 'visibility', t ? 'visible' : 'none');
+			this.hosts.forEach(d => MAPBOX.setLayoutProperty(d.id, 'visibility', 'none'));
+			MAPBOX.setLayoutProperty(this.host.id, 'visibility', t ? 'visible' : 'none');
 		}
 	};
 

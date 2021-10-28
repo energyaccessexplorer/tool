@@ -8,7 +8,7 @@ let ul, input, resultscontainer;
 let ds, resultsinfo, attr, searchable, searchable_attrs;
 
 function pointto(f, a = false) {
-	const t = MAPBOX.querySourceFeatures(ds.source.id, {
+	const t = MAPBOX.querySourceFeatures(ds.id, {
 		filter: ['==', attr, f.properties[attr] || "<justnotnull>"]
 	});
 

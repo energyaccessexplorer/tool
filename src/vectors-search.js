@@ -63,6 +63,7 @@ async function reset() {
 
 	if (!(searchable = !!attr)) {
 		resultsinfo.replaceChildren(ce('b', ds.name), " is not searchable (for now...)");
+		resultscontainer.replaceChildren(resultsinfo);
 		return;
 	}
 

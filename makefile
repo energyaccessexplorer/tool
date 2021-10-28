@@ -121,13 +121,14 @@ build-d:
 	@sed -ri 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/d/index.html
 
 	@cp ${CSS}/ripple.css ${DIST}/d/ripple.css
-	@cp ${SRC}/{cards,timeline,controls,controls-search,ds,parse,mapbox,overlord,plot,d}.js ${DIST}/d/
+	@cp ${SRC}/{cards,timeline,controls,controls-search,ds,parse,rasters,mapbox,overlord,plot,d}.js ${DIST}/d/
 
 	@cat \
 		${LIB}/d3.js \
 		${LIB}/geotiff.js \
 		${LIB}/mapbox-gl.js \
 		${LIB}/geojson-extent.js \
+		${LIB}/sphericalmercator.js \
 		${LIB}/helpers.js \
 		${LIB}/flash.js \
 		${LIB}/dropdown.js \

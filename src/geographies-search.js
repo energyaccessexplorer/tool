@@ -134,9 +134,11 @@ export async function init() {
 			const a = !v ? [] : d.csv.data.map(x => x[v]);
 
 			lists[i] = a.map((g,j) => {
+				const k = +d.csv.data[j][d.csv.key];
+
 				return {
-					i: j,
-					li: li(g, i, +d.csv.data[j][d.csv.key]),
+					i: k,
+					li: li(g, i, k),
 					name: g,
 				};
 			});

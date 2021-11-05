@@ -124,18 +124,6 @@ export default class Overlord {
 			break;
 		}
 
-		case "dblclick": {
-			if (INFOMODE) break;
-
-			mapbox.fit(geojsonExtent(et));
-
-			U.subdiv = et.id;
-			U.divtier = coalesce(maybe(ds, 'config', 'divisions_tier'), 0);
-			O.view = U.view;
-
-			break;
-		}
-
 		default:
 			break;
 		}

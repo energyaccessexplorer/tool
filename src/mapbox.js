@@ -82,7 +82,6 @@ export function init(overlord = {}) {
 
 	if (_O.map) {
 		mb.on('click', e => _O.map('click', e));
-		mb.on('dblclick', e => _O.map('dblclick', e));
 
 		mb.addControl((new MapboxThemeControl()), 'top-right');
 		mb.addControl((new MapboxInfoControl()), 'top-right');

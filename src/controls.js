@@ -62,6 +62,10 @@ export default class dscontrols extends HTMLElement {
 		return this;
 	};
 
+	refresh() {
+		range_group_controls.call(this);
+	};
+
 	loading(t) {
 		this.spinner.style.display = t ? 'block' : 'none';
 	};
@@ -286,8 +290,18 @@ function range(opts = {}) {
 
 	const domain = {};
 
+	let {min,max} = this.domain;
+
+	const diff = Math.abs(max - min);
+	let d = 3 - Math.ceil(Math.log10(diff || 1));
+	if (d < 0) d = 0;
+
+	if (and(this.category.unit === "%",
+	        or(and(min === 0, max === 100),
+	           and(min === 100, max === 0)))) d = 0;
+
 	const update = (x, i, el) => {
-		el.innerText = (+x).toFixed(maybe(this, 'raster', 'precision') || 0);
+		el.innerText = (+x).toFixed(d);
 
 		const man = maybe(this.controls, 'manual_' + i);
 		if (man) man.value = x;
@@ -511,6 +525,9 @@ function range_group_controls() {
 	}
 
 	manual_setup.call(this);
+
+	if (qs('[slot=range-slider]', this))
+		qs('[slot=range-slider]', this).remove();
 
 	slot_populate.call(this, {
 		"range-slider": maybe(this.range_group, 'el'),

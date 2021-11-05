@@ -60,8 +60,6 @@ export default class DS {
 
 		this.set_colorscale();
 
-		if (this.card) this.card.refresh();
-
 		if (!this.disabled) {
 			this.card = new dscard(this);
 			this.controls = new dscontrols(this);

@@ -463,7 +463,11 @@ export async function polygons_csv() {
 
 	this.update_source(this.vectors.features);
 
+	if (this._domain)
+		Object.assign(this._domain, this.domain);
+
 	if (this.card) this.card.refresh();
+	if (this.controls) this.controls.refresh();
 };
 
 export function reset_features_visibility() {

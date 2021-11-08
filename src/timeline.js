@@ -333,18 +333,21 @@ export function lines_draw() {
 		width: 350,
 		height: 250,
 		message: function(m,i,a) {
-			return el_tree([
-				document.createElement('table'), [
-					[ ce('tr'), [
-						ce('td', ce('strong', "Value: &nbsp;")),
-						ce('td', a.toString())
-					]],
-					[ ce('tr'), [
-						ce('td', ce('strong', "State Average: &nbsp;")),
-						ce('td', (Math.round(average.find(x => x.id === m.id).values[i] * 100) / 100).toString())
-					]]
-				]
+			const table = document.createElement('table');
+
+			const t1 = ce('tr', [
+				ce('td', ce('strong', "Value: &nbsp;")),
+				ce('td', a.toString())
 			]);
+
+			const t2 = ce('tr', [
+				ce('td', ce('strong', "State Average: &nbsp;")),
+				ce('td', (Math.round(average.find(x => x.id === m.id).values[i] * 100) / 100).toString())
+			]);
+
+			table.append(t1,t2);
+
+			return table;
 		}
 	});
 	ml.svg.id = 'timeline-lines';

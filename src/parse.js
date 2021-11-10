@@ -447,18 +447,11 @@ export async function polygons_csv() {
 		return;
 	}
 
-	for (const x in this.vectors.features.features[0].properties) {
-		if (['OBJECTID', 'FID', 'Id', 'Code'].map(t => t.toLowerCase()).includes(x.toLowerCase())) {
-			this.vectors.key = x;
-			break;
-		}
-	}
-
 	const fs = this.vectors.features.features;
 	for (let i = 0; i < fs.length; i += 1) {
-		let row = data.find(r => +r[this.csv.key] === +fs[i].properties[this.vectors.key]);
+		let row = data.find(r => +r[this.csv.key] === +fs[i].properties[this.vectors.id]);
 		fs[i].properties.__color = (this.colorscale && row) ? s(row[col]) : this.vectors.fill || "transparent";
-		fs[i].id = fs[i].properties[this.vectors.key];
+		fs[i].id = fs[i].properties[this.vectors.id];
 	}
 
 	this.update_source(this.vectors.features);

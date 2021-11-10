@@ -99,6 +99,7 @@ This is not fatal but the dataset is now disabled.`
 			this.vectors = jsonclone(b.vectors);
 			Object.assign(this.vectors, this.category.vectors);
 
+			this.vectors.id = b.config.vectors_id;
 			this.vectors.parse = x => parse.polygons.call(x || this);
 
 			indicator = true;
@@ -111,6 +112,9 @@ This is not fatal but the dataset is now disabled.`
 			else {
 				this.vectors = {};
 				Object.assign(this.vectors, o.category.vectors, f);
+
+				if (this.category.name === 'boundaries')
+					this.vectors.id = this.config.vectors_id;
 
 				let p; switch (this.vectors.shape_type) {
 				case 'points': {

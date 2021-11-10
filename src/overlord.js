@@ -341,7 +341,7 @@ function mapclick(e) {
 
 		if (maybe(et, 'source') === inp) {
 			if (and(maybe(t, 'csv', 'key'), t.category.name !== 'boundaries')) {
-				const v = t.csv.table[et.properties[t.vectors.key]];
+				const v = t.csv.table[et.properties[t.vectors.id]];
 
 				if (v ?? false) {
 					dict.push(["_" + t.csv.key, t.name]);

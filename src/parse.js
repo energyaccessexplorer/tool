@@ -1,6 +1,8 @@
 import * as plot from './plot.js';
 
 async function fetchcheck(endpoint, format) {
+	await until(_ => MAPBOX.isStyleLoaded()); // <-- magic line. If you remove it, no more unicorns!
+
 	if (endpoint.match(/^(blob:)?http/)) ;
 	else endpoint = ea_settings.storage + endpoint;
 

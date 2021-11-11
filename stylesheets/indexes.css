@@ -14,49 +14,46 @@
 
 #indexes-list .element {
   background-color: var(--the-white);
-  display: flex;
-  justify-content: space-between;
-
-  padding: 0.5em;
-  line-height: 1.8em;
-
-  padding: 5px;
-
   cursor: pointer;
-  white-space: nowrap;
 }
 
 #indexes-list .element[disabled] {
   color: #ababab;
 }
 
-#indexes-list .element[disabled] span::after {
-  content: '(no datasets selected)';
-  font-size: smaller;
-  margin-left: 3em;
+#indexes-list .element td {
+  line-height: 2.9em;
+  min-width: 1.5em;
+}
+
+#indexes-list .element span {
+  vertical-align: middle;
 }
 
 #indexes-list .element span.name {
-  padding: 0.5em;
-  flex: 1;
+  margin-left: 0.5em;
+}
+
+#indexes-list .element[disabled] span.name:after {
+  content: '(no datasets selected)';
+  font-size: 9px;
+  float: right;
+  margin-right: 10px;
+}
+
+#indexes-list .element span.radio svg {
+  margin-bottom: -0.3em;
 }
 
 #indexes-list .element .radio {
-  margin-top: 10px;
   margin-left: 10px;
 }
 
-#indexes-list .element[bind="demand"]:before,
-#indexes-list .element[bind="supply"]:before {
-  width: 1.3em;
-  display: block;
+#indexes-list .element[bind="demand"] span.radio:before,
+#indexes-list .element[bind="supply"] span.radio:before {
   content: ' ';
   border-right: solid 1px #d9d9d9;
-  margin-right: 0.5em;
-}
-
-#indexes-list .element .analysis-to-dataset {
-  padding: 0.5em;
+  margin: 0 0.9em 0 0.6em;
 }
 
 #index-graphs {

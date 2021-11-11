@@ -178,11 +178,13 @@ export function list() {
 	indexes_list.replaceChildren();
 
 	function i_elem(t, v) {
-		const d = ce('li',  null, { bind: t, class: 'element', ripple: "" });
+		const d = ce('tr',  null, { bind: t, class: 'element' });
 		d.append(
-			ce('div', null, { class: 'radio' }),
-			ce('span', v, { class: 'name' }),
-			ce('span', font_icon('collection'), { class: 'analysis-to-dataset' }),
+			ce('td', [
+				ce('span', null, { class: 'radio' }),
+				ce('span', v, { class: 'name' }),
+			], { ripple: "" }),
+			ce('td', font_icon('collection'), { class: 'analysis-to-dataset' }),
 		);
 
 		if (analysis_datasets(t) < 1)

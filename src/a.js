@@ -119,10 +119,6 @@ export async function init() {
 	GEOGRAPHY.timeline = maybe(GEOGRAPHY, 'configuration', 'timeline');
 	GEOGRAPHY.timeline_dates = maybe(GEOGRAPHY, 'configuration', 'timeline_dates');
 
-	fetch(`https://world.energyaccessexplorer.org/countries?select=cca2&cca3=eq.${GEOGRAPHY.cca3}`)
-		.then(r => r.json())
-		.then(r => GEOGRAPHY.cca2 = maybe(r, 0, 'cca2'));
-
 	if (location.hostname.match(/^www/))
 		ENV = "production";
 	else if (location.hostname.match(/^staging/))

@@ -100,4 +100,8 @@ export function init() {
 
 		trigger(this.value);
 	};
+
+	fetch(`https://world.energyaccessexplorer.org/countries?select=cca2&or=(names->>official.eq.${GEOGRAPHY.name},name.eq.${GEOGRAPHY.name})`)
+		.then(r => r.json())
+		.then(r => GEOGRAPHY.cca2 = maybe(r, 0, 'cca2'));
 };

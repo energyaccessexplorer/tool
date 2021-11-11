@@ -109,9 +109,7 @@ async function overview() {
 	await fetch('https://wri-public-data.s3.amazonaws.com/EnergyAccess/Country%20indicators/eae_country_indicators.csv')
 		.then(r => r.text())
 		.then(t => d3.csvParse(t))
-		.then(d => {
-			return r = d.find(x => x.cca3 === GEOGRAPHY.cca3);
-		});
+		.then(d => (r = d.find(x => x.name === GEOGRAPHY.name)));
 
 	if (r) {
 		r['urban_population'] = (100 - r['rural_population']).toFixed(1);
@@ -243,7 +241,7 @@ export function init() {
 					};
 				}
 
-				fetch(`https://world.energyaccessexplorer.org/countries?select=flag&cca3=eq.${co.cca3}`)
+				fetch(`https://world.energyaccessexplorer.org/countries?select=flag&or=(names->>official.eq.${co.name},name.eq.${co.name})`)
 					.then(r => r.json())
 					.then(r => {
 						const data = r[0];

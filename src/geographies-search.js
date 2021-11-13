@@ -24,6 +24,8 @@ function li(g,i,j) {
 };
 
 function trigger(value) {
+	if (!lists[U.divtier + 1]) return;
+
 	for (let i of lists[U.divtier + 1])
 		i.li.style.display = i.name.match(new RegExp(value, 'i')) ? "" : "none";
 };

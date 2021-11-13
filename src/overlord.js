@@ -8,8 +8,11 @@ import {
 import {
 	lines_update as timeline_lines_update,
 	lines_draw as timeline_lines_draw,
-	filter_valued_polygons as timeline_filter_valued_polygons,
 } from './timeline.js';
+
+import {
+	filtered_valued_polygons,
+} from './filtered.js';
 
 import {
 	plot_active as analysis_plot_active,
@@ -262,7 +265,7 @@ function load_view() {
 
 		analysis_plot_active(output, true);
 
-		timeline_filter_valued_polygons();
+		filtered_valued_polygons();
 		break;
 	}
 

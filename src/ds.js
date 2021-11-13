@@ -91,9 +91,7 @@ This is not fatal but the dataset is now disabled.`
 
 		if (this.category.name.match(/^(timeline-)?indicator/)) {
 			let b = GEOGRAPHY.divisions[this.config.divisions_tier];
-
-			// TODO: remove this when divisions are consolidated on the database
-			if (!b) b = GEOGRAPHY.divisions[1];
+			if (!b) throw new Error("Indicator datasets should have configuration->divisions_tier set.");
 
 			this.raster = b.raster;
 			this.vectors = jsonclone(b.vectors);

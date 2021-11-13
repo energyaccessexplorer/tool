@@ -194,28 +194,31 @@ function load_view() {
 
 		if (!GEOGRAPHY.timeline) return;
 
-		if (!MAPBOX.getSource('filtered-source')) {
-			MAPBOX.addSource('filtered-source', {
-				"type": 'geojson',
-				"data": GEOGRAPHY.divisions[1].vectors.features
-			});
-		}
 
-		if (!MAPBOX.getLayer('filtered-layer')) {
-			MAPBOX.addLayer({
-				"id": 'filtered-layer',
-				"source": 'filtered-source',
-				"type": 'fill',
-				"layout": {
-					"visibility": "none",
-				},
-				"paint": {
-					"fill-color": "#0571B0",
-					"fill-outline-color": "black",
-					"fill-opacity": [ "case", [ "boolean", [ "get", "__visible" ], true ], 1, 0 ]
-				},
-			}, MAPBOX.first_symbol);
-		}
+		GEOGRAPHY.divisions.forEach((d,i) => {
+			if (!MAPBOX.getSource(`filtered-source-${i}`)) {
+				MAPBOX.addSource(`filtered-source-${i}`, {
+					"type": 'geojson',
+					"data": d.vectors.features
+				});
+			}
+
+			if (!MAPBOX.getLayer(`filtered-layer-${i}`)) {
+				MAPBOX.addLayer({
+					"id": `filtered-layer-${i}`,
+					"source": `filtered-source-${i}`,
+					"type": 'fill',
+					"layout": {
+						"visibility": "none",
+					},
+					"paint": {
+						"fill-color": ["transparent", "red", "blue", "yellow"][i],
+						"fill-outline-color": "black",
+						"fill-opacity": [ "case", [ "boolean", [ "get", "__visible" ], true ], 0.5, 0 ]
+					},
+				}, MAPBOX.first_symbol);
+			}
+		});
 	})();
 
 	switch (view) {
@@ -226,8 +229,10 @@ function load_view() {
 			.then(_ => {
 				if (timeline) timeline.style.display = 'none';
 
-				if (MAPBOX.getLayer('filtered-layer'))
-					MAPBOX.setLayoutProperty('filtered-layer', 'visibility', 'none');
+				GEOGRAPHY.divisions.forEach((_,i) => {
+					if (MAPBOX.getLayer(`filtered-layer-${i}`))
+						MAPBOX.setLayoutProperty(`filtered-layer-${i}`, 'visibility', 'none');
+				});
 
 				MAPBOX.setLayoutProperty('output-layer', 'visibility', 'visible');
 			});
@@ -249,7 +254,10 @@ function load_view() {
 	case "filtered": {
 		if (timeline) timeline.style.display = 'none';
 
-		MAPBOX.setLayoutProperty('filtered-layer', 'visibility', 'visible');
+		GEOGRAPHY.divisions.forEach((_,i) => {
+			MAPBOX.setLayoutProperty(`filtered-layer-${i}`, 'visibility', 'visible');
+		});
+
 		MAPBOX.setLayoutProperty('output-layer', 'visibility', 'none');
 
 		analysis_plot_active(output, true);
@@ -261,7 +269,9 @@ function load_view() {
 	case "timeline": {
 		if (timeline) timeline.style.display = '';
 
-		MAPBOX.setLayoutProperty('filtered-layer', 'visibility', 'none');
+		GEOGRAPHY.divisions.forEach((_,i) => {
+			MAPBOX.setLayoutProperty(`filtered-layer-${i}`, 'visibility', 'visible');
+		});
 		MAPBOX.setLayoutProperty('output-layer', 'visibility', 'none');
 
 		timeline_lines_update();

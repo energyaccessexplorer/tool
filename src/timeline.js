@@ -379,10 +379,14 @@ export async function lines_update() {
 };
 
 export function filter_valued_polygons() {
-	const ul = qs('#filtered-subgeographies');
-	ul.innerHTML = "";
+	const lists = qs('#filtered-subgeographies');
 
-	const datasets = DS.array.filter(d => and(d.on, d.datatype.match("polygons-(fixed|timeline)")));
+	const opens = Array.from(qsa('details', lists)).map(a => a.getAttribute('open') === '');
+	opens.unshift(false);
+
+	lists.replaceChildren();
+
+	const datasets = DS.array.filter(d => and(d.on, d.datatype.match("polygons-(fixed|timeline)"), maybe(d, 'csv', 'data')));
 
 	function matches(d) {
 		return d.csv.data
@@ -399,28 +403,36 @@ export function filter_valued_polygons() {
 			.map(r => +r[d.csv.key]);
 	};
 
-	const arr = datasets
-		.filter(d => maybe(d, 'csv', 'data'))
-		.map(d => matches(d));
+	GEOGRAPHY.divisions.forEach((d,k) => {
+		const n = datasets.filter(t => t.config.divisions_tier === k);
+		if (!n.length) return;
 
-	if (!arr.length) return;
+		let ul = ce('ul');
+		const details = ce('details', [ce('summary', d.name), ul], opens[k] ? { "open": '' } : {});
 
-	const result = arr[0].filter(e => arr.every(a => a.includes(e)));
+		const arr = n.map(t => matches(t));
 
-	const source = MAPBOX.getSource('filtered-source');
+		if (!arr.length) return;
 
-	const fs = source._data.features;
+		const result = arr[0].filter(e => arr.every(a => a.includes(e)));
 
-	const lis = [];
-	for (let i = 0; i < fs.length; i += 1) {
-		const x = result.includes(+fs[i].id);
+		const source = MAPBOX.getSource(`filtered-source-${k}`);
 
-		fs[i].properties.__visible = x;
+		const fs = source._data.features;
 
-		if (x) lis.push(ce('li', fs[i].properties[GEOGRAPHY.divisions[1].csv.value]));
-	}
+		const lis = [];
+		for (let i = 0; i < fs.length; i += 1) {
+			const x = result.includes(+fs[i].id);
 
-	ul.append(...lis);
+			fs[i].properties.__visible = x;
 
-	source.setData(source._data);
+			if (x) lis.push(ce('li', d.csv.table[fs[i].id]));
+		}
+
+		ul.append(...lis);
+
+		source.setData(source._data);
+
+		lists.append(details);
+	});
 };

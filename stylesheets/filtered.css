@@ -1,6 +1,7 @@
 #filtered-pane {
   padding: 0.7em 0 2em;
   background-color: white;
+  justify-content: space-between;
 }
 
 #filtered-pane .up-title {
@@ -8,6 +9,12 @@
   text-align: left;
 }
 
-ul#filtered-subgeographies {
-  margin-left: 0;
+#filtered-subgeographies {
+  flex-grow: 1;
+  overflow-y: scroll;
+  border-bottom: 1px solid lightgray;
+}
+
+#filtered-subgeographies details {
+  padding: 10px 20px;
 }

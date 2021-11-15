@@ -225,9 +225,13 @@ function load_view() {
 	})();
 
 	function filtered_visibility(v) {
+		const a = DS.array.filter(d => d.on).map(d => maybe(d, 'config', 'divisions_tier'));
+
 		GEOGRAPHY.divisions.forEach((_,i) => {
+			let y = (a.indexOf(i) < 0) ? 'none' : v;
+
 			if (MAPBOX.getLayer(`filtered-layer-${i}`))
-				MAPBOX.setLayoutProperty(`filtered-layer-${i}`, 'visibility', v);
+				MAPBOX.setLayoutProperty(`filtered-layer-${i}`, 'visibility', y);
 		});
 	};
 

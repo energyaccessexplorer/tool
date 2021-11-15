@@ -224,6 +224,18 @@ function load_view() {
 		});
 	})();
 
+	function filtered_visibility(v) {
+		GEOGRAPHY.divisions.forEach((_,i) => {
+			if (MAPBOX.getLayer(`filtered-layer-${i}`))
+				MAPBOX.setLayoutProperty(`filtered-layer-${i}`, 'visibility', v);
+		});
+	};
+
+	function output_visibility(v) {
+		if (MAPBOX.getLayer('output-layer'))
+			MAPBOX.setLayoutProperty('output-layer', 'visibility', v);
+	};
+
 	switch (view) {
 	case "outputs": {
 		indexes.list();
@@ -232,19 +244,17 @@ function load_view() {
 			.then(_ => {
 				if (timeline) timeline.style.display = 'none';
 
-				GEOGRAPHY.divisions.forEach((_,i) => {
-					if (MAPBOX.getLayer(`filtered-layer-${i}`))
-						MAPBOX.setLayoutProperty(`filtered-layer-${i}`, 'visibility', 'none');
-				});
+				filtered_visibility('none');
 
-				MAPBOX.setLayoutProperty('output-layer', 'visibility', 'visible');
+				output_visibility('visible');
 			});
 		break;
 	}
 
 	case "inputs": {
-		if (MAPBOX.getLayer('output-layer'))
-			MAPBOX.setLayoutProperty('output-layer', 'visibility', 'none');
+		filtered_visibility('none');
+
+		output_visibility('none');
 
 		cards.update(inputs);
 		O.sort();
@@ -257,11 +267,9 @@ function load_view() {
 	case "filtered": {
 		if (timeline) timeline.style.display = 'none';
 
-		GEOGRAPHY.divisions.forEach((_,i) => {
-			MAPBOX.setLayoutProperty(`filtered-layer-${i}`, 'visibility', 'visible');
-		});
+		filtered_visibility('visible');
 
-		MAPBOX.setLayoutProperty('output-layer', 'visibility', 'none');
+		output_visibility('none');
 
 		analysis_plot_active(output, true);
 
@@ -272,10 +280,9 @@ function load_view() {
 	case "timeline": {
 		if (timeline) timeline.style.display = '';
 
-		GEOGRAPHY.divisions.forEach((_,i) => {
-			MAPBOX.setLayoutProperty(`filtered-layer-${i}`, 'visibility', 'visible');
-		});
-		MAPBOX.setLayoutProperty('output-layer', 'visibility', 'none');
+		filtered_visibility('none');
+
+		output_visibility('none');
 
 		timeline_lines_update();
 

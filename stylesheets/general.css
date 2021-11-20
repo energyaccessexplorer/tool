@@ -110,8 +110,6 @@ aside.bubblearrow-marker {
   border-radius: 3px;
   box-shadow: 0 20px 30px 0 rgba(0,0,0,0.2);
 
-  max-width: 400px;
-
   animation: pulse 3s ease-out;
   animation-iteration-count: infinite;
   opacity: 0.5;

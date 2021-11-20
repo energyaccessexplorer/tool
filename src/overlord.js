@@ -7,7 +7,6 @@ import {
 
 import {
 	lines_update as timeline_lines_update,
-	lines_draw as timeline_lines_draw,
 } from './timeline.js';
 
 import {
@@ -197,7 +196,6 @@ function load_view() {
 
 		if (!GEOGRAPHY.timeline) return;
 
-
 		GEOGRAPHY.divisions.forEach((d,i) => {
 			if (!MAPBOX.getSource(`filtered-source-${i}`)) {
 				MAPBOX.addSource(`filtered-source-${i}`, {
@@ -306,144 +304,81 @@ function load_view() {
 };
 
 function mapclick(e) {
-	const {view, inputs, output} = U;
+	if (!INFOMODE) return;
 
-	const inp = maybe(inputs, 0);
+	const et = MAPBOX.queryRenderedFeatures(e.point)[0];
 
-	let t;
+	const ll = [e.lngLat.lng, e.lngLat.lat];
+	const rc = coordinates_to_raster_pixel(ll, DST.get('outline').raster);
 
-	let dict = [];
-	let props = {};
+	const [dict, props] = context(rc, et);
 
-	function tier_rows(v) {
-		if (GEOGRAPHY.divisions.length < 2) return;
+	if (U.view === "outputs") {
+		const ac = coordinates_to_raster_pixel(ll, {
+			data: MAPBOX.getSource('output-source').raster,
+			nodata: -1
+		});
 
-		dict.push(null);
-
-		GEOGRAPHY
-			.divisions
-			.map((d,i) => {
-				if (i === 0) return;
-
-				const t = d.csv.table[d.raster.data[v]];
-				if (!t) return;
-
-				dict.push(["_" + d.name, d.name]);
-				props["_" + d.name] = t;
-			});
-	};
-
-	function click(fn) {
-		if (!INFOMODE) return;
-
-		const et = MAPBOX.queryRenderedFeatures(e.point)[0];
-
-		const rc = coordinates_to_raster_pixel([e.lngLat.lng, e.lngLat.lat], t.raster);
-
-		fn(rc, et);
-
-		const s = maybe(et, 'source');
-		context(rc, dict, props, (!s || (s === inp)) ? t.id : null);
-
-		tier_rows(rc.index);
-
-		const td = table_data(dict, props);
-
-		table_add_lnglat(td, [e.lngLat.lng, e.lngLat.lat]);
-
-		map_pointer(
-			td,
-			e.originalEvent.pageX,
-			e.originalEvent.pageY
-		);
-	};
-
-	function vectors(_, et) {
-		if (et) Object.assign(props, et.properties);
-
-		timeline_lines_draw();
-
-		if (maybe(et, 'source') === inp) {
-			if (and(maybe(t, 'csv', 'key'), t.category.name !== 'boundaries')) {
-				const v = t.csv.table[et.properties[t.vectors.id]];
-
-				if (v ?? false) {
-					dict.push(["_" + t.csv.key, t.name]);
-					props["_" + t.csv.key] = v + " " + (t.category.unit || "km (proximity to)");
-				} else return;
-			}
-
-			if (maybe(t.config, 'attributes_map', 'length'))
-				t.config.attributes_map.forEach(e => dict.push([e.dataset, e.target]));
-		} else {
-			dict.push(["value", t.name]);
-			props['value'] = "none under these coordinates";
+		if (Number.isFinite(maybe(ac, 'value'))) {
+			dict.unshift(["_analysis_name", ea_indexes[U.output]['name']], null);
+			props["_analysis_name"] = ea_lowmedhigh_scale(ac.value);
 		}
-
-		dict.push(null);
-	};
-
-	function raster(rc, _) {
-		if (typeof maybe(rc, 'value') === 'number' &&
-        rc.value !== t.raster.nodata) {
-			const v = rc.value;
-
-			const vv = (v%1 === 0) ? v : v.toFixed(2);
-
-			dict.push(["value", t.name]);
-			props["value"] = `${vv} <code>${t.category.unit || ''}</code>`;
-		}
-	};
-
-	function analysis(rc, _) {
-		if (typeof maybe(rc, 'value') === 'number') {
-			dict = dict.concat([
-				["aname", t.name],
-				null
-			]);
-
-			props = {
-				"aname": ea_lowmedhigh_scale(rc.value),
-			};
-		}
-	};
-
-	if (view === "outputs") {
-		if (!INFOMODE) return;
-
-		t = {
-			raster: {
-				data: MAPBOX.getSource('output-source').raster,
-				nodata: -1,
-			},
-			category: {},
-			name: ea_indexes[output]['name']
-		};
-
-		click(analysis);
 	}
 
-	else if (or(view === "timeline",
-	            view === "inputs")) {
-		t = DST.get(inp);
+	const td = table_data(dict, props, ll);
 
-		if (!t) return;
-
-		if (t.vectors) click(vectors);
-		else if (t.raster.data) click(raster);
-	}
+	map_pointer(
+		td,
+		e.originalEvent.pageX,
+		e.originalEvent.pageY
+	);
 };
 
-function context(rc, dict, props, skip = null) {
-	if (!rc) return [];
+function context(rc, f) {
+	const dict = [];
+	const props = {};
+
+	if (!rc) return [dict, props];
 
 	const controls = controls_list();
 
+	const x = rc.index;
+	const in0 = maybe(U.inputs, 0);
+
+	function rows(d) {
+		let v = d.raster.data[x];
+		let k = d.id;
+
+		if (v === d.raster.nodata) return;
+
+		if ((v + "").match('[0-9]\\.[0-9]{3}'))
+			v = v.toFixed(2);
+
+		if (maybe(d, 'csv', 'key')) { // (!d.category.name.match(/^(timeline-)?indicator/))
+			k = d.id + "_csv_" + d.csv.key;
+			v = d.csv.table[v];
+		}
+
+		if (v || !d.vectors) {
+			dict.push([k, d.name]);
+			props[k] = `${v} <code>${d.category.unit || "km (proximity to)"}</code>`;
+		}
+
+		if (and(d.vectors, d.id === in0)) {
+			if ((f && f.source) === d.id) {
+				if (maybe(d.config, 'attributes_map', 'length')) {
+					Object.assign(props, f.properties);
+					const a = d.config.attributes_map.map(e => [e.dataset, e.target]);
+					if (a.length) dict.unshift(...a, null);
+				}
+			}
+		}
+	};
+
 	DS.array
 		.filter(d => and(d.on,
-		                 d.category.name !== 'outline',
 		                 d.category.name !== 'boundaries',
-		                 d.id !== skip))
+		                 d.category.name !== 'outline'))
 		.sort((a,b) => {
 			const bi = controls.indexOf(b.id);
 			const ai = controls.indexOf(a.id);
@@ -452,23 +387,31 @@ function context(rc, dict, props, skip = null) {
 			else if (ai < bi) return -1;
 			else return 0;
 		})
-		.forEach(d => {
-			let v = d.raster.data[rc.index];
-			let p = d.id;
+		.forEach(d => rows(d));
 
-			if ((v + "").match('[0-9]\\.[0-9]{3}'))
-				v = v.toFixed(2);
+	(function tier_rows() {
+		const g = GEOGRAPHY.divisions.slice(0);
 
-			if (v === d.raster.nodata) return;
+		const a = g
+			.filter(d => maybe(d, 'csv', 'table', d.raster.data[x]))
+			.map(d => {
+				props["_" + d.name] = d.csv.table[d.raster.data[x]];
+				return ["_" + d.name, d.name];
+			});
 
-			if (maybe(d, 'csv', 'key')) { // (!d.category.name.match(/^(timeline-)?indicator/))
-				p = "_analysis_" + p + "_" + d.csv.key;
-				v = d.csv.table[v];
-			}
+		if (dict.length) a.unshift(null);
 
-			if (v ?? false) {
-				dict.push([p, d.name]);
-				props[p] = v + " " + (d.category.unit || "km (proximity to)");
-			}
-		});
+		dict.push(...a);
+	})();
+
+	dict.forEach((d,i) => {
+		if (!d) return;
+
+		if (d[0] === in0) {
+			dict.splice(i,1);
+			dict.unshift(d, null);
+		}
+	});
+
+	return [dict,props];
 };

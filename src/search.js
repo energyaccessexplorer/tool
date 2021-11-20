@@ -11,11 +11,9 @@ export function pointto(coords, dict, props, a = false) {
 
 	const rc = coordinates_to_raster_pixel(coords, OUTLINE.raster);
 
-	if (a) O.context(rc, dict, props, null);
+	if (a) O.context(rc, dict, props);
 
-	const td = table_data(dict, props);
-
-	table_add_lnglat(td, coords);
+	const td = table_data(dict, props, coords);
 
 	const box = maparea.getBoundingClientRect();
 

@@ -462,12 +462,13 @@ function table_keyvalue(obj, kfn, vfn) {
 	return table;
 };
 
-function table_data(dict, props) {
+function table_data(dict, props, lnglat) {
 	const t = ce('table');
+	const s = ce('tr', [ce('td', "&nbsp;"), ce('td', "&nbsp;")]);
 
 	for (let e of dict) {
 		if (!e) {
-			t.append(ce('tr', [ ce('td', "&nbsp;"), ce('td', "&nbsp;") ]));
+			t.append(s.cloneNode(true));
 			continue;
 		}
 
@@ -477,24 +478,21 @@ function table_data(dict, props) {
 		]));
 	};
 
+	if (maybe(lnglat, 'length') === 2) {
+		t.append(
+			qs('tr', t) ? s.cloneNode(true) : "",
+			ce('tr', [
+				ce('td', "longitude"),
+				ce('td', ce('code', lnglat[0].toFixed(5))),
+			]),
+			ce('tr', [
+				ce('td', "latitude"),
+				ce('td', ce('code', lnglat[1].toFixed(5))),
+			]),
+		);
+	}
+
 	return t;
-};
-
-function table_add_lnglat(d, lnglat = [0, 0]) {
-	d.append(ce('tr', [
-		ce('td', "&nbsp;"),
-		ce('td', "&nbsp;"),
-	]));
-
-	d.append(ce('tr', [
-		ce('td', "longitude"),
-		ce('td', ce('code', lnglat[0].toFixed(5))),
-	]));
-
-	d.append(ce('tr', [
-		ce('td', "latitude"),
-		ce('td', ce('code', lnglat[1].toFixed(5))),
-	]));
 };
 
 function map_pointer(content, x, y) {

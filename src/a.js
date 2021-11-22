@@ -27,16 +27,8 @@ import {
 } from './timeline.js';
 
 import {
-	analysis,
-} from './analysis.js';
-
-import {
 	select_tab as controls_select_tab,
 } from './controls-search.js';
-
-import {
-	intersect,
-} from './rasters.js';
 
 import DS from './ds.js';
 
@@ -488,100 +480,4 @@ function drawer_init() {
 	}
 
 	toggle_left_panel();
-};
-
-let analysis_count = 0;
-
-export async function analysis_to_dataset(t) {
-	const category = await ea_api.get("categories", { "select": "*", "name": "eq.analysis" }, { one: true });
-
-	category.colorstops = ea_analysis_colorscale.stops;
-
-	analysis_count++;
-
-	const a = await analysis(t);
-
-	const url = URL.createObjectURL(new Blob([a.tiff], { type: "application/octet-stream;charset=utf-8" }));
-
-	const d = new DS({
-		"name": `analysis-${t}-` + analysis_count,
-		"name_long": `Analysis ${t.toUpperCase()} - ` + analysis_count,
-		"datatype": "raster",
-		"category": category,
-		"processed_files": [{
-			"func": "raster",
-			"endpoint": url
-		}],
-		"source_files": [],
-		"metadata": {},
-	});
-
-	d.metadata.inputs = U.inputs;
-
-	d._active(true, true);
-
-	PARAMS.inputs.push(d.id);
-
-	U.inputs = [d.id].concat(U.inputs);
-	O.view = 'inputs';
-
-	qs('#cards-pane #cards-list').prepend(d.card);
-
-	await until(_ => maybe(d, 'raster', 'data'));
-
-	d['summary'] = {
-		'intersections': {}
-	};
-
-	for (const i of d.metadata.inputs) {
-		const ds = DST.get(i);
-		const x = analysis_dataset_intersect.call(ds, d.raster);
-
-		if (x) d['summary']['intersections'][ds.id] = x;
-	}
-
-	d['summary']['analysis'] = a.analysis;
-};
-
-function analysis_dataset_intersect(raster) {
-	const { data, nodata } = raster;
-
-	if (this.datatype === 'raster') return;
-
-	let fn;
-	if (this.datatype === 'polygons')
-		fn = p => extent_contained(p.properties['__extent'], raster);
-	else if (this.datatype === 'lines')
-		fn = p => intersect(p.properties['__rasterindexes'], raster);
-	else if (this.datatype === 'points')
-		fn = p => (data[p.properties['__rasterindex']] !== nodata);
-	else
-		fn = _ => true;
-
-	let count = 0;
-	for (const p of this.vectors.features.features) {
-		const x = fn(p);
-		p.properties['__visible'] = x;
-
-		if (x) count += 1;
-	}
-
-	MAPBOX.getSource(this.id).setData(DST.get(this.id).vectors.features);
-
-	return count;
-};
-
-function extent_contained(extent, raster) {
-	const [left,bottom,right,top] = extent;
-
-	const f = (x,y) => {
-		const v = maybe(coordinates_to_raster_pixel([x,y], raster), 'value');
-		return and(v, v !== raster.nodata);
-	};
-
-	return or(f(left, top),
-	          f(left, bottom),
-	          f(right, top),
-	          f(right, bottom),
-	          f((right - left) / 2, (top - bottom) / 2));
 };

@@ -464,11 +464,3 @@ export async function polygons_csv() {
 	if (this.card) this.card.refresh();
 	if (this.controls) this.controls.refresh();
 };
-
-export function reset_features_visibility() {
-	const fs = maybe(this, 'vectors', 'features');
-	if (!fs) return;
-
-	fs.features.forEach(f => f.properties.__visible = true);
-	MAPBOX.getSource(this.id).setData(fs);
-};

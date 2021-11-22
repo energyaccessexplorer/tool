@@ -23,6 +23,7 @@ reload:
 	-${BROWSER_RELOAD}
 
 deps:
+	mkdir -p ${DIST}/lib/fonts
 	DEST=${DIST}/lib ${BIN}/deps
 
 start:

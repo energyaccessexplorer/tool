@@ -152,6 +152,15 @@ export default class Overlord {
 				(i === 0) ? MAPBOX.first_symbol : arr[i-1].id
 			);
 		}
+
+		const d = arr[0];
+
+		for (const ds of arr) {
+			if (d.summary)
+				analysis_dataset_intersect.call(ds, d.raster);
+			else
+				reset_features_visibility.call(ds);
+		}
 	};
 
 	info_mode() {

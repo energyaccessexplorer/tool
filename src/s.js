@@ -216,48 +216,50 @@ export function init() {
 		return s;
 	};
 
+	function list(geographies) {
+		for (let co of geographies) {
+			const d = ce('div', ce('h2', co.name, { class: 'country-name' }), { class: 'country-item', ripple: "" });
+			d.onclick = _ => setTimeout(_ => geography(co), 350);
+
+			const intro = maybe(co, 'configuration', 'introduction');
+			if (intro) {
+				let p;
+				d.onmouseenter = _ => {
+					p = bubblearrow(d, {
+						message: ce('pre', intro),
+						close: false,
+						position: "C",
+					});
+				};
+				d.onmouseleave = _ => {
+					p.remove();
+				};
+			}
+
+			fetch(`https://world.energyaccessexplorer.org/countries?select=flag&or=(names->>official.eq.${co.name},name.eq.${co.name})`)
+				.then(r => r.json())
+				.then(r => {
+					const data = r[0];
+
+					if (!data) return;
+
+					d.append(ugly_flag(
+						URL.createObjectURL((new Blob([hextostring(data['flag'])], {type: 'image/svg+xml'})))
+					));
+				});
+
+			playground.append(d);
+		}
+
+		ea_loading(false);
+	};
+
 	ea_api
 		.get("geographies", {
 			"adm": "eq.0",
 			"deployment": `ov.{${ENV}}`,
 		})
-		.then(countries_online => {
-			for (let co of countries_online) {
-				const d = ce('div', ce('h2', co.name, { class: 'country-name' }), { class: 'country-item', ripple: "" });
-				d.onclick = _ => setTimeout(_ => geography(co), 350);
-
-				const intro = maybe(co, 'configuration', 'introduction');
-				if (intro) {
-					let p;
-					d.onmouseenter = _ => {
-						p = bubblearrow(d, {
-							message: ce('pre', intro),
-							close: false,
-							position: "C",
-						});
-					};
-					d.onmouseleave = _ => {
-						p.remove();
-					};
-				}
-
-				fetch(`https://world.energyaccessexplorer.org/countries?select=flag&or=(names->>official.eq.${co.name},name.eq.${co.name})`)
-					.then(r => r.json())
-					.then(r => {
-						const data = r[0];
-
-						if (!data) return;
-
-						d.append(ugly_flag(
-							URL.createObjectURL((new Blob([hextostring(data['flag'])], {type: 'image/svg+xml'})))
-						));
-					});
-
-				playground.append(d);
-			}
-
-			ea_loading(false);
-		})
+		.then(r => list(r))
 		.catch(error => {
 			ea_flash.push({
 				type: 'error',

@@ -50,9 +50,11 @@ export default class DS {
 
 		this.items = config.collection ? [] : undefined;
 
-		this.initialise(o);
+		DST.set(this.id, this);
 
 		this.loaded = false;
+
+		if (!this.init(o)) return;
 
 		this.domain = o.category.domain;
 
@@ -64,12 +66,39 @@ export default class DS {
 			this.card = new dscard(this);
 			this.controls = new dscontrols(this);
 		}
-
-		DST.set(this.id, this);
 	};
 
-	initialise(o) {
+	init(o) {
 		let indicator = false;
+
+		if (this.category.name.match(/^(timeline-)?indicator/)) {
+			let b = GEOGRAPHY.divisions[this.config.divisions_tier];
+
+			if (!b) {
+				ea_flash.push({
+					type: 'error',
+					timeout: 5000,
+					title: "Dataset/File error",
+					message: `
+'${this.name}' requires a geography->divisions->${this.config.divisions_tier}.
+
+This is not fatal but the dataset is now disabled.`
+				});
+
+				console.error(`'${this.name}' failed. Missing geography->divisions->${this.config.divisions_tier}.`);
+
+				return false;
+			}
+
+			this.raster = b.raster;
+			this.vectors = jsonclone(b.vectors);
+			Object.assign(this.vectors, this.category.vectors);
+
+			this.vectors.id = b.config.vectors_id;
+			this.vectors.parse = x => parse.polygons.call(x || this);
+
+			indicator = true;
+		}
 
 		const ferr = t => {
 			if (indicator && ['vectors', 'raster'].includes(t)) return;
@@ -88,20 +117,6 @@ This is not fatal but the dataset is now disabled.`
 
 			this.disable(`Missing ${t}`);
 		};
-
-		if (this.category.name.match(/^(timeline-)?indicator/)) {
-			let b = GEOGRAPHY.divisions[this.config.divisions_tier];
-			if (!b) throw new Error("Indicator datasets should have configuration->divisions_tier set.");
-
-			this.raster = b.raster;
-			this.vectors = jsonclone(b.vectors);
-			Object.assign(this.vectors, this.category.vectors);
-
-			this.vectors.id = b.config.vectors_id;
-			this.vectors.parse = x => parse.polygons.call(x || this);
-
-			indicator = true;
-		}
 
 		if (o.category.vectors) {
 			let f = this.processed_files.find(x => x.func === 'vectors');
@@ -195,6 +210,8 @@ This is not fatal but the dataset is now disabled.`
 			break;
 		}
 		}
+
+		return true;
 	};
 
 	category_overrides(ovrr) {

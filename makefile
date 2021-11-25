@@ -186,5 +186,3 @@ reconfig:
 		> settings.json
 
 	@cat settings.json
-
-.include <extras.mk>

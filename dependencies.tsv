@@ -4,7 +4,7 @@ mapbox-gl.js	https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js
 mapbox-gl.css	https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css
 geojson-extent.js	https://raw.githubusercontent.com/mapbox/geojson-extent/master/geojson-extent.js
 sphericalmercator.js	https://raw.githubusercontent.com/mapbox/sphericalmercator/master/sphericalmercator.js
-html5sortable.js	https://unpkg.com/html5sortable/dist/html5sortable.js
+html5sortable.js	https://unpkg.com/html5sortable/dist/html5sortable.min.js
 countries.json	https://raw.githubusercontent.com/mledoze/countries/master/dist/countries.json
 helpers.js	https://git.263.nu/f/web-toolbelt/raw/branch/trunk/helpers.js
 flash.js	https://git.263.nu/f/web-toolbelt/raw/branch/trunk/flash.js

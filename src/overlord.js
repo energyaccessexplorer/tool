@@ -153,14 +153,15 @@ export default class Overlord {
 			);
 		}
 
-		const d = arr[0];
+		const a = arr[0];
+		for (const d of arr) {
+			if (!a.summary) {
+				reset_features_visibility.call(d);
+				continue;
+			}
 
-		for (const ds of arr) {
-			if (d.summary)
-				analysis_dataset_intersect.call(ds, d.raster);
-			else
-				reset_features_visibility.call(ds);
-		}
+			analysis_dataset_intersect.call(d, a.raster);
+		};
 	};
 
 	info_mode() {

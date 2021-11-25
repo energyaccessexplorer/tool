@@ -1,3 +1,10 @@
+if (location.hostname.match(/^www/))
+	ENV = "production";
+else if (location.hostname.match(/^staging/))
+	ENV = "staging";
+else if (location.hostname.match(/localhost/))
+	ENV = ["production", "staging"];
+
 function ugly_flag(flagurl) {
 	return ce('img', null, {
 		src: flagurl,
@@ -208,13 +215,6 @@ export function init() {
 
 		return s;
 	};
-
-	if (location.hostname.match(/^www/))
-		ENV = "production";
-	else if (location.hostname.match(/^staging/))
-		ENV = "staging";
-	else if (location.hostname.match(/localhost/))
-		ENV = ["production", "staging"];
 
 	ea_api
 		.get("geographies", {

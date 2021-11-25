@@ -67,7 +67,10 @@ async function load(x,y) {
 	U.subdiv = y;
 	O.view = U.view;
 
-	const geometry = maybe(GEOGRAPHY.divisions, x, 'vectors', 'features', 'features').find(f => f['id'] === y);
+	const fs = maybe(GEOGRAPHY.divisions, x, 'vectors', 'features', 'features');
+	if (!fs) return;
+
+	const geometry = fs.find(f => f['id'] === y);
 
 	geometry_path[x] = y;
 

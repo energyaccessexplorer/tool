@@ -171,10 +171,14 @@ synced:
 deploy:
 	touch ${env}.diff
 
+	patch -p1 --reverse <development.diff
+
 	patch -p1 <${env}.diff
 	bmake reconfig build sync env=${env}
 
 	patch -p1 --reverse <${env}.diff
+
+	patch -p1 <development.diff
 	bmake reconfig build reload env=development
 
 reconfig:

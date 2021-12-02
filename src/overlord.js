@@ -376,9 +376,14 @@ function context(rc, f) {
 			v = d.csv.table[v];
 		}
 
-		if (v || !d.vectors) {
+		if (d.category.unit) {
 			dict.push([k, d.name]);
-			props[k] = `${v} <code>${d.category.unit || "km (proximity to)"}</code>`;
+			props[k] = `${v} <code>${d.category.unit}</code>`;
+		}
+
+		else if (and(v, d.vectors)) {
+			dict.push([k, d.name]);
+			props[k] = `${v} <code>km (proximity to)</code>`;
 		}
 
 		if (and(d.vectors, d.id === in0)) {

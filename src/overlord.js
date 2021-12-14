@@ -387,6 +387,11 @@ function context(rc, f) {
 		}
 
 		if (and(d.vectors, d.id === in0)) {
+			if (v === 0) {
+				dict.push([k, d.name]);
+				props[k] = `<code>&lt; 1 km (proximity to)</code>`;
+			}
+
 			if ((f && f.source) === d.id) {
 				if (maybe(d.config, 'attributes_map', 'length')) {
 					Object.assign(props, f.properties);

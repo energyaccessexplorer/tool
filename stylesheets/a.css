@@ -32,3 +32,7 @@
 .svg-pie {
   filter: drop-shadow( 0px 1px 1px rgba(0, 0, 0, 0.3));
 }
+
+aside.bubblearrow-marker main {
+  max-width: 42em;
+}

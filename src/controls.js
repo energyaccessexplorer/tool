@@ -535,5 +535,5 @@ function range_group_controls() {
 };
 
 export function list() {
-	return Array.from(qs('ds-controls', contents_el)).map(c => c.ds.id);
-}
+	return Array.from(qsa('ds-controls', contents_el)).map(c => c.ds.id);
+};

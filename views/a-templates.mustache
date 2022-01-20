@@ -100,11 +100,19 @@
 
     <div class="right" style="flex: 0 300px; padding-left: 3em;">
       <section>
-        <a class="download-link" id="metadata-sources" target="_blank">Download from Source</a>
+        <a class="download-link"
+           bind-cond="download_original_url"
+           bind-attr="href"
+           bind-value="download_original_url"
+           target="_blank">Download from Source</a>
       </section>
 
       <section>
-        <a class="download-link" id="learn-more" target="_blank">Learn More</a>
+        <a class="download-link"
+           bind-cond="learn_more_url"
+           bind-attr="href"
+           bind-value="learn_more_url"
+           target="_blank">Learn More</a>
       </section>
 
       <section bind-cond="sources">

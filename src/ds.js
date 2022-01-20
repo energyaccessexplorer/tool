@@ -528,9 +528,6 @@ This is not fatal but the dataset is now disabled.`
 		} else {
 			const m = Object.assign({}, this.metadata, { "category-description": this.category.description });
 			content = tmpl('#ds-info-modal', m);
-
-			qs('#metadata-sources', content).href = m.download_original_url;
-			qs('#learn-more', content).href = m.learn_more_url;
 		}
 
 		ea_modal.set({

@@ -141,11 +141,8 @@ export function raster() {
 			}
 
 			if (this !== OUTLINE) {
-				if (this.raster.width !== OUTLINE.raster.width) {
-					// TODO: enable this when paver is ready
-					//
-					// || this.raster.height !== OUTLINE.raster.height
-					//
+				if (or(this.raster.width !== OUTLINE.raster.width,
+				       this.raster.height !== OUTLINE.raster.height)) {
 					fail.call(this, `Raster resolution does not match OUTLINE.
 ${this.id}: ${this.raster.width} × ${this.raster.height}
 OUTLINE: ${OUTLINE.raster.width} × ${OUTLINE.raster.height}`);

@@ -156,10 +156,6 @@ body {
   z-index: 0;
 }
 
-#mapbox-theme-control-popup .radio-group + .radio-group {
-  margin-top: 8px;
-}
-
 .bottom-right-container {
   height: auto;
   margin-top: 3px;

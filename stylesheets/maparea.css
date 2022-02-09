@@ -30,3 +30,11 @@ canvas.mapboxgl-canvas {
   font-family: monospace;
   white-space: nowrap;
 }
+
+.mapbox-control-popup .radio-group label {
+  margin-left: 0.5em;
+}
+
+.mapbox-control-popup .radio-group + .radio-group {
+  margin-top: 8px;
+}

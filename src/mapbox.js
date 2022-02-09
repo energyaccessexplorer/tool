@@ -11,6 +11,26 @@ const default_styles = [{
 
 const styles = default_styles;
 
+const projections = [{
+	"name": "Natural Earth",
+	"value": "naturalEarth"
+}, {
+	"name": "Mercator",
+	"value": "mercator"
+}, {
+	"name": "Winkel tripel",
+	"value": "winkelTripel"
+}, {
+	"name": "Lambert conformal conic",
+	"value": "lambertConformalConic"
+}, {
+	"name": "Equirectangular",
+	"value": "equirectangular"
+}, {
+	"name": "Equal Earth",
+	"value": "equalEarth"
+}];
+
 let info_mode_button;
 
 class MapboxThemeControl {
@@ -25,6 +45,28 @@ class MapboxThemeControl {
 		this._container.append(button);
 
 		button.addEventListener('mouseup', e => theme_control_popup(e.target.closest('button')));
+
+		return this._container;
+	};
+
+	onRemove() {
+		this._container.parentNode.removeChild(this._container);
+		this._map = undefined;
+	};
+};
+
+class MapboxProjectionControl {
+	onAdd(map) {
+		this._map = map;
+		this._container = document.createElement('div');
+		this._container.className = 'mapboxgl-ctrl';
+		this._container.classList.add('mapboxgl-ctrl-group');
+
+		let button = ce('button', ce('div', font_icon('dribbble'), { style: "transform: scale(0.75)" }), { type: 'button', class: 'mapboxgl-ctrl-icon'});
+
+		this._container.append(button);
+
+		button.addEventListener('mouseup', e => projection_control_popup(e.target.closest('button')));
 
 		return this._container;
 	};
@@ -84,14 +126,57 @@ export function init(overlord = {}) {
 		mb.on('click', e => _O.map('click', e));
 
 		mb.addControl((new MapboxThemeControl()), 'top-right');
+		mb.addControl((new MapboxProjectionControl()), 'top-right');
 		mb.addControl((new MapboxInfoControl()), 'top-right');
 	}
 
 	return mb;
 };
 
+function projection_control_popup(_) {
+	let x = ce('div', null, { class: 'mapbox-control-popup' });
+	let radios = ce('div');
+
+	for (let t of projections) {
+		let e = ce('div', null, { class: 'radio-group' });
+
+		e.append(
+			ce('input', null, {
+				id: `mapbox_projection_${t.value}`,
+				type: "radio",
+				name: "mapbox_projection",
+				value: t.value
+			}),
+			ce('label', t.name, { for: `mapbox_projection_${t.value}` })
+		);
+
+		radios.append(e);
+	}
+
+	let current = qs(`input[value="${MAPBOX.getProjection()}"]`, radios);
+	if (current) current.setAttribute('checked', true);
+
+	qsa('input[name="mapbox_projection"]', radios)
+		.forEach(e => e.addEventListener('change', _ => MAPBOX.setProjection(e.value)));
+
+	x.addEventListener('mouseleave', _ => x.remove());
+
+	x.append(radios);
+
+	x.style = `
+position: absolute;
+top: 120px;
+right: 10px;
+background-color: white;
+box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+border-radius: 4px;
+padding: 16px;`;
+
+	qs('#maparea').append(x);
+};
+
 function theme_control_popup(_) {
-	let x = ce('div', null, { id: 'mapbox-theme-control-popup' });
+	let x = ce('div', null, { class: 'mapbox-control-popup' });
 	let radios = ce('div');
 
 	for (let t of styles) {

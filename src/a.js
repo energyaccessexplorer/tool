@@ -322,12 +322,12 @@ function layout() {
 	const oc = tmpl('#bottom-right-container-output-template');
 	const gc = tmpl('#bottom-right-container-graphs-template');
 
-	if (GEOGRAPHY.timeline) {
-		qs('#filtered-pane').append(oc);
+	qs('#filtered-pane').append(oc);
+
+	if (GEOGRAPHY.timeline)
 		qs('#cards-pane').append(gc);
-	} else {
+	else
 		qs('#cards-pane').append(oc);
-	}
 
 	document.body.onresize = function() {
 		set_heights();

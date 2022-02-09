@@ -22,7 +22,7 @@ ea_views = {
 
 ea_params = {
 	"default": {
-		"view": ['inputs', 'outputs'],
+		"view": ['inputs', 'filtered', 'outputs'],
 		"inputs": [],
 		"output": ['eai', 'ani', 'demand', 'supply'],
 		"pack": [],

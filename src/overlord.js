@@ -211,8 +211,6 @@ function load_view() {
 			}, MAPBOX.first_symbol);
 		}
 
-		if (!GEOGRAPHY.timeline) return;
-
 		GEOGRAPHY.divisions.forEach((d,i) => {
 			if (!MAPBOX.getSource(`filtered-source-${i}`)) {
 				MAPBOX.addSource(`filtered-source-${i}`, {

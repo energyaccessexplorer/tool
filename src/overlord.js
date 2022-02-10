@@ -9,8 +9,16 @@ import {
 } from './analysis.js';
 
 import {
+	load as config_load,
+} from './config.js';
+
+import {
 	polygons_csv as parse_polygons_csv,
 } from './parse.js';
+
+import {
+	update as cards_update,
+} from './cards.js';
 
 import {
 	lines_update as timeline_lines_update,
@@ -180,6 +188,24 @@ export default class Overlord {
 			});
 
 		O.view = U.view;
+	};
+
+	load_config(c = JSON.parse(localStorage.getItem('config'))) {
+		config_load(c);
+
+		const arr = c.datasets.filter(x => DST.get(x.name));
+
+		arr.forEach(i => {
+			const ds = DST.get(i.name);
+			if (ds) ds.active(true, true);
+		});
+
+		U.inputs = arr.map(i => i.name);
+
+		load_view();
+		cards_update();
+
+		return c;
 	};
 };
 

@@ -144,12 +144,13 @@ export default class Overlord {
 			return d.mutant ? d.host : d;
 		});
 
-		await Promise.all(arr.map(d => until(_ => d.layer)));
+		const layers = [].concat(...arr.map(d => d._layers));
+		await Promise.all(layers.map(i => until(_ => MAPBOX.getLayer(i))));
 
-		for (let i = 0; i < arr.length; i++) {
+		for (let i = 0; i < layers.length; i++) {
 			MAPBOX.moveLayer(
-				arr[i].id,
-				(i === 0) ? MAPBOX.first_symbol : arr[i-1].id
+				layers[i],
+				(i === 0) ? MAPBOX.first_symbol : layers[i-1]
 			);
 		}
 

@@ -105,7 +105,8 @@ export function raster() {
 				"coordinates": MAPBOX.coords
 			}, overrideid);
 
-			this.add_layer({
+			this.add_layers({
+				"id": overrideid,
 				"type": 'raster',
 				"layout": {
 					"visibility": "none",
@@ -113,7 +114,7 @@ export function raster() {
 				"paint": {
 					"raster-resampling": "nearest"
 				}
-			}, overrideid);
+			});
 		};
 
 		if (!maybe(this.raster, 'data')) {
@@ -268,7 +269,7 @@ export function points() {
 				"data": this.vectors.features
 			});
 
-			this.add_layer({
+			this.add_layers({
 				"type": "circle",
 				"filter": ['get', '__visible'],
 				"layout": {
@@ -343,7 +344,7 @@ export function lines() {
 				"data": this.vectors.features
 			});
 
-			this.add_layer({
+			this.add_layers({
 				"type": "line",
 				"filter": ['get', '__visible'],
 				"layout": {
@@ -389,7 +390,7 @@ export function polygons() {
 				['get', '__color'] :
 				this.vectors.fill;
 
-			this.add_layer({
+			this.add_layers({
 				"type": "fill",
 				"filter": ['get', '__visible'],
 				"layout": {

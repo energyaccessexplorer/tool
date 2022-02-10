@@ -27,6 +27,8 @@ export default class DS {
 
 		this.on = false;
 
+		this._layers = [];
+
 		let config = o.configuration || {};
 
 		this.config = config;
@@ -257,7 +259,7 @@ This is not fatal but the dataset is now disabled.`
 			if (!this.collection.disabled) this.collection.disable();
 		}
 
-		if (this.layer) MAPBOX.removeLayer(this.id);
+		this._layers.map(i => MAPBOX.removeLayer(i));
 	};
 
 	get source() {
@@ -277,25 +279,21 @@ This is not fatal but the dataset is now disabled.`
 		this.source_config = opts;
 	};
 
-	get layer() {
-		return MAPBOX.getLayer(this.id);
-	};
+	get layers() {
+		return this._layers.map(i => MAPBOX.getLayer(i)).filter(l => l);
+	}
 
-	add_layer(opts, as) {
-		if (as) {
-			opts['id'] = as;
-			opts['source'] = as;
+	add_layers(...arr) {
+		if (this.layers.length) return;
 
-			MAPBOX.addLayer(opts, MAPBOX.first_symbol);
-			return;
+		for (let a of arr) {
+			a['id'] = a['id'] || this.id;
+			a['source'] = this.id;
+
+			MAPBOX.addLayer(a, MAPBOX.first_symbol);
+
+			this._layers.push(a.id);
 		}
-
-		if (this.layer) return;
-
-		opts['id'] = this.id;
-		opts['source'] = this.id;
-
-		MAPBOX.addLayer(opts, MAPBOX.first_symbol);
 	};
 
 	update_source(data) {
@@ -424,8 +422,7 @@ This is not fatal but the dataset is now disabled.`
 			return;
 		}
 
-		if (this.layer)
-			MAPBOX.setLayoutProperty(this.id, 'visibility', t ? 'visible' : 'none');
+		this.layers.map(l => MAPBOX.setLayoutProperty(l.id, 'visibility', t ? 'visible' : 'none'));
 
 		if (this.host) {
 			this.hosts.forEach(d => MAPBOX.setLayoutProperty(d.id, 'visibility', 'none'));
@@ -606,8 +603,7 @@ This is not fatal but the dataset is now disabled.`
 	};
 
 	raise() {
-		if (this.layer)
-			MAPBOX.moveLayer(this.id, MAPBOX.first_symbol);
+		this.layers.map(l => MAPBOX.moveLayer(l.id, MAPBOX.first_symbol));
 
 		if (this.items)
 			for (let d of this.items) d.raise();

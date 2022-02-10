@@ -266,12 +266,16 @@ export function points() {
 
 			this.add_source({
 				"type": "geojson",
-				"data": this.vectors.features
+				"data": this.vectors.features,
+				"cluster": true,
+				"clusterMaxZoom": 10,
+				"clusterMinPoints": 4,
+				"clusterRadius": 20,
 			});
 
 			this.add_layers({
 				"type": "circle",
-				"filter": ['get', '__visible'],
+				"filter": ['all', ['!', ['has', 'point_count']], ['get', '__visible']],
 				"layout": {
 					"visibility": "none",
 				},
@@ -281,6 +285,26 @@ export function points() {
 					"circle-radius": ['get', '__radius'],
 					"circle-opacity": this.vectors.opacity,
 					"circle-color": this.vectors.fill,
+				},
+			}, {
+				"id": `${this.id}-clusters`,
+				"type": "circle",
+				"filter": ['has', 'point_count'],
+				"layout": {
+					"visibility": "none",
+				},
+				"paint": {
+					"circle-radius": [
+						'step', ['get', 'point_count'],
+						10, 10,
+						20, 100,
+						30, 750,
+						40
+					],
+					"circle-opacity": this.vectors.opacity,
+					"circle-color": this.vectors.fill,
+					"circle-stroke-width": this.vectors['stroke-width'],
+					"circle-stroke-color": this.vectors['stroke'],
 				},
 			});
 

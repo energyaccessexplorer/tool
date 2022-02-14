@@ -50,8 +50,6 @@ export default class DS {
 
 		this.mutant = !!maybe(config.mutant_targets, 'length');
 
-		this.items = config.collection ? [] : undefined;
-
 		DST.set(this.id, this);
 
 		this.loaded = false;
@@ -253,12 +251,6 @@ This is not fatal but the dataset is now disabled.`
 
 		if (this.card) this.card.disable();
 
-		if (this.items) this.items.map(d => d.disable());
-
-		if (this.collection) {
-			if (!this.collection.disabled) this.collection.disable();
-		}
-
 		this._layers.map(i => MAPBOX.removeLayer(i));
 	};
 
@@ -329,16 +321,6 @@ This is not fatal but the dataset is now disabled.`
 		this.card.refresh();
 
 		return this;
-	};
-
-	items_init() {
-		for (let i of this.config.collection) {
-			const d = DST.get(i);
-			d.card = d.card || new dscard(d);
-			d.collection = this;
-
-			this.items.push(d);
-		}
 	};
 
 	/*
@@ -417,11 +399,6 @@ This is not fatal but the dataset is now disabled.`
 	};
 
 	async visibility(t) {
-		if (this.items) {
-			await Promise.all(this.items.map(d => d.visibility(t)));
-			return;
-		}
-
 		this.layers.map(l => MAPBOX.setLayoutProperty(l.id, 'visibility', t ? 'visible' : 'none'));
 
 		if (this.host) {
@@ -558,13 +535,6 @@ This is not fatal but the dataset is now disabled.`
 			if (draw) this.raise();
 		}
 
-		if (this.items) {
-			await Promise.all(this.items.map(d => d.active(v, draw)));
-			this.controls.turn(v);
-
-			return;
-		}
-
 		if (this.mutant) this.mutate(this.host);
 
 		if (this.controls) this.controls.turn(v);
@@ -584,13 +554,6 @@ This is not fatal but the dataset is now disabled.`
 	async load(arg) {
 		this.loading = true;
 
-		if (this.items) {
-			// Collections will (as of now) always share rasters.
-			//
-			if (this.raster) this.raster.parse();
-			await Promise.all(this.items.map(d => d.load(arg)));
-		}
-
 		if (this.mutant) {
 			await until(_ => maybe(this.hosts, 'length') === this.config.mutant_targets.length);
 			return Promise.all(this.hosts.map(d => d.load(arg)));
@@ -604,9 +567,6 @@ This is not fatal but the dataset is now disabled.`
 
 	raise() {
 		this.layers.map(l => MAPBOX.moveLayer(l.id, MAPBOX.first_symbol));
-
-		if (this.items)
-			for (let d of this.items) d.raise();
 
 		if (this.host)
 			this.host.raise();

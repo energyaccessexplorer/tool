@@ -276,10 +276,9 @@ This is fatal. Thanks for all the fish.`;
 	PARAMS.inputs = [...new Set(DS.array.map(e => e.id))];
 
 	// We need all the datasets to be initialised _before_ setting
-	// mutant/collection attributes (order is never guaranteed)
+	// mutant attributes (order is never guaranteed)
 	//
 	DS.array.filter(d => d.mutant).forEach(d => d.mutant_init());
-	DS.array.filter(d => d.items).forEach(d => d.items_init());
 };
 
 function layout() {

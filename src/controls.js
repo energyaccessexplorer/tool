@@ -28,9 +28,6 @@ export default class dscontrols extends HTMLElement {
 		if (this.ds.category.controls.weight)
 			this.weight_group = weight.call(this.ds);
 
-		if (this.ds.items)
-			this.collection_list = collection_list.call(this.ds);
-
 		if (this.ds.mutant)
 			mutant_options.call(this.ds);
 
@@ -369,17 +366,6 @@ function weight() {
 		change: w.change,
 		ramp: r,
 	};
-};
-
-function collection_list() {
-	if (!this.items) return;
-
-	const e = ce('ul', null, { class: 'collection' });
-
-	for (let d of this.items)
-		e.append(ce('li', d.name));
-
-	return e;
 };
 
 function options() {

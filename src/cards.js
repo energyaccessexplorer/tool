@@ -90,7 +90,7 @@ function points_legends_svg(l) {
 		.attr('stroke-width', l['stroke-width']);
 
 	return svg.node();
-}
+};
 
 function polygons_legends_svg(l) {
 	const svg = d3.create('svg')
@@ -106,7 +106,7 @@ function polygons_legends_svg(l) {
 		.attr('stroke', l['stroke']);
 
 	return svg.node();
-}
+};
 
 function svg_el() {
 	const ds = this.ds;
@@ -199,23 +199,10 @@ function svg_el() {
 	}
 	}
 
-	if (ds.items) {
-		const el = ce('ul', null, { class: 'collection' });
-
-		for (let d of ds.items) {
-			let li = ce('li');
-
-			li.append(d.card.svg_el, ce('div', d.name, { class: 'subheader' }));
-			el.append(li);
-		}
-
-		return el;
-	}
-
 	d.prepend(e);
 
 	return d;
-}
+};
 
 export function init() {
 	const list = qs('#cards-pane #cards-list');
@@ -336,6 +323,8 @@ export default class dscard extends HTMLElement {
 
 			ul.append(li);
 		}
+
+		this.legends_el = ul;
 
 		it.replaceChildren(ul);
 	};

@@ -15,7 +15,7 @@
     "semi": ["error", "always"],
     "no-console": "off",
     "no-extra-semi": "off",
-    "no-mixed-spaces-and-tabs": "off",
+    "no-mixed-spaces-and-tabs":  ["error", "smart-tabs"],
     "no-prototype-builtins": "off",
     "no-unused-vars": ["warn", {
       "varsIgnorePattern": "^_$",

@@ -454,7 +454,7 @@ This is not fatal but the dataset is now disabled.`
 		let content;
 
 		if (this.summary) {
-			content = tmpl('#analysis-summary-modal', {});
+			content = shadow('#analysis-summary-modal', {});
 
 			const datasets = this.summary.analysis.datasets.slice(0);
 			const averages = datasets
@@ -501,7 +501,7 @@ This is not fatal but the dataset is now disabled.`
 
 		} else {
 			const m = Object.assign({}, this.metadata, { "category-description": this.category.description });
-			content = tmpl('#ds-info-modal', m);
+			content = shadow('#ds-info-modal', m);
 		}
 
 		ea_modal.set({

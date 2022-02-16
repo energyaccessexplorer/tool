@@ -25,7 +25,7 @@ async function summary() {
 
 	const summary = {};
 
-	const r = tmpl("#ramp");
+	const r = shadow('#ramp');
 	qs('.ramp', r).append(
 		ce('div', "Low"),
 		ce('div', "Medium"),
@@ -43,7 +43,7 @@ async function summary() {
 		let ppie = ea_svg_pie(summary[idxn]['population-density']['distribution'].map(x => [x]), 75, 0, ea_analysis_colorscale.stops, null);
 		let apie = ea_svg_pie(summary[idxn]['area']['distribution'].map(x => [x]), 75, 0, ea_analysis_colorscale.stops, null);
 
-		const container = tmpl('#index-graphs-container-template');
+		const container = shadow('#index-graphs-container-template').shadowRoot;
 		qs('.index-graphs-group #area-number', container).parentElement.append(apie.svg);
 		qs('.index-graphs-group #population-number', container).parentElement.append(ppie.svg);
 

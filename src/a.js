@@ -318,8 +318,8 @@ function layout() {
 
 	if (MOBILE) m.style['width'] = screen.width + "px";
 
-	const oc = tmpl('#bottom-right-container-output-template');
-	const gc = tmpl('#bottom-right-container-graphs-template');
+	const oc = shadow('#bottom-right-container-output-template').shadowRoot;
+	const gc = shadow('#bottom-right-container-graphs-template').shadowRoot;
 
 	qs('#filtered-pane').append(oc);
 

@@ -103,7 +103,8 @@ export async function graphs(raster) {
 export function init() {
 	const url = new URL(location);
 
-	const r = tmpl("#ramp");
+	const r = shadow('#ramp');
+
 	qs('.ramp', r).append(
 		ce('div', "Low"),
 		ce('div', "Medium"),
@@ -162,7 +163,7 @@ export function init() {
 		};
 	}
 
-	const graphs = tmpl('#index-graphs-container-template');
+	const graphs = shadow('#index-graphs-container-template').shadowRoot;
 
 	qs('.index-graphs-group #area-number', graphs).parentElement.append(PIES['area'].svg);
 	qs('.index-graphs-group #population-number', graphs).parentElement.append(PIES['population'].svg);

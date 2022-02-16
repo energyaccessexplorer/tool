@@ -33,7 +33,7 @@ export default class dscontrols extends HTMLElement {
 
 		this.dropdown = new dropdown(options.call(this));
 
-		attach.call(this, shadow_tmpl('#ds-controls-template'));
+		attach.call(this, shadow('#ds-controls-template').shadowRoot);
 
 		this.main = qs('main', this);
 		this.header = qs('header', this);
@@ -309,7 +309,7 @@ function range(opts = {}) {
 	const v1 = ce('div', null, { bind: "v1" });
 	const v2 = ce('div', null, { bind: "v2" });
 
-	const r = tmpl('#ramp');
+	const r = shadow('#ramp');
 	qs('.ramp', r).append(v1, ce('div', opts.ramp || 'range', { class: "unit-ramp" }), v2);
 
 	r.style['width'] = `${slider_width + 2}px`;
@@ -339,7 +339,8 @@ function range(opts = {}) {
 function weight() {
 	const weights = [1,2,3,4,5];
 
-	const r = tmpl('#ramp');
+	const r = shadow('#ramp');
+
 	qs('.ramp', r).append(
 		ce('div', weights[0]),
 		ce('div', "importance", { class: "unit-ramp" }),

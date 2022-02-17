@@ -14,11 +14,12 @@ const resultsinfo = ce('div', null, {
 });
 
 function li(g,i,j) {
-	const el = ce('li', g);
+	const el = shadow('#geographies-search-item', {
+		name: g.name,
+		url: g.id ? `./?id=${g.id}` : null,
+	}, 'div');
 
-	el.onclick = function() {
-		load(i,j);
-	};
+	qs('[zoom]', el).onclick = _ => load(i,j);
 
 	return el;
 };
@@ -40,7 +41,7 @@ function fetch_countries() {
 		"order": "name.asc"
 	};
 
-	ea_api.get("geographies", p).then(j => {
+	return ea_api.get("geographies", p).then(j => {
 		lists[0] = j.map((g,i) => {
 			const li = ce('li', g.name);
 			li.onclick = function() {
@@ -127,26 +128,35 @@ export async function init() {
 	ul = ce('ul');
 	resultscontainer.append(ul);
 
-	fetch_countries();
+	await fetch_countries();
 
 	const at = DST.get('admin-tiers');
 	if (at) at.load('csv');
 
-	GEOGRAPHY
-		.divisions
-		.map((d,i) => {
-			const v = maybe(d, 'csv', 'value');
-			const a = !v ? [] : d.csv.data.map(x => x[v]);
+	const gid = (new URL(location)).searchParams.get('id');
 
-			lists[i] = a.map((g,j) => {
-				const k = +d.csv.data[j][d.csv.key];
+	await ea_api
+		.get('geographies', { "select": ["name", "id"], "parent_id": `eq.${gid}` })
+		.then(r => {
+			GEOGRAPHY
+				.divisions
+				.forEach((d,i) => {
+					const v = maybe(d, 'csv', 'value');
+					const a = !v ? [] : d.csv.data.map(x => x[v]);
 
-				return {
-					i: k,
-					li: li(g, i, k),
-					name: g,
-				};
-			});
+					lists[i] = a.map((g,j) => {
+						const k = +d.csv.data[j][d.csv.key];
+						const id = maybe(r.find(e => e.name === g), 'id');
+
+						const geo = { name: g, id };
+
+						return {
+							i: k,
+							li: li(geo, i, k),
+							name: g,
+						};
+					});
+				});
 		});
 
 	resultscontainer.prepend(resultsinfo);

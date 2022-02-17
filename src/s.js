@@ -19,6 +19,8 @@ async function geography(c) {
 		"deployment": `ov.{${ENV}}`,
 	});
 
+	if (c.datasets_count > 1) coll.unshift(c);
+
 	const data = {};
 	for (let x of coll) data[x.name] = x.name;
 
@@ -29,7 +31,7 @@ async function geography(c) {
 		}
 	});
 
-	if (coll.length === 0) {
+	if (coll.length === 1) {
 		usertype(c.id);
 		return;
 	}
@@ -256,6 +258,7 @@ export function init() {
 
 	ea_api
 		.get("geographies", {
+			"select": ['*', 'datasets_count'],
 			"adm": "eq.0",
 			"deployment": `ov.{${ENV}}`,
 		})

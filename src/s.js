@@ -27,6 +27,12 @@ async function geography(c) {
 	const sl = new selectlist(`geographies-select-` + c.id, data, {
 		'change': function(_) {
 			const x = coll.find(x => x.name === this.value);
+
+			if (maybe(x, 'configuration', 'exclude_sector_presets')) {
+				window.location = `/tool/a?id=${x.id}`;
+				return;
+			}
+
 			if (x) usertype(x.id);
 		}
 	});

@@ -15,6 +15,7 @@ GITCLEAN != [ "`git diff --stat`" = '' ] || echo "-dirty"
 default: reconfig build reload
 
 build: lint build-a build-s build-d
+	@cp views/index.html ${DIST}/index.html
 
 lint:
 	@${BIN}/lint ${SRC}

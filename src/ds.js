@@ -506,8 +506,7 @@ This is not fatal but the dataset is now disabled.`
 
 		ea_modal.set({
 			header: this.name,
-			content: content,
-			footer: null
+			content,
 		}).show();
 	};
 

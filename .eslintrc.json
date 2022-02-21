@@ -33,6 +33,7 @@
 		"geojsonExtent": "readonly",
 		"jsPDF": "readonly",
 		"SphericalMercator": "readonly",
+		"jwt_decode": "readonly",
 
 		"DST": "readonly",
 		"GEOGRAPHY": "writable",

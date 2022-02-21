@@ -1,4 +1,4 @@
-.include ".env"
+.include <env.mk>
 
 DIST = ./dist
 SRC = ./src
@@ -56,6 +56,7 @@ build-a:
 		${LIB}/selectlist.js \
 		${LIB}/dropdown.js \
 		${LIB}/pgrest.js \
+		${LIB}/jwt-decode.js \
 		> ${DIST}/a/libs.js
 
 	@echo -n "window.ea_settings = " | cat - \
@@ -99,6 +100,7 @@ build-s:
 		${LIB}/bubblearrow.js \
 		${LIB}/selectlist.js \
 		${LIB}/pgrest.js \
+		${LIB}/jwt-decode.js \
 		> ${DIST}/s/libs.js
 
 	@echo -n "const ea_settings = " | cat - \

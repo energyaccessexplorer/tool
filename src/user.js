@@ -1,3 +1,9 @@
 export function logged_in() {
-	return false;
+	const token = localStorage.getItem('token');
+
+	try {
+		return (token && jwt_decode(token)['email']);
+	} catch (e) {
+		return false;
+	}
 };

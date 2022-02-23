@@ -33,7 +33,7 @@ export default class dscontrols extends HTMLElement {
 
 		this.dropdown = new dropdown(options.call(this));
 
-		attach.call(this, shadow('#ds-controls-template').shadowRoot);
+		attach.call(this, tmpl('#ds-controls-template'));
 
 		this.main = qs('main', this);
 		this.header = qs('header', this);

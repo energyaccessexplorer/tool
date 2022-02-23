@@ -266,7 +266,7 @@ export default class dscard extends HTMLElement {
 
 		this.svg_el = svg_el.call(this);
 
-		attach.call(this, shadow('#ds-card-template').shadowRoot);
+		attach.call(this, tmpl('#ds-card-template'));
 
 		slot_populate.call(this, this.ds);
 

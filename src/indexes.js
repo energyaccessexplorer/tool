@@ -163,7 +163,7 @@ export function init() {
 		};
 	}
 
-	const graphs = shadow('#index-graphs-container-template').shadowRoot;
+	const graphs = tmpl('#index-graphs-container-template');
 
 	qs('.index-graphs-group #area-number', graphs).parentElement.append(PIES['area'].svg);
 	qs('.index-graphs-group #population-number', graphs).parentElement.append(PIES['population'].svg);

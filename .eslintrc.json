@@ -59,6 +59,7 @@
 		"coalesce": "readonly",
 		"el_tree": "readonly",
 		"attach": "readonly",
+		"tmpl": "readonly",
 		"shadow": "readonly",
 		"slot_populate": "readonly",
 		"Whatever": "readonly",

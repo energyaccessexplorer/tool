@@ -454,7 +454,7 @@ This is not fatal but the dataset is now disabled.`
 		let content;
 
 		if (this.summary) {
-			content = shadow('#analysis-summary-modal', {});
+			content = ce('div');
 
 			const datasets = this.summary.analysis.datasets.slice(0);
 			const averages = datasets

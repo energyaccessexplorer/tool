@@ -473,6 +473,9 @@ function reset_features_visibility() {
 	if (!fs) return;
 
 	fs.features.forEach(f => f.properties.__visible = true);
+
+	qsa('input[type="checkbox"]', this.card).forEach(c => c.checked = true);
+
 	MAPBOX.getSource(this.id).setData(fs);
 };
 

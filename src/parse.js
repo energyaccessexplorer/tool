@@ -197,7 +197,13 @@ export async function geojson_summary() {
 };
 
 function specs_set(fs, specs) {
-	const criteria = [];
+	const criteria = [{
+		"params": ["__name"],
+		"__name": this.name,
+		"radius": this.vectors['radius'],
+		"stroke": this.vectors['stroke'],
+		"stroke-width": this.vectors['stroke-width'],
+	}];
 
 	for (let i = 0; i < fs.length; i += 1) {
 		fs[i].properties['__radius'] = this.vectors['radius'];
@@ -205,7 +211,8 @@ function specs_set(fs, specs) {
 		fs[i].properties['__stroke-width'] = this.vectors['stroke-width'];
 
 		if (specs) {
-			const c = { params: [] };
+			const c = Object.assign({}, criteria[0]);
+
 			let p = false;
 
 			for (let s of specs) {
@@ -223,24 +230,22 @@ function specs_set(fs, specs) {
 
 					if (c.params.indexOf(s.key) < 0) c.params.push(s.key);
 
-					if (has(s, 'radius')) {
+					if (has(s, 'radius'))
 						fs[i].properties['__radius'] = c['radius'] = s['radius'];
-					}
 
-					if (has(s, 'stroke')) {
+					if (has(s, 'stroke'))
 						fs[i].properties['__stroke'] = c['stroke'] = s['stroke'];
-					}
 
-					if (has(s, 'stroke-width')) {
+					if (has(s, 'stroke-width'))
 						fs[i].properties['__stroke-width'] = c['stroke-width'] = s['stroke-width'];
-					}
 
 					p = true;
 				}
 			}
 
-			if (p && criteria.indexOf(JSON.stringify(c)) < 0)
-				criteria.push(JSON.stringify(c));
+			if (p && !criteria.find(x => same(x,c))) criteria.push(c);
+
+			fs[i].properties['__criteria'] = c;
 		}
 	}
 
@@ -308,17 +313,7 @@ export function points() {
 				},
 			});
 
-			if (criteria.length) {
-				criteria.unshift(JSON.stringify({
-					"params": ["__name"],
-					"__name": this.name,
-					"radius": this.vectors['radius'],
-					"stroke": this.vectors['stroke'],
-					"stroke-width": this.vectors['stroke-width'],
-				}));
-
-				this.card.legends(criteria.map(x => JSON.parse(x)), "points");
-			}
+			if (criteria.length > 1) this.card.legends(criteria, "points");
 		});
 };
 
@@ -383,8 +378,7 @@ export function lines() {
 				},
 			});
 
-			if (criteria.length)
-				this.card.legends(criteria.map(x => JSON.parse(x)), "lines");
+			if (criteria.length > 1) this.card.legends(criteria, "lines");
 		});
 };
 
@@ -427,15 +421,7 @@ export function polygons() {
 				},
 			});
 
-			if (criteria.length) {
-				criteria.unshift(JSON.stringify({
-					"params": ["__name"],
-					"__name": this.name,
-					"stroke": this.vectors['stroke'],
-				}));
-
-				this.card.legends(criteria.map(x => JSON.parse(x)), "polygons");
-			}
+			if (criteria.length > 1) this.card.legends(criteria, "polygons");
 		});
 };
 

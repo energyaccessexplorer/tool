@@ -318,8 +318,29 @@ export default class dscard extends HTMLElement {
 		}
 
 		for (let l of ls) {
-			const li = ce('div');
-			li.append(f.call(this, l), ce('span', '&nbsp;&nbsp;&nbsp;'), l.params.map(p => l[p]).join(", "));
+			let cb;
+
+			const li = ce(
+				'div',
+				[
+					f.call(this, l),
+					ce('span', l.params.map(p => l[p] ?? 'default').slice(1).join(", ")),
+					cb = ce('input', null, { "type": 'checkbox', "checked": '' }),
+				],
+				{
+					"style": `display: flex; justify-content: space-between;`,
+				}
+			);
+
+			cb.onchange = _ => {
+				const fs = this.ds.vectors.features.features;
+
+				for (let i = 0; i < fs.length; i += 1)
+					if (same(fs[i].properties['__criteria'], l))
+						fs[i].properties['__visible'] = cb.checked;
+
+				MAPBOX.getSource(this.ds.id).setData(this.ds.vectors.features);
+			};
 
 			ul.append(li);
 		}

@@ -454,7 +454,7 @@ This is not fatal but the dataset is now disabled.`
 		let content;
 
 		if (this.summary) {
-			content = ce('div');
+			const a_count = this.summary.analysis.raster.filter(t => t !== -1).length;
 
 			const datasets = this.summary.analysis.datasets.slice(0);
 			const averages = datasets
@@ -463,6 +463,8 @@ This is not fatal but the dataset is now disabled.`
 					ds: d,
 					raster: average(crop_to(d.raster, { data: this.summary.analysis.raster, nodata: -1 }))
 				}));
+
+			content = ce('div', ce('p', `<code>${a_count} km<sup>2</sup></code> covered by the analysis.`));
 
 			Object
 				.keys(this.summary.analysis.totals)
@@ -498,7 +500,6 @@ This is not fatal but the dataset is now disabled.`
 							}
 						});
 				});
-
 		} else {
 			const m = Object.assign({}, this.metadata, { "category-description": this.category.description });
 			content = shadow('#ds-info-modal', m);

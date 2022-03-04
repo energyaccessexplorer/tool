@@ -142,8 +142,10 @@ export default class dscontrols extends HTMLElement {
 
 	reset_defaults() {
 		if (this.weight_group) {
-			this.weight_group.change(0,2);
-			O.ds(this.ds, { 'weight': 2 });
+			const w = maybe(this.ds.category, 'analysis', 'weight');
+
+			this.weight_group.change({ min: 0, max: w });
+			O.ds(this.ds, { 'weight': w });
 		}
 
 		if (this.range_group) {

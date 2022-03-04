@@ -37,7 +37,7 @@ export default class DS {
 
 		this.index = maybe(this, 'analysis', 'index');
 
-		this.weight = maybe(this, 'analysis', 'weight') || 2;
+		this.weight = maybe(this, 'analysis', 'weight') || 3;
 
 		this.timeline = this.category.timeline;
 

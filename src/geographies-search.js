@@ -49,8 +49,9 @@ function fetch_countries() {
 	};
 
 	return ea_api.get("geographies", p).then(j => {
-		lists[0] = j.map((g,i) => {
+		return j.map((g,i) => {
 			const li = ce('li', g.name);
+
 			li.onclick = function() {
 				if (g.id === GEOGRAPHY.id) {
 					load(0,0);
@@ -135,8 +136,6 @@ export async function init() {
 	ul = ce('ul');
 	resultscontainer.append(ul);
 
-	await fetch_countries();
-
 	const at = DST.get('admin-tiers');
 	if (at) at.load('csv');
 
@@ -167,6 +166,8 @@ export async function init() {
 					});
 				});
 		});
+
+	lists[0] = await fetch_countries();
 
 	resultscontainer.prepend(resultsinfo);
 	load(0,0);

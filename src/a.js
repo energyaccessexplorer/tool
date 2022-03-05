@@ -197,6 +197,8 @@ async function dsinit(id, pack) {
 		return !!coalesce(DST.get(e.name));
 	};
 
+	GEOGRAPHY.divisions = [];
+
 	await (function fetch_outline() {
 		// TODO: this should be more strict divisions 0/outline
 		const outline_id = maybe(divisions.find(d => d.dataset_id), 'dataset_id');
@@ -279,6 +281,8 @@ This is fatal. Thanks for all the fish.`;
 	// mutant attributes (order is never guaranteed)
 	//
 	DS.array.filter(d => d.mutant).forEach(d => d.mutant_init());
+
+	GEOGRAPHY.divisions = GEOGRAPHY.divisions.filter(d => d);
 };
 
 function layout() {

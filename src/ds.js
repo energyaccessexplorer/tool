@@ -245,11 +245,11 @@ This is not fatal but the dataset is now disabled.`
 		this.on = false;
 		this.disabled = true;
 
-		DST.delete(this.id);
-
 		if (this.controls) this.controls.disable();
 
 		if (this.card) this.card.disable();
+
+		O.ds(this, { "disable": true });
 
 		this._layers.map(i => MAPBOX.removeLayer(i));
 	};

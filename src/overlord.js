@@ -88,12 +88,15 @@ export default class Overlord {
 				break;
 			}
 
-			case "disable":
-				break;
+			case "disable": {
+				DST.delete(d.id);
+				return;
+			}
 
-			default:
+			default: {
 				console.warn(`O.ds: Ignoring garbage argument '${k}' for`, d);
 				break;
+			}
 			}
 		}
 

@@ -37,7 +37,7 @@ async function geography(c) {
 		}
 	});
 
-	if (coll.length === 1) {
+	if (coll.length === 1 && c.id === coll[0].id) {
 		usertype(c.id);
 		return;
 	}

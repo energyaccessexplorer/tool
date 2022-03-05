@@ -13,13 +13,20 @@ const resultsinfo = ce('div', null, {
 	"style": "cursor: pointer;",
 });
 
-function li(g,i,j) {
+function div(g,i,j) {
 	const el = shadow('#geographies-search-item', {
 		name: g.name,
 		url: g.id ? `./?id=${g.id}` : null,
 	}, 'div');
 
 	qs('[zoom]', el).onclick = _ => load(i,j);
+
+	return el;
+};
+
+function li(g,i,j) {
+	const el = ce('li', g.name);
+	el.onclick = _ => load(i,j);
 
 	return el;
 };
@@ -138,6 +145,8 @@ export async function init() {
 	await ea_api
 		.get('geographies', { "select": ["name", "id"], "parent_id": `eq.${gid}` })
 		.then(r => {
+			const fli = r.find(e => maybe(e.id)) ? div : li;
+
 			GEOGRAPHY
 				.divisions
 				.forEach((d,i) => {
@@ -152,7 +161,7 @@ export async function init() {
 
 						return {
 							i: k,
-							li: li(geo, i, k),
+							li: fli(geo, i, k),
 							name: g,
 						};
 					});

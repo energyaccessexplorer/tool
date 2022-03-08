@@ -502,7 +502,8 @@ This is not fatal but the dataset is now disabled.`
 				});
 		} else {
 			const m = Object.assign({}, this.metadata, { "category-description": this.category.description });
-			content = shadow('#ds-info-modal', m);
+			content = tmpl('#ds-info-modal', m);
+			bind_el(content, m);
 		}
 
 		ea_modal.set({

@@ -347,7 +347,7 @@ function ea_svg_checkbox(init, callback) { // this is not used anywhere
 };
 
 function ea_opacity_control({ fn, init }) {
-	const o = shadow('#opacity-control');
+	const o = tmpl('#opacity-control');
 
 	let opacity_value = init ?? 1;
 

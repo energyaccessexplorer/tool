@@ -48,7 +48,7 @@ export function average(raster) {
 		size += 1;
 	}
 
-	const r = new Float32Array(data.length).fill(-1);
+	const r = new Float64Array(data.length).fill(-1);
 
 	const lin = d3.scaleLinear().domain([min,max]).range([0,1]);
 	for (let i = 0; i < r.length; i++)
@@ -78,7 +78,7 @@ export function crop_to(raster, envelope) {
 	let min;
 	let max;
 
-	const r = new Float32Array(data.length).fill(nodata);
+	const r = new Float64Array(data.length).fill(nodata);
 
 	for (let i = 0; i < data.length; i++) {
 		if (edata[i] === enodata) continue;

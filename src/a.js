@@ -82,11 +82,6 @@ const Uproxy = {
 			break;
 		}
 
-		case "pack": {
-			url.searchParams.set(t,v);
-			break;
-		}
-
 		case "inputs": {
 			url.searchParams.set(t, [...new Set(v)]);
 			break;
@@ -132,7 +127,7 @@ export async function init() {
 	MAPBOX = mapbox.init(O);
 	MAPBOX.coords = mapbox.fit(GEOGRAPHY.envelope);
 
-	await dsinit(GEOGRAPHY.id, U.pack);
+	await dsinit(GEOGRAPHY.id);
 
 	const conf = localStorage.getItem('config');
 	if (conf) {
@@ -183,12 +178,11 @@ export async function init() {
  *
  * @param "id" uuid
  * @param "inputs" string[] with DS.id's
- * @param "pack" string ("all" ...)
  *
  * returns DS[]
  */
 
-async function dsinit(id, pack) {
+async function dsinit(id) {
 	let select = ["*", "datatype", "category:categories(*)"];
 
 	const divisions = maybe(GEOGRAPHY.configuration, 'divisions').filter(d => d.dataset_id !== null);
@@ -256,13 +250,10 @@ This is fatal. Thanks for all the fish.`;
 	GEOGRAPHY.divisions = divisions.map(d => DS.array.find(t => t.dataset_id === d.dataset_id));
 
 	await (function fetch_datasets() {
-		pack = maybe(pack, 'length') ? pack : 'all';
-
 		const nd = divisions.filter(d => d.dataset_id).map(d => d.dataset_id).concat(OUTLINE.dataset_id);
 		const p = {
 			"geography_id": `eq.${id}`,
 			"select": select,
-			"pack": `eq.${pack}`,
 			"deployment": `ov.{${ENV}}`,
 			"id": `not.in.(${nd})`,
 		};

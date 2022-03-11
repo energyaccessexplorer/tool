@@ -70,6 +70,7 @@ export default class DS {
 
 	init(o) {
 		let indicator = false;
+		let go = true;
 
 		if (this.category.name.match(/^(timeline-)?indicator/)) {
 			let b = GEOGRAPHY.divisions[this.config.divisions_tier];
@@ -100,10 +101,10 @@ This is not fatal but the dataset is now disabled.`
 			indicator = true;
 		}
 
-		const ferr = t => {
-			if (indicator && ['vectors', 'raster'].includes(t)) return;
+		const ok = t => {
+			if (indicator && ['vectors', 'raster'].includes(t)) return true;
 
-			if (this.category.name === 'outline') return;
+			if (this.category.name === 'outline') return true;
 
 			ea_flash.push({
 				type: 'error',
@@ -116,12 +117,14 @@ This is not fatal but the dataset is now disabled.`
 			});
 
 			this.disable(`Missing ${t}`);
+
+			return false;
 		};
 
 		if (o.category.vectors) {
 			let f = this.processed_files.find(x => x.func === 'vectors');
 
-			if (!f) ferr('vectors');
+			if (!f) go = ok('raster');
 			else {
 				this.vectors = {};
 				Object.assign(this.vectors, o.category.vectors, f);
@@ -153,7 +156,7 @@ This is not fatal but the dataset is now disabled.`
 		if (o.category.raster) {
 			const f = this.processed_files.find(x => x.func === 'raster');
 
-			if (!f) ferr('raster');
+			if (!f) go = ok('raster');
 			else {
 				this.raster = {};
 				Object.assign(this.raster, o.category.raster, f);
@@ -164,7 +167,7 @@ This is not fatal but the dataset is now disabled.`
 		if (o.category.csv) {
 			const f = this.source_files.find(x => x.func === 'csv');
 
-			if (!f) ferr('csv');
+			if (!f) go = ok('csv');
 			else {
 				this.csv = {};
 				Object.assign(this.csv, o.category.csv, f);
@@ -174,6 +177,8 @@ This is not fatal but the dataset is now disabled.`
 				this.csv.parse = _ => parse.csv.call(this);
 			}
 		}
+
+		if (!go) return false;
 
 		switch (this.datatype) {
 		case 'points':

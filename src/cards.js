@@ -193,8 +193,12 @@ function svg_el() {
 		break;
 	}
 
+	case 'table': {
+		break;
+	}
+
 	default: {
-		console.warn("dscard.svg could not be set.", ds.id);
+		console.warn("dscard.svg_el could not decide datatype.", ds.id);
 		break;
 	}
 	}

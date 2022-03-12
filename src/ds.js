@@ -610,9 +610,10 @@ This is not fatal but the dataset is now disabled.`
 			return;
 		}
 
-		default:
+		default: {
 			console.warn("ds.opacity: undecided datatype", this.id, this.datatype);
 			break;
+		}
 		}
 
 		for (let a of t)

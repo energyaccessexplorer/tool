@@ -397,7 +397,7 @@ function elem_collapse(el, t, open) {
 			break;
 
 		default:
-			throw `triangle: e, ne, s, se, w. Got ${d}.`;
+			throw new Error(`triangle: e, ne, s, se, w. Got ${d}`);
 		}
 
 		const svg = d3.create('svg');
@@ -568,7 +568,7 @@ function coordinates_to_raster_pixel(coords, raster) {
 	const b = OUTLINE.raster;
 
 	if (coords.length !== 2)
-		throw Error(`ea_coordinates_raster_pixel: expected and array of length 2. Got ${coords}`);
+		throw new Error(`ea_coordinates_raster_pixel: expected and array of length 2. Got ${coords}`);
 
 	const merc = new SphericalMercator({ size: 1 });
 

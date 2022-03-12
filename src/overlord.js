@@ -51,7 +51,7 @@ export default class Overlord {
 
 	ds(d, data) {
 		if (!(d instanceof DS))
-			throw Error("O.ds: Expected a DS as input:", d);
+			throw new Error("O.ds: Expected a DS as input:", d);
 
 		for (const [k, v] of Object.entries(data)) {
 			switch (k) {
@@ -340,7 +340,7 @@ function load_view() {
 	}
 
 	default: {
-		throw `Argument Error: Overlord: Could not set/find the view '${view}'.`;
+		throw new Error(`Overlord: Could not set/find the view '${view}'`);
 	}
 	}
 

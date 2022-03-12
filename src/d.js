@@ -40,7 +40,7 @@ This is fatal. Thanks for all the fish.`;
 
 		ea_super_error("Geography error", m);
 
-		throw Error("No OUTLINE. Ciao.");
+		throw new Error("No OUTLINE");
 	}
 
 	await (function fetch_outline() {
@@ -51,7 +51,7 @@ This is fatal. Thanks for all the fish.`;
 
 			ea_super_error("Geography error", m);
 
-			throw Error("No OUTLINE. Ciao.");
+			throw new Error("No OUTLINE");
 		}
 
 		const bp = {

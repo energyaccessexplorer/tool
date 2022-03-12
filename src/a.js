@@ -88,7 +88,7 @@ const Uproxy = {
 		}
 
 		default: {
-			throw TypeError(`U: I'm not allowed to set '${t}'`);
+			throw new TypeError(`U: I'm not allowed to set '${t}'`);
 		}
 		}
 
@@ -204,7 +204,7 @@ This is fatal. Thanks for all the fish.`;
 
 			ea_super_error("Geography error", m);
 
-			throw Error("No OUTLINE. Ciao.");
+			throw new Error("No OUTLINE");
 		}
 
 		const bp = {

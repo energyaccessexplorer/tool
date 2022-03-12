@@ -251,7 +251,7 @@ export function update() {
 
 export default class dscard extends HTMLElement {
 	constructor(d) {
-		if (!(d instanceof DS)) throw Error(`dscard: Expected a DS. Got ${d}.`);
+		if (!(d instanceof DS)) throw new Error(`dscard: Expected a ds but got ${d}`);
 		super();
 
 		if (d.disabled) return undefined;

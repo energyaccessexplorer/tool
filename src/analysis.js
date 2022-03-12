@@ -59,13 +59,15 @@ export default async function run(type) {
 		if (filter_types.indexOf(d.analysis_scale(type)) > -1) weights[d.id] = 0;
 		else {
 			switch (type) {
-			case "ani":
+			case "ani": {
 				weights[d.id] = d.index ? d.weight / Object.keys(tots).reduce((a,c) => tots[c] + a, 0) : 0;
 				break;
+			}
 
-			default:
+			default: {
 				weights[d.id] = d.index ? d.weight / (tots[d.index] * Object.keys(singles).length) : 0;
 				break;
+			}
 			}
 		}
 	});

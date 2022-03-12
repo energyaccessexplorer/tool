@@ -10,7 +10,7 @@ const tabs_el = qs('#controls-tabs');
 
 export default class dscontrols extends HTMLElement {
 	constructor(d) {
-		if (!(d instanceof DS)) throw Error(`dscontrols: Expected a DS. Got ${d}.`);
+		if (!(d instanceof DS)) throw new Error(`dscontrols: Expected a DS but got ${d}`);
 		super();
 
 		this.ds = d;

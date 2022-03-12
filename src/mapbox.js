@@ -284,7 +284,7 @@ Tried to fit to:
 This is fatal. Thanks for all the fish.`
 		);
 
-		throw new Error("Could not set geography's bounds. Ciao.");
+		throw new Error("Could not set geography's bounds. Ciao");
 	}
 
 	const [left, bottom, right, top] = bounds;

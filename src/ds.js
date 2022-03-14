@@ -289,7 +289,7 @@ This is not fatal but the dataset is now disabled.`
 
 			MAPBOX.addLayer(a, MAPBOX.first_symbol);
 
-			this._layers.push(a.id);
+			if (this._layers.indexOf(a.id) < 0) this._layers.push(a.id);
 		}
 	};
 

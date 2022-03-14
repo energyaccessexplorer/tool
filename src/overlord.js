@@ -29,6 +29,10 @@ import {
 } from './filtered.js';
 
 import {
+	snapshot as session_snapshot,
+} from './session.js';
+
+import {
 	plot_active as analysis_plot_active,
 } from './analysis.js';
 
@@ -346,6 +350,8 @@ function load_view() {
 
 	views.buttons();
 	views.right_pane();
+
+	session_snapshot();
 };
 
 function mapclick(e) {

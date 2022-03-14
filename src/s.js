@@ -104,6 +104,7 @@ async function usertype(gid) {
 		const li = ce('li', ce('a', [ce('h3', t.name), p], { "href": `/tool/a?id=${gid}&inputs=${inputs}&output=${output}&view=${view}` }));
 		li.onclick = function() {
 			localStorage.setItem('config', JSON.stringify(t));
+			localStorage.setItem('user-type', t.name);
 		};
 
 		ul.append(li);

@@ -159,7 +159,8 @@ export function init() {
 		code.append(font_icon('braces'));
 		code.onclick = _ => {
 			const conf = config.generate();
-			fake_blob_download(JSON.stringify(conf), `energyaccessexplorer-config-${conf.id}.json`);
+			const time = (new Date()).getTime();
+			fake_blob_download(JSON.stringify(conf), `energyaccessexplorer-config-${time}.json`);
 		};
 	}
 

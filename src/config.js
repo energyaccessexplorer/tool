@@ -35,12 +35,10 @@ export function generate() {
 			name: d.id,
 			weight: d.weight,
 			domain: d._domain,
-			position: U.inputs.indexOf(d.id)
 		});
 	}
 
 	const config = {
-		"id": +(new Date) + "-" + parseInt(Math.random() * 1e4).toString(),
 		"geography": GEOGRAPHY.id,
 		"zoom": MAPBOX.getZoom(),
 		"center": MAPBOX.getCenter(),

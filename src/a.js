@@ -34,6 +34,10 @@ import DS from './ds.js';
 
 import Overlord from './overlord.js';
 
+import {
+	init as session_init,
+} from './session.js';
+
 const Uproxy = {
 	get: function(url,p) {
 		const i = url.searchParams.get(p);
@@ -105,6 +109,8 @@ export async function init() {
 	GEOGRAPHY = await ea_api.get("geographies", { "id": `eq.${id}` }, { one: true });
 	GEOGRAPHY.timeline = maybe(GEOGRAPHY, 'configuration', 'timeline');
 	GEOGRAPHY.timeline_dates = maybe(GEOGRAPHY, 'configuration', 'timeline_dates');
+
+	session_init();
 
 	if (location.hostname.match(/^www/))
 		ENV = "production";

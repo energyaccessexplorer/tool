@@ -65,6 +65,7 @@
 		"slot_populate": "readonly",
 		"Whatever": "readonly",
 		"same": "readonly",
+		"uuid": "readonly",
 		"font_icon": "readonly",
 
 		"browsers": "readonly",

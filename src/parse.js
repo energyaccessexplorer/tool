@@ -301,10 +301,10 @@ export function points() {
 				"paint": {
 					"circle-radius": [
 						'step', ['get', 'point_count'],
-						10, 10,
-						20, 100,
-						30, 750,
-						40
+						2, 10,
+						5, 100,
+						7, 750,
+						10
 					],
 					"circle-opacity": this.vectors.opacity,
 					"circle-color": this.vectors.fill,

@@ -1,6 +1,8 @@
 import DS from './ds.js';
 
-export function filtered_valued_polygons() {
+export const colors_array = ["transparent", "red", "#0059ff", "yellow"];
+
+export function valued_polygons() {
 	const lists = qs('#filtered-subgeographies');
 
 	const opens = Array.from(qsa('details', lists)).map(a => a.getAttribute('open') === '');
@@ -43,12 +45,20 @@ export function filtered_valued_polygons() {
 		const fs = source._data.features;
 
 		const lis = [];
+
+		const c = colors_array[k];
+
 		for (let i = 0; i < fs.length; i += 1) {
 			const x = result.includes(+fs[i].id);
 
 			fs[i].properties.__visible = x;
 
-			if (x) lis.push(ce('li', d.csv.table[fs[i].id]));
+			if (x) lis.push(ce('li',
+				                 [
+				                 	ce('span', "●", { class: "colored-disc", style: `color: ${c};` }),
+				                 	ce('span', d.csv.table[fs[i].id]),
+				                 ],
+			));
 		}
 
 		ul.append(...lis);

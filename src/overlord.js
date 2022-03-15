@@ -25,7 +25,8 @@ import {
 } from './timeline.js';
 
 import {
-	filtered_valued_polygons,
+	valued_polygons as filtered_valued_polygons,
+	colors_array as filtered_colors_array,
 } from './filtered.js';
 
 import {
@@ -262,7 +263,7 @@ function load_view() {
 						"visibility": "none",
 					},
 					"paint": {
-						"fill-color": ["transparent", "red", "blue", "yellow"][i],
+						"fill-color": filtered_colors_array[i],
 						"fill-outline-color": "black",
 						"fill-opacity": [ "case", [ "boolean", [ "get", "__visible" ], true ], 0.5, 0 ]
 					},

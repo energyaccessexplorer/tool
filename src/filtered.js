@@ -5,8 +5,7 @@ export const colors_array = ["transparent", "red", "#0059ff", "yellow"];
 export function valued_polygons() {
 	const lists = qs('#filtered-subgeographies');
 
-	const opens = Array.from(qsa('details', lists)).map(a => a.getAttribute('open') === '');
-	opens.unshift(false);
+	const opens = Array.from(qsa('details[open]', lists)).map(a => a.id);
 
 	lists.replaceChildren();
 
@@ -32,7 +31,8 @@ export function valued_polygons() {
 		if (!n.length) return;
 
 		let ul = ce('ul');
-		const details = ce('details', [ce('summary', d.name), ul], opens[k] ? { "open": '' } : {});
+		const details = ce('details', [ce('summary', d.name), ul], { "id": `filtered-divisions-${k}` });
+		if (opens.find(t => t === details.id)) details.setAttribute('open', '');
 
 		const arr = n.map(t => matches(t));
 
@@ -53,12 +53,10 @@ export function valued_polygons() {
 
 			fs[i].properties.__visible = x;
 
-			if (x) lis.push(ce('li',
-				                 [
-				                 	ce('span', "●", { class: "colored-disc", style: `color: ${c};` }),
-				                 	ce('span', d.csv.table[fs[i].id]),
-				                 ],
-			));
+			if (x) lis.push(ce('li', [
+				ce('span', "●", { class: "colored-disc", style: `color: ${c};` }),
+				ce('span', d.csv.table[fs[i].id]),
+			]));
 		}
 
 		ul.append(...lis);

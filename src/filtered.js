@@ -1,6 +1,19 @@
+import {
+	pointto as search_pointto,
+} from './search.js';
+
 import DS from './ds.js';
 
 export const colors_array = ["transparent", "red", "#0059ff", "yellow"];
+
+function pointto(f, dsname, name) {
+	const ext = geojsonExtent(f);
+
+	const dict = [[ "name", dsname ]];
+	const props = { name };
+
+	search_pointto([((ext[0] + ext[2]) / 2), ((ext[1] + ext[3]) / 2)], dict, props);
+};
 
 export function valued_polygons() {
 	const lists = qs('#filtered-subgeographies');
@@ -53,10 +66,18 @@ export function valued_polygons() {
 
 			fs[i].properties.__visible = x;
 
-			if (x) lis.push(ce('li', [
-				ce('span', "●", { class: "colored-disc", style: `color: ${c};` }),
-				ce('span', d.csv.table[fs[i].id]),
-			]));
+			if (x) {
+				const name = d.csv.table[fs[i].id];
+
+				const t = ce('li', [
+					ce('span', "●", { class: "colored-disc", style: `color: ${c};` }),
+					ce('span', name),
+				]);
+
+				t.onmouseover = run(pointto, fs[i], d.name, name);
+
+				lis.push(t);
+			}
 		}
 
 		ul.append(...lis);

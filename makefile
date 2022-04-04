@@ -18,7 +18,7 @@ build: lint build-a build-s build-d
 	@cp views/index.html ${DIST}/index.html
 
 lint:
-	@${BIN}/lint ${SRC}
+	@${BIN}/lint ${SRC} &
 
 deps:
 	mkdir -p ${DIST}/lib/fonts

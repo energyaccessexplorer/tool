@@ -12,16 +12,13 @@ TIMESTAMP != date -u +'%Y-%m-%d--%T'
 GITSHA != git log -n1 --format=format:"%H" | head -c 8
 GITCLEAN != [ "`git diff --stat`" = '' ] || echo "-dirty"
 
-default: reconfig build reload
+default: reconfig build
 
 build: lint build-a build-s build-d
 	@cp views/index.html ${DIST}/index.html
 
 lint:
 	@${BIN}/lint ${SRC}
-
-reload:
-	-${BROWSER_RELOAD}
 
 deps:
 	mkdir -p ${DIST}/lib/fonts
@@ -182,7 +179,7 @@ deploy:
 	patch -p1 --reverse <${env}.diff
 
 	patch -p1 <development.diff
-	bmake reconfig build reload env=development
+	bmake reconfig build env=development
 
 reconfig:
 	@echo '{}' \

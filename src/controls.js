@@ -45,14 +45,12 @@ export default class dscontrols extends HTMLElement {
 		this.manual_min = qs('.manual-controls input[bind=min]', this);
 		this.manual_max = qs('.manual-controls input[bind=max]', this);
 
-		slot_populate.call(this, this.ds);
-
-		slot_populate.call(this, {
+		slot_populate.call(this, Object.assign({}, this.ds, {
 			"dropdown": this.dropdown,
 			"checkbox": this.checkbox.svg,
 			"collection-list": this.collection_list,
 			"weight-slider": maybe(this.weight_group, 'el'),
-		});
+		}));
 
 		this.inject();
 
@@ -284,6 +282,19 @@ async function mutant_options() {
 	});
 };
 
+function ramp(...els) {
+	const r = tmpl('#ramp');
+
+	for (const e of els)
+		qs('.ramp', r).append(e)
+
+	const div = qs(':scope > div', r);
+	div.style['width'] = `${slider_width + 2}px`;
+	div.style['margin'] = 'auto';
+
+	return r;
+};
+
 function range(opts = {}) {
 	if (!opts.sliders) return null;
 
@@ -311,11 +322,11 @@ function range(opts = {}) {
 	const v1 = ce('div', null, { bind: "v1" });
 	const v2 = ce('div', null, { bind: "v2" });
 
-	const r = shadow('#ramp');
-	qs('.ramp', r).append(v1, ce('div', opts.ramp || 'range', { class: "unit-ramp" }), v2);
-
-	r.style['width'] = `${slider_width + 2}px`;
-	r.style['margin'] = 'auto';
+	const r = ramp(
+		v1,
+		ce('div', opts.ramp || 'range', { class: "unit-ramp" }),
+		v2
+	);
 
 	const s = ea_svg_interval({
 		sliders: opts.sliders,
@@ -341,16 +352,11 @@ function range(opts = {}) {
 function weight() {
 	const weights = [1,2,3,4,5];
 
-	const r = shadow('#ramp');
-
-	qs('.ramp', r).append(
+	const r = ramp(
 		ce('div', weights[0]),
 		ce('div', "importance", { class: "unit-ramp" }),
 		ce('div', weights[weights.length - 1])
 	);
-
-	r.style['width'] = `${slider_width + 2}px`;
-	r.style['margin'] = 'auto';
 
 	const w = ea_svg_interval({
 		sliders: "single",

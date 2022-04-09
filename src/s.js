@@ -170,7 +170,7 @@ async function overview() {
 
 		ea_modal.set({
 			header: r.name,
-			content: shadow('#country-overview', r),
+			content: tmpl('#country-overview', r),
 			footer: ce(
 				'div',
 				"<strong>Source:</strong> World Bank, World Development Indicators (latest data) crosschecked with values reported by local stakeholders/partners.",

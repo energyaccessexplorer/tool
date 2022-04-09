@@ -166,7 +166,7 @@ function svg_el() {
 
 	case 'polygons-fixed':
 	case 'polygons-timeline': {
-		const r = shadow('#ramp');
+		const r = tmpl('#ramp');
 
 		if (ds.domain) {
 			qs('.ramp', r).append(...ramp_domain.call(this));
@@ -183,7 +183,7 @@ function svg_el() {
 
 	case 'raster-mutant':
 	case 'raster': {
-		const r = shadow('#ramp');
+		const r = tmpl('#ramp');
 
 		if (ds.domain) {
 			qs('.ramp', r).append(...ramp_domain.call(this));
@@ -272,15 +272,13 @@ export default class dscard extends HTMLElement {
 
 		attach.call(this, tmpl('#ds-card-template'));
 
-		slot_populate.call(this, this.ds);
-
-		slot_populate.call(this, {
+		slot_populate.call(this, Object.assign({}, this.ds, {
 			'svg': this.svg_el,
 			'info': this.info(),
 			'unit': (this.ds.category.unit && ce('span', `[${this.ds.category.unit}]`, { style: "margin-left: 1em;" })),
 			'opacity': this.opacity(),
 			'close': this.close(),
-		});
+		}));
 
 		return this;
 	};

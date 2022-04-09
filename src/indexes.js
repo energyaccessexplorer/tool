@@ -103,7 +103,7 @@ export async function graphs(raster) {
 export function init() {
 	const url = new URL(location);
 
-	const r = shadow('#ramp');
+	const r = tmpl('#ramp');
 
 	qs('.ramp', r).append(
 		ce('div', "Low"),

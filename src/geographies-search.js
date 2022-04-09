@@ -14,14 +14,15 @@ const resultsinfo = ce('div', null, {
 });
 
 function div(g,i,j) {
-	const el = shadow('#geographies-search-item', {
+	const el = tmpl('#geographies-search-item');
+	bind(el, {
 		name: g.name,
 		url: g.id ? `./?id=${g.id}` : null,
-	}, 'div');
+	});
 
 	qs('[zoom]', el).onclick = _ => load(i,j);
 
-	return el;
+	return ce('li', el);
 };
 
 function li(g,i,j) {

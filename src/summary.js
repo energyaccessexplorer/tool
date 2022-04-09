@@ -25,7 +25,7 @@ async function summary() {
 
 	const summary = {};
 
-	const r = shadow('#ramp');
+	const r = tmpl('#ramp');
 	qs('.ramp', r).append(
 		ce('div', "Low"),
 		ce('div', "Medium"),

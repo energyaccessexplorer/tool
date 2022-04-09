@@ -74,7 +74,7 @@ export function valued_polygons() {
 					ce('span', name),
 				]);
 
-				t.onmouseover = run(pointto, fs[i], d.name, name);
+				t.onmouseover = pointto.bind(this, fs[i], d.name, name);
 
 				lis.push(t);
 			}

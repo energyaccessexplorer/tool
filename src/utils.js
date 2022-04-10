@@ -474,7 +474,7 @@ function table_data(dict, props, lnglat) {
 		}
 
 		t.append(ce('tr', [
-			ce('td', ce('strong', e.hasOwnProperty(1) ? e[1] + ": &nbsp;" : "&nbsp;")),
+			ce('td', ce('strong', e.hasOwnProperty(1) ? e[1] + "&nbsp;" : "&nbsp;")),
 			ce('td', (e.hasOwnProperty(0) && props[e[0]]) ? props[e[0]].toString() : ""),
 		]));
 	};

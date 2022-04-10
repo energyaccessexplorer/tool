@@ -398,6 +398,11 @@ function context(rc, f) {
 	const in0 = maybe(U.inputs, 0);
 
 	function rows(d) {
+		if (typeof d === "string") {
+			dict.push(null, [d, `<strong style="font-size: 1.1em;">${d.toUpperCase()}</strong>`]);
+			return;
+		}
+
 		let v = d.raster.data[x];
 		let k = d.id;
 
@@ -437,7 +442,7 @@ function context(rc, f) {
 		}
 	};
 
-	DS.array
+	const p = DS.array
 		.filter(d => and(d.on,
 		                 d.category.name !== 'boundaries',
 		                 d.category.name !== 'outline'))
@@ -449,6 +454,18 @@ function context(rc, f) {
 			else if (ai < bi) return -1;
 			else return 0;
 		})
+		.reduce(function(a,c) {
+			const b = c.category.controls.path[0];
+
+			if (!a[b]) a[b] = [];
+			a[b].push(c);
+
+			return a;
+		}, {});
+
+	Object.keys(p)
+		.map(e => [e, p[e]])
+		.flat(2)
 		.forEach(d => rows(d));
 
 	(function tier_rows() {

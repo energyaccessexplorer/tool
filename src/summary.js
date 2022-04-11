@@ -118,10 +118,11 @@ async function summary() {
 
 	const footer = ce('div', [switcher, pdf, csv], { style: "text-align: center;" });
 
-	MODAL.set({
+	new modal('snapshot-modal', {
 		header: "Snapshot",
 		content: content,
-		footer: footer
+		footer: footer,
+		destroy: true,
 	}).show();
 
 	return content;

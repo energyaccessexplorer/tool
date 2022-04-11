@@ -511,9 +511,10 @@ This is not fatal but the dataset is now disabled.`
 			bind(content, m);
 		}
 
-		MODAL.set({
+		new modal('ds-info', {
 			header: this.name,
 			content,
+			destroy: true,
 		}).show();
 	};
 

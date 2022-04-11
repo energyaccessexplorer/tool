@@ -142,7 +142,7 @@ export function init() {
 
 	const info = qs('#index-graphs-info');
 	info.append(font_icon('info-circle'));
-	info.onclick = _ => modal();
+	info.onclick = _ => open_modal();
 
 	if (user.logged_in()) {
 		for (const i in more_tools)
@@ -219,7 +219,7 @@ export function list() {
 	}
 };
 
-export function modal() {
+function open_modal() {
 	const c = ce('div');
 
 	for (let i in ea_indexes) {
@@ -229,13 +229,14 @@ export function modal() {
 		);
 	}
 
-	MODAL.set({
+	new modal('indexes-modal', {
 		header: "Energy Access Explorer Indexes",
 		content: c,
 		footer: ce('a', "See technical note for more detailed methodology", {
 			"style": "text-align: right; display: block;",
 			"href": "https://www.wri.org/publication/energy-access-explorer-data-and-methods",
-		})
+		}),
+		destroy: true,
 	}).show();
 };
 

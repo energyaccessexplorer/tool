@@ -48,10 +48,11 @@ async function geography(c) {
 		sl.el
 	);
 
-	MODAL.set({
+	new modal('geography-modal', {
 		header: c.name,
 		content: content,
-		footer: null
+		footer: null,
+		destroy: true,
 	}).show();
 
 	sl.input.focus();
@@ -112,10 +113,11 @@ async function usertype(gid) {
 
 	content.append(ul);
 
-	MODAL.set({
+	new modal('usertype-modal', {
 		content,
 		"header": "Choose your area of interest",
 		footer: null,
+		destroy: true,
 	}).show();
 };
 
@@ -168,7 +170,7 @@ async function overview() {
 			err.change(0);
 		}
 
-		MODAL.set({
+		new modal('overview-modal', {
 			header: r.name,
 			content: tmpl('#country-overview', r),
 			footer: ce(
@@ -176,6 +178,7 @@ async function overview() {
 				"<strong>Source:</strong> World Bank, World Development Indicators (latest data) crosschecked with values reported by local stakeholders/partners.",
 				{ style: "font-size: small; max-width: 30em; margin-left: auto; margin-right: 0;" }
 			),
+			destroy: true,
 		}).show();
 	}
 };

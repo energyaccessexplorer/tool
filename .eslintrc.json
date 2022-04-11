@@ -69,12 +69,12 @@
 
 		"browsers": "readonly",
 		"nanny": "readonly",
+		"modal": "readonly",
 		"bubblearrow": "readonly",
 		"selectlist": "readonly",
 		"dropdown": "readonly",
 
 		"FLASH": "readonly",
-		"MODAL": "readonly",
 		"API": "readonly",
 		"NANNY": "readonly",
 

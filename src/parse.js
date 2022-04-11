@@ -1,4 +1,6 @@
-import * as plot from './plot.js';
+import {
+	drawcanvas as plot_drawcanvas,
+} from './plot.js';
 
 async function fetchcheck(endpoint, format) {
 	await until(_ => MAPBOX.isStyleLoaded()); // <-- magic line. If you remove it, no more unicorns!
@@ -88,7 +90,7 @@ export function raster() {
 			const r = this.raster;
 
 			if (!r.canvas) {
-				r.canvas = plot.drawcanvas({
+				r.canvas = plot_drawcanvas({
 					canvas: ce('canvas'),
 					data: r.data,
 					width: r.width,

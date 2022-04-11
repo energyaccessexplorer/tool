@@ -1,4 +1,8 @@
-import * as mapbox from './mapbox.js';
+import {
+	init as mapbox_init,
+	fit as mapbox_fit,
+	change_theme as mapbox_change_theme,
+} from './mapbox.js';
 
 import {
 	geojson_summary
@@ -15,7 +19,7 @@ export async function init() {
 
 	layout();
 
-	MAPBOX = mapbox.init();
+	MAPBOX = mapbox_init();
 
 	U = {};
 
@@ -30,8 +34,8 @@ async function dsinit(_) {
 	const divisions = maybe(GEOGRAPHY.configuration, 'divisions');
 	const outline_id = maybe(divisions.find(d => d.dataset_id), 'dataset_id');
 
-	MAPBOX.coords = mapbox.fit(GEOGRAPHY.envelope);
-	mapbox.change_theme(ea_settings.mapbox_theme);
+	MAPBOX.coords = mapbox_fit(GEOGRAPHY.envelope);
+	mapbox_change_theme(ea_settings.mapbox_theme);
 
 	if (!outline_id) {
 		const m = `

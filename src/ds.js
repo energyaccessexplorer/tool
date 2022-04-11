@@ -2,7 +2,14 @@ import dscard from './cards.js';
 
 import dscontrols from './controls.js';
 
-import * as parse from './parse.js';
+import {
+	csv as parse_csv,
+	raster as parse_raster,
+	points as parse_points,
+	polygons as parse_polygons,
+	lines as parse_lines,
+	fail as parse_fail,
+} from './parse.js';
 
 import {
 	average,
@@ -96,7 +103,7 @@ This is not fatal but the dataset is now disabled.`
 			Object.assign(this.vectors, this.category.vectors);
 
 			this.vectors.id = b.config.vectors_id;
-			this.vectors.parse = x => parse.polygons.call(x || this);
+			this.vectors.parse = x => parse_polygons.call(x || this);
 
 			indicator = true;
 		}
@@ -134,17 +141,17 @@ This is not fatal but the dataset is now disabled.`
 
 				let p; switch (this.vectors.shape_type) {
 				case 'points': {
-					p = x => parse.points.call(x || this);
+					p = x => parse_points.call(x || this);
 					break;
 				}
 
 				case 'lines': {
-					p = x => parse.lines.call(x || this);
+					p = x => parse_lines.call(x || this);
 					break;
 				}
 
 				case 'polygons': {
-					p = x => parse.polygons.call(x || this);
+					p = x => parse_polygons.call(x || this);
 					break;
 				}
 				}
@@ -160,7 +167,7 @@ This is not fatal but the dataset is now disabled.`
 			else {
 				this.raster = {};
 				Object.assign(this.raster, o.category.raster, f);
-				this.raster.parse = _ => parse.raster.call(this);
+				this.raster.parse = _ => parse_raster.call(this);
 			}
 		}
 
@@ -174,7 +181,7 @@ This is not fatal but the dataset is now disabled.`
 
 				this.csv.key = maybe(this.config, 'csv_columns', 'id');
 				this.csv.value = maybe(this.config, 'csv_columns', 'value');
-				this.csv.parse = _ => parse.csv.call(this);
+				this.csv.parse = _ => parse_csv.call(this);
 			}
 		}
 
@@ -211,7 +218,7 @@ This is not fatal but the dataset is now disabled.`
 
 		case undefined:
 		default: {
-			parse.fail.call(this, "Cannot decide dataset's type. This is likely a configuration error");
+			parse_fail.call(this, "Cannot decide dataset's type. This is likely a configuration error");
 			break;
 		}
 		}

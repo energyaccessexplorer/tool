@@ -1,6 +1,11 @@
-import * as plot from './plot.js';
+import {
+	outputcanvas as plot_outputcanvas,
+} from './plot.js';
 
-import * as report from './report.js';
+import {
+	pdf as report_pdf,
+	csv as report_csv,
+} from './report.js';
 
 import analysis_plot_active from './analysis.js';
 
@@ -63,7 +68,7 @@ async function summary() {
 		c.style.display = 'none';
 		document.body.append(c);
 
-		plot.outputcanvas(raster, c);
+		plot_outputcanvas(raster, c);
 	};
 
 	await Promise.all(Object.keys(ea_indexes).map(i => get_summaries(i)));
@@ -109,10 +114,10 @@ async function summary() {
 	};
 
 	const pdf = ce('button', "Export PDF Report", { class: 'big-green-button' });
-	pdf.onclick = report.pdf;
+	pdf.onclick = report_pdf;
 
 	const csv = ce('button', "Export CSV Report", { class: 'big-green-button' });
-	csv.onclick = _ => fake_blob_download(report.csv(summary), `energyaccessexplorer-report.csv`, "text/csv");
+	csv.onclick = _ => fake_blob_download(report_csv(summary), `energyaccessexplorer-report.csv`, "text/csv");
 
 	content.append(graphs_tab, tables_tab);
 

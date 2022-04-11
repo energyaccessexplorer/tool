@@ -1,8 +1,12 @@
 import summary_analyse from './summary.js';
 
-import * as config from './config.js';
+import {
+	generate as config_generate,
+} from './config.js';
 
-import * as user from './user.js';
+import {
+	logged_in as user_logged_in,
+} from './user.js';
 
 import {
 	datasets as analysis_datasets,
@@ -144,7 +148,7 @@ export function init() {
 	info.append(font_icon('info-circle'));
 	info.onclick = _ => open_modal();
 
-	if (user.logged_in()) {
+	if (user_logged_in()) {
 		for (const i in more_tools)
 			toolbox.append(ce('a', null, { id: i, title: more_tools[i] }));
 
@@ -158,7 +162,7 @@ export function init() {
 		const code = qs('#index-graphs-code');
 		code.append(font_icon('braces'));
 		code.onclick = _ => {
-			const conf = config.generate();
+			const conf = config_generate();
 			const time = (new Date()).getTime();
 			fake_blob_download(JSON.stringify(conf), `energyaccessexplorer-config-${time}.json`);
 		};

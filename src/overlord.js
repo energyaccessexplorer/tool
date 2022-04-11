@@ -37,13 +37,18 @@ import {
 	plot_active as analysis_plot_active,
 } from './analysis.js';
 
-import * as mapbox from './mapbox.js';
+import {
+	info_mode_change as mapbox_info_mode_change,
+} from './mapbox.js';
 
-import * as indexes from './indexes.js';
+import {
+	list as indexes_list,
+} from './indexes.js';
 
-import * as cards from './cards.js';
-
-import * as views from './views.js';
+import {
+	buttons as views_buttons,
+	right_pane as views_right_pane,
+} from './views.js';
 
 import {
 	list as controls_list,
@@ -182,7 +187,7 @@ export default class Overlord {
 	};
 
 	info_mode() {
-		mapbox.info_mode_change();
+		mapbox_info_mode_change();
 	}
 
 	async theme_changed() {
@@ -290,7 +295,7 @@ function load_view() {
 
 	switch (view) {
 	case "outputs": {
-		indexes.list();
+		indexes_list();
 
 		analysis_plot_active(output, true)
 			.then(_ => {
@@ -308,7 +313,7 @@ function load_view() {
 
 		output_visibility('none');
 
-		cards.update(inputs);
+		cards_update(inputs);
 		O.sort();
 
 		analysis_plot_active(output, false);
@@ -338,7 +343,7 @@ function load_view() {
 
 		timeline_lines_update();
 
-		cards.update(inputs);
+		cards_update(inputs);
 		O.sort();
 
 		break;
@@ -349,8 +354,8 @@ function load_view() {
 	}
 	}
 
-	views.buttons();
-	views.right_pane();
+	views_buttons();
+	views_right_pane();
 
 	session_snapshot();
 };

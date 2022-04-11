@@ -1,6 +1,8 @@
 import DS from './ds.js';
 
-import * as plot from './plot.js';
+import {
+	outputcanvas as plot_outputcanvas
+} from './plot.js';
 
 import {
 	graphs as indexes_graphs,
@@ -238,7 +240,7 @@ export function datasets(type) {
 
 export async function plot_active(type, doindexes) {
 	const a = await run(type);
-	plot.outputcanvas(a.raster);
+	plot_outputcanvas(a.raster);
 
 	const index = ea_indexes[type];
 

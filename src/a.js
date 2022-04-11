@@ -1,22 +1,47 @@
-import * as cards from './cards.js';
+import {
+	init as controlssearch_init,
+} from './controls-search.js';
 
-import * as controlssearch from './controls-search.js';
+import {
+	init as geographiessearch_init,
+} from './geographies-search.js';
 
-import * as geographiessearch from './geographies-search.js';
+import {
+	init as vectorssearch_init,
+} from './vectors-search.js';
 
-import * as vectorssearch from './vectors-search.js';
+import {
+	init as analysissearch_init,
+} from './analysis-search.js';
 
-import * as analysissearch from './analysis-search.js';
+import {
+	init as locationssearch_init,
+} from './locations-search.js';
 
-import * as locationssearch from './locations-search.js';
+import {
+	init as views_init,
+	buttons as views_buttons,
+	right_pane as views_right_pane,
+} from './views.js';
 
-import * as views from './views.js';
+import {
+	init as mapbox_init,
+	fit as mapbox_fit,
+	change_theme as mapbox_change_theme,
+} from './mapbox.js';
 
-import * as indexes from './indexes.js';
+import {
+	load as config_load,
+} from './config.js';
 
-import * as mapbox from './mapbox.js';
+import {
+	init as cards_init,
+	update as cards_update,
+} from './cards.js';
 
-import * as config from './config.js';
+import {
+	init as indexes_init,
+} from './indexes.js';
 
 import {
 	init as nanny_init,
@@ -30,13 +55,13 @@ import {
 	select_tab as controls_select_tab,
 } from './controls-search.js';
 
-import DS from './ds.js';
-
-import Overlord from './overlord.js';
-
 import {
 	init as session_init,
 } from './session.js';
+
+import DS from './ds.js';
+
+import Overlord from './overlord.js';
 
 const Uproxy = {
 	get: function(url,p) {
@@ -130,14 +155,14 @@ export async function init() {
 	U = new Proxy(url, Uproxy);
 	O = new Overlord();
 
-	MAPBOX = mapbox.init(O);
-	MAPBOX.coords = mapbox.fit(GEOGRAPHY.envelope);
+	MAPBOX = mapbox_init(O);
+	MAPBOX.coords = mapbox_fit(GEOGRAPHY.envelope);
 
 	await dsinit(GEOGRAPHY.id);
 
 	const conf = localStorage.getItem('config');
 	if (conf) {
-		config.load(JSON.parse(conf));
+		config_load(JSON.parse(conf));
 		localStorage.removeItem('config');
 	}
 
@@ -145,17 +170,17 @@ export async function init() {
 
 	O.index = U.output;
 
-	cards.init();
-	controlssearch.init();
-	geographiessearch.init();
-	vectorssearch.init();
-	analysissearch.init();
-	locationssearch.init();
+	cards_init();
+	controlssearch_init();
+	geographiessearch_init();
+	vectorssearch_init();
+	analysissearch_init();
+	locationssearch_init();
 
 	if (MOBILE) mobile();
 
-	views.init();
-	indexes.init();
+	views_init();
+	indexes_init();
 
 	drawer_init();
 	toggle_left_panel();
@@ -168,8 +193,8 @@ export async function init() {
 		const d = DST.get(i);
 		return d._active(true, false);
 	})).then(_ => {
-		cards.update();
-		mapbox.change_theme(ea_settings.mapbox_theme, false);
+		cards_update();
+		mapbox_change_theme(ea_settings.mapbox_theme, false);
 	});
 
 	loading(false);
@@ -385,8 +410,8 @@ function mobile() {
 
 			U.view = v;
 
-			views.right_pane();
-			views.buttons();
+			views_right_pane();
+			views_buttons();
 			break;
 		}
 

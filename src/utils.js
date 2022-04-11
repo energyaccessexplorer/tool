@@ -473,10 +473,21 @@ function table_data(dict, props, lnglat) {
 			continue;
 		}
 
-		t.append(ce('tr', [
-			ce('td', ce('strong', e.hasOwnProperty(1) ? e[1] + "&nbsp;" : "&nbsp;")),
-			ce('td', (e.hasOwnProperty(0) && props[e[0]]) ? props[e[0]].toString() : ""),
-		]));
+		const tr = ce('tr', null);
+
+		if (props[e[0]]) {
+			tr.append(
+				ce('td', ce('strong', e.hasOwnProperty(1) ? e[1] + ": &nbsp;" : "&nbsp;")),
+				ce('td', (e.hasOwnProperty(0) && props[e[0]]) ? props[e[0]].toString() : ""),
+			);
+		}
+		else {
+			tr.append(
+				ce('td', ce('strong', e.hasOwnProperty(1) ? e[1] : "&nbsp;"), { "colspan": "2", "style": "text-align: center;" }),
+			);
+		}
+
+		t.append(tr);
 	};
 
 	if (maybe(lnglat, 'length') === 2) {

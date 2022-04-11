@@ -10,7 +10,7 @@ if [ ! -d $1 ]; then
 	exit 1
 fi
 
-errors=`$PWD/node_modules/.bin/eslint --format unix --fix $1`
+errors=`eslint --format unix --fix $1`
 
 if [ -z "$errors" ]; then
 	notify-send --urgency=low --expire-time=1000 "Lint" "EAE Tool - OK"

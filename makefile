@@ -12,13 +12,13 @@ TIMESTAMP != date -u +'%Y-%m-%d--%T'
 GITSHA != git log -n1 --format=format:"%H" | head -c 8
 GITCLEAN != [ "`git diff --stat`" = '' ] || echo "-dirty"
 
-default: reconfig build
+default: reconfig build lint
 
-build: lint build-a build-s build-d
+build: build-a build-s build-d
 	@cp views/index.html ${DIST}/index.html
 
 lint:
-	@${BIN}/lint ${SRC} &
+	${BIN}/lint ${SRC}
 
 deps:
 	mkdir -p ${DIST}/lib/fonts

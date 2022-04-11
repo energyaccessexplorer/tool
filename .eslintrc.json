@@ -1,13 +1,14 @@
 {
 	"env": {
 		"browser": true,
-		"es2021": true
+		"es2022": true
 	},
 	"extends": "eslint:recommended",
 	"parserOptions": {
-		"ecmaVersion": 12,
+		"ecmaVersion": "latest",
 		"sourceType": "module"
 	},
+	"ignorePatterns": ["/lib/*.js"],
 	"rules": {
 		"indent": ["error", "tab"],
 		"linebreak-style": ["error", "unix"],
@@ -20,10 +21,9 @@
 		"no-mixed-spaces-and-tabs":	 ["error", "smart-tabs"],
 		"no-prototype-builtins": "off",
 		"no-unused-vars": ["warn", {
-			"varsIgnorePattern": "^_$",
-			"argsIgnorePattern": "^_$"
+			"varsIgnorePattern": "^_",
+			"argsIgnorePattern": "^_"
 		}]
-
 	},
 	"globals": {
 		"d3": "readonly",

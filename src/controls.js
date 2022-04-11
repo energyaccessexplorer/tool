@@ -286,7 +286,7 @@ function ramp(...els) {
 	const r = tmpl('#ramp');
 
 	for (const e of els)
-		qs('.ramp', r).append(e)
+		qs('.ramp', r).append(e);
 
 	const div = qs(':scope > div', r);
 	div.style['width'] = `${slider_width + 2}px`;

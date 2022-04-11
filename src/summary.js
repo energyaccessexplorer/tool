@@ -40,8 +40,8 @@ async function summary() {
 
 		summary[idxn] = await analyse(raster);
 
-		let ppie = ea_svg_pie(summary[idxn]['population-density']['distribution'].map(x => [x]), 75, 0, ea_analysis_colorscale.stops, null);
-		let apie = ea_svg_pie(summary[idxn]['area']['distribution'].map(x => [x]), 75, 0, ea_analysis_colorscale.stops, null);
+		let ppie = svg_pie(summary[idxn]['population-density']['distribution'].map(x => [x]), 75, 0, ea_analysis_colorscale.stops, null);
+		let apie = svg_pie(summary[idxn]['area']['distribution'].map(x => [x]), 75, 0, ea_analysis_colorscale.stops, null);
 
 		const container = tmpl('#index-graphs-container-template');
 		qs('.index-graphs-group #area-number', container).parentElement.append(apie.svg);
@@ -193,19 +193,19 @@ export default async function analyse(raster) {
 /*
  * wrapper
  *
- * A hack. For javascript reasons, ea_loading does not get executed in a
+ * A hack. For javascript reasons, loading does not get executed in a
  * blocking manner.
  */
 
 function wrapper() {
 	const prom = new Promise((resolve, _) => {
-		ea_loading(true);
+		loading(true);
 		setTimeout(_ => resolve("Success!"), 100);
 	});
 
 	prom
 		.then(summary)
-		.then(_ => ea_loading(false));
+		.then(_ => loading(false));
 };
 
 qs('#summary-button').onclick = wrapper;

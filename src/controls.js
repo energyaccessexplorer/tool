@@ -328,7 +328,7 @@ function range(opts = {}) {
 		v2
 	);
 
-	const s = ea_svg_interval({
+	const s = svg_interval({
 		sliders: opts.sliders,
 		width: slider_width,
 		init: this._domain,
@@ -358,7 +358,7 @@ function weight() {
 		ce('div', weights[weights.length - 1])
 	);
 
-	const w = ea_svg_interval({
+	const w = svg_interval({
 		sliders: "single",
 		init: { min: 1, max: this.weight },
 		domain: { min: 1, max: 5 },

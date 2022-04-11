@@ -2,7 +2,7 @@
 
 NORM_STOPS = d3.range(0, 1.000000001, 0.25);
 
-function ea_colorscale(opts) {
+function colorscale(opts) {
 	let s;
 
 	let {intervals,stops,domain} = opts;
@@ -79,7 +79,7 @@ function ea_colorscale(opts) {
 	};
 };
 
-function ea_svg_pie(data, outer, inner, colors, inner_text, parse) {
+function svg_pie(data, outer, inner, colors, inner_text, parse) {
 	if (typeof parse !== 'function')
 		parse = x => (x * 100).toFixed(2);
 
@@ -150,7 +150,7 @@ function ea_svg_pie(data, outer, inner, colors, inner_text, parse) {
 	};
 };
 
-function ea_svg_interval(opts = {}) {
+function svg_interval(opts = {}) {
 	const {sliders, domain, init, steps, width, callback1, callback2, end_callback} = opts;
 
 	const radius = 6,
@@ -292,7 +292,7 @@ function ea_svg_interval(opts = {}) {
 	};
 };
 
-function ea_svg_checkbox(init, callback) { // this is not used anywhere
+function svg_checkbox(init, callback) { // this is not used anywhere
 	const size = 24;
 
 	const svg = d3.create("svg")
@@ -346,12 +346,12 @@ function ea_svg_checkbox(init, callback) { // this is not used anywhere
 	};
 };
 
-function ea_opacity_control({ fn, init }) {
+function opacity_control({ fn, init }) {
 	const o = tmpl('#opacity-control');
 
 	let opacity_value = init ?? 1;
 
-	const grad = ea_svg_interval({
+	const grad = svg_interval({
 		init: { min: 0, max: init ?? 1 },
 		domain: { min: 0, max: 1 },
 		sliders: 'single',
@@ -425,11 +425,11 @@ function elem_collapse(el, t, open) {
 	}
 };
 
-function ea_loading(bool) {
+function loading(bool) {
 	qs('#app-loading').style['display'] = bool ? 'block' : 'none';
 };
 
-function ea_super_error(t, m, e = "error") {
+function super_error(t, m, e = "error") {
 	FLASH.push({
 		type: e,
 		timeout: 0,

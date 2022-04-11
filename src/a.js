@@ -172,7 +172,7 @@ export async function init() {
 		mapbox.change_theme(ea_settings.mapbox_theme, false);
 	});
 
-	ea_loading(false);
+	loading(false);
 };
 
 /*
@@ -208,7 +208,7 @@ async function dsinit(id) {
 Failed to get the geography's OUTLINE.
 This is fatal. Thanks for all the fish.`;
 
-			ea_super_error("Geography error", m);
+			super_error("Geography error", m);
 
 			throw new Error("No OUTLINE");
 		}

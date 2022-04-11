@@ -17,7 +17,7 @@ async function fetchcheck(endpoint, format) {
 
 export function fail(msg = "") {
 	if (this === OUTLINE) {
-		ea_super_error("Dataset error", `
+		super_error("Dataset error", `
 Failed to process dataset '${this.name}'.
 This is fatal. Thanks for all the fish.
 

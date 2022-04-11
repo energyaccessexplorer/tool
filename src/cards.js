@@ -367,7 +367,7 @@ export default class dscard extends HTMLElement {
 	};
 
 	opacity() {
-		return ea_opacity_control({
+		return opacity_control({
 			fn: x => {
 				this.opacity_value = x;
 				this.ds.opacity(x);

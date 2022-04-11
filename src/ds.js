@@ -452,7 +452,7 @@ This is not fatal but the dataset is now disabled.`
 			break;
 		}
 
-		if (opts) this.colorscale = ea_colorscale(opts);
+		if (opts) this.colorscale = colorscale(opts);
 	};
 
 	info_modal() {

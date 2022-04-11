@@ -38,7 +38,7 @@ async function dsinit(_) {
 Failed to get the geography's OUTLINE.
 This is fatal. Thanks for all the fish.`;
 
-		ea_super_error("Geography error", m);
+		super_error("Geography error", m);
 
 		throw new Error("No OUTLINE");
 	}
@@ -49,7 +49,7 @@ This is fatal. Thanks for all the fish.`;
 Failed to get the geography's OUTLINE.
 This is fatal. Thanks for all the fish.`;
 
-			ea_super_error("Geography error", m);
+			super_error("Geography error", m);
 
 			throw new Error("No OUTLINE");
 		}
@@ -139,7 +139,7 @@ async function plot() {
 			this.raster.min = min;
 			this.raster.max = max;
 
-			this.colorscale = ea_colorscale({
+			this.colorscale = colorscale({
 				stops: NORM_STOPS.map(x => d3.interpolateMagma(x)),
 				domain: { min: this.raster.min, max: this.raster.max },
 			});
@@ -172,7 +172,7 @@ async function plot() {
 
 		this.vectors.opacity = 0.2;
 
-		this.colorscale = ea_colorscale({
+		this.colorscale = colorscale({
 			stops: ["#000", "#fff"],
 			domain: { min: min, max: max },
 		});
@@ -223,7 +223,7 @@ CSV has ${empties} empty cells.`
 	}
 
 	case 'raster-mutant': {
-		ea_super_error(
+		super_error(
 			"Pseudo-dataset",
 			`Nothing to see for a '${this.datatype}'
 
@@ -236,7 +236,7 @@ Instead, see:
 	}
 
 	default:
-		ea_super_error("WIP", `
+		super_error("WIP", `
 Testing '${this.datatype}'
 
 I haven't done this yet...`);
@@ -251,7 +251,7 @@ I haven't done this yet...`);
 
 	this.raise();
 
-	ea_loading(false);
+	loading(false);
 
 	const fn = url.searchParams.get('fn');
 	if (fn) {

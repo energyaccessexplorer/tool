@@ -14,8 +14,8 @@ import {
 } from './overlord.js';
 
 const PIES = {
-	'population': ea_svg_pie([[0], [0], [0], [0], [0]], 70, 0, ea_analysis_colorscale.stops, null),
-	'area': ea_svg_pie([[0], [0], [0], [0], [0]], 70, 0, ea_analysis_colorscale.stops, null),
+	'population': svg_pie([[0], [0], [0], [0], [0]], 70, 0, ea_analysis_colorscale.stops, null),
+	'area': svg_pie([[0], [0], [0], [0], [0]], 70, 0, ea_analysis_colorscale.stops, null),
 };
 
 function radio(init, callback) {
@@ -136,7 +136,7 @@ export function init() {
 		toolbox.append(ce('a', null, { id: i, title: tools[i] }));
 
 	const opacity = qs('#index-graphs-opacity');
-	opacity.append(ea_opacity_control({
+	opacity.append(opacity_control({
 		fn: x => MAPBOX.setPaintProperty('output-layer', 'raster-opacity', x),
 	}));
 

@@ -272,7 +272,7 @@ export function fit(bounds, animate = false) {
 	try {
 		MAPBOX.fitBounds(bounds, { animate: animate, padding: { top: vp, bottom: vp, left: hp, right: hp } });
 	} catch (e) {
-		ea_super_error(
+		super_error(
 			"Geography bounding box",
 			`
 Mapbox says:

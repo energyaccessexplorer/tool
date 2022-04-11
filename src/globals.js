@@ -81,12 +81,12 @@ energy demand, low economic activity, and low access to infrastructure and resou
 	},
 };
 
-ea_default_colorscale = ea_colorscale({
+ea_default_colorscale = colorscale({
 	stops: d3.schemeRdBu[5].reverse(),
 	domain: { min: 0, max: 1 },
 });
 
-ea_analysis_colorscale = ea_colorscale({
+ea_analysis_colorscale = colorscale({
 	stops: NORM_STOPS.map(x => d3.interpolateMagma(x)),
 	domain: { min: 0, max: 1 },
 });

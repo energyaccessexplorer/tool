@@ -20,7 +20,7 @@ export function right_pane() {
 
 	for (let pi of panes) {
 		let p; if (!(p = qs(`#${pi}-pane`))) continue;
-		p.style['z-index'] = (views[U.view].indexOf(pi) > -1) ? 1 : 0;
+		p.style['display'] = (views[U.view].indexOf(pi) > -1) ? "" : "none";
 	}
 };
 

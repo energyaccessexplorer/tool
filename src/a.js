@@ -319,15 +319,15 @@ function layout() {
 
 	if (MOBILE) m.style['width'] = screen.width + "px";
 
-	const oc = tmpl('#bottom-right-container-output-template');
-	const gc = tmpl('#bottom-right-container-graphs-template');
+	const o = tmpl('#analysis-output-template');
 
-	qs('#filtered-pane').append(oc);
-
-	if (GEOGRAPHY.timeline)
-		qs('#cards-pane').append(gc);
-	else
-		qs('#cards-pane').append(oc);
+	if (GEOGRAPHY.timeline) {
+		const g = tmpl('#timeline-graphs-template');
+		qs('#cards-pane').append(g);
+		qs('#filtered-pane').append(o);
+	} else {
+		qs('#cards-pane').append(o);
+	}
 
 	document.body.onresize = function() {
 		set_heights();

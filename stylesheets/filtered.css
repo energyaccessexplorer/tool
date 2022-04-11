@@ -1,5 +1,4 @@
 #filtered-pane {
-  padding: 0.7em 0 2em;
   background-color: white;
   justify-content: space-between;
 }
@@ -12,6 +11,7 @@
 #filtered-subgeographies {
   flex-grow: 1;
   overflow-y: scroll;
+  background-color: #F8F8F8;
   border-bottom: 1px solid lightgray;
 }
 

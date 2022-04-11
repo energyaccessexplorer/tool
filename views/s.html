@@ -34,9 +34,9 @@
   </body>
 
   <script>
-    ea_modal = new modal("ea-modal", {});
-    ea_flash = new flash();
-    ea_api = new pgrest(ea_settings.database, ea_flash);
+    MODAL = new modal("ea-modal", {});
+    FLASH = new flash();
+    API = new pgrest(ea_settings.database, FLASH);
 
 	ENV = null;
 	MOBILE = false;

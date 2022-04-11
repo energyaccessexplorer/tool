@@ -229,7 +229,7 @@ export function modal() {
 		);
 	}
 
-	ea_modal.set({
+	MODAL.set({
 		header: "Energy Access Explorer Indexes",
 		content: c,
 		footer: ce('a', "See technical note for more detailed methodology", {

@@ -76,7 +76,7 @@ export default class DS {
 			let b = GEOGRAPHY.divisions[this.config.divisions_tier];
 
 			if (!b) {
-				ea_flash.push({
+				FLASH.push({
 					type: 'error',
 					timeout: 5000,
 					title: "Dataset/File error",
@@ -106,7 +106,7 @@ This is not fatal but the dataset is now disabled.`
 
 			if (this.category.name === 'outline') return true;
 
-			ea_flash.push({
+			FLASH.push({
 				type: 'error',
 				timeout: 5000,
 				title: "Dataset/File error",
@@ -511,7 +511,7 @@ This is not fatal but the dataset is now disabled.`
 			bind(content, m);
 		}
 
-		ea_modal.set({
+		MODAL.set({
 			header: this.name,
 			content,
 		}).show();

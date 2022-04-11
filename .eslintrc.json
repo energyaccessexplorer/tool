@@ -76,13 +76,13 @@
 
 		"elem_collapse": "readonly",
 
-		"ea_flash": "readonly",
-		"ea_modal": "readonly",
+		"FLASH": "readonly",
+		"MODAL": "readonly",
+		"API": "readonly",
 		"ea_super_error": "readonly",
 
 		"ea_nanny": "readonly",
 		"ea_nanny_steps": "readonly",
-		"ea_api": "readonly",
 		"ea_settings": "readonly",
 		"ea_loading": "readonly",
 		"ea_indexes": "writable",

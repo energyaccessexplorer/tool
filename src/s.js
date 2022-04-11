@@ -13,7 +13,7 @@ function ugly_flag(flagurl) {
 };
 
 async function geography(c) {
-	const coll = await ea_api.get("geographies", {
+	const coll = await API.get("geographies", {
 		"datasets_count": "gt.0",
 		"parent_id": `eq.${c.id}`,
 		"deployment": `ov.{${ENV}}`,
@@ -48,7 +48,7 @@ async function geography(c) {
 		sl.el
 	);
 
-	ea_modal.set({
+	MODAL.set({
 		header: c.name,
 		content: content,
 		footer: null
@@ -112,7 +112,7 @@ async function usertype(gid) {
 
 	content.append(ul);
 
-	ea_modal.set({
+	MODAL.set({
 		content,
 		"header": "Choose your area of interest",
 		footer: null,
@@ -168,7 +168,7 @@ async function overview() {
 			err.change(0);
 		}
 
-		ea_modal.set({
+		MODAL.set({
 			header: r.name,
 			content: tmpl('#country-overview', r),
 			footer: ce(
@@ -263,7 +263,7 @@ export function init() {
 		ea_loading(false);
 	};
 
-	ea_api
+	API
 		.get("geographies", {
 			"select": ['*', 'datasets_count'],
 			"adm": "eq.0",
@@ -271,7 +271,7 @@ export function init() {
 		})
 		.then(r => list(r))
 		.catch(error => {
-			ea_flash.push({
+			FLASH.push({
 				type: 'error',
 				title: "Fetch error",
 				message: error

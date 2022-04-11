@@ -49,7 +49,7 @@ function fetch_countries() {
 		"order": "name.asc"
 	};
 
-	return ea_api.get("geographies", p).then(j => {
+	return API.get("geographies", p).then(j => {
 		return j.map((g,i) => {
 			const li = ce('li', g.name);
 
@@ -142,7 +142,7 @@ export async function init() {
 
 	const gid = (new URL(location)).searchParams.get('id');
 
-	await ea_api
+	await API
 		.get('geographies', { "select": ["name", "id"], "parent_id": `eq.${gid}` })
 		.then(r => {
 			const fli = r.find(e => maybe(e.id)) ? div : li;

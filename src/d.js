@@ -11,7 +11,7 @@ const url = new URL(location);
 export async function init() {
 	const id = url.searchParams.get('id');
 
-	GEOGRAPHY = await ea_api.get("geographies", { "id": `eq.${id}` }, { one: true });
+	GEOGRAPHY = await API.get("geographies", { "id": `eq.${id}` }, { one: true });
 
 	layout();
 
@@ -59,7 +59,7 @@ This is fatal. Thanks for all the fish.`;
 			"select": select,
 		};
 
-		return ea_api.get("datasets", bp, { one: true })
+		return API.get("datasets", bp, { one: true })
 			.then(async e => {
 				const ds = OUTLINE = new DS(e);
 
@@ -76,7 +76,7 @@ This is fatal. Thanks for all the fish.`;
 					"select": select,
 				};
 
-				return ea_api.get("datasets", dp, { one: true })
+				return API.get("datasets", dp, { one: true })
 					.then(async e => {
 						const ds = new DS(e);
 
@@ -103,7 +103,7 @@ This is fatal. Thanks for all the fish.`;
 		"select": select
 	};
 
-	const e = await ea_api.get("datasets", p, { one: true });
+	const e = await API.get("datasets", p, { one: true });
 	const ds = new DS(e);
 
 	await ds.active(true, true);
@@ -149,7 +149,7 @@ async function plot() {
 	}
 
 	case 'polygons-fixed': {
-		ea_flash.push({
+		FLASH.push({
 			type: 'info',
 			timeout: 0,
 			title: "Boundaries dependency",
@@ -189,7 +189,7 @@ async function plot() {
 				if (r[d] === "") empties += 1;
 
 		if (empties) {
-			ea_flash.push({
+			FLASH.push({
 				type: 'error',
 				timeout: 0,
 				title: "Faulty/Incomplete dataset",
@@ -198,7 +198,7 @@ CSV has ${empties} empty cells.`
 			});
 		}
 
-		ea_flash.push({
+		FLASH.push({
 			type: 'info',
 			timeout: 0,
 			title: "Available info",
@@ -208,7 +208,7 @@ CSV has ${this.csv.data.length} rows
 CSV has ${empties} empty cells.`
 		});
 
-		ea_flash.push({
+		FLASH.push({
 			type: 'warning',
 			timeout: 0,
 			title: "Timeline unavailable",

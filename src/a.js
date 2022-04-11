@@ -106,7 +106,7 @@ export async function init() {
 	const url = new URL(location);
 	const id = url.searchParams.get('id');
 
-	GEOGRAPHY = await ea_api.get("geographies", { "id": `eq.${id}` }, { one: true });
+	GEOGRAPHY = await API.get("geographies", { "id": `eq.${id}` }, { one: true });
 	GEOGRAPHY.timeline = maybe(GEOGRAPHY, 'configuration', 'timeline');
 	GEOGRAPHY.timeline_dates = maybe(GEOGRAPHY, 'configuration', 'timeline_dates');
 
@@ -218,7 +218,7 @@ This is fatal. Thanks for all the fish.`;
 			"select": select,
 		};
 
-		return ea_api.get("datasets", bp, { one: true })
+		return API.get("datasets", bp, { one: true })
 			.then(async e => {
 				if (exists(e)) return;
 
@@ -239,7 +239,7 @@ This is fatal. Thanks for all the fish.`;
 					"select": select,
 				};
 
-				return ea_api.get("datasets", dp, { one: true })
+				return API.get("datasets", dp, { one: true })
 					.then(async e => {
 						if (exists(e)) return;
 
@@ -264,7 +264,7 @@ This is fatal. Thanks for all the fish.`;
 			"id": `not.in.(${nd})`,
 		};
 
-		return ea_api.get("datasets", p)
+		return API.get("datasets", p)
 			.then(r => r.map(e => {
 				if (exists(e)) return;
 

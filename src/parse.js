@@ -27,7 +27,7 @@ ${msg}`);
 	}
 
 	else {
-		ea_flash.push({
+		FLASH.push({
 			type: 'error',
 			timeout: 5000,
 			title: "Dataset error",

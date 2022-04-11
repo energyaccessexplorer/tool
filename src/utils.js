@@ -430,7 +430,7 @@ function ea_loading(bool) {
 };
 
 function ea_super_error(t, m, e = "error") {
-	ea_flash.push({
+	FLASH.push({
 		type: e,
 		timeout: 0,
 		title: t,

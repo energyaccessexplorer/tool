@@ -118,7 +118,7 @@ async function summary() {
 
 	const footer = ce('div', [switcher, pdf, csv], { style: "text-align: center;" });
 
-	ea_modal.set({
+	MODAL.set({
 		header: "Snapshot",
 		content: content,
 		footer: footer

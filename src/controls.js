@@ -529,6 +529,15 @@ function range_group_controls() {
 	});
 };
 
+export function dig(ds) {
+	const sb = ds.controls.closest('.controls-subbranch');
+	const t = sb.closest('.controls-branch').id.replace('controls-branch-', '');
+
+	select_tab(qs('#controls-tab-' + t), t);
+
+	elem_collapse(qs('.controls-container', sb), sb, true);
+};
+
 export function list() {
 	return Array.from(qsa('ds-controls', contents_el)).map(c => c.ds.id);
 };

@@ -44,8 +44,8 @@ import {
 } from './indexes.js';
 
 import {
-	init as nanny_init,
-} from './nanny-steps.js';
+	init as help_init,
+} from './help.js';
 
 import {
 	init as timeline_init,
@@ -187,7 +187,7 @@ export async function init() {
 
 	if (GEOGRAPHY.timeline) timeline_init();
 
-	if (!MOBILE && !GEOGRAPHY.timeline) nanny_init();
+	if (!MOBILE && !GEOGRAPHY.timeline) help_init();
 
 	await Promise.all(U.inputs.map(i => {
 		const d = DST.get(i);
@@ -198,6 +198,32 @@ export async function init() {
 	});
 
 	loading(false);
+};
+
+export function clean() {
+	U.inputs = [];
+	U.output = 'eai';
+	U.view = 'inputs';
+
+	DS.array.filter(d => d.on).forEach(d => d.active(false, false));
+
+	DS.array.forEach(d => {
+		d._domain = jsonclone(d.domain);
+
+		if (maybe(d, 'controls', 'range_group'))
+			d.controls.range_group.change(d.domain);
+
+		if (maybe(d, 'controls', 'weight_group'))
+			d.controls.weight_group.change({ min: 0, max: maybe(d.category, 'analysis', 'weight') });
+	});
+
+	qs('input#controls-search').value = "";
+	qs('input#controls-search').dispatchEvent(new Event('input'));
+
+	for (let e of qsa('.controls-subbranch'))
+		elem_collapse(qs('.controls-container', e), e);
+
+	O.view = 'inputs';
 };
 
 /*

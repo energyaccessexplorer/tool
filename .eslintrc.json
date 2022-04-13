@@ -68,7 +68,6 @@
 		"fake_blob_download": "readonly",
 
 		"browsers": "readonly",
-		"nanny": "readonly",
 		"modal": "readonly",
 		"bubblearrow": "readonly",
 		"selectlist": "readonly",
@@ -76,7 +75,6 @@
 
 		"FLASH": "readonly",
 		"API": "readonly",
-		"NANNY": "readonly",
 
 		"ea_settings": "readonly",
 		"ea_views": "writable",

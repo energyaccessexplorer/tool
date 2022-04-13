@@ -98,6 +98,7 @@
 }
 
 #index-graphs-toolbox {
+  position: relative;
   display: flex;
   padding-right: 1em;
   float: right;

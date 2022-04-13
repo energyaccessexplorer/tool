@@ -188,6 +188,7 @@ export default class Overlord {
 
 	info_mode() {
 		mapbox_info_mode_change();
+		return INFOMODE;
 	}
 
 	async theme_changed() {
@@ -386,8 +387,8 @@ function mapclick(e) {
 
 	map_pointer(
 		td,
-		e.originalEvent.pageX,
-		e.originalEvent.pageY
+		maybe(e, 'originalEvent', 'pageX') || 0,
+		maybe(e, 'originalEvent', 'pageY') || 0
 	);
 };
 

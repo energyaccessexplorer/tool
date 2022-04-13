@@ -217,10 +217,10 @@ export function list() {
 
 		qs('.analysis-to-dataset', node).onclick = _ => analysis_to_dataset(t);
 
-		indexes_list.append(node);
-
 		nodes.push(node);
 	}
+
+	indexes_list.append(...nodes);
 };
 
 function open_modal() {

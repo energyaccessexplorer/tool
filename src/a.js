@@ -457,14 +457,12 @@ export function toggle_left_panel(t) {
 		const i = qs('.search-input', p);
 		if (i) i.focus();
 
-		const e = new Event('activate');
-		p.dispatchEvent(e);
+		p.dispatchEvent(new Event('activate'));
 	}
 
 	qs('#left-pane').style['min-width'] = t ? '40em' : '';
 
 	const rs = new Event('resize');
-
 	window.dispatchEvent(rs);
 
 	const tl = qs('#timeline');

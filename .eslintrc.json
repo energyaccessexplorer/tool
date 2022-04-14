@@ -67,8 +67,6 @@
 		"font_icon": "readonly",
 		"fake_blob_download": "readonly",
 
-		"browsers": "readonly",
-
 		"FLASH": "readonly",
 		"API": "readonly",
 

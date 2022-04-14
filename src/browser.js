@@ -1,3 +1,5 @@
+import browsers from '../lib/browsers.js';
+
 browsers({
 	"IE": null,
 

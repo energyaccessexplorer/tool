@@ -1,5 +1,7 @@
 import DS from './ds.js';
 
+import dropdown from '../lib/dropdown.js';
+
 import { select_tab } from './controls-search.js';
 
 const slider_width = 256;

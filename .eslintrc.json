@@ -68,10 +68,7 @@
 		"fake_blob_download": "readonly",
 
 		"browsers": "readonly",
-		"modal": "readonly",
 		"bubblearrow": "readonly",
-		"selectlist": "readonly",
-		"dropdown": "readonly",
 
 		"FLASH": "readonly",
 		"API": "readonly",

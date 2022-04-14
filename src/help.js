@@ -1,3 +1,5 @@
+import nanny from '../lib/nanny.js';
+
 import {
 	dig as controls_dig
 } from './controls.js';
@@ -12,8 +14,6 @@ import {
 } from './a.js';
 
 import DS from './ds.js';
-
-import nanny from './nanny.js';
 
 const welcome = (_ => {
 	const divstyle = `

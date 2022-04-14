@@ -44,16 +44,10 @@ build-a:
 		${LIB}/mapbox-gl.js \
 		${LIB}/geojson-extent.js \
 		${LIB}/sphericalmercator.js \
-		${LIB}/helpers.js \
-		${LIB}/flash.js \
-		${LIB}/modal.js \
 		${LIB}/html5sortable.js \
-		${LIB}/nanny.js \
-		${LIB}/bubblearrow.js \
-		${LIB}/selectlist.js \
-		${LIB}/dropdown.js \
-		${LIB}/pgrest.js \
 		${LIB}/jwt-decode.js \
+		${LIB}/helpers.js \
+		${LIB}/bubblearrow.js \
 		> ${DIST}/a/libs.js
 
 	@echo -n "window.ea_settings = " | cat - \
@@ -91,13 +85,9 @@ build-s:
 
 	@cat \
 		${LIB}/d3.js \
-		${LIB}/helpers.js \
-		${LIB}/flash.js \
-		${LIB}/modal.js \
-		${LIB}/bubblearrow.js \
-		${LIB}/selectlist.js \
-		${LIB}/pgrest.js \
 		${LIB}/jwt-decode.js \
+		${LIB}/helpers.js \
+		${LIB}/bubblearrow.js \
 		> ${DIST}/s/libs.js
 
 	@echo -n "const ea_settings = " | cat - \
@@ -131,9 +121,6 @@ build-d:
 		${LIB}/geojson-extent.js \
 		${LIB}/sphericalmercator.js \
 		${LIB}/helpers.js \
-		${LIB}/flash.js \
-		${LIB}/dropdown.js \
-		${LIB}/pgrest.js \
 		> ${DIST}/d/libs.js
 
 	@echo -n "window.ea_settings = " | cat - \

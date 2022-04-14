@@ -33,12 +33,15 @@
 	{{> views/loading}}
   </body>
 
-  <script>
-    FLASH = new flash();
-    API = new pgrest(ea_settings.database, FLASH);
+  <script type="module">
+    import flash from '../lib/flash.js';
+    import pgrest from '../lib/pgrest.js';
 
-	ENV = null;
-	MOBILE = false;
+    window.FLASH = new flash();
+	window.API = new pgrest(ea_settings.database, FLASH);
+
+	window.ENV = null;
+	window.MOBILE = false;
   </script>
 
   <script type="module">

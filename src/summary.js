@@ -1,3 +1,5 @@
+import modal from '../lib/modal.js';
+
 import {
 	outputcanvas as plot_outputcanvas,
 } from './plot.js';

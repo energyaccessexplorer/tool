@@ -1,3 +1,7 @@
+import modal from '../lib/modal.js';
+
+import selectlist from '../lib/selectlist.js';
+
 if (location.hostname.match(/^www/))
 	ENV = "production";
 else if (location.hostname.match(/^staging/))

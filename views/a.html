@@ -125,20 +125,23 @@
     {{> views/loading}}
   </body>
 
-  <script>
-	FLASH = new flash();
-	API = new pgrest(ea_settings.database, FLASH);
+  <script type="module">
+    import flash from '../lib/flash.js';
+    import pgrest from '../lib/pgrest.js';
 
-	GEOGRAPHY = null;
-	OUTLINE = null;
-	MAPBOX = null;
-	INFOMODE = false;
-	MOBILE = false;
-	ENV = null;
-	O = null;
-	U = null;
-	DST = new Map();
-    PARAMS = null;
+    window.FLASH = new flash();
+	window.API = new pgrest(ea_settings.database, FLASH);
+
+	window.GEOGRAPHY = null;
+	window.OUTLINE = null;
+	window.MAPBOX = null;
+	window.INFOMODE = false;
+	window.MOBILE = false;
+	window.ENV = null;
+	window.O = null;
+	window.U = null;
+	window.DST = new Map();
+    window.PARAMS = null;
   </script>
 
   <script type="module">

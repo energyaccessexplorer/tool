@@ -28,7 +28,7 @@ function colorscale(opts) {
 		const h = height || 5;
 
 		const svg = d3.create("svg")
-			    .attr('class', 'svg-interval');
+			.attr('class', 'svg-interval');
 
 		const g = svg.append('g');
 
@@ -83,45 +83,45 @@ function svg_pie(data, outer, inner, colors, inner_text, parse) {
 	if (typeof parse !== 'function')
 		parse = x => (x * 100).toFixed(2);
 
-	const width =  outer * 2,
-		    height = outer * 2;
+	const width =  outer * 2;
+	const height = outer * 2;
 
 	const pie = d3.pie()
-		    .value(d => d[0])
-		    .sort(null);
+		.value(d => d[0])
+		.sort(null);
 
 	const arc = d3.arc()
-		    .innerRadius(typeof inner !== 'number' ? outer - (outer/4) : inner)
-		    .outerRadius(outer - (outer/15));
+		.innerRadius(typeof inner !== 'number' ? outer - (outer/4) : inner)
+		.outerRadius(outer - (outer/15));
 
 	const svg = d3.create("svg")
-		    .attr('class', 'svg-pie')
-		    .attr("width", width)
-		    .attr("height", height);
+		.attr('class', 'svg-pie')
+		.attr("width", width)
+		.attr("height", height);
 
 	const g = svg.append("g")
-		    .attr("transform", `translate(${ width / 2 }, ${ height / 2 })`);
+		.attr("transform", `translate(${ width / 2 }, ${ height / 2 })`);
 
 	let n;
 
 	const outline = svg.append('circle')
-		    .attr('cx', width / 2)
-		    .attr('cy', height / 2)
-		    .attr('r', outer - (outer/15) - 1)
-		    .attr('stroke', 'gray')
-		    .attr('stroke-width', 0)
-		    .attr('fill', 'none');
+		.attr('cx', width / 2)
+		.attr('cy', height / 2)
+		.attr('r', outer - (outer/15) - 1)
+		.attr('stroke', 'gray')
+		.attr('stroke-width', 0)
+		.attr('fill', 'none');
 
 	let path = g
-		  .datum(data)
-		  .selectAll("path")
-		  .data(pie).enter()
-		  .append("path")
-		  .attr("fill", (d,i) => colors[i])
-		  .attr("d", arc)
-		  .on("mouseenter", function(d) { n = bubblearrow(this, { message: parse(d.value) + "%", position: "W", close: false }); })
-		  .on("mouseleave", function(_) { if (n) n.remove(); })
-		  .each(function(d) { this._current = d; });
+		.datum(data)
+		.selectAll("path")
+		.data(pie).enter()
+		.append("path")
+		.attr("fill", (d,i) => colors[i])
+		.attr("d", arc)
+		.on("mouseenter", function(d) { n = bubblearrow(this, { message: parse(d.value) + "%", position: "W", close: false }); })
+		.on("mouseleave", function(_) { if (n) n.remove(); })
+		.each(function(d) { this._current = d; });
 
 	function change(v) {
 		pie.value(d => d[v]);
@@ -153,12 +153,12 @@ function svg_pie(data, outer, inner, colors, inner_text, parse) {
 function svg_interval(opts = {}) {
 	const {sliders, domain, init, steps, width, callback1, callback2, end_callback} = opts;
 
-	const radius = 6,
-		    svgwidth = width || 256,
-		    svgheight = (radius * 2) + 2,
-		    linewidth = radius * 2,
-		    svgmin = radius + 1,
-		    svgmax = svgwidth - radius - 1;
+	const radius = 6;
+	const svgwidth = width || 256;
+	const svgheight = (radius * 2) + 2;
+	const linewidth = radius * 2;
+	const svgmin = radius + 1;
+	const svgmax = svgwidth - radius - 1;
 
 	let norm = d3.scaleLinear().domain([svgmin, svgmax]).range([domain.min, domain.max]);
 	let denorm = norm.invert;
@@ -169,7 +169,7 @@ function svg_interval(opts = {}) {
 	}
 
 	const svg = d3.create("svg")
-		    .attr('class', 'svg-interval');
+		.attr('class', 'svg-interval');
 
 	const g = svg.append('g');
 	const ticks = g.append('g').attr('class', 'ticks');
@@ -296,7 +296,7 @@ function svg_checkbox(init, callback) { // this is not used anywhere
 	const size = 24;
 
 	const svg = d3.create("svg")
-		    .attr('class', 'svg-checkbox');
+		.attr('class', 'svg-checkbox');
 
 	const g = svg.append('g');
 
@@ -595,7 +595,7 @@ function coordinates_to_raster_pixel(coords, raster) {
 	        plng < b.width,
 	        plat > 0,
 	        plat < b.height)) {
-	        a = { x: coords[0], y: coords[1] };
+		a = { x: coords[0], y: coords[1] };
 
 		const i = (plat * b.width) + plng;
 		a.index = i;

@@ -26,7 +26,7 @@ function radio(init, callback) {
 	const size = 20;
 
 	const svg = d3.create("svg")
-		    .attr('class', 'svg-radio');
+		.attr('class', 'svg-radio');
 
 	const g = svg.append('g');
 	const gutter = g.append('circle');

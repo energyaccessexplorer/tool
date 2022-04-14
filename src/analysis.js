@@ -246,8 +246,8 @@ export async function plot_active(type, doindexes) {
 
 	if (!type || !index) {
 		console.warn("plot_active: Too early...",
-			           "This is an initialisation bug.",
-			           "Index type:", type);
+		             "This is an initialisation bug.",
+		             "Index type:", type);
 
 		return a;
 	}

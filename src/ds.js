@@ -336,18 +336,18 @@ This is not fatal but the dataset is now disabled.`
 	};
 
 	/*
-   * analysis_fn
-   *
-   * Scaling function that sets the behaviour of a dataset when contributing to
-   * an analysis. Whether it's a filter, a linearised part, etc...
-   *
-   * @param "type" string
-   *   name of the current index being drawn and decide if the dataset
-   *   contributes to the analysis at all and if the range of the function
-   *   should be inverted.
-   *
-   * returns function (ds domain) -> [0,1]
-   */
+	 * analysis_fn
+	 *
+	 * Scaling function that sets the behaviour of a dataset when contributing to
+	 * an analysis. Whether it's a filter, a linearised part, etc...
+	 *
+	 * @param "type" string
+	 *   name of the current index being drawn and decide if the dataset
+	 *   contributes to the analysis at all and if the range of the function
+	 *   should be inverted.
+	 *
+	 * returns function (ds domain) -> [0,1]
+	 */
 
 	analysis_fn(type) {
 		if (!maybe(this, 'analysis', 'indexes')) return null;
@@ -386,8 +386,8 @@ This is not fatal but the dataset is now disabled.`
 
 		case 'intervals': {
 			const q = d3.scaleQuantile()
-				    .domain(this.analysis.intervals)
-				    .range(NORM_STOPS);
+				.domain(this.analysis.intervals)
+				.range(NORM_STOPS);
 
 			s = x => and(x >= min, x <= max) ? q(x) : -1;
 

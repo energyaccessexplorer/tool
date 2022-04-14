@@ -356,12 +356,12 @@ function layout() {
 		const h = window.innerHeight - n.clientHeight - (MOBILE ? w.clientHeight : 0);
 
 		p.style['height'] =
-      l.style['height'] =
-      g.style['height'] =
-      m.style['height'] =
-      b.style['height'] =
-      d.style['height'] =
-      r.style['height'] = h + "px";
+			l.style['height'] =
+			g.style['height'] =
+			m.style['height'] =
+			b.style['height'] =
+			d.style['height'] =
+			r.style['height'] = h + "px";
 
 		b.style['height'] = (h - (MOBILE ? v.clientHeight : 0)) + "px";
 

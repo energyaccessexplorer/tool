@@ -54,12 +54,12 @@ async function summary() {
 
 		graphs.append(
 			ce('div',
-				 [
-					 ce('div', ea_indexes[idxn]['name'], { class: 'up-title' }),
-					 container,
-					 ce('div', (summary[idxn]['area']['total'] === 0) ? ce('code', "(no datasets selected)") : null, { style: "text-align: center; font-size: smaller;" }),
-				 ],
-				 { class: 'index-group' }));
+			   [
+				   ce('div', ea_indexes[idxn]['name'], { class: 'up-title' }),
+				   container,
+				   ce('div', (summary[idxn]['area']['total'] === 0) ? ce('code', "(no datasets selected)") : null, { style: "text-align: center; font-size: smaller;" }),
+			   ],
+			   { class: 'index-group' }));
 
 		ppie.change(0);
 		apie.change(0);

@@ -39,6 +39,7 @@ import {
 
 import {
 	info_mode_change as mapbox_info_mode_change,
+	map_pointer,
 } from './mapbox.js';
 
 import {

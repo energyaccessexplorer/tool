@@ -1,3 +1,5 @@
+import bubblemessage from '../lib/bubblemessage.js';
+
 import {
 	plot_active as analysis_plot_active,
 } from './analysis.js';
@@ -95,11 +97,11 @@ This file should be <strong>strictly</strong> formatted.
 	let bubble;
 
 	upload.onmouseenter = _ => {
-		bubble = bubblearrow(upload_icon, {
+		bubble = new bubblemessage({
 			position: "E",
 			message: msg,
 			close: false
-		});
+		}, upload_icon);
 
 		bubble.style['pointer-events'] = "none";
 	};

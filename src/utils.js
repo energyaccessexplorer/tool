@@ -79,7 +79,7 @@ function colorscale(opts) {
 	};
 };
 
-function svg_pie(data, outer, inner, colors, inner_text, parse) {
+function svg_pie(data, outer, inner, colors, inner_text, parse, bubble) {
 	if (typeof parse !== 'function')
 		parse = x => (x * 100).toFixed(2);
 
@@ -119,7 +119,7 @@ function svg_pie(data, outer, inner, colors, inner_text, parse) {
 		.append("path")
 		.attr("fill", (d,i) => colors[i])
 		.attr("d", arc)
-		.on("mouseenter", function(d) { n = bubblearrow(this, { message: parse(d.value) + "%", position: "W", close: false }); })
+		.on("mouseenter", function(d) { if (bubble) n = bubble(parse(d.value), svg.node()); }, this)
 		.on("mouseleave", function(_) { if (n) n.remove(); })
 		.each(function(d) { this._current = d; });
 
@@ -505,61 +505,6 @@ function table_data(dict, props, lnglat) {
 	}
 
 	return t;
-};
-
-function map_pointer(content, x, y) {
-	let p = qs('#map-pointer');
-
-	if (p) p.remove();
-
-	p = ce('div', null, {
-		id: "map-pointer",
-		style: `
-position: absolute;
-left: ${x - 10}px;
-top: ${y - 10}px;
-height: 20px;
-width: 20px;
-background-color: transparent;
-`
-	});
-
-	for (const e of qsa('.bubblearrow-marker'))
-		e.remove();
-
-	document.body.append(p);
-
-	let cls = false;
-	let pos = "W";
-
-	if (MOBILE) {
-		cls = true;
-		pos = "C";
-	}
-
-	const mark = bubblearrow((MOBILE ? document.body : p), { position: pos, message: content, close: cls });
-
-	function drop() {
-		p.remove();
-		mark.remove();
-	};
-
-	p.addEventListener('mouseleave', drop);
-
-	let _clk;
-	function clk() {
-		drop();
-		document.removeEventListener('click', _clk);
-	};
-
-	delay(0.2).then(_ => {
-		_clk = clk;
-		document.addEventListener('click', _clk);
-	});
-
-	return {
-		drop,
-	};
 };
 
 /*

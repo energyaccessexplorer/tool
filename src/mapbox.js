@@ -1,3 +1,5 @@
+import bubblemessage from '../lib/bubblemessage.js';
+
 const default_styles = [{
 	"name": "Light (default)",
 	"value": "mapbox/basic-v9"
@@ -290,4 +292,59 @@ This is fatal. Thanks for all the fish.`
 	const [left, bottom, right, top] = bounds;
 
 	return [[left,top], [right,top], [right,bottom], [left,bottom]];
+};
+
+export function map_pointer(content, x, y) {
+	let p = qs('#map-pointer');
+
+	if (p) p.remove();
+
+	p = ce('div', null, {
+		id: "map-pointer",
+		style: `
+position: absolute;
+left: ${x - 10}px;
+top: ${y - 10}px;
+height: 20px;
+width: 20px;
+background-color: transparent;
+`
+	});
+
+	for (const e of qsa('bubble-message'))
+		e.remove();
+
+	document.body.append(p);
+
+	let cls = false;
+	let pos = "W";
+
+	if (MOBILE) {
+		cls = true;
+		pos = "C";
+	}
+
+	const mark = new bubblemessage({ position: pos, message: content, close: cls }, (MOBILE ? document.body : p));
+
+	function drop() {
+		p.remove();
+		mark.remove();
+	};
+
+	p.addEventListener('mouseleave', drop);
+
+	let _clk;
+	function clk() {
+		drop();
+		document.removeEventListener('click', _clk);
+	};
+
+	delay(0.2).then(_ => {
+		_clk = clk;
+		document.addEventListener('click', _clk);
+	});
+
+	return {
+		drop,
+	};
 };

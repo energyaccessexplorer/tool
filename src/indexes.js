@@ -2,6 +2,8 @@ import modal from '../lib/modal.js';
 
 import summary_analyse from './summary.js';
 
+import bubblemessage from '../lib/bubblemessage.js';
+
 import {
 	generate as config_generate,
 } from './config.js';
@@ -19,9 +21,11 @@ import {
 	analysis_to_dataset,
 } from './overlord.js';
 
+const bubble = (v,e) => new bubblemessage({ message: v + "%", position: "C", close: false, noevents: true }, e);
+
 const PIES = {
-	'population': svg_pie([[0], [0], [0], [0], [0]], 70, 0, ea_analysis_colorscale.stops, null),
-	'area': svg_pie([[0], [0], [0], [0], [0]], 70, 0, ea_analysis_colorscale.stops, null),
+	'population': svg_pie([[0], [0], [0], [0], [0]], 70, 0, ea_analysis_colorscale.stops, null, null, bubble),
+	'area': svg_pie([[0], [0], [0], [0], [0]], 70, 0, ea_analysis_colorscale.stops, null, null, bubble),
 };
 
 function radio(init, callback) {

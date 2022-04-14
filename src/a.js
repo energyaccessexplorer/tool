@@ -63,6 +63,8 @@ import DS from './ds.js';
 
 import Overlord from './overlord.js';
 
+import bubblemessage from '../lib/bubblemessage.js';
+
 const Uproxy = {
 	get: function(url,p) {
 		const i = url.searchParams.get(p);
@@ -469,7 +471,7 @@ function mobile() {
 };
 
 export function toggle_left_panel(t) {
-	for (let m of qsa('.bubblearrow-marker')) m.remove();
+	for (let m of qsa('bubble-message')) m.remove();
 
 	for (let e of qsa('#left-pane > div'))
 		e.style.display = 'none';
@@ -516,11 +518,11 @@ function drawer_init() {
 		a.onmouseenter = function() {
 			if (p) p.remove();
 
-			p = bubblearrow(a, {
+			p = new bubblemessage({
 				position: "E",
 				message: this.getAttribute('description'),
 				close: false
-			});
+			}, a);
 		};
 
 		a.onmouseleave = function() {

@@ -47,7 +47,6 @@ build-a:
 		${LIB}/html5sortable.js \
 		${LIB}/jwt-decode.js \
 		${LIB}/helpers.js \
-		${LIB}/bubblearrow.js \
 		> ${DIST}/a/libs.js
 
 	@echo -n "window.ea_settings = " | cat - \
@@ -87,7 +86,6 @@ build-s:
 		${LIB}/d3.js \
 		${LIB}/jwt-decode.js \
 		${LIB}/helpers.js \
-		${LIB}/bubblearrow.js \
 		> ${DIST}/s/libs.js
 
 	@echo -n "const ea_settings = " | cat - \

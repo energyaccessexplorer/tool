@@ -68,7 +68,6 @@
 		"fake_blob_download": "readonly",
 
 		"browsers": "readonly",
-		"bubblearrow": "readonly",
 
 		"FLASH": "readonly",
 		"API": "readonly",
@@ -91,7 +90,6 @@
 		"super_error": "readonly",
 		"table_keyvalue": "readonly",
 		"table_data": "readonly",
-		"map_pointer": "readonly",
 		"coordinates_to_raster_pixel": "readonly",
 		"raster_pixel_to_coordinates": "readonly",
 		"jsonclone": "readonly"

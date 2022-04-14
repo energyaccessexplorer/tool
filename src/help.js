@@ -1,5 +1,7 @@
 import nanny from '../lib/nanny.js';
 
+import bubblemessage from '../lib/bubblemessage.js';
+
 import {
 	dig as controls_dig
 } from './controls.js';
@@ -228,7 +230,9 @@ const steps = [
 	}
 ];
 
-const HELP = new nanny(steps);
+const bubblefn = (m, el) => new bubblemessage(m, el);
+
+const HELP = new nanny({ steps, bubblefn });
 
 export function init() {
 	qs('#drawer-help').onclick = run;

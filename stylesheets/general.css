@@ -105,7 +105,7 @@ dialog pre {
   background-color: #cecece
 }
 
-aside.bubblearrow-marker {
+bubble-message {
   background-color: rgba(0,0,0,1);
   border-radius: 3px;
   box-shadow: 0 20px 30px 0 rgba(0,0,0,0.2);
@@ -116,26 +116,23 @@ aside.bubblearrow-marker {
   z-index: 9999;
 }
 
-aside.bubblearrow-marker * {
+bubble-message * {
   color: white;
 }
 
-aside.bubblearrow-marker main {
+bubble-message main {
   padding: 1em;
 }
 
-aside.bubblearrow-marker header {
+bubble-message header {
   font-weight: bold;
   font-size: 1.05em;
   margin-bottom: 0.7em;
 }
 
-aside.bubblearrow-marker .bubblearrow-close-button::before {
+bubble-message .bubble-message-close-button::before {
   font-size: 1.5em;
   padding: 2px 7px;
-}
-
-aside.bubblearrow-marker .bubblearrow-close-button::before {
   content: '×';
 }
 

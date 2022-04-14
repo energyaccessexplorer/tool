@@ -51,11 +51,11 @@ body {
   color: dimgray;
 }
 
-.bubblearrow-marker {
+bubble-message {
   pointer-events: none;
 }
 
-.bubblearrow-marker pre {
+bubble-message pre {
   font-family: sans-serif;
   white-space: pre-wrap;
 }

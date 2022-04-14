@@ -1,5 +1,7 @@
 import modal from '../lib/modal.js';
 
+import bubblemessage from '../lib/bubblemessage.js';
+
 import {
 	outputcanvas as plot_outputcanvas,
 } from './plot.js';
@@ -42,13 +44,15 @@ async function summary() {
 	const scale = ce('div');
 	scale.append(ea_analysis_colorscale.svg.cloneNode(true), r);
 
+	const bubble = (v,e) => new bubblemessage({ message: v + "%", position: "C", close: false, noevents: true }, e);
+
 	async function get_summaries(idxn) {
 		let raster = (await analysis_plot_active(idxn)).raster;
 
 		summary[idxn] = await analyse(raster);
 
-		let ppie = svg_pie(summary[idxn]['population-density']['distribution'].map(x => [x]), 75, 0, ea_analysis_colorscale.stops, null);
-		let apie = svg_pie(summary[idxn]['area']['distribution'].map(x => [x]), 75, 0, ea_analysis_colorscale.stops, null);
+		let ppie = svg_pie(summary[idxn]['population-density']['distribution'].map(x => [x]), 75, 0, ea_analysis_colorscale.stops, null, null, bubble);
+		let apie = svg_pie(summary[idxn]['area']['distribution'].map(x => [x]), 75, 0, ea_analysis_colorscale.stops, null, null, bubble);
 
 		const container = tmpl('#index-graphs-container-template');
 		qs('.index-graphs-group #area-number', container).parentElement.append(apie.svg);

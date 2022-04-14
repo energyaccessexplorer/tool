@@ -1,5 +1,6 @@
 import {
 	fit as mapbox_fit,
+	map_pointer,
 } from './mapbox.js';
 
 let pointer;

@@ -1,5 +1,7 @@
 import DS from './ds.js';
 
+import bubblemessage from '../lib/bubblemessage.js';
+
 function timeline_slider(opts) {
 	const {steps, drag, width, init} = opts;
 
@@ -206,12 +208,13 @@ function multiline(opts) {
 
 			if (n) n.remove();
 
-			n = bubblearrow(dot.node(), {
+			n = new bubblemessage({
 				title: s.name,
 				message: typeof message === 'function' ? message(s, i, s.values[i]) : s.name,
 				position: "W",
-				close: false
-			});
+				close: false,
+				noevents: true,
+			}, dot.node());
 		};
 
 		function left() {

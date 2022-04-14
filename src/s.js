@@ -1,5 +1,7 @@
 import modal from '../lib/modal.js';
 
+import bubblemessage from '../lib/bubblemessage.js';
+
 import selectlist from '../lib/selectlist.js';
 
 if (location.hostname.match(/^www/))
@@ -133,6 +135,8 @@ async function overview() {
 		.then(t => d3.csvParse(t))
 		.then(d => (r = d.find(x => x.name === GEOGRAPHY.name)));
 
+	const bubble = v => new bubblemessage({ message: v + "%", position: "W", close: false, noevents: true });
+
 	if (r) {
 		r['urban_population'] = (100 - r['rural_population']).toFixed(1);
 
@@ -148,7 +152,8 @@ async function overview() {
 					getComputedStyle(document.body).getPropertyValue('--the-green')
 				],
 				"",
-				x => x
+				x => x,
+				bubble,
 			);
 
 			r['urban_electrification_pie'] = eru.svg;
@@ -167,7 +172,8 @@ async function overview() {
 					getComputedStyle(document.body).getPropertyValue('--the-green')
 				],
 				"",
-				x => x
+				x => x,
+				bubble,
 			);
 
 			r['rural_electrification_pie'] = err.svg;
@@ -241,11 +247,11 @@ export function init() {
 			if (intro) {
 				let p;
 				d.onmouseenter = _ => {
-					p = bubblearrow(d, {
+					p = new bubblemessage({
 						message: ce('pre', intro),
 						close: false,
 						position: "C",
-					});
+					}, d);
 				};
 				d.onmouseleave = _ => {
 					p.remove();

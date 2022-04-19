@@ -510,7 +510,8 @@ function reset_features_visibility() {
 
 	qsa('input[type="checkbox"]', this.card).forEach(c => c.checked = true);
 
-	MAPBOX.getSource(this.id).setData(fs);
+	const source = MAPBOX.getSource(this.id);
+	if (source) source.setData(fs);
 };
 
 function extent_contained(extent, raster) {

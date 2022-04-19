@@ -54,7 +54,8 @@ async function geography(c) {
 		sl.el
 	);
 
-	new modal('geography-modal', {
+	new modal({
+		id: 'geography-modal',
 		header: c.name,
 		content: content,
 		footer: null,
@@ -119,7 +120,8 @@ async function usertype(gid) {
 
 	content.append(ul);
 
-	new modal('usertype-modal', {
+	new modal({
+		id: 'usertype-modal',
 		content,
 		"header": "Choose your area of interest",
 		footer: null,
@@ -180,7 +182,8 @@ async function overview() {
 			err.change(0);
 		}
 
-		new modal('overview-modal', {
+		new modal({
+			id: 'overview-modal',
 			header: r.name,
 			content: tmpl('#country-overview', r),
 			footer: ce(

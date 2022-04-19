@@ -520,7 +520,8 @@ This is not fatal but the dataset is now disabled.`
 			bind(content, m);
 		}
 
-		new modal('ds-info', {
+		new modal({
+			id: 'ds-info',
 			header: this.name,
 			content,
 			destroy: true,

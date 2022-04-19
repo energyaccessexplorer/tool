@@ -239,7 +239,8 @@ function open_modal() {
 		);
 	}
 
-	new modal('indexes-modal', {
+	new modal({
+		id: 'indexes-modal',
 		header: "Energy Access Explorer Indexes",
 		content: c,
 		footer: ce('a', "See technical note for more detailed methodology", {

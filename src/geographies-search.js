@@ -143,7 +143,11 @@ export async function init() {
 	const gid = (new URL(location)).searchParams.get('id');
 
 	await API
-		.get('geographies', { "select": ["name", "id"], "parent_id": `eq.${gid}` })
+		.get("geographies", {
+			"select": ["name", "id"],
+			"parent_id": `eq.${gid}`,
+			"deployment": `ov.{${ENV}}`,
+		})
 		.then(r => {
 			const fli = r.find(e => maybe(e.id)) ? div : li;
 

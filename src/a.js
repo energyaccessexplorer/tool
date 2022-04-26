@@ -189,7 +189,16 @@ export async function init() {
 
 	if (GEOGRAPHY.timeline) timeline_init();
 
-	if (!MOBILE && !GEOGRAPHY.timeline) help_init();
+	if (!MOBILE && !GEOGRAPHY.timeline) {
+		try {
+			help_init();
+		} catch(e) {
+			console.error(e);
+			console.error("Disabling the nanny helper...");
+
+			qs('#drawer-help').remove();
+		}
+	}
 
 	await Promise.all(U.inputs.map(i => {
 		const d = DST.get(i);

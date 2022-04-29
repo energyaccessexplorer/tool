@@ -24,17 +24,20 @@
     {{> views/loading}}
   </body>
 
-  <script>
-	FLASH = new flash();
-	API = new pgrest(ea_settings.database, FLASH);
+  <script type="module">
+    import flash from '../lib/flash.js';
+    import pgrest from '../lib/pgrest.js';
 
-	U = null;
+	window.FLASH = new flash();
+	window.API = new pgrest(ea_settings.database, FLASH);
 
-	GEOGRAPHY = null;
-	OUTLINE = null;
-	MAPBOX = null;
-	MOBILE = false;
-	DST = new Map();
+	window.U = null;
+
+	window.GEOGRAPHY = null;
+	window.OUTLINE = null;
+	window.MAPBOX = null;
+	window.MOBILE = false;
+	window.DST = new Map();
   </script>
 
   <script type="module">

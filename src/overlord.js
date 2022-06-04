@@ -512,6 +512,7 @@ function reset_features_visibility() {
 
 	const source = MAPBOX.getSource(this.id);
 	if (source) source.setData(fs);
+	else console.warn("reset_features_visibility: could not find source: %s. First load? -> Seems OK.", this.id);
 };
 
 function extent_contained(extent, raster) {
@@ -535,14 +536,23 @@ function analysis_dataset_intersect(raster) {
 	if (this.datatype === 'raster') return;
 
 	let fn;
-	if (this.datatype === 'polygons')
+	switch (this.datatype) {
+	case 'polygons':
 		fn = p => extent_contained(p.properties['__extent'], raster);
-	else if (this.datatype === 'lines')
+		break;
+
+	case 'lines':
 		fn = p => intersect(p.properties['__rasterindexes'], raster);
-	else if (this.datatype === 'points')
+		break;
+
+	case 'points':
 		fn = p => (data[p.properties['__rasterindex']] !== nodata);
-	else
+		break;
+
+	default:
 		fn = _ => true;
+		break;
+	}
 
 	let count = 0;
 	for (const p of this.vectors.features.features) {

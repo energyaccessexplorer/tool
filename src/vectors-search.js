@@ -47,10 +47,10 @@ async function reset() {
 		return;
 	}
 
-	await until(_ => ds.vectors.features.features);
+	await until(_ => ds.vectors.geojson.features);
 
 	if (maybe(ds.config, 'properties_search', 'length')) {
-		const first = ds.vectors.features.features[0];
+		const first = ds.vectors.geojson.features[0];
 
 		for (let a of ds.config.properties_search) {
 			if (!first.properties.hasOwnProperty(a))
@@ -67,7 +67,7 @@ async function reset() {
 		return;
 	}
 
-	for (let f of ds.vectors.features.features) {
+	for (let f of ds.vectors.geojson.features) {
 		if (f['__li']) continue;
 
 		const li = ce('li', f.properties[attr]);
@@ -96,7 +96,7 @@ function trigger(value) {
 	ul.replaceChildren();
 
 	let count = 0;
-	for (let i = 0; i < ds.vectors.features.features.length; i++) {
+	for (let i = 0; i < ds.vectors.geojson.features.length; i++) {
 		if (count > 100) {
 			qs('div.search-results-info', resultscontainer).innerHTML = `Searching <b>${ds.name}</b>. Too many results. Showing first 101 <i>only</i>:`;
 			break;
@@ -104,7 +104,7 @@ function trigger(value) {
 
 		resultsinfo.innerHTML = `Searching <b>${ds.name}</b>. ${count} results:`;
 
-		const f = ds.vectors.features.features[i];
+		const f = ds.vectors.geojson.features[i];
 		let matches = false;
 
 		for (let [k,v] of Object.entries(f.properties)) {

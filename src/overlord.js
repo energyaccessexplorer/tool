@@ -257,7 +257,7 @@ function load_view() {
 			if (!MAPBOX.getSource(`filtered-source-${i}`)) {
 				MAPBOX.addSource(`filtered-source-${i}`, {
 					"type": 'geojson',
-					"data": d.vectors.features
+					"data": d.vectors.geojson,
 				});
 			}
 
@@ -503,7 +503,7 @@ function context(rc, f) {
 };
 
 function reset_features_visibility() {
-	const fs = maybe(this, 'vectors', 'features');
+	const fs = maybe(this, 'vectors', 'geojson');
 	if (!fs) return;
 
 	fs.features.forEach(f => f.properties.__visible = true);
@@ -555,14 +555,14 @@ function analysis_dataset_intersect(raster) {
 	}
 
 	let count = 0;
-	for (const p of this.vectors.features.features) {
+	for (const p of this.vectors.geojson.features) {
 		const x = fn(p);
 		p.properties['__visible'] = x;
 
 		if (x) count += 1;
 	}
 
-	MAPBOX.getSource(this.id).setData(DST.get(this.id).vectors.features);
+	MAPBOX.getSource(this.id).setData(DST.get(this.id).vectors.geojson);
 
 	return count;
 };

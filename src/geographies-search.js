@@ -77,7 +77,7 @@ async function load(x,y) {
 	U.subdiv = y;
 	O.view = U.view;
 
-	const fs = maybe(GEOGRAPHY.divisions, x, 'vectors', 'features', 'features');
+	const fs = maybe(GEOGRAPHY.divisions, x, 'vectors', 'geojson', 'features');
 	if (!fs) return;
 
 	const geometry = fs.find(f => f['id'] === y);
@@ -117,8 +117,8 @@ async function load(x,y) {
 	const d = GEOGRAPHY.divisions[x];
 	await d.load('vectors');
 
-	d.vectors.features.features.forEach(f => f.properties.__visible = (f.id === y));
-	MAPBOX.getSource(d.id).setData(DST.get(d.id).vectors.features);
+	d.vectors.geojson.features.forEach(f => f.properties.__visible = (f.id === y));
+	MAPBOX.getSource(d.id).setData(DST.get(d.id).vectors.geojson);
 
 	if (d.on) {
 		await delay(1);
@@ -190,8 +190,8 @@ export async function init() {
 		}
 
 		const d = GEOGRAPHY.divisions[x];
-		d.vectors.features.features.forEach(f => f.properties.__visible = true);
-		MAPBOX.getSource(d.id).setData(DST.get(d.id).vectors.features);
+		d.vectors.geojson.features.forEach(f => f.properties.__visible = true);
+		MAPBOX.getSource(d.id).setData(DST.get(d.id).vectors.geojson);
 
 		load(x - 1, geometry_path[x - 1]);
 	};

@@ -289,7 +289,7 @@ This is fatal. Thanks for all the fish.`;
 				await ds.load('vectors');
 				await ds.load('raster');
 
-				ds.vectors.features.features[0].id = 0;
+				ds.vectors.geojson.features[0].id = 0;
 			});
 	})();
 

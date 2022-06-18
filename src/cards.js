@@ -335,13 +335,13 @@ export default class dscard extends HTMLElement {
 			);
 
 			cb.onchange = _ => {
-				const fs = this.ds.vectors.features.features;
+				const fs = this.ds.vectors.geojson.features;
 
 				for (let i = 0; i < fs.length; i += 1)
 					if (same(fs[i].properties['__criteria'], l))
 						fs[i].properties['__visible'] = cb.checked;
 
-				MAPBOX.getSource(this.ds.id).setData(this.ds.vectors.features);
+				MAPBOX.getSource(this.ds.id).setData(this.ds.vectors.geojson);
 			};
 
 			ul.append(li);

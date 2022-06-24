@@ -21,11 +21,11 @@ import {
 	analysis_to_dataset,
 } from './overlord.js';
 
-const bubble = (v,e) => new bubblemessage({ message: v + "%", position: "C", close: false, noevents: true }, e);
+const bubble = (v,e) => new bubblemessage({ "message": v + "%", "position": "C", "close": false, "noevents": true }, e);
 
 const PIES = {
-	'population': svg_pie([[0], [0], [0], [0], [0]], 70, 0, ea_analysis_colorscale.stops, null, null, bubble),
-	'area': svg_pie([[0], [0], [0], [0], [0]], 70, 0, ea_analysis_colorscale.stops, null, null, bubble),
+	"population": svg_pie([[0], [0], [0], [0], [0]], 70, 0, ea_analysis_colorscale.stops, null, null, bubble),
+	"area": svg_pie([[0], [0], [0], [0], [0]], 70, 0, ea_analysis_colorscale.stops, null, null, bubble),
 };
 
 function radio(init, callback) {

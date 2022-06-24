@@ -11,7 +11,7 @@ import {
 	csv as report_csv,
 } from './report.js';
 
-import analysis_plot_active from './analysis.js';
+import analysis_run from './analysis.js';
 
 /*
  * summary
@@ -47,7 +47,7 @@ async function summary() {
 	const bubble = (v,e) => new bubblemessage({ message: v + "%", position: "C", close: false, noevents: true }, e);
 
 	async function get_summaries(idxn) {
-		let raster = (await analysis_plot_active(idxn)).raster;
+		let raster = (await analysis_run(idxn)).raster;
 
 		summary[idxn] = await analyse(raster);
 

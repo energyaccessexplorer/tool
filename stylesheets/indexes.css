@@ -65,6 +65,14 @@
   text-align: left;
 }
 
+#output-variant-select {
+  border: none;
+  font-size: 1em;
+  background: none;
+  padding: 0.7em 1em;
+  border-top: solid 1px lightgray;
+}
+
 .index-graphs-container {
   display: flex;
   flex-flow: row nowrap;

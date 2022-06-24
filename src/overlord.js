@@ -5,6 +5,7 @@ import {
 } from './rasters.js';
 
 import {
+	priority,
 	analysis,
 } from './analysis.js';
 
@@ -276,6 +277,29 @@ function load_view() {
 					},
 				}, MAPBOX.first_symbol);
 			}
+
+			if (!MAPBOX.getSource(`priority-source-${i}`)) {
+				MAPBOX.addSource(`priority-source-${i}`, {
+					"type": 'geojson',
+					"data": jsonclone(d.vectors.geojson),
+				});
+			}
+
+			if (!MAPBOX.getLayer(`priority-layer-${i}`)) {
+				MAPBOX.addLayer({
+					"id": `priority-layer-${i}`,
+					"source": `priority-source-${i}`,
+					"type": 'fill',
+					"layout": {
+						"visibility": "none",
+					},
+					"paint": {
+						"fill-color": [ "get", "__color" ],
+						"fill-outline-color": "black",
+						"fill-opacity": 1,
+					},
+				}, MAPBOX.first_symbol);
+			}
 		});
 	})();
 
@@ -295,18 +319,35 @@ function load_view() {
 			MAPBOX.setLayoutProperty('output-layer', 'visibility', v);
 	};
 
+	function priority_visibility_pick(x) {
+		GEOGRAPHY.divisions.forEach((d,i) => {
+			const t = U.divtier + 1;
+
+			if (MAPBOX.getLayer(`priority-layer-${i}`))
+				MAPBOX.setLayoutProperty(`priority-layer-${i}`, 'visibility', x && (t === i) ? "visible" : "none");
+		});
+	};
+
 	switch (view) {
 	case "outputs": {
 		indexes_list();
 
 		analysis_plot_active(output, true)
-			.then(_ => {
+			.then(a => {
 				if (timeline) timeline.style.display = 'none';
 
 				filtered_visibility('none');
 
-				output_visibility('visible');
+				output_visibility(U.variant === 'raster' ? 'visible' : 'none');
+
+				const t = U.divtier + 1;
+
+				if (GEOGRAPHY.divisions[t])
+					priority(GEOGRAPHY.divisions[t], a, t);
+
+				priority_visibility_pick(U.variant === 'priority');
 			});
+
 		break;
 	}
 
@@ -314,6 +355,8 @@ function load_view() {
 		filtered_visibility('none');
 
 		output_visibility('none');
+
+		priority_visibility_pick(false);
 
 		cards_update(inputs);
 		O.sort();
@@ -330,9 +373,12 @@ function load_view() {
 
 		output_visibility('none');
 
+		priority_visibility_pick(false);
+
 		analysis_plot_active(output, true);
 
 		filtered_valued_polygons();
+
 		break;
 	}
 
@@ -342,6 +388,8 @@ function load_view() {
 		filtered_visibility('none');
 
 		output_visibility('none');
+
+		priority_visibility_pick(false);
 
 		timeline_lines_update();
 

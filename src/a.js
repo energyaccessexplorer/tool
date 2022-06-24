@@ -96,6 +96,7 @@ const Uproxy = {
 	set: function(url,t,v) {
 		switch (t) {
 		case "output":
+		case "variant":
 		case "view": {
 			if (!PARAMS[t].includes(v)) v = PARAMS[t][0];
 			url.searchParams.set(t,v);

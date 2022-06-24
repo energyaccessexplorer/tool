@@ -301,3 +301,66 @@ export async function analysis(type) {
 		analysis: a,
 	};
 };
+
+export function priority(d, a, i) {
+	const pop = DST.get('population-density');
+
+	const o = {};
+
+	const g = d.raster.data;
+	const p = pop.raster.data;
+
+	const u = [];
+	for (const e of g) if (u.indexOf(e) === -1) u.push(e);
+	for (const e of u.sort()) {
+		if (e === -1) continue;
+
+		o[e] = {
+			"values": [],
+			"populations": [],
+		};
+	}
+
+	if (!p) return;
+
+	for (let i = 0; i < a.raster.length; i += 1) {
+		if (and(g[i] > -1, p[i] !== pop.raster.nodata)) {
+			o[g[i]]['values'].push(a.raster[i]);
+			o[g[i]]['populations'].push(p[i]);
+		}
+	}
+
+	for (const e in o) {
+		o[e]['values-average'] = o[e]['values'].reduce((a,b) => a+b, 0) / o[e]['values'].length;
+		o[e]['population-density-average'] = o[e]['populations'].reduce((a,b) => a+b, 0) / o[e]['populations'].length;
+	}
+
+	const actives = Object.keys(o).filter(k => o[k]['values-average'] !== -1);
+
+	const pop_averages = actives.map(k => o[k]['population-density-average']);
+	const val_averages = actives.map(k => o[k]['values-average']);
+
+	const pop_scale = d3.scaleLinear().domain([Math.min(...pop_averages), Math.max(...pop_averages)]).range([0,1]);
+	const val_scale = d3.scaleLinear().domain([Math.min(...val_averages), Math.max(...val_averages)]).range([0,1]);
+
+	const source = MAPBOX.getSource(`priority-source-${i}`);
+	if (!source) return;
+
+	const priority_values = actives.map(e => val_scale(o[e]['values-average']) * pop_scale(o[e]['population-density-average']));
+
+	const s = d3.scaleQuantile().domain([Math.min(...priority_values), Math.max(...priority_values)]).range(ea_analysis_colorscale.stops);
+
+	for (const e in o) {
+		if (o[e]['values-average'] === -1) {
+			source._data.features.find(f => f.id === +e).properties['__color'] = "transparent";
+			continue;
+		}
+
+		const t = val_scale(o[e]['values-average']) * pop_scale(o[e]['population-density-average']);
+		source._data.features.find(f => f.id === +e).properties['__color'] = s(t);
+	}
+
+	source.setData(jsonclone(source._data));
+
+	return o;
+};

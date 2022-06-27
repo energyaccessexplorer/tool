@@ -271,7 +271,26 @@ contact our team at`;
 
 		add_right_title();
 
-		add_title(GEOGRAPHY.name, 18);
+		let name = GEOGRAPHY.name;
+
+		if (U.divtier === 1) {
+			const c = GEOGRAPHY.divisions[1].csv;
+			name += " - " + c.data.find(d => +d[c.key] === U.subdiv)[c.value];
+		}
+
+		if (U.divtier === 2) {
+			const c = GEOGRAPHY.divisions[2].csv;
+			const two = c.data.find(d => +d[c.key] === U.subdiv);
+
+			const t1 = DST.get('admin-tiers').csv.data.find(d => +d['TIER2'] === U.subdiv)['TIER1'];
+
+			const c1 = GEOGRAPHY.divisions[1].csv;
+			const one = c1.data.find(d => +d[c1.key] === +t1);
+
+			name += " - " + one[c1.value] + " - " + two[c.value];
+		}
+
+		add_title(name, 18);
 
 		await add_indexes_infos();
 

@@ -131,6 +131,9 @@ async function usertype(gid) {
 		ul.append(li);
 	}
 
+	// move the "own criteria" entry to the beggining. CAREFUL: The rest of the presets are ordered with presets.tsv below..."
+	ul.prepend(ul.lastElementChild);
+
 	content.append(ul);
 
 	new modal({

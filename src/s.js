@@ -118,11 +118,10 @@ async function usertype(gid) {
 	const ul = ce('ul');
 	for (const t of presets) {
 		const inputs = t.datasets.map(x => x.name).join(',');
-		const output = t.output;
-		const view = t.view;
+		const { output, view, variant } = t;
 
 		const p = ce('p', t.description);
-		const li = ce('li', ce('a', [ce('h3', t.name), p], { "href": `/tool/a?id=${gid}&inputs=${inputs}&output=${output}&view=${view}` }));
+		const li = ce('li', ce('a', [ce('h3', t.name), p], { "href": `/tool/a?id=${gid}&inputs=${inputs}&output=${output}&view=${view}&variant=${variant}` }));
 		li.onclick = function() {
 			localStorage.setItem('config', JSON.stringify(t));
 			localStorage.setItem('user-type', t.name);

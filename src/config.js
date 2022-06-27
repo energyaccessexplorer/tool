@@ -48,7 +48,8 @@ export function generate() {
 		"tab": tab_id,
 		"output": U.output,
 		"theme": ea_settings.mapbox_theme,
-		"datasets": datasets
+		"datasets": datasets,
+		"variant": U.variant,
 	};
 
 	return config;

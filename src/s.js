@@ -71,24 +71,28 @@ const presets = [
 		"output": "eai",
 		"view": "outputs",
 		"description": "Electrification planning agencies are able to link electrification and development outcomes.",
+		"variant": "raster",
 	},
 	{
 		"name": "The expansion of clean energy markets",
 		"output": "eai",
 		"view": "outputs",
 		"description": "Technology suppliers (whether mini grid developers or solar home system providers) can get a better understanding of aspects of affordability and level of service needed.",
+		"variant": "raster",
 	},
 	{
 		"name": "Impact investment",
 		"output": "ani",
 		"view": "outputs",
-		"description": "Donors and development finance institutions can identify areas where grants and support will have the most impact."
+		"description": "Donors and development finance institutions can identify areas where grants and support will have the most impact.",
+		"variant": "raster",
 	},
 	{
 		"name": "Bottom-up assessment of energy needs",
 		"output": "demand",
 		"view": "outputs",
-		"description": "Service delivery institutions in the health, education and agriculture sectors are able to estimate energy needs associated to development services."
+		"description": "Service delivery institutions in the health, education and agriculture sectors are able to estimate energy needs associated to development services.",
+		"variant": "raster",
 	},
 	{
 		"name": "Generate custom geospatial analysis based on your own criteria",
@@ -96,6 +100,7 @@ const presets = [
 		"output": "eai",
 		"view": "inputs",
 		"datasets": [],
+		"variant": "raster",
 	},
 ];
 

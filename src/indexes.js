@@ -180,7 +180,7 @@ export function init() {
 	qs('.index-graphs-group #population-number', graphs).parentElement.append(PIES['population'].svg);
 
 	const variant_select = qs('#output-variant-select');
-	variant_select.value = U.variant || "raster";
+	variant_select.value = U.variant;
 	variant_select.onchange = function(_) {
 		U.variant = this.value;
 		O.view = U.view;

@@ -58,11 +58,15 @@
 
 #index-graphs {
   background-color: white;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-around;
 }
 
 #index-graphs-title {
   padding: 0.7em 1em;
   text-align: left;
+  width: 100%;
 }
 
 #output-variant-select {
@@ -102,18 +106,16 @@
   font-size: 0.8em;
   font-style: italic;
   text-align: center;
-  padding: 1em 2em;
+  max-width: 40%;
+  min-height: 3em;
 }
 
 #index-graphs-toolbox {
-  position: relative;
   display: flex;
-  padding-right: 1em;
-  float: right;
 }
 
 #index-graphs-toolbox a {
-  padding-right: 0.5em;
+  padding-left: 0.5em;
   cursor: pointer;
   color: var(--the-color);
   margin-right: 5px;

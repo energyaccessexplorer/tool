@@ -97,7 +97,7 @@ const presets = [
 	},
 ];
 
-async function usertype(gid) {
+function usertype(gid) {
 	const content = ce('div', ce('p', "What are you interested in?"), { "id": "presets" });
 
 	const ul = ce('ul');

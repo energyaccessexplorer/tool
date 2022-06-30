@@ -163,6 +163,7 @@ export async function init() {
 	}
 
 	U.inputs = U.inputs.slice(0); // cleanup non-existent ids
+	U.variant = U.variant || 'raster';
 
 	O.index = U.output;
 

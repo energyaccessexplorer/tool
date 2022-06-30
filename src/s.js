@@ -4,21 +4,6 @@ import bubblemessage from '../lib/bubblemessage.js';
 
 import selectlist from '../lib/selectlist.js';
 
-if (location.hostname.match(/localhost/))
-	ENV = ["production", "staging"];
-else {
-	const subdomain = location.hostname.match(/^(.*).energyaccessexplorer/)[1];
-	switch (subdomain) {
-	case 'www':
-		ENV = "production";
-		break;
-
-	default:
-		ENV = subdomain;
-		break;
-	}
-}
-
 function ugly_flag(flagurl) {
 	return ce('img', null, {
 		src: flagurl,

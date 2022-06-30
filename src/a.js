@@ -140,21 +140,6 @@ export async function init() {
 
 	session_init();
 
-	if (location.hostname.match(/localhost/))
-		ENV = ["production", "staging"];
-	else {
-		const subdomain = location.hostname.match(/^(.*).energyaccessexplorer/)[1];
-		switch (subdomain) {
-		case 'www':
-			ENV = "production";
-			break;
-
-		default:
-			ENV = subdomain;
-			break;
-		}
-	}
-
 	PARAMS = ea_params['default'];
 
 	if (GEOGRAPHY.timeline)

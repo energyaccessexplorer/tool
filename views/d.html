@@ -28,21 +28,21 @@
     import flash from '../lib/flash.js';
     import pgrest from '../lib/pgrest.js';
 
-	window.FLASH = new flash();
-	window.API = new pgrest(ea_settings.database, FLASH);
+    window.FLASH = new flash();
+    window.API = new pgrest(ea_settings.database, FLASH);
 
-	window.U = null;
+    window.U = null;
 
-	window.GEOGRAPHY = null;
-	window.OUTLINE = null;
-	window.MAPBOX = null;
-	window.MOBILE = false;
-	window.DST = new Map();
+    window.GEOGRAPHY = null;
+    window.OUTLINE = null;
+    window.MAPBOX = null;
+    window.MOBILE = false;
+    window.DST = new Map();
   </script>
 
   <script type="module">
-	import {init} from './d.js';
-	init();
+    import {init} from './d.js';
+    init();
   </script>
 
   {{> views/templates}}

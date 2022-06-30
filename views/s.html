@@ -25,11 +25,11 @@
   </head>
 
   <body>
-	{{> views/nav}}
+    {{> views/nav}}
 
     <div id="playground"></div>
 
-	{{> views/loading}}
+    {{> views/loading}}
   </body>
 
   <script type="module">
@@ -37,17 +37,17 @@
     import pgrest from '../lib/pgrest.js';
 
     window.FLASH = new flash();
-	window.API = new pgrest(ea_settings.database, FLASH);
+    window.API = new pgrest(ea_settings.database, FLASH);
 
-	window.ENV = null;
-	window.MOBILE = false;
+    window.ENV = null;
+    window.MOBILE = false;
   </script>
 
   {{> views/env }}
 
   <script type="module">
-	import {init} from './s.js';
-	init();
+    import {init} from './s.js';
+    init();
   </script>
 
   {{> views/gapps}}

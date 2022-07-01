@@ -7,3 +7,15 @@ export function logged_in() {
 		return false;
 	}
 };
+
+export function envs() {
+	const token = localStorage.getItem('token');
+
+	const p = ['production'];
+
+	if (logged_in())
+		return coalesce(maybe(jwt_decode(token), 'data', 'envs'), p);
+
+	if (window.ENV !== 'production')
+		window.location = '/login';
+};

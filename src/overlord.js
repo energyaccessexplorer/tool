@@ -319,9 +319,11 @@ function load_view() {
 			MAPBOX.setLayoutProperty('output-layer', 'visibility', v);
 	};
 
-	function priority_visibility_pick(x) {
+	function priority_visibility_pick() {
+		const x = U.variant !== "raster";
+
 		GEOGRAPHY.divisions.forEach((d,i) => {
-			const t = U.divtier + 1;
+			const t = +U.variant;
 
 			if (MAPBOX.getLayer(`priority-layer-${i}`))
 				MAPBOX.setLayoutProperty(`priority-layer-${i}`, 'visibility', x && (t === i) ? "visible" : "none");
@@ -340,12 +342,12 @@ function load_view() {
 
 				output_visibility(U.variant === 'raster' ? 'visible' : 'none');
 
-				const t = U.divtier + 1;
+				const t = U.variant;
 
 				if (GEOGRAPHY.divisions[t])
 					priority(GEOGRAPHY.divisions[t], a, t);
 
-				priority_visibility_pick(U.variant === 'priority');
+				priority_visibility_pick();
 			});
 
 		break;
@@ -356,7 +358,7 @@ function load_view() {
 
 		output_visibility('none');
 
-		priority_visibility_pick(false);
+		priority_visibility_pick();
 
 		cards_update(inputs);
 		O.sort();
@@ -373,7 +375,7 @@ function load_view() {
 
 		output_visibility('none');
 
-		priority_visibility_pick(false);
+		priority_visibility_pick();
 
 		analysis_plot_active(output, true);
 
@@ -389,7 +391,7 @@ function load_view() {
 
 		output_visibility('none');
 
-		priority_visibility_pick(false);
+		priority_visibility_pick();
 
 		timeline_lines_update();
 

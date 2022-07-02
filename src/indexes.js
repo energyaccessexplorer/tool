@@ -180,6 +180,11 @@ export function init() {
 	qs('.index-graphs-group #population-number', graphs).parentElement.append(PIES['population'].svg);
 
 	const variant_select = qs('#output-variant-select');
+	GEOGRAPHY.divisions.forEach((d,i) => {
+		if (i === 0) return;
+		variant_select.append(ce('option', `Administrative Priority - ${d.name}`, { "value": i }));
+	});
+
 	variant_select.value = U.variant;
 	variant_select.onchange = function(_) {
 		U.variant = this.value;

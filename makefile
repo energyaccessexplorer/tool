@@ -80,7 +80,7 @@ build-s:
 
 	@sed -ri 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/s/index.html
 
-	@cp ${SRC}/{browser,s}.js ${DIST}/s/
+	@cp ${SRC}/{browser,user,s}.js ${DIST}/s/
 
 	@cat \
 		${LIB}/d3.js \

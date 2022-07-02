@@ -303,12 +303,16 @@ export async function analysis(type) {
 };
 
 export function priority(d, a, i) {
-	const pop = DST.get('population-density');
+	const g = d.raster.data;
+
+	const pop = DST.get('population-density') || {
+		"raster": {
+			"data": new Int8Array(g.length).fill(1),
+			"nodata": -1
+		}
+	};
 
 	const o = {};
-
-	const g = d.raster.data;
-	const p = pop.raster.data;
 
 	const u = [];
 	for (const e of g) if (u.indexOf(e) === -1) u.push(e);
@@ -321,8 +325,7 @@ export function priority(d, a, i) {
 		};
 	}
 
-	if (!p) return;
-
+	const p = pop.raster.data;
 	for (let i = 0; i < a.raster.length; i += 1) {
 		if (and(g[i] > -1, p[i] !== pop.raster.nodata)) {
 			o[g[i]]['values'].push(a.raster[i]);

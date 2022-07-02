@@ -1,9 +1,7 @@
-/data
-/default.mk
+/lib
 /dist
-/settings.json
-/postgrest.conf
-/extras.mk
 /*.diff
 *.orig
 *.rej
+/package-lock.json
+/settings.json

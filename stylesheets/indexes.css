@@ -75,6 +75,7 @@
   background: none;
   padding: 0.7em 1em;
   border-top: solid 1px lightgray;
+  color: var(--the-color);
 }
 
 .index-graphs-container {

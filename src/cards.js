@@ -69,7 +69,8 @@ function lines_legends_svg(l) {
 		.attr('d', "M 0.5625,23.71875 C 2.0625,8.0625 14.439788,10.706994 17.625,7.5 20.810212,4.2930056 23.71875,0.375 23.71875,0.375")
 		.attr('fill', 'none')
 		.attr('stroke', l['stroke'] || 'black')
-		.attr('stroke-width', l['stroke-width']);
+		.attr('stroke-width', l['stroke-width'])
+		.attr('stroke-dasharray', l['dasharray']);
 
 	return svg.node();
 };

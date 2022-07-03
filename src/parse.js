@@ -198,6 +198,21 @@ export async function geojson_summary() {
 	return o;
 };
 
+// mapbox-gl does not follow SVG's stroke-dasharray convention when it comes
+// to single numbered arrays.
+//
+function mapbox_dasharray(str) {
+	let da = str ? str.split(' ').map(x => +x) : [1];
+
+	if (da.length === 1) {
+		(da[0] === 0) ?
+			da = [1] :
+			da = [da[0], da[0]];
+	}
+
+	return da;
+};
+
 function specs_set(fs, specs) {
 	const criteria = [{
 		"params": ["__name"],
@@ -205,12 +220,14 @@ function specs_set(fs, specs) {
 		"radius": this.vectors['radius'],
 		"stroke": this.vectors['stroke'],
 		"stroke-width": this.vectors['stroke-width'],
+		"dasharray": this.vectors['dasharray'],
 	}];
 
 	for (let i = 0; i < fs.length; i += 1) {
 		fs[i].properties['__radius'] = this.vectors['radius'];
 		fs[i].properties['__stroke'] = this.vectors['stroke'];
 		fs[i].properties['__stroke-width'] = this.vectors['stroke-width'];
+		fs[i].properties['__dasharray'] = mapbox_dasharray(this.vectors['dasharray']);
 
 		if (specs) {
 			const c = Object.assign({}, criteria[0]);
@@ -240,6 +257,11 @@ function specs_set(fs, specs) {
 
 					if (has(s, 'stroke-width'))
 						fs[i].properties['__stroke-width'] = c['stroke-width'] = s['stroke-width'];
+
+					if (has(s, 'dasharray')) {
+						c['dasharray'] = s['dasharray'];
+						fs[i].properties['__dasharray'] = mapbox_dasharray(s['dasharray']);
+					}
 
 					p = true;
 				}
@@ -340,20 +362,6 @@ export function lines() {
 			}
 		})
 		.then(_ => {
-			let da = [1];
-
-			// mapbox-gl does not follow SVG's stroke-dasharray convention when it comes
-			// to single numbered arrays.
-			//
-			if (this.vectors.dasharray) {
-				da = this.vectors.dasharray.split(' ').map(x => +x);
-				if (da.length === 1) {
-					(da[0] === 0) ?
-						da = [1] :
-						da = [da[0], da[0]];
-				}
-			}
-
 			const criteria = specs_set.call(
 				this,
 				this.vectors.geojson.features,
@@ -376,7 +384,7 @@ export function lines() {
 				"paint": {
 					"line-color": ['get', '__stroke'],
 					"line-width": ['get', '__stroke-width'],
-					"line-dasharray": da, // ['get', '__dasharray'] // Waiting for mapbox to do something about this...
+					"line-dasharray": ['get', '__dasharray'],
 				},
 			});
 

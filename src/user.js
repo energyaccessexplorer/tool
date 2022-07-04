@@ -16,6 +16,5 @@ export function envs() {
 	if (logged_in())
 		return coalesce(maybe(jwt_decode(token), 'data', 'envs'), p);
 
-	if (window.ENV !== 'production')
-		window.location = '/login';
+	return p;
 };

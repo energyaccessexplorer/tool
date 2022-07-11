@@ -21,8 +21,8 @@ lint:
 	${BIN}/lint ${SRC}
 
 deps:
-	mkdir -p ${DIST}/lib/fonts
-	DEST=${DIST}/lib ${BIN}/deps
+	@mkdir -p ${LIB}/fonts
+	DEST=${LIB} ${BIN}/deps
 
 start:
 	${HTTP_SERVER} --port ${TOOL_PORT} --dir ${DIST}

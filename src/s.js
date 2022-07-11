@@ -279,12 +279,11 @@ export function init() {
 		loading(false);
 	};
 
-	API
-		.get("geographies", {
-			"select": ['*', 'datasets_count'],
-			"adm": "eq.0",
-			"deployment": `ov.{${ENV}}`,
-		})
+	API.get("geographies", {
+		"select": ['*', 'datasets_count'],
+		"adm": "eq.0",
+		"deployment": `ov.{${ENV}}`,
+	})
 		.then(r => list(r))
 		.catch(error => {
 			FLASH.push({

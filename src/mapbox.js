@@ -5,10 +5,10 @@ const default_styles = [{
 	"value": "mapbox/basic-v9"
 }, {
 	"name": "Satellite",
-	"value": "mapbox/satellite-streets-v9"
+	"value": "mapbox/satellite-streets-v11"
 }, {
 	"name": "Dark",
-	"value": "mapbox/dark-v9"
+	"value": "mapbox/dark-v10"
 }];
 
 const styles = default_styles;

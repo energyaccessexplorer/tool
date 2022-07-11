@@ -70,6 +70,10 @@ dialog content {
   padding: 1.7em !important;
 }
 
+dialog footer {
+  padding: 1em 3em 2em;
+}
+
 dialog pre {
   max-width: 850px;
   white-space: pre-line;

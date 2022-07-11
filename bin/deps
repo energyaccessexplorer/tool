@@ -4,11 +4,6 @@
 # second column into the first column. A poor man's package manager if
 # you will...
 
-function printline {
-	echo -en "\e[1A"
-	echo -e "\e[0K\r$1"
-}
-
 if [ ! -f dependencies.tsv ]; then
 	>&2 echo "No 'dependencies.tsv' file"
 	exit 1
@@ -23,6 +18,23 @@ if [ ! -d $DEST ]; then
 	printf "%s\n\n" "Creating $DEST..."
 	mkdir -p $DEST
 fi
+
+function printline {
+	echo -en "\e[1A"
+	echo -e "\e[0K\r$1"
+}
+
+function fetch {
+	if curl --location \
+			--silent \
+			--fail \
+			--output \
+			"$DEST/$1" "$2"; then
+		printline "$1"
+	else
+		printf "%s\n\n" "FAILED to fetch $1!"
+	fi
+}
 
 while read -r line
 do
@@ -41,11 +53,7 @@ EOF
 		continue
 	fi
 
-	if curl -L "$origin" --silent --fail --output "$DEST/$target"; then
-		printline "$target"
-	else
-		printf "%s\n\n" "FAILED to fetch $target!"
-	fi
+	fetch "$target" "$origin"
 done <dependencies.tsv
 
 printline "deps finished"

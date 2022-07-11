@@ -18,6 +18,15 @@
     z-index: 1;
   }
 
+  #left-pane[open] {
+	max-width: 100%;
+	min-width: unset;
+  }
+
+  .search-panel {
+	width: calc(100% - 4em);
+  }
+
   .search-input {
 	display: none;
   }

@@ -1,5 +1,6 @@
 #left-pane #drawer {
   border-right: 1px solid lightgray;
+  background-color: white;
 }
 
 #left-pane #drawer > div {

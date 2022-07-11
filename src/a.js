@@ -492,7 +492,9 @@ export function toggle_left_panel(t) {
 		p.dispatchEvent(new Event('activate'));
 	}
 
-	qs('#left-pane').style['min-width'] = t ? '40em' : '';
+	const l = qs('#left-pane');
+	if (t) l.setAttribute('open', '');
+	else l.removeAttribute('open');
 
 	const rs = new Event('resize');
 	window.dispatchEvent(rs);

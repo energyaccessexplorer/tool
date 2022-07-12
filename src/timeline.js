@@ -100,7 +100,7 @@ function timeline_slider(opts) {
 	});
 
 	return {
-		svg: node,
+		"svg": node,
 		set,
 	};
 };
@@ -113,7 +113,7 @@ function multiline(opts) {
 	const width = opts.width ?? 600;
 	const height = opts.height ?? 400;
 
-	const margin = { top: 20, right: 20, bottom: 30, left: 40 };
+	const margin = { "top": 20, "right": 20, "bottom": 30, "left": 40 };
 
 	const svg = d3.create("svg")
 		.attr("viewBox", [0, 0, width, height]);
@@ -135,7 +135,7 @@ function multiline(opts) {
 	const line = function(i) {
 		y.domain([
 			d3.min(data.series[i].values),
-			d3.max(data.series[i].values)
+			d3.max(data.series[i].values),
 		]);
 
 		return d3.line()
@@ -209,11 +209,11 @@ function multiline(opts) {
 			if (n) n.remove();
 
 			n = new bubblemessage({
-				title: s.name,
-				message: typeof message === 'function' ? message(s, i, s.values[i]) : s.name,
-				position: "W",
-				close: false,
-				noevents: true,
+				"title":    s.name,
+				"message":  typeof message === 'function' ? message(s, i, s.values[i]) : s.name,
+				"position": "W",
+				"close":    false,
+				"noevents": true,
 			}, dot.node());
 		};
 
@@ -258,7 +258,7 @@ function multiline(opts) {
 
 			y.domain([
 				d3.min(data.series[j].values),
-				d3.max(data.series[j].values)
+				d3.max(data.series[j].values),
 			]);
 
 			dot.attr("display", null);
@@ -272,7 +272,7 @@ function multiline(opts) {
 	path.call(pathhover);
 
 	return {
-		svg: svg.node()
+		"svg": svg.node(),
 	};
 };
 
@@ -285,11 +285,11 @@ export async function init() {
 	const padding = 100;
 
 	const tl = timeline_slider({
-		steps: steps,
-		width: qs('#maparea').clientWidth - padding,
-		init: steps.length - 1,
-		parent: parent,
-		drag: x => O.timeline = GEOGRAPHY.timeline_dates.find(i => i.match(x))
+		"steps":  steps,
+		"width":  qs('#maparea').clientWidth - padding,
+		"init":   steps.length - 1,
+		"parent": parent,
+		"drag":   x => O.timeline = GEOGRAPHY.timeline_dates.find(i => i.match(x)),
 	});
 
 	tl.svg.style.left = (padding / 2) + "px";
@@ -309,13 +309,13 @@ export function lines_draw() {
 
 	const series = datasets.reduce((a,c) => {
 		return a.concat(c.csv.data.filter(r => +r[c.csv.key] === U.subdiv).map(r => ({
-			values: GEOGRAPHY.timeline_dates.map(k => (r[k] === "" ? undefined : +r[k])),
-			id: c.id,
-			name: ce('span', [
+			"values": GEOGRAPHY.timeline_dates.map(k => (r[k] === "" ? undefined : +r[k])),
+			"id":     c.id,
+			"name":   ce('span', [
 				ce('span', c.name),
-				ce('span', "[" + c.category.unit + "]", { style: "margin-left: 1em; font-size: 0.8em;" }),
+				ce('span', "[" + c.category.unit + "]", { "style": "margin-left: 1em; font-size: 0.8em;" }),
 			]),
-			color: c.colorscale.stops.slice(-1)
+			"color": c.colorscale.stops.slice(-1),
 		})));
 	}, []);
 
@@ -323,35 +323,35 @@ export function lines_draw() {
 	if (lines) lines.remove();
 
 	const average = datasets.map(i => ({
-		id: i['id'],
-		values: GEOGRAPHY.timeline_dates.map(d => i.csv.data.map(r => +r[d])).map(x => x.reduce((a,c) => a + c, 0) / x.length)
+		"id":     i['id'],
+		"values": GEOGRAPHY.timeline_dates.map(d => i.csv.data.map(r => +r[d])).map(x => x.reduce((a,c) => a + c, 0) / x.length),
 	}));
 
 	const ml = multiline({
-		data: {
-			series: series,
-			dates: GEOGRAPHY.timeline_dates.map(d3.utcParse("%Y-%m-%d"))
+		"data": {
+			"series": series,
+			"dates":  GEOGRAPHY.timeline_dates.map(d3.utcParse("%Y-%m-%d")),
 		},
-		color: "green",
-		width: 350,
-		height: 250,
-		message: function(m,i,a) {
+		"color":   "green",
+		"width":   350,
+		"height":  250,
+		"message": function(m,i,a) {
 			const table = document.createElement('table');
 
 			const t1 = ce('tr', [
 				ce('td', ce('strong', "Value: &nbsp;")),
-				ce('td', a.toString())
+				ce('td', a.toString()),
 			]);
 
 			const t2 = ce('tr', [
 				ce('td', ce('strong', "State Average: &nbsp;")),
-				ce('td', (Math.round(average.find(x => x.id === m.id).values[i] * 100) / 100).toString())
+				ce('td', (Math.round(average.find(x => x.id === m.id).values[i] * 100) / 100).toString()),
 			]);
 
 			table.append(t1,t2);
 
 			return table;
-		}
+		},
 	});
 	ml.svg.id = 'timeline-lines';
 

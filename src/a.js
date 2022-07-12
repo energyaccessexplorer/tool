@@ -66,7 +66,7 @@ import Overlord from './overlord.js';
 import bubblemessage from '../lib/bubblemessage.js';
 
 const Uproxy = {
-	get: function(url,p) {
+	"get": function(url,p) {
 		const i = url.searchParams.get(p);
 
 		let v;
@@ -93,7 +93,7 @@ const Uproxy = {
 		return v;
 	},
 
-	set: function(url,t,v) {
+	"set": function(url,t,v) {
 		switch (t) {
 		case "output":
 		case "variant":
@@ -127,14 +127,14 @@ const Uproxy = {
 		history.replaceState(null, null, url);
 
 		return true;
-	}
+	},
 };
 
 export async function init() {
 	const url = new URL(location);
 	const id = url.searchParams.get('id');
 
-	GEOGRAPHY = await API.get("geographies", { "id": `eq.${id}` }, { one: true });
+	GEOGRAPHY = await API.get("geographies", { "id": `eq.${id}` }, { "one": true });
 	GEOGRAPHY.timeline = maybe(GEOGRAPHY, 'configuration', 'timeline');
 	GEOGRAPHY.timeline_dates = maybe(GEOGRAPHY, 'configuration', 'timeline_dates');
 
@@ -220,7 +220,7 @@ export function clean() {
 			d.controls.range_group.change(d.domain);
 
 		if (maybe(d, 'controls', 'weight_group'))
-			d.controls.weight_group.change({ min: 0, max: maybe(d.category, 'analysis', 'weight') });
+			d.controls.weight_group.change({ "min": 0, "max": maybe(d.category, 'analysis', 'weight') });
 	});
 
 	qs('input#controls-search').value = "";
@@ -271,11 +271,11 @@ This is fatal. Thanks for all the fish.`;
 		}
 
 		const bp = {
-			"id": `eq.${outline_id}`,
+			"id":     `eq.${outline_id}`,
 			"select": select,
 		};
 
-		return API.get("datasets", bp, { one: true })
+		return API.get("datasets", bp, { "one": true })
 			.then(async e => {
 				if (exists(e)) return;
 
@@ -292,11 +292,11 @@ This is fatal. Thanks for all the fish.`;
 		return Promise.all(
 			divisions.filter(x => x.dataset_id).slice(1).map(x => {
 				const dp = {
-					"id": `eq.${x.dataset_id}`,
+					"id":     `eq.${x.dataset_id}`,
 					"select": select,
 				};
 
-				return API.get("datasets", dp, { one: true })
+				return API.get("datasets", dp, { "one": true })
 					.then(async e => {
 						if (exists(e)) return;
 
@@ -306,7 +306,7 @@ This is fatal. Thanks for all the fish.`;
 						await ds.load('vectors');
 						await ds.load('raster');
 					});
-			})
+			}),
 		);
 	})();
 
@@ -316,9 +316,9 @@ This is fatal. Thanks for all the fish.`;
 		const nd = divisions.filter(d => d.dataset_id).map(d => d.dataset_id).concat(OUTLINE.dataset_id);
 		const p = {
 			"geography_id": `eq.${id}`,
-			"select": select,
-			"deployment": `ov.{${ENV}}`,
-			"id": `not.in.(${nd})`,
+			"select":       select,
+			"deployment":   `ov.{${ENV}}`,
+			"id":           `not.in.(${nd})`,
 		};
 
 		return API.get("datasets", p)
@@ -341,7 +341,7 @@ This is fatal. Thanks for all the fish.`;
 
 function layout() {
 	if (maybe(GEOGRAPHY, 'timeline'))
-		qs('#visual').append(ce('div', null, { id: 'timeline' }));
+		qs('#visual').append(ce('div', null, { "id": 'timeline' }));
 
 	const n = qs('nav');
 	const p = qs('#playground');
@@ -403,10 +403,10 @@ function mobile() {
 
 	const switcher = qs('#mobile-switcher');
 
-	const svgcontrols = ce('div', font_icon('list-task'), { bind: 'controls', ripple: "" });
-	const map = ce('div', font_icon('globe'), { bind: 'map', ripple: "" });
-	const inputs = ce('div', font_icon('layers-fill'), { bind: 'inputs', ripple: "" });
-	const outputs = ce('div', font_icon('pie-chart-fill'), { bind: 'outputs', ripple: "" });
+	const svgcontrols = ce('div', font_icon('list-task'), { "bind": 'controls', "ripple": "" });
+	const map = ce('div', font_icon('globe'), { "bind": 'map', "ripple": "" });
+	const inputs = ce('div', font_icon('layers-fill'), { "bind": 'inputs', "ripple": "" });
+	const outputs = ce('div', font_icon('pie-chart-fill'), { "bind": 'outputs', "ripple": "" });
 
 	const tabs = [svgcontrols, map, inputs, outputs];
 
@@ -525,9 +525,9 @@ function drawer_init() {
 			if (p) p.remove();
 
 			p = new bubblemessage({
-				position: "E",
-				message: this.getAttribute('description'),
-				close: false
+				"position": "E",
+				"message":  this.getAttribute('description'),
+				"close":    false,
 			}, a);
 		};
 

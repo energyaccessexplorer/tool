@@ -7,7 +7,7 @@ function time() {
 };
 
 const session = {
-	"time": time(),
+	"time":      time(),
 	"snapshots": [],
 };
 
@@ -15,12 +15,12 @@ export function init() {
 	localStorage['user-id'] = localStorage['user-id'] || uuid();
 
 	const s = {
-		"time": session.time,
-		"user_id": localStorage['user-id'],
+		"time":         session.time,
+		"user_id":      localStorage['user-id'],
 		"geography_id": GEOGRAPHY.id,
 	};
 
-	ea_api.post('sessions', null, { payload: s });
+	ea_api.post('sessions', null, { "payload": s });
 };
 
 export function snapshot() {
@@ -29,12 +29,12 @@ export function snapshot() {
 	delete c.geography;
 
 	const s = {
-		"time": time(),
+		"time":       time(),
 		"session_id": session.time,
-		"config": c,
+		"config":     c,
 	};
 
 	session.snapshots.push(s);
 
-	ea_api.post('snapshots', null, { payload: s });
+	ea_api.post('snapshots', null, { "payload": s });
 };

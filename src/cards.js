@@ -127,28 +127,28 @@ function svg_el() {
 
 		return [
 			ce('div', min.toFixed(i)),
-			ce('div', max.toFixed(i))
+			ce('div', max.toFixed(i)),
 		];
 	}
 
 	switch (ds.datatype) {
 	case 'points': {
 		e = points_symbol({
-			size: 24,
-			fill: ds.vectors.fill,
-			stroke: ds.vectors.stroke,
-			strokewidth: 2,
+			"size":        24,
+			"fill":        ds.vectors.fill,
+			"stroke":      ds.vectors.stroke,
+			"strokewidth": 2,
 		});
 		break;
 	}
 
 	case 'lines': {
 		e = lines_symbol({
-			size: 28,
-			dasharray: ds.vectors.dasharray,
-			stroke: ds.vectors.stroke,
-			width: ds.vectors.width * 2,
-			fill: 'none'
+			"size":      28,
+			"dasharray": ds.vectors.dasharray,
+			"stroke":    ds.vectors.stroke,
+			"width":     ds.vectors.width * 2,
+			"fill":      'none',
 		});
 		break;
 	}
@@ -156,11 +156,11 @@ function svg_el() {
 	case 'polygons':
 	case 'polygons-boundaries': {
 		e = polygons_symbol({
-			size: 28,
-			fill: ds.vectors.fill,
-			opacity: ds.vectors.opacity,
-			stroke: ds.vectors.stroke,
-			strokewidth: (ds.vectors.width - 1) || 1
+			"size":        28,
+			"fill":        ds.vectors.fill,
+			"opacity":     ds.vectors.opacity,
+			"stroke":      ds.vectors.stroke,
+			"strokewidth": (ds.vectors.width - 1) || 1,
 		});
 		break;
 	}
@@ -175,8 +175,8 @@ function svg_el() {
 
 		d.append(
 			r,
-			ce('div', null, { style: "display: inline-block; width: 64px; height: 5px; background-color: rgba(155,155,155,1); margin: 15px 15px 0 0;" }),
-			ce('div', "Not Available", { style: "display: inline-block; font-size: x-small;" })
+			ce('div', null, { "style": "display: inline-block; width: 64px; height: 5px; background-color: rgba(155,155,155,1); margin: 15px 15px 0 0;" }),
+			ce('div', "Not Available", { "style": "display: inline-block; font-size: x-small;" }),
 		);
 
 		break;
@@ -213,13 +213,13 @@ export function init() {
 	const list = qs('#cards-pane #cards-list');
 
 	sortable(list, {
-		'items': 'ds-card',
+		'items':                'ds-card',
 		'forcePlaceholderSize': true,
-		'placeholder': '<div style="margin: 1px; background-color: rgba(0,0,0,0.3);"></div>',
+		'placeholder':          '<div style="margin: 1px; background-color: rgba(0,0,0,0.3);"></div>',
 	})[0]
 		.addEventListener(
 			'sortupdate',
-			e => O.inputs = e.detail.destination.items.map(i => i.getAttribute('bind'))
+			e => O.inputs = e.detail.destination.items.map(i => i.getAttribute('bind')),
 		);
 
 	const ca = ce('div', 'Clear all datasets', { "id": 'cards-clear-all' });
@@ -274,11 +274,11 @@ export default class dscard extends HTMLElement {
 		attach.call(this, tmpl('#ds-card-template'));
 
 		slot_populate.call(this, Object.assign({}, this.ds, {
-			'svg': this.svg_el,
-			'info': this.info(),
-			'unit': (this.ds.category.unit && ce('span', `[${this.ds.category.unit}]`, { style: "margin-left: 1em;" })),
+			'svg':     this.svg_el,
+			'info':    this.info(),
+			'unit':    (this.ds.category.unit && ce('span', `[${this.ds.category.unit}]`, { "style": "margin-left: 1em;" })),
 			'opacity': this.opacity(),
-			'close': this.close(),
+			'close':   this.close(),
 		}));
 
 		return this;
@@ -300,7 +300,7 @@ export default class dscard extends HTMLElement {
 	legends(ls, t) {
 		const it = qs('[slot=svg]', this);
 
-		const ul = ce('div', null, { style: "font-size: smaller;" });
+		const ul = ce('div', null, { "style": "font-size: smaller;" });
 
 		let f;
 		switch (t) {
@@ -332,7 +332,7 @@ export default class dscard extends HTMLElement {
 				],
 				{
 					"style": `display: flex; justify-content: space-between;`,
-				}
+				},
 			);
 
 			cb.onchange = _ => {
@@ -369,11 +369,11 @@ export default class dscard extends HTMLElement {
 
 	opacity() {
 		return opacity_control({
-			fn: x => {
+			"fn": x => {
 				this.opacity_value = x;
 				this.ds.opacity(x);
 			},
-			init: maybe(this.ds, 'vectors', 'opacity'),
+			"init": maybe(this.ds, 'vectors', 'opacity'),
 		});
 	};
 };

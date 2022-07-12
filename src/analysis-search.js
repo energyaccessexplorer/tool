@@ -27,12 +27,12 @@ async function getpoints(n = 20) {
 		return t;
 	}, []);
 
-	return points.map(t => ({ v: t.v, i: raster_pixel_to_coordinates(t.i) }));
+	return points.map(t => ({ "v": t.v, "i": raster_pixel_to_coordinates(t.i) }));
 };
 
 function pointto(p, a = false) {
 	const dict = [[ "v", ea_indexes[U.output]['name'] ]];
-	const props = { v: ea_lowmedhigh_scale(p.v) };
+	const props = { "v": ea_lowmedhigh_scale(p.v) };
 
 	search_pointto(p.i, dict, props, a);
 };
@@ -69,11 +69,11 @@ async function trigger({ points = getpoints, n = 20 }) {
 
 export function init() {
 	const panel = qs('#analysis.search-panel');
-	input = ce('span', "Analysis top locations", { id: 'analysis-search', class: 'search-input' });
+	input = ce('span', "Analysis top locations", { "id": 'analysis-search', "class": 'search-input' });
 
-	const file_input = ce('input', null, { type: "file", id: "location-search-input", style: "width: 0; height: 0;", accept: "text/csv" });
+	const file_input = ce('input', null, { "type": "file", "id": "location-search-input", "style": "width: 0; height: 0;", "accept": "text/csv" });
 	const upload_icon = font_icon("box-arrow-in-up");
-	const upload = ce('label', upload_icon, { class: "search-input", for: "location-search-input" });
+	const upload = ce('label', upload_icon, { "class": "search-input", "for": "location-search-input" });
 
 	const msg = `
 <h1>Upload a CSV file</h1>
@@ -98,9 +98,9 @@ This file should be <strong>strictly</strong> formatted.
 
 	upload.onmouseenter = _ => {
 		bubble = new bubblemessage({
-			position: "E",
-			message: msg,
-			close: false
+			"position": "E",
+			"message":  msg,
+			"close":    false,
 		}, upload_icon);
 
 		bubble.style['pointer-events'] = "none";
@@ -115,11 +115,11 @@ This file should be <strong>strictly</strong> formatted.
 
 		reader.onload = function() {
 			const data = d3.csvParseRows(reader.result, d => ({
-				v: null,
-				i: [parseFloat(d[0]), parseFloat(d[1])],
+				"v": null,
+				"i": [parseFloat(d[0]), parseFloat(d[1])],
 			}));
 
-			trigger({ points: async _ => data });
+			trigger({ "points": async _ => data });
 		};
 
 		reader.readAsText(this.files[0]);
@@ -133,7 +133,7 @@ This file should be <strong>strictly</strong> formatted.
 	ul = ce('ul');
 	resultscontainer.append(ul);
 
-	resultsinfo = ce('div', ce('b', "Analysis coordinates"), { class: 'search-results-info' });
+	resultsinfo = ce('div', ce('b', "Analysis coordinates"), { "class": 'search-results-info' });
 	resultscontainer.prepend(resultsinfo);
 
 	input.onclick = function(_) {

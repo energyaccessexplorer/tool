@@ -14,9 +14,9 @@ export function pdf() {
 
 	let doc;
 	let page = {
-		padding: [50, 50, 30, 50],
-		width: 0,
-		height: 0,
+		"padding": [50, 50, 30, 50],
+		"width":   0,
+		"height":  0,
 	};
 
 	let lpad = page.padding[3];
@@ -79,7 +79,7 @@ contact our team at`;
 		c += (about.split('\n').length * font_size) + font_size;
 
 		doc.setTextColor("#00794C");
-		doc.textWithLink("energyaccessexplorer@wri.org", lpad, c, { url: "mailto:energyaccessexplorer@wri.org"});
+		doc.textWithLink("energyaccessexplorer@wri.org", lpad, c, { "url": "mailto:energyaccessexplorer@wri.org"});
 		reset_font();
 	};
 
@@ -91,11 +91,11 @@ contact our team at`;
 			add_title(`Share of ${names[i]} for each category`);
 
 			if (tables[i]) doc.autoTable({
-				html: tables[i],
-				startY: c,
-				styles: { halign: "right" },
-				columnStyles: { 0: { halign: "left" } },
-				theme: "plain"
+				"html":         tables[i],
+				"startY":       c,
+				"styles":       { "halign": "right" },
+				"columnStyles": { "0": { "halign": "left" } },
+				"theme":        "plain",
 			});
 
 			c += 120;
@@ -124,15 +124,15 @@ contact our team at`;
 				d.name,
 				d.category.unit || "proximity in km",
 				JSON.stringify(d._domain || {}).replace(/"/g, '').replace(/([:,])/g, '$1 '),
-				d.weight
+				d.weight,
 			]));
 
 		doc.autoTable({
-			head: [['Dataset', 'Unit', 'Range', 'Importance']],
-			body: body,
-			startY: c,
-			styles: { halign: "center" },
-			theme: "plain"
+			"head":   [['Dataset', 'Unit', 'Range', 'Importance']],
+			"body":   body,
+			"startY": c,
+			"styles": { "halign": "center" },
+			"theme":  "plain",
 		});
 
 		c += 10;
@@ -187,7 +187,7 @@ contact our team at`;
 
 		svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
 
-		let blob = new Blob([svg.outerHTML], { type: "image/svg+xml;charset=utf-8" });
+		let blob = new Blob([svg.outerHTML], { "type": "image/svg+xml;charset=utf-8" });
 		let img = new Image();
 
 		let url = URL.createObjectURL(blob);
@@ -325,7 +325,7 @@ export function csv(summary) {
 	csv.push([
 		"index",
 		"share",
-		["low", "low-med", "medium", "med-high", "high"].toString()
+		["low", "low-med", "medium", "med-high", "high"].toString(),
 	].join());
 
 	for (let i in summary) {
@@ -333,7 +333,7 @@ export function csv(summary) {
 			csv.push([
 				i,
 				s,
-				summary[i][s]['amounts']
+				summary[i][s]['amounts'],
 			].join());
 		}
 	}

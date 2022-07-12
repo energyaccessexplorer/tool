@@ -1,7 +1,7 @@
 import DS from './ds.js';
 
 import {
-	toggle_ds
+	toggle_ds,
 } from './controls.js';
 
 const contents_el = qs('#controls-contents');
@@ -92,7 +92,7 @@ async function trigger(value) {
 
 export function init() {
 	const panel = qs('#controls.search-panel');
-	input = ce('input', null, { id: 'controls-search', autocomplete: 'off', class: 'search-input' });
+	input = ce('input', null, { "id": 'controls-search', "autocomplete": 'off', "class": 'search-input' });
 	input.setAttribute('placeholder', 'Filter datasets');
 
 	panel.prepend(input);
@@ -114,7 +114,7 @@ export function init() {
 		if (c) toggle_ds.call(c.ds);
 	};
 
-	const tab_all = ce('div', "all", { id: 'controls-tab-all', class: 'controls-branch-tab up-title' });
+	const tab_all = ce('div', "all", { "id": 'controls-tab-all', "class": 'controls-branch-tab up-title' });
 
 	tabs_el.append(tab_all);
 

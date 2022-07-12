@@ -9,7 +9,7 @@ let resultsinfo;
 
 function pointto(p, a = false) {
 	const dict = [[ "name", "Name" ]];
-	const props = { name: p._name };
+	const props = { "name": p._name };
 
 	search_pointto(p.center, dict, props, a);
 };
@@ -51,7 +51,7 @@ function li(p) {
 
 	const el = ce('li', p._name, {});
 
-	el.prepend(ce('span', font_icon(icon(p.place_type)), { style: "font-size: 1.2em; margin-right: 0.8em;" }));
+	el.prepend(ce('span', font_icon(icon(p.place_type)), { "style": "font-size: 1.2em; margin-right: 0.8em;" }));
 
 	el.onmouseenter = _ => pointto(p);
 
@@ -81,7 +81,7 @@ function trigger(v) {
 
 export function init() {
 	const panel = qs('#locations.search-panel');
-	input = ce('input', null, { id: 'locations-search', autocomplete: 'off', class: 'search-input' });
+	input = ce('input', null, { "id": 'locations-search', "autocomplete": 'off', "class": 'search-input' });
 	input.setAttribute('placeholder', 'Search for a location');
 
 	panel.prepend(input);
@@ -90,7 +90,7 @@ export function init() {
 	ul = ce('ul');
 	resultscontainer.append(ul);
 
-	resultsinfo = ce('div', ce('i', "City, region, park..."), { class: 'search-results-info' });
+	resultsinfo = ce('div', ce('i', "City, region, park..."), { "class": 'search-results-info' });
 	resultscontainer.prepend(resultsinfo);
 
 	input.onchange = function(_) {

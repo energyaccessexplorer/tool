@@ -173,7 +173,7 @@ export default class Overlord {
 		for (let i = 0; i < layers.length; i++) {
 			MAPBOX.moveLayer(
 				layers[i],
-				(i === 0) ? MAPBOX.first_symbol : layers[i-1]
+				(i === 0) ? MAPBOX.first_symbol : layers[i-1],
 			);
 		}
 
@@ -233,24 +233,24 @@ function load_view() {
 	(function special_layers() {
 		if (!MAPBOX.getSource('output-source')) {
 			MAPBOX.addSource('output-source', {
-				"type": 'canvas',
-				"canvas": 'output',
-				"animate": false,
-				"coordinates": MAPBOX.coords
+				"type":        'canvas',
+				"canvas":      'output',
+				"animate":     false,
+				"coordinates": MAPBOX.coords,
 			});
 		}
 
 		if (!MAPBOX.getLayer('output-layer')) {
 			MAPBOX.addLayer({
-				"id": 'output-layer',
+				"id":     'output-layer',
 				"source": 'output-source',
-				"type": 'raster',
+				"type":   'raster',
 				"layout": {
 					"visibility": "none",
 				},
 				"paint": {
 					"raster-resampling": "nearest",
-				}
+				},
 			}, MAPBOX.first_symbol);
 		}
 
@@ -264,16 +264,16 @@ function load_view() {
 
 			if (!MAPBOX.getLayer(`filtered-layer-${i}`)) {
 				MAPBOX.addLayer({
-					"id": `filtered-layer-${i}`,
+					"id":     `filtered-layer-${i}`,
 					"source": `filtered-source-${i}`,
-					"type": 'fill',
+					"type":   'fill',
 					"layout": {
 						"visibility": "none",
 					},
 					"paint": {
-						"fill-color": filtered_colors_array[i],
+						"fill-color":         filtered_colors_array[i],
 						"fill-outline-color": "black",
-						"fill-opacity": [ "case", [ "boolean", [ "get", "__visible" ], true ], 0.5, 0 ]
+						"fill-opacity":       [ "case", [ "boolean", [ "get", "__visible" ], true ], 0.5, 0 ],
 					},
 				}, MAPBOX.first_symbol);
 			}
@@ -287,16 +287,16 @@ function load_view() {
 
 			if (!MAPBOX.getLayer(`priority-layer-${i}`)) {
 				MAPBOX.addLayer({
-					"id": `priority-layer-${i}`,
+					"id":     `priority-layer-${i}`,
 					"source": `priority-source-${i}`,
-					"type": 'fill',
+					"type":   'fill',
 					"layout": {
 						"visibility": "none",
 					},
 					"paint": {
-						"fill-color": [ "get", "__color" ],
+						"fill-color":         [ "get", "__color" ],
 						"fill-outline-color": "black",
-						"fill-opacity": 1,
+						"fill-opacity":       1,
 					},
 				}, MAPBOX.first_symbol);
 			}
@@ -424,8 +424,8 @@ function mapclick(e) {
 
 	if (U.view === "outputs") {
 		const ac = coordinates_to_raster_pixel(ll, {
-			data: MAPBOX.getSource('output-source').raster,
-			nodata: -1
+			"data":   MAPBOX.getSource('output-source').raster,
+			"nodata": -1,
 		});
 
 		if (Number.isFinite(maybe(ac, 'value'))) {
@@ -439,7 +439,7 @@ function mapclick(e) {
 	map_pointer(
 		td,
 		maybe(e, 'originalEvent', 'pageX') || 0,
-		maybe(e, 'originalEvent', 'pageY') || 0
+		maybe(e, 'originalEvent', 'pageY') || 0,
 	);
 };
 
@@ -619,7 +619,7 @@ function analysis_dataset_intersect(raster) {
 
 let analysis_count = 0;
 export async function analysis_to_dataset(t) {
-	const category = await API.get("categories", { "select": "*", "name": "eq.analysis" }, { one: true });
+	const category = await API.get("categories", { "select": "*", "name": "eq.analysis" }, { "one": true });
 
 	category.colorstops = ea_analysis_colorscale.stops;
 
@@ -627,19 +627,19 @@ export async function analysis_to_dataset(t) {
 
 	const a = await analysis(t);
 
-	const url = URL.createObjectURL(new Blob([a.tiff], { type: "application/octet-stream;charset=utf-8" }));
+	const url = URL.createObjectURL(new Blob([a.tiff], { "type": "application/octet-stream;charset=utf-8" }));
 
 	const d = new DS({
-		"name": `analysis-${t}-` + analysis_count,
-		"name_long": `Analysis ${t.toUpperCase()} - ` + analysis_count,
-		"datatype": "raster",
-		"category": category,
+		"name":            `analysis-${t}-` + analysis_count,
+		"name_long":       `Analysis ${t.toUpperCase()} - ` + analysis_count,
+		"datatype":        "raster",
+		"category":        category,
 		"processed_files": [{
-			"func": "raster",
-			"endpoint": url
+			"func":     "raster",
+			"endpoint": url,
 		}],
 		"source_files": [],
-		"metadata": {},
+		"metadata":     {},
 	});
 
 	d.metadata.inputs = U.inputs;
@@ -656,7 +656,7 @@ export async function analysis_to_dataset(t) {
 	await until(_ => maybe(d, 'raster', 'data'));
 
 	d['summary'] = {
-		'intersections': {}
+		'intersections': {},
 	};
 
 	for (const i of d.metadata.inputs) {

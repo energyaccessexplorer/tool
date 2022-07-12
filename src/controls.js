@@ -48,10 +48,10 @@ export default class dscontrols extends HTMLElement {
 		this.manual_max = qs('.manual-controls input[bind=max]', this);
 
 		slot_populate.call(this, Object.assign({}, this.ds, {
-			"dropdown": this.dropdown,
-			"checkbox": this.checkbox.svg,
+			"dropdown":        this.dropdown,
+			"checkbox":        this.checkbox.svg,
 			"collection-list": this.collection_list,
-			"weight-slider": maybe(this.weight_group, 'el'),
+			"weight-slider":   maybe(this.weight_group, 'el'),
 		}));
 
 		this.inject();
@@ -85,23 +85,23 @@ export default class dscontrols extends HTMLElement {
 		if (!path.length) return;
 
 		function create_tab(name) {
-			return ce('div', humanformat(name), { id: 'controls-tab-' + name, class: 'controls-branch-tab up-title' });
+			return ce('div', humanformat(name), { "id": 'controls-tab-' + name, "class": 'controls-branch-tab up-title' });
 		};
 
 		function create_branch(name) {
-			return ce('div', null, { id: 'controls-branch-' + name, class: 'controls-branch' });
+			return ce('div', null, { "id": 'controls-branch-' + name, "class": 'controls-branch' });
 		};
 
 		function create_subbranch(name) {
 			let conel, title;
-			const el = ce('div', null, { id: 'controls-subbranch-' + name, class: 'controls-subbranch' });
+			const el = ce('div', null, { "id": 'controls-subbranch-' + name, "class": 'controls-subbranch' });
 
 			el.append(
-				title = ce('div', humanformat(name), { class: 'controls-subbranch-title up-title' }),
-				conel = ce('div', null, { class: 'controls-container' })
+				title = ce('div', humanformat(name), { "class": 'controls-subbranch-title up-title' }),
+				conel = ce('div', null, { "class": 'controls-container' }),
 			);
 
-			title.prepend(ce('span', null, { class: 'collapse triangle' }));
+			title.prepend(ce('span', null, { "class": 'collapse triangle' }));
 			title.addEventListener('mouseup', _ => elem_collapse(conel, el));
 
 			elem_collapse(conel, el);
@@ -144,7 +144,7 @@ export default class dscontrols extends HTMLElement {
 		if (this.weight_group) {
 			const w = maybe(this.ds.category, 'analysis', 'weight');
 
-			this.weight_group.change({ min: 0, max: w });
+			this.weight_group.change({ "min": 0, "max": w });
 			O.ds(this.ds, { 'weight': w });
 		}
 
@@ -237,7 +237,7 @@ function toggle_switch(init, callback) {
 	change(status, false);
 
 	return {
-		svg: svg.node(),
+		"svg": svg.node(),
 		change,
 	};
 };
@@ -253,17 +253,17 @@ function header_click() {
 			return;
 
 		else
-			svg.dispatchEvent(new Event('click', { bubbles: true }));
+			svg.dispatchEvent(new Event('click', { "bubbles": true }));
 	};
 };
 
 async function mutant_options() {
 	await until(_ => maybe(this.hosts, 'length') === this.config.mutant_targets.length);
 
-	const container = ce('div', null, { class: 'control-option' });
+	const container = ce('div', null, { "class": 'control-option' });
 	const select = ce('select');
 
-	this.hosts.forEach(d => select.append(ce('option', d.name, { value: d.id })));
+	this.hosts.forEach(d => select.append(ce('option', d.name, { "value": d.id })));
 
 	select.value = this.host.id;
 
@@ -321,33 +321,33 @@ function range(opts = {}) {
 		domain[i] = parseFloat(x);
 	};
 
-	const v1 = ce('div', null, { bind: "v1" });
-	const v2 = ce('div', null, { bind: "v2" });
+	const v1 = ce('div', null, { "bind": "v1" });
+	const v2 = ce('div', null, { "bind": "v2" });
 
 	const r = ramp(
 		v1,
-		ce('div', opts.ramp || 'range', { class: "unit-ramp" }),
-		v2
+		ce('div', opts.ramp || 'range', { "class": "unit-ramp" }),
+		v2,
 	);
 
 	const s = svg_interval({
-		sliders: opts.sliders,
-		width: slider_width,
-		init: this._domain,
-		domain: this.domain,
-		steps: opts.steps,
-		callback1: x => update(x, 'min', v1),
-		callback2: x => update(x, 'max', v2),
-		end_callback: _ => O.ds(this, { 'domain': domain }),
+		"sliders":      opts.sliders,
+		"width":        slider_width,
+		"init":         this._domain,
+		"domain":       this.domain,
+		"steps":        opts.steps,
+		"callback1":    x => update(x, 'min', v1),
+		"callback2":    x => update(x, 'max', v2),
+		"end_callback": _ => O.ds(this, { 'domain': domain }),
 	});
 
-	const el = ce('div', [s.svg, r], { style: "text-align: center;" });
+	const el = ce('div', [s.svg, r], { "style": "text-align: center;" });
 
 	return {
 		el,
-		svg: s.svg,
-		change: s.change,
-		ramp: r
+		"svg":    s.svg,
+		"change": s.change,
+		"ramp":   r,
 	};
 };
 
@@ -356,26 +356,26 @@ function weight() {
 
 	const r = ramp(
 		ce('div', weights[0]),
-		ce('div', "importance", { class: "unit-ramp" }),
-		ce('div', weights[weights.length - 1])
+		ce('div', "importance", { "class": "unit-ramp" }),
+		ce('div', weights[weights.length - 1]),
 	);
 
 	const w = svg_interval({
-		sliders: "single",
-		init: { min: 1, max: this.weight },
-		domain: { min: 1, max: 5 },
-		steps: weights,
-		width: slider_width,
-		end_callback: x => O.ds(this, { 'weight': x })
+		"sliders":      "single",
+		"init":         { "min": 1, "max": this.weight },
+		"domain":       { "min": 1, "max": 5 },
+		"steps":        weights,
+		"width":        slider_width,
+		"end_callback": x => O.ds(this, { 'weight': x }),
 	});
 
-	const el = ce('div', [w.svg, r], { style: "text-align: center;" });
+	const el = ce('div', [w.svg, r], { "style": "text-align: center;" });
 
 	return {
 		el,
-		svg: w.svg,
-		change: w.change,
-		ramp: r,
+		"svg":    w.svg,
+		"change": w.change,
+		"ramp":   r,
 	};
 };
 
@@ -385,25 +385,25 @@ function options() {
 	if (!Object.keys(this.ds.metadata).every(k => !this.ds.metadata[k])) {
 		dropdownlist.push({
 			"content": "Dataset info",
-			"action": _ => this.ds.info_modal()
+			"action":  _ => this.ds.info_modal(),
 		});
 	}
 
 	if (this.weight_group) {
 		dropdownlist.push({
 			"content": "Toggle advanced controls",
-			"action": _ => this.toggle_advanced()
+			"action":  _ => this.toggle_advanced(),
 		});
 	}
 
 	dropdownlist.push({
 		"content": "Reset default values",
-		"action": _ => this.reset_defaults()
+		"action":  _ => this.reset_defaults(),
 	});
 
 	dropdownlist.push({
 		"content": "Set values manually",
-		"action": _ => qs('.manual-controls', this).style.display = 'flex'
+		"action":  _ => qs('.manual-controls', this).style.display = 'flex',
 	});
 
 	// Enable this later when we are ready to let the users download the
@@ -482,10 +482,10 @@ function range_group_controls() {
 		if (!this.ds.raster) break;
 
 		this.range_group = range.call(this.ds, {
-			ramp: lr,
-			steps: steps,
-			sliders: cat.controls.range,
-			domain: this.ds.domain
+			"ramp":    lr,
+			"steps":   steps,
+			"sliders": cat.controls.range,
+			"domain":  this.ds.domain,
 		});
 		break;
 	}
@@ -493,10 +493,10 @@ function range_group_controls() {
 	case 'polygons-fixed':
 	case 'polygons-timeline': {
 		this.range_group = range.call(this.ds, {
-			ramp: lr,
-			steps: steps,
-			sliders: cat.controls.range,
-			domain: this.ds.domain
+			"ramp":    lr,
+			"steps":   steps,
+			"sliders": cat.controls.range,
+			"domain":  this.ds.domain,
 		});
 		break;
 	}
@@ -508,9 +508,9 @@ function range_group_controls() {
 	case 'raster':
 	case 'raster-mutant': {
 		this.range_group = range.call(this.ds, {
-			ramp: lr,
-			steps: steps,
-			sliders: cat.controls.range
+			"ramp":    lr,
+			"steps":   steps,
+			"sliders": cat.controls.range,
 		});
 		break;
 	}

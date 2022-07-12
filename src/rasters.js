@@ -60,8 +60,8 @@ export function average(raster) {
 		sum,
 		size,
 		nodata,
-		normalised_data: r,
-		avg: sum/size,
+		"normalised_data": r,
+		"avg":             sum/size,
 	};
 };
 
@@ -100,7 +100,7 @@ export function crop_to(raster, envelope) {
 		sum,
 		size,
 		nodata,
-		data: r,
-		avg: sum/size,
+		"data": r,
+		"avg":  sum/size,
 	};
 };

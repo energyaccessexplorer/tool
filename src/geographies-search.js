@@ -16,8 +16,8 @@ const resultsinfo = ce('div', null, {
 function div(g,i,j) {
 	const el = tmpl('#geographies-search-item');
 	bind(el, {
-		name: g.name,
-		url: g.id ? `./?id=${g.id}` : null,
+		"name": g.name,
+		"url":  g.id ? `./?id=${g.id}` : null,
 	});
 
 	qs('[zoom]', el).onclick = _ => load(i,j);
@@ -41,12 +41,12 @@ function trigger(value) {
 
 function fetch_countries() {
 	const p = {
-		"select": ["id", "name"],
+		"select":         ["id", "name"],
 		"datasets_count": "gt.0",
-		"parent_id": GEOGRAPHY.parent_id ? `eq.${GEOGRAPHY.parent_id}` : "is.null",
-		"adm": `eq.0`,
-		"deployment": `ov.{${ENV}}`,
-		"order": "name.asc"
+		"parent_id":      GEOGRAPHY.parent_id ? `eq.${GEOGRAPHY.parent_id}` : "is.null",
+		"adm":            `eq.0`,
+		"deployment":     `ov.{${ENV}}`,
+		"order":          "name.asc",
 	};
 
 	return API.get("geographies", p).then(j => {
@@ -66,7 +66,7 @@ function fetch_countries() {
 			return {
 				i,
 				li,
-				name: g.name,
+				"name": g.name,
 			};
 		});
 	});
@@ -86,7 +86,7 @@ async function load(x,y) {
 
 	resultsinfo.replaceChildren(
 		font_icon('arrow-up'),
-		ce('span', "Up a level", { "style": "margin-left: 1em;"})
+		ce('span', "Up a level", { "style": "margin-left: 1em;"}),
 	);
 
 	if (lists[x+1]) {
@@ -128,7 +128,7 @@ async function load(x,y) {
 
 export async function init() {
 	const panel = qs('#geographies.search-panel');
-	input = ce('input', null, { id: 'geographies-search', autocomplete: 'off', class: 'search-input' });
+	input = ce('input', null, { "id": 'geographies-search', "autocomplete": 'off', "class": 'search-input' });
 	input.setAttribute('placeholder', 'Geographies search');
 
 	panel.prepend(input);
@@ -144,8 +144,8 @@ export async function init() {
 
 	await API
 		.get("geographies", {
-			"select": ["name", "id"],
-			"parent_id": `eq.${gid}`,
+			"select":     ["name", "id"],
+			"parent_id":  `eq.${gid}`,
 			"deployment": `ov.{${ENV}}`,
 		})
 		.then(r => {
@@ -161,12 +161,12 @@ export async function init() {
 						const k = +d.csv.data[j][d.csv.key];
 						const id = maybe(r.find(e => e.name === g), 'id');
 
-						const geo = { name: g, id };
+						const geo = { "name": g, id };
 
 						return {
-							i: k,
-							li: fli(geo, i, k),
-							name: g,
+							"i":    k,
+							"li":   fli(geo, i, k),
+							"name": g,
 						};
 					});
 				});

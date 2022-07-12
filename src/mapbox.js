@@ -1,36 +1,36 @@
 import bubblemessage from '../lib/bubblemessage.js';
 
 const default_styles = [{
-	"name": "Light (default)",
-	"value": "mapbox/basic-v9"
+	"name":  "Light (default)",
+	"value": "mapbox/basic-v9",
 }, {
-	"name": "Satellite",
-	"value": "mapbox/satellite-streets-v11"
+	"name":  "Satellite",
+	"value": "mapbox/satellite-streets-v11",
 }, {
-	"name": "Dark",
-	"value": "mapbox/dark-v10"
+	"name":  "Dark",
+	"value": "mapbox/dark-v10",
 }];
 
 const styles = default_styles;
 
 const projections = [{
-	"name": "Natural Earth",
-	"value": "naturalEarth"
+	"name":  "Natural Earth",
+	"value": "naturalEarth",
 }, {
-	"name": "Mercator",
-	"value": "mercator"
+	"name":  "Mercator",
+	"value": "mercator",
 }, {
-	"name": "Winkel tripel",
-	"value": "winkelTripel"
+	"name":  "Winkel tripel",
+	"value": "winkelTripel",
 }, {
-	"name": "Lambert conformal conic",
-	"value": "lambertConformalConic"
+	"name":  "Lambert conformal conic",
+	"value": "lambertConformalConic",
 }, {
-	"name": "Equirectangular",
-	"value": "equirectangular"
+	"name":  "Equirectangular",
+	"value": "equirectangular",
 }, {
-	"name": "Equal Earth",
-	"value": "equalEarth"
+	"name":  "Equal Earth",
+	"value": "equalEarth",
 }];
 
 let info_mode_button;
@@ -42,7 +42,7 @@ class MapboxThemeControl {
 		this._container.className = 'mapboxgl-ctrl';
 		this._container.classList.add('mapboxgl-ctrl-group');
 
-		let button = ce('button', ce('div', font_icon('layers-fill'), { style: "transform: scale(0.75)" }), { type: 'button', class: 'mapboxgl-ctrl-icon'});
+		let button = ce('button', ce('div', font_icon('layers-fill'), { "style": "transform: scale(0.75)" }), { "type": 'button', "class": 'mapboxgl-ctrl-icon'});
 
 		this._container.append(button);
 
@@ -64,7 +64,7 @@ class MapboxProjectionControl {
 		this._container.className = 'mapboxgl-ctrl';
 		this._container.classList.add('mapboxgl-ctrl-group');
 
-		let button = ce('button', ce('div', font_icon('dribbble'), { style: "transform: scale(0.75)" }), { type: 'button', class: 'mapboxgl-ctrl-icon'});
+		let button = ce('button', ce('div', font_icon('dribbble'), { "style": "transform: scale(0.75)" }), { "type": 'button', "class": 'mapboxgl-ctrl-icon'});
 
 		this._container.append(button);
 
@@ -86,7 +86,7 @@ class MapboxInfoControl {
 		this._container.className = 'mapboxgl-ctrl';
 		this._container.classList.add('mapboxgl-ctrl-group');
 
-		let button = ce('button', ce('div', font_icon('info-circle'), { style: "transform: scale(0.75)" }), { type: 'button', class: 'mapboxgl-ctrl-icon'});
+		let button = ce('button', ce('div', font_icon('info-circle'), { "style": "transform: scale(0.75)" }), { "type": 'button', "class": 'mapboxgl-ctrl-icon'});
 
 		this._container.append(button);
 
@@ -111,15 +111,15 @@ export function init(overlord = {}) {
 	_O = overlord;
 
 	const mb = new mapboxgl.Map({
-		"container": 'mapbox-container',
-		"trackResize": true,
+		"container":             'mapbox-container',
+		"trackResize":           true,
 		"preserveDrawingBuffer": true, // this allows us to get canvas.toDataURL()
-		"style": theme_pick("")
+		"style":                 theme_pick(""),
 	});
 
-	mb.addControl(new mapboxgl.NavigationControl({ showCompass: false }));
+	mb.addControl(new mapboxgl.NavigationControl({ "showCompass": false }));
 
-	mb.zoomTo(mb.getZoom() * 0.95, {duration: 0});
+	mb.zoomTo(mb.getZoom() * 0.95, {"duration": 0});
 	mb.doubleClickZoom.disable();
 	mb.dragRotate.disable();
 	mb.touchZoomRotate.disableRotation();
@@ -136,20 +136,20 @@ export function init(overlord = {}) {
 };
 
 function projection_control_popup(_) {
-	let x = ce('div', null, { class: 'mapbox-control-popup' });
+	let x = ce('div', null, { "class": 'mapbox-control-popup' });
 	let radios = ce('div');
 
 	for (let t of projections) {
-		let e = ce('div', null, { class: 'radio-group' });
+		let e = ce('div', null, { "class": 'radio-group' });
 
 		e.append(
 			ce('input', null, {
-				id: `mapbox_projection_${t.value}`,
-				type: "radio",
-				name: "mapbox_projection",
-				value: t.value
+				"id":    `mapbox_projection_${t.value}`,
+				"type":  "radio",
+				"name":  "mapbox_projection",
+				"value": t.value,
 			}),
-			ce('label', t.name, { for: `mapbox_projection_${t.value}` })
+			ce('label', t.name, { "for": `mapbox_projection_${t.value}` }),
 		);
 
 		radios.append(e);
@@ -178,20 +178,20 @@ padding: 16px;`;
 };
 
 function theme_control_popup(_) {
-	let x = ce('div', null, { class: 'mapbox-control-popup' });
+	let x = ce('div', null, { "class": 'mapbox-control-popup' });
 	let radios = ce('div');
 
 	for (let t of styles) {
-		let e = ce('div', null, { class: 'radio-group' });
+		let e = ce('div', null, { "class": 'radio-group' });
 
 		e.append(
 			ce('input', null, {
-				id: `mapbox_theme_${t.value}`,
-				type: "radio",
-				name: "mapbox_theme",
-				value: t.value
+				"id":    `mapbox_theme_${t.value}`,
+				"type":  "radio",
+				"name":  "mapbox_theme",
+				"value": t.value,
 			}),
-			ce('label', t.name, { for: `mapbox_theme_${t.value}` })
+			ce('label', t.name, { "for": `mapbox_theme_${t.value}` }),
 		);
 
 		radios.append(e);
@@ -225,13 +225,13 @@ function theme_pick(theme) {
 	return (t ? `mapbox://styles/${t}` : {
 		"version": 8,
 		"sources": {},
-		"layers": [{
-			"id": 'background',
-			"type": 'background',
+		"layers":  [{
+			"id":    'background',
+			"type":  'background',
 			"paint": {
-				"background-color": 'white'
-			}
-		}]
+				"background-color": 'white',
+			},
+		}],
 	});
 };
 
@@ -272,7 +272,7 @@ export function fit(bounds, animate = false) {
 	const vp = (rect.height > rect.width) ? 0 : (rect.height * 0.1);
 
 	try {
-		MAPBOX.fitBounds(bounds, { animate: animate, padding: { top: vp, bottom: vp, left: hp, right: hp } });
+		MAPBOX.fitBounds(bounds, { "animate": animate, "padding": { "top": vp, "bottom": vp, "left": hp, "right": hp } });
 	} catch (e) {
 		super_error(
 			"Geography bounding box",
@@ -283,7 +283,7 @@ ${e}
 Tried to fit to:
 	${JSON.stringify(bounds)}
 
-This is fatal. Thanks for all the fish.`
+This is fatal. Thanks for all the fish.`,
 		);
 
 		throw new Error("Could not set geography's bounds. Ciao");
@@ -300,15 +300,14 @@ export function map_pointer(content, x, y) {
 	if (p) p.remove();
 
 	p = ce('div', null, {
-		id: "map-pointer",
-		style: `
+		"id":    "map-pointer",
+		"style": `
 position: absolute;
 left: ${x - 10}px;
 top: ${y - 10}px;
 height: 20px;
 width: 20px;
-background-color: transparent;
-`
+background-color: transparent;`,
 	});
 
 	for (const e of qsa('bubble-message'))
@@ -324,7 +323,7 @@ background-color: transparent;
 		pos = "C";
 	}
 
-	const mark = new bubblemessage({ position: pos, message: content, close: cls }, (MOBILE ? document.body : p));
+	const mark = new bubblemessage({ "position": pos, "message": content, "close": cls }, (MOBILE ? document.body : p));
 
 	function drop() {
 		p.remove();

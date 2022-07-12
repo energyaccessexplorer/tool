@@ -71,11 +71,11 @@ function colorscale(opts) {
 	};
 
 	return {
-		domain: domain,
-		fn: x => rgba(s(x)),
-		stops: stops,
-		intervals: intervals,
-		svg: color_steps(stops)
+		"domain":    domain,
+		"fn":        x => rgba(s(x)),
+		"stops":     stops,
+		"intervals": intervals,
+		"svg":       color_steps(stops),
 	};
 };
 
@@ -142,11 +142,11 @@ function svg_pie(data, outer, inner, colors, inner_text, parse, bubble) {
 	};
 
 	return {
-		data: data,
-		change: change,
-		tween: tween,
-		path: path,
-		svg: svg.node(),
+		"data":   data,
+		"change": change,
+		"tween":  tween,
+		"path":   path,
+		"svg":    svg.node(),
 	};
 };
 
@@ -259,7 +259,7 @@ function svg_interval(opts = {}) {
 			.on('end', _ => {
 				if (typeof end_callback === 'function') end_callback(norm(x_position));
 			})
-			.touchable(MOBILE)
+			.touchable(MOBILE),
 	);
 
 	c2.call(
@@ -274,7 +274,7 @@ function svg_interval(opts = {}) {
 			.on('end', _ => {
 				if (typeof end_callback === 'function') end_callback(norm(x_position));
 			})
-			.touchable(MOBILE)
+			.touchable(MOBILE),
 	);
 
 	function change({min,max}) {
@@ -287,8 +287,8 @@ function svg_interval(opts = {}) {
 	if (sliders === "single") c1.remove();
 
 	return {
-		svg: svg.node(),
-		change: change
+		"svg":    svg.node(),
+		"change": change,
 	};
 };
 
@@ -341,8 +341,8 @@ function svg_checkbox(init, callback) { // this is not used anywhere
 	change(status, false);
 
 	return {
-		svg: svg.node(),
-		change: change
+		"svg":    svg.node(),
+		"change": change,
 	};
 };
 
@@ -352,11 +352,11 @@ function opacity_control({ fn, init }) {
 	let opacity_value = init ?? 1;
 
 	const grad = svg_interval({
-		init: { min: 0, max: init ?? 1 },
-		domain: { min: 0, max: 1 },
-		sliders: 'single',
-		callback2: x => opacity_value = x,
-		end_callback: _ => fn(+opacity_value),
+		"init":         { "min": 0, "max": init ?? 1 },
+		"domain":       { "min": 0, "max": 1 },
+		"sliders":      'single',
+		"callback2":    x => opacity_value = x,
+		"end_callback": _ => fn(+opacity_value),
 	});
 
 	const b = qs('.opacity-box', o);
@@ -431,10 +431,10 @@ function loading(bool) {
 
 function super_error(t, m, e = "error") {
 	FLASH.push({
-		type: e,
-		timeout: 0,
-		title: t,
-		message: m
+		"type":    e,
+		"timeout": 0,
+		"title":   t,
+		"message": m,
 	});
 
 	const l = qs('#app-loading');
@@ -456,7 +456,7 @@ function table_keyvalue(obj, kfn, vfn) {
 
 		table.append(ce('tr', [
 			ce('td', (kfn ? kfn(i) : i) + ": &nbsp;"),
-			ce('td', ce('code', (vfn ? vfn(v) : v)), { style: "text-align: right;" }),
+			ce('td', ce('code', (vfn ? vfn(v) : v)), { "style": "text-align: right;" }),
 		]));
 	}
 
@@ -526,7 +526,7 @@ function coordinates_to_raster_pixel(coords, raster) {
 	if (coords.length !== 2)
 		throw new Error(`ea_coordinates_raster_pixel: expected and array of length 2. Got ${coords}`);
 
-	const merc = new SphericalMercator({ size: 1 });
+	const merc = new SphericalMercator({ "size": 1 });
 
 	const [mx,my] = merc.forward([coords[0], coords[1]]);
 	const [bx,by] = merc.forward([GEOGRAPHY.envelope[0], GEOGRAPHY.envelope[3]]);
@@ -540,7 +540,7 @@ function coordinates_to_raster_pixel(coords, raster) {
 	        plng < b.width,
 	        plat > 0,
 	        plat < b.height)) {
-		a = { x: coords[0], y: coords[1] };
+		a = { "x": coords[0], "y": coords[1] };
 
 		const i = (plat * b.width) + plng;
 		a.index = i;
@@ -558,7 +558,7 @@ function raster_pixel_to_coordinates(i) {
 	const r = OUTLINE.raster;
 	const [left,bottom,right,top] = GEOGRAPHY.envelope;
 
-	const merc = new SphericalMercator({ size: 1 });
+	const merc = new SphericalMercator({ "size": 1 });
 
 	const x = i%r.width;
 	const y = Math.floor(i/r.width);

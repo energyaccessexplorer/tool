@@ -5,7 +5,7 @@ import {
 } from './mapbox.js';
 
 import {
-	geojson_summary
+	geojson_summary,
 } from './parse.js';
 
 import DS from './ds.js';
@@ -15,7 +15,7 @@ const url = new URL(location);
 export async function init() {
 	const id = url.searchParams.get('id');
 
-	GEOGRAPHY = await API.get("geographies", { "id": `eq.${id}` }, { one: true });
+	GEOGRAPHY = await API.get("geographies", { "id": `eq.${id}` }, { "one": true });
 
 	layout();
 
@@ -59,11 +59,11 @@ This is fatal. Thanks for all the fish.`;
 		}
 
 		const bp = {
-			"id": `eq.${outline_id}`,
+			"id":     `eq.${outline_id}`,
 			"select": select,
 		};
 
-		return API.get("datasets", bp, { one: true })
+		return API.get("datasets", bp, { "one": true })
 			.then(async e => {
 				const ds = OUTLINE = new DS(e);
 
@@ -76,11 +76,11 @@ This is fatal. Thanks for all the fish.`;
 		return Promise.all(
 			divisions.filter(x => x.dataset_id).slice(1).map(x => {
 				const dp = {
-					"id": `eq.${x.dataset_id}`,
+					"id":     `eq.${x.dataset_id}`,
 					"select": select,
 				};
 
-				return API.get("datasets", dp, { one: true })
+				return API.get("datasets", dp, { "one": true })
 					.then(async e => {
 						const ds = new DS(e);
 
@@ -88,7 +88,7 @@ This is fatal. Thanks for all the fish.`;
 						await ds.load('vectors');
 						await ds.load('raster');
 					});
-			})
+			}),
 		);
 	})();
 
@@ -103,11 +103,11 @@ This is fatal. Thanks for all the fish.`;
 
 	const p = {
 		"geography_id": `eq.${geography_id}`,
-		"id": `eq.${dataset_id}`,
-		"select": select
+		"id":           `eq.${dataset_id}`,
+		"select":       select,
 	};
 
-	const e = await API.get("datasets", p, { one: true });
+	const e = await API.get("datasets", p, { "one": true });
 	const ds = new DS(e);
 
 	await ds.active(true, true);
@@ -144,8 +144,8 @@ async function plot() {
 			this.raster.max = max;
 
 			this.colorscale = colorscale({
-				stops: NORM_STOPS.map(x => d3.interpolateMagma(x)),
-				domain: { min: this.raster.min, max: this.raster.max },
+				"stops":  NORM_STOPS.map(x => d3.interpolateMagma(x)),
+				"domain": { "min": this.raster.min, "max": this.raster.max },
 			});
 		}
 
@@ -154,10 +154,10 @@ async function plot() {
 
 	case 'polygons-fixed': {
 		FLASH.push({
-			type: 'info',
-			timeout: 0,
-			title: "Boundaries dependency",
-			message: `Be sure to review the 'boundaries' raster file.`
+			"type":    'info',
+			"timeout": 0,
+			"title":   "Boundaries dependency",
+			"message": `Be sure to review the 'boundaries' raster file.`,
 		});
 
 		break;
@@ -177,8 +177,8 @@ async function plot() {
 		this.vectors.opacity = 0.2;
 
 		this.colorscale = colorscale({
-			stops: ["#000", "#fff"],
-			domain: { min: min, max: max },
+			"stops":  ["#000", "#fff"],
+			"domain": { "min": min, "max": max },
 		});
 
 		break;
@@ -194,29 +194,29 @@ async function plot() {
 
 		if (empties) {
 			FLASH.push({
-				type: 'error',
-				timeout: 0,
-				title: "Faulty/Incomplete dataset",
-				message: `
-CSV has ${empties} empty cells.`
+				"type":    'error',
+				"timeout": 0,
+				"title":   "Faulty/Incomplete dataset",
+				"message": `
+CSV has ${empties} empty cells.`,
 			});
 		}
 
 		FLASH.push({
-			type: 'info',
-			timeout: 0,
-			title: "Available info",
-			message: `
+			"type":    'info',
+			"timeout": 0,
+			"title":   "Available info",
+			"message": `
 ${GEOGRAPHY.configuration.timeline_dates.length} dates configured
 CSV has ${this.csv.data.length} rows
-CSV has ${empties} empty cells.`
+CSV has ${empties} empty cells.`,
 		});
 
 		FLASH.push({
-			type: 'warning',
-			timeout: 0,
-			title: "Timeline unavailable",
-			message: `The timeline feature requires UI gadgets. Review this on the tool.`
+			"type":    'warning',
+			"timeout": 0,
+			"title":   "Timeline unavailable",
+			"message": `The timeline feature requires UI gadgets. Review this on the tool.`,
 		});
 
 		break;
@@ -233,7 +233,7 @@ CSV has ${empties} empty cells.`
 
 Instead, see:
   ${this.config.mutant_targets.join("\n  ")}`,
-			'warning'
+			'warning',
 		);
 
 		return;
@@ -272,7 +272,7 @@ I haven't done this yet...`);
 
 function layout() {
 	if (maybe(GEOGRAPHY, 'timeline'))
-		qs('#visual').append(ce('div', null, { id: 'timeline' }));
+		qs('#visual').append(ce('div', null, { "id": 'timeline' }));
 
 	const p = qs('#playground');
 	const m = qs('#maparea', p);

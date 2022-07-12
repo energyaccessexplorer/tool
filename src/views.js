@@ -13,8 +13,8 @@ export function right_pane() {
 
 	const views = {
 		"timeline": ["cards"],
-		"inputs": ["cards"],
-		"outputs": ["indexes"],
+		"inputs":   ["cards"],
+		"outputs":  ["indexes"],
 		"filtered": ["filtered"],
 	};
 
@@ -30,7 +30,7 @@ export function init() {
 	for (let v in ea_views) {
 		if (!PARAMS.view.includes(v)) continue;
 
-		const btn = ce('div', ea_views[v]['name'], { class: 'view up-title', id: 'view-' + v, ripple: '' });
+		const btn = ce('div', ea_views[v]['name'], { "class": 'view up-title', "id": 'view-' + v, "ripple": '' });
 
 		if (U.view === v) btn.classList.add('active');
 

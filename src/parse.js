@@ -30,14 +30,14 @@ ${msg}`);
 
 	else {
 		FLASH.push({
-			type: 'error',
-			timeout: 5000,
-			title: "Dataset error",
-			message: `
+			"type":    'error',
+			"timeout": 5000,
+			"title":   "Dataset error",
+			"message": `
 Failed to process dataset '${this.name}'.
 This is not fatal but the dataset is now disabled.
 
-${msg}`
+${msg}`,
 		});
 	}
 
@@ -91,31 +91,31 @@ export function raster() {
 
 			if (!r.canvas) {
 				r.canvas = plot_drawcanvas({
-					canvas: ce('canvas'),
-					data: r.data,
-					width: r.width,
-					height: r.height,
-					nodata: r.nodata,
-					colorscale: this.colorscale
+					"canvas":     ce('canvas'),
+					"data":       r.data,
+					"width":      r.width,
+					"height":     r.height,
+					"nodata":     r.nodata,
+					"colorscale": this.colorscale,
 				});
 			}
 
 			this.add_source({
-				"type": "canvas",
-				"canvas": r.canvas,
-				"animate": false,
-				"coordinates": MAPBOX.coords
+				"type":        "canvas",
+				"canvas":      r.canvas,
+				"animate":     false,
+				"coordinates": MAPBOX.coords,
 			}, overrideid);
 
 			this.add_layers({
-				"id": overrideid,
-				"type": 'raster',
+				"id":     overrideid,
+				"type":   'raster',
 				"layout": {
 					"visibility": "none",
 				},
 				"paint": {
-					"raster-resampling": "nearest"
-				}
+					"raster-resampling": "nearest",
+				},
 			});
 		};
 
@@ -179,7 +179,7 @@ export async function geojson_summary() {
 	const properties = Array.from(new Set(features.map(x => Object.keys(x.properties)).flat()));
 
 	const o = {
-		"__IGNORED": []
+		"__IGNORED": [],
 	};
 
 	for (let p of properties) {
@@ -215,12 +215,12 @@ function mapbox_dasharray(str) {
 
 function specs_set(fs, specs) {
 	const criteria = [{
-		"params": ["__name"],
-		"__name": this.name,
-		"radius": this.vectors['radius'],
-		"stroke": this.vectors['stroke'],
+		"params":       ["__name"],
+		"__name":       this.name,
+		"radius":       this.vectors['radius'],
+		"stroke":       this.vectors['stroke'],
 		"stroke-width": this.vectors['stroke-width'],
-		"dasharray": this.vectors['dasharray'],
+		"dasharray":    this.vectors['dasharray'],
 	}];
 
 	for (let i = 0; i < fs.length; i += 1) {
@@ -294,16 +294,16 @@ export function points() {
 			);
 
 			this.add_source({
-				"type": "geojson",
-				"data": this.vectors.geojson,
-				"cluster": true,
-				"clusterMaxZoom": 10,
+				"type":             "geojson",
+				"data":             this.vectors.geojson,
+				"cluster":          true,
+				"clusterMaxZoom":   10,
 				"clusterMinPoints": 4,
-				"clusterRadius": 20,
+				"clusterRadius":    20,
 			});
 
 			this.add_layers({
-				"type": "circle",
+				"type":   "circle",
 				"filter": ['all', ['!', ['has', 'point_count']], ['get', '__visible']],
 				"layout": {
 					"visibility": "none",
@@ -311,13 +311,13 @@ export function points() {
 				"paint": {
 					"circle-stroke-color": ['get', '__stroke'],
 					"circle-stroke-width": ['get', '__stroke-width'],
-					"circle-radius": ['get', '__radius'],
-					"circle-opacity": this.vectors.opacity,
-					"circle-color": this.vectors.fill,
+					"circle-radius":       ['get', '__radius'],
+					"circle-opacity":      this.vectors.opacity,
+					"circle-color":        this.vectors.fill,
 				},
 			}, {
-				"id": `${this.id}-clusters`,
-				"type": "circle",
+				"id":     `${this.id}-clusters`,
+				"type":   "circle",
 				"filter": ['has', 'point_count'],
 				"layout": {
 					"visibility": "none",
@@ -328,10 +328,10 @@ export function points() {
 						2, 10,
 						5, 100,
 						7, 750,
-						10
+						10,
 					],
-					"circle-opacity": this.vectors.opacity,
-					"circle-color": this.vectors.fill,
+					"circle-opacity":      this.vectors.opacity,
+					"circle-color":        this.vectors.fill,
 					"circle-stroke-width": this.vectors['stroke-width'],
 					"circle-stroke-color": this.vectors['stroke'],
 				},
@@ -374,16 +374,16 @@ export function lines() {
 			});
 
 			this.add_layers({
-				"type": "line",
+				"type":   "line",
 				"filter": ['get', '__visible'],
 				"layout": {
 					"visibility": "none",
-					"line-cap": 'round',
-					'line-join': 'round',
+					"line-cap":   'round',
+					'line-join':  'round',
 				},
 				"paint": {
-					"line-color": ['get', '__stroke'],
-					"line-width": ['get', '__stroke-width'],
+					"line-color":     ['get', '__stroke'],
+					"line-width":     ['get', '__stroke-width'],
 					"line-dasharray": ['get', '__dasharray'],
 				},
 			});
@@ -419,15 +419,15 @@ export function polygons() {
 				this.vectors.fill;
 
 			this.add_layers({
-				"type": "fill",
+				"type":   "fill",
 				"filter": ['get', '__visible'],
 				"layout": {
 					"visibility": "none",
 				},
 				"paint": {
-					"fill-color": c,
+					"fill-color":         c,
 					"fill-outline-color": ['get', '__stroke'],
-					"fill-opacity": [ "case", [ "boolean", [ "get", "__visible" ], true ], 1 * this.vectors.opacity, 0 ],
+					"fill-opacity":       [ "case", [ "boolean", [ "get", "__visible" ], true ], 1 * this.vectors.opacity, 0 ],
 				},
 			});
 
@@ -443,8 +443,8 @@ export async function polygons_csv() {
 	if (this.timeline) {
 		if (or(this.datatype === 'polygons-timeline', !this.domain)) {
 			this.domain = {
-				min: d3.min([].concat(...GEOGRAPHY.timeline_dates.map(d => this.csv.data.map(r => +r[d])))),
-				max: d3.max([].concat(...GEOGRAPHY.timeline_dates.map(d => this.csv.data.map(r => +r[d]))))
+				"min": d3.min([].concat(...GEOGRAPHY.timeline_dates.map(d => this.csv.data.map(r => +r[d])))),
+				"max": d3.max([].concat(...GEOGRAPHY.timeline_dates.map(d => this.csv.data.map(r => +r[d])))),
 			};
 		}
 

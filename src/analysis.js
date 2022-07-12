@@ -1,7 +1,7 @@
 import DS from './ds.js';
 
 import {
-	outputcanvas as plot_outputcanvas
+	outputcanvas as plot_outputcanvas,
 } from './plot.js';
 
 import {
@@ -38,7 +38,7 @@ export default async function run(type) {
 	// There's nothing interesting about an analysis with only filters. Also,
 	// filters return 1 so a silly (single-valued) analysis would be plotted.
 	//
-	if (list.every(d => filter_types.includes(d.analysis_scale(type)))) return { raster: it };
+	if (list.every(d => filter_types.includes(d.analysis_scale(type)))) return { "raster": it };
 
 	// Add up how much non-compound indexes datasets will account for. Then, just
 	// below, these values will be split into equal proportions of the total
@@ -77,7 +77,7 @@ export default async function run(type) {
 	// If the total weight is 0, ciao.
 	//
 	if (Object.keys(weights).reduce((a,c) => (weights[c] || 0) + a, 0) === 0)
-		return { raster: it };
+		return { "raster": it };
 
 	// Each dataset has a different scaling function. We cache these to optimise
 	// the huge loop we are about to do.
@@ -103,7 +103,7 @@ export default async function run(type) {
 	if (list.find(l => !maybe(l, 'raster', 'data')))
 		await until(_ => list.filter(d => and(d.on, d.raster, d.analysis, !d.raster.data)).length === 0);
 
-	if (list.length === 1 && full_weight === 0) return { raster: it };
+	if (list.length === 1 && full_weight === 0) return { "raster": it };
 
 	const sd = U.subdiv;
 	const subdiv = and(typeof sd === 'number', divraster);
@@ -173,10 +173,10 @@ export default async function run(type) {
 	return {
 		min,
 		max,
-		avg: avg_sum / avg_count,
-		raster: it,
-		datasets: list,
-		totals: tots,
+		"avg":      avg_sum / avg_count,
+		"raster":   it,
+		"datasets": list,
+		"totals":   tots,
 		weights,
 	};
 };
@@ -284,21 +284,21 @@ export async function analysis(type) {
 		arr[i] = (r[i] === -1) ? 0 : Math.floor(r[i] * 100);
 
 	const metadata = {
-		ImageWidth: b.raster.width,
-		ImageLength: b.raster.height,
-		ResolutionUnit: "1",
-		XPosition: env[0],
-		YPosition: env[1],
-		ModelTiepoint: [ 0, 0, 0, env[0], env[3], 0 ],
-		XResolution: "1",
-		YResolution: "1",
-		GDAL_NODATA: "0",
-		ModelPixelScale: [(env[2] - env[0]) / b.raster.width, (env[3] - env[1]) / b.raster.height, 0]
+		"ImageWidth":      b.raster.width,
+		"ImageLength":     b.raster.height,
+		"ResolutionUnit":  "1",
+		"XPosition":       env[0],
+		"YPosition":       env[1],
+		"ModelTiepoint":   [ 0, 0, 0, env[0], env[3], 0 ],
+		"XResolution":     "1",
+		"YResolution":     "1",
+		"GDAL_NODATA":     "0",
+		"ModelPixelScale": [(env[2] - env[0]) / b.raster.width, (env[3] - env[1]) / b.raster.height, 0],
 	};
 
 	return {
-		tiff: await GeoTIFF.writeArrayBuffer(arr, metadata),
-		analysis: a,
+		"tiff":     await GeoTIFF.writeArrayBuffer(arr, metadata),
+		"analysis": a,
 	};
 };
 
@@ -316,7 +316,7 @@ export function priority(d, a, i) {
 		if (e === -1) continue;
 
 		o[e] = {
-			"values": [],
+			"values":  [],
 			"average": 0,
 		};
 	}

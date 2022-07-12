@@ -31,25 +31,25 @@ export function generate() {
 		let d = DST.get(i);
 
 		datasets.push({
-			id: d.dataset_id,
-			name: d.id,
-			weight: d.weight,
-			domain: d._domain,
+			"id":     d.dataset_id,
+			"name":   d.id,
+			"weight": d.weight,
+			"domain": d._domain,
 		});
 	}
 
 	const config = {
 		"geography": GEOGRAPHY.id,
-		"zoom": MAPBOX.getZoom(),
-		"center": MAPBOX.getCenter(),
-		"view": U.view,
-		"subdiv": U.subdiv,
-		"divtier": U.divtier,
-		"tab": tab_id,
-		"output": U.output,
-		"theme": ea_settings.mapbox_theme,
-		"datasets": datasets,
-		"variant": U.variant,
+		"zoom":      MAPBOX.getZoom(),
+		"center":    MAPBOX.getCenter(),
+		"view":      U.view,
+		"subdiv":    U.subdiv,
+		"divtier":   U.divtier,
+		"tab":       tab_id,
+		"output":    U.output,
+		"theme":     ea_settings.mapbox_theme,
+		"datasets":  datasets,
+		"variant":   U.variant,
 	};
 
 	return config;

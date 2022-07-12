@@ -6,16 +6,16 @@ import selectlist from '../lib/selectlist.js';
 
 function ugly_flag(flagurl) {
 	return ce('img', null, {
-		src: flagurl,
-		width: MOBILE ? 100 : 200,
+		"src":   flagurl,
+		"width": MOBILE ? 100 : 200,
 	});
 };
 
 async function geography(c) {
 	const coll = await API.get("geographies", {
 		"datasets_count": "gt.0",
-		"parent_id": `eq.${c.id}`,
-		"deployment": `ov.{${ENV}}`,
+		"parent_id":      `eq.${c.id}`,
+		"deployment":     `ov.{${ENV}}`,
 	});
 
 	if (c.datasets_count > 1) coll.unshift(c);
@@ -33,7 +33,7 @@ async function geography(c) {
 			}
 
 			if (x) usertype(x.id);
-		}
+		},
 	});
 
 	if (coll.length === 1 && c.id === coll[0].id) {
@@ -44,15 +44,15 @@ async function geography(c) {
 	let content = ce('div');
 	content.append(
 		ce('p', `We have several geographies for ${c.name}. Please do select one.`),
-		sl.el
+		sl.el,
 	);
 
 	new modal({
-		id: 'geography-modal',
-		header: c.name,
-		content: content,
-		footer: null,
-		destroy: true,
+		"id":      'geography-modal',
+		"header":  c.name,
+		"content": content,
+		"footer":  null,
+		"destroy": true,
 	}).show();
 
 	sl.input.focus();
@@ -60,40 +60,40 @@ async function geography(c) {
 
 const presets = [
 	{
-		"name": "Strategic and Integrated Energy Planning",
-		"output": "eai",
-		"view": "outputs",
+		"name":        "Strategic and Integrated Energy Planning",
+		"output":      "eai",
+		"view":        "outputs",
 		"description": "Electrification planning agencies are able to link electrification and development outcomes.",
-		"variant": "raster",
+		"variant":     "raster",
 	},
 	{
-		"name": "The expansion of clean energy markets",
-		"output": "eai",
-		"view": "outputs",
+		"name":        "The expansion of clean energy markets",
+		"output":      "eai",
+		"view":        "outputs",
 		"description": "Technology suppliers (whether mini grid developers or solar home system providers) can get a better understanding of aspects of affordability and level of service needed.",
-		"variant": "raster",
+		"variant":     "raster",
 	},
 	{
-		"name": "Impact investment",
-		"output": "ani",
-		"view": "outputs",
+		"name":        "Impact investment",
+		"output":      "ani",
+		"view":        "outputs",
 		"description": "Donors and development finance institutions can identify areas where grants and support will have the most impact.",
-		"variant": "raster",
+		"variant":     "raster",
 	},
 	{
-		"name": "Bottom-up assessment of energy needs",
-		"output": "demand",
-		"view": "outputs",
+		"name":        "Bottom-up assessment of energy needs",
+		"output":      "demand",
+		"view":        "outputs",
 		"description": "Service delivery institutions in the health, education and agriculture sectors are able to estimate energy needs associated to development services.",
-		"variant": "raster",
+		"variant":     "raster",
 	},
 	{
-		"name": "Generate custom geospatial analysis based on your own criteria",
+		"name":        "Generate custom geospatial analysis based on your own criteria",
 		"description": null,
-		"output": "eai",
-		"view": "inputs",
-		"datasets": [],
-		"variant": "raster",
+		"output":      "eai",
+		"view":        "inputs",
+		"datasets":    [],
+		"variant":     "raster",
 	},
 ];
 
@@ -121,11 +121,11 @@ function usertype(gid) {
 	content.append(ul);
 
 	new modal({
-		id: 'usertype-modal',
+		"id":       'usertype-modal',
 		content,
-		"header": "Choose your area of interest",
-		footer: null,
-		destroy: true,
+		"header":  "Choose your area of interest",
+		"footer":   null,
+		"destroy":  true,
 	}).show();
 };
 
@@ -137,7 +137,7 @@ async function overview() {
 		.then(t => d3.csvParse(t))
 		.then(d => (r = d.find(x => x.name === GEOGRAPHY.name)));
 
-	const bubble = v => new bubblemessage({ message: v + "%", position: "W", close: false, noevents: true });
+	const bubble = v => new bubblemessage({ "message": v + "%", "position": "W", "close": false, "noevents": true });
 
 	if (r) {
 		r['urban_population'] = (100 - r['rural_population']).toFixed(1);
@@ -146,12 +146,12 @@ async function overview() {
 			let eru = svg_pie(
 				[
 					[100 - r['urban_electrification']],
-					[r['urban_electrification']]
+					[r['urban_electrification']],
 				],
 				50, 0,
 				[
 					getComputedStyle(document.body).getPropertyValue('--the-light-green'),
-					getComputedStyle(document.body).getPropertyValue('--the-green')
+					getComputedStyle(document.body).getPropertyValue('--the-green'),
 				],
 				"",
 				x => x,
@@ -166,12 +166,12 @@ async function overview() {
 			let err = svg_pie(
 				[
 					[100 - (r['rural_electrification'])],
-					[r['rural_electrification']]
+					[r['rural_electrification']],
 				],
 				50, 0,
 				[
 					getComputedStyle(document.body).getPropertyValue('--the-light-green'),
-					getComputedStyle(document.body).getPropertyValue('--the-green')
+					getComputedStyle(document.body).getPropertyValue('--the-green'),
 				],
 				"",
 				x => x,
@@ -183,15 +183,15 @@ async function overview() {
 		}
 
 		new modal({
-			id: 'overview-modal',
-			header: r.name,
-			content: tmpl('#country-overview', r),
-			footer: ce(
+			"id":      'overview-modal',
+			"header":  r.name,
+			"content": tmpl('#country-overview', r),
+			"footer":  ce(
 				'div',
 				"<strong>Source:</strong> World Bank, World Development Indicators (latest data) crosschecked with values reported by local stakeholders/partners.",
-				{ style: "font-size: small; max-width: 30em; margin-left: auto; margin-right: 0;" }
+				{ "style": "font-size: small; max-width: 30em; margin-left: auto; margin-right: 0;" },
 			),
-			destroy: true,
+			"destroy": true,
 		}).show();
 	}
 };
@@ -211,11 +211,11 @@ async function presets_init() {
 				if (!preset.datasets) preset.datasets = [];
 
 				const ds = {
-					name: r['ds_name'],
-					weight: intornot(r['weight']),
-					domain: {
-						min: intornot(r['min']),
-						max: intornot(r['max']),
+					"name":   r['ds_name'],
+					"weight": intornot(r['weight']),
+					"domain": {
+						"min": intornot(r['min']),
+						"max": intornot(r['max']),
 					},
 				};
 
@@ -243,7 +243,7 @@ export function init() {
 
 	function list(geographies) {
 		for (let co of geographies) {
-			const d = ce('div', ce('h2', co.name, { class: 'country-name' }), { class: 'country-item', ripple: "" });
+			const d = ce('div', ce('h2', co.name, { "class": 'country-name' }), { "class": 'country-item', "ripple": "" });
 			d.onclick = _ => setTimeout(_ => geography(co), 350);
 
 			const intro = maybe(co, 'configuration', 'introduction');
@@ -251,9 +251,9 @@ export function init() {
 				let p;
 				d.onmouseenter = _ => {
 					p = new bubblemessage({
-						message: ce('pre', intro),
-						close: false,
-						position: "C",
+						"message":  ce('pre', intro),
+						"close":    false,
+						"position": "C",
 					}, d);
 				};
 				d.onmouseleave = _ => {
@@ -269,7 +269,7 @@ export function init() {
 					if (!data) return;
 
 					d.append(ugly_flag(
-						URL.createObjectURL((new Blob([hextostring(data['flag'])], {type: 'image/svg+xml'})))
+						URL.createObjectURL((new Blob([hextostring(data['flag'])], {"type": 'image/svg+xml'}))),
 					));
 				});
 
@@ -280,16 +280,16 @@ export function init() {
 	};
 
 	API.get("geographies", {
-		"select": ['*', 'datasets_count'],
-		"adm": "eq.0",
+		"select":     ['*', 'datasets_count'],
+		"adm":        "eq.0",
 		"deployment": `ov.{${ENV}}`,
 	})
 		.then(r => list(r))
 		.catch(error => {
 			FLASH.push({
-				type: 'error',
-				title: "Fetch error",
-				message: error
+				"type":    'error',
+				"title":   "Fetch error",
+				"message": error,
 			});
 
 			throw error;

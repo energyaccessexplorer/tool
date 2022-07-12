@@ -9,7 +9,7 @@ let ds, resultsinfo, attr, searchable, searchable_attrs;
 
 function pointto(f, a = false) {
 	const t = MAPBOX.querySourceFeatures(ds.id, {
-		filter: ['==', attr, f.properties[attr] || "<justnotnull>"]
+		"filter": ['==', attr, f.properties[attr] || "<justnotnull>"],
 	});
 
 	if (!t[0]) return;
@@ -24,7 +24,7 @@ function pointto(f, a = false) {
 	})();
 
 	const dict = [[ "name", ds.name ]];
-	const props = { name: f.properties[attr] };
+	const props = { "name": f.properties[attr] };
 
 	search_pointto([x,y], dict, props, a);
 };
@@ -36,7 +36,7 @@ async function reset() {
 
 	ul.replaceChildren();
 
-	resultsinfo = ce('div', ce('b', ds.name), { class: 'search-results-info' });
+	resultsinfo = ce('div', ce('b', ds.name), { "class": 'search-results-info' });
 
 	if (!ds || !ds.vectors) {
 		resultsinfo.replaceChildren(
@@ -75,9 +75,9 @@ async function reset() {
 		li.onclick = _ => {
 			const p = (_ => {
 				if (ds.datatype === 'points')
-					return { center: f.geometry.coordinates };
+					return { "center": f.geometry.coordinates };
 				else {
-					return { bbox: geojsonExtent(f) };
+					return { "bbox": geojsonExtent(f) };
 				}
 			})();
 
@@ -125,7 +125,7 @@ function trigger(value) {
 
 export function init() {
 	const panel = qs('#vectors.search-panel');
-	input = ce('input', null, { id: 'vectors-search', autocomplete: 'off', class: 'search-input' });
+	input = ce('input', null, { "id": 'vectors-search', "autocomplete": 'off', "class": 'search-input' });
 	input.setAttribute('placeholder', 'Search features');
 
 	panel.prepend(input);

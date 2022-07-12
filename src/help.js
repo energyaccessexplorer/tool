@@ -3,7 +3,7 @@ import nanny from '../lib/nanny.js';
 import bubblemessage from '../lib/bubblemessage.js';
 
 import {
-	dig as controls_dig
+	dig as controls_dig,
 } from './controls.js';
 
 import {
@@ -46,121 +46,121 @@ margin-right: 0.5em;
 
 const steps = [
 	{
-		lazy: true,
-		target: 'body',
-		mark: {
-			title: "Welcome to Energy Access Explorer",
-			message: welcome,
-			align: "middle",
-			position: "C",
+		"lazy":   true,
+		"target": 'body',
+		"mark":   {
+			"title":    "Welcome to Energy Access Explorer",
+			"message":  welcome,
+			"align":    "middle",
+			"position": "C",
 		},
-		listen: {
-			el: _ => welcome,
-			action: 'click',
+		"listen": {
+			"el":     _ => welcome,
+			"action": 'click',
 		},
 	},
 	{
-		mark: {
-			title: "1/9",
-			message: "Select <strong>sub-national level data</strong>. These can be used as filters to identify regions of interest.",
-			position: "E",
-			align: "middle"
+		"mark": {
+			"title":    "1/9",
+			"message":  "Select <strong>sub-national level data</strong>. These can be used as filters to identify regions of interest.",
+			"position": "E",
+			"align":    "middle",
 		},
-		target: function() {
+		"target": function() {
 			this.ds = DS.array.find(d => maybe(d.category, 'controls', 'path', 0) === "census");
 			return this.ds.controls;
 		},
-		run: function() {
+		"run": function() {
 			toggle_left_panel('controls');
 			controls_select_tab(qs('#controls-tab-census'), "census");
 			controls_dig(this.ds);
 		},
-		listen: {
-			el: function() { return qs('header', this.el); },
-			action: 'click',
+		"listen": {
+			"el":     function() { return qs('header', this.el); },
+			"action": 'click',
 		},
 	},
 	{
-		target: '#controls-tab-demand',
-		mark: {
-			title: "2/9",
-			message: "Click on the <strong>Demand</strong> data group.",
-			position: "E",
-			align: "middle"
+		"target": '#controls-tab-demand',
+		"mark":   {
+			"title":    "2/9",
+			"message":  "Click on the <strong>Demand</strong> data group.",
+			"position": "E",
+			"align":    "middle",
 		},
-		listen: {
-			action: 'click'
+		"listen": {
+			"action": 'click',
 		},
 	},
 	{
-		mark: {
-			title: "3/9",
-			message: "Select data on <strong>Demographics</strong> and <strong>Social and Productive Uses</strong>. These will be used to visualize current and/or potential demand for energy.",
-			position: "E",
-			align: "middle",
+		"mark": {
+			"title":    "3/9",
+			"message":  "Select data on <strong>Demographics</strong> and <strong>Social and Productive Uses</strong>. These will be used to visualize current and/or potential demand for energy.",
+			"position": "E",
+			"align":    "middle",
 		},
-		target: function() {
+		"target": function() {
 			this.ds = DST.get('population-density');
 			return this.ds.controls;
 		},
-		run: function() {
+		"run": function() {
 			controls_dig(this.ds);
 		},
-		wait: function() {
+		"wait": function() {
 			return this.ds.on && this.ds.layers.length;
 		},
-		mock: {
-			el: function() { return qs('header', this.el); },
-			action: 'click',
+		"mock": {
+			"el":     function() { return qs('header', this.el); },
+			"action": 'click',
 		},
 	},
 	{
-		mark: {
-			title: "4/9",
-			message: "Select the <strong>Healthcare Facilities</strong> dataset",
-			position: "E",
-			align: "middle",
+		"mark": {
+			"title":    "4/9",
+			"message":  "Select the <strong>Healthcare Facilities</strong> dataset",
+			"position": "E",
+			"align":    "middle",
 		},
-		target: function() {
+		"target": function() {
 			this.ds = DST.get('health');
 			return this.ds.controls;
 		},
-		run: function() {
+		"run": function() {
 			controls_dig(this.ds);
 		},
-		wait: function() {
+		"wait": function() {
 			return this.ds.on && this.ds.layers.length;
 		},
-		mock: {
-			el: function() { return qs('header', this.el); },
-			action: 'click',
+		"mock": {
+			"el":     function() { return qs('header', this.el); },
+			"action": 'click',
 		},
 	},
 	{
-		target: function() {
+		"target": function() {
 			this.ds = DST.get('health');
 			return this.ds.controls;
 		},
-		mark: {
-			el: function() {
+		"mark": {
+			"el": function() {
 				return qs('[slot=range-slider] .svg-interval', this.el);
 			},
-			title: "5/9",
-			message: `<strong>Filter areas</strong> that are close to social loads by selecting a short proximity (e.g. set proximity to healthcare facilities at 10km)`,
-			position: "E",
-			align: "middle",
+			"title":    "5/9",
+			"message":  `<strong>Filter areas</strong> that are close to social loads by selecting a short proximity (e.g. set proximity to healthcare facilities at 10km)`,
+			"position": "E",
+			"align":    "middle",
 		},
-		wait: function() {
+		"wait": function() {
 			return or(
 				+this.ds._domain.max !== +this.ds.domain.max,
 				+this.ds._domain.min !== +this.ds.domain.min,
 			);
 		},
-		mock: {
-			el: function() { return qs('header', this.el); },
-			action: function() {
+		"mock": {
+			"el":     function() { return qs('header', this.el); },
+			"action": function() {
 				delay(0.5).then(_ => {
-					const d = { min: 0, max: 15 };
+					const d = { "min": 0, "max": 15 };
 
 					DST.get('health').controls.range_group.change(d);
 					DST.get('health')._domain = d;
@@ -170,64 +170,64 @@ const steps = [
 		},
 	},
 	{
-		mark: {
-			title: "6/9",
-			message: "Click on the <strong>Supply</strong> data group.",
-			position: "E",
-			align: "middle"
+		"mark": {
+			"title":    "6/9",
+			"message":  "Click on the <strong>Supply</strong> data group.",
+			"position": "E",
+			"align":    "middle",
 		},
-		target: '#controls-tab-supply',
-		listen: {
-			action: 'click'
+		"target": '#controls-tab-supply',
+		"listen": {
+			"action": 'click',
 		},
 	},
 	{
-		mark: {
-			title: "7/9",
-			message: "Select data on <strong>Resources</strong> and <strong>Infrastructure</strong> to visualize current and/or potential energy supply.",
-			position: "E",
-			align: "middle",
+		"mark": {
+			"title":    "7/9",
+			"message":  "Select data on <strong>Resources</strong> and <strong>Infrastructure</strong> to visualize current and/or potential energy supply.",
+			"position": "E",
+			"align":    "middle",
 		},
-		target: function() {
+		"target": function() {
 			this.ds = DST.get('ghi');
 			return this.ds.controls;
 		},
-		run: function() {
+		"run": function() {
 			controls_dig(this.ds);
 		},
-		wait: function() {
+		"wait": function() {
 			return this.ds.on && this.ds.layers.length;
 		},
-		mock: {
-			el: function() { return qs('header', this.el); },
-			action: 'click',
+		"mock": {
+			"el":     function() { return qs('header', this.el); },
+			"action": 'click',
 		},
 	},
 	{
-		target: '#mapbox-container',
-		mark: {
-			title: "8/9",
-			message: "<strong>Visualize Underlying Data</strong> Click on the map to read location specific information of the top most layer.",
-			position: "C",
-			align: "middle"
+		"target": '#mapbox-container',
+		"mark":   {
+			"title":    "8/9",
+			"message":  "<strong>Visualize Underlying Data</strong> Click on the map to read location specific information of the top most layer.",
+			"position": "C",
+			"align":    "middle",
 		},
-		run: function() { if (!INFOMODE) O.info_mode(); },
-		listen: {
-			action: 'click'
+		"run":    function() { if (!INFOMODE) O.info_mode(); },
+		"listen": {
+			"action": 'click',
 		},
 	},
 	{
-		target: '#view-outputs',
-		mark: {
-			title: "9/9",
-			message: "Analysis indicates low hanging fruits (energy access potential index) areas where demand or supply are likely to be higher (demand and supply index) and areas where finance assistance is needed the most",
-			position: "S",
-			align: "middle"
+		"target": '#view-outputs',
+		"mark":   {
+			"title":    "9/9",
+			"message":  "Analysis indicates low hanging fruits (energy access potential index) areas where demand or supply are likely to be higher (demand and supply index) and areas where finance assistance is needed the most",
+			"position": "S",
+			"align":    "middle",
 		},
-		listen: {
-			action: 'click'
+		"listen": {
+			"action": 'click',
 		},
-	}
+	},
 ];
 
 const bubblefn = (m, el) => new bubblemessage(m, el);

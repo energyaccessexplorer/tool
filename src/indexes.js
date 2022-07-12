@@ -25,7 +25,7 @@ const bubble = (v,e) => new bubblemessage({ "message": v + "%", "position": "C",
 
 const PIES = {
 	"population": svg_pie([[0], [0], [0], [0], [0]], 70, 0, ea_analysis_colorscale.stops, null, null, bubble),
-	"area": svg_pie([[0], [0], [0], [0], [0]], 70, 0, ea_analysis_colorscale.stops, null, null, bubble),
+	"area":       svg_pie([[0], [0], [0], [0], [0]], 70, 0, ea_analysis_colorscale.stops, null, null, bubble),
 };
 
 function radio(init, callback) {
@@ -118,15 +118,15 @@ export function init() {
 	qs('.ramp', r).append(
 		ce('div', "Low"),
 		ce('div', "Medium"),
-		ce('div', "High")
+		ce('div', "High"),
 	);
 
-	const scale = ce('div', null, { class: 'index-graphs-scale' });
+	const scale = ce('div', null, { "class": 'index-graphs-scale' });
 	scale.append(ea_analysis_colorscale.svg, r);
 
 	const cos = qs('#canvas-output-select');
 	for (let i in ea_indexes)
-		cos.append(ce('option', ea_indexes[i]['name'], { value: i }));
+		cos.append(ce('option', ea_indexes[i]['name'], { "value": i }));
 
 	cos.value = U.output;
 	cos.onchange = x => { O.index = x.target.value; };
@@ -134,20 +134,20 @@ export function init() {
 	const toolbox = qs('#index-graphs-toolbox');
 	const tools = {
 		"index-graphs-opacity": "Change opacity of the analysis layer",
-		"index-graphs-info": "Info about different indexes",
+		"index-graphs-info":    "Info about different indexes",
 	};
 
 	const more_tools = {
 		"index-graphs-download": "Download TIFF image of the current analysis",
-		"index-graphs-code": "Download JSON file of the current analysis",
+		"index-graphs-code":     "Download JSON file of the current analysis",
 	};
 
 	for (const i in tools)
-		toolbox.append(ce('a', null, { id: i, title: tools[i] }));
+		toolbox.append(ce('a', null, { "id": i, "title": tools[i] }));
 
 	const opacity = qs('#index-graphs-opacity');
 	opacity.append(opacity_control({
-		fn: x => MAPBOX.setPaintProperty('output-layer', 'raster-opacity', x),
+		"fn": x => MAPBOX.setPaintProperty('output-layer', 'raster-opacity', x),
 	}));
 
 	const info = qs('#index-graphs-info');
@@ -156,7 +156,7 @@ export function init() {
 
 	if (user_logged_in()) {
 		for (const i in more_tools)
-			toolbox.append(ce('a', null, { id: i, title: more_tools[i] }));
+			toolbox.append(ce('a', null, { "id": i, "title": more_tools[i] }));
 
 		const download = qs('#index-graphs-download');
 		download.append(font_icon('image'));
@@ -201,13 +201,13 @@ export function list() {
 	indexes_list.replaceChildren();
 
 	function i_elem(t, v) {
-		const d = ce('tr',  null, { bind: t, class: 'element' });
+		const d = ce('tr',  null, { "bind": t, "class": 'element' });
 		d.append(
 			ce('td', [
-				ce('span', null, { class: 'radio' }),
-				ce('span', v, { class: 'name' }),
-			], { ripple: "" }),
-			ce('td', font_icon('collection'), { class: 'analysis-to-dataset' }),
+				ce('span', null, { "class": 'radio' }),
+				ce('span', v, { "class": 'name' }),
+			], { "ripple": "" }),
+			ce('td', font_icon('collection'), { "class": 'analysis-to-dataset' }),
 		);
 
 		if (analysis_datasets(t) < 1)
@@ -247,19 +247,19 @@ function open_modal() {
 	for (let i in ea_indexes) {
 		c.append(
 			ce('h3', ea_indexes[i]['name']),
-			ce('p', ea_indexes[i]['info'])
+			ce('p', ea_indexes[i]['info']),
 		);
 	}
 
 	new modal({
-		id: 'indexes-modal',
-		header: "Energy Access Explorer Indexes",
-		content: c,
-		footer: ce('a', "See technical note for more detailed methodology", {
+		"id":      'indexes-modal',
+		"header":  "Energy Access Explorer Indexes",
+		"content": c,
+		"footer":  ce('a', "See technical note for more detailed methodology", {
 			"style": "text-align: right; display: block;",
-			"href": "https://www.wri.org/publication/energy-access-explorer-data-and-methods",
+			"href":  "https://www.wri.org/publication/energy-access-explorer-data-and-methods",
 		}),
-		destroy: true,
+		"destroy": true,
 	}).show();
 };
 

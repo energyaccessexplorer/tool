@@ -29,8 +29,8 @@ async function summary() {
 
 	const content = ce('div');
 
-	const graphs = ce('div', null, { id: "summary-graphs" });
-	const graphs_tab = ce('div', graphs, { class: 'tab' });
+	const graphs = ce('div', null, { "id": "summary-graphs" });
+	const graphs_tab = ce('div', graphs, { "class": 'tab' });
 
 	const summary = {};
 
@@ -38,13 +38,13 @@ async function summary() {
 	qs('.ramp', r).append(
 		ce('div', "Low"),
 		ce('div', "Medium"),
-		ce('div', "High")
+		ce('div', "High"),
 	);
 
 	const scale = ce('div');
 	scale.append(ea_analysis_colorscale.svg.cloneNode(true), r);
 
-	const bubble = (v,e) => new bubblemessage({ message: v + "%", position: "C", close: false, noevents: true }, e);
+	const bubble = (v,e) => new bubblemessage({ "message": v + "%", "position": "C", "close": false, "noevents": true }, e);
 
 	async function get_summaries(idxn) {
 		let raster = (await analysis_run(idxn)).raster;
@@ -61,16 +61,16 @@ async function summary() {
 		graphs.append(
 			ce('div',
 			   [
-				   ce('div', ea_indexes[idxn]['name'], { class: 'up-title' }),
+				   ce('div', ea_indexes[idxn]['name'], { "class": 'up-title' }),
 				   container,
-				   ce('div', (summary[idxn]['area']['total'] === 0) ? ce('code', "(no datasets selected)") : null, { style: "text-align: center; font-size: smaller;" }),
+				   ce('div', (summary[idxn]['area']['total'] === 0) ? ce('code', "(no datasets selected)") : null, { "style": "text-align: center; font-size: smaller;" }),
 			   ],
-			   { class: 'index-group' }));
+			   { "class": 'index-group' }));
 
 		ppie.change(0);
 		apie.change(0);
 
-		const c = qs('#canvas-' + idxn) || ce('canvas', null, { id: 'canvas-' + idxn});
+		const c = qs('#canvas-' + idxn) || ce('canvas', null, { "id": 'canvas-' + idxn});
 		c.style.display = 'none';
 		document.body.append(c);
 
@@ -79,26 +79,26 @@ async function summary() {
 
 	await Promise.all(Object.keys(ea_indexes).map(i => get_summaries(i)));
 
-	graphs.append(ce('div', scale.cloneNode(true), { class: "index-graphs-scale" }));
+	graphs.append(ce('div', scale.cloneNode(true), { "class": "index-graphs-scale" }));
 
 	const s = ea_analysis_colorscale.stops;
 
 	const lowmedhigh = i => ["low", "low-med", "medium", "med-high", "high"][i];
 
-	const tables_tab = ce('div', null, { class: 'tab hidden' });
+	const tables_tab = ce('div', null, { "class": 'tab hidden' });
 
 	for (let j of ['area', 'population-density']) {
-		const table = ce('table', null, { class: 'summary' });
+		const table = ce('table', null, { "class": 'summary' });
 		let thead, tbody, thr;
 
-		const title = ce('div', `${j} share`, { class: 'up-title' });
+		const title = ce('div', `${j} share`, { "class": 'up-title' });
 
 		table.append(thead = ce('thead'), tbody = ce('tbody'));
-		thead.append(thr = ce('tr', ce('th'), { class: 'number-labels-row' }));
-		s.forEach((x,i) => thr.append(ce('th', lowmedhigh(i), { style: `background-color: ${x};`})));
+		thead.append(thr = ce('tr', ce('th'), { "class": 'number-labels-row' }));
+		s.forEach((x,i) => thr.append(ce('th', lowmedhigh(i), { "style": `background-color: ${x};`})));
 
 		for (let k in summary) {
-			let tr = ce('tr', ce('td', ea_indexes[k]['name'], { class: 'index-name' }));
+			let tr = ce('tr', ce('td', ea_indexes[k]['name'], { "class": 'index-name' }));
 			s.forEach((x,i) => tr.append(ce('td', (summary[k][j]['amounts'][i]).toLocaleString())));
 
 			tbody.append(tr);
@@ -109,7 +109,7 @@ async function summary() {
 
 	let ss = true;
 
-	const switcher = ce('button', "Summary Table", { class: 'big-green-button' });
+	const switcher = ce('button', "Summary Table", { "class": 'big-green-button' });
 	switcher.onclick = function() {
 		ss = !ss;
 
@@ -119,22 +119,22 @@ async function summary() {
 		this.innerText = ss ? "Summary Table" : "Summary Graphs";
 	};
 
-	const pdf = ce('button', "Export PDF Report", { class: 'big-green-button' });
+	const pdf = ce('button', "Export PDF Report", { "class": 'big-green-button' });
 	pdf.onclick = report_pdf;
 
-	const csv = ce('button', "Export CSV Report", { class: 'big-green-button' });
+	const csv = ce('button', "Export CSV Report", { "class": 'big-green-button' });
 	csv.onclick = _ => fake_blob_download(report_csv(summary), `energyaccessexplorer-report.csv`, "text/csv");
 
 	content.append(graphs_tab, tables_tab);
 
-	const footer = ce('div', [switcher, pdf, csv], { style: "text-align: center;" });
+	const footer = ce('div', [switcher, pdf, csv], { "style": "text-align: center;" });
 
 	new modal({
-		id: 'snapshot-modal',
-		header: "Snapshot",
-		content: content,
-		footer: footer,
-		destroy: true,
+		"id":      'snapshot-modal',
+		"header":  "Snapshot",
+		"content": content,
+		"footer":  footer,
+		"destroy": true,
 	}).show();
 
 	return content;
@@ -189,15 +189,15 @@ export default async function analyse(raster) {
 	const o = {};
 	if (ds.id === 'population-density')
 		o['population-density'] = {
-			total: ptotal,
-			amounts: population_groups,
-			distribution: population_groups.reduce((a,b) => { a.push(b/ptotal); return a; }, [])
+			"total":        ptotal,
+			"amounts":      population_groups,
+			"distribution": population_groups.reduce((a,b) => { a.push(b/ptotal); return a; }, []),
 		};
 
 	o['area'] = {
-		total: atotal,
-		amounts: area_groups,
-		distribution: area_groups.reduce((a,b) => { a.push(b/atotal); return a; }, [])
+		"total":        atotal,
+		"amounts":      area_groups,
+		"distribution": area_groups.reduce((a,b) => { a.push(b/atotal); return a; }, []),
 	};
 
 	return o;

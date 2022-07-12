@@ -29,10 +29,10 @@ export function zoom(p, fn) {
 		mapbox_fit(p.bbox, true);
 
 	else if (p.center) {
-		MAPBOX.flyTo({ center: p.center, zoom: 12, speed: 2 });
+		MAPBOX.flyTo({ "center": p.center, "zoom": 12, "speed": 2 });
 	}
 	else if (p.i) {
-		MAPBOX.flyTo({ center: p.i, zoom: 12, speed: 2 });
+		MAPBOX.flyTo({ "center": p.i, "zoom": 12, "speed": 2 });
 	}
 
 	if (typeof fn === 'function')

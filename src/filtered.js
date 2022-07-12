@@ -70,7 +70,7 @@ export function valued_polygons() {
 				const name = d.csv.table[fs[i].id];
 
 				const t = ce('li', [
-					ce('span', "●", { class: "colored-disc", style: `color: ${c};` }),
+					ce('span', "●", { "class": "colored-disc", "style": `color: ${c};` }),
 					ce('span', name),
 				]);
 

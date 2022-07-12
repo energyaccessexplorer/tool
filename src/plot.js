@@ -37,11 +37,11 @@ export function drawcanvas(opts) {
 export function outputcanvas(data, canvas = null) {
 
 	drawcanvas({
-		canvas: canvas || qs('canvas#output'),
-		data: data,
-		width: OUTLINE.raster.width,
-		height: OUTLINE.raster.height,
-		nodata: -1,
-		colorscale: ea_analysis_colorscale,
+		"canvas":     canvas || qs('canvas#output'),
+		"data":       data,
+		"width":      OUTLINE.raster.width,
+		"height":     OUTLINE.raster.height,
+		"nodata":     -1,
+		"colorscale": ea_analysis_colorscale,
 	});
 };

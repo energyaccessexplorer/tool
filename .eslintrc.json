@@ -10,9 +10,19 @@
 	},
 	"ignorePatterns": ["/lib/*.js"],
 	"rules": {
+		"comma-dangle": ["error", "always-multiline"],
 		"indent": ["error", "tab"],
+		"key-spacing": ["error", {
+			"align": {
+				"beforeColon": false,
+				"afterColon": true,
+				"on": "value",
+				"mode": "minimum"
+			}
+		}],
 		"linebreak-style": ["error", "unix"],
 		"quotes": "off",
+		"quote-props": ["error", "always"],
 		"semi": ["error", "always"],
 		"no-cond-assign": "off",
 		"no-console": "off",

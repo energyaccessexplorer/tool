@@ -86,13 +86,13 @@ export default class DS {
 
 			if (!b) {
 				FLASH.push({
-					type: 'error',
-					timeout: 5000,
-					title: "Dataset/File error",
-					message: `
+					"type":    'error',
+					"timeout": 5000,
+					"title":   "Dataset/File error",
+					"message": `
 '${this.name}' requires a geography->divisions->${this.config.divisions_tier}.
 
-This is not fatal but the dataset is now disabled.`
+This is not fatal but the dataset is now disabled.`,
 				});
 
 				console.error(`'${this.name}' failed. Missing geography->divisions->${this.config.divisions_tier}.`);
@@ -116,13 +116,13 @@ This is not fatal but the dataset is now disabled.`
 			if (this.category.name === 'outline') return true;
 
 			FLASH.push({
-				type: 'error',
-				timeout: 5000,
-				title: "Dataset/File error",
-				message: `
+				"type":    'error',
+				"timeout": 5000,
+				"title":   "Dataset/File error",
+				"message": `
 '${this.name}' has category '${this.category.name}' which requires a ${t} file.
 
-This is not fatal but the dataset is now disabled.`
+This is not fatal but the dataset is now disabled.`,
 			});
 
 			this.disable(`Missing ${t}`);
@@ -433,7 +433,7 @@ This is not fatal but the dataset is now disabled.`
 		case 'polygons-fixed': {
 			if (this.csv.key) {
 				opts = {
-					stops: this.category.colorstops,
+					"stops": this.category.colorstops,
 				};
 			}
 			break;
@@ -441,7 +441,7 @@ This is not fatal but the dataset is now disabled.`
 
 		case 'polygons-timeline': {
 			opts = {
-				stops: this.category.colorstops,
+				"stops": this.category.colorstops,
 			};
 
 			break;
@@ -449,9 +449,9 @@ This is not fatal but the dataset is now disabled.`
 
 		case 'raster': {
 			opts = {
-				stops: this.category.colorstops,
-				domain: this.domain,
-				intervals: this.raster.intervals
+				"stops":     this.category.colorstops,
+				"domain":    this.domain,
+				"intervals": this.raster.intervals,
 			};
 
 			break;
@@ -474,8 +474,8 @@ This is not fatal but the dataset is now disabled.`
 			const averages = datasets
 				.filter(d => d.datatype === 'raster')
 				.map(d => ({
-					ds: d,
-					raster: average(crop_to(d.raster, { data: this.summary.analysis.raster, nodata: -1 }))
+					"ds":     d,
+					"raster": average(crop_to(d.raster, { "data": this.summary.analysis.raster, "nodata": -1 })),
 				}));
 
 			content = ce('div', ce('p', `<code>${a_count} km<sup>2</sup></code> covered by the analysis.`));
@@ -521,10 +521,10 @@ This is not fatal but the dataset is now disabled.`
 		}
 
 		new modal({
-			id: 'ds-info',
-			header: this.name,
+			"id":      'ds-info',
+			"header":  this.name,
 			content,
-			destroy: true,
+			"destroy": true,
 		}).show();
 	};
 

@@ -116,6 +116,7 @@
 }
 
 #index-graphs-toolbox a {
+  position: relative;
   padding-left: 0.5em;
   cursor: pointer;
   color: var(--the-color);

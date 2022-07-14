@@ -20,7 +20,7 @@ export function init() {
 		"geography_id": GEOGRAPHY.id,
 	};
 
-	ea_api.post('sessions', null, { "payload": s });
+	API.post('sessions', null, { "payload": s });
 };
 
 export function snapshot() {
@@ -36,5 +36,5 @@ export function snapshot() {
 
 	session.snapshots.push(s);
 
-	ea_api.post('snapshots', null, { "payload": s });
+	API.post('snapshots', null, { "payload": s });
 };

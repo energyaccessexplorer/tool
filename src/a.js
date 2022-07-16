@@ -134,7 +134,10 @@ export async function init() {
 	const url = new URL(location);
 	const id = url.searchParams.get('id');
 
-	GEOGRAPHY = await API.get("geographies", { "id": `eq.${id}` }, { "one": true });
+	GEOGRAPHY = await API.get("geographies", {
+		"id":     `eq.${id}`,
+		"select": ['*', 'parent_sort_branches', 'parent_sort_subbranches', 'parent_sort_datasets'],
+	}, { "one": true });
 	GEOGRAPHY.timeline = maybe(GEOGRAPHY, 'configuration', 'timeline');
 	GEOGRAPHY.timeline_dates = maybe(GEOGRAPHY, 'configuration', 'timeline_dates');
 

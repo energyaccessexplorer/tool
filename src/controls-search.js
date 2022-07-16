@@ -19,8 +19,10 @@ function openall() {
 	}
 };
 
-function sort_datasets(config) {
-	const {sort_datasets, sort_subbranches, sort_branches} = config;
+function sort_datasets() {
+	const sort_datasets = GEOGRAPHY.configuration.sort_datasets || GEOGRAPHY.parent_sort_datasets;
+	const sort_branches = GEOGRAPHY.configuration.sort_branches || GEOGRAPHY.parent_sort_branches;
+	const sort_subbranches = GEOGRAPHY.configuration.sort_subbranches || GEOGRAPHY.parent_sort_subbranches;
 
 	const controls_elements = qsa('ds-controls', contents_el);
 

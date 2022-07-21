@@ -101,7 +101,7 @@ export function raster() {
 			}
 
 			this.add_source({
-				"type":        "canvas",
+				"type":        'canvas',
 				"canvas":      r.canvas,
 				"animate":     false,
 				"coordinates": MAPBOX.coords,
@@ -111,10 +111,10 @@ export function raster() {
 				"id":     overrideid,
 				"type":   'raster',
 				"layout": {
-					"visibility": "none",
+					"visibility": 'none',
 				},
 				"paint": {
-					"raster-resampling": "nearest",
+					"raster-resampling": 'nearest',
 				},
 			});
 		};
@@ -215,7 +215,7 @@ function mapbox_dasharray(str) {
 
 function specs_set(fs, specs) {
 	const criteria = [{
-		"params":       ["__name"],
+		"params":       ['__name'],
 		"__name":       this.name,
 		"radius":       this.vectors['radius'],
 		"stroke":       this.vectors['stroke'],
@@ -294,7 +294,7 @@ export function points() {
 			);
 
 			this.add_source({
-				"type":             "geojson",
+				"type":             'geojson',
 				"data":             this.vectors.geojson,
 				"cluster":          true,
 				"clusterMaxZoom":   10,
@@ -303,10 +303,10 @@ export function points() {
 			});
 
 			this.add_layers({
-				"type":   "circle",
+				"type":   'circle',
 				"filter": ['all', ['!', ['has', 'point_count']], ['get', '__visible']],
 				"layout": {
-					"visibility": "none",
+					"visibility": 'none',
 				},
 				"paint": {
 					"circle-stroke-color": ['get', '__stroke'],
@@ -317,10 +317,10 @@ export function points() {
 				},
 			}, {
 				"id":     `${this.id}-clusters`,
-				"type":   "circle",
+				"type":   'circle',
 				"filter": ['has', 'point_count'],
 				"layout": {
-					"visibility": "none",
+					"visibility": 'none',
 				},
 				"paint": {
 					"circle-radius": [
@@ -374,12 +374,12 @@ export function lines() {
 			});
 
 			this.add_layers({
-				"type":   "line",
+				"type":   'line',
 				"filter": ['get', '__visible'],
 				"layout": {
-					"visibility": "none",
+					"visibility": 'none',
 					"line-cap":   'round',
-					'line-join':  'round',
+					"line-join":  'round',
 				},
 				"paint": {
 					"line-color":     ['get', '__stroke'],
@@ -419,7 +419,7 @@ export function polygons() {
 				this.vectors.fill;
 
 			this.add_layers({
-				"type":   "fill",
+				"type":   'fill',
 				"filter": ['get', '__visible'],
 				"layout": {
 					"visibility": "none",
@@ -427,7 +427,7 @@ export function polygons() {
 				"paint": {
 					"fill-color":         c,
 					"fill-outline-color": ['get', '__stroke'],
-					"fill-opacity":       [ "case", [ "boolean", [ "get", "__visible" ], true ], 1 * this.vectors.opacity, 0 ],
+					"fill-opacity":       [ 'case', [ 'boolean', [ 'get', '__visible' ], true ], 1 * this.vectors.opacity, 0 ],
 				},
 			});
 

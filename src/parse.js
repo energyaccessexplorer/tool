@@ -49,8 +49,6 @@ export function csv() {
 
 	return fetchcheck.call(this, this.csv.endpoint, "CSV")
 		.then(d => d.text())
-		.then(r => d3.csvParse(r))
-		.then(d => this.csv.data = d)
 		.then(_ => this.csv.table = this.csv.key ? csv_table.call(this) : undefined)
 		.then(_ => {
 			if (or(this.domain,
@@ -68,6 +66,7 @@ export function csv() {
 			this.domain = { min, max };
 			this._domain = { min, max };
 		});
+		.then(r => this.csv.data = d3.csvParse(r, d3.autoType))
 };
 
 function csv_table(c) {

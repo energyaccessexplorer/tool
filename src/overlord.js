@@ -14,7 +14,7 @@ import {
 } from './config.js';
 
 import {
-	polygons_csv as parse_polygons_csv,
+	polygons_timeline_indicator as parse_polygons_timeline_indicator,
 } from './parse.js';
 
 import {
@@ -125,7 +125,7 @@ export default class Overlord {
 
 		DS.array.forEach(async d => {
 			if (d.on && d.datatype === 'polygons-timeline')
-				parse_polygons_csv.call(d, t);
+				parse_polygons_timeline_indicator.call(d, t);
 		});
 	};
 

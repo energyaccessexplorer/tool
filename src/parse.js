@@ -401,7 +401,7 @@ export function polygons() {
 			}
 		})
 		.then(async _ => {
-			if (this.csv) polygons_csv.call(this);
+			if (this.csv) polygons_timeline_indicator.call(this);
 
 			const criteria = specs_set.call(
 				this,
@@ -435,7 +435,7 @@ export function polygons() {
 		});
 };
 
-export async function polygons_csv() {
+export async function polygons_timeline_indicator() {
 	await until(_ => this.csv.data && this.vectors.geojson);
 
 	const col = coalesce(U.timeline, this.csv.value);

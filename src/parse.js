@@ -49,27 +49,31 @@ export function csv() {
 
 	return fetchcheck.call(this, this.csv.endpoint, "CSV")
 		.then(d => d.text())
-		.then(_ => this.csv.table = this.csv.key ? csv_table.call(this) : undefined)
-		.then(_ => {
-			if (or(this.domain,
-			       !this.csv.table,
-			       this.datatype === 'polygons-boundaries'))
-				return;
-
-
-			const arr = [];
-			for (let i in this.csv.table) arr[i] = this.csv.table[i];
-
-			const min = d3.min(arr);
-			const max = d3.max(arr);
-
-			this.domain = { min, max };
-			this._domain = { min, max };
-		});
 		.then(r => this.csv.data = d3.csvParse(r, d3.autoType))
+		.then(_ => table_setup.call(this));
 };
 
-function csv_table(c) {
+function table_setup() {
+	if (!this.csv.key) return;
+
+	this.csv.table = table_refresh.call(this);
+
+	if (or(this.domain,
+	       !this.csv.table,
+	       this.datatype === 'polygons-boundaries'))
+		return;
+
+	const arr = [];
+	for (let i in this.csv.table) arr[i] = this.csv.table[i];
+
+	const min = d3.min(arr);
+	const max = d3.max(arr);
+
+	this.domain = { min, max };
+	this._domain = { min, max };
+};
+
+function table_refresh(c) {
 	const table = {};
 	const data = this.csv.data;
 	const v = c ?? this.csv.value;
@@ -405,8 +409,8 @@ export function polygons() {
 		})
 		.then(async _ => {
 			if (this.csv) {
-				if (this.category.name === "timeline-indicator")
-					polygons_timeline_indicator.call(this);
+				if (this.category.name.match(/indicator/))
+					polygons_indicator.call(this);
 				else if (this.datatype.match(/-timeline/))
 					vectors_timeline_csv.call(this);
 			}
@@ -443,10 +447,10 @@ export function polygons() {
 		});
 };
 
-export async function polygons_timeline_indicator() {
+export async function polygons_indicator() {
 	await until(_ => this.csv.data && this.vectors.geojson);
 
-	const col = coalesce(U.timeline, this.csv.value);
+	let col = this.timeline ? U.timeline : this.csv.value;
 
 	if (this.timeline) {
 		if (or(this.datatype === 'polygons-timeline', !this.domain)) {
@@ -456,7 +460,7 @@ export async function polygons_timeline_indicator() {
 			};
 		}
 
-		this.csv.table = csv_table.call(this, col);
+		this.csv.table = table_refresh.call(this, U.timeline);
 	}
 
 	let s;

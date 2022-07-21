@@ -287,6 +287,8 @@ export function points() {
 			}
 		})
 		.then(_ => {
+			if (this.csv) vectors_timeline_csv.call(this);
+
 			const criteria = specs_set.call(
 				this,
 				this.vectors.geojson.features,
@@ -362,6 +364,8 @@ export function lines() {
 			}
 		})
 		.then(_ => {
+			if (this.csv) vectors_timeline_csv.call(this);
+
 			const criteria = specs_set.call(
 				this,
 				this.vectors.geojson.features,
@@ -401,7 +405,12 @@ export function polygons() {
 			}
 		})
 		.then(async _ => {
-			if (this.csv) polygons_timeline_indicator.call(this);
+			if (this.csv) {
+				if (this.category.name === "timeline-indicator")
+					polygons_timeline_indicator.call(this);
+				else if (this.datatype.match(/-timeline/))
+					vectors_timeline_csv.call(this);
+			}
 
 			const criteria = specs_set.call(
 				this,
@@ -481,4 +490,16 @@ export async function polygons_timeline_indicator() {
 
 	if (this.card) this.card.refresh();
 	if (this.controls) this.controls.refresh();
+};
+
+export async function vectors_timeline_csv() {
+	await until(_ => this.csv.data && this.vectors.geojson);
+
+	const fs = this.vectors.geojson.features;
+	const data = this.csv.data;
+
+	for (let i = 0; i < fs.length; i += 1)
+		fs[i].properties['__visible'] = !!data[i][U.timeline];
+
+	this.update_source(this.vectors.geojson);
 };

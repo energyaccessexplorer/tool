@@ -132,7 +132,8 @@ function svg_el() {
 	}
 
 	switch (ds.datatype) {
-	case 'points': {
+	case 'points':
+	case 'points-timeline': {
 		e = points_symbol({
 			"size":        24,
 			"fill":        ds.vectors.fill,
@@ -142,7 +143,8 @@ function svg_el() {
 		break;
 	}
 
-	case 'lines': {
+	case 'lines':
+	case 'lines-timeline': {
 		e = lines_symbol({
 			"size":      28,
 			"dasharray": ds.vectors.dasharray,

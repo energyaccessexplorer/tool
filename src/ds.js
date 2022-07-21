@@ -213,6 +213,8 @@ This is not fatal but the dataset is now disabled.`,
 		}
 
 		case 'raster-mutant':
+		case 'lines-timeline':
+		case 'points-timeline':
 		case 'polygons-timeline':
 		case 'polygons-boundaries': {
 			break;

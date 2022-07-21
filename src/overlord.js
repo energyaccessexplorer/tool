@@ -15,6 +15,7 @@ import {
 
 import {
 	polygons_timeline_indicator as parse_polygons_timeline_indicator,
+	vectors_timeline_csv as parse_vectors_timeline_csv,
 } from './parse.js';
 
 import {
@@ -124,8 +125,14 @@ export default class Overlord {
 		U.timeline = t;
 
 		DS.array.forEach(async d => {
-			if (d.on && d.datatype === 'polygons-timeline')
+			if (!d.on) return;
+
+			if (and(d.category.name.match(/indicator/),
+			        d.datatype === 'polygons-timeline'))
 				parse_polygons_timeline_indicator.call(d, t);
+
+			else if (d.datatype.match(/-timeline/))
+				parse_vectors_timeline_csv.call(d, t);
 		});
 	};
 

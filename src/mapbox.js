@@ -103,12 +103,8 @@ class MapboxInfoControl {
 	};
 };
 
-let _O;
-
-export function init(overlord = {}) {
+export function init() {
 	mapboxgl.accessToken = ea_settings.mapbox_token;
-
-	_O = overlord;
 
 	const mb = new mapboxgl.Map({
 		"container":             'mapbox-container',
@@ -124,8 +120,8 @@ export function init(overlord = {}) {
 	mb.dragRotate.disable();
 	mb.touchZoomRotate.disableRotation();
 
-	if (_O.map) {
-		mb.on('click', e => _O.map('click', e));
+	if (O.map) {
+		mb.on('click', e => O.map('click', e));
 
 		mb.addControl((new MapboxThemeControl()), 'top-right');
 		mb.addControl((new MapboxProjectionControl()), 'top-right');
@@ -155,7 +151,7 @@ function projection_control_popup(_) {
 		radios.append(e);
 	}
 
-	let current = qs(`input[value="${MAPBOX.getProjection()}"]`, radios);
+	let current = qs(`input[value="${MAPBOX.getProjection()?.name}"]`, radios);
 	if (current) current.setAttribute('checked', true);
 
 	qsa('input[name="mapbox_projection"]', radios)
@@ -256,7 +252,7 @@ export function change_theme(theme, soft) {
 		const c = MAPBOX.getStyle().layers.find(l => l.type === 'symbol');
 		MAPBOX.first_symbol = maybe(c, 'id');
 
-		if (_O.theme_changed) _O.theme_changed();
+		if (O.theme_changed) O.theme_changed();
 	};
 
 	MAPBOX.once('style.load', go);

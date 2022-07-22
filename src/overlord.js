@@ -489,17 +489,18 @@ function context(rc, f) {
 			props[k] = `<code>${v} km (proximity to)</code>`;
 		}
 
-		if (and(d.vectors, d.id === in0)) {
-			if (v === 0) {
-				dict.push([k, d.name]);
-				props[k] = `<code>&lt; 1 km (proximity to)</code>`;
-			}
-
+		if (d.vectors) {
 			if ((f && f.source) === d.id) {
 				if (maybe(d.config, 'attributes_map', 'length')) {
 					Object.assign(props, f.properties);
+
 					const a = d.config.attributes_map.map(e => [e.dataset, e.target]);
-					if (a.length) dict.unshift(...a, null);
+					if (a.length) {
+						dict.unshift(
+							["_" + d.id, `<strong style="font-size: 1.1em;">${d.name.toUpperCase()}</strong>`],
+							...a,
+						);
+					}
 				}
 			}
 		}

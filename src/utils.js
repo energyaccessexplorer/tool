@@ -467,7 +467,11 @@ function table_data(dict, props, lnglat) {
 	const t = ce('table');
 	const s = ce('tr', [ce('td', "&nbsp;"), ce('td', "&nbsp;")]);
 
+	let prev;
 	for (let e of dict) {
+		if (prev === null && e === null) continue;
+		prev = e;
+
 		if (!e) {
 			t.append(s.cloneNode(true));
 			continue;

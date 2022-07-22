@@ -169,7 +169,7 @@ This is not fatal but the dataset is now disabled.`,
 			else {
 				this.raster = {};
 				Object.assign(this.raster, o.category.raster, f);
-				this.raster.parse = _ => parse_raster.call(this);
+				this.raster.parse = parse_raster.bind(this);
 			}
 		}
 
@@ -183,7 +183,7 @@ This is not fatal but the dataset is now disabled.`,
 
 				this.csv.key = maybe(this.config, 'csv_columns', 'id');
 				this.csv.value = maybe(this.config, 'csv_columns', 'value');
-				this.csv.parse = _ => parse_csv.call(this);
+				this.csv.parse = parse_csv.bind(this);
 			}
 		}
 

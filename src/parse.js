@@ -9,7 +9,7 @@ async function fetchcheck(endpoint, format) {
 	else endpoint = ea_settings.storage + endpoint;
 
 	return fetch(endpoint)
-		.catch(_ => fail.call(this, `Could not fetch ${format}`))
+		.catch(fail.bind(this, `Could not fetch ${format}`))
 		.then(r => {
 			if (r.ok && r.status < 400) return r;
 
@@ -50,7 +50,7 @@ export function csv() {
 	return fetchcheck.call(this, this.csv.endpoint, "CSV")
 		.then(d => d.text())
 		.then(r => this.csv.data = d3.csvParse(r, d3.autoType))
-		.then(_ => table_setup.call(this));
+		.then(table_setup.bind(this));
 };
 
 function table_setup() {

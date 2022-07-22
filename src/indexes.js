@@ -231,7 +231,7 @@ export function list() {
 
 		qs('.radio', node).append(radio(t === U.output));
 
-		node.onclick = _ => trigger_this.call(node);
+		node.onclick = trigger_this.bind(node);
 
 		qs('.analysis-to-dataset', node).onclick = _ => analysis_to_dataset(t);
 

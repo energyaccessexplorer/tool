@@ -357,14 +357,14 @@ export default class dscard extends HTMLElement {
 
 	info() {
 		const e = font_icon('info-circle');
-		e.onclick = _ => this.ds.info_modal();
+		e.onclick = this.ds.info_modal.bind(this.ds);
 
 		return e;
 	};
 
 	close() {
 		const e = font_icon('x-lg');
-		e.onclick = _ => O.ds(this.ds, { 'active': false });
+		e.onclick = O.ds.bind(null, this.ds, { 'active': false });
 
 		return e;
 	};

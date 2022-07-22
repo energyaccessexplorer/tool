@@ -255,7 +255,7 @@ function svg_interval(opts = {}) {
 
 				dragged(c1, cx, callback1);
 			})
-			.on('start', _ => c1.raise())
+			.on('start', c1.raise.bind(c2))
 			.on('end', _ => {
 				if (typeof end_callback === 'function') end_callback(norm(x_position));
 			})
@@ -270,7 +270,7 @@ function svg_interval(opts = {}) {
 
 				dragged(c2, cx, callback2);
 			})
-			.on('start', _ => c2.raise())
+			.on('start', c2.raise.bind(c2))
 			.on('end', _ => {
 				if (typeof end_callback === 'function') end_callback(norm(x_position));
 			})
@@ -336,7 +336,7 @@ function svg_checkbox(init, callback) { // this is not used anywhere
 		if ((typeof callback === 'function') && x) callback(s);
 	};
 
-	svg.on('click', _ => change(status = !status, true));
+	svg.on('click', change.bind(this, status = !status, true));
 
 	change(status, false);
 

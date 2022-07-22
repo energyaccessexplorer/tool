@@ -42,9 +42,9 @@ function li(p) {
 
 	const el = ce('li', ce('code', c), {});
 
-	el.onmouseenter = _ => pointto(p);
+	el.onmouseenter = pointto.bind(null, p);
 
-	el.onclick = _ => zoom(p, _ => pointto(p, true));
+	el.onclick = zoom.bind(null, p, pointto.bind(null, p, true));
 
 	return el;
 };

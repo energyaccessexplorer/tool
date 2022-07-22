@@ -20,14 +20,14 @@ function div(g,i,j) {
 		"url":  g.id ? `./?id=${g.id}` : null,
 	});
 
-	qs('[zoom]', el).onclick = _ => load(i,j);
+	qs('[zoom]', el).onclick = load.bind(null, i,j);
 
 	return ce('li', el);
 };
 
 function li(g,i,j) {
 	const el = ce('li', g.name);
-	el.onclick = _ => load(i,j);
+	el.onclick = load.bind(null,i,j);
 
 	return el;
 };

@@ -385,20 +385,20 @@ function options() {
 	if (!Object.keys(this.ds.metadata).every(k => !this.ds.metadata[k])) {
 		dropdownlist.push({
 			"content": "Dataset info",
-			"action":  _ => this.ds.info_modal(),
+			"action":  this.ds.info_modal.bind(this.ds),
 		});
 	}
 
 	if (this.weight_group) {
 		dropdownlist.push({
 			"content": "Toggle advanced controls",
-			"action":  _ => this.toggle_advanced(),
+			"action":  this.toggle_advanced.bind(this),
 		});
 	}
 
 	dropdownlist.push({
 		"content": "Reset default values",
-		"action":  _ => this.reset_defaults(),
+		"action":  this.reset_defaults.bind(this),
 	});
 
 	dropdownlist.push({

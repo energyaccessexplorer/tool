@@ -71,7 +71,7 @@ async function reset() {
 		if (f['__li']) continue;
 
 		const li = ce('li', f.properties[attr]);
-		li.onmouseenter = _ => pointto(f, false);
+		li.onmouseenter = pointto.bind(null, f, false);
 		li.onclick = _ => {
 			const p = (_ => {
 				if (ds.datatype === 'points')
@@ -81,7 +81,7 @@ async function reset() {
 				}
 			})();
 
-			zoom(p, _ => pointto(f, true));
+			zoom(p, pointto.bind(null, f, true));
 		};
 
 		f['__li'] = li;

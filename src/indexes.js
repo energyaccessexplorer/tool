@@ -152,7 +152,7 @@ export function init() {
 
 	const info = qs('#index-graphs-info');
 	info.append(font_icon('info-circle'));
-	info.onclick = _ => open_modal();
+	info.onclick = open_modal;
 
 	if (user_logged_in()) {
 		for (const i in more_tools)
@@ -233,7 +233,7 @@ export function list() {
 
 		node.onclick = trigger_this.bind(node);
 
-		qs('.analysis-to-dataset', node).onclick = _ => analysis_to_dataset(t);
+		qs('.analysis-to-dataset', node).onclick = analysis_to_dataset.bind(this, t);
 
 		nodes.push(node);
 	}

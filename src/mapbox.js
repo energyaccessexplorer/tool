@@ -161,7 +161,7 @@ function projection_control_popup(_) {
 	qsa('input[name="mapbox_projection"]', radios)
 		.forEach(e => e.addEventListener('change', _ => MAPBOX.setProjection(e.value)));
 
-	x.addEventListener('mouseleave', _ => x.remove());
+	x.addEventListener('mouseleave', x.remove);
 
 	x.append(radios);
 
@@ -204,7 +204,7 @@ function theme_control_popup(_) {
 	qsa('input[name="mapbox_theme"]', radios)
 		.forEach(e => e.addEventListener('change', _ => change_theme(e.value)));
 
-	x.addEventListener('mouseleave', _ => x.remove());
+	x.addEventListener('mouseleave', x.remove);
 
 	x.append(radios);
 

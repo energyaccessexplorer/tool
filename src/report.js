@@ -194,8 +194,8 @@ contact our team at`;
 
 		function load_image(u) {
 			return new Promise((resolve, reject) => {
-				img.onload = _ => resolve(u);
-				img.onerror = _ => reject(u);
+				img.onload = resolve.bind(this, u);
+				img.onerror = reject.bind(this, u);
 				img.src = u;
 			});
 		}

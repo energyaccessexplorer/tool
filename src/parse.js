@@ -226,54 +226,58 @@ function specs_set(fs, specs) {
 		"dasharray":    this.vectors['dasharray'],
 	}];
 
+	function ok(c,s,v) {
+		let x = false;
+		const vs = v + "";
+
+		if (s.match) {
+			if (vs.match(new RegExp(s.match)))
+				x = true;
+		}
+
+		c[s.key] = vs;
+
+		return x;
+	};
+
 	for (let i = 0; i < fs.length; i += 1) {
 		fs[i].properties['__radius'] = this.vectors['radius'];
 		fs[i].properties['__stroke'] = this.vectors['stroke'];
 		fs[i].properties['__stroke-width'] = this.vectors['stroke-width'];
 		fs[i].properties['__dasharray'] = mapbox_dasharray(this.vectors['dasharray']);
 
-		if (specs) {
-			const c = Object.assign({}, criteria[0]);
+		if (!specs) continue;
 
-			let p = false;
+		const c = Object.assign({}, criteria[0]);
 
-			for (let s of specs) {
-				let m;
+		for (let s of specs) {
+			const v = fs[i].properties[s.key];
 
-				const r = new RegExp(s.match);
-				const v = fs[i].properties[s.key];
+			if (!v) continue;
 
-				if (!v) continue;
+			if (!ok(c,s,v)) continue;
 
-				const vs = v + "";
+			if (c.params.indexOf(s.key) < 0)
+				c.params.push(s.key);
 
-				if (vs === s.match || (m = vs.match(r))) {
-					c[s.key] = vs ? vs : m[1];
+			if (has(s, 'radius'))
+				fs[i].properties['__radius'] = c['radius'] = s['radius'];
 
-					if (c.params.indexOf(s.key) < 0) c.params.push(s.key);
+			if (has(s, 'stroke'))
+				fs[i].properties['__stroke'] = c['stroke'] = s['stroke'];
 
-					if (has(s, 'radius'))
-						fs[i].properties['__radius'] = c['radius'] = s['radius'];
+			if (has(s, 'stroke-width'))
+				fs[i].properties['__stroke-width'] = c['stroke-width'] = s['stroke-width'];
 
-					if (has(s, 'stroke'))
-						fs[i].properties['__stroke'] = c['stroke'] = s['stroke'];
-
-					if (has(s, 'stroke-width'))
-						fs[i].properties['__stroke-width'] = c['stroke-width'] = s['stroke-width'];
-
-					if (has(s, 'dasharray')) {
-						c['dasharray'] = s['dasharray'];
-						fs[i].properties['__dasharray'] = mapbox_dasharray(s['dasharray']);
-					}
-
-					p = true;
-				}
+			if (has(s, 'dasharray')) {
+				c['dasharray'] = s['dasharray'];
+				fs[i].properties['__dasharray'] = mapbox_dasharray(s['dasharray']);
 			}
 
-			if (p && !criteria.find(x => same(x,c))) criteria.push(c);
-
-			fs[i].properties['__criteria'] = c;
+			if (!criteria.find(x => same(x,c))) criteria.push(c);
 		}
+
+		fs[i].properties['__criteria'] = c;
 	}
 
 	return criteria;

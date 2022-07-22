@@ -235,6 +235,11 @@ function specs_set(fs, specs) {
 				x = true;
 		}
 
+		else if (s.range) {
+			const [min, max] = s.range.split(',').map(t => +t);
+			x = and(+v >= min, +v <= max);
+		}
+
 		c[s.key] = vs;
 
 		return x;

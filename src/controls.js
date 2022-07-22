@@ -505,8 +505,8 @@ function range_group_controls() {
 		return;
 	}
 
-	case 'raster':
-	case 'raster-mutant': {
+	case 'raster-mutant':
+	case 'raster': {
 		this.range_group = range.call(this.ds, {
 			"ramp":    lr,
 			"steps":   steps,

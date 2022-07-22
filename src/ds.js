@@ -190,14 +190,13 @@ This is not fatal but the dataset is now disabled.`,
 		if (!go) return false;
 
 		switch (this.datatype) {
+		case 'points-timeline':
+		case 'lines-timeline':
+		case 'polygons-timeline':
+		case 'polygons-fixed':
 		case 'points':
 		case 'lines':
 		case 'polygons': {
-			this.download = this.vectors.endpoint;
-			break;
-		}
-
-		case 'polygons-fixed': {
 			this.download = this.vectors.endpoint;
 			break;
 		}
@@ -213,9 +212,6 @@ This is not fatal but the dataset is now disabled.`,
 		}
 
 		case 'raster-mutant':
-		case 'lines-timeline':
-		case 'points-timeline':
-		case 'polygons-timeline':
 		case 'polygons-boundaries': {
 			break;
 		}
@@ -605,10 +601,10 @@ This is not fatal but the dataset is now disabled.`,
 			break;
 		}
 
-		case 'polygons':
 		case 'polygons-fixed':
 		case 'polygons-timeline':
-		case 'polygons-boundaries': {
+		case 'polygons-boundaries':
+		case 'polygons': {
 			t = ['fill-opacity'];
 			break;
 		}

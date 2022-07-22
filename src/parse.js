@@ -420,7 +420,11 @@ export function polygons() {
 			if (this.csv) {
 				if (this.category.name.match(/indicator/))
 					polygons_indicator.call(this);
-				else if (this.datatype.match(/-timeline/))
+
+				else if (this.datatype.match(/polygons-boundaries/))
+					polygons_indicator.call(this);
+
+				else if (this.datatype.match(/(lines|points|polygons)-timeline/))
 					vectors_timeline_csv.call(this);
 			}
 

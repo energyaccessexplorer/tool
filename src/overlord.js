@@ -130,7 +130,7 @@ export default class Overlord {
 			if (d.category.name.match(/indicator/))
 				parse_polygons_indicator.call(d);
 
-			else if (d.datatype.match(/-timeline/))
+			else if (d.datatype.match(/(lines|points|polygons)-timeline/))
 				parse_vectors_timeline_csv.call(d);
 		});
 	};

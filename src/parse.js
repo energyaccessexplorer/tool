@@ -132,7 +132,10 @@ export function raster() {
 			this.raster.height = image.getHeight();
 			this.raster.nodata = parseFloat(image.fileDirectory.GDAL_NODATA);
 
-			if (this.datatype === 'raster' && !this.domain) {
+			if (this.timeline)
+				this.timeline.rasters = rasters;
+
+			if (this.datatype.match(/raster(-timeline)?/) && !this.domain) {
 				let min, max; min = max = this.raster.nodata;
 				for (let v of this.raster.data) {
 					if (v === this.raster.nodata) continue;
@@ -158,7 +161,7 @@ OUTLINE: ${OUTLINE.raster.width} × ${OUTLINE.raster.height}`);
 
 		this.drawraster = draw;
 
-		if (this.datatype === 'raster') draw.call(this);
+		if (this.datatype.match(/raster/)) draw.call(this);
 	};
 
 	let t;
@@ -424,6 +427,9 @@ export function polygons() {
 				else if (this.datatype.match(/polygons-boundaries/))
 					polygons_indicator.call(this);
 
+				else if (this.datatype.match(/raster-timeline/))
+					raster_timeline.call(this);
+
 				else if (this.datatype.match(/(lines|points|polygons)-timeline/))
 					vectors_timeline_csv.call(this);
 			}
@@ -518,4 +524,10 @@ export async function vectors_timeline_csv() {
 		fs[i].properties['__visible'] = !!data[i][U.timeline];
 
 	this.update_source(this.vectors.geojson);
+};
+
+export async function raster_timeline() {
+	const i = GEOGRAPHY.timeline_dates.indexOf(U.timeline);
+	console.log(i, this.timeline.rasters || "no timeline rasters");
+	// this.update_source(this.timeline.rasters[i]);
 };

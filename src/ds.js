@@ -201,6 +201,7 @@ This is not fatal but the dataset is now disabled.`,
 			break;
 		}
 
+		case 'raster-timeline':
 		case 'raster': {
 			this.download = this.raster.endpoint;
 			break;
@@ -445,6 +446,7 @@ This is not fatal but the dataset is now disabled.`,
 			break;
 		}
 
+		case 'raster-timeline':
 		case 'raster': {
 			opts = {
 				"stops":     this.category.colorstops,
@@ -490,6 +492,7 @@ This is not fatal but the dataset is now disabled.`,
 						.filter(d => d.analysis.index === k)
 						.forEach(d => {
 							switch (d.datatype) {
+							case 'raster-timeline':
 							case 'raster': {
 								const f = averages.find(a => a.ds === d);
 								table.append(ce('tr', [
@@ -609,6 +612,7 @@ This is not fatal but the dataset is now disabled.`,
 			break;
 		}
 
+		case 'raster-timeline':
 		case 'raster': {
 			t = ['raster-opacity'];
 			break;

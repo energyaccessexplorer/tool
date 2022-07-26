@@ -15,6 +15,7 @@ import {
 
 import {
 	polygons_indicator as parse_polygons_indicator,
+	raster_timeline as parse_raster_timeline,
 	vectors_timeline_csv as parse_vectors_timeline_csv,
 } from './parse.js';
 
@@ -129,6 +130,9 @@ export default class Overlord {
 
 			if (d.category.name.match(/indicator/))
 				parse_polygons_indicator.call(d);
+
+			else if (d.datatype.match(/raster-timeline/))
+				parse_raster_timeline.call(d);
 
 			else if (d.datatype.match(/(lines|points|polygons)-timeline/))
 				parse_vectors_timeline_csv.call(d);

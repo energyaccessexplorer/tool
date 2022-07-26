@@ -505,6 +505,7 @@ function range_group_controls() {
 		return;
 	}
 
+	case 'raster-timeline':
 	case 'raster-mutant':
 	case 'raster': {
 		this.range_group = range.call(this.ds, {

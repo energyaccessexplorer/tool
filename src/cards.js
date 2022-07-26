@@ -185,6 +185,7 @@ function svg_el() {
 	}
 
 	case 'raster-mutant':
+	case 'raster-timeline':
 	case 'raster': {
 		const r = tmpl('#ramp');
 

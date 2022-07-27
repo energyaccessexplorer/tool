@@ -6,8 +6,9 @@ import selectlist from '../lib/selectlist.js';
 
 function ugly_flag(flagurl) {
 	return ce('img', null, {
-		"src":   flagurl,
-		"width": MOBILE ? 100 : 200,
+		"src":    flagurl,
+		"width":  MOBILE ? 100 : 200,
+		"height": MOBILE ? 100 : 130,
 	});
 };
 

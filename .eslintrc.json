@@ -61,6 +61,7 @@
 		"qsa": "readonly",
 		"ce": "readonly",
 		"delay": "readonly",
+		"debounce": "readonly",
 		"until": "readonly",
 		"maybe": "readonly",
 		"has": "readonly",

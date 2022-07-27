@@ -11,6 +11,9 @@ const contents_el = qs('#controls-contents');
 const tabs_el = qs('#controls-tabs');
 
 export default class dscontrols extends HTMLElement {
+	manual_min;
+	manual_max;
+
 	constructor(d) {
 		if (!(d instanceof DS)) throw new Error(`dscontrols: Expected a DS but got ${d}`);
 		super();
@@ -44,9 +47,6 @@ export default class dscontrols extends HTMLElement {
 
 		this.header.onclick = header_click.call(this);
 
-		this.manual_min = qs('.manual-controls input[bind=min]', this);
-		this.manual_max = qs('.manual-controls input[bind=max]', this);
-
 		slot_populate.call(this, Object.assign({}, this.ds, {
 			"dropdown":        this.dropdown,
 			"checkbox":        this.checkbox.svg,
@@ -61,6 +61,7 @@ export default class dscontrols extends HTMLElement {
 
 	refresh() {
 		range_group_controls.call(this);
+		manual_setup.call(this);
 	};
 
 	loading(t) {
@@ -74,6 +75,8 @@ export default class dscontrols extends HTMLElement {
 		if (this.checkbox) this.checkbox.change(t);
 
 		if (t && !this.range_group) range_group_controls.call(this);
+
+		if (t) manual_setup.call(this);
 	};
 
 	inject() {
@@ -291,6 +294,8 @@ function ramp(...els) {
 		qs('.ramp', r).append(e);
 
 	const div = qs(':scope > div', r);
+
+	if (!div) return r;
 	div.style['width'] = `${slider_width + 2}px`;
 	div.style['margin'] = 'auto';
 
@@ -313,7 +318,7 @@ function range(opts = {}) {
 	           and(min === 100, max === 0)))) d = 0;
 
 	const update = (x, i, el) => {
-		el.innerText = (+x).toFixed(d);
+		el.value = (+x).toFixed(d);
 
 		const man = maybe(this.controls, 'manual_' + i);
 		if (man) man.value = x;
@@ -321,13 +326,28 @@ function range(opts = {}) {
 		domain[i] = parseFloat(x);
 	};
 
-	const v1 = ce('div', null, { "bind": "v1" });
-	const v2 = ce('div', null, { "bind": "v2" });
+	let step = 0.1 * Math.pow(10, Math.floor(Math.log10(Math.abs(this.domain.max - this.domain.min))));
+
+	this.controls.manual_min = ce('input', null, {
+		"bind": "min",
+		"type": "number",
+		"min":  this.domain.min,
+		"max":  this.domain.max,
+		"step": step,
+	});
+
+	this.controls.manual_max = ce('input', null, {
+		"bind": "max",
+		"type": "number",
+		"min":  this.domain.min,
+		"max":  this.domain.max,
+		"step": step,
+	});
 
 	const r = ramp(
-		v1,
+		this.controls.manual_min,
 		ce('div', opts.ramp || 'range', { "class": "unit-ramp" }),
-		v2,
+		this.controls.manual_max,
 	);
 
 	const s = svg_interval({
@@ -336,8 +356,8 @@ function range(opts = {}) {
 		"init":         this._domain,
 		"domain":       this.domain,
 		"steps":        opts.steps,
-		"callback1":    x => update(x, 'min', v1),
-		"callback2":    x => update(x, 'max', v2),
+		"callback1":    x => update(x, 'min', this.controls.manual_min),
+		"callback2":    x => update(x, 'max', this.controls.manual_max),
 		"end_callback": _ => O.ds(this, { 'domain': domain }),
 	});
 
@@ -401,11 +421,6 @@ function options() {
 		"action":  this.reset_defaults.bind(this),
 	});
 
-	dropdownlist.push({
-		"content": "Set values manually",
-		"action":  _ => qs('.manual-controls', this).style.display = 'flex',
-	});
-
 	// Enable this later when we are ready to let the users download the
 	// original file.
 	//
@@ -422,19 +437,11 @@ function options() {
 function manual_setup() {
 	if (!this.manual_min || !this.manual_max) return;
 
-	this.manual_min.value = this.ds.domain.min;
-	this.manual_max.value = this.ds.domain.max;
+	this.manual_min.value = this.ds._domain.min;
+	this.manual_max.value = this.ds._domain.min;
 
 	const change = (e,i) => {
 		let v = +e.target.value;
-
-		if (i === 'max' && v > this.ds.domain.max) {
-			e.target.value = this.ds.domain.max;
-		}
-
-		if (i === 'min' && v < this.ds.domain.min) {
-			e.target.value = this.ds.domain.min;
-		}
 
 		const d = this.ds._domain;
 		d[i] = +v;
@@ -444,8 +451,8 @@ function manual_setup() {
 		O.ds(this.ds, { 'domain': d });
 	};
 
-	this.manual_min.onchange = e => change(e, 'min');
-	this.manual_max.onchange = e => change(e, 'max');
+	this.manual_min.onchange = debounce(e => change(e, 'min'));
+	this.manual_max.onchange = debounce(e => change(e, 'max'));
 
 	switch (maybe(this.ds, 'category', 'controls', 'range')) {
 	case 'single':
@@ -521,8 +528,6 @@ function range_group_controls() {
 		break;
 	}
 	}
-
-	manual_setup.call(this);
 
 	if (qs('[slot=range-slider]', this))
 		qs('[slot=range-slider]', this).remove();

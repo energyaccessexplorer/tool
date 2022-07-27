@@ -154,7 +154,7 @@ export async function init() {
 	U = new Proxy(url, Uproxy);
 	O = new Overlord();
 
-	MAPBOX = mapbox_init(O);
+	MAPBOX = mapbox_init();
 	MAPBOX.coords = mapbox_fit(GEOGRAPHY.envelope);
 
 	await dsinit(GEOGRAPHY.id);

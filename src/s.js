@@ -12,6 +12,17 @@ function ugly_flag(flagurl) {
 	});
 };
 
+function preload_boundaries(id) {
+	return API.get('datasets', {
+		"select":        ['processed_files'],
+		"geography_id":     `eq.${id}`,
+		"category_name": "in.(outline,boundaries)",
+	}).then(r => {
+		r.map(d => d['processed_files'].find(f => f['func'] === 'vectors'))
+			.forEach(f => fetch(f['endpoint']));
+	});
+};
+
 async function geography(c) {
 	const coll = await API.get("geographies", {
 		"datasets_count": "gt.0",
@@ -245,7 +256,10 @@ export function init() {
 	function list(geographies) {
 		for (let co of geographies) {
 			const d = ce('div', ce('h2', co.name, { "class": 'country-name' }), { "class": 'country-item', "ripple": "" });
-			d.onclick = _ => setTimeout(_ => geography(co), 350);
+			d.onclick = async _ => {
+				preload_boundaries(co.id);
+				setTimeout(_ => geography(co), 350);
+			};
 
 			const intro = maybe(co, 'configuration', 'introduction');
 			if (intro) {

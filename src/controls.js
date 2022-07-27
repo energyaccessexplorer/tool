@@ -438,7 +438,7 @@ function manual_setup() {
 	if (!this.manual_min || !this.manual_max) return;
 
 	this.manual_min.value = this.ds._domain.min;
-	this.manual_max.value = this.ds._domain.min;
+	this.manual_max.value = this.ds._domain.max;
 
 	const change = (e,i) => {
 		let v = +e.target.value;
@@ -508,7 +508,9 @@ function range_group_controls() {
 		break;
 	}
 
+	case 'table':
 	case 'polygons-boundaries': {
+		for (let e of qsa('content', this)) e.remove();
 		return;
 	}
 

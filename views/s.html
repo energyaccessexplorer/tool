@@ -38,8 +38,7 @@
 
     window.FLASH = new flash();
     window.API = new pgrest(ea_settings.database, FLASH);
-
-    window.MOBILE = false;
+    window.MOBILE = window.innerWidth < 1152;
   </script>
 
   {{> views/env }}

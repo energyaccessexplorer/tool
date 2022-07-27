@@ -21,6 +21,11 @@ body {
   filter: drop-shadow(0px 0px 1.5px #000);
 }
 
+.flag {
+  width: 200px;
+  height: 130px;
+}
+
 .selectlist-input {
   font-size: 1.7em;
   padding: 0.5em 1em;
@@ -64,6 +69,11 @@ bubble-message pre {
   #playground {
     flex-flow: column nowrap;
     width: unset;
+  }
+
+  .flag {
+	width: 100px;
+	height: 100px;
   }
 
   .country-item {

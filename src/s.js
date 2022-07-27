@@ -4,14 +4,6 @@ import bubblemessage from '../lib/bubblemessage.js';
 
 import selectlist from '../lib/selectlist.js';
 
-function ugly_flag(flagurl) {
-	return ce('img', null, {
-		"src":    flagurl,
-		"width":  MOBILE ? 100 : 200,
-		"height": MOBILE ? 100 : 130,
-	});
-};
-
 function preload_boundaries(id) {
 	return API.get('datasets', {
 		"select":        ['processed_files'],
@@ -239,8 +231,6 @@ async function presets_init() {
 export function init() {
 	const playground = qs('#playground');
 
-	MOBILE = window.innerWidth < 1152;
-
 	function hextostring(hex) {
 		let s = "";
 
@@ -283,9 +273,10 @@ export function init() {
 
 					if (!data) return;
 
-					d.append(ugly_flag(
-						URL.createObjectURL((new Blob([hextostring(data['flag'])], {"type": 'image/svg+xml'}))),
-					));
+					d.append(ce('img', null, {
+						"src":   URL.createObjectURL((new Blob([hextostring(data['flag'])], {"type": 'image/svg+xml'}))),
+						"class": "flag",
+					}));
 				});
 
 			playground.append(d);

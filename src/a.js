@@ -115,7 +115,7 @@ const Uproxy = {
 		}
 
 		case "inputs": {
-			url.searchParams.set(t, [...new Set(v)]);
+			url.searchParams.set(t, [...new Set(v)].filter(t => DST.get(t)));
 			break;
 		}
 

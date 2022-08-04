@@ -95,7 +95,7 @@ export default class DS {
 This is not fatal but the dataset is now disabled.`,
 				});
 
-				console.error(`'${this.name}' failed. Missing geography->divisions->${this.config.divisions_tier}.`);
+				this.disable(`Missing geography->divisions->${this.config.divisions_tier}.`);
 
 				return false;
 			}
@@ -252,8 +252,8 @@ This is not fatal but the dataset is now disabled.`,
 		}
 	};
 
-	disable(msg) {
-		console.error(`Disabling ${this.id}.`, msg);
+	disable(msg = "") {
+		console.warn("Disabling:", this, msg);
 
 		this.on = false;
 		this.disabled = true;
@@ -543,8 +543,14 @@ This is not fatal but the dataset is now disabled.`,
 
 			// make sure polygons-fixed have decided their _domain
 			//
-			if (maybe(this, '_domain', 'min') === undefined)
-				Object.assign(this._domain, this.domain);
+			if (maybe(this, '_domain', 'min') === undefined) {
+				try {
+					Object.assign(this._domain, this.domain);
+				} catch {
+					this.disable("Could not set _domain while setting as 'active'. Too soon?");
+					return;
+				}
+			}
 
 			if (this.controls) this.controls.loading(false);
 

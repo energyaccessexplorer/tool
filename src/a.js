@@ -191,8 +191,7 @@ export async function init() {
 		try {
 			help_init();
 		} catch(e) {
-			console.error(e);
-			console.error("Disabling the nanny helper...");
+			console.warn("Disabling the nanny helper.", e);
 
 			qs('#drawer-help').remove();
 		}
@@ -305,9 +304,10 @@ This is fatal. Thanks for all the fish.`;
 
 						const ds = new DS(e);
 
-						await ds.load('csv');
-						await ds.load('vectors');
-						await ds.load('raster');
+						await ds.load('csv')
+							.then(_ => ds.load('vectors'))
+							.then(_ => ds.load('raster'))
+							.catch(err => console.error(err));
 					});
 			}),
 		);

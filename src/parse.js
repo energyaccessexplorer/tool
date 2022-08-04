@@ -9,11 +9,16 @@ async function fetchcheck(endpoint, format) {
 	else endpoint = ea_settings.storage + endpoint;
 
 	return fetch(endpoint)
-		.catch(fail.bind(this, `Could not fetch ${format}`))
+		.catch(_ => {
+			fail.call(this);
+			throw new Error(`Network error: Could not fetch ${format} from ${endpoint}`);
+		})
 		.then(r => {
-			if (r.ok && r.status < 400) return r;
-
-			fail.call(this, `${format} Endpoint gave ${r.status} response.`);
+			if (r && r.ok && r.status < 400) return r;
+			else {
+				fail.call(this);
+				throw new Error(`${format} Endpoint gave ${r.status} response.`);
+			}
 		});
 };
 
@@ -24,22 +29,19 @@ Failed to process dataset '${this.name}'.
 This is fatal. Thanks for all the fish.
 
 ${msg}`);
-
-		throw new Error(msg);
+		return;
 	}
 
-	else {
-		FLASH.push({
-			"type":    'error',
-			"timeout": 5000,
-			"title":   "Dataset error",
-			"message": `
+	FLASH.push({
+		"type":    'error',
+		"timeout": 5000,
+		"title":   "Dataset error",
+		"message": `
 Failed to process dataset '${this.name}'.
 This is not fatal but the dataset is now disabled.
 
 ${msg}`,
-		});
-	}
+	});
 
 	this.disable(msg);
 };

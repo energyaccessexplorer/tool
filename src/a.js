@@ -59,6 +59,10 @@ import {
 	init as session_init,
 } from './session.js';
 
+import {
+	run as qa_run,
+} from './qa.js';
+
 import DS from './ds.js';
 
 import Overlord from './overlord.js';
@@ -206,6 +210,8 @@ export async function init() {
 	});
 
 	loading(false);
+
+	if (url.searchParams.get('qa')) qa_run();
 };
 
 export function clean() {

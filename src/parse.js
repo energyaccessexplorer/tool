@@ -363,21 +363,21 @@ export function points() {
 export function lines() {
 	return geojson.call(this)
 		.then(_ => {
-			for (const p of this.vectors.geojson.features) {
-				if (p.geometry.type === "LineString") {
-					p.properties['__rasterindexes'] = p.geometry.coordinates.map(t => maybe(coordinates_to_raster_pixel(t), 'index')).sort();
+			for (const f of this.vectors.geojson.features) {
+				if (f.geometry.type === "LineString") {
+					f.properties['__rasterindexes'] = f.geometry.coordinates.map(t => maybe(coordinates_to_raster_pixel(t), 'index')).sort();
 				} else {
 					const a = [];
 
-					p.geometry.coordinates.map(t => {
+					f.geometry.coordinates.map(t => {
 						for (let i = 0; i < t.length; i++)
 							a[i] = maybe(coordinates_to_raster_pixel(t[i]), 'index');
 					});
 
-					p.properties['__rasterindexes'] = a.sort();
+					f.properties['__rasterindexes'] = a.sort();
 				}
 
-				p.properties['__visible'] = true;
+				f.properties['__visible'] = true;
 			}
 		})
 		.then(_ => {
@@ -500,11 +500,11 @@ export async function polygons_indicator() {
 		return;
 	}
 
-	const fs = this.vectors.geojson.features;
-	for (let i = 0; i < fs.length; i += 1) {
-		let row = data.find(r => +r[this.csv.key] === +fs[i].properties[this.vectors.id]);
-		fs[i].properties.__color = (this.colorscale && row) ? s(row[col]) : this.vectors.fill || "transparent";
-		fs[i].id = fs[i].properties[this.vectors.id];
+	for (let f of this.vectors.geojson.features) {
+		f.id = f.properties[this.vectors.id];
+
+		let row = data.find(r => r[this.csv.key] === f.id);
+		f.properties.__color = this.colorscale ? s(maybe(row, col)) : this.vectors.fill || "transparent";
 	}
 
 	this.update_source(this.vectors.geojson);
@@ -519,11 +519,10 @@ export async function polygons_indicator() {
 export async function vectors_timeline_csv() {
 	await until(_ => this.csv.data && this.vectors.geojson);
 
-	const fs = this.vectors.geojson.features;
 	const data = this.csv.data;
 
-	for (let i = 0; i < fs.length; i += 1)
-		fs[i].properties['__visible'] = !!data[i][U.timeline];
+	for (let f of this.vectors.geojson.features)
+		f.properties['__visible'] = !!data.find(r => r[this.csv.key] === f.id);
 
 	this.update_source(this.vectors.geojson);
 };

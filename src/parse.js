@@ -83,7 +83,11 @@ function table_refresh(c) {
 
 	for (let r of data) {
 		const n = +r[v];
-		table[r[k]] = isNaN(n) ? r[v] : n;
+
+		if (k)
+			table[r[k]] = isNaN(n) ? r[v] : n;
+		else if (this.timeline)
+			table[k] = r[k];
 	}
 
 	return table;
@@ -423,7 +427,7 @@ export function polygons() {
 		})
 		.then(async _ => {
 			if (this.csv) {
-				if (this.category.name.match(/indicator/))
+				if (this.category.name === 'indicator')
 					polygons_indicator.call(this);
 
 				else if (this.datatype.match(/polygons-boundaries/))
@@ -481,6 +485,7 @@ export async function polygons_indicator() {
 			};
 		}
 
+		this.csv.key = this.csv.data.columns[0];
 		this.csv.table = table_refresh.call(this, U.timeline);
 	}
 

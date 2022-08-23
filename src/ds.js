@@ -571,11 +571,16 @@ This is not fatal but the dataset is now disabled.`,
 	loadall() {
 		if (this.loaded) return Whatever;
 
-		return Promise.all(['vectors', 'csv', 'raster'].map(i => this[i] ? this.load(i) : null))
+		return Whatever
+			.then(_ => this.load('csv'))
+			.then(_ => this.load('vectors'))
+			.then(_ => this.load('raster'))
 			.then(_ => (this.loaded = true));
 	};
 
 	async load(arg) {
+		if (!this[arg]) return;
+
 		this.loading = true;
 
 		if (this.mutant) {

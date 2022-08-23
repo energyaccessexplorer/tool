@@ -172,6 +172,9 @@ deploy:
 reconfig:
 	@echo "Building settings.json - ${env}"
 	@echo '{}' \
+		| jq '.domain = ${DOMAIN}' \
+		| jq '.world = ${WORLD}' \
+		| jq '.title = ${TITLE}' \
 		| jq '.database = ${API_URL}' \
 		| jq '.storage = ${STORAGE_URL}' \
 		| jq '.mapbox_token = ${MAPBOX_TOKEN}' \

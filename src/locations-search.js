@@ -103,7 +103,7 @@ export function init() {
 
 	const n = GEOGRAPHY.name.replace(/\ ?(training|test)\ ?/i, '');
 
-	fetch(`https://world.energyaccessexplorer.org/countries?select=cca2&or=(names->>official.eq.${n},name.eq.${n})`)
+	fetch(`${ea_settings.world}/countries?select=cca2&or=(names->>official.eq.${n},name.eq.${n})`)
 		.then(r => r.json())
 		.then(r => GEOGRAPHY.cca2 = maybe(r, 0, 'cca2'));
 };

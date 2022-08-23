@@ -253,7 +253,7 @@ function open_modal() {
 
 	new modal({
 		"id":      'indexes-modal',
-		"header":  "Energy Access Explorer Indexes",
+		"header":  "Indexes Descriptions",
 		"content": c,
 		"footer":  ce('a', "See technical note for more detailed methodology", {
 			"style": "text-align: right; display: block;",

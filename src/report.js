@@ -62,7 +62,7 @@ export function pdf() {
 		doc.setTextColor("#00794C");
 		doc.setFontSize(16);
 
-		doc.text("Energy Access Explorer", hhalf + 80, c);
+		doc.text(ea_settings.title, hhalf + 80, c);
 	};
 
 	function add_about() {

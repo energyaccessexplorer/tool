@@ -266,7 +266,7 @@ export function init() {
 				};
 			}
 
-			fetch(`https://world.energyaccessexplorer.org/countries?select=flag&or=(names->>official.eq.${co.name},name.eq.${co.name})`)
+			fetch(`${ea_settings.world}/countries?select=flag&or=(names->>official.eq.${co.name},name.eq.${co.name})`)
 				.then(r => r.json())
 				.then(r => {
 					const data = r[0];

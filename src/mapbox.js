@@ -14,23 +14,11 @@ const default_styles = [{
 const styles = default_styles;
 
 const projections = [{
-	"name":  "Natural Earth",
-	"value": "naturalEarth",
+	"name":  "Globe",
+	"value": "globe",
 }, {
 	"name":  "Mercator",
 	"value": "mercator",
-}, {
-	"name":  "Winkel tripel",
-	"value": "winkelTripel",
-}, {
-	"name":  "Lambert conformal conic",
-	"value": "lambertConformalConic",
-}, {
-	"name":  "Equirectangular",
-	"value": "equirectangular",
-}, {
-	"name":  "Equal Earth",
-	"value": "equalEarth",
 }];
 
 let info_mode_button;

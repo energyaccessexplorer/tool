@@ -137,6 +137,7 @@ sync:
 	@echo ${GITSHA}${GITCLEAN} > ${DIST}/.sync-${env}
 
 	@rsync -OPrv \
+		--quiet \
 		--checksum \
 		--copy-links \
 		--delete-before \
@@ -154,24 +155,25 @@ synced:
 		${DIST}/ ${WEBSITE_SSH_USER}@${WEBSITE_HOST}:${TOOL_DEST}
 
 deploy:
-	touch ${env}.diff
+	@touch ${env}.diff
 
-	patch -p1 --reverse <development.diff
+	patch -p1 --reverse --silent <development.diff
 
-	patch -p1 <${env}.diff
-	bmake reconfig build sync env=${env}
+	patch -p1 --silent <${env}.diff
+	@bmake reconfig build sync env=${env}
 
-	patch -p1 --reverse <${env}.diff
+	@echo "--------"
 
-	patch -p1 <development.diff
-	bmake reconfig build env=development
+	patch -p1 --reverse --silent <${env}.diff
+
+	patch -p1 --silent <development.diff
+	@bmake reconfig build env=development
 
 reconfig:
+	@echo "Building settings.json - ${env}"
 	@echo '{}' \
 		| jq '.database = ${API_URL}' \
 		| jq '.storage = ${STORAGE_URL}' \
 		| jq '.mapbox_token = ${MAPBOX_TOKEN}' \
 		| jq '.mapbox_theme = ${MAPBOX_THEME}' \
 		> settings.json
-
-	@cat settings.json

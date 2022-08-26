@@ -14,7 +14,7 @@ GITCLEAN != [ "`git diff --stat`" = '' ] || echo "-dirty"
 
 default: reconfig build lint
 
-build: build-a build-s build-d
+build: build-a build-s
 	@cp views/index.html ${DIST}/index.html
 
 lint:
@@ -100,38 +100,6 @@ build-s:
 		${CSS}/views.css \
 		${CSS}/ripple.css \
 		> ${DIST}/s/main.css
-
-build-d:
-	@echo "Building test screen"
-	@mkdir -p ${DIST}/d
-
-	@mustache /dev/null ${VIEWS}/d.html > ${DIST}/d/index.html
-
-	@sed -ri 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/d/index.html
-
-	@cp ${CSS}/ripple.css ${DIST}/d/ripple.css
-	@cp ${SRC}/{cards,timeline,controls,controls-search,ds,parse,rasters,mapbox,overlord,plot,d}.js ${DIST}/d/
-
-	@cat \
-		${LIB}/d3.js \
-		${LIB}/geotiff.js \
-		${LIB}/mapbox-gl.js \
-		${LIB}/geojson-extent.js \
-		${LIB}/sphericalmercator.js \
-		${LIB}/helpers.js \
-		> ${DIST}/d/libs.js
-
-	@echo -n "window.ea_settings = " | cat - \
-		settings.json \
-		${SRC}/utils.js \
-		${SRC}/globals.js \
-		> ${DIST}/d/main.js
-
-	@cat \
-		${CSS}/general.css \
-		${CSS}/layout.css \
-		${CSS}/maparea.css \
-		> ${DIST}/d/main.css
 
 sync:
 	@echo ${GITSHA}${GITCLEAN} > ${DIST}/.sync-${env}

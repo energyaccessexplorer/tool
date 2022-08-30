@@ -287,9 +287,9 @@ function specs_set(fs, specs) {
 				c['dasharray'] = s['dasharray'];
 				fs[i].properties['__dasharray'] = mapbox_dasharray(s['dasharray']);
 			}
-
-			if (!criteria.find(x => same(x,c))) criteria.push(c);
 		}
+
+		if (!criteria.find(x => same(x,c))) criteria.push(c);
 
 		fs[i].properties['__criteria'] = c;
 	}

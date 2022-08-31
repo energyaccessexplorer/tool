@@ -328,6 +328,7 @@ This is fatal. Thanks for all the fish.`;
 			"select":       select,
 			"deployment":   `ov.{${ENV}}`,
 			"id":           `not.in.(${nd})`,
+			"flagged":      "is.false",
 		};
 
 		return API.get("datasets", p)

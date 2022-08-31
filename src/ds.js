@@ -63,18 +63,7 @@ export default class DS {
 
 		this.loaded = false;
 
-		if (!this.init(o)) return;
-
-		this.domain = o.category.domain;
-
-		this._domain = jsonclone(this.category.domain_init) || jsonclone(this.domain);
-
-		this.set_colorscale();
-
-		if (!this.disabled) {
-			this.card = new dscard(this);
-			this.controls = new dscontrols(this);
-		}
+		this.init(o);
 	};
 
 	init(o) {
@@ -110,7 +99,7 @@ This is not fatal but the dataset is now disabled.`,
 			indicator = true;
 		}
 
-		const ok = t => {
+		function ok(t) {
 			if (indicator && ['vectors', 'raster'].includes(t)) return true;
 
 			if (this.category.name === 'outline') return true;
@@ -133,7 +122,7 @@ This is not fatal but the dataset is now disabled.`,
 		if (o.category.vectors) {
 			let f = this.processed_files.find(x => x.func === 'vectors');
 
-			if (!f) go = ok('raster');
+			if (!f) go = ok.call(this, 'vectors');
 			else {
 				this.vectors = {};
 				Object.assign(this.vectors, o.category.vectors, f);
@@ -162,10 +151,12 @@ This is not fatal but the dataset is now disabled.`,
 			}
 		}
 
+		if (!go) return false;
+
 		if (o.category.raster) {
 			const f = this.processed_files.find(x => x.func === 'raster');
 
-			if (!f) go = ok('raster');
+			if (!f) go = ok.call(this, 'raster');
 			else {
 				this.raster = {};
 				Object.assign(this.raster, o.category.raster, f);
@@ -173,10 +164,12 @@ This is not fatal but the dataset is now disabled.`,
 			}
 		}
 
+		if (!go) return false;
+
 		if (o.category.csv) {
 			const f = this.source_files.find(x => x.func === 'csv');
 
-			if (!f) go = ok('csv');
+			if (!f) go = ok.call(this, 'csv');
 			else {
 				this.csv = {};
 				Object.assign(this.csv, o.category.csv, f);
@@ -188,6 +181,15 @@ This is not fatal but the dataset is now disabled.`,
 		}
 
 		if (!go) return false;
+
+		this.domain = o.category.domain;
+
+		this._domain = jsonclone(this.category.domain_init) || jsonclone(this.domain);
+
+		this.set_colorscale();
+
+		this.card = new dscard(this);
+		this.controls = new dscontrols(this);
 
 		switch (this.datatype) {
 		case 'points-timeline':

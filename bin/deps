@@ -19,7 +19,7 @@ if [ ! -d $DEST ]; then
 	mkdir -p $DEST
 fi
 
-function printline {
+printline() {
 	if [ -t 1 ]; then
 		echo -en "\e[1A"
 		echo -e "\e[0K\r$1"
@@ -28,7 +28,7 @@ function printline {
 	fi
 }
 
-function fetch {
+fetch() {
 	if curl --location \
 			--silent \
 			--fail \

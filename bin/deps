@@ -19,12 +19,16 @@ if [ ! -d $DEST ]; then
 	mkdir -p $DEST
 fi
 
-printline() {
-	echo -en "\e[1A"
-	echo -e "\e[0K\r$1"
+function printline {
+	if [ -t 1 ]; then
+		echo -en "\e[1A"
+		echo -e "\e[0K\r$1"
+	else
+		echo "$1"
+	fi
 }
 
-fetch() {
+function fetch {
 	if curl --location \
 			--silent \
 			--fail \

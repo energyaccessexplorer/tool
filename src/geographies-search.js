@@ -89,6 +89,25 @@ async function load(x,y) {
 		ce('span', "Up a level", { "style": "margin-left: 1em;"}),
 	);
 
+	resultsinfo.onclick = function(_) {
+		const x = U.divtier;
+
+		if (loaded_list === 0) return;
+
+		if (x === 0) {
+			ul.replaceChildren(...lists[0].map(x => x.li));
+			loaded_list = 0;
+			resultsinfo.replaceChildren(ce('span', "Top level", { "style": "margin-left: 1em; color: gray;" }));
+			return;
+		}
+
+		const d = GEOGRAPHY.divisions[x];
+		d.vectors.geojson.features.forEach(f => f.properties.__visible = true);
+		MAPBOX.getSource(d.id).setData(DST.get(d.id).vectors.geojson);
+
+		load(x - 1, geometry_path[x - 1]);
+	};
+
 	if (lists[x+1]) {
 		let tiers;
 		const at = DST.get('admin-tiers');
@@ -107,6 +126,11 @@ async function load(x,y) {
 		}).map(i => i.li));
 	} else {
 		resultsinfo.append(ce('span', "(No more subdivisions)", { "style": "margin-left: 1em; color: gray;" }));
+	}
+
+	if (!maybe(lists, x, 'length')) {
+		resultsinfo.replaceChildren(ce('span', "Already at top level", { "style": "margin-left: 1em; color: gray;" }));
+		resultsinfo.onclick = null;
 	}
 
 	loaded_list = x+1;
@@ -176,25 +200,6 @@ export async function init() {
 
 	resultscontainer.prepend(resultsinfo);
 	load(0,0);
-
-	resultsinfo.onclick = function(_) {
-		const x = U.divtier;
-
-		if (loaded_list === 0) return;
-
-		if (x === 0) {
-			ul.replaceChildren(...lists[0].map(x => x.li));
-			loaded_list = 0;
-			resultsinfo.replaceChildren(ce('span', "Top level", { "style": "margin-left: 1em; color: gray;" }));
-			return;
-		}
-
-		const d = GEOGRAPHY.divisions[x];
-		d.vectors.geojson.features.forEach(f => f.properties.__visible = true);
-		MAPBOX.getSource(d.id).setData(DST.get(d.id).vectors.geojson);
-
-		load(x - 1, geometry_path[x - 1]);
-	};
 
 	input.oninput = function(_) {
 		trigger(this.value);

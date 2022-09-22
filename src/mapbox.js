@@ -235,12 +235,51 @@ export function info_mode_change() {
 	}
 };
 
+async function worldview() {
+	let v = "US";
+	switch (GEOGRAPHY.circle) {
+	case "india":
+		v = "IN";
+		break;
+
+	default:
+		break;
+	}
+
+	if (!MAPBOX.getLayer('admin-0-boundary-disputed')) return;
+
+	MAPBOX.setFilter('admin-0-boundary-disputed', [
+		'all',
+		['==', ['get', 'disputed'], 'true'],
+		['==', ['get', 'admin_level'], 0],
+		['==', ['get', 'maritime'], 'false'],
+		['match', ['get', 'worldview'], ['all', v], true, false],
+	]);
+
+	MAPBOX.setFilter('admin-0-boundary', [
+		'all',
+		['==', ['get', 'admin_level'], 0],
+		['==', ['get', 'disputed'], 'false'],
+		['==', ['get', 'maritime'], 'false'],
+		['match', ['get', 'worldview'], ['all', v], true, false],
+	]);
+
+	MAPBOX.setFilter('admin-0-boundary-bg', [
+		'all',
+		['==', ['get', 'admin_level'], 0],
+		['==', ['get', 'maritime'], 'false'],
+		['match', ['get', 'worldview'], ['all', v], true, false],
+	]);
+}
+
 export function change_theme(theme, soft) {
-	function go() {
+	async function go() {
 		const c = MAPBOX.getStyle().layers.find(l => l.type === 'symbol');
 		MAPBOX.first_symbol = maybe(c, 'id');
 
-		if (O.theme_changed) O.theme_changed();
+		await O.theme_changed();
+
+		worldview();
 	};
 
 	MAPBOX.once('style.load', go);

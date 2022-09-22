@@ -104,38 +104,36 @@ build-s:
 sync:
 	@echo ${GITSHA}${GITCLEAN} > ${DIST}/.sync-${env}
 
-	@rsync -OPrv \
-		--quiet \
+	@rsync -OPr \
 		--checksum \
 		--copy-links \
 		--delete-before \
 		--exclude=files \
+		--info=name1,progress0 \
 		${DIST}/ ${WEBSITE_SSH_USER}@${WEBSITE_HOST}:${TOOL_DEST}
 
 synced:
-	@rsync -OPrv \
+	@rsync -OPr \
 		--dry-run \
-		--info=FLIST0 \
 		--checksum \
 		--copy-links \
 		--delete-before \
 		--exclude=files \
+		--info=name1,progress0 \
 		${DIST}/ ${WEBSITE_SSH_USER}@${WEBSITE_HOST}:${TOOL_DEST}
 
 deploy:
 	@touch ${env}.diff
 
 	patch -p1 --reverse --silent <development.diff
-
 	patch -p1 --silent <${env}.diff
-	@bmake reconfig build sync env=${env}
+	bmake reconfig build sync env=${env}
 
 	@echo "--------"
 
 	patch -p1 --reverse --silent <${env}.diff
-
 	patch -p1 --silent <development.diff
-	@bmake reconfig build env=development
+	bmake reconfig build env=development
 
 reconfig:
 	@echo "Building settings.json - ${env}"

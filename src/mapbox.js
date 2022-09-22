@@ -2,7 +2,7 @@ import bubblemessage from '../lib/bubblemessage.js';
 
 const default_styles = [{
 	"name":  "Light (default)",
-	"value": "mapbox/basic-v9",
+	"value": "mapbox/light-v10",
 }, {
 	"name":  "Satellite",
 	"value": "mapbox/satellite-streets-v11",

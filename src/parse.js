@@ -394,8 +394,9 @@ export function lines() {
 			);
 
 			this.add_source({
-				"type": "geojson",
-				"data": this.vectors.geojson,
+				"type":      "geojson",
+				"data":      this.vectors.geojson,
+				"tolerance": 0,
 			});
 
 			this.add_layers({
@@ -403,8 +404,8 @@ export function lines() {
 				"filter": ['get', '__visible'],
 				"layout": {
 					"visibility": 'none',
-					"line-cap":   'round',
-					"line-join":  'round',
+					"line-cap":   'butt',
+					"line-join":  'miter',
 				},
 				"paint": {
 					"line-color":     ['get', '__stroke'],

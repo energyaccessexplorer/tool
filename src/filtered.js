@@ -4,7 +4,7 @@ import {
 
 import DS from './ds.js';
 
-export const colors_array = ["transparent", "red", "#0059ff", "yellow"];
+export const colors_array = ["transparent", "red", "#0059ff", "#d6d600", "green", "black"];
 
 function pointto(f, dsname, name) {
 	const ext = geojsonExtent(f);

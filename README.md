@@ -29,11 +29,11 @@ Other minor plugins/functions are used. See `dependencies.tsv`.
 Assumptions made:
 
 - standard Unix-like environment (cat, sed, echo, rsync, bmake...)
-- an Energy Access Explorer API is running. See
-  [database](https://github.com/energyaccessexplorer/database) and
-  [PostgREST](https://postgrest.org)
-- (optionally) the website is running. See
+- Energy Access Explorer infrastructure:
+  [database](https://github.com/energyaccessexplorer/database),
+  [API](https://github.com/energyaccessexplorer/api) and
   [website](https://github.com/energyaccessexplorer/website)
+  should be up and running.
 
 The `makefile` (BSDmake) contains basic tasks for development/deployment. To get
 started, edit the `.env` file to match your needs.

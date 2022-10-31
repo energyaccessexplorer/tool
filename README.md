@@ -36,10 +36,9 @@ Assumptions made:
   [website](https://github.com/energyaccessexplorer/website)
 
 The `makefile` (BSDmake) contains basic tasks for development/deployment. To get
-started, you will need to set up a `.env` file with the necessary variables for
-`make` to work.
+started, edit the `.env` file to match your needs.
 
-Now you can run in development mode with (maybe `bmake` if you are in Linux):
+Now you can run in development mode with (`bmake` in Linux):
 
     $ make build start
 

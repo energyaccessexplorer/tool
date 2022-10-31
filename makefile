@@ -1,4 +1,4 @@
-.include <env.mk>
+.include ".env"
 
 DIST = ./dist
 SRC = ./src

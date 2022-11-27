@@ -129,7 +129,7 @@ const steps = [
 			controls_dig(this.ds);
 		},
 		"wait": function() {
-			return this.ds.on && this.ds.layers.length;
+			return this.ds.on && this.ds.layers.length && qs('[slot=range-slider] .svg-interval', this.ds.controls);
 		},
 		"mock": {
 			"el":     function() { return qs('header', this.el); },

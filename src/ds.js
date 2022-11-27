@@ -174,8 +174,8 @@ This is not fatal but the dataset is now disabled.`,
 				this.csv = {};
 				Object.assign(this.csv, o.category.csv, f);
 
-				this.csv.key = maybe(this.config, 'csv_columns', 'key');
-				this.csv.value = maybe(this.config, 'csv_columns', 'value');
+				this.csv.key = maybe(this.config, 'polygons_valued_columns', 'key');
+				this.csv.value = maybe(this.config, 'polygons_valued_columns', 'value');
 				this.csv.parse = parse_csv.bind(this);
 			}
 		}

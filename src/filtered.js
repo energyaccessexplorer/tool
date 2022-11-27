@@ -31,7 +31,7 @@ export function valued_polygons() {
 				if (d.datatype.match("polygons-(timeline)"))
 					c = U.timeline;
 				else if (d.datatype.match("polygons-(valued|boundaries)"))
-					c = d.config.csv_columns.value;
+					c = d.config.polygons_valued_columns.value;
 
 				const v = +r[c];
 				return and(v >= d._domain.min, v <= d._domain.max);

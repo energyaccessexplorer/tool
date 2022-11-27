@@ -22,7 +22,7 @@ export function valued_polygons() {
 
 	lists.replaceChildren();
 
-	const datasets = DS.array.filter(d => and(d.on, d.datatype.match("polygons-(fixed|timeline)"), maybe(d, 'csv', 'data')));
+	const datasets = DS.array.filter(d => and(d.on, d.datatype.match("polygons-(valued|timeline)"), maybe(d, 'csv', 'data')));
 
 	function matches(d) {
 		return d.csv.data
@@ -30,7 +30,7 @@ export function valued_polygons() {
 				let c;
 				if (d.datatype.match("polygons-(timeline)"))
 					c = U.timeline;
-				else if (d.datatype.match("polygons-(fixed|boundaries)"))
+				else if (d.datatype.match("polygons-(valued|boundaries)"))
 					c = d.config.csv_columns.value;
 
 				const v = +r[c];

@@ -115,7 +115,7 @@ This is fatal. Thanks for all the fish.`;
 };
 
 async function plot() {
-	if (this.datatype === 'polygons-fixed') ;
+	if (this.datatype === 'polygons-valued') ;
 	else if (this.raster)
 		await until(_ => typeof this.drawraster === 'function');
 
@@ -152,7 +152,7 @@ async function plot() {
 		break;
 	}
 
-	case 'polygons-fixed': {
+	case 'polygons-valued': {
 		FLASH.push({
 			"type":    'info',
 			"timeout": 0,
@@ -247,7 +247,7 @@ I haven't done this yet...`);
 		throw new Error("WIP");
 	}
 
-	if (this.datatype === 'polygons-fixed') ;
+	if (this.datatype === 'polygons-valued') ;
 	else if (this.raster) {
 		this.drawraster(this.id + "-raster");
 		MAPBOX.setLayoutProperty(this.id + "-raster", 'visibility', 'visible');

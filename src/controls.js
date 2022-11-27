@@ -497,7 +497,7 @@ function range_group_controls() {
 		break;
 	}
 
-	case 'polygons-fixed':
+	case 'polygons-valued':
 	case 'polygons-timeline': {
 		this.range_group = range.call(this.ds, {
 			"ramp":    lr,

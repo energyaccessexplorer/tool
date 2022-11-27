@@ -195,7 +195,7 @@ This is not fatal but the dataset is now disabled.`,
 		case 'points-timeline':
 		case 'lines-timeline':
 		case 'polygons-timeline':
-		case 'polygons-fixed':
+		case 'polygons-valued':
 		case 'points':
 		case 'lines':
 		case 'polygons': {
@@ -431,7 +431,7 @@ This is not fatal but the dataset is now disabled.`,
 		let opts;
 
 		switch (this.datatype) {
-		case 'polygons-fixed': {
+		case 'polygons-valued': {
 			if (this.csv.key) {
 				opts = {
 					"stops": this.category.colorstops,
@@ -543,7 +543,7 @@ This is not fatal but the dataset is now disabled.`,
 
 			await this.loadall();
 
-			// make sure polygons-fixed have decided their _domain
+			// make sure polygons-valued have decided their _domain
 			//
 			if (maybe(this, '_domain', 'min') === undefined) {
 				try {
@@ -617,7 +617,7 @@ This is not fatal but the dataset is now disabled.`,
 			break;
 		}
 
-		case 'polygons-fixed':
+		case 'polygons-valued':
 		case 'polygons-timeline':
 		case 'polygons-boundaries':
 		case 'polygons': {

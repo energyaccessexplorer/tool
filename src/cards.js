@@ -167,7 +167,7 @@ function svg_el() {
 		break;
 	}
 
-	case 'polygons-fixed':
+	case 'polygons-valued':
 	case 'polygons-timeline': {
 		const r = tmpl('#ramp');
 

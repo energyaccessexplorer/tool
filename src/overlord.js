@@ -573,7 +573,7 @@ function reset_features_visibility() {
 
 	const source = MAPBOX.getSource(this.id);
 	if (source) source.setData(fs);
-	else console.warn("reset_features_visibility: could not find source: %s. First load? -> Seems OK.", this.id);
+	else console.debug("reset_features_visibility: could not find source '%s'. First load? -> OK.", this.id);
 };
 
 function extent_contained(extent, raster) {

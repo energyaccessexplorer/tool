@@ -201,7 +201,7 @@ export function datasets(type) {
 			if (d.datatype === 'polygons-boundaries') return false;
 
 			if (!and(d.domain, d._domain)) {
-				console.log(`Discarding '${d.id}'. Domain is not set yet...`);
+				console.debug(`Discarding '${d.id}'. Domain is not set yet.`);
 				return false;
 			}
 
@@ -304,7 +304,10 @@ export async function analysis(type) {
 
 export function priority(d, a, i) {
 	const source = MAPBOX.getSource(`priority-source-${i}`);
-	if (!source) return;
+	if (!source) {
+		console.debug(`priority-source-${i}: not yet...`);
+		return;
+	}
 
 	const g = d.raster.data;
 

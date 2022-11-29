@@ -10,7 +10,7 @@ import {
 } from './analysis.js';
 
 import {
-	load as config_load,
+	load_datasets as config_load_datasets,
 } from './config.js';
 
 import {
@@ -217,14 +217,11 @@ export default class Overlord {
 	};
 
 	load_config(c = JSON.parse(localStorage.getItem('config'))) {
-		config_load(c);
+		config_load_datasets(c);
 
 		const arr = c.datasets.filter(x => DST.get(x.name));
 
-		arr.forEach(i => {
-			const ds = DST.get(i.name);
-			if (ds) ds.active(true, true);
-		});
+		arr.forEach(x => x.active(true, true));
 
 		U.inputs = arr.map(i => i.name);
 

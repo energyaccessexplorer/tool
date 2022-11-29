@@ -31,10 +31,6 @@ import {
 } from './mapbox.js';
 
 import {
-	load as config_load,
-} from './config.js';
-
-import {
 	init as cards_init,
 	update as cards_update,
 } from './cards.js';
@@ -180,14 +176,11 @@ async function init_1() {
 async function init_2() {
 	const url = new URL(location);
 
+	const conf = localStorage.getItem('config');
 
 	await dsinit(GEOGRAPHY.id);
 
-	const conf = localStorage.getItem('config');
-	if (conf) {
-		config_load(JSON.parse(conf));
-		localStorage.removeItem('config');
-	}
+	if (conf) O.load_config();
 
 	U.inputs = U.inputs.slice(0); // cleanup non-existent ids
 	U.variant = U.variant || 'raster';

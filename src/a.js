@@ -27,7 +27,7 @@ import {
 import {
 	init as mapbox_init,
 	fit as mapbox_fit,
-	change_theme as mapbox_change_theme,
+	theme_init as mapbox_theme_init,
 } from './mapbox.js';
 
 import {
@@ -134,7 +134,14 @@ const Uproxy = {
 	},
 };
 
-export async function init() {
+export function init() {
+	Whatever
+		.then(init_1)
+		.then(init_2)
+		.then(init_3);
+};
+
+async function init_1() {
 	const url = new URL(location);
 	const id = url.searchParams.get('id');
 
@@ -142,6 +149,21 @@ export async function init() {
 		"id":     `eq.${id}`,
 		"select": ['*', 'parent_sort_branches', 'parent_sort_subbranches', 'parent_sort_datasets'],
 	}, { "one": true });
+
+	MOBILE = screen.width < 1152;
+	layout();
+
+	O = new Overlord();
+
+	MAPBOX = mapbox_init();
+	MAPBOX.coords = mapbox_fit(GEOGRAPHY.envelope);
+
+	if (MOBILE) mobile();
+
+	drawer_init();
+
+	mapbox_theme_init(ea_settings.mapbox_theme);
+
 	GEOGRAPHY.timeline = maybe(GEOGRAPHY, 'configuration', 'timeline');
 	GEOGRAPHY.timeline_dates = maybe(GEOGRAPHY, 'configuration', 'timeline_dates');
 
@@ -152,14 +174,12 @@ export async function init() {
 	if (GEOGRAPHY.timeline)
 		PARAMS = ea_params['timeline'];
 
-	MOBILE = screen.width < 1152;
-	layout();
-
 	U = new Proxy(url, Uproxy);
-	O = new Overlord();
+};
 
-	MAPBOX = mapbox_init();
-	MAPBOX.coords = mapbox_fit(GEOGRAPHY.envelope);
+async function init_2() {
+	const url = new URL(location);
+
 
 	await dsinit(GEOGRAPHY.id);
 
@@ -181,12 +201,9 @@ export async function init() {
 	analysissearch_init();
 	locationssearch_init();
 
-	if (MOBILE) mobile();
-
 	views_init();
 	indexes_init();
 
-	drawer_init();
 	toggle_left_panel();
 
 	if (GEOGRAPHY.timeline) timeline_init();
@@ -201,17 +218,16 @@ export async function init() {
 		}
 	}
 
-	await Promise.all(U.inputs.map(i => {
-		const d = DST.get(i);
-		return d._active(true, false);
-	})).then(_ => {
-		cards_update();
-		mapbox_change_theme(ea_settings.mapbox_theme, false);
-	});
-
-	loading(false);
+	await Promise.all(U.inputs.map(i => DST.get(i)._active(true, false)));
 
 	if (url.searchParams.get('qa')) qa_run();
+};
+
+async function init_3() {
+	O.view = U.view;
+	cards_update();
+
+	loading(false);
 };
 
 export function clean() {

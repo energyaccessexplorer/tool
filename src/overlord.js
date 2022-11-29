@@ -228,9 +228,6 @@ export default class Overlord {
 
 		U.inputs = arr.map(i => i.name);
 
-		load_view();
-		cards_update();
-
 		return c;
 	};
 };

@@ -119,6 +119,10 @@ export function init() {
 	return mb;
 };
 
+export function theme_init(theme) {
+	MAPBOX.setStyle(theme_pick(ea_settings.mapbox_theme = theme));
+};
+
 function projection_control_popup(_) {
 	let x = ce('div', null, { "class": 'mapbox-control-popup' });
 	let radios = ce('div');

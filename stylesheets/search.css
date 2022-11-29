@@ -2,7 +2,7 @@
   display: flex;
   flex: 1;
   overflow: hidden;
-  width: 36em;
+  min-width: 36em;
   user-select: none;
   flex-flow: column;
   border-top: solid 1px transparent;

@@ -17,7 +17,7 @@ body {
 
 #left-pane {
   display: flex;
-  flex-flow: column wrap;
+  flex-flow: row;
   flex: 0;
   margin-top: -1px;
 }
@@ -62,8 +62,7 @@ body {
 }
 
 #filtered-pane,
-#indexes-pane,
-#cards-pane {
+#indexes-pane {
   display: flex;
   flex-grow: 1;
   flex-flow: column nowrap;
@@ -170,4 +169,10 @@ body {
 canvas#output {
   max-height: 300px;
   max-width: 100%;
+}
+
+#canvas-output-select {
+  border: none;
+  font-size: 1em;
+  background-color: white;
 }

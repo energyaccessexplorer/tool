@@ -1,19 +1,7 @@
-#cards-pane {
-  background-color: var(--the-white);
-}
-
 #cards-list {
   margin: 0;
   padding: 0;
   list-style-type: none;
-  background-color: var(--the-white);
-  overflow-y: scroll;
-}
-
-#canvas-output-select {
-  border: none;
-  font-size: 1em;
-  background-color: white;
 }
 
 #cards-clear-all {

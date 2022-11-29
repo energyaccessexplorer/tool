@@ -186,6 +186,10 @@
       position: relative;
     }
 
+    :host(:hover) buttons {
+      visibility: visible;
+    }
+
     header {
       display: flex;
       flex-flow: row nowrap;
@@ -219,12 +223,6 @@
       margin-right: 5px;
     }
 
-    [layout=info],
-    [layout=close],
-    [layout=opacity] {
-      margin-left: 10px;
-    }
-
     [name=info] svg {
       width: 18px;
       margin-top: -2px;
@@ -237,17 +235,24 @@
       color: gray;
     }
 
-    .handle {
-      display: block;
+    handle {
+      display: flex;
       width: 22px;
-      margin-top: 10px;
       margin-left: 2px;
+      align-items: center;
 
-      color: #aaa;
+      color: #ccc;
       font-size: 1.8em;
 
       cursor: grab;
       cursor: -webkit-grab;
+    }
+
+    buttons {
+      display: flex;
+      flex-flow: column nowrap;
+      margin: 0 7px 0 10px;
+      visibility: hidden;
     }
 
     [name=ramp] {
@@ -276,27 +281,15 @@
     }
   </style>
 
-  <div class="handle">
+  <handle>
     <i class="bi bi-grip-vertical"></i>
-  </div>
+  </handle>
 
   <main>
     <header>
       <div layout="title">
         <slot name="name"></slot>
         <slot name="unit"></slot>
-      </div>
-
-      <div layout="opacity">
-        <slot name="opacity"></slot>
-      </div>
-
-      <div layout="info">
-        <slot name="info"></slot>
-      </div>
-
-      <div layout="close">
-        <slot name="close"></slot>
       </div>
     </header>
 
@@ -305,6 +298,24 @@
       <slot name="ramp"></slot>
     </content>
   </main>
+
+  <buttons>
+    <div layout="close">
+      <slot name="close"></slot>
+    </div>
+
+    <div layout="info">
+      <slot name="info"></slot>
+    </div>
+
+    <div layout="ctrls">
+      <slot name="ctrls"></slot>
+    </div>
+
+    <div layout="opacity">
+      <slot name="opacity"></slot>
+    </div>
+  </buttons>
 </template>
 
 <template id="opacity-control">

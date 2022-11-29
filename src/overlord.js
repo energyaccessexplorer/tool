@@ -662,7 +662,7 @@ export async function analysis_to_dataset(t) {
 	U.inputs = [d.id].concat(U.inputs);
 	O.view = 'inputs';
 
-	qs('#cards-pane #cards-list').prepend(d.card);
+	qs('#cards #cards-list').prepend(d.card);
 
 	await until(_ => maybe(d, 'raster', 'data'));
 

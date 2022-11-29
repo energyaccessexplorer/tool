@@ -6,31 +6,27 @@
 
 #controls-tabs {
   display: flex;
-  flex-flow: column nowrap;
   background-color: white;
 }
 
 #controls-contents {
   flex: 1;
   flex-grow: 1;
-  border-left: solid 1px #d9d9d9;
   background-color: var(--the-white);
 
-  overflow-y: scroll;
   overflow-x: hidden;
 }
 
 .controls-branch-tab {
   font-size: 1.14em;
   line-height: 2em;
-  padding: 0.4em 2em;
+  padding: 0.4em 1em;
   white-space: nowrap;
   text-align: left;
   font-weight: normal;
 
   position: sticky;
   top: 0;
-  margin-bottom: 1px;
 }
 
 .controls-subbranch-title {
@@ -43,6 +39,11 @@
 
   position: sticky;
   top: 0;
+}
+
+.controls-subbranch:first-child,
+.controls-subbranch[style*="display:none"] + .controls-subbranch {
+  border-top: solid 1px #d9d9d9;
 }
 
 .controls-subbranch-title .triangle {
@@ -59,9 +60,7 @@
 #controls .search-results {
   padding: 0;
   margin: 0;
-  display: flex;
   flex-flow: row nowrap;
-  overflow: hidden;
 }
 
 input[bind="max"]::-webkit-outer-spin-button,

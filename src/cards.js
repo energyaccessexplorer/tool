@@ -213,7 +213,7 @@ function svg_el() {
 };
 
 export function init() {
-	const list = qs('#cards-pane #cards-list');
+	const list = qs('#cards #cards-list');
 
 	sortable(list, {
 		'items':                'ds-card',
@@ -236,11 +236,11 @@ export function init() {
 		O.view = U.view;
 	};
 
-	qs('#cards-pane').prepend(ca);
+	qs('#cards').prepend(ca);
 };
 
 export function update() {
-	const cards_list = qs('#cards-pane #cards-list');
+	const cards_list = qs('#cards #cards-list');
 
 	const ldc = U.inputs.reverse().map(i => DST.get(i).card);
 	const empty = cards_list.children.length === 0;

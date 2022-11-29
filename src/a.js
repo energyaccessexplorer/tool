@@ -390,11 +390,10 @@ function layout() {
 
 	if (GEOGRAPHY.timeline) {
 		const g = tmpl('#timeline-graphs-template');
-		qs('#cards-pane').append(g);
-		qs('#filtered-pane').append(o);
-	} else {
-		qs('#cards-pane').append(o);
+		console.warn("Append #timeline-graphs-template somewhere", g);
 	}
+
+	qs('#right-pane').insertBefore(o, qs('#drawer-right-pane'));
 
 	document.body.onresize = function() {
 		set_heights();

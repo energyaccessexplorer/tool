@@ -1,6 +1,6 @@
 import DS from './ds.js';
 
-export function load(conf) {
+export function load_datasets(conf) {
 	const list = DS.array.filter(d => conf.datasets.find(t => t.id === d.dataset_id || t.name === d.id));
 
 	conf.datasets.forEach(d => {

@@ -30,6 +30,8 @@ export function init() {
 	for (let v in ea_views) {
 		if (!PARAMS.view.includes(v)) continue;
 
+		if (v === 'filtered' && !GEOGRAPHY.configuration.filtered_geographies) continue;
+
 		const btn = ce('div', ea_views[v]['name'], { "class": 'view up-title', "id": 'view-' + v, "ripple": '' });
 
 		if (U.view === v) btn.classList.add('active');

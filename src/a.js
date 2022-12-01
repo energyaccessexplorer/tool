@@ -147,6 +147,7 @@ async function init_1() {
 	}, { "one": true });
 
 	MOBILE = screen.width < 1152;
+	GEOGRAPHY.timeline = maybe(GEOGRAPHY, 'configuration', 'timeline');
 	layout();
 
 	O = new Overlord();
@@ -160,7 +161,6 @@ async function init_1() {
 
 	mapbox_theme_init(ea_settings.mapbox_theme);
 
-	GEOGRAPHY.timeline = maybe(GEOGRAPHY, 'configuration', 'timeline');
 	GEOGRAPHY.timeline_dates = maybe(GEOGRAPHY, 'configuration', 'timeline_dates');
 
 	session_init();
@@ -359,38 +359,15 @@ This is fatal. Thanks for all the fish.`;
 };
 
 function layout() {
-	if (maybe(GEOGRAPHY, 'timeline'))
-		qs('#visual').append(ce('div', null, { "id": 'timeline' }));
-
 	const n = qs('nav');
 	const p = qs('#playground');
 	const w = qs('#mobile-switcher');
 
 	const m = qs('#maparea', p);
-	const b = qs('#mapbox-container', m);
-	const v = qs('#views', m);
 	const t = qs('#timeline');
 
-	const l = qs('#left-pane', p);
-	const d = qs('#drawer', p);
-	const g = qs('#geographies', p);
-
-	const r = qs('#right-pane', p);
-
 	function set_heights() {
-		const h = window.innerHeight - n.clientHeight - (MOBILE ? w.clientHeight : 0);
-
-		p.style['height'] =
-			l.style['height'] =
-			g.style['height'] =
-			m.style['height'] =
-			b.style['height'] =
-			d.style['height'] =
-			r.style['height'] = h + "px";
-
-		b.style['height'] = (h - (MOBILE ? v.clientHeight : 0)) + "px";
-
-		if (t) b.style['height'] = m.style['height'] = h - t.clientHeight + "px";
+		p.style['height'] = window.innerHeight - n.clientHeight - (MOBILE ? w.clientHeight : 0) + "px";
 	};
 
 	if (MOBILE) m.style['width'] = screen.width + "px";

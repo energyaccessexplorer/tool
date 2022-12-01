@@ -4,9 +4,11 @@ body {
 
 #playground {
   display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
 
   width: 100%;     /* will be changed by JS */
-  height: 100%;    /* will be changed by JS */
+  height: auto;    /* will be changed by JS */
 
   padding: 0;
   font-size: 0.9em;
@@ -14,6 +16,8 @@ body {
 
 #left-pane {
   display: flex;
+  flex-grow: 0;
+  flex-flow: column wrap;
   margin-top: -1px;
 }
 
@@ -22,7 +26,10 @@ body {
 }
 
 #visual {
+  display: flex;
   flex-grow: 1;
+  flex-shrink: 0;
+  flex-flow: column nowrap;
   position: relative;
 }
 
@@ -34,9 +41,11 @@ body {
 }
 
 #maparea {
+  flex: 1;
   position: relative;
   width: 100%;
   height: auto;
+  flex-grow: 1;
   padding: 0;
   margin: auto;
 }

@@ -277,6 +277,9 @@ function multiline(opts) {
 };
 
 export async function init() {
+	if (maybe(GEOGRAPHY, 'timeline'))
+		qs('#visual').append(ce('div', null, { "id": 'timeline' }));
+
 	await until(_ => GEOGRAPHY.timeline_dates.length > 0);
 
 	const steps = GEOGRAPHY.timeline_dates.map(x => parseInt(x.replace('(^[0-9]{4}-)', '\\1'))); // <- \/\/ due to strict mode in modules

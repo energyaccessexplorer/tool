@@ -131,7 +131,7 @@ export function init() {
 	cos.value = U.output;
 	cos.onchange = x => { O.index = x.target.value; };
 
-	const toolbox = qs('#index-graphs-toolbox');
+	const toolbox = qs('#index-layer-toolbox');
 	const tools = {
 		"index-graphs-opacity": "Change opacity of the analysis layer",
 		"index-graphs-info":    "Info about different indexes",

@@ -1,18 +1,18 @@
 #filtered-pane {
+  display: flex;
+  flex-flow: column;
   background-color: white;
-  justify-content: space-between;
 }
 
 #filtered-pane .up-title {
   padding: 0.7em 1em;
-  text-align: left;
+  text-align: center;
 }
 
 #filtered-subgeographies {
   flex-grow: 1;
+  flex-basis: 0;
   overflow-y: scroll;
-  background-color: #F8F8F8;
-  border-bottom: 1px solid lightgray;
 }
 
 #filtered-subgeographies details {

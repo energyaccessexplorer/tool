@@ -14,8 +14,6 @@ body {
 
 #left-pane {
   display: flex;
-  flex-grow: 0;
-  flex-flow: column wrap;
   margin-top: -1px;
 }
 
@@ -56,12 +54,8 @@ body {
 
 #filtered-pane,
 #indexes-pane {
-  display: flex;
   flex-grow: 1;
-  flex-flow: column nowrap;
-
-  height: 100%;
-  width: inherit;
+  border-top: 1px solid lightgray;
 }
 
 #cards-list {
@@ -157,6 +151,7 @@ body {
 #canvas-output-select {
   display: block;
   padding: 0.7em 1em;
+  width: 100%;
 }
 
 canvas#output {

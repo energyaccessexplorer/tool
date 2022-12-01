@@ -80,25 +80,26 @@
       </div>
 
       <div id="right-pane">
+        <button id="summary-button" class="big-green-button">Report</button>
+
         <div id="filtered-pane" style="display: none;">
           <div class="up-title">Considered geographies</div>
           <div id="filtered-subgeographies"></div>
         </div>
 
-        <div id="indexes-pane" style="display: none;">
+        <div id="indexes-pane">
           <div id="index-graphs">
             <div id="index-graphs-title" class="up-title"></div>
             <div id="index-graphs-description"></div>
-            <div id="index-graphs-toolbox"></div>
           </div>
+
+          <div id="index-layer-toolbox"></div>
 
           <table id="indexes-list"></table>
 
           <select id="output-variant-select">
             <option value="raster">Raster Analysis</option>
           </select>
-
-          <div id="summary-button" class="up-title" ripple>Snapshot</div>
         </div>
 
         <div id="drawer-right-pane">

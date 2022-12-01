@@ -354,6 +354,8 @@ function load_view() {
 				priority_visibility_pick();
 			});
 
+		views_right_pane();
+
 		break;
 	}
 
@@ -385,6 +387,8 @@ function load_view() {
 
 		filtered_valued_polygons();
 
+		views_right_pane();
+
 		break;
 	}
 
@@ -411,7 +415,6 @@ function load_view() {
 	}
 
 	views_buttons();
-	views_right_pane();
 
 	session_snapshot();
 };

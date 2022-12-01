@@ -10,6 +10,10 @@ a {
     outline: none;
 }
 
+button {
+  font-family: without-serif, sans-serif !important;
+}
+
 .big-green-button {
   text-align: center;
   margin: 1em;
@@ -162,6 +166,7 @@ bubble-message .bubble-message-close-button::before {
 .bottom-right-container {
   background-color: white;
   text-align: center;
+  border-top: solid 1px lightgray;
 }
 
 @keyframes pulse {

@@ -4,11 +4,10 @@ body {
 
 #playground {
   display: flex;
-  flex-flow: row nowrap;
-
   flex-direction: row;
+  flex-wrap: nowrap;
 
-  width: auto;     /* will be changed by JS */
+  width: 100%;     /* will be changed by JS */
   height: auto;    /* will be changed by JS */
 
   padding: 0;
@@ -17,8 +16,8 @@ body {
 
 #left-pane {
   display: flex;
+  flex-grow: 0;
   flex-flow: column wrap;
-  flex: 0;
   margin-top: -1px;
 }
 
@@ -27,9 +26,9 @@ body {
 }
 
 #visual {
+  display: flex;
   flex: 1 0;
-  flex-flow: row nowrap;
-
+  flex-flow: column nowrap;
   position: relative;
 }
 
@@ -41,10 +40,11 @@ body {
 }
 
 #maparea {
-  position: relative;
   flex: 1;
-  width: 100%;    /* will be changed by JS */
-  height: auto;    /* will be changed by JS */
+  position: relative;
+  width: 100%;
+  height: auto;
+  flex-grow: 1;
   padding: 0;
   margin: auto;
 }
@@ -52,7 +52,6 @@ body {
 #right-pane {
   display: flex;
   flex-flow: column nowrap;
-  justify-content: space-between;
 
   width: 24em;
 }

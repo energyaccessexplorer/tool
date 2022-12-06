@@ -184,6 +184,8 @@ export default class dscard extends HTMLElement {
 			'close':   this.close(),
 		}));
 
+		this.legends();
+
 		return this;
 	};
 
@@ -201,7 +203,7 @@ export default class dscard extends HTMLElement {
 	};
 
 	legends() {
-		if (this.ds.criteria.length < 2) return;
+		if (!this.ds.criteria || this.ds.criteria.length < 2) return;
 
 		const ul = ce('div', null, { "style": "font-size: smaller;" });
 

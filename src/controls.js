@@ -99,8 +99,8 @@ export default class dscontrols extends HTMLElement {
 	};
 
 	turn(t) {
-		this.content.style.display = t ? 'block' : 'none';
 		this.main.classList[this.ds.on ? 'add' : 'remove']('active');
+		this.classList[this.ds.on ? 'add' : 'remove']('active');
 
 		if (this.checkbox) this.checkbox.change(t);
 
@@ -139,6 +139,7 @@ export default class dscontrols extends HTMLElement {
 			);
 
 			title.prepend(ce('span', null, { "class": 'collapse triangle' }));
+			title.append(ce('span', "0", { "class": 'count' }));
 			title.addEventListener('mouseup', _ => elem_collapse(conel, el));
 
 			elem_collapse(conel, el);
@@ -171,7 +172,6 @@ export default class dscontrols extends HTMLElement {
 		this.loading(true);
 
 		this.spinner.remove();
-		this.content.remove();
 		this.dropdown.remove();
 
 		if (this.checkbox) this.checkbox.svg.remove();

@@ -532,7 +532,10 @@ This is not fatal but the dataset is now disabled.`,
 	};
 
 	active() {
-		this._active(...arguments);
+		return this._active(...arguments)
+			.then(_ => {
+				if (!this.card) this.card = new dscard(this);
+			});
 	};
 
 	async _active(v, draw) {

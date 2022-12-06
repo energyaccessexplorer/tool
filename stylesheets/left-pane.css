@@ -5,7 +5,7 @@
   background-color: white;
 }
 
-#left-pane #drawer {
+#drawer {
   display: block;
   flex: 0;
   min-height: 100%;
@@ -13,7 +13,7 @@
   border-right: 1px solid lightgray;
 }
 
-#left-pane #drawer a {
+#drawer a {
   margin: 0;
   height: 3em;
   line-height: 3em;
@@ -24,7 +24,7 @@
   color: var(--the-color);
 }
 
-#left-pane #drawer a.active {
+#drawer a.active {
   box-shadow: inset 0px 0px 5px rgba(0, 0, 0, 0.05);
   background-color: rgba(0, 0, 0, 0.07);
 }

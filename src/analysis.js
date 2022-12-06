@@ -45,7 +45,10 @@ export default async function run(type) {
 	// analysis.
 	//
 	const singles = {};
-	for (let i in ea_indexes) if (!ea_indexes[i].compound) singles[i] = 0;
+	for (let i in ea_indexes) {
+		const compound = ea_indexes[i].compound;
+		if (compound.length < 2) singles[i] = 0;
+	}
 
 	const tots = list.reduce((a,d) => {
 		if (filter_types.indexOf(d.analysis_scale(type)) > -1) ;

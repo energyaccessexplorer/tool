@@ -53,7 +53,7 @@ data sets under both Demand and Supply categories.`,
 
 	"demand": {
 		"name":        "Demand Index",
-		"compound":    null,
+		"compound":    ["demand"],
 		"description": "Current and/or potential",
 		"info":        `
 The Demand Index identifies areas with higher energy demand which are characterized with
@@ -63,7 +63,7 @@ under Demographics and Socio-economic activities.`,
 
 	"supply": {
 		"name":        "Supply Index",
-		"compound":    null,
+		"compound":    ["supply"],
 		"description": "Current and/or potential",
 		"info":        `
 The Supply Index identifies areas with higher energy supply which are characterized with
@@ -73,7 +73,7 @@ under Resource Availability and Infrastructure.`,
 
 	"ani": {
 		"name":        "Assistance Need Index",
-		"compound":    null,
+		"compound":    ["demand", "supply"],
 		"description": "Areas where financial assistance is needed",
 		"info":        `
 The Assistance Need Index identifies areas where market assistance is needed the most

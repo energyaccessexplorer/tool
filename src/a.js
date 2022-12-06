@@ -178,6 +178,8 @@ async function init_2() {
 
 	const conf = localStorage.getItem('config');
 
+	loading(false);
+
 	await dsinit(GEOGRAPHY.id);
 
 	if (conf) O.load_config();
@@ -219,8 +221,6 @@ async function init_2() {
 async function init_3() {
 	O.view = U.view;
 	cards_update();
-
-	loading(false);
 };
 
 export function clean() {
@@ -474,8 +474,6 @@ export function toggle_left_panel(t) {
 
 	for (let e of qsa('#left-pane > div'))
 		e.style.display = 'none';
-
-	qs('#drawer').style.display = 'block';
 
 	if (t) {
 		const p = document.getElementById(t);

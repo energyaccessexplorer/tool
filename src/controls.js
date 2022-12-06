@@ -100,7 +100,7 @@ export default class dscontrols extends HTMLElement {
 			const el = ce('div', null, { "id": 'controls-subbranch-' + name, "class": 'controls-subbranch' });
 
 			el.append(
-				title = ce('div', humanformat(name), { "class": 'controls-subbranch-title up-title' }),
+				title = ce('div', ce('span', humanformat(name), { "class": "text" }), { "class": 'controls-subbranch-title up-title' }),
 				conel = ce('div', null, { "class": 'controls-container' }),
 			);
 

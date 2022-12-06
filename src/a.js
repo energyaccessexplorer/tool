@@ -476,8 +476,6 @@ export function toggle_left_panel(t) {
 	for (let e of qsa('#left-pane > div'))
 		e.style.display = 'none';
 
-	qs('#drawer').style.display = 'block';
-
 	if (t) {
 		const p = document.getElementById(t);
 		p.style.display = '';

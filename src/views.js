@@ -12,6 +12,7 @@ export function right_pane() {
 	const panes = ["indexes", "filtered"];
 
 	const views = {
+		"inputs":   ["indexes"],
 		"outputs":  ["indexes"],
 		"filtered": ["filtered"],
 	};

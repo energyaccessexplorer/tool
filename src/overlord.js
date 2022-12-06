@@ -375,6 +375,8 @@ function load_view() {
 
 		analysis_plot_active(output, false);
 
+		views_right_pane();
+
 		break;
 	}
 

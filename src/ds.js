@@ -188,7 +188,6 @@ This is not fatal but the dataset is now disabled.`,
 
 		this.set_colorscale();
 
-		this.card = new dscard(this);
 		this.controls = new dscontrols(this);
 
 		switch (this.datatype) {

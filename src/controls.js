@@ -8,6 +8,36 @@ const slider_width = 256;
 
 const contents_el = qs('#controls-contents');
 
+function branch_recount() {
+	const tabs = qsa('.controls-branch[bind]', document.body, true);
+	const required = ea_indexes[U.output].compound;
+
+	for (const b of tabs) {
+		const attr = b.getAttribute('bind');
+		if (required.indexOf(attr) < -1) continue;
+
+		const t = qs(`.controls-branch-tab[bind=${attr}]`);
+		if (qs('ds-controls.active', b)) {
+			t.classList.remove('missing');
+		} else {
+			t.classList.add('missing');
+		}
+	}
+};
+
+function subbranch_recount() {
+	const subbranch = this.closest('.controls-subbranch');
+
+	const t = qsa('ds-controls', subbranch, true)
+		.filter(c => c.ds.on)
+		.length;
+
+	const count = qs('.count', subbranch);
+
+	count.innerText = t;
+	count.style.visibility = t ? 'visible' : 'hidden';
+};
+
 const tabs_el = qs('#controls-tabs');
 
 export default class dscontrols extends HTMLElement {
@@ -88,11 +118,15 @@ export default class dscontrols extends HTMLElement {
 		if (!path.length) return;
 
 		function create_tab(name) {
-			return ce('div', humanformat(name), { "id": 'controls-tab-' + name, "class": 'controls-branch-tab up-title' });
+			const t = ce('div', humanformat(name), { "id": 'controls-tab-' + name, "class": 'controls-branch-tab up-title' });
+			if (ea_indexes[name]) t.setAttribute('bind', name);
+			return t;
 		};
 
 		function create_branch(name) {
-			return ce('div', null, { "id": 'controls-branch-' + name, "class": 'controls-branch' });
+			const t = ce('div', null, { "id": 'controls-branch-' + name, "class": 'controls-branch' });
+			if (ea_indexes[name]) t.setAttribute('bind', name);
+			return t;
 		};
 
 		function create_subbranch(name) {
@@ -175,7 +209,11 @@ function humanformat(s) {
 };
 
 export function toggle_ds() {
-	O.ds(this, { 'active': (this.on = !this.on) });
+	O.ds(this, { 'active': (this.on = !this.on) })
+		.then(_ => {
+			subbranch_recount.call(this.controls);
+			branch_recount();
+		});
 };
 
 function toggle_switch(init, callback) {

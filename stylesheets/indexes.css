@@ -128,7 +128,12 @@
   display: block;
   cursor: pointer;
   color: var(--the-color);
-  padding: 1em;
+  padding: 1em 1.2em;
+}
+
+#index-layer-toolbox a:hover {
+  box-shadow: inset 0px 0px 5px rgb(0 0 0 / 5%);
+  background-color: rgba(0, 0, 0, 0.07);
 }
 
 #index-layer-toolbox a i {

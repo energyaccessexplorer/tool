@@ -300,13 +300,13 @@ export default class dscard extends HTMLElement {
 			.replaceChildren(this.opacity());
 	};
 
-	legends(ls, t) {
-		const it = qs('[slot=svg]', this);
+	legends() {
+		if (this.ds.criteria.length < 2) return;
 
 		const ul = ce('div', null, { "style": "font-size: smaller;" });
 
 		let f;
-		switch (t) {
+		switch (this.ds.datatype) {
 		case "lines":
 			f = lines_legends_svg;
 			break;
@@ -323,7 +323,7 @@ export default class dscard extends HTMLElement {
 			break;
 		}
 
-		for (let l of ls) {
+		for (let l of this.ds.criteria) {
 			let cb;
 
 			const li = ce(
@@ -353,7 +353,7 @@ export default class dscard extends HTMLElement {
 
 		this.legends_el = ul;
 
-		it.replaceChildren(ul);
+		qs('[slot=svg]', this).append(ul);
 	};
 
 	info() {

@@ -310,7 +310,7 @@ export function points() {
 		.then(_ => {
 			if (this.csv) vectors_timeline_csv.call(this);
 
-			const criteria = specs_set.call(
+			this.criteria = specs_set.call(
 				this,
 				this.vectors.geojson.features,
 				this.config.features_specs,
@@ -359,8 +359,6 @@ export function points() {
 					"circle-stroke-color": this.vectors['stroke'],
 				},
 			});
-
-			if (criteria.length > 1) this.card.legends(criteria, "points");
 		});
 };
 
@@ -387,7 +385,7 @@ export function lines() {
 		.then(_ => {
 			if (this.csv) vectors_timeline_csv.call(this);
 
-			const criteria = specs_set.call(
+			this.criteria = specs_set.call(
 				this,
 				this.vectors.geojson.features,
 				this.config.features_specs,
@@ -413,8 +411,6 @@ export function lines() {
 					"line-dasharray": ['get', '__dasharray'],
 				},
 			});
-
-			if (criteria.length > 1) this.card.legends(criteria, "lines");
 		});
 };
 
@@ -441,7 +437,7 @@ export function polygons() {
 					vectors_timeline_csv.call(this);
 			}
 
-			const criteria = specs_set.call(
+			this.criteria = specs_set.call(
 				this,
 				this.vectors.geojson.features,
 				this.config.features_specs,
@@ -468,8 +464,6 @@ export function polygons() {
 					"fill-opacity":       [ 'case', [ 'boolean', [ 'get', '__visible' ], true ], 1 * this.vectors.opacity, 0 ],
 				},
 			});
-
-			if (criteria.length > 1) this.card.legends(criteria, "polygons");
 		});
 };
 

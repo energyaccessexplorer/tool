@@ -67,6 +67,8 @@ export default class Overlord {
 		if (!(d instanceof DS))
 			throw new Error("O.ds: Expected a DS as input:", d);
 
+		let w = Whatever;
+
 		for (const [k, v] of Object.entries(data)) {
 			switch (k) {
 			case "domain": {
@@ -81,7 +83,7 @@ export default class Overlord {
 
 			case "active": {
 				const draw = ['inputs', 'timeline'].includes(U.view);
-				d.active(v, draw);
+				w = d.active(v, draw);
 
 				let arr = U.inputs;
 				if (d.on) arr.unshift(d.id);
@@ -115,6 +117,8 @@ export default class Overlord {
 		}
 
 		load_view();
+
+		return w;
 	};
 
 	set inputs(arr) {

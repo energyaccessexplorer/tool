@@ -36,7 +36,7 @@
 }
 
 #indexes-list .element[disabled] span.name:after {
-  content: '(no datasets selected)';
+  content: '(not enough datasets)';
   font-size: 9px;
   float: right;
   margin-right: 10px;

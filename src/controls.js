@@ -1,27 +1,27 @@
 import DS from './ds.js';
 
 import dropdown from '../lib/dropdown.js';
+import {
+	select_tab,
+} from './controls-search.js';
 
-import { select_tab } from './controls-search.js';
-
-const slider_width = 256;
+import {
+	enough_datasets,
+} from './analysis.js';
 
 const contents_el = qs('#controls-contents');
 
 function branch_recount() {
 	const tabs = qsa('.controls-branch[bind]', document.body, true);
-	const required = ea_indexes[U.output].compound;
 
 	for (const b of tabs) {
 		const attr = b.getAttribute('bind');
-		if (required.indexOf(attr) < -1) continue;
-
 		const t = qs(`.controls-branch-tab[bind=${attr}]`);
-		if (qs('ds-controls.active', b)) {
+
+		if (enough_datasets(attr))
 			t.classList.remove('missing');
-		} else {
+		else
 			t.classList.add('missing');
-		}
 	}
 };
 

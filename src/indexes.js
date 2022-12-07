@@ -13,7 +13,7 @@ import {
 } from './user.js';
 
 import {
-	datasets as analysis_datasets,
+	enough_datasets,
 	analysis,
 } from './analysis.js';
 
@@ -210,7 +210,7 @@ export function list() {
 			ce('td', font_icon('collection'), { "class": 'analysis-to-dataset' }),
 		);
 
-		if (analysis_datasets(t) < 1)
+		if (!enough_datasets(t))
 			d.setAttribute('disabled', "");
 
 		return d;

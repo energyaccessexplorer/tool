@@ -197,7 +197,7 @@ export default async function run(type) {
  * returns DS to be plotted onto a canvas
  */
 
-export function datasets(type) {
+function datasets(type) {
 	return DS.array
 		.filter(d => and(d.on, d.raster, d.analysis))
 		.filter(d => {
@@ -351,4 +351,18 @@ export function priority(d, a, i) {
 	source.setData(jsonclone(source._data));
 
 	return o;
+};
+
+export function enough_datasets(t) {
+	if (["eai", "ani"].includes(t)) {
+		const required = ea_indexes[t].compound;
+
+		for (const r of required)
+			if (!DS.array.find(d => and(d.on, d.analysis, d.index === r))) return false;
+
+		return true;
+	}
+
+	else
+		return DS.array.filter(d => and(d.on, d.analysis, d.index === t)).length > 0;
 };

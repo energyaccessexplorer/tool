@@ -9,6 +9,254 @@ import {
 	polygons_legends_svg,
 } from './symbols.js';
 
+const slider_width = 420;
+
+async function mutant_options() {
+	const d = this.ds;
+
+	await until(_ => maybe(d.hosts, 'length') === d.config.mutant_targets.length);
+
+	const container = ce('div', null, { "class": 'control-option' });
+	const select = ce('select');
+
+	d.hosts.forEach(d => select.append(ce('option', d.name, { "value": d.id })));
+
+	select.value = d.host.id;
+
+	select.onchange = async e => {
+		const host = DST.get(e.target.value);
+
+		await d.mutate(host);
+
+		O.ds(d, { 'mutate': host });
+	};
+
+	container.append(select);
+
+	this.mutant_options = container;
+
+	slot_populate.call(this, {
+		"mutant-options": container,
+	});
+};
+
+function ramp(...els) {
+	const r = tmpl('#ramp');
+
+	for (const e of els)
+		qs('.ramp', r).append(e);
+
+	const div = qs(':scope > div', r);
+
+	if (!div) return r;
+	div.style['width'] = `${slider_width + 2}px`;
+	div.style['margin'] = 'auto';
+
+	return r;
+};
+
+function range(opts = {}) {
+	if (!opts.sliders) return null;
+
+	const domain = {};
+
+	const ds = this.ds;
+
+	let {min,max} = ds.domain;
+
+	const diff = Math.abs(max - min);
+	let d = 3 - Math.ceil(Math.log10(diff || 1));
+	if (d < 0) d = 0;
+
+	if (and(ds.category.unit === "%",
+	        or(and(min === 0, max === 100),
+	           and(min === 100, max === 0)))) d = 0;
+
+	const update = (x, i, el, cx) => {
+		el.value = (+x).toFixed(d);
+
+		const man = maybe(this, 'manual_' + i);
+		if (man) {
+			man.value = x;
+		}
+
+		const ctrl = maybe(this, 'cr_' + i);
+		if (ctrl?.style) {
+			ctrl.style.left = cx + "px";
+		}
+		domain[i] = parseFloat(x);
+	};
+
+	let step = 0.1 * Math.pow(10, Math.floor(Math.log10(Math.abs(ds.domain.max - ds.domain.min))));
+
+	this.cr_max = tmpl('#controls-input').firstElementChild;
+	this.cr_min = tmpl('#controls-input').firstElementChild;
+
+	this.cr_max.style['margin-left'] = "15px";
+	this.cr_min.style['margin-left'] = "5px";
+
+	this.manual_min = ce('input', null, {
+		"bind":  "min",
+		"type":  "number",
+		"min":   ds.domain.min,
+		"max":   ds.domain.max,
+		"step":  step,
+		"value": ds._domain.min,
+	});
+
+	this.manual_max = ce('input', null, {
+		"bind":  "max",
+		"type":  "number",
+		"min":   ds.domain.min,
+		"max":   ds.domain.max,
+		"step":  step,
+		"value": ds._domain.max,
+	});
+
+	const change = (e,i) => {
+		let v = +e.target.value;
+
+		const d = this.ds._domain;
+		d[i] = +v;
+
+		this.range_group.change(d);
+
+		O.ds(this.ds, { 'domain': d });
+	};
+
+	this.manual_min.onchange = debounce(e => change(e, 'min'));
+	this.manual_max.onchange = debounce(e => change(e, 'max'));
+
+	this.cr_min.append(this.manual_min);
+	this.cr_max.append(this.manual_max);
+
+	switch (maybe(ds, 'category', 'controls', 'range')) {
+	case 'single':
+		this.manual_min.setAttribute('disabled', true);
+		break;
+
+	case 'double':
+		break;
+
+	case null:
+	default:
+		break;
+	}
+
+	const s = opts.interval({
+		"sliders":      opts.sliders,
+		"width":        470,
+		"init":         ds._domain,
+		"domain":       ds.domain,
+		"steps":        opts.steps,
+		"callback1":    (x, cx) => update(x, 'min', this.manual_min, cx),
+		"callback2":    (x, cx) => update(x, 'max', this.manual_max, cx),
+		"end_callback": _ => O.ds(ds, { 'domain': domain }),
+	});
+
+	return {
+		"elements": [s.svg, this.cr_min, this.cr_max],
+		"svg":      s.svg,
+		"change":   s.change,
+	};
+};
+
+function weight() {
+	const weights = [1,2,3,4,5];
+
+	const r = ramp(
+		ce('div', weights[0]),
+		ce('div', "importance", { "class": "unit-ramp" }),
+		ce('div', weights[weights.length - 1]),
+	);
+
+	const w = svg_interval({
+		"sliders":      "single",
+		"init":         { "min": 1, "max": this.weight },
+		"domain":       { "min": 1, "max": 5 },
+		"steps":        weights,
+		"width":        slider_width,
+		"end_callback": x => O.ds(this, { 'weight': x }),
+	});
+
+	const el = ce('div', [w.svg, r], { "style": "text-align: center;" });
+
+	return {
+		el,
+		"svg":    w.svg,
+		"change": w.change,
+		"ramp":   r,
+	};
+};
+
+function range_group_controls() {
+	const cat = this.ds.category;
+
+	let steps;
+	if (cat.controls.range_steps) {
+		steps = [];
+		const s = (this.ds.domain.max - this.ds.domain.min) / (cat.controls.range_steps - 1);
+
+		for (let i = 0; i < cat.controls.range_steps; i += 1)
+			steps[i] = this.ds.domain.min + (s * i);
+	}
+
+	const lr = coalesce(cat.controls.range_label, cat.unit, 'range');
+
+	switch (this.ds.datatype) {
+	case 'points':
+	case 'lines':
+	case 'polygons': {
+		if (!this.ds.raster) break;
+
+		this.range_group = range.call(this, {
+			"interval": svg_interval,
+			"ramp":     lr,
+			"steps":    steps,
+			"sliders":  cat.controls.range,
+			"domain":   this.ds.domain,
+		});
+		break;
+	}
+
+	case 'polygons-valued':
+	case 'polygons-timeline': {
+		this.range_group = range.call(this, {
+			"interval": svg_interval_transparent,
+			"ramp":     lr,
+			"steps":    steps,
+			"sliders":  cat.controls.range,
+			"domain":   this.ds.domain,
+			"width":    400,
+		});
+		break;
+	}
+
+	case 'table':
+	case 'polygons-boundaries': {
+		for (let e of qsa('content', this)) e.remove();
+		return;
+	}
+
+	case 'raster-timeline':
+	case 'raster-mutant':
+	case 'raster': {
+		this.range_group = range.call(this, {
+			"interval": svg_interval_transparent,
+			"ramp":     lr,
+			"steps":    steps,
+			"sliders":  cat.controls.range,
+		});
+		break;
+	}
+
+	default: {
+		this.range_group = null;
+		break;
+	}
+	}
+};
+
 function svg_el() {
 	const ds = this.ds;
 	let d = ce('div');
@@ -27,6 +275,7 @@ function svg_el() {
 
 		return [
 			ce('div', min.toFixed(i)),
+			ce('div', this.ds.category.unit || 'range', { "class": "unit-ramp" }),
 			ce('div', max.toFixed(i)),
 		];
 	};
@@ -107,7 +356,7 @@ function svg_el() {
 	}
 	}
 
-	d.prepend(e);
+	d.prepend(...maybe(this.range_group, 'elements'), e);
 
 	return d;
 };
@@ -147,13 +396,16 @@ export function update() {
 
 	if (!empty) sortable('#cards-list', 'disable');
 
-	for (let i of ldc)
+	for (let i of ldc.filter(x => x))
 		if (!cards_list.contains(i)) cards_list.prepend(i);
 
 	if (!empty) sortable('#cards-list', 'enable');
 };
 
 export default class dscard extends HTMLElement {
+	manual_min;
+	manual_max;
+
 	constructor(d) {
 		if (!(d instanceof DS)) throw new Error(`dscard: Expected a ds but got ${d}`);
 		super();
@@ -164,6 +416,8 @@ export default class dscard extends HTMLElement {
 
 		this.opacity_value = 1;
 
+		this.show_advanced = false;
+
 		this.render();
 
 		return this;
@@ -172,16 +426,26 @@ export default class dscard extends HTMLElement {
 	render() {
 		this.setAttribute('bind', this.ds.id);
 
-		this.svg_el = svg_el.call(this);
+		this.content = qs('content', this);
+
+		if (this.ds.category.controls.weight)
+			this.weight_group = weight.call(this.ds);
+
+		if (this.ds.mutant) mutant_options.call(this);
 
 		attach.call(this, tmpl('#ds-card-template'));
+
+		range_group_controls.call(this);
+
+		this.svg_el = svg_el.call(this);
 
 		slot_populate.call(this, Object.assign({}, this.ds, {
 			'svg':     this.svg_el,
 			'info':    this.info(),
-			'unit':    (this.ds.category.unit && ce('span', `[${this.ds.category.unit}]`, { "style": "margin-left: 1em;" })),
+			'ctrls':   this.ctrls(),
 			'opacity': this.opacity(),
 			'close':   this.close(),
+			'weight':  maybe(this.weight_group, 'el'),
 		}));
 
 		this.legends();
@@ -265,6 +529,13 @@ export default class dscard extends HTMLElement {
 		return e;
 	};
 
+	ctrls() {
+		const e = font_icon('gear');
+		e.onclick = _ => qs('.advanced-controls', this).style.display = ((this.show_advanced = !this.show_advanced)) ? 'block' : 'none';
+
+		return e;
+	}
+
 	close() {
 		const e = font_icon('x-lg');
 		e.onclick = O.ds.bind(null, this.ds, { 'active': false });
@@ -280,6 +551,20 @@ export default class dscard extends HTMLElement {
 			},
 			"init": maybe(this.ds, 'vectors', 'opacity'),
 		});
+	};
+
+	reset_defaults() {
+		if (this.weight_group) {
+			const w = maybe(this.ds.category, 'analysis', 'weight');
+
+			this.weight_group.change({ "min": 0, "max": w });
+			O.ds(this.ds, { 'weight': w });
+		}
+
+		if (this.range_group) {
+			this.range_group.change(this.ds.domain);
+			O.ds(this.ds, { 'domain': this.ds.domain });
+		}
 	};
 };
 

@@ -143,9 +143,6 @@ body {
 
   margin: 0;
   padding: 0;
-}
-
-#mapbox-container {
   z-index: 0;
 }
 
@@ -160,7 +157,9 @@ body {
 #canvas-output-select {
   display: block;
   padding: 0.7em 1em;
-  width: 100%;
+  width: 20em;
+  margin: auto;
+  margin-bottom: 1em;
 }
 
 canvas#output {

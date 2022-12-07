@@ -511,9 +511,6 @@ export async function polygons_indicator() {
 
 	if (this._domain)
 		Object.assign(this._domain, this.domain);
-
-	if (this.card) this.card.refresh();
-	if (this.controls) this.controls.refresh();
 };
 
 export async function vectors_timeline_csv() {

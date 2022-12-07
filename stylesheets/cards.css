@@ -2,6 +2,7 @@
   margin: 0;
   padding: 0;
   list-style-type: none;
+  max-width: 40em;
 }
 
 #cards-clear-all {
@@ -11,4 +12,32 @@
   color: var(--the-green);
   cursor: pointer;
   border-bottom: solid 1px #d9d9d9;
+}
+
+input[bind="max"]::-webkit-outer-spin-button,
+input[bind="max"]::-webkit-inner-spin-button,
+input[bind="min"]::-webkit-outer-spin-button,
+input[bind="min"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  margin: 0 !important;
+}
+
+.svg-interval.transparent {
+  position: absolute;
+  top: 68px;
+  z-index: 10;
+}
+
+input[bind="min"],
+input[bind="max"] {
+  width: 4em !important;
+  border: 1px solid rgba(0,0,0,1);
+  appearance: none;
+  padding: 2px 5px;
+  color: white;
+  text-align: center;
+  background: black;
+  border-radius: 2px;
 }

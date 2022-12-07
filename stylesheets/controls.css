@@ -4,16 +4,6 @@
   position: relative;
 }
 
-.controls-branch-tab.missing {
-  animation: pulse 3s ease-out;
-  animation-iteration-count: infinite;
-  background-color: rgba(255,0,0,0.6) !important;
-  color: white !important;
-  border: 1px solid rgba(255,0,0,0.3) !important;
-  margin: -1px;
-  border-radius: 2px;
-}
-
 #controls-tabs {
   display: flex;
   background-color: white;
@@ -38,9 +28,19 @@
   white-space: nowrap;
   text-align: left;
   font-weight: normal;
+  border: 1px solid transparent !important;
 
   position: sticky;
   top: 0;
+}
+
+.controls-branch-tab.missing {
+  animation: pulse 3s ease-out;
+  animation-iteration-count: infinite;
+  background-color: rgba(255,0,0,0.6) !important;
+  color: white !important;
+  border: 1px solid rgba(255,0,0,0.3) !important;
+  border-radius: 2px;
 }
 
 .controls-subbranch-title {
@@ -89,30 +89,4 @@
   padding: 0;
   margin: 0;
   flex-flow: row nowrap;
-}
-
-input[bind="max"]::-webkit-outer-spin-button,
-input[bind="max"]::-webkit-inner-spin-button,
-input[bind="min"]::-webkit-outer-spin-button,
-input[bind="min"]::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  margin: 0 !important;
-}
-
-input[bind="min"],
-input[bind="max"] {
-  max-width: 5em !important;
-  border: 1px solid rgba(0,0,0,0.07);
-  appearance: none;
-  padding: 2px 5px;
-}
-
-input[bind="min"] {
-  text-align: left;
-}
-
-input[bind="max"] {
-  text-align: right;
 }

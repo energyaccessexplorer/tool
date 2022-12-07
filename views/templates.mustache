@@ -61,11 +61,6 @@
       padding-top: 1em;
     }
 
-    .weight-group,
-    .range-group {
-      padding: 0.9em 1.5em 0.9em 1.5em;
-    }
-
     .ramp {
       font-size: 0.8em;
     }
@@ -133,25 +128,7 @@
     <header ripple>
       <slot name="checkbox"></slot>
       <slot name="name"></slot>
-      <slot name="dropdown"></slot>
     </header>
-
-    <content>
-      <div class="group">
-        <slot name="collection-list"></slot>
-        <slot name="mutant-options"></slot>
-      </div>
-
-      <div class="group range-group">
-        <slot name="range-slider"></slot>
-      </div>
-
-      <div class="advanced-controls">
-        <div class="group weight-group">
-          <slot name="weight-slider"></slot>
-        </div>
-      </div>
-    </content>
   </main>
 </template>
 
@@ -196,6 +173,7 @@
       flex: 1;
       display: block;
       padding: 0.5em;
+      margin-top: 1em;
     }
 
     .svg-interval,
@@ -242,8 +220,24 @@
       visibility: hidden;
     }
 
+    buttons [layout] {
+      padding: 0 0.35em;
+      cursor: pointer;
+      border-radius: 2px;
+    }
+
+    buttons [layout]:hover {
+      box-shadow: inset 0px 0px 5px rgb(0 0 0 / 5%);
+      background-color: rgba(0, 0, 0, 0.07);
+    }
+
     [name=ramp] {
       font-size: 0.8em;
+    }
+
+    .weight-group,
+    .range-group {
+      padding: 0.9em 1.5em;
     }
 
     .collection {
@@ -276,13 +270,24 @@
     <header>
       <div layout="title">
         <slot name="name"></slot>
-        <slot name="unit"></slot>
       </div>
     </header>
 
     <content>
       <slot name="svg"></slot>
+      <slot name="range-slider"></slot>
       <slot name="ramp"></slot>
+
+      <div class="group">
+        <slot name="collection-list"></slot>
+        <slot name="mutant-options"></slot>
+      </div>
+
+      <div class="group advanced-controls" style="display: none;">
+        <div class="weight-group">
+          <slot name="weight"></slot>
+        </div>
+      </div>
     </content>
   </main>
 
@@ -363,5 +368,19 @@
     </style>
 
     <div class="ramp"></div>
+  </div>
+</template>
+
+<template id="controls-input">
+  <div style="position: absolute; display: flex; top: 40px; opacity: 0.7;">
+    <span style="display: block;
+                 position: absolute;
+                 top: -8px;
+                 border-style: inset;
+                 border-color: transparent transparent black;
+                 border-radius: 2px;
+                 border-width: 33px;
+                 transform: scale(1, -0.125);">
+    </span>
   </div>
 </template>

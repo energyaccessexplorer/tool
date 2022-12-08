@@ -9,6 +9,7 @@ import {
 	raster as parse_raster,
 	points as parse_points,
 	polygons as parse_polygons,
+	polygons_indicator as parse_polygons_indicator, // TODO: move this...
 	lines as parse_lines,
 	fail as parse_fail,
 } from './parse.js';
@@ -595,6 +596,10 @@ This is not fatal but the dataset is now disabled.`,
 
 		if (maybe(this, arg)) await this[arg].parse();
 		else throw new Error(`Loading Error: '${this.id}' tried to load '${arg}', but failed`);
+
+		// TODO: this should be in parse.js
+		if (this.datatype === 'polygons-timeline')
+			parse_polygons_indicator.call(this);
 
 		this.loading = false;
 	};

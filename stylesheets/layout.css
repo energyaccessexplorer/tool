@@ -22,7 +22,7 @@ body {
 }
 
 #left-pane[open] {
-  min-width: 40em;
+  min-width: 36em;
 }
 
 #visual {

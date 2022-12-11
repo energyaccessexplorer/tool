@@ -224,8 +224,7 @@ export default class Overlord {
 		config_load_datasets(c);
 
 		const arr = c.datasets.filter(x => DST.get(x.name));
-
-		arr.forEach(x => x.active(true, true));
+		arr.forEach(x => DST.get(x.name).active(true, true));
 
 		U.inputs = arr.map(i => i.name);
 

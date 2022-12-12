@@ -171,6 +171,8 @@ async function init_1() {
 		PARAMS = ea_params['timeline'];
 
 	U = new Proxy(url, Uproxy);
+
+	views_init();
 };
 
 async function init_2() {
@@ -196,7 +198,6 @@ async function init_2() {
 	analysissearch_init();
 	locationssearch_init();
 
-	views_init();
 	indexes_init();
 
 	toggle_left_panel();
@@ -267,17 +268,18 @@ async function dsinit(id) {
 
 	const divisions = maybe(GEOGRAPHY.configuration, 'divisions').filter(d => d.dataset_id !== null);
 
-	function exists(e) {
-		return !!coalesce(DST.get(e.name));
-	};
-
 	GEOGRAPHY.divisions = [];
 
-	await (function fetch_outline() {
-		// TODO: this should be more strict divisions 0/outline
-		const outline_id = maybe(divisions.find(d => d.dataset_id), 'dataset_id');
+	const ALL = await API.get("datasets", {
+		"geography_id": `eq.${id}`,
+		"select":       select,
+		"deployment":   `ov.{${ENV}}`,
+		"flagged":      "is.false",
+	});
 
-		if (!outline_id) {
+	await (async function outline() {
+		const OUTLINE_JSON = ALL.find(d => d.id === divisions[0].dataset_id);
+		if (!OUTLINE_JSON) {
 			const m = `
 Failed to get the geography's OUTLINE.
 This is fatal. Thanks for all the fish.`;
@@ -287,66 +289,30 @@ This is fatal. Thanks for all the fish.`;
 			throw new Error("No OUTLINE");
 		}
 
-		const bp = {
-			"id":     `eq.${outline_id}`,
-			"select": select,
-		};
+		OUTLINE = new DS(OUTLINE_JSON);
+		await OUTLINE.load('vectors');
+		await OUTLINE.load('raster');
 
-		return API.get("datasets", bp, { "one": true })
-			.then(async e => {
-				if (exists(e)) return;
-
-				const ds = OUTLINE = new DS(e);
-
-				await ds.load('vectors');
-				await ds.load('raster');
-
-				ds.vectors.geojson.features[0].id = 0;
-			});
+		OUTLINE.vectors.geojson.features[0].id = 0;
 	})();
 
 	await (function fetch_divisions() {
-		return Promise.all(
-			divisions.filter(x => x.dataset_id).slice(1).map(x => {
-				const dp = {
-					"id":     `eq.${x.dataset_id}`,
-					"select": select,
-				};
+		const divisions_ids = divisions.slice(1).map(d => d.dataset_id);
 
-				return API.get("datasets", dp, { "one": true })
-					.then(async e => {
-						if (exists(e)) return;
+		return Promise.all(ALL.filter(x => divisions_ids.includes(x.id))
+			.map(async e => {
+				const ds = new DS(e);
 
-						const ds = new DS(e);
-
-						await ds.load('csv')
-							.then(_ => ds.load('vectors'))
-							.then(_ => ds.load('raster'))
-							.catch(err => console.error(err));
-					});
-			}),
-		);
+				return ds.load('csv')
+					.then(_ => ds.load('vectors'))
+					.then(_ => ds.load('raster'))
+					.catch(err => console.error(err));
+			}));
 	})();
 
 	GEOGRAPHY.divisions = divisions.map(d => DS.array.find(t => t.dataset_id === d.dataset_id));
 
-	await (function fetch_datasets() {
-		const nd = divisions.filter(d => d.dataset_id).map(d => d.dataset_id).concat(OUTLINE.dataset_id);
-		const p = {
-			"geography_id": `eq.${id}`,
-			"select":       select,
-			"deployment":   `ov.{${ENV}}`,
-			"id":           `not.in.(${nd})`,
-			"flagged":      "is.false",
-		};
-
-		return API.get("datasets", p)
-			.then(r => r.map(e => {
-				if (exists(e)) return;
-
-				new DS(e);
-			}));
-	})();
+	ALL.filter(d => !divisions.map(i => i.dataset_id).includes(d.id)).map(e => new DS(e));
 
 	PARAMS.inputs = [...new Set(DS.array.map(e => e.id))];
 
@@ -354,8 +320,6 @@ This is fatal. Thanks for all the fish.`;
 	// mutant attributes (order is never guaranteed)
 	//
 	DS.array.filter(d => d.mutant).forEach(d => d.mutant_init());
-
-	GEOGRAPHY.divisions = GEOGRAPHY.divisions.filter(d => d);
 };
 
 function layout() {

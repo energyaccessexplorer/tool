@@ -21,10 +21,6 @@ export function load_datasets(conf) {
 };
 
 export function generate() {
-	const tab = qs('#controls .controls-branch-tab.active');
-	let tab_id = null;
-	if (tab) tab_id = tab.id;
-
 	const datasets = [];
 
 	for (let i of U.inputs) {
@@ -45,7 +41,7 @@ export function generate() {
 		"view":      U.view,
 		"subdiv":    U.subdiv,
 		"divtier":   U.divtier,
-		"tab":       tab_id,
+		"tab":       U.tab,
 		"output":    U.output,
 		"theme":     ea_settings.mapbox_theme,
 		"datasets":  datasets,

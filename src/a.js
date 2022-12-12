@@ -95,6 +95,7 @@ const Uproxy = {
 
 	"set": function(url,t,v) {
 		switch (t) {
+		case "tab":
 		case "output":
 		case "variant":
 		case "view": {
@@ -200,7 +201,7 @@ async function init_2() {
 
 	indexes_init();
 
-	toggle_left_panel();
+	toggle_left_panel(U.tab);
 
 	if (GEOGRAPHY.timeline) timeline_init();
 
@@ -474,8 +475,10 @@ function drawer_init() {
 				this.classList.remove('active');
 				toggle_left_panel();
 			} else {
-				toggle_left_panel(this.getAttribute('for'));
+				const f = this.getAttribute('for');
+				toggle_left_panel(f);
 				this.classList.add('active');
+				U.tab = f;
 			}
 		};
 

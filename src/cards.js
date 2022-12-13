@@ -1,5 +1,7 @@
 import DS from './ds.js';
 
+const cards_list = qs('#cards-pane #cards-list');
+
 function points_symbol(opts) {
 	const {size,fill,stroke,strokewidth} = opts;
 
@@ -213,9 +215,7 @@ function svg_el() {
 };
 
 export function init() {
-	const list = qs('#cards-pane #cards-list');
-
-	sortable(list, {
+	sortable(cards_list, {
 		'items':                'ds-card',
 		'forcePlaceholderSize': true,
 		'placeholder':          '<div style="margin: 1px; background-color: rgba(0,0,0,0.3);"></div>',
@@ -227,12 +227,7 @@ export function init() {
 
 	const ca = ce('div', 'Clear all datasets', { "id": 'cards-clear-all' });
 	ca.onclick = _ => {
-		O.inputs = [];
-
-		DS.array
-			.filter(x => x.on)
-			.forEach(x => x.active(false));
-
+		DS.all("on").forEach(x => x.active(false));
 		O.view = U.view;
 	};
 
@@ -240,17 +235,15 @@ export function init() {
 };
 
 export function update() {
-	const cards_list = qs('#cards-pane #cards-list');
+	const list = DS.all("on").map(d => d.card);
+	const cards = dscard.all;
 
-	const ldc = DS.all("on").map(d => d.card).reverse();
-	const empty = cards_list.children.length === 0;
+	if (cards.length) sortable(cards_list, 'disable');
 
-	if (!empty) sortable('#cards-list', 'disable');
-
-	for (let i of ldc)
+	for (let i of list)
 		if (!cards_list.contains(i)) cards_list.prepend(i);
 
-	if (!empty) sortable('#cards-list', 'enable');
+	if (cards.length) sortable(cards_list, 'enable');
 };
 
 export default class dscard extends HTMLElement {
@@ -381,7 +374,7 @@ export default class dscard extends HTMLElement {
 	};
 
 	static get all() {
-		return qsa('ds-card', document, true);
+		return qsa('ds-card', cards_list, true);
 	};
 };
 

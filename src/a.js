@@ -304,8 +304,6 @@ This is fatal. Thanks for all the fish.`;
 
 	ALL.filter(d => !divisions.map(i => i.dataset_id).includes(d.id)).map(e => new DS(e));
 
-	PARAMS.inputs = [...new Set(DS.array.map(e => e.id))];
-
 	// We need all the datasets to be initialised _before_ setting
 	// mutant attributes (order is never guaranteed)
 	//

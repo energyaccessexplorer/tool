@@ -23,7 +23,6 @@ ea_views = {
 ea_params = {
 	"default": {
 		"view":    ['inputs', 'filtered', 'outputs'],
-		"inputs":  [],
 		"output":  ['eai', 'ani', 'demand', 'supply'],
 		"variant": ['raster', '1', '2', '3'],
 		"subdiv":  [],
@@ -33,7 +32,6 @@ ea_params = {
 
 	"timeline": {
 		"view":    ['timeline', 'filtered', 'outputs'],
-		"inputs":  [],
 		"output":  ['eai', 'ani', 'demand', 'supply'],
 		"variant": ['raster', '1', '2', '3'],
 		"subdiv":  [],

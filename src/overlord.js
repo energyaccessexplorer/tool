@@ -222,7 +222,7 @@ export default class Overlord {
 function load_view() {
 	const timeline = qs('#timeline');
 
-	const {view, output, inputs} = U;
+	const {view, output} = U;
 
 	(function special_layers() {
 		if (!MAPBOX.getSource('output-source')) {
@@ -354,7 +354,7 @@ function load_view() {
 
 		priority_visibility_pick();
 
-		cards_update(inputs);
+		cards_update();
 		O.sort();
 
 		analysis_plot_active(output, false);
@@ -389,7 +389,7 @@ function load_view() {
 
 		timeline_lines_update();
 
-		cards_update(inputs);
+		cards_update();
 		O.sort();
 
 		break;
@@ -640,8 +640,6 @@ export async function analysis_to_dataset(t) {
 	d.metadata.inputs = DS.all("on").map(d => d.name);
 
 	d._active(true, true);
-
-	PARAMS.inputs.push(d.id);
 
 	O.view = 'inputs';
 

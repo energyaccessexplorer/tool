@@ -124,11 +124,11 @@ function usertype(gid) {
 	content.append(ul);
 
 	new modal({
-		"id":       'usertype-modal',
 		content,
+		"id":      'usertype-modal',
 		"header":  "Choose your area of interest",
-		"footer":   null,
-		"destroy":  true,
+		"footer":  null,
+		"destroy": true,
 	}).show();
 };
 

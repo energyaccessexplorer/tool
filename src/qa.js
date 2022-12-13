@@ -301,6 +301,9 @@ const QA = new nanny({ steps, bubblefn });
 QA.mock = true;
 
 export function run() {
+	const url = new URL(location);
+	if (!url.searchParams.get('qa')) return;
+
 	QA.current_step = -1;
 	QA.start();
 };

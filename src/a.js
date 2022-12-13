@@ -168,24 +168,21 @@ async function init_1() {
 	U = new Proxy(url, Uproxy);
 
 	views_init();
+	cards_init();
+
+	loading(false);
 };
 
 async function init_2() {
-	const url = new URL(location);
-
-	const conf = localStorage.getItem('config');
-
-	loading(false);
-
 	await dsinit(GEOGRAPHY.id);
 
+	const conf = localStorage.getItem('config');
 	if (conf) O.load_config();
 
 	U.variant = U.variant || 'raster';
 
 	O.index = U.output;
 
-	cards_init();
 	controlssearch_init();
 	geographiessearch_init();
 	vectorssearch_init();
@@ -210,7 +207,7 @@ async function init_2() {
 
 	await Promise.all(DS.all("on").map(d => d._active(true, false)));
 
-	if (url.searchParams.get('qa')) qa_run();
+	qa_run();
 };
 
 async function init_3() {

@@ -36,14 +36,16 @@ export function generate() {
 		"geography": GEOGRAPHY.id,
 		"zoom":      MAPBOX.getZoom(),
 		"center":    MAPBOX.getCenter(),
+		"theme":     ea_settings.mapbox_theme,
 		"view":      U.view,
 		"subdiv":    U.subdiv,
 		"divtier":   U.divtier,
 		"tab":       U.tab,
 		"output":    U.output,
-		"theme":     ea_settings.mapbox_theme,
 		"variant":   U.variant,
 	};
 
 	return config;
 };
+
+window.gen = generate;

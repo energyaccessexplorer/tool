@@ -71,12 +71,6 @@ const Uproxy = {
 
 		let v;
 		switch (p) {
-		case "inputs": {
-			if (!i || i === "") v = [];
-			else v = i.split(',').filter(e => PARAMS.inputs.indexOf(e) > -1);
-			break;
-		}
-
 		case "subdiv":
 		case "divtier": {
 			const x = parseInt(i);
@@ -187,7 +181,6 @@ async function init_2() {
 
 	if (conf) O.load_config();
 
-	U.inputs = U.inputs.slice(0); // cleanup non-existent ids
 	U.variant = U.variant || 'raster';
 
 	O.index = U.output;
@@ -215,7 +208,7 @@ async function init_2() {
 		}
 	}
 
-	await Promise.all(U.inputs.map(i => DST.get(i)._active(true, false)));
+	await Promise.all(DS.all("on").map(d => d._active(true, false)));
 
 	if (url.searchParams.get('qa')) qa_run();
 };
@@ -226,11 +219,10 @@ async function init_3() {
 };
 
 export function clean() {
-	U.inputs = [];
 	U.output = 'eai';
 	U.view = 'inputs';
 
-	DS.array.filter(d => d.on).forEach(d => d.active(false, false));
+	DS.all("on").forEach(d => d.active(false, false));
 
 	DS.array.forEach(d => {
 		d._domain = jsonclone(d.domain);

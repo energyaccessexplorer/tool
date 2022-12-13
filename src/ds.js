@@ -654,6 +654,13 @@ This is not fatal but the dataset is now disabled.`,
 			MAPBOX.setPaintProperty(this.id, a, v);
 	};
 
+	static all(state) {
+		if (state === "on")
+			return Array.from(DST.values()).filter(x => x.on);
+		else
+			return Array.from(DST.values());
+	};
+
 	static get array() {
 		return Array.from(DST.values());
 	};

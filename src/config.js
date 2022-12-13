@@ -1,5 +1,7 @@
 import DS from './ds.js';
 
+import dscard from './cards.js';
+
 export function load_datasets(conf) {
 	const list = DS.array.filter(d => conf.datasets.find(t => t.id === d.dataset_id || t.name === d.id));
 
@@ -21,20 +23,16 @@ export function load_datasets(conf) {
 };
 
 export function generate() {
-	const datasets = [];
-
-	for (let i of U.inputs) {
-		let d = DST.get(i);
-
-		datasets.push({
+	const datasets = dscard.all.map(d => d.ds)
+		.map(d => ({
 			"id":     d.dataset_id,
 			"name":   d.id,
 			"weight": d.weight,
 			"domain": d._domain,
-		});
-	}
+		}));
 
 	const config = {
+		datasets,
 		"geography": GEOGRAPHY.id,
 		"zoom":      MAPBOX.getZoom(),
 		"center":    MAPBOX.getCenter(),
@@ -44,7 +42,6 @@ export function generate() {
 		"tab":       U.tab,
 		"output":    U.output,
 		"theme":     ea_settings.mapbox_theme,
-		"datasets":  datasets,
 		"variant":   U.variant,
 	};
 

@@ -28,11 +28,10 @@ const _clear_batch = [
 		"lazy":   true,
 		"target": 'body',
 		"run":    function() {
-			U.inputs = [];
 			U.output = 'eai';
 			U.view = 'inputs';
 
-			DS.array.filter(d => d.on).forEach(d => d.active(false, false));
+			DS.all("on").forEach(d => d.active(false, false));
 
 			for (let e of qsa('.controls-subbranch'))
 				elem_collapse(qs('.controls-container', e), e);

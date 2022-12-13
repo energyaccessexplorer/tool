@@ -222,7 +222,7 @@ export function init() {
 	})[0]
 		.addEventListener(
 			'sortupdate',
-			e => O.inputs = e.detail.destination.items.map(i => i.getAttribute('bind')),
+			_ => O.sort(),
 		);
 
 	const ca = ce('div', 'Clear all datasets', { "id": 'cards-clear-all' });
@@ -242,7 +242,7 @@ export function init() {
 export function update() {
 	const cards_list = qs('#cards-pane #cards-list');
 
-	const ldc = U.inputs.reverse().map(i => DST.get(i).card);
+	const ldc = DS.all("on").map(d => d.card).reverse();
 	const empty = cards_list.children.length === 0;
 
 	if (!empty) sortable('#cards-list', 'disable');
@@ -378,6 +378,10 @@ export default class dscard extends HTMLElement {
 			},
 			"init": maybe(this.ds, 'vectors', 'opacity'),
 		});
+	};
+
+	static get all() {
+		return qsa('ds-card', document, true);
 	};
 };
 

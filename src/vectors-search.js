@@ -1,3 +1,5 @@
+import dscard from './cards.js';
+
 import {
 	pointto as search_pointto,
 	zoom,
@@ -30,7 +32,7 @@ function pointto(f, a = false) {
 };
 
 async function reset() {
-	ds = DST.get(U.inputs[0]);
+	ds = dscard.all[0]?.ds;
 
 	if (!ds) return;
 

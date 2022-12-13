@@ -83,36 +83,6 @@ dialog pre {
   white-space: pre-line;
 }
 
-.more-dropdown-ul {
-  width: fit-content;
-  width: -moz-fit-content;
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-  background-color: white;
-  position: absolute;
-  right: -25px;
-  top: 30px;
-  padding: 8px 0;
-  border-radius: 5px;
-  box-shadow: 0 3px 5px 0 rgba(0,0,0,0.2);
-  z-index: 9999;
-}
-
-.more-dropdown-li {
-  padding: 7px 15px;
-  font-size: 0.9em;
-  color: var(--the-color);
-}
-
-.more-dropdown-li:hover {
-  background-color: #e7e9ec;
-}
-
-.more-dropdown-li:hover:active {
-  background-color: #cecece
-}
-
 bubble-message {
   background-color: rgba(0,0,0,1);
   border-radius: 3px;

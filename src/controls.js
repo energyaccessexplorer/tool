@@ -63,7 +63,6 @@ export default class dscontrols extends HTMLElement {
 		this.header.onclick = header_click.call(this);
 
 		slot_populate.call(this, Object.assign({}, this.ds, {
-			"dropdown":        this.dropdown,
 			"checkbox":        this.checkbox.svg,
 			"collection-list": this.collection_list,
 		}));
@@ -147,7 +146,6 @@ export default class dscontrols extends HTMLElement {
 		this.loading(true);
 
 		this.spinner.remove();
-		this.dropdown.remove();
 
 		if (this.checkbox) this.checkbox.svg.remove();
 	};
@@ -244,9 +242,6 @@ function header_click() {
 
 		if (e.target.closest('svg') === svg)
 			toggle_ds.call(this.ds);
-
-		else if (e.target.closest('.more-dropdown') === this.ds.controls.dropdown)
-			return;
 
 		else
 			svg.dispatchEvent(new Event('click', { "bubbles": true }));

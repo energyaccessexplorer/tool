@@ -238,7 +238,7 @@ export function init() {
 	qs('#drawer-help').onclick = run;
 
 	if (![null, "inputs"].includes(U.view)) return;
-	if (U.inputs.length > 0) return;
+	if (DS.all("on").length) return;
 
 	HELP.start();
 };

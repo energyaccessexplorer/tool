@@ -71,12 +71,6 @@ const Uproxy = {
 
 		let v;
 		switch (p) {
-		case "inputs": {
-			if (!i || i === "") v = [];
-			else v = i.split(',').filter(e => PARAMS.inputs.indexOf(e) > -1);
-			break;
-		}
-
 		case "subdiv":
 		case "divtier": {
 			const x = parseInt(i);
@@ -95,6 +89,7 @@ const Uproxy = {
 
 	"set": function(url,t,v) {
 		switch (t) {
+		case "tab":
 		case "output":
 		case "variant":
 		case "view": {
@@ -173,25 +168,21 @@ async function init_1() {
 	U = new Proxy(url, Uproxy);
 
 	views_init();
+	cards_init();
+
+	loading(false);
 };
 
 async function init_2() {
-	const url = new URL(location);
-
-	const conf = localStorage.getItem('config');
-
-	loading(false);
-
 	await dsinit(GEOGRAPHY.id);
 
+	const conf = localStorage.getItem('config');
 	if (conf) O.load_config();
 
-	U.inputs = U.inputs.slice(0); // cleanup non-existent ids
 	U.variant = U.variant || 'raster';
 
 	O.index = U.output;
 
-	cards_init();
 	controlssearch_init();
 	geographiessearch_init();
 	vectorssearch_init();
@@ -200,7 +191,7 @@ async function init_2() {
 
 	indexes_init();
 
-	toggle_left_panel();
+	toggle_left_panel(U.tab);
 
 	if (GEOGRAPHY.timeline) timeline_init();
 
@@ -214,9 +205,9 @@ async function init_2() {
 		}
 	}
 
-	await Promise.all(U.inputs.map(i => DST.get(i)._active(true, false)));
+	await Promise.all(DS.all("on").map(d => d._active(true, false)));
 
-	if (url.searchParams.get('qa')) qa_run();
+	qa_run();
 };
 
 async function init_3() {
@@ -225,11 +216,10 @@ async function init_3() {
 };
 
 export function clean() {
-	U.inputs = [];
 	U.output = 'eai';
 	U.view = 'inputs';
 
-	DS.array.filter(d => d.on).forEach(d => d.active(false, false));
+	DS.all("on").forEach(d => d.active(false, false));
 
 	DS.array.forEach(d => {
 		d._domain = jsonclone(d.domain);
@@ -313,8 +303,6 @@ This is fatal. Thanks for all the fish.`;
 	GEOGRAPHY.divisions = divisions.map(d => DS.array.find(t => t.dataset_id === d.dataset_id));
 
 	ALL.filter(d => !divisions.map(i => i.dataset_id).includes(d.id)).map(e => new DS(e));
-
-	PARAMS.inputs = [...new Set(DS.array.map(e => e.id))];
 
 	// We need all the datasets to be initialised _before_ setting
 	// mutant attributes (order is never guaranteed)
@@ -473,8 +461,10 @@ function drawer_init() {
 				this.classList.remove('active');
 				toggle_left_panel();
 			} else {
-				toggle_left_panel(this.getAttribute('for'));
+				const f = this.getAttribute('for');
+				toggle_left_panel(f);
 				this.classList.add('active');
+				U.tab = f;
 			}
 		};
 

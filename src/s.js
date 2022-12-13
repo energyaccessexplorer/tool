@@ -106,11 +106,10 @@ function usertype(gid) {
 
 	const ul = ce('ul');
 	for (const t of presets) {
-		const inputs = t.datasets.map(x => x.name).join(',');
 		const { output, view, variant } = t;
 
 		const p = ce('p', t.description);
-		const li = ce('li', ce('a', [ce('h3', t.name), p], { "href": `/tool/a?id=${gid}&inputs=${inputs}&output=${output}&view=${view}&variant=${variant}` }));
+		const li = ce('li', ce('a', [ce('h3', t.name), p], { "href": `/tool/a?id=${gid}&output=${output}&view=${view}&variant=${variant}` }));
 		li.onclick = function() {
 			localStorage.setItem('config', JSON.stringify(t));
 			localStorage.setItem('user-type', t.name);
@@ -125,11 +124,11 @@ function usertype(gid) {
 	content.append(ul);
 
 	new modal({
-		"id":       'usertype-modal',
 		content,
+		"id":      'usertype-modal',
 		"header":  "Choose your area of interest",
-		"footer":   null,
-		"destroy":  true,
+		"footer":  null,
+		"destroy": true,
 	}).show();
 };
 

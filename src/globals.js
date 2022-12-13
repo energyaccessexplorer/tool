@@ -23,20 +23,20 @@ ea_views = {
 ea_params = {
 	"default": {
 		"view":    ['inputs', 'filtered', 'outputs'],
-		"inputs":  [],
 		"output":  ['eai', 'ani', 'demand', 'supply'],
 		"variant": ['raster', '1', '2', '3'],
 		"subdiv":  [],
 		"divtier": [],
+		"tab":     ['controls', 'vectors', 'analysis', 'locations', 'geographies'],
 	},
 
 	"timeline": {
 		"view":    ['timeline', 'filtered', 'outputs'],
-		"inputs":  [],
 		"output":  ['eai', 'ani', 'demand', 'supply'],
 		"variant": ['raster', '1', '2', '3'],
 		"subdiv":  [],
 		"divtier": [],
+		"tab":     ['controls', 'vectors', 'analysis', 'locations', 'geographies'],
 	},
 };
 

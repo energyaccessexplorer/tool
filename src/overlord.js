@@ -1,5 +1,9 @@
 import DS from './ds.js';
 
+import dscard, {
+	update as cards_update,
+} from './cards.js';
+
 import {
 	intersect,
 } from './rasters.js';
@@ -18,10 +22,6 @@ import {
 	raster_timeline as parse_raster_timeline,
 	vectors_timeline_csv as parse_vectors_timeline_csv,
 } from './parse.js';
-
-import {
-	update as cards_update,
-} from './cards.js';
 
 import {
 	lines_update as timeline_lines_update,
@@ -60,7 +60,8 @@ import {
 
 export default class Overlord {
 	layers() {
-		Promise.all(U.inputs.map(id => DST.get(id).active(true, ['inputs', 'timeline'].includes(U.view))));
+		Promise.all(
+			DS.all("on").map(x => x.active(true, ['inputs', 'timeline'].includes(U.view))));
 	};
 
 	ds(d, data) {
@@ -85,11 +86,7 @@ export default class Overlord {
 				const draw = ['inputs', 'timeline'].includes(U.view);
 				w = d.active(v, draw);
 
-				let arr = U.inputs;
-				if (d.on) arr.unshift(d.id);
-				else arr.splice(arr.indexOf(d.id), 1);
-
-				O.inputs = arr;
+				O.sort();
 
 				if (d.summary) {
 					for (const i in d.summary)
@@ -119,11 +116,6 @@ export default class Overlord {
 		load_view();
 
 		return w;
-	};
-
-	set inputs(arr) {
-		U.inputs = arr;
-		O.sort();
 	};
 
 	set timeline(t) {
@@ -176,10 +168,7 @@ export default class Overlord {
 	};
 
 	async sort() {
-		const arr = U.inputs.map(i => {
-			const d = DST.get(i);
-			return d.mutant ? d.host : d;
-		});
+		const arr = dscard.all.map(d => d.ds.mutant ? d.ds.host : d.ds);
 
 		const layers = [].concat(...arr.map(d => d._layers));
 		await Promise.all(layers.map(i => until(_ => MAPBOX.getLayer(i))));
@@ -226,8 +215,6 @@ export default class Overlord {
 		const arr = c.datasets.filter(x => DST.get(x.name));
 		arr.forEach(x => DST.get(x.name).active(true, true));
 
-		U.inputs = arr.map(i => i.name);
-
 		return c;
 	};
 };
@@ -235,7 +222,7 @@ export default class Overlord {
 function load_view() {
 	const timeline = qs('#timeline');
 
-	const {view, output, inputs} = U;
+	const {view, output} = U;
 
 	(function special_layers() {
 		if (!MAPBOX.getSource('output-source')) {
@@ -369,7 +356,7 @@ function load_view() {
 
 		priority_visibility_pick();
 
-		cards_update(inputs);
+		cards_update();
 		O.sort();
 
 		analysis_plot_active(output, false);
@@ -408,7 +395,7 @@ function load_view() {
 
 		timeline_lines_update();
 
-		cards_update(inputs);
+		cards_update();
 		O.sort();
 
 		break;
@@ -464,7 +451,7 @@ function context(rc, f) {
 	const controls = controls_list();
 
 	const x = rc.index;
-	const in0 = maybe(U.inputs, 0);
+	const in0 = DS.all("on")[0];
 
 	function rows(d) {
 		if (typeof d === "string") {
@@ -655,13 +642,10 @@ export async function analysis_to_dataset(t) {
 		"metadata":     {},
 	});
 
-	d.metadata.inputs = U.inputs;
+	d.metadata.inputs = DS.all("on").map(d => d.name);
 
 	d._active(true, true);
 
-	PARAMS.inputs.push(d.id);
-
-	U.inputs = [d.id].concat(U.inputs);
 	O.view = 'inputs';
 
 	qs('#cards #cards-list').prepend(d.card);

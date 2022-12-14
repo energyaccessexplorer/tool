@@ -27,6 +27,20 @@
       cursor: pointer;
     }
 
+    ::slotted([slot=description]) {
+      display: block;
+
+      padding-bottom: 0.9em;
+      margin: auto 1em auto 3.8em;
+
+      color: #a3a3a3;
+    }
+
+    ::slotted([slot=description]:empty) {
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+
     [name=name] {
       flex: 1;
       display: block;
@@ -43,11 +57,6 @@
     [name=checkbox] {
       margin-bottom: -4px;
       transform: scale(0.6);
-    }
-
-    content {
-      display: none;
-      padding: 0.7em;
     }
 
     .svg-interval {
@@ -129,6 +138,10 @@
       <slot name="checkbox"></slot>
       <slot name="name"></slot>
     </header>
+
+    <content>
+      <slot name="description"></slot>
+    </content>
   </main>
 </template>
 

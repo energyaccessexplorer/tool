@@ -3,6 +3,7 @@
   flex: 1;
   overflow: hidden;
   min-width: 36em;
+  max-width: 40em;
   user-select: none;
   flex-direction: column;
   border-top: solid 1px transparent;

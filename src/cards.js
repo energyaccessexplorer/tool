@@ -235,7 +235,10 @@ export function init() {
 };
 
 export function update() {
-	const list = DS.all("on").map(d => d.card);
+	const list = DS.all("on")
+		.map(d => d.card)
+		.filter(c => c); // some datasets (eg boundaries)
+
 	const cards = dscard.all;
 
 	if (cards.length) sortable(cards_list, 'disable');

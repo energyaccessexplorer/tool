@@ -9,6 +9,10 @@ import {
 	polygons_legends_svg,
 } from './symbols.js';
 
+import {
+	toggle_left_panel,
+} from './a.js';
+
 const cards_list = qs('#cards-list');
 
 const slider_width = 420;
@@ -548,6 +552,11 @@ export default class dscard extends HTMLElement {
 			"init": maybe(this.ds, 'vectors', 'opacity'),
 		});
 	};
+
+	discover() {
+		toggle_left_panel('cards');
+		this.scrollIntoView();
+	}
 
 	static get all() {
 		return qsa('ds-card', cards_list, true);

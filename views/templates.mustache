@@ -129,6 +129,34 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+
+    :host(:hover) buttons {
+      visibility: visible;
+    }
+
+    buttons {
+      display: flex;
+      flex-flow: row nowrap;
+      margin: 0 7px 0 10px;
+      visibility: hidden;
+    }
+
+    buttons [layout] {
+      padding: 0 0.35em;
+      cursor: pointer;
+      border-radius: 2px;
+      line-height: 1.5em;
+      margin: auto 0.2em;
+    }
+
+    buttons [layout]:hover {
+      box-shadow: inset 0px 0px 5px rgb(0 0 0 / 5%);
+      background-color: rgba(0, 0, 0, 0.07);
+    }
+
+    :host(:not(.active)) buttons [layout=card] {
+      display: none;
+    }
   </style>
 
   <main>
@@ -137,6 +165,16 @@
     <header ripple>
       <slot name="checkbox"></slot>
       <slot name="name"></slot>
+
+      <buttons>
+        <div layout="card">
+          <slot name="card"></slot>
+        </div>
+
+        <div layout="info">
+          <slot name="info"></slot>
+        </div>
+      </buttons>
     </header>
 
     <content>

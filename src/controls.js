@@ -66,6 +66,8 @@ export default class dscontrols extends HTMLElement {
 			"checkbox":        this.checkbox.svg,
 			"collection-list": this.collection_list,
 			"description":     this.ds.description || this.ds.category.description,
+			"card":            this.card(),
+			"info":            this.info(),
 		}));
 
 		this.inject();
@@ -150,6 +152,23 @@ export default class dscontrols extends HTMLElement {
 
 		if (this.checkbox) this.checkbox.svg.remove();
 	};
+
+	info() {
+		const e = font_icon('info-circle');
+		e.onclick = this.ds.info_modal.bind(this.ds);
+
+		return e;
+	};
+
+	card() {
+		const e = font_icon('list-task');
+		e.onclick = v => {
+			v.stopPropagation();
+			this.ds.card.discover();
+		};
+
+		return e;
+	}
 };
 
 customElements.define('ds-controls', dscontrols);

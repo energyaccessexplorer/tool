@@ -55,6 +55,11 @@
 
         <div id="geographies" class="search-panel">
           <div class="search-results"></div>
+
+          <div id="timeline-graphs" style="display: none;">
+            <strong id="lines-header" class="header up-title"></strong>
+            <div id="lines-graph" class="graphs"></div>
+          </div>
         </div>
 
         <div id="vectors" class="search-panel">
@@ -100,6 +105,11 @@
           <select id="output-variant-select">
             <option value="raster">Raster Analysis</option>
           </select>
+        </div>
+
+        <div id="output-preview">
+          <select id="canvas-output-select"></select>
+          <canvas id="output"></canvas>
         </div>
 
         <div id="drawer-right-pane">

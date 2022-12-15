@@ -3,7 +3,7 @@
 }
 
 @media (max-width: 72em) {
-  .bottom-right-container {
+  #output-preview {
     display: none;
   }
 

@@ -324,14 +324,8 @@ function layout() {
 
 	if (MOBILE) m.style['width'] = screen.width + "px";
 
-	const o = tmpl('#analysis-output-template');
-
-	if (GEOGRAPHY.timeline) {
-		const g = tmpl('#timeline-graphs-template');
-		console.warn("Append #timeline-graphs-template somewhere", g);
-	}
-
-	qs('#right-pane').insertBefore(o, qs('#drawer-right-pane'));
+	if (GEOGRAPHY.timeline)
+		console.warn("TODO #timeline-graphs", qs('#timeline-graphs'));
 
 	document.body.onresize = function() {
 		set_heights();

@@ -219,6 +219,8 @@ export default class Overlord {
 	};
 };
 
+const output_preview = qs('#output-preview');
+
 function load_view() {
 	const timeline = qs('#timeline');
 
@@ -346,6 +348,8 @@ function load_view() {
 
 		views_right_pane();
 
+		output_preview.style.display = 'none';
+
 		break;
 	}
 
@@ -360,6 +364,8 @@ function load_view() {
 		O.sort();
 
 		analysis_plot_active(output, false);
+
+		output_preview.style.display = '';
 
 		views_right_pane();
 
@@ -379,6 +385,8 @@ function load_view() {
 
 		filtered_valued_polygons();
 
+		output_preview.style.display = '';
+
 		views_right_pane();
 
 		break;
@@ -392,6 +400,8 @@ function load_view() {
 		output_visibility('none');
 
 		priority_visibility_pick();
+
+		output_preview.style.display = '';
 
 		timeline_lines_update();
 

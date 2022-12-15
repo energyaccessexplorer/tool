@@ -133,7 +133,7 @@ bubble-message .bubble-message-close-button::before {
   white-space: pre-line;
 }
 
-.bottom-right-container {
+#output-preview {
   background-color: white;
   text-align: center;
   border-top: solid 1px lightgray;

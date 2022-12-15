@@ -442,10 +442,10 @@ export default class dscard extends HTMLElement {
 		slot_populate.call(this, Object.assign({}, this.ds, {
 			'svg':     this.svg_el,
 			'info':    this.info(),
-			'ctrls':   this.ctrls(),
 			'opacity': this.opacity(),
 			'close':   this.close(),
 			'weight':  maybe(this.weight_group, 'el'),
+			'ctrls':   maybe(this.weight_group, 'el') && this.ctrls(),
 		}));
 
 		this.legends();

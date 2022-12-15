@@ -75,20 +75,27 @@ function table_setup() {
 	this._domain = { min, max };
 };
 
-function table_refresh(c) {
+function table_refresh_timeline(t) {
 	const table = {};
 	const data = this.csv.data;
-	const v = c ?? this.csv.value;
+	const k = this.csv.key;
+
+	for (let r of data)
+		table[r[k]] = r[t];
+
+	return table;
+};
+
+function table_refresh() {
+	const table = {};
+	const data = this.csv.data;
+	const v = this.csv.value;
 	const k = this.csv.key;
 
 	for (let r of data) {
 		const n = +r[v];
-
-		if (k)
-			table[r[k]] = isNaN(n) ? r[v] : n;
-		else if (this.timeline)
-			table[k] = r[k];
-	}
+		table[r[k]] = isNaN(n) ? r[v] : n;
+	};
 
 	return table;
 };
@@ -480,8 +487,8 @@ export async function polygons_indicator() {
 			};
 		}
 
-		this.csv.key = this.csv.data.columns[0];
-		this.csv.table = table_refresh.call(this, U.timeline);
+		this.csv.key = 'OBJECTID'; // TODO: this.csv.data.columns[0];
+		this.csv.table = table_refresh_timeline.call(this, U.timeline);
 	}
 
 	let s;

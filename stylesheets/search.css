@@ -43,7 +43,15 @@
 }
 
 .search-results ul li {
-  padding: 0.5em 1em;
+  display: flex;
+  padding-left: 0.7em;
+  justify-content: space-between;
+  line-height: 2.4em;
+}
+
+.search-results ul li buttons > * {
+  line-height: 2.4em;
+  width: 2.4em;
 }
 
 .search-results ul li:hover {

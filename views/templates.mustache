@@ -1,6 +1,7 @@
 <template id="ds-controls-template">
   <style>
-    @import "./ripple.css";
+    @import url("./ripple.css");
+    @import url("./buttons.css");
 
     main {
       background-color: var(--the-darker-white);
@@ -48,13 +49,9 @@
       line-height: 1.5em;
     }
 
-    [name=info],
     [name=checkbox] {
       flex: 0;
       display: block;
-    }
-
-    [name=checkbox] {
       margin-bottom: -4px;
       transform: scale(0.6);
     }
@@ -130,31 +127,16 @@
       100% { transform: rotate(360deg); }
     }
 
+    buttons {
+      visibility: hidden;
+      justify-content: flex-end;
+    }
+
     :host(:hover) buttons {
       visibility: visible;
     }
 
-    buttons {
-      display: flex;
-      flex-flow: row nowrap;
-      margin: 0 7px 0 10px;
-      visibility: hidden;
-    }
-
-    buttons [layout] {
-      padding: 0 0.35em;
-      cursor: pointer;
-      border-radius: 2px;
-      line-height: 1.5em;
-      margin: auto 0.2em;
-    }
-
-    buttons [layout]:hover {
-      box-shadow: inset 0px 0px 5px rgb(0 0 0 / 5%);
-      background-color: rgba(0, 0, 0, 0.07);
-    }
-
-    :host(:not(.active)) buttons [layout=card] {
+    :host(:not(.active)) buttons [name=card] {
       display: none;
     }
   </style>
@@ -167,13 +149,8 @@
       <slot name="name"></slot>
 
       <buttons>
-        <div layout="card">
-          <slot name="card"></slot>
-        </div>
-
-        <div layout="info">
-          <slot name="info"></slot>
-        </div>
+        <slot name="card"></slot>
+        <slot name="info"></slot>
       </buttons>
     </header>
 
@@ -186,6 +163,7 @@
 <template id="ds-card-template">
   <style>
     @import url("../lib/bootstrap-icons.css");
+    @import url("./buttons.css");
 
     :host {
       background-color: var(--the-white);
@@ -199,10 +177,6 @@
 
       border-bottom: solid 1px #d9d9d9;
       position: relative;
-    }
-
-    :host(:hover) buttons {
-      visibility: visible;
     }
 
     header {
@@ -234,7 +208,7 @@
       filter: drop-shadow( 0px 1px 1px rgba(0, 0, 0, 0.3));
     }
 
-    [layout=title] {
+    [name=title] {
       flex: 1;
       margin-right: 5px;
     }
@@ -264,22 +238,13 @@
       cursor: -webkit-grab;
     }
 
+    :host(:hover) buttons {
+      visibility: visible;
+    }
+
     buttons {
-      display: flex;
       flex-flow: column nowrap;
-      margin: 0 7px 0 10px;
       visibility: hidden;
-    }
-
-    buttons [layout] {
-      padding: 0 0.35em;
-      cursor: pointer;
-      border-radius: 2px;
-    }
-
-    buttons [layout]:hover {
-      box-shadow: inset 0px 0px 5px rgb(0 0 0 / 5%);
-      background-color: rgba(0, 0, 0, 0.07);
     }
 
     [name=ramp] {
@@ -319,9 +284,7 @@
 
   <main>
     <header>
-      <div layout="title">
-        <slot name="name"></slot>
-      </div>
+      <slot name="name"></slot>
     </header>
 
     <content>
@@ -343,21 +306,10 @@
   </main>
 
   <buttons>
-    <div layout="close">
-      <slot name="close"></slot>
-    </div>
-
-    <div layout="info">
-      <slot name="info"></slot>
-    </div>
-
-    <div layout="opacity">
-      <slot name="opacity"></slot>
-    </div>
-
-    <div layout="ctrls">
-      <slot name="ctrls"></slot>
-    </div>
+    <slot name="close"></slot>
+    <slot name="info"></slot>
+    <slot name="opacity"></slot>
+    <slot name="ctrls"></slot>
   </buttons>
 </template>
 

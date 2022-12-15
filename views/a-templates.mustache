@@ -139,45 +139,15 @@
 </template>
 
 <template id="geographies-search-item">
-  <style>
-    @import url("../lib/bootstrap-icons.css");
+  <div bind="name"></div>
 
-    :host {
-      display: inline-block;
-      min-width: 25%;
-      margin: 1em;
-    }
+  <buttons>
+    <span class="bi-zoom-in"
+          zoom="true"></span>
 
-    .name {
-      text-align: center;
-      padding: 0.5em 1em;
-    }
-
-    .buttons {
-      display: flex;
-      justify-content: space-evenly;
-    }
-
-    .buttons a {
-      display: block;
-      padding: 0.9em 1em;
-      font-size: 1.2em;
-    }
-
-    .buttons a:hover {
-      background-color: rgba(0, 0, 0, 0.05);
-    }
-  </style>
-
-  <div class="name" bind="name"></div>
-
-  <div class="buttons">
-    <a class="bi-zoom-in"
-       zoom="true"></a>
-
-    <a class="bi-box-arrow-in-down"
-       bind-cond="url"
-       bind-attr="href"
-       bind-value="url"></a>
-  </div>
+    <span class="bi-box-arrow-in-down"
+          bind-cond="url"
+          bind-attr="href"
+          bind-value="url"></span>
+  </buttons>
 </template>

@@ -36,6 +36,7 @@ build-a:
 	@sed -ri 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/a/index.html
 
 	@cp ${CSS}/ripple.css ${DIST}/a/ripple.css
+	@cp ${CSS}/buttons.css ${DIST}/a/buttons.css
 	@cp ${SRC}/{browser,session,analysis,cards,config,controls,search,controls-search,symbols,geographies-search,vectors-search,analysis-search,locations-search,ds,parse,indexes,filtered,mapbox,overlord,plot,rasters,report,summary,timeline,user,views,help,a,qa}.js ${DIST}/a/
 
 	@cat \
@@ -67,6 +68,7 @@ build-a:
 		${CSS}/views.css \
 		${CSS}/filtered.css \
 		${CSS}/ripple.css \
+		${CSS}/buttons.css \
 		${CSS}/summary.css \
 		${CSS}/mobile.css \
 		${CSS}/cards.css \

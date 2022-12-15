@@ -20,7 +20,7 @@ function div(g,i,j) {
 		"url":  g.id ? `./?id=${g.id}` : null,
 	});
 
-	qs('[zoom]', el).onclick = load.bind(null, i,j);
+	qs('[zoom]', el).onclick = load.bind(null, i, j);
 
 	return ce('li', el);
 };

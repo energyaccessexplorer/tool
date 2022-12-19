@@ -98,9 +98,6 @@ function range(opts = {}) {
 	this.cr_max = tmpl('#controls-input').firstElementChild;
 	this.cr_min = tmpl('#controls-input').firstElementChild;
 
-	this.cr_max.style['margin-left'] = "15px";
-	this.cr_min.style['margin-left'] = "5px";
-
 	this.manual_min = ce('input', null, {
 		"bind":  "min",
 		"type":  "number",

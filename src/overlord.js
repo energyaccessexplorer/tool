@@ -84,9 +84,11 @@ export default class Overlord {
 
 			case "active": {
 				const draw = ['inputs', 'timeline'].includes(U.view);
-				w = d.active(v, draw);
-
-				O.sort();
+				w = d.active(v, draw)
+					.then(_ => {
+						cards_update();
+						O.sort();
+					});
 
 				if (d.summary) {
 					for (const i in d.summary)
@@ -360,7 +362,6 @@ function load_view() {
 
 		priority_visibility_pick();
 
-		cards_update();
 		O.sort();
 
 		analysis_plot_active(output, false);
@@ -401,12 +402,11 @@ function load_view() {
 
 		priority_visibility_pick();
 
+		O.sort();
+
 		output_preview.style.display = '';
 
 		timeline_lines_update();
-
-		cards_update();
-		O.sort();
 
 		break;
 	}

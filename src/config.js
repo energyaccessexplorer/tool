@@ -13,8 +13,12 @@ export function load_datasets(conf) {
 			return;
 		}
 
-		if (typeof d.domain.min === 'number') ds._domain.min = d.domain.min;
-		if (typeof d.domain.max === 'number') ds._domain.max = d.domain.max;
+		if (ds._domain) {
+			if (typeof d.domain.min === 'number') ds._domain.min = d.domain.min;
+			if (typeof d.domain.max === 'number') ds._domain.max = d.domain.max;
+		}
+		else
+			console.warn(`Could not initialise domain for '${ds.id}'. Valued polygons, right?`);
 
 		if (typeof d.weight === 'number') ds.weight = d.weight;
 	});

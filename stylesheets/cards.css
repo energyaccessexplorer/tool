@@ -14,20 +14,6 @@
   border-bottom: solid 1px #d9d9d9;
 }
 
-/* TODO: fix this transparent mess */
-.svg-interval.transparent ~ .svg-interval:not(.transparent) {
-  position: absolute;
-  top: 73.5px;
-  width: 468px;
-  left: 43px;
-  z-index: 0;
-}
-
-.svg-interval.transparent {
-  position: relative;
-  z-index: 1;
-}
-
 input[bind="min"],
 input[bind="max"] {
   width: 4em !important;
@@ -38,6 +24,7 @@ input[bind="max"] {
   text-align: center;
   background: black;
   border-radius: 2px;
+  z-index: 2;
 }
 
 input[bind="max"]::-webkit-outer-spin-button,

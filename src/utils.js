@@ -295,7 +295,7 @@ function svg_interval(opts = {}) {
 };
 
 function svg_interval_transparent(opts = {}) {
-	const {sliders, domain, init, steps, width, callback1, callback2, end_callback} = opts;
+	const {sliders, background, domain, init, steps, width, callback1, callback2, end_callback} = opts;
 
 	const radius = 6;
 	const svgwidth = width || 420;
@@ -315,8 +315,14 @@ function svg_interval_transparent(opts = {}) {
 	const svg = d3.create("svg")
 		.attr('class', 'svg-interval transparent');
 
-	const g = svg.append('g');
+	if (background) {
+		svg.node().append(background);
 
+		d3.select(background)
+			.attr("transform", "translate(0,4) scale(0.98,1)");
+	}
+
+	const g = svg.append('g');
 	const c1 = g.append('circle');
 	const c2 = g.append('circle');
 

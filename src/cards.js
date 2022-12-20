@@ -147,6 +147,7 @@ function range(opts = {}) {
 	}
 
 	const s = opts.interval({
+		"background":   this.ds.colorscale?.svg.querySelector('g').cloneNode(true),
 		"sliders":      opts.sliders,
 		"width":        470,
 		"init":         ds._domain,
@@ -204,66 +205,61 @@ function range_group_controls() {
 			steps[i] = this.ds.domain.min + (s * i);
 	}
 
-	const lr = coalesce(cat.controls.range_label, cat.unit, 'range');
-
 	switch (this.ds.datatype) {
 	case 'points':
 	case 'lines':
 	case 'polygons': {
 		if (!this.ds.raster) break;
 
-		this.range_group = range.call(this, {
+		return range.call(this, {
 			"interval": svg_interval,
-			"ramp":     lr,
 			"steps":    steps,
 			"sliders":  cat.controls.range,
 			"domain":   this.ds.domain,
 		});
-		break;
 	}
 
 	case 'polygons-valued':
 	case 'polygons-timeline': {
-		this.range_group = range.call(this, {
+		return range.call(this, {
 			"interval": svg_interval_transparent,
-			"ramp":     lr,
 			"steps":    steps,
 			"sliders":  cat.controls.range,
 			"domain":   this.ds.domain,
 			"width":    400,
 		});
-		break;
-	}
-
-	case 'table':
-	case 'polygons-boundaries': {
-		for (let e of qsa('content', this)) e.remove();
-		return;
 	}
 
 	case 'raster-timeline':
 	case 'raster-mutant':
 	case 'raster': {
-		this.range_group = range.call(this, {
+		return range.call(this, {
 			"interval": svg_interval_transparent,
-			"ramp":     lr,
 			"steps":    steps,
 			"sliders":  cat.controls.range,
 		});
-		break;
 	}
 
+	case 'polygons-boundaries':
+		return undefined;
+
+	case 'table':
 	default: {
-		this.range_group = null;
-		break;
+		qs('content', this).remove();
+		return undefined;
 	}
 	}
 };
 
 function svg_el() {
 	const ds = this.ds;
+	const cat = this.ds.category;
+
 	let d = ce('div');
-	let e = maybe(ds.colorscale, 'svg') || ce('div');
+	let e = "";
+	let r = "";
+	let t = "";
+	let o = "";
 
 	function ramp_domain() {
 		let {min,max} = this.ds.domain;
@@ -272,13 +268,15 @@ function svg_el() {
 		let i = 3 - Math.ceil(Math.log10(diff || 1));
 		if (i < 0) i = 0;
 
-		if (and(this.ds.category.unit === "%",
+		if (and(cat.unit === "%",
 		        or(and(min === 0, max === 100),
 		           and(min === 100, max === 0)))) i = 0;
 
+		const u = coalesce(cat.controls.range_label, cat.unit, 'range');
+
 		return [
 			ce('div', min.toFixed(i)),
-			ce('div', this.ds.category.unit || 'range', { "class": "unit-ramp" }),
+			ce('div', u, { "class": "unit-ramp" }),
 			ce('div', max.toFixed(i)),
 		];
 	};
@@ -321,17 +319,20 @@ function svg_el() {
 
 	case 'polygons-valued':
 	case 'polygons-timeline': {
-		const r = tmpl('#ramp');
-
-		if (ds.domain) {
-			qs('.ramp', r).append(...ramp_domain.call(this));
-		}
-
-		d.append(
-			r,
-			ce('div', null, { "style": "display: inline-block; width: 64px; height: 5px; background-color: rgba(155,155,155,1); margin: 15px 15px 0 0;" }),
-			ce('div', "Not Available", { "style": "display: inline-block; font-size: x-small;" }),
-		);
+		o = ce(
+			'span',
+			[
+				ce('div', null, {
+					"style": `
+	display: inline-block;
+	width: 64px;
+	height: 5px;
+	background-color: rgba(155,155,155,1);
+	margin: 15px 15px 0 0;
+	`,
+				}),
+				ce('div', "Not Available", { "style": "display: inline-block; font-size: x-small;" }),
+			]);
 
 		break;
 	}
@@ -339,13 +340,6 @@ function svg_el() {
 	case 'raster-mutant':
 	case 'raster-timeline':
 	case 'raster': {
-		const r = tmpl('#ramp');
-
-		if (ds.domain) {
-			qs('.ramp', r).append(...ramp_domain.call(this));
-			d.append(r);
-		}
-
 		break;
 	}
 
@@ -359,7 +353,20 @@ function svg_el() {
 	}
 	}
 
-	d.prepend(...maybe(this.range_group, 'elements'), e);
+	if (ds.domain) {
+		r = tmpl('#ramp');
+		qs('.ramp', r).append(...ramp_domain.call(this));
+	}
+
+	this.range_group = range_group_controls.call(this);
+
+	d.append(
+		...coalesce(maybe(this.range_group, 'elements'), []),
+		coalesce(t, ""),
+		coalesce(r, ""),
+		coalesce(o, ""),
+		coalesce(e, ""),
+	);
 
 	return d;
 };
@@ -431,8 +438,6 @@ export default class dscard extends HTMLElement {
 		if (this.ds.mutant) mutant_options.call(this);
 
 		attach.call(this, tmpl('#ds-card-template'));
-
-		range_group_controls.call(this);
 
 		this.svg_el = svg_el.call(this);
 

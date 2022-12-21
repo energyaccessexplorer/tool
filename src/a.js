@@ -152,8 +152,6 @@ async function init_1() {
 
 	if (MOBILE) mobile();
 
-	drawer_init();
-
 	mapbox_theme_init(ea_settings.mapbox_theme);
 
 	GEOGRAPHY.timeline_dates = maybe(GEOGRAPHY, 'configuration', 'timeline_dates');
@@ -167,6 +165,7 @@ async function init_1() {
 
 	U = new Proxy(url, Uproxy);
 
+	drawer_init();
 	views_init();
 	cards_init();
 
@@ -421,6 +420,13 @@ export function toggle_left_panel(t) {
 	for (let e of qsa('#left-pane > div'))
 		e.style.display = 'none';
 
+	const as = qsa('#drawer a');
+
+	for (let a of as) {
+		if (a.getAttribute('for') === t) a.classList.add('active');
+		else a.classList.remove('active');
+	}
+
 	if (t) {
 		const p = document.getElementById(t);
 		p.style.display = '';
@@ -440,6 +446,8 @@ export function toggle_left_panel(t) {
 
 	const tl = qs('#timeline');
 	if (tl) tl.dispatchEvent(rs);
+
+	U.tab = t;
 };
 
 function drawer_init() {
@@ -449,17 +457,10 @@ function drawer_init() {
 
 	for (let a of as) {
 		a.onclick = function() {
-			for (let x of as) if (x !== this) x.classList.remove('active');
-
-			if (this.classList.contains('active')) {
-				this.classList.remove('active');
-				toggle_left_panel();
-			} else {
-				const f = this.getAttribute('for');
-				toggle_left_panel(f);
-				this.classList.add('active');
-				U.tab = f;
-			}
+			toggle_left_panel(
+				this.classList.contains('active') ? null :
+					this.getAttribute('for'),
+			);
 		};
 
 		a.onmouseenter = function() {

@@ -45,6 +45,7 @@
 .search-results ul li {
   display: flex;
   padding-left: 0.7em;
+  padding-right: 0.7em;
   justify-content: space-between;
   line-height: 2.4em;
 }

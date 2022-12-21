@@ -38,13 +38,33 @@ function pointto(p, a = false) {
 };
 
 function li(p) {
-	const c = (p.v ? Math.round((p.v).toFixed(2) * 100) : "") + " " + "[" + (p.i).map(c => +c.toFixed(3)).join(", ") + "]";
+	const pi3 = (p.i).map(c => +c.toFixed(3));
+	const c = "[" + pi3.join(", ") + "]";
 
-	const el = ce('li', ce('code', c), {});
+	const pn = ce('span');
+
+	const el = ce('li', [
+		ce('code', c, { "style": "font-size: 0.9em" } ),
+		pn,
+	]);
+
+	const t = (p.v ? Math.round((p.v).toFixed(2) * 100) : "");
+
+	el.setAttribute('group', t);
 
 	el.onmouseenter = pointto.bind(null, p);
 
 	el.onclick = zoom.bind(null, p, pointto.bind(null, p, true));
+
+	const types = ['poi', 'neighborhood', 'locality', 'place'];
+	const search = `?limit=1&types=${types}&access_token=${mapboxgl.accessToken}`;
+
+	fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${pi3}.json${search}`)
+		.then(r => r.json())
+		.then(r => {
+			if (r.features.length)
+				pn.innerText = r.features[0]['text'];
+		});
 
 	return el;
 };
@@ -58,10 +78,37 @@ async function trigger({ points = getpoints, n = 20 }) {
 
 	resultsinfo.innerHTML = `Searching <b>analysis coordinates</b>. Top ${count} results:`;
 
-	results
+	const list = results
 		.sort((a,b) => a.v > b.v ? -1 : 1)
 		.slice(0,n)
-		.forEach(t => ul.append(li(t)));
+		.map(t => li(t));
+
+	const groups = {};
+	list.forEach(i => {
+		const a = i.getAttribute('group');
+		if (!groups[a]) groups[a] = [];
+
+		groups[a].push(i);
+	});
+
+	ul.append(...list);
+
+	for (const g in groups) {
+		const el = ul.querySelector(`[group='${g}']`);
+		const h = ce('h5', g + "%");
+
+		ul.insertBefore(h, el);
+
+		h.style = `
+font-size: 0.9em;
+background-color: rgba(${ea_analysis_colorscale.fn(g/100.0)});
+padding: 0.5em;
+padding-left: 1em;
+margin: 0.5em auto;
+margin-left: 0;
+width: calc(${g}% - 1.5em);
+`;
+	}
 
 	if (count > n)
 		qs('div.search-results-info', resultscontainer).innerHTML = `Searching <b>analysis coordinates</b>. Showing first ${n} of ${count}:`;

@@ -51,5 +51,3 @@ export function generate() {
 
 	return config;
 };
-
-window.gen = generate;

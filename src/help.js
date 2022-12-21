@@ -129,7 +129,7 @@ const steps = [
 			controls_dig(this.ds);
 		},
 		"wait": function() {
-			return this.ds.on && this.ds.layers.length && qs('[slot=range-slider] .svg-interval', this.ds.controls);
+			return this.ds.on && this.ds.layers.length && qs('[slot=range] .svg-interval', this.ds.card);
 		},
 		"mock": {
 			"el":     function() { return qs('header', this.el); },
@@ -139,11 +139,11 @@ const steps = [
 	{
 		"target": function() {
 			this.ds = DST.get('health');
-			return this.ds.controls;
+			return this.ds.card;
 		},
 		"mark": {
 			"el": function() {
-				return qs('[slot=range-slider] .svg-interval', this.el);
+				return qs('[slot=range] .svg-interval', this.el);
 			},
 			"title":    "5/9",
 			"message":  `<strong>Filter areas</strong> that are close to social loads by selecting a short proximity (e.g. set proximity to healthcare facilities at 10km)`,
@@ -162,7 +162,7 @@ const steps = [
 				delay(0.5).then(_ => {
 					const d = { "min": 0, "max": 15 };
 
-					DST.get('health').controls.range_group.change(d);
+					DST.get('health').card.range_group.change(d);
 					DST.get('health')._domain = d;
 					O.view = U.view;
 				});

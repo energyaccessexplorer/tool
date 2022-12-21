@@ -15,7 +15,7 @@ import {
 
 const cards_list = qs('#cards-list');
 
-const slider_width = 420;
+const slider_width = 472;
 
 async function mutant_options() {
 	const d = this.ds;
@@ -61,12 +61,11 @@ function ramp(...els) {
 	return r;
 };
 
-function range(opts = {}) {
-	if (!opts.sliders) return null;
+function range(interval) {
+	const ds = this.ds;
+	const cat = this.ds.category;
 
 	const domain = {};
-
-	const ds = this.ds;
 
 	let {min,max} = ds.domain;
 
@@ -74,7 +73,7 @@ function range(opts = {}) {
 	let d = 3 - Math.ceil(Math.log10(diff || 1));
 	if (d < 0) d = 0;
 
-	if (and(ds.category.unit === "%",
+	if (and(cat.unit === "%",
 	        or(and(min === 0, max === 100),
 	           and(min === 100, max === 0)))) d = 0;
 
@@ -122,7 +121,7 @@ function range(opts = {}) {
 		const d = this.ds._domain;
 		d[i] = +v;
 
-		this.range_group.change(d);
+		this.range_el.change(d);
 
 		O.ds(this.ds, { 'domain': d });
 	};
@@ -133,7 +132,7 @@ function range(opts = {}) {
 	this.cr_min.append(this.manual_min);
 	this.cr_max.append(this.manual_max);
 
-	switch (maybe(ds, 'category', 'controls', 'range')) {
+	switch (maybe(cat, 'controls', 'range')) {
 	case 'single':
 		this.manual_min.setAttribute('disabled', true);
 		break;
@@ -146,13 +145,22 @@ function range(opts = {}) {
 		break;
 	}
 
-	const s = opts.interval({
-		"background":   this.ds.colorscale?.svg.querySelector('g').cloneNode(true),
-		"sliders":      opts.sliders,
-		"width":        470,
+	let steps;
+	if (maybe(cat, 'controls', 'range_steps')) {
+		steps = [];
+		const s = (ds.domain.max - ds.domain.min) / (cat.controls.range_steps - 1);
+
+		for (let i = 0; i < cat.controls.range_steps; i += 1)
+			steps[i] = ds.domain.min + (s * i);
+	}
+
+	const s = interval({
+		"background":   ds.colorscale?.svg.querySelector('g').cloneNode(true),
+		"sliders":      ds.category.controls.range,
+		"width":        slider_width,
 		"init":         ds._domain,
 		"domain":       ds.domain,
-		"steps":        opts.steps,
+		"steps":        steps,
 		"callback1":    (x, cx) => update(x, 'min', this.manual_min, cx),
 		"callback2":    (x, cx) => update(x, 'max', this.manual_max, cx),
 		"end_callback": _ => O.ds(ds, { 'domain': domain }),
@@ -193,65 +201,7 @@ function weight() {
 	};
 };
 
-function range_group_controls() {
-	const cat = this.ds.category;
-
-	let steps;
-	if (cat.controls.range_steps) {
-		steps = [];
-		const s = (this.ds.domain.max - this.ds.domain.min) / (cat.controls.range_steps - 1);
-
-		for (let i = 0; i < cat.controls.range_steps; i += 1)
-			steps[i] = this.ds.domain.min + (s * i);
-	}
-
-	switch (this.ds.datatype) {
-	case 'points':
-	case 'lines':
-	case 'polygons': {
-		if (!this.ds.raster) break;
-
-		return range.call(this, {
-			"interval": svg_interval,
-			"steps":    steps,
-			"sliders":  cat.controls.range,
-			"domain":   this.ds.domain,
-		});
-	}
-
-	case 'polygons-valued':
-	case 'polygons-timeline': {
-		return range.call(this, {
-			"interval": svg_interval_transparent,
-			"steps":    steps,
-			"sliders":  cat.controls.range,
-			"domain":   this.ds.domain,
-			"width":    400,
-		});
-	}
-
-	case 'raster-timeline':
-	case 'raster-mutant':
-	case 'raster': {
-		return range.call(this, {
-			"interval": svg_interval_transparent,
-			"steps":    steps,
-			"sliders":  cat.controls.range,
-		});
-	}
-
-	case 'polygons-boundaries':
-		return undefined;
-
-	case 'table':
-	default: {
-		qs('content', this).remove();
-		return undefined;
-	}
-	}
-};
-
-function svg_el() {
+function range_el() {
 	const ds = this.ds;
 	const cat = this.ds.category;
 
@@ -260,9 +210,10 @@ function svg_el() {
 	let r = "";
 	let t = "";
 	let o = "";
+	let g = undefined;
 
 	function ramp_domain() {
-		let {min,max} = this.ds.domain;
+		let {min,max} = ds.domain;
 
 		const diff = Math.abs(max - min);
 		let i = 3 - Math.ceil(Math.log10(diff || 1));
@@ -282,8 +233,7 @@ function svg_el() {
 	};
 
 	switch (ds.datatype) {
-	case 'points-timeline':
-	case 'points': {
+	case 'points-timeline': {
 		e = points_symbol({
 			"size":        24,
 			"fill":        ds.vectors.fill,
@@ -293,8 +243,33 @@ function svg_el() {
 		break;
 	}
 
-	case 'lines-timeline':
+	case 'points': {
+		if (ds.raster)
+			g = range.call(this, svg_interval);
+
+		e = points_symbol({
+			"size":        24,
+			"fill":        ds.vectors.fill,
+			"stroke":      ds.vectors.stroke,
+			"strokewidth": 2,
+		});
+		break;
+	}
+
+	case 'lines-timeline': {
+		e = points_symbol({
+			"size":        24,
+			"fill":        ds.vectors.fill,
+			"stroke":      ds.vectors.stroke,
+			"strokewidth": 2,
+		});
+		break;
+	}
+
 	case 'lines': {
+		if (ds.raster)
+			g = range.call(this, svg_interval);
+
 		e = lines_symbol({
 			"size":      28,
 			"dasharray": ds.vectors.dasharray,
@@ -305,8 +280,21 @@ function svg_el() {
 		break;
 	}
 
-	case 'polygons-boundaries':
+	case 'polygons-boundaries': {
+		e = polygons_symbol({
+			"size":        28,
+			"fill":        ds.vectors.fill,
+			"opacity":     ds.vectors.opacity,
+			"stroke":      ds.vectors.stroke,
+			"strokewidth": (ds.vectors.width - 1) || 1,
+		});
+		break;
+	}
+
 	case 'polygons': {
+		if (ds.raster)
+			g = range.call(this, svg_interval);
+
 		e = polygons_symbol({
 			"size":        28,
 			"fill":        ds.vectors.fill,
@@ -319,6 +307,8 @@ function svg_el() {
 
 	case 'polygons-valued':
 	case 'polygons-timeline': {
+		g = range.call(this, svg_interval_transparent);
+
 		o = ce(
 			'span',
 			[
@@ -340,15 +330,17 @@ function svg_el() {
 	case 'raster-mutant':
 	case 'raster-timeline':
 	case 'raster': {
+		g = range.call(this, svg_interval_transparent);
 		break;
 	}
 
 	case 'table': {
+		qs('content', this).remove();
 		break;
 	}
 
 	default: {
-		console.warn("dscard.svg_el could not decide datatype.", ds.id);
+		console.warn("dscard.range_el could not decide datatype.", ds.id);
 		break;
 	}
 	}
@@ -358,10 +350,8 @@ function svg_el() {
 		qs('.ramp', r).append(...ramp_domain.call(this));
 	}
 
-	this.range_group = range_group_controls.call(this);
-
 	d.append(
-		...coalesce(maybe(this.range_group, 'elements'), []),
+		...coalesce(maybe((this.range_el = g), 'elements'), []),
 		coalesce(t, ""),
 		coalesce(r, ""),
 		coalesce(o, ""),
@@ -439,10 +429,8 @@ export default class dscard extends HTMLElement {
 
 		attach.call(this, tmpl('#ds-card-template'));
 
-		this.svg_el = svg_el.call(this);
-
 		slot_populate.call(this, Object.assign({}, this.ds, {
-			'svg':     this.svg_el,
+			'range':   range_el.call(this),
 			'info':    this.info(),
 			'opacity': this.opacity(),
 			'close':   this.close(),
@@ -460,8 +448,8 @@ export default class dscard extends HTMLElement {
 	};
 
 	refresh() {
-		qs('[slot=svg]', this)
-			.replaceChildren(this.svg_el = svg_el.call(this));
+		qs('[slot=range]', this)
+			.replaceChildren(this.range_el = range_el.call(this));
 
 		this.opacity_value = 1;
 		qs('[slot=opacity]', this)
@@ -521,7 +509,7 @@ export default class dscard extends HTMLElement {
 
 		this.legends_el = ul;
 
-		qs('[slot=svg]', this).append(ul);
+		qs('[slot=range]', this).append(ul);
 	};
 
 	info() {

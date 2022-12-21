@@ -154,7 +154,7 @@ function svg_interval(opts = {}) {
 	const {sliders, domain, init, steps, width, callback1, callback2, end_callback} = opts;
 
 	const radius = 6;
-	const svgwidth = width || 256;
+	const svgwidth = width;
 	const svgheight = (radius * 2) + 2;
 	const linewidth = radius * 2;
 	const svgmin = radius + 1;
@@ -298,11 +298,11 @@ function svg_interval_transparent(opts = {}) {
 	const {sliders, background, domain, init, steps, width, callback1, callback2, end_callback} = opts;
 
 	const radius = 6;
-	const svgwidth = width || 420;
+	const svgwidth = width;
 	const svgheight = (radius * 2) + 2;
 	const linewidth = radius * 2;
 	const svgmin = radius;
-	const svgmax = svgwidth - radius - 1;
+	const svgmax = svgwidth - (radius/2) - 1;
 
 	let norm = d3.scaleLinear().domain([svgmin, svgmax]).range([domain.min, domain.max]);
 	let denorm = norm.invert;
@@ -319,7 +319,7 @@ function svg_interval_transparent(opts = {}) {
 		svg.node().append(background);
 
 		d3.select(background)
-			.attr("transform", "translate(0,4) scale(0.98,1)");
+			.attr("transform", "translate(0,4)");
 	}
 
 	const g = svg.append('g');
@@ -462,6 +462,7 @@ function opacity_control({ fn, init }) {
 	let opacity_value = init ?? 1;
 
 	const grad = svg_interval({
+		"width":        256,
 		"init":         { "min": 0, "max": init ?? 1 },
 		"domain":       { "min": 0, "max": 1 },
 		"sliders":      'single',

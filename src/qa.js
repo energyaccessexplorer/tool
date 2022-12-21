@@ -97,7 +97,7 @@ const _controls_batch = [
 			controls_dig(this.ds);
 		},
 		"wait": function() {
-			return this.ds.on && this.ds.layers.length && qs('[slot=range-slider] .svg-interval', this.ds.controls);
+			return this.ds.on && this.ds.layers.length && qs('[slot=range] .svg-interval', this.ds.card);
 		},
 		"mock": {
 			"el":     function() { return qs('header', this.el); },
@@ -105,16 +105,19 @@ const _controls_batch = [
 		},
 	},
 	{
+		"target": function() {
+			this.ds = DST.get('health');
+			return this.ds.card;
+		},
 		"mark": {
 			"el": function() {
-				return qs('[slot=range-slider] .svg-interval', this.el);
+				return qs('[slot=range] .svg-interval', this.el);
 			},
 			"position": 'C',
 			"close":    false,
 		},
-		"target": function() {
-			this.ds = DST.get('health');
-			return this.ds.controls;
+		"run": function() {
+			toggle_left_panel('cards');
 		},
 		"wait": function() {
 			return or(
@@ -127,7 +130,7 @@ const _controls_batch = [
 				delay(0.5).then(_ => {
 					const d = { "min": 0, "max": 15 };
 
-					DST.get('health').controls.range_group.change(d);
+					DST.get('health').card.range_el.change(d);
 					DST.get('health')._domain = d;
 					O.view = U.view;
 				});

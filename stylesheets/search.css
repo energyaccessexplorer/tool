@@ -69,3 +69,23 @@
   margin: -1em;
   margin-top: -1em;
 }
+
+details details {
+  margin: auto 1.3em;
+}
+
+details summary {
+  padding: 0.5em;
+}
+
+details details div {
+  padding: 0.5em 1.5em;
+}
+
+.search-results .matches {
+  background-color: rgba(0,0,0,0.1);
+}
+
+.search-results details > summary::marker {
+  font-size: 0.8em;
+}

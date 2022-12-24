@@ -2,7 +2,7 @@ import DS from './ds.js';
 
 import bubblemessage from '../lib/bubblemessage.js';
 
-function timeline_slider(opts) {
+function slider(opts) {
 	const {steps, drag, width, init} = opts;
 
 	let v;
@@ -287,7 +287,7 @@ export async function init() {
 	const parent = qs('#timeline');
 	const padding = 100;
 
-	const tl = timeline_slider({
+	const tl = slider({
 		"steps":  steps,
 		"width":  qs('#maparea').clientWidth - padding,
 		"init":   steps.length - 1,
@@ -358,10 +358,10 @@ export function lines_draw() {
 	});
 	ml.svg.id = 'timeline-lines';
 
-	const rp = qs('#right-pane');
+	ml.svg.style.display = 'block';
 
-	qs('#lines-header', rp).innerText = maybe(tiercsv.data.find(r => +r[tiercsv.key] === U.subdiv), tiercsv.value);
-	qs('#lines-graph', rp).append(ml.svg);
+	qs('#lines-header').innerText = maybe(tiercsv.data.find(r => +r[tiercsv.key] === U.subdiv), tiercsv.value);
+	qs('#lines-graph').append(ml.svg);
 };
 
 export async function lines_update() {
@@ -371,13 +371,10 @@ export async function lines_update() {
 
 	const datasets = DS.array.filter(d => and(d.on, d.datatype === 'polygons-timeline'));
 
-	if (datasets.length) {
-		if (U.subdiv > -1) lines_draw();
-	}
-
-	if (or(U.divtier < 1, !datasets.length)) {
-		const rp = qs('#right-pane');
-		qs('#lines-header', rp).innerText = "";
+	if (and(datasets.length, U.subdiv > -1))
+		lines_draw();
+	else {
+		qs('#lines-header').innerText = "";
 
 		let lines = qs('#timeline-lines');
 		if (lines) lines.remove();

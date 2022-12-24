@@ -109,11 +109,6 @@ const Uproxy = {
 			break;
 		}
 
-		case "inputs": {
-			url.searchParams.set(t, [...new Set(v)].filter(t => DST.get(t)));
-			break;
-		}
-
 		default: {
 			throw new TypeError(`U: I'm not allowed to set '${t}'`);
 		}
@@ -177,8 +172,6 @@ async function init_2() {
 
 	const conf = localStorage.getItem('config');
 	if (conf) O.load_config();
-
-	U.variant = U.variant || 'raster';
 
 	O.index = U.output;
 
@@ -299,10 +292,6 @@ This is fatal. Thanks for all the fish.`;
 			}));
 	})();
 
-	GEOGRAPHY.divisions = divisions.map(d => DS.array.find(t => t.dataset_id === d.dataset_id));
-
-	ALL.filter(d => !divisions.map(i => i.dataset_id).includes(d.id)).map(e => new DS(e));
-
 	(async function fetch_admintiers() {
 		const ds = new DS(ALL.find(x => x.category.name === 'admin-tiers'));
 		await ds.load('csv');
@@ -332,6 +321,13 @@ This is fatal. Thanks for all the fish.`;
 
 		ds.tree = tree;
 	})();
+
+	GEOGRAPHY.divisions = divisions.map(d => DS.array.find(t => t.dataset_id === d.dataset_id));
+
+	ALL
+		.filter(d => !divisions.map(i => i.dataset_id).includes(d.id))
+		.filter(d => d.category.name !== 'admin-tiers')
+		.forEach(e => new DS(e));
 
 	// We need all the datasets to be initialised _before_ setting
 	// mutant attributes (order is never guaranteed)
@@ -508,5 +504,5 @@ function drawer_init() {
 		};
 	}
 
-	toggle_left_panel();
+	toggle_left_panel(U.tab);
 };

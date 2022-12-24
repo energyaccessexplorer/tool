@@ -35,10 +35,13 @@
   overflow-y: scroll;
 }
 
+.search-results > details,
+.search-results > ul {
+  margin-top: 2em;
+}
+
 .search-results ul {
   list-style-type: none;
-  margin: 0;
-  margin-top: 2em;
   padding: 0;
 }
 

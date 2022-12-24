@@ -6,27 +6,42 @@ let input, resultscontainer;
 let all = [];
 let details = [];
 
+const defaultinfo = "Showing all subgeographies";
+const resultsinfo = ce('div', defaultinfo, { "class": 'search-results-info' });
+
 function trigger(value) {
 	details.forEach(x => x.removeAttribute('open'));
 
 	const re = new RegExp(value, 'i');
 	if (String(re) === "/(?:)/i") {
-		all.forEach(x => x.classList.remove('matches'));
+		all.forEach(x => {
+			x.classList.remove('matches');
+			x.classList.remove('nonmatch');
+		});
+
 		details[0]?.setAttribute('open', '');
+
+		resultsinfo.innerText = defaultinfo;
+
 		return;
 	}
 
 	all.forEach(x => {
 		x.classList.remove('matches');
+		x.classList.remove('nonmatch');
 
 		if (x.textContent.match(re))
 			x.classList.add('matches');
+		else
+			x.classList.add('nonmatch');
 	});
 
 	details.forEach(x => {
-		if (x.querySelector('.matches'))
-			x.setAttribute('open', '');
+		if (x.querySelector('.matches')) x.setAttribute('open', '');
 	});
+
+	const l = resultscontainer.querySelectorAll('.matches').length;
+	resultsinfo.innerText = l ? l + " results" : defaultinfo;
 };
 
 async function load(x,y) {
@@ -75,6 +90,8 @@ export async function init() {
 	all = resultscontainer.querySelectorAll('summary,div');
 	details = resultscontainer.querySelectorAll('details');
 
+	resultscontainer.prepend(resultsinfo);
+
 	load(0,0);
 };
 
@@ -86,7 +103,14 @@ async function tree() {
 	function subtree(branch, j, title, y) {
 		const s = ce('summary', title);
 		const d = ce('details', s);
-		s.onclick = load.bind(null, j, y);
+		d.subdiv = y;
+		s.onclick = _ => {
+			const t = d.getAttribute('open') === null;
+			if (t)
+				load(j, y);
+			else
+				load(j-1, d.parentElement.subdiv);
+		};
 
 		for (let i = 0; i < branch.length; i++) {
 			if (!branch[i])
@@ -107,6 +131,7 @@ async function tree() {
 
 	const t = subtree(DST.get('admin-tiers').tree, 0, GEOGRAPHY.name);
 	t.querySelector('summary').onclick = load.bind(null, 0, 0);
+	t.subdiv = 0;
 
 	return t;
 };

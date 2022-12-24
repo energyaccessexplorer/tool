@@ -92,3 +92,11 @@ details details div {
 .search-results details > summary::marker {
   font-size: 0.8em;
 }
+
+div.nonmatch {
+  display: none;
+}
+
+.matches ~ .nonmatch {
+  display: block;
+}

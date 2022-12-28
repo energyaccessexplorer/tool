@@ -1,6 +1,10 @@
 import bubblemessage from '../lib/bubblemessage.js';
 
 import {
+	coords_search as mapbox_coords_search,
+} from './mapbox.js';
+
+import {
 	plot_active as analysis_plot_active,
 } from './analysis.js';
 
@@ -39,12 +43,11 @@ function pointto(p, a = false) {
 
 function li(p) {
 	const pi3 = (p.i).map(c => +c.toFixed(3));
-	const c = "[" + pi3.join(", ") + "]";
 
 	const pn = ce('span');
 
 	const el = ce('li', [
-		ce('code', c, { "style": "font-size: 0.9em" } ),
+		ce('code', 	"[" + pi3.join(", ") + "]", { "style": "font-size: 0.9em" } ),
 		pn,
 	]);
 
@@ -56,14 +59,16 @@ function li(p) {
 
 	el.onclick = zoom.bind(null, p, pointto.bind(null, p, true));
 
-	const types = ['poi', 'neighborhood', 'locality', 'place'];
-	const search = `?limit=1&types=${types}&access_token=${mapboxgl.accessToken}`;
-
-	fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${pi3}.json${search}`)
-		.then(r => r.json())
+	mapbox_coords_search({ "coords": p.i })
 		.then(r => {
-			if (r.features.length)
-				pn.innerText = r.features[0]['text'];
+			if (!maybe(r, 'features', 'length')) return;
+
+			const name = r.features[0]['text'];
+			const path = r.features[0]['context'].reverse().slice(1).map(x => x.text);
+
+			if (path[path.length - 1] === name) path.splice(path[path.length - 1]);
+
+			pn.append(ce('span', path.join(', ') + ", ", { "class": "context" }), name);
 		});
 
 	return el;

@@ -100,3 +100,9 @@ div.nonmatch {
 .matches ~ .nonmatch {
   display: block;
 }
+
+.search-results .context {
+  margin-right: 0.4em;
+  color: #a9a9a9;
+  font-size: 0.8em;
+}

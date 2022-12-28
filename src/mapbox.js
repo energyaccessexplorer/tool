@@ -379,3 +379,27 @@ background-color: transparent;`,
 		drop,
 	};
 };
+
+export function text_search({
+	query,
+	limit = 10,
+	box = GEOGRAPHY.envelope,
+	types = ['region', 'district', 'place', 'locality', 'neighborhood', 'poi'],
+}) {
+	const q = encodeURI(query);
+	const search = `?limit=${limit}&country=${GEOGRAPHY.cca2}&types=${types}&bbox=${box}&access_token=${mapboxgl.accessToken}`;
+
+	return fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${q}.json${search}`)
+		.then(r => r.json());
+};
+
+export function coords_search({
+	coords,
+	limit = 1,
+	types = ['poi', 'neighborhood', 'locality', 'place'],
+}) {
+	const search = `?limit=${limit}&types=${types}&access_token=${mapboxgl.accessToken}`;
+
+	return fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${coords}.json${search}`)
+		.then(r => r.json());
+};

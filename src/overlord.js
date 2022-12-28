@@ -43,6 +43,7 @@ import {
 import {
 	info_mode_change as mapbox_info_mode_change,
 	map_pointer,
+	coords_search as mapbox_coords_search,
 } from './mapbox.js';
 
 import {
@@ -445,11 +446,26 @@ function mapclick(e) {
 
 	const td = table_data(dict, props, ll);
 
-	map_pointer(
-		td,
-		maybe(e, 'originalEvent', 'pageX') || 0,
-		maybe(e, 'originalEvent', 'pageY') || 0,
-	);
+	mapbox_coords_search({ "coords": ll, "limit": 10, "types": ["poi"] })
+		.catch(_ => ({ "features": [] }))
+		.then(r => {
+			if (!r.features.length) return "";
+
+			const pois = ce('div', null, { "id": "pois" });
+			pois.append(ce('h5', "Points of interest"));
+
+			r.features.forEach(f => pois.append(ce('div', f.text, { "class": "small" })));
+
+			return pois;
+		})
+		.then(p => {
+			map_pointer(
+				{
+					"x": maybe(e, 'originalEvent', 'pageX'),
+					"y": maybe(e, 'originalEvent', 'pageY'),
+				},
+				td, p);
+		});
 };
 
 function context(rc, f) {

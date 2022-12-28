@@ -326,7 +326,7 @@ This is fatal. Thanks for all the fish.`,
 	return [[left,top], [right,top], [right,bottom], [left,bottom]];
 };
 
-export function map_pointer(content, x, y) {
+export function map_pointer({x = 0, y = 0}, ...contents) {
 	let p = qs('#map-pointer');
 
 	if (p) p.remove();
@@ -354,6 +354,9 @@ background-color: transparent;`,
 		cls = true;
 		pos = "C";
 	}
+
+	const content = ce('span');
+	content.append(...contents);
 
 	const mark = new bubblemessage({ "position": pos, "message": content, "close": cls }, (MOBILE ? document.body : p));
 

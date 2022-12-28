@@ -19,7 +19,7 @@ export function pointto(coords, dict, props, a = false) {
 	const box = maparea.getBoundingClientRect();
 
 	if (pointer) pointer.drop();
-	pointer = map_pointer(td, box.x + x, box.y + y);
+	pointer = map_pointer({"x": box.x + x, "y": box.y + y}, td);
 };
 
 export function zoom(p, fn) {

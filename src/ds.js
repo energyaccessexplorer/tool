@@ -157,6 +157,9 @@ This is not fatal but the dataset is now disabled.`,
 		if (o.category.raster) {
 			const f = this.processed_files.find(x => x.func === 'raster');
 
+			if (this.category.controls.range === "multiselect")
+				this._domain_select = [];
+
 			if (!f) go = ok.call(this, 'raster');
 			else {
 				this.raster = {};
@@ -204,6 +207,7 @@ This is not fatal but the dataset is now disabled.`,
 		}
 
 		case 'raster-timeline':
+		case 'raster-valued':
 		case 'raster': {
 			this.download = this.raster.endpoint;
 			break;
@@ -449,6 +453,7 @@ This is not fatal but the dataset is now disabled.`,
 		}
 
 		case 'raster-timeline':
+		case 'raster-valued':
 		case 'raster': {
 			opts = {
 				"stops":     this.category.colorstops,

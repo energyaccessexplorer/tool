@@ -61,6 +61,41 @@ function ramp(...els) {
 	return r;
 };
 
+function value_multiselect() {
+	const ds = this.ds;
+
+	const inputs = ds.csv.data.map(x => {
+		const k = x['KEY'];
+
+		const i = ce('input', null, { "type": 'checkbox', "name": "", "value": k });
+		i.checked = true;
+		i.id = ds.id + "_" + k;
+
+		i.onchange = _ => {
+			ds._domain_select = [...new Set(inputs.filter(e => e.checked).map(e => +e.value))];
+			O.ds(ds, { 'domain': ds.domain });
+		};
+
+		return i;
+	});
+
+	ds._domain_select = ds.csv.data.map(r => +r['KEY']);
+
+	const elements = inputs.map((e,i) => {
+		const c = ds.colorscale.fn(+e.value);
+		const s = ce('span', null, { "style": `width: 20px; height: 14px; display: inline-block; background-color: rgba(${c}); margin: auto 1em;` });
+
+		const l = ce('label', s, { "for": e.id });
+		l.append(ds.csv.data[i]['VALUE']);
+
+		return ce('div', [e,l]);
+	});
+
+	return {
+		elements,
+	};
+};
+
 function range(interval) {
 	const ds = this.ds;
 	const cat = this.ds.category;
@@ -327,10 +362,18 @@ function range_el() {
 		break;
 	}
 
+	case 'raster-valued':	{
+		if (this.ds._domain_select)
+			g = value_multiselect.call(this);
+
+		break;
+	}
+
 	case 'raster-mutant':
 	case 'raster-timeline':
 	case 'raster': {
 		g = range.call(this, svg_interval_transparent);
+
 		break;
 	}
 
@@ -345,7 +388,7 @@ function range_el() {
 	}
 	}
 
-	if (ds.domain) {
+	if (ds.domain && !ds._domain_select) {
 		r = tmpl('#ramp');
 		qs('.ramp', r).append(...ramp_domain.call(this));
 	}

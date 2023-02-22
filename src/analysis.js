@@ -208,7 +208,9 @@ function datasets(type) {
 				return false;
 			}
 
-			if (typeof d.analysis_fn(type) !== 'function')
+			if (d._domain_select)
+				d._afn = _ => x => (d._domain_select.indexOf(x) > -1) ? 1 : -1;
+			else if (typeof d.analysis_fn(type) !== 'function')
 				d._afn = _ => x => (x < d._domain.min || x > d._domain.max) ? -1 : 1;
 			else
 				d._afn = d.analysis_fn;

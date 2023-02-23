@@ -362,6 +362,7 @@ function range_el() {
 		break;
 	}
 
+	case 'raster-valued-mutant':
 	case 'raster-valued':	{
 		if (this.ds._domain_select)
 			g = value_multiselect.call(this);

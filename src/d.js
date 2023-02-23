@@ -226,6 +226,7 @@ CSV has ${empties} empty cells.`,
 		break;
 	}
 
+	case 'raster-valued-mutant':
 	case 'raster-mutant': {
 		super_error(
 			"Pseudo-dataset",

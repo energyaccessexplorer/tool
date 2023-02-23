@@ -293,7 +293,10 @@ This is fatal. Thanks for all the fish.`;
 	})();
 
 	(async function fetch_admintiers() {
-		const ds = new DS(ALL.find(x => x.category.name === 'admin-tiers'));
+		const o = ALL.find(x => x.category.name === 'admin-tiers');
+		if (!o) return;
+
+		const ds = new DS(o);
 		await ds.load('csv');
 
 		const data = ds.csv.data;

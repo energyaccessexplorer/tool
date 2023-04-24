@@ -41,7 +41,6 @@
 		"mapboxgl": "readonly",
 		"GeoTIFF": "readonly",
 		"geojsonExtent": "readonly",
-		"jsPDF": "readonly",
 		"SphericalMercator": "readonly",
 		"jwt_decode": "readonly",
 

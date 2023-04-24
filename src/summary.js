@@ -7,8 +7,6 @@ import {
 } from './plot.js';
 
 import {
-	pdf as report_pdf,
-	csv as report_csv,
 } from './report.js';
 
 import analysis_run from './analysis.js';
@@ -119,15 +117,10 @@ async function summary() {
 		this.innerText = ss ? "Summary Table" : "Summary Graphs";
 	};
 
-	const pdf = ce('button', "Export PDF Report", { "class": 'big-green-button' });
-	pdf.onclick = report_pdf;
-
-	const csv = ce('button', "Export CSV Report", { "class": 'big-green-button' });
-	csv.onclick = _ => fake_blob_download(report_csv(summary), `energyaccessexplorer-report.csv`, "text/csv");
 
 	content.append(graphs_tab, tables_tab);
 
-	const footer = ce('div', [switcher, pdf, csv], { "style": "text-align: center;" });
+	const footer = ce('div', [switcher], { "style": "text-align: center;" });
 
 	new modal({
 		"id":      'snapshot-modal',

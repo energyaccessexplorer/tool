@@ -14,8 +14,6 @@ bubblemessage.js	https://git.263.nu/f/web-toolbelt/raw/branch/trunk/bubblemessag
 pgrest.js	https://git.263.nu/f/web-toolbelt/raw/branch/trunk/pgrest.js
 selectlist.js	https://git.263.nu/f/web-toolbelt/raw/branch/trunk/selectlist.js
 browsers.js	https://git.263.nu/f/web-toolbelt/raw/branch/trunk/browsers.js
-jspdf.js	https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js
-jspdf-autotable.js	https://unpkg.com/jspdf-autotable@latest/dist/jspdf.plugin.autotable.min.js
 bootstrap-icons.css	https://cdn.jsdelivr.net/npm/bootstrap-icons@latest/font/bootstrap-icons.css
 fonts/bootstrap-icons.woff2	https://cdn.jsdelivr.net/npm/bootstrap-icons@latest/font/fonts/bootstrap-icons.woff2
 jwt-decode.js	https://raw.githubusercontent.com/auth0/jwt-decode/master/build/jwt-decode.js

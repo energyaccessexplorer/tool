@@ -30,14 +30,14 @@ async function summary() {
 	const graphs = ce('div', null, { "id": "summary-graphs" });
 	const graphs_tab = ce('div', graphs, { "class": 'tab' });
 
-	const summary = {};
-
 	const r = tmpl('#ramp');
 	qs('.ramp', r).append(
 		ce('div', "Low"),
 		ce('div', "Medium"),
 		ce('div', "High"),
 	);
+
+	SUMMARY = {};
 
 	const scale = ce('div');
 	scale.append(ea_analysis_colorscale.svg.cloneNode(true), r);
@@ -47,10 +47,10 @@ async function summary() {
 	async function get_summaries(idxn) {
 		let raster = (await analysis_run(idxn)).raster;
 
-		summary[idxn] = await analyse(raster);
+		SUMMARY[idxn] = await analyse(raster);
 
-		let ppie = svg_pie(summary[idxn]['population-density']['distribution'].map(x => [x]), 75, 0, ea_analysis_colorscale.stops, null, null, bubble);
-		let apie = svg_pie(summary[idxn]['area']['distribution'].map(x => [x]), 75, 0, ea_analysis_colorscale.stops, null, null, bubble);
+		let ppie = svg_pie(SUMMARY[idxn]['population-density']['distribution'].map(x => [x]), 75, 0, ea_analysis_colorscale.stops, null, null, bubble);
+		let apie = svg_pie(SUMMARY[idxn]['area']['distribution'].map(x => [x]), 75, 0, ea_analysis_colorscale.stops, null, null, bubble);
 
 		const container = tmpl('#index-graphs-container-template');
 		qs('.index-graphs-group #area-number', container).parentElement.append(apie.svg);
@@ -61,7 +61,7 @@ async function summary() {
 			   [
 				   ce('div', ea_indexes[idxn]['name'], { "class": 'up-title' }),
 				   container,
-				   ce('div', (summary[idxn]['area']['total'] === 0) ? ce('code', "(no datasets selected)") : null, { "style": "text-align: center; font-size: smaller;" }),
+				   ce('div', (SUMMARY[idxn]['area']['total'] === 0) ? ce('code', "(no datasets selected)") : null, { "style": "text-align: center; font-size: smaller;" }),
 			   ],
 			   { "class": 'index-group' }));
 
@@ -95,9 +95,9 @@ async function summary() {
 		thead.append(thr = ce('tr', ce('th'), { "class": 'number-labels-row' }));
 		s.forEach((x,i) => thr.append(ce('th', lowmedhigh(i), { "style": `background-color: ${x};`})));
 
-		for (let k in summary) {
+		for (let k in SUMMARY) {
 			let tr = ce('tr', ce('td', ea_indexes[k]['name'], { "class": 'index-name' }));
-			s.forEach((x,i) => tr.append(ce('td', (summary[k][j]['amounts'][i]).toLocaleString())));
+			s.forEach((x,i) => tr.append(ce('td', (SUMMARY[k][j]['amounts'][i]).toLocaleString())));
 
 			tbody.append(tr);
 		}

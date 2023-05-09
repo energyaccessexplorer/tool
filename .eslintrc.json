@@ -55,6 +55,7 @@
 		"O": "writable",
 		"ENV": "writable",
 		"PARAMS": "writable",
+		"SUMMARY": "writable",
 
 		"qs": "readonly",
 		"qsa": "readonly",

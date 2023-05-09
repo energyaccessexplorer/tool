@@ -1,4 +1,5 @@
 .include ".env"
+default: reconfig build lint
 
 DIST = ./dist
 SRC = ./src
@@ -11,8 +12,6 @@ TIMESTAMP != date -u +'%Y-%m-%d--%T'
 
 GITSHA != git log -n1 --format=format:"%H" | head -c 8
 GITCLEAN != [ "`git diff --stat`" = '' ] || echo "-dirty"
-
-default: reconfig build lint
 
 build: build-a build-s
 	@cp views/index.html ${DIST}/index.html
@@ -127,14 +126,14 @@ synced:
 deploy:
 	@touch ${env}.diff
 
-	patch -p1 --reverse --silent <development.diff
-	patch -p1 --silent <${env}.diff
+	@patch -p1 --reverse --silent <development.diff
+	@patch -p1 --silent <${env}.diff
 	bmake reconfig build sync env=${env}
 
 	@echo "--------"
 
-	patch -p1 --reverse --silent <${env}.diff
-	patch -p1 --silent <development.diff
+	@patch -p1 --reverse --silent <${env}.diff
+	@patch -p1 --silent <development.diff
 	bmake reconfig build env=development
 
 reconfig:

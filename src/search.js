@@ -31,8 +31,8 @@ export function zoom(p, fn) {
 	else if (p.center) {
 		MAPBOX.flyTo({ "center": p.center, "zoom": 12, "speed": 2 });
 	}
-	else if (p.i) {
-		MAPBOX.flyTo({ "center": p.i, "zoom": 12, "speed": 2 });
+	else if (p.c) {
+		MAPBOX.flyTo({ "center": p.c, "zoom": 12, "speed": 2 });
 	}
 
 	if (typeof fn === 'function')

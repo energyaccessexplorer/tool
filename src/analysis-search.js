@@ -31,18 +31,18 @@ async function getpoints(n = 20) {
 		return t;
 	}, []);
 
-	return points.map(t => ({ "v": t.v, "i": raster_pixel_to_coordinates(t.i) }));
+	return points.map(t => ({ "v": t.v, "i": t.i, "c": raster_pixel_to_coordinates(t.i) }));
 };
 
 function pointto(p, a = false) {
 	const dict = [[ "v", ea_indexes[U.output]['name'] ]];
 	const props = { "v": ea_lowmedhigh_scale(p.v) };
 
-	search_pointto(p.i, dict, props, a);
+	search_pointto(p.c, dict, props, a);
 };
 
 function li(p) {
-	const pi3 = (p.i).map(c => +c.toFixed(3));
+	const pi3 = (p.c).map(c => +c.toFixed(3));
 
 	const pn = ce('span');
 
@@ -59,7 +59,7 @@ function li(p) {
 
 	el.onclick = zoom.bind(null, p, pointto.bind(null, p, true));
 
-	mapbox_coords_search({ "coords": p.i })
+	mapbox_coords_search({ "coords": p.c })
 		.then(r => {
 			if (!maybe(r, 'features', 'length')) return;
 

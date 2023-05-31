@@ -233,7 +233,7 @@ export function init() {
 	function hextostring(hex) {
 		let s = "";
 
-		//             ________________ careful there
+		//             /--------------- careful there
 		//            /
 		//           V
 		for (let i = 2; i < hex.length; i += 2)

@@ -468,7 +468,7 @@ function mapclick(e) {
 		});
 };
 
-function context(rc, f) {
+export function context(rc, f) {
 	const dict = [];
 	const props = {};
 

@@ -106,6 +106,7 @@ async function tree() {
 		d.subdiv = y;
 		s.onclick = _ => {
 			const t = d.getAttribute('open') === null;
+
 			if (t)
 				load(j, y);
 			else

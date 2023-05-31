@@ -95,6 +95,7 @@ function svg_pie(data, outer, inner, colors, inner_text, parse, bubble) {
 		.outerRadius(outer - (outer/15));
 
 	const svg = d3.create("svg")
+		.attr('xmlns', "http://www.w3.org/2000/svg")
 		.attr('class', 'svg-pie')
 		.attr("width", width)
 		.attr("height", height);

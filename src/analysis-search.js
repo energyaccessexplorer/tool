@@ -17,7 +17,7 @@ let ul, input, resultscontainer;
 
 let resultsinfo;
 
-async function getpoints(n = 20) {
+export async function getpoints(n = 20) {
 	const a = await analysis_plot_active(U.output, false);
 
 	const threshold = a.raster.slice(0)

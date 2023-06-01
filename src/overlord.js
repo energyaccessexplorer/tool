@@ -215,8 +215,8 @@ export default class Overlord {
 	load_config(c = JSON.parse(localStorage.getItem('config'))) {
 		config_load_datasets(c);
 
-		const arr = c.datasets.filter(x => DST.get(x.name));
-		arr.forEach(x => DST.get(x.name).active(true, true));
+		const arr = c.datasets.filter(x => DST.get(x.id));
+		arr.forEach(x => DST.get(x.id).active(true, true));
 
 		return c;
 	};

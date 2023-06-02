@@ -212,7 +212,9 @@ export default class Overlord {
 		O.view = U.view;
 	};
 
-	load_config(c = JSON.parse(localStorage.getItem('config'))) {
+	load_config(c) {
+		if (!c) return;
+
 		config_load_datasets(c);
 
 		const arr = c.datasets.filter(x => DST.get(x.id));

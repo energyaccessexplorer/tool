@@ -170,8 +170,17 @@ async function init_1() {
 async function init_2() {
 	await dsinit(GEOGRAPHY.id);
 
-	const conf = localStorage.getItem('config');
-	if (conf) O.load_config();
+	let conf = localStorage.getItem('config');
+
+	const url = new URL(location);
+	const stamp = url.searchParams.get('snapshot');
+	if (stamp) {
+		conf = await API.get('snapshots', { "time": `eq.${stamp}` }, { "one": true })
+			.catch(_ => {})
+			.then(r => r['config']);
+	}
+
+	O.load_config(conf);
 
 	O.index = U.output;
 

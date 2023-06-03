@@ -171,6 +171,7 @@ async function init_2() {
 	await dsinit(GEOGRAPHY.id);
 
 	let conf = localStorage.getItem('config');
+	if (conf) conf = JSON.parse(conf);
 
 	const url = new URL(location);
 	const stamp = url.searchParams.get('snapshot');

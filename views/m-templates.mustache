@@ -1,0 +1,25 @@
+<template id="sessions">
+  <ul>
+    <li bind-each="_">
+    </li>
+  </ul>
+</template>
+
+<template id="session">
+  <div class="session-square">
+    <h4>
+      <span bind="last"></span>
+
+      <a bind="url"
+         target="_blank"></a>
+    </h4>
+
+    <p bind="date" class="date"></p>
+
+    <h4 bind="path"></h4>
+
+    <p>
+      <span bind="size"></span> snapshots
+    </p>
+  </div>
+</template>

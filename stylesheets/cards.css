@@ -5,13 +5,19 @@
   max-width: 40em;
 }
 
-#cards-clear-all {
+#cards-clear-buttons {
+  border-bottom: solid 1px #d9d9d9;
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.cards-clear {
   line-height: 2.7em;
   font-size: 1.1em;
   text-align: center;
   color: var(--the-green);
   cursor: pointer;
-  border-bottom: solid 1px #d9d9d9;
+  flex-grow: 1;
 }
 
 input[bind="min"],

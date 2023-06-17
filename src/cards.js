@@ -416,13 +416,24 @@ export function init() {
 			_ => O.sort(),
 		);
 
-	const ca = ce('div', 'Clear all datasets', { "id": 'cards-clear-all' });
+	const ca = ce('span', 'Clear all datasets', { "class": 'cards-clear' });
 	ca.onclick = _ => {
 		DS.all("on").forEach(x => x.active(false));
 		O.view = U.view;
+		update();
 	};
 
-	qs('#cards').prepend(ca);
+	const cp = ce('span', 'Clear filters', { "class": 'cards-clear' });
+	cp.onclick = _ => {
+		DS.all("on").forEach(d => {
+			O.ds(d, { "domain": d.domain });
+			d.card.refresh();
+		});
+
+		O.view = U.view;
+	};
+
+	qs('#cards #cards-clear-buttons').append(ca,cp);
 };
 
 export function update() {

@@ -22,7 +22,7 @@ export async function getpoints(n = 20) {
 
 	const threshold = a.raster.slice(0)
 		.sort((a,b) => a > b ? -1 : 1)
-		.slice(0, n)[n-1];
+		.slice(0,n)[n-1];
 
 	const points = a.raster.reduce((t,v,i) => {
 		if (v > 0 && v >= threshold)
@@ -31,7 +31,9 @@ export async function getpoints(n = 20) {
 		return t;
 	}, []);
 
-	return points.map(t => ({ "v": t.v, "i": t.i, "c": raster_pixel_to_coordinates(t.i) }));
+	return points
+		.sort((a,b) => a.v > b.v ? -1 : 1)
+		.map(t => ({ "v": t.v, "i": t.i, "c": raster_pixel_to_coordinates(t.i) }));
 };
 
 function pointto(p, a = false) {

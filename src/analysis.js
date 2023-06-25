@@ -368,3 +368,14 @@ export function enough_datasets(t) {
 	else
 		return DS.array.filter(d => and(d.on, d.analysis, d.index === t)).length > 0;
 };
+
+export function medhigh_point_count(d, a) {
+	let count = 0;
+
+	for (let i = 0; i < d.length; i++) {
+		if ((d[i] === 0) && (a[i] > 0.6))
+			count += 1;
+	}
+
+	return count;
+};

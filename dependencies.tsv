@@ -17,3 +17,5 @@ browsers.js	https://git.263.nu/f/web-toolbelt/raw/branch/trunk/browsers.js
 bootstrap-icons.css	https://cdn.jsdelivr.net/npm/bootstrap-icons@latest/font/bootstrap-icons.css
 fonts/bootstrap-icons.woff2	https://cdn.jsdelivr.net/npm/bootstrap-icons@latest/font/fonts/bootstrap-icons.woff2
 jwt-decode.js	https://raw.githubusercontent.com/auth0/jwt-decode/master/build/jwt-decode.js
+jszip.js	https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@3.12.0/libs/jszip.min.js
+pptxgen.js	https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@3.12.0/dist/pptxgen.min.js

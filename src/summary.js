@@ -7,6 +7,7 @@ import {
 } from './plot.js';
 
 import {
+	pptx as report_pptx,
 } from './report.js';
 
 import analysis_run from './analysis.js';
@@ -45,9 +46,11 @@ async function summary() {
 	const bubble = (v,e) => new bubblemessage({ "message": v + "%", "position": "C", "close": false, "noevents": true }, e);
 
 	async function get_summaries(idxn) {
+
 		let raster = (await analysis_run(idxn)).raster;
 
 		SUMMARY[idxn] = await analyse(raster);
+		SUMMARY[idxn]['raw_raster'] = raster;
 
 		let ppie = svg_pie(SUMMARY[idxn]['population-density']['distribution'].map(x => [x]), 75, 0, ea_analysis_colorscale.stops, null, null, bubble);
 		let apie = svg_pie(SUMMARY[idxn]['area']['distribution'].map(x => [x]), 75, 0, ea_analysis_colorscale.stops, null, null, bubble);
@@ -73,6 +76,10 @@ async function summary() {
 		document.body.append(c);
 
 		plot_outputcanvas(raster, c);
+
+		SUMMARY[idxn]['canvas'] = c;
+		SUMMARY[idxn]['population-density']['pie'] = ppie;
+		SUMMARY[idxn]['area']['pie'] = apie;
 	};
 
 	await Promise.all(Object.keys(ea_indexes).map(i => get_summaries(i)));
@@ -117,10 +124,12 @@ async function summary() {
 		this.innerText = ss ? "Summary Table" : "Summary Graphs";
 	};
 
+	const pptx_button = ce('button', "Export Presentation", { "class": 'big-green-button' });
+	pptx_button.onclick = report_pptx;
 
 	content.append(graphs_tab, tables_tab);
 
-	const footer = ce('div', [switcher], { "style": "text-align: center;" });
+	const footer = ce('div', [switcher, pptx_button], { "style": "text-align: center;" });
 
 	new modal({
 		"id":      'snapshot-modal',
@@ -192,6 +201,8 @@ export default async function analyse(raster) {
 		"amounts":      area_groups,
 		"distribution": area_groups.reduce((a,b) => { a.push(b/atotal); return a; }, []),
 	};
+
+	o['raster'] = a;
 
 	return o;
 };

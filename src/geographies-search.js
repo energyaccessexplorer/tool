@@ -82,7 +82,13 @@ export async function init() {
 		trigger(this.value);
 	};
 
-	const d = await tree();
+	const x = await until(_ => maybe(DST.get('admin-tiers'), 'tree'))
+		.catch(err => {
+			console.debug(err);
+			throw "NO ADMIN TIERS";
+		});
+
+	const d = await tree(x);
 	d.setAttribute('open', '');
 
 	resultscontainer.replaceChildren(d);
@@ -95,9 +101,7 @@ export async function init() {
 	load(0,0);
 };
 
-async function tree() {
-	await until(_ => DST.get('admin-tiers').tree);
-
+function tree($) {
 	const divisions = GEOGRAPHY.divisions;
 
 	function subtree(branch, j, title, y) {
@@ -130,7 +134,7 @@ async function tree() {
 		return d;
 	};
 
-	const t = subtree(DST.get('admin-tiers').tree, 0, GEOGRAPHY.name);
+	const t = subtree($, 0, GEOGRAPHY.name);
 	t.querySelector('summary').onclick = load.bind(null, 0, 0);
 	t.subdiv = 0;
 

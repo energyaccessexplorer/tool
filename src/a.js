@@ -291,15 +291,18 @@ This is fatal. Thanks for all the fish.`;
 	await (function fetch_divisions() {
 		const divisions_ids = divisions.slice(1).map(d => d.dataset_id);
 
-		return Promise.all(ALL.filter(x => divisions_ids.includes(x.id))
-			.map(async e => {
-				const ds = new DS(e);
+		return Promise.all(
+			ALL
+				.filter(x => divisions_ids.includes(x.id))
+				.map(async e => {
+					const ds = new DS(e);
 
-				return ds.load('csv')
-					.then(_ => ds.load('vectors'))
-					.then(_ => ds.load('raster'))
-					.catch(err => console.error(err));
-			}));
+					return ds.load('csv')
+						.then(_ => ds.load('vectors'))
+						.then(_ => ds.load('raster'))
+						.catch(err => console.error(err));
+				}),
+		);
 	})();
 
 	(async function fetch_admintiers() {

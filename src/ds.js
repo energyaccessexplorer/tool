@@ -194,6 +194,11 @@ This is not fatal but the dataset is now disabled.`,
 
 		this.controls = new dscontrols(this);
 
+		if (this.id === 'admin-tiers') {
+			this.controls.remove();
+			delete this.controls;
+		}
+
 		switch (this.datatype) {
 		case 'points-timeline':
 		case 'lines-timeline':

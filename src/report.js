@@ -122,12 +122,10 @@ function front() {
 			{
 				"text":    "Energy Access Exporer Report",
 				"options": { "fontSize": 48, bold, breakLine },
-			},
-			{
+			}, {
 				"text":    GEOGRAPHY.name,
 				"options": { "fontSize": 48, bold, breakLine },
-			},
-			{
+			}, {
 				"text":    "A Data-driven, Integrated and Inclusive Approach to Achieving Universal Access to Energy for Equitable Development",
 				"options": { "fontSize": 10 },
 			},
@@ -140,12 +138,10 @@ function front() {
 			{
 				"text":    "Prepared by Hordor",
 				"options": { bold, breakLine },
-			},
-			{
+			}, {
 				"text":    "The report has been developed using data available on the Energy Access Explorer",
 				"options": { breakLine },
-			},
-			{
+			}, {
 				"text":    "https://www.energyaccessexplorer.org/",
 				"options": { "fontSize": 8 },
 			},
@@ -180,8 +176,7 @@ function platform_overview() {
 			{
 				"text":    "Strategic Energy Planning. ",
 				"options": { bold },
-			},
-			{
+			}, {
 				"text": "Analysts and/or decision-makers within energy planning functions (a rural electrification agency, a planning unit of an energy ministry, etc.) can use the tool to improve linking electrification and socioeconomic development to meet people's needs. Energy Access Explorer complements the cost-optimization planning tools these agencies use and provides a bottom-up representation of aspects of affordability and demand. Further, it serves as a database that aggregates up-todate information. This reduces high transaction costs for data aggregation and sharing.",
 			},
 		],
@@ -193,8 +188,7 @@ function platform_overview() {
 			{
 				"text":    "Expansion of energy access markets. ",
 				"options": { bold },
-			},
-			{
+			}, {
 				"text": "Off-grid and mini-grid developers can use the tool to better assess the level of service needed. Understanding where their customers are likely to be located and where there is a concentration of demand will help clean energy entrepreneurs identify market opportunities.",
 			},
 		],
@@ -206,8 +200,7 @@ function platform_overview() {
 			{
 				"text":    "Investment for impact. ",
 				"options": { bold },
-			},
-			{
+			}, {
 				"text": "Analysts and/or decisionmakers within development finance institutions and donors can understand better where to most effectively channel funds into electrification efforts to ensure that no one is left behind.",
 			},
 		],
@@ -256,20 +249,16 @@ function selected_datasets_index($, index) {
 		{
 			"text":    "Dataset",
 			"options": textopts({ "align": "center", bold }),
-		},
-		{
+		}, {
 			"text":    "Unit",
 			"options": textopts({ "align": "center", bold }),
-		},
-		{
+		}, {
 			"text":    "Range",
 			"options": textopts({ "align": "center", bold }),
-		},
-		{
+		}, {
 			"text":    "Selected Range",
 			"options": textopts({ "align": "center", bold }),
-		},
-		{
+		}, {
 			"text":    "Importance",
 			"options": textopts({ "align": "center", bold }),
 		},
@@ -285,10 +274,10 @@ function selected_datasets_index($, index) {
 				"options": textopts({ "align": "left" }),
 			}, {
 				"text": d.unit ? d.unit.replace('<sup>2</sup>', '²') : "proximity in km",
-			},{
+			}, {
 				"text":    `min: ${d.domain.min}, max: ${d.domain.max}`,
 				"options": textopts(monospace),
-			},{
+			}, {
 				"text":    `min: ${d._domain.min}, max: ${d._domain.max}`,
 				"options": textopts(monospace),
 			}, {
@@ -328,8 +317,7 @@ function geography_indexes_left($) {
 				{
 					"text":    index.name + " ",
 					"options": { bold },
-				},
-				{
+				}, {
 					"text": index.info.replace(/\n/g, ' '),
 				},
 			],
@@ -403,8 +391,7 @@ function analysis(index) {
 		return [
 			{
 				"text": d.text,
-			},
-			{
+			}, {
 				"text":    (d.value).toLocaleString(),
 				"options": { "color": green, "fontSize": 24, "align": "right", bold, "wrap": false },
 			},
@@ -493,20 +480,34 @@ function analysis(index) {
 		const g = DST.get('ghi');
 		const w = DST.get('windspeed');
 
-		right_rows = [
-			row({
-				"text":  "Number of supply points e.g. transformers, power stations",
-				"value": points_count,
-			}),
+		right_rows = [];
 
-			row({
-				"text":  "Aproximate amount of people living with 1km of an electricity line",
-				"value": population_lines,
-			}),
-		];
+		if (points_count) {
+			right_rows.push(
+				row({
+					"text":  "Number of supply points e.g. transformers, power stations",
+					"value": points_count,
+				}),
+			);
+		}
+
+		if (lines.length) {
+			right_rows.push(
+				row({
+					"text":  "Aproximate amount of people living with 1km of an electricity line",
+					"value": population_lines,
+				}),
+			);
+		}
 
 		if (g.on) {
-			const data = w.raster.data;
+			const data = [];
+			for (let i = 0; i < summary_raster.length; i++) {
+				if (summary_raster[i] === -1) continue;
+				else if (g.raster.data[i] === g.raster.nodata) continue;
+
+				data.push(g.raster.data[i]);
+			}
 
 			right_rows.push(
 				row({
@@ -517,7 +518,13 @@ function analysis(index) {
 		}
 
 		if (w.on) {
-			const data = w.raster.data;
+			const data = [];
+			for (let i = 0; i < summary_raster.length; i++) {
+				if (summary_raster[i] === -1) continue;
+				else if (w.raster.data[i] === w.raster.nodata) continue;
+
+				data.push(w.raster.data[i]);
+			}
 
 			right_rows.push(
 				row({
@@ -629,12 +636,10 @@ function analysis_left($, index) {
 		{
 			"text":    "Low",
 			"options": textopts({ "align": "left", valign }),
-		},
-		{
+		}, {
 			"text":    "Medium",
 			"options": textopts({ "align": "center", valign }),
-		},
-		{
+		}, {
 			"text":    "High",
 			"options": textopts({ "align": "right", valign }),
 		},
@@ -721,28 +726,22 @@ function toplocations_list(points) {
 			{
 				"text":    i+1,
 				"options": { bold, "align": "right", "fontSize": 10, "fontFace": "monospace" },
-			},
-			{
+			}, {
 				"text":    `[${(p.long).toFixed(4)}, ${(p.lat).toFixed(4)}]`,
 				"options": { "align": "center", "fontSize": 8, "fontFace": "monospace" },
-			},
-			{
+			}, {
 				"text":    vtot(p.eai),
 				"options": { bold, "align": "center", "fontSize": 9, "color": font(p.eai), "fill": { "color": color(p.eai) } },
-			},
-			{
+			}, {
 				"text":    vtot(p.ani),
 				"options": { bold, "align": "center", "fontSize": 9, "color": font(p.ani), "fill": { "color": color(p.ani) } },
-			},
-			{
+			}, {
 				"text":    vtot(p.demand),
 				"options": { bold, "align": "center", "fontSize": 9, "color": font(p.demand), "fill": { "color": color(p.demand) } },
-			},
-			{
+			}, {
 				"text":    vtot(p.supply),
 				"options": { bold, "align": "center", "fontSize": 9, "color": font(p.supply), "fill": { "color": color(p.supply) } },
-			},
-			{
+			}, {
 				"text":    path(p),
 				"options": { "fontSize": 9 },
 			},
@@ -753,29 +752,23 @@ function toplocations_list(points) {
 		{
 			"text":    "#",
 			"options": textopts({ "align": "right", bold }),
-		},
-		{
+		}, {
 			"text":    "Long/Lat",
 			"options": textopts({ "align": "center", bold }),
-		},
-		{
+		}, {
 			"text":    "EAI",
 			"options": textopts({ "align": "center", bold }),
-		},
-		{
+		}, {
 			"text":    "ANI",
 			"options": textopts({ "align": "center", bold }),
-		},
-		{
+		}, {
 			"text":    "Demand",
 			"options": textopts({ "align": "center", bold }),
-		},
-		{
+		}, {
 			"text":    "Supply",
 			"options": textopts({ "align": "center", bold }),
-		},
-		{
-			"text":    "Path",
+		}, {
+			"text":    divs.join(" → "),
 			"options": textopts({ bold }),
 		},
 	];

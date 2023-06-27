@@ -13,7 +13,7 @@ TIMESTAMP != date -u +'%Y-%m-%d--%T'
 GITSHA != git log -n1 --format=format:"%H" | head -c 8
 GITCLEAN != [ "`git diff --stat`" = '' ] || echo "-dirty"
 
-build: build-a build-s
+build: build-a build-s build-m
 	@cp views/index.html ${DIST}/index.html
 
 lint:
@@ -25,6 +25,31 @@ deps:
 
 start:
 	${HTTP_SERVER} --port ${TOOL_PORT} --dir ${DIST}
+
+build-m:
+	@echo "Building my screen"
+	@mkdir -p ${DIST}/m
+
+	@mustache /dev/null ${VIEWS}/m.html > ${DIST}/m/index.html
+
+	@sed -ri 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/m/index.html
+
+		@cp ${SRC}/{user,m}.js ${DIST}/m/
+
+	@cat \
+		${LIB}/jwt-decode.js \
+		${LIB}/helpers.js \
+		> ${DIST}/m/libs.js
+
+	@echo -n "window.ea_settings = " | cat - \
+		settings.json \
+		> ${DIST}/m/main.js
+
+	@cat \
+		${CSS}/general.css \
+		${CSS}/m.css \
+		${CSS}/buttons.css \
+		> ${DIST}/m/main.css
 
 build-a:
 	@echo "Building analysis screen"

@@ -670,11 +670,13 @@ export async function analysis_to_dataset(t) {
 		"metadata":     {},
 	});
 
-	d.metadata.inputs = DS.all("on").map(d => d.name);
+	d.metadata.inputs = DS.all("on").map(d => d.id);
 
-	d._active(true, true);
+	await d._active(true, true);
 
 	O.view = 'inputs';
+
+	await until(_ => d.card);
 
 	qs('#cards #cards-list').prepend(d.card);
 

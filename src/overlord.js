@@ -430,7 +430,7 @@ function mapclick(e) {
 	const et = MAPBOX.queryRenderedFeatures(e.point)[0];
 
 	const ll = [e.lngLat.lng, e.lngLat.lat];
-	const rc = coordinates_to_raster_pixel(ll, DST.get('outline').raster);
+	const rc = coordinates_to_raster_pixel(ll, OUTLINE.raster);
 
 	const [dict, props] = context(rc, et);
 

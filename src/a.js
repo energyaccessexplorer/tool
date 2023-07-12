@@ -61,6 +61,8 @@ import {
 
 import DS from './ds.js';
 
+import admintiers from './admin-tiers.js';
+
 import Overlord from './overlord.js';
 
 import bubblemessage from '../lib/bubblemessage.js';
@@ -306,36 +308,25 @@ This is fatal. Thanks for all the fish.`;
 	})();
 
 	(async function fetch_admintiers() {
-		const o = ALL.find(x => x.category.name === 'admin-tiers');
-		if (!o) return;
+		let o = ALL.find(x => x.category.name === 'admin-tiers');
 
-		const ds = new DS(o);
-		await ds.load('csv');
+		if (!o) {
+			const pid = maybe(
+				await API.get(
+					'geographies_tree_up',
+					{ "id": `eq.${GEOGRAPHY.id}` },
+					{ "one": true },
+				), 'path', 0,
+			);
 
-		const data = ds.csv.data;
-		const columns = data.columns;
+			o = await API.get("datasets", {
+				"geography_id":  `eq.${pid}`,
+				"select":        select,
+				"category_name": "eq.admin-tiers",
+			}, { "one": true });
+		}
 
-		const tree = [];
-
-		function insert(nums, t) {
-			const head = maybe(nums, 0);
-
-			if (nums.length === 1) {
-				t[head] = 1;
-				return t;
-			}
-
-			if (!nums.length) return t;
-
-			if (t[head] === undefined) t[head] = [];
-
-			return insert(nums.slice(1), t[head]);
-		};
-
-		for (let i = 0; i < data.length; i++)
-			insert(columns.map(c => data[i][c]), tree);
-
-		ds.tree = tree;
+		admintiers(o);
 	})();
 
 	GEOGRAPHY.divisions = divisions.map(d => DS.array.find(t => t.dataset_id === d.dataset_id));

@@ -34,7 +34,9 @@ build-m:
 
 	@sed -ri 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/m/index.html
 
-		@cp ${SRC}/{user,m}.js ${DIST}/m/
+		@cp ${SRC}/user.js \
+			${SRC}/m.js \
+			${DIST}/m/
 
 	@cat \
 		${LIB}/jwt-decode.js \
@@ -61,7 +63,38 @@ build-a:
 
 	@cp ${CSS}/ripple.css ${DIST}/a/ripple.css
 	@cp ${CSS}/buttons.css ${DIST}/a/buttons.css
-	@cp ${SRC}/{browser,session,analysis,cards,config,controls,search,controls-search,symbols,geographies-search,vectors-search,analysis-search,locations-search,ds,parse,indexes,filtered,mapbox,overlord,plot,rasters,report,summary,timeline,user,views,help,a,qa}.js ${DIST}/a/
+	@cp \
+		${SRC}/admin-tiers.js \
+		${SRC}/browser.js \
+		${SRC}/session.js \
+		${SRC}/analysis.js \
+		${SRC}/cards.js \
+		${SRC}/config.js \
+		${SRC}/controls.js \
+		${SRC}/search.js \
+		${SRC}/controls-search.js \
+		${SRC}/symbols.js \
+		${SRC}/geographies-search.js \
+		${SRC}/vectors-search.js \
+		${SRC}/analysis-search.js \
+		${SRC}/locations-search.js \
+		${SRC}/ds.js \
+		${SRC}/parse.js \
+		${SRC}/indexes.js \
+		${SRC}/filtered.js \
+		${SRC}/mapbox.js \
+		${SRC}/overlord.js \
+		${SRC}/plot.js \
+		${SRC}/rasters.js \
+		${SRC}/report.js \
+		${SRC}/summary.js \
+		${SRC}/timeline.js \
+		${SRC}/user.js \
+		${SRC}/views.js \
+		${SRC}/help.js \
+		${SRC}/a.js \
+		${SRC}/qa.js \
+		${DIST}/a/
 
 	@cat \
 		${LIB}/d3.js \
@@ -106,7 +139,11 @@ build-s:
 
 	@sed -ri 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/s/index.html
 
-	@cp ${SRC}/{browser,user,s}.js ${DIST}/s/
+	@cp \
+		${SRC}/browser.js \
+		${SRC}/user.js \
+		${SRC}/s.js \
+		${DIST}/s/
 
 	@cat \
 		${LIB}/d3.js \

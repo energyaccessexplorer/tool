@@ -62,6 +62,8 @@ async function load(x,y) {
 	MAPBOX.getSource(d.id).setData(DST.get(d.id).vectors.geojson);
 
 	if (d.on) d.raise();
+
+	O.view = U.view;
 };
 
 export async function init() {

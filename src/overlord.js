@@ -367,7 +367,7 @@ function load_view() {
 
 		O.sort();
 
-		analysis_plot_active(output, false);
+		analysis_plot_active(output, true);
 
 		output_preview.style.display = '';
 

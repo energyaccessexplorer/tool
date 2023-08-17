@@ -63,7 +63,7 @@ function footer($) {
 	);
 
 	$.addImage(
-		{ "path": "/images/wri-footer.png", "x": 0.5, "y": a4(100, 'y') - h, "w": (h*2.12), h },
+		{ "path": "/images/wri-hbox-white-on-yellow.jpg", "x": 0.5, "y": (a4(100, 'y') - h) + 0.125, "w": (h*3), "h": h/2 },
 	);
 
 	$.addText(
@@ -96,7 +96,7 @@ function chapter(number, name) {
 function title($, text) {
 	$.addText(
 		text,
-		{ "color": green, x, "y": 0.5, "fontSize": 24, bold },
+		{ "color": green, x, "y": 0.5, "w": "100%", "fontSize": 22, bold },
 	);
 };
 
@@ -109,7 +109,7 @@ function front() {
 
 	const h = 1;
 	$.addImage(
-		{ "path": "/images/wri-footer.png", "x": 0.5, "y": 0.5, "w": (h*2.12), h },
+		{ "path": "/images/wri-box-white-on-yellow.jpg", "x": 0.5, "y": 0.5, "w": (h*2.12), h },
 	);
 
 	$.addText(
@@ -289,6 +289,8 @@ function selected_datasets_index($, index) {
 	const tabletextopts = Object.assign(textopts({ "fontSize": 10, "align": "right", "valign": "middle" }));
 
 	$.addTable(rows.concat(selected), Object.assign(tabletextopts, { x, "y": first_paragraph_y, "w": "90%" }));
+
+	footer($);
 };
 
 function geography_indexes() {
@@ -727,6 +729,9 @@ function toplocations_list(points) {
 				"text":    i+1,
 				"options": { bold, "align": "right", "fontSize": 10, "fontFace": "monospace" },
 			}, {
+				"text":    path(p),
+				"options": { "fontSize": 9 },
+			}, {
 				"text":    `[${(p.long).toFixed(4)}, ${(p.lat).toFixed(4)}]`,
 				"options": { "align": "center", "fontSize": 8, "fontFace": "monospace" },
 			}, {
@@ -741,9 +746,6 @@ function toplocations_list(points) {
 			}, {
 				"text":    vtot(p.supply),
 				"options": { bold, "align": "center", "fontSize": 9, "color": font(p.supply), "fill": { "color": color(p.supply) } },
-			}, {
-				"text":    path(p),
-				"options": { "fontSize": 9 },
 			},
 		];
 	};
@@ -752,6 +754,9 @@ function toplocations_list(points) {
 		{
 			"text":    "#",
 			"options": textopts({ "align": "right", bold }),
+		}, {
+			"text":    divs.join(" → "),
+			"options": textopts({ bold, "fontSize": 9 }),
 		}, {
 			"text":    "Long/Lat",
 			"options": textopts({ "align": "center", bold }),
@@ -767,9 +772,6 @@ function toplocations_list(points) {
 		}, {
 			"text":    "Supply",
 			"options": textopts({ "align": "center", bold }),
-		}, {
-			"text":    divs.join(" → "),
-			"options": textopts({ bold }),
 		},
 	];
 
@@ -777,7 +779,9 @@ function toplocations_list(points) {
 
 	rows.push(...points.map((p,i) => row(p,i)));
 
-	$.addTable(rows, textopts({ x, "y": 1, "w": "96%", "colW": [0.5, 2, 1, 1, 1, 1, 5], border }));
+	$.addTable(rows, textopts({ x, "y": 1, "w": "96%", "colW": [0.5, 4.5, 2, 1, 1, 1, 1], border }));
+
+	footer($);
 };
 
 function toplocations_index(index, points) {
@@ -785,30 +789,85 @@ function toplocations_index(index, points) {
 
 	const border = tableborder;
 
-	title($, `Selected ${ea_indexes[index]['name']} Datasets`);
+	title($, `High Priority Locations for Energy Interventions (${ea_indexes[index]['name']} Info)`);
 
 	const datasets = DS.array.filter(d => and(d.on, d.index === index));
 
-	const cell = t => ({
-		"text":    t ? t.replace(/<\/?code>/g, '') : "",
-		"options": { "align": "center", "fontSize": 8, "fontFace": "monospace", "fill": "#F5FAF8" },
-	});
+	const divs = GEOGRAPHY.divisions.slice(1).map(d => d.name);
+
+	const path = p => divs.map(d => p["_" + d]).join(" → ");
+
+	const color = v => d3.rgb(...ea_analysis_colorscale.fn(v)).formatHex();
+
+	const font = v => v > 0.80 ? black : white;
+
+	const cell = (p,d) => {
+		let t = p[d.id];
+
+		if (t) {
+			t = t
+				.replace(/<\/?code>/g, '')
+				.replace(d.category.unit || "", "")
+				.replace("km (proximity to)", "");
+		}
+
+		return {
+			"text":    t || "",
+			"options": { "align": "center", "fontSize": 8, "fontFace": "monospace", "fill": "#F5FAF8" },
+		};
+	};
 
 	const numcell = t => ({
 		"text":    t+1,
 		"options": { "align": "right", "fontFace": "monospace", bold, "fontSize": 10 },
 	});
 
-	const header = [{ "text": "#", "options": { "align": "right", bold } }].concat(datasets.map(d => ({
-		"text":    d.name,
-		"options": { "align": "center", bold, "fill": "#F0F5F3", "fontSize": 10 },
+	const header = [
+		{
+			"text":    "#",
+			"options": { "align": "right", bold },
+		}, {
+			"text":    divs.join(" → "),
+			"options": textopts({ bold, "fontSize": 9 }),
+		}, {
+			"text": "",
+		}, {
+			"text": "",
+		}, {
+			"text": "",
+		}, {
+			"text": "",
+		},
+	].concat(datasets.map(d => ({
+		"text":    d.name + "\n\n" + (d.category.unit || "km (proximity to)"),
+		"options": { "align": "center", "valign": "middle", "fill": "#F0F5F3", "fontFace": "monospace", "fontSize": 6, bold },
 	})));
 
 	const rows = [header];
 
-	rows.push(...points.map((p,i) => [numcell(i)].concat(datasets.map(d => cell(p[d.id])))));
+	rows.push(...points.map((p,i) => [
+		numcell(i),
+		{
+			"text":    path(p),
+			"options": { "fontSize": 7 },
+		}, {
+			"text":    "",
+			"options": { bold, "align": "center", "fontSize": 9, "color": font(p.eai), "fill": { "color": color(p.eai) } },
+		}, {
+			"text":    "",
+			"options": { bold, "align": "center", "fontSize": 9, "color": font(p.ani), "fill": { "color": color(p.ani) } },
+		}, {
+			"text":    "",
+			"options": { bold, "align": "center", "fontSize": 9, "color": font(p.demand), "fill": { "color": color(p.demand) } },
+		}, {
+			"text":    "",
+			"options": { bold, "align": "center", "fontSize": 9, "color": font(p.supply), "fill": { "color": color(p.supply) } },
+		},
+	].concat(datasets.map(d => cell(p,d)))));
 
-	$.addTable(rows, textopts({ x, "y": 1, "w": "96%", "colW": [0.5, ...Array(datasets.length).fill(2)], border }));
+	$.addTable(rows, textopts({ x, "y": 1, "w": "96%", "colW": [0.5, 3, ...Array(4).fill(0.1), ...Array(datasets.length).fill(1)], border }));
+
+	footer($);
 };
 
 export async function pptx() {

@@ -34,9 +34,10 @@ build-m:
 
 	@sed -ri 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/m/index.html
 
-		@cp ${SRC}/user.js \
-			${SRC}/m.js \
-			${DIST}/m/
+	@cp ${SRC}/user.js \
+		${SRC}/m.js \
+		${LIB}/bind.js \
+		${DIST}/m/
 
 	@cat \
 		${LIB}/jwt-decode.js \

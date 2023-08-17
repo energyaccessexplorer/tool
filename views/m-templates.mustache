@@ -8,10 +8,13 @@
 <template id="session">
   <div class="session-square">
     <h4>
-      <span bind="last"></span>
-
-      <a bind="url"
-         target="_blank"></a>
+      <a bind-attr="href"
+         bind-arg="url"
+         target="_blank">
+        <span bind="last"></span>
+        &nbsp;
+        <i class="bi bi-box-arrow-up-right"></i>
+      </a>
     </h4>
 
     <p bind="date" class="date"></p>

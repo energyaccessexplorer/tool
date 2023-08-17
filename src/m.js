@@ -2,6 +2,8 @@ import {
 	logged_in as user_logged_in,
 } from './user.js';
 
+import bind from './bind.js';
+
 function unique(arr) {
 	return arr.filter((v,i,a) => a.indexOf(v) === i);
 };
@@ -11,11 +13,18 @@ function loading(bool) {
 };
 
 export async function init() {
-	console.log(user_logged_in());
+	const user_id = user_logged_in();
+
+	if (!user_id) {
+		console.warn("NOT logged in.");
+		loading(false);
+		return;
+	}
 
 	const sessions = await API.get('sessions', {
-		"user_id": `eq.${localStorage['user-id']}`,
+		"user_id": `eq.${user_id}`,
 		"select":  ["*", "snapshots(*)"],
+		"order":   "time.desc",
 	});
 
 	const gs = unique(sessions.map(t => t.geography_id));
@@ -30,14 +39,14 @@ export async function init() {
 
 	const container = document.querySelector('#sessions');
 
-	sessions.sort((a,b) => (a.time > b.time ? -1 : 1)).forEach(s => {
+	sessions.forEach(s => {
 		s.size = s.snapshots.length;
 
 		if (!s.size) return;
 
 		s.last = s.snapshots[s.size - 1]['time'];
 
-		s.url = `/a/?id=${s.geography_id}&snapshot=${s.last}`;
+		s.url = `/tool/a/?id=${s.geography_id}&snapshot=${s.last}`;
 
 		const d = new Date(s.time);
 		s.date = d.toLocaleDateString() + " at " + d.toLocaleTimeString();

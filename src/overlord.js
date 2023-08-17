@@ -192,6 +192,8 @@ export default class Overlord {
 
 			analysis_dataset_intersect.call(d, a.raster);
 		};
+
+		session_snapshot();
 	};
 
 	info_mode() {
@@ -420,8 +422,6 @@ function load_view() {
 	}
 
 	views_buttons();
-
-	session_snapshot();
 };
 
 function mapclick(e) {

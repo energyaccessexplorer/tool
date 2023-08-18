@@ -721,17 +721,19 @@ function toplocations_list(points) {
 
 	const font = v => v > 0.80 ? black : white;
 
-	const path = p => divs.map(d => p["_" + d]).join(" → ");
+	// const path = p => divs.map(d => p["_" + d]).join(" → ");
 
 	function row(p,i) {
 		return [
 			{
 				"text":    i+1,
 				"options": { bold, "align": "right", "fontSize": 10, "fontFace": "monospace" },
-			}, {
-				"text":    path(p),
+			},
+			...divs.map(t => ({
+				"text":    p["_" + t],
 				"options": { "fontSize": 9 },
-			}, {
+			})),
+			{
 				"text":    `[${(p.long).toFixed(4)}, ${(p.lat).toFixed(4)}]`,
 				"options": { "align": "center", "fontSize": 8, "fontFace": "monospace" },
 			}, {
@@ -754,10 +756,12 @@ function toplocations_list(points) {
 		{
 			"text":    "#",
 			"options": textopts({ "align": "right", bold }),
-		}, {
-			"text":    divs.join(" → "),
-			"options": textopts({ bold, "fontSize": 9 }),
-		}, {
+		},
+		...divs.map(t => ({
+			"text":    t,
+			"options": textopts({ "align": "center", bold }),
+		})),
+		{
 			"text":    "Long/Lat",
 			"options": textopts({ "align": "center", bold }),
 		}, {
@@ -779,7 +783,7 @@ function toplocations_list(points) {
 
 	rows.push(...points.map((p,i) => row(p,i)));
 
-	$.addTable(rows, textopts({ x, "y": 1, "w": "96%", "colW": [0.5, 4.5, 2, 1, 1, 1, 1], border }));
+	$.addTable(rows, textopts({ x, "y": 1, "w": "96%", "colW": [0.5, ...Array(divs.length).fill(1.5), 2, 1, 1, 1, 1], border }));
 
 	footer($);
 };
@@ -795,12 +799,6 @@ function toplocations_index(index, points) {
 
 	const divs = GEOGRAPHY.divisions.slice(1).map(d => d.name);
 
-	const path = p => divs.map(d => p["_" + d]).join(" → ");
-
-	const color = v => d3.rgb(...ea_analysis_colorscale.fn(v)).formatHex();
-
-	const font = v => v > 0.80 ? black : white;
-
 	const cell = (p,d) => {
 		let t = p[d.id];
 
@@ -812,7 +810,7 @@ function toplocations_index(index, points) {
 		}
 
 		return {
-			"text":    t || "",
+			"text":    coalesce(t, ""),
 			"options": { "align": "center", "fontSize": 8, "fontFace": "monospace", "fill": "#F5FAF8" },
 		};
 	};
@@ -826,17 +824,14 @@ function toplocations_index(index, points) {
 		{
 			"text":    "#",
 			"options": { "align": "right", bold },
-		}, {
-			"text":    divs.join(" → "),
-			"options": textopts({ bold, "fontSize": 9 }),
-		}, {
-			"text": "",
-		}, {
-			"text": "",
-		}, {
-			"text": "",
-		}, {
-			"text": "",
+		},
+		...divs.map(t => ({
+			"text":    t,
+			"options": textopts({ bold, "align": "center", "fontSize": 9 }),
+		})),
+		{
+			"text":    "Long/Lat",
+			"options": textopts({ bold, "align": "center", "fontSize": 9 }),
 		},
 	].concat(datasets.map(d => ({
 		"text":    d.name + "\n\n" + (d.category.unit || "km (proximity to)"),
@@ -847,25 +842,19 @@ function toplocations_index(index, points) {
 
 	rows.push(...points.map((p,i) => [
 		numcell(i),
+		...divs.map(t => {
+			return {
+				"text":    p["_" + t],
+				"options": { "fontSize": 7 },
+			};
+		}),
 		{
-			"text":    path(p),
-			"options": { "fontSize": 7 },
-		}, {
-			"text":    "",
-			"options": { bold, "align": "center", "fontSize": 9, "color": font(p.eai), "fill": { "color": color(p.eai) } },
-		}, {
-			"text":    "",
-			"options": { bold, "align": "center", "fontSize": 9, "color": font(p.ani), "fill": { "color": color(p.ani) } },
-		}, {
-			"text":    "",
-			"options": { bold, "align": "center", "fontSize": 9, "color": font(p.demand), "fill": { "color": color(p.demand) } },
-		}, {
-			"text":    "",
-			"options": { bold, "align": "center", "fontSize": 9, "color": font(p.supply), "fill": { "color": color(p.supply) } },
+			"text":    `[${(p.long).toFixed(4)}, ${(p.lat).toFixed(4)}]`,
+			"options": { "align": "center", "fontSize": 7, "fontFace": "monospace" },
 		},
 	].concat(datasets.map(d => cell(p,d)))));
 
-	$.addTable(rows, textopts({ x, "y": 1, "w": "96%", "colW": [0.5, 3, ...Array(4).fill(0.1), ...Array(datasets.length).fill(1)], border }));
+	$.addTable(rows, textopts({ x, "y": 1, "w": "96%", "colW": [0.5, ...Array(divs.length).fill(1.5), 1.5, ...Array(datasets.length).fill(1)], border }));
 
 	footer($);
 };

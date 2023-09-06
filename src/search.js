@@ -19,7 +19,7 @@ export function pointto(coords, dict, props, a = false) {
 	const box = maparea.getBoundingClientRect();
 
 	if (pointer) pointer.drop();
-	pointer = map_pointer(td, box.x + x, box.y + y);
+	pointer = map_pointer({"x": box.x + x, "y": box.y + y}, td);
 };
 
 export function zoom(p, fn) {
@@ -31,8 +31,8 @@ export function zoom(p, fn) {
 	else if (p.center) {
 		MAPBOX.flyTo({ "center": p.center, "zoom": 12, "speed": 2 });
 	}
-	else if (p.i) {
-		MAPBOX.flyTo({ "center": p.i, "zoom": 12, "speed": 2 });
+	else if (p.c) {
+		MAPBOX.flyTo({ "center": p.c, "zoom": 12, "speed": 2 });
 	}
 
 	if (typeof fn === 'function')

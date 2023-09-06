@@ -7,8 +7,7 @@ import {
 } from './plot.js';
 
 import {
-	pdf as report_pdf,
-	csv as report_csv,
+	pptx as report_pptx,
 } from './report.js';
 
 import analysis_run from './analysis.js';
@@ -32,8 +31,6 @@ async function summary() {
 	const graphs = ce('div', null, { "id": "summary-graphs" });
 	const graphs_tab = ce('div', graphs, { "class": 'tab' });
 
-	const summary = {};
-
 	const r = tmpl('#ramp');
 	qs('.ramp', r).append(
 		ce('div', "Low"),
@@ -41,18 +38,22 @@ async function summary() {
 		ce('div', "High"),
 	);
 
+	SUMMARY = {};
+
 	const scale = ce('div');
 	scale.append(ea_analysis_colorscale.svg.cloneNode(true), r);
 
 	const bubble = (v,e) => new bubblemessage({ "message": v + "%", "position": "C", "close": false, "noevents": true }, e);
 
 	async function get_summaries(idxn) {
+
 		let raster = (await analysis_run(idxn)).raster;
 
-		summary[idxn] = await analyse(raster);
+		SUMMARY[idxn] = await analyse(raster);
+		SUMMARY[idxn]['raw_raster'] = raster;
 
-		let ppie = svg_pie(summary[idxn]['population-density']['distribution'].map(x => [x]), 75, 0, ea_analysis_colorscale.stops, null, null, bubble);
-		let apie = svg_pie(summary[idxn]['area']['distribution'].map(x => [x]), 75, 0, ea_analysis_colorscale.stops, null, null, bubble);
+		let ppie = svg_pie(SUMMARY[idxn]['population-density']['distribution'].map(x => [x]), 75, 0, ea_analysis_colorscale.stops, null, null, bubble);
+		let apie = svg_pie(SUMMARY[idxn]['area']['distribution'].map(x => [x]), 75, 0, ea_analysis_colorscale.stops, null, null, bubble);
 
 		const container = tmpl('#index-graphs-container-template');
 		qs('.index-graphs-group #area-number', container).parentElement.append(apie.svg);
@@ -63,7 +64,7 @@ async function summary() {
 			   [
 				   ce('div', ea_indexes[idxn]['name'], { "class": 'up-title' }),
 				   container,
-				   ce('div', (summary[idxn]['area']['total'] === 0) ? ce('code', "(no datasets selected)") : null, { "style": "text-align: center; font-size: smaller;" }),
+				   ce('div', (SUMMARY[idxn]['area']['total'] === 0) ? ce('code', "(no datasets selected)") : null, { "style": "text-align: center; font-size: smaller;" }),
 			   ],
 			   { "class": 'index-group' }));
 
@@ -75,6 +76,10 @@ async function summary() {
 		document.body.append(c);
 
 		plot_outputcanvas(raster, c);
+
+		SUMMARY[idxn]['canvas'] = c;
+		SUMMARY[idxn]['population-density']['pie'] = ppie;
+		SUMMARY[idxn]['area']['pie'] = apie;
 	};
 
 	await Promise.all(Object.keys(ea_indexes).map(i => get_summaries(i)));
@@ -97,9 +102,9 @@ async function summary() {
 		thead.append(thr = ce('tr', ce('th'), { "class": 'number-labels-row' }));
 		s.forEach((x,i) => thr.append(ce('th', lowmedhigh(i), { "style": `background-color: ${x};`})));
 
-		for (let k in summary) {
+		for (let k in SUMMARY) {
 			let tr = ce('tr', ce('td', ea_indexes[k]['name'], { "class": 'index-name' }));
-			s.forEach((x,i) => tr.append(ce('td', (summary[k][j]['amounts'][i]).toLocaleString())));
+			s.forEach((x,i) => tr.append(ce('td', (SUMMARY[k][j]['amounts'][i]).toLocaleString())));
 
 			tbody.append(tr);
 		}
@@ -119,15 +124,20 @@ async function summary() {
 		this.innerText = ss ? "Summary Table" : "Summary Graphs";
 	};
 
-	const pdf = ce('button', "Export PDF Report", { "class": 'big-green-button' });
-	pdf.onclick = report_pdf;
+	const pptx_button = ce('button', "Export Presentation", { "class": 'big-green-button' });
+	pptx_button.onclick = async _ => {
+		loading(true);
 
-	const csv = ce('button', "Export CSV Report", { "class": 'big-green-button' });
-	csv.onclick = _ => fake_blob_download(report_csv(summary), `energyaccessexplorer-report.csv`, "text/csv");
+		await delay(0.1);
+		await report_pptx();
+		await delay(5);
+
+		loading(false);
+	};
 
 	content.append(graphs_tab, tables_tab);
 
-	const footer = ce('div', [switcher, pdf, csv], { "style": "text-align: center;" });
+	const footer = ce('div', [switcher, pptx_button], { "style": "text-align: center;" });
 
 	new modal({
 		"id":      'snapshot-modal',
@@ -199,6 +209,8 @@ export default async function analyse(raster) {
 		"amounts":      area_groups,
 		"distribution": area_groups.reduce((a,b) => { a.push(b/atotal); return a; }, []),
 	};
+
+	o['raster'] = a;
 
 	return o;
 };

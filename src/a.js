@@ -61,6 +61,8 @@ import {
 
 import DS from './ds.js';
 
+import admintiers from './admin-tiers.js';
+
 import Overlord from './overlord.js';
 
 import bubblemessage from '../lib/bubblemessage.js';
@@ -109,11 +111,6 @@ const Uproxy = {
 			break;
 		}
 
-		case "inputs": {
-			url.searchParams.set(t, [...new Set(v)].filter(t => DST.get(t)));
-			break;
-		}
-
 		default: {
 			throw new TypeError(`U: I'm not allowed to set '${t}'`);
 		}
@@ -152,8 +149,6 @@ async function init_1() {
 
 	if (MOBILE) mobile();
 
-	drawer_init();
-
 	mapbox_theme_init(ea_settings.mapbox_theme);
 
 	GEOGRAPHY.timeline_dates = maybe(GEOGRAPHY, 'configuration', 'timeline_dates');
@@ -167,6 +162,7 @@ async function init_1() {
 
 	U = new Proxy(url, Uproxy);
 
+	drawer_init();
 	views_init();
 	cards_init();
 
@@ -176,10 +172,18 @@ async function init_1() {
 async function init_2() {
 	await dsinit(GEOGRAPHY.id);
 
-	const conf = localStorage.getItem('config');
-	if (conf) O.load_config();
+	let conf = localStorage.getItem('config');
+	if (conf) conf = JSON.parse(conf);
 
-	U.variant = U.variant || 'raster';
+	const url = new URL(location);
+	const stamp = url.searchParams.get('snapshot');
+	if (stamp) {
+		conf = await API.get('snapshots', { "time": `eq.${stamp}` }, { "one": true })
+			.catch(_ => {})
+			.then(r => r['config']);
+	}
+
+	O.load_config(conf);
 
 	O.index = U.output;
 
@@ -289,20 +293,48 @@ This is fatal. Thanks for all the fish.`;
 	await (function fetch_divisions() {
 		const divisions_ids = divisions.slice(1).map(d => d.dataset_id);
 
-		return Promise.all(ALL.filter(x => divisions_ids.includes(x.id))
-			.map(async e => {
-				const ds = new DS(e);
+		return Promise.all(
+			ALL
+				.filter(x => divisions_ids.includes(x.id))
+				.map(async e => {
+					const ds = new DS(e);
 
-				return ds.load('csv')
-					.then(_ => ds.load('vectors'))
-					.then(_ => ds.load('raster'))
-					.catch(err => console.error(err));
-			}));
+					return ds.load('csv')
+						.then(_ => ds.load('vectors'))
+						.then(_ => ds.load('raster'))
+						.catch(err => console.error(err));
+				}),
+		);
+	})();
+
+	(async function fetch_admintiers() {
+		let o = ALL.find(x => x.category.name === 'admin-tiers');
+
+		if (!o) {
+			const pid = maybe(
+				await API.get(
+					'geographies_tree_up',
+					{ "id": `eq.${GEOGRAPHY.id}` },
+					{ "one": true },
+				), 'path', 0,
+			);
+
+			o = await API.get("datasets", {
+				"geography_id":  `eq.${pid}`,
+				"select":        select,
+				"category_name": "eq.admin-tiers",
+			}, { "one": true });
+		}
+
+		admintiers(o);
 	})();
 
 	GEOGRAPHY.divisions = divisions.map(d => DS.array.find(t => t.dataset_id === d.dataset_id));
 
-	ALL.filter(d => !divisions.map(i => i.dataset_id).includes(d.id)).map(e => new DS(e));
+	ALL
+		.filter(d => !divisions.map(i => i.dataset_id).includes(d.id))
+		.filter(d => d.category.name !== 'admin-tiers')
+		.forEach(e => new DS(e));
 
 	// We need all the datasets to be initialised _before_ setting
 	// mutant attributes (order is never guaranteed)
@@ -324,15 +356,8 @@ function layout() {
 
 	if (MOBILE) m.style['width'] = screen.width + "px";
 
-	const o = tmpl('#analysis-output-template');
-
-	if (GEOGRAPHY.timeline) {
-		const g = tmpl('#timeline-graphs-template');
-		qs('#cards-pane').append(g);
-		qs('#filtered-pane').append(o);
-	} else {
-		qs('#cards-pane').append(o);
-	}
+	if (GEOGRAPHY.timeline)
+		console.warn("TODO #timeline-graphs", qs('#timeline-graphs'));
 
 	document.body.onresize = function() {
 		set_heights();
@@ -428,6 +453,13 @@ export function toggle_left_panel(t) {
 	for (let e of qsa('#left-pane > div'))
 		e.style.display = 'none';
 
+	const as = qsa('#drawer a');
+
+	for (let a of as) {
+		if (a.getAttribute('for') === t) a.classList.add('active');
+		else a.classList.remove('active');
+	}
+
 	if (t) {
 		const p = document.getElementById(t);
 		p.style.display = '';
@@ -447,6 +479,8 @@ export function toggle_left_panel(t) {
 
 	const tl = qs('#timeline');
 	if (tl) tl.dispatchEvent(rs);
+
+	U.tab = t;
 };
 
 function drawer_init() {
@@ -456,17 +490,10 @@ function drawer_init() {
 
 	for (let a of as) {
 		a.onclick = function() {
-			for (let x of as) if (x !== this) x.classList.remove('active');
-
-			if (this.classList.contains('active')) {
-				this.classList.remove('active');
-				toggle_left_panel();
-			} else {
-				const f = this.getAttribute('for');
-				toggle_left_panel(f);
-				this.classList.add('active');
-				U.tab = f;
-			}
+			toggle_left_panel(
+				this.classList.contains('active') ? null :
+					this.getAttribute('for'),
+			);
 		};
 
 		a.onmouseenter = function() {
@@ -484,5 +511,5 @@ function drawer_init() {
 		};
 	}
 
-	toggle_left_panel();
+	toggle_left_panel(U.tab);
 };

@@ -43,6 +43,7 @@ import {
 import {
 	info_mode_change as mapbox_info_mode_change,
 	map_pointer,
+	coords_search as mapbox_coords_search,
 } from './mapbox.js';
 
 import {
@@ -84,9 +85,11 @@ export default class Overlord {
 
 			case "active": {
 				const draw = ['inputs', 'timeline'].includes(U.view);
-				w = d.active(v, draw);
-
-				O.sort();
+				w = d.active(v, draw)
+					.then(_ => {
+						cards_update();
+						O.sort();
+					});
 
 				if (d.summary) {
 					for (const i in d.summary)
@@ -189,6 +192,8 @@ export default class Overlord {
 
 			analysis_dataset_intersect.call(d, a.raster);
 		};
+
+		session_snapshot();
 	};
 
 	info_mode() {
@@ -209,15 +214,19 @@ export default class Overlord {
 		O.view = U.view;
 	};
 
-	load_config(c = JSON.parse(localStorage.getItem('config'))) {
+	load_config(c) {
+		if (!c) return;
+
 		config_load_datasets(c);
 
-		const arr = c.datasets.filter(x => DST.get(x.name));
-		arr.forEach(x => DST.get(x.name).active(true, true));
+		const arr = c.datasets.filter(x => DST.get(x.id));
+		arr.forEach(x => DST.get(x.id).active(true, true));
 
 		return c;
 	};
 };
+
+const output_preview = qs('#output-preview');
 
 function load_view() {
 	const timeline = qs('#timeline');
@@ -344,6 +353,10 @@ function load_view() {
 				priority_visibility_pick();
 			});
 
+		views_right_pane();
+
+		output_preview.style.display = 'none';
+
 		break;
 	}
 
@@ -354,10 +367,13 @@ function load_view() {
 
 		priority_visibility_pick();
 
-		cards_update();
 		O.sort();
 
-		analysis_plot_active(output, false);
+		analysis_plot_active(output, true);
+
+		output_preview.style.display = '';
+
+		views_right_pane();
 
 		break;
 	}
@@ -375,6 +391,10 @@ function load_view() {
 
 		filtered_valued_polygons();
 
+		output_preview.style.display = '';
+
+		views_right_pane();
+
 		break;
 	}
 
@@ -387,10 +407,11 @@ function load_view() {
 
 		priority_visibility_pick();
 
-		timeline_lines_update();
-
-		cards_update();
 		O.sort();
+
+		output_preview.style.display = '';
+
+		timeline_lines_update();
 
 		break;
 	}
@@ -401,9 +422,6 @@ function load_view() {
 	}
 
 	views_buttons();
-	views_right_pane();
-
-	session_snapshot();
 };
 
 function mapclick(e) {
@@ -412,7 +430,7 @@ function mapclick(e) {
 	const et = MAPBOX.queryRenderedFeatures(e.point)[0];
 
 	const ll = [e.lngLat.lng, e.lngLat.lat];
-	const rc = coordinates_to_raster_pixel(ll, DST.get('outline').raster);
+	const rc = coordinates_to_raster_pixel(ll, OUTLINE.raster);
 
 	const [dict, props] = context(rc, et);
 
@@ -430,14 +448,29 @@ function mapclick(e) {
 
 	const td = table_data(dict, props, ll);
 
-	map_pointer(
-		td,
-		maybe(e, 'originalEvent', 'pageX') || 0,
-		maybe(e, 'originalEvent', 'pageY') || 0,
-	);
+	mapbox_coords_search({ "coords": ll, "limit": 10, "types": ["poi"] })
+		.catch(_ => ({ "features": [] }))
+		.then(r => {
+			if (!r.features.length) return "";
+
+			const pois = ce('div', null, { "id": "pois" });
+			pois.append(ce('h5', "Points of interest"));
+
+			r.features.forEach(f => pois.append(ce('div', f.text, { "class": "small" })));
+
+			return pois;
+		})
+		.then(p => {
+			map_pointer(
+				{
+					"x": maybe(e, 'originalEvent', 'pageX'),
+					"y": maybe(e, 'originalEvent', 'pageY'),
+				},
+				td, p);
+		});
 };
 
-function context(rc, f) {
+export function context(rc, f) {
 	const dict = [];
 	const props = {};
 
@@ -637,13 +670,15 @@ export async function analysis_to_dataset(t) {
 		"metadata":     {},
 	});
 
-	d.metadata.inputs = DS.all("on").map(d => d.name);
+	d.metadata.inputs = DS.all("on").map(d => d.id);
 
-	d._active(true, true);
+	await d._active(true, true);
 
 	O.view = 'inputs';
 
-	qs('#cards-pane #cards-list').prepend(d.card);
+	await until(_ => d.card);
+
+	qs('#cards #cards-list').prepend(d.card);
 
 	await until(_ => maybe(d, 'raster', 'data'));
 

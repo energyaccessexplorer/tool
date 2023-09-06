@@ -3,10 +3,10 @@ import DS from './ds.js';
 import dscard from './cards.js';
 
 export function load_datasets(conf) {
-	const list = DS.array.filter(d => conf.datasets.find(t => t.id === d.dataset_id || t.name === d.id));
+	const list = DS.array.filter(d => conf.datasets.find(t => t.id === d.id));
 
 	conf.datasets.forEach(d => {
-		const ds = list.find(t => t.dataset_id === d.id || t.id === d.name);
+		const ds = list.find(t => t.id === d.id);
 
 		if (!ds) {
 			console.error("config load: Failed to find dataset for preset/param:", d);
@@ -29,10 +29,14 @@ export function load_datasets(conf) {
 export function generate() {
 	const datasets = dscard.all.map(d => d.ds)
 		.map(d => ({
-			"id":     d.dataset_id,
-			"name":   d.id,
-			"weight": d.weight,
-			"domain": d._domain,
+			"dataset_id": d.dataset_id,
+			"id":         d.id,
+			"name":       d.name,
+			"weight":     d.weight,
+			"domain":     d.domain,
+			"_domain":    d._domain,
+			"index":      d.index,
+			"unit":       d.category.unit,
 		}));
 
 	const config = {
@@ -51,5 +55,3 @@ export function generate() {
 
 	return config;
 };
-
-window.gen = generate;

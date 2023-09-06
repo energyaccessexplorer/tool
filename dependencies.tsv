@@ -1,7 +1,7 @@
 d3.js	https://d3js.org/d3.v5.min.js
 geotiff.js	https://cdn.jsdelivr.net/npm/geotiff@1.0.4
-mapbox-gl.js	https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js
-mapbox-gl.css	https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css
+mapbox-gl.js	https://api.mapbox.com/mapbox-gl-js/v2.11.1/mapbox-gl.js
+mapbox-gl.css	https://api.mapbox.com/mapbox-gl-js/v2.11.1/mapbox-gl.css
 geojson-extent.js	https://raw.githubusercontent.com/mapbox/geojson-extent/master/geojson-extent.js
 sphericalmercator.js	https://raw.githubusercontent.com/mapbox/sphericalmercator/master/sphericalmercator.js
 html5sortable.js	https://unpkg.com/html5sortable/dist/html5sortable.min.js
@@ -13,10 +13,9 @@ nanny.js	https://git.263.nu/f/web-toolbelt/raw/branch/trunk/nanny.js
 bubblemessage.js	https://git.263.nu/f/web-toolbelt/raw/branch/trunk/bubblemessage.js
 pgrest.js	https://git.263.nu/f/web-toolbelt/raw/branch/trunk/pgrest.js
 selectlist.js	https://git.263.nu/f/web-toolbelt/raw/branch/trunk/selectlist.js
-dropdown.js	https://git.263.nu/f/web-toolbelt/raw/branch/trunk/dropdown.js
 browsers.js	https://git.263.nu/f/web-toolbelt/raw/branch/trunk/browsers.js
-jspdf.js	https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js
-jspdf-autotable.js	https://unpkg.com/jspdf-autotable@latest/dist/jspdf.plugin.autotable.min.js
 bootstrap-icons.css	https://cdn.jsdelivr.net/npm/bootstrap-icons@latest/font/bootstrap-icons.css
 fonts/bootstrap-icons.woff2	https://cdn.jsdelivr.net/npm/bootstrap-icons@latest/font/fonts/bootstrap-icons.woff2
 jwt-decode.js	https://raw.githubusercontent.com/auth0/jwt-decode/master/build/jwt-decode.js
+jszip.js	https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@3.12.0/libs/jszip.min.js
+pptxgen.js	https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@3.12.0/dist/pptxgen.min.js

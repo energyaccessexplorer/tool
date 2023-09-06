@@ -33,14 +33,20 @@
 
     <div id="playground">
       <div id="drawer">
-        <a for="controls" description="Search Datasets"><i class="bi bi-list-task"></i></a>
+        <a for="controls" description="Add Layers"><i class="bi bi-plus-lg"></i></a>
+        <a for="cards" description="Active Layers"><i class="bi bi-list-task"></i></a>
         <a for="vectors" description="Search Features"><i class="bi bi-search"></i></a>
-        <a for="analysis" description="Top Locations"><i class="bi bi-geo-alt"></i></a>
+        <a for="analysis" description="Top Locations"><i class="bi bi-bar-chart"></i></a>
         <a for="locations" description="Search POI's"><i class="bi bi-geo"></i></a>
         <a for="geographies" description="Change geographies"><i class="bi bi-globe"></i></a>
       </div>
 
       <div id="left-pane">
+        <div id="cards" class="search-panel">
+          <div id="cards-clear-buttons"></div>
+          <div id="cards-list" class="search-results"></div>
+        </div>
+
         <div id="controls" class="search-panel">
           <div class="search-results">
             <div id="controls-tabs"></div>
@@ -50,6 +56,11 @@
 
         <div id="geographies" class="search-panel">
           <div class="search-results"></div>
+
+          <div id="timeline-graphs" style="display: none;">
+            <strong id="lines-header" class="header up-title"></strong>
+            <div id="lines-graph" class="graphs"></div>
+          </div>
         </div>
 
         <div id="vectors" class="search-panel">
@@ -75,9 +86,7 @@
       </div>
 
       <div id="right-pane">
-        <div id="cards-pane">
-          <div id="cards-list"></div>
-        </div>
+        <button id="summary-button" class="big-green-button">Report</button>
 
         <div id="filtered-pane" style="display: none;">
           <div class="up-title">Considered geographies</div>
@@ -88,16 +97,20 @@
           <div id="index-graphs">
             <div id="index-graphs-title" class="up-title"></div>
             <div id="index-graphs-description"></div>
-            <div id="index-graphs-toolbox"></div>
           </div>
+
+          <div id="index-layer-toolbox"></div>
 
           <table id="indexes-list"></table>
 
           <select id="output-variant-select">
             <option value="raster">Raster Analysis</option>
           </select>
+        </div>
 
-          <div id="summary-button" class="up-title" ripple>Snapshot</div>
+        <div id="output-preview">
+          <select id="canvas-output-select"></select>
+          <canvas id="output"></canvas>
         </div>
 
         <div id="drawer-right-pane">
@@ -144,6 +157,7 @@
     window.U = null;
     window.DST = new Map();
     window.PARAMS = null;
+    window.SUMMARY = null;
   </script>
 
   {{> views/env }}

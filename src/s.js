@@ -233,7 +233,7 @@ export function init() {
 	function hextostring(hex) {
 		let s = "";
 
-		//             ________________ careful there
+		//             /--------------- careful there
 		//            /
 		//           V
 		for (let i = 2; i < hex.length; i += 2)
@@ -265,7 +265,9 @@ export function init() {
 				};
 			}
 
-			fetch(`${ea_settings.world}/countries?select=flag&or=(names->>official.eq.${co.name},name.eq.${co.name})`)
+			const _name = co.name.replace(new RegExp("\\ ?\\(?(" + ENV.join('|') + ")\\)?", "i"), '');
+
+			fetch(`${ea_settings.world}/countries?select=flag&or=(names->>official.eq."${_name}",name.eq."${_name}")`)
 				.then(r => r.json())
 				.then(r => {
 					const data = r[0];

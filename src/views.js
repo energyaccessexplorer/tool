@@ -9,11 +9,10 @@ export function buttons() {
 };
 
 export function right_pane() {
-	const panes = ["cards", "indexes", "filtered"];
+	const panes = ["indexes", "filtered"];
 
 	const views = {
-		"timeline": ["cards"],
-		"inputs":   ["cards"],
+		"inputs":   ["indexes"],
 		"outputs":  ["indexes"],
 		"filtered": ["filtered"],
 	};

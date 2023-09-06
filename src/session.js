@@ -2,34 +2,49 @@ import {
 	generate as config_gen,
 } from './config.js';
 
-function time() {
-	return (new Date()).getTime();
-};
+import {
+	logged_in as user_logged_in,
+} from './user.js';
 
-const session = {
-	"time":      time(),
-	"snapshots": [],
-};
+const snapshot_id = (new URL(location)).searchParams.get('snapshot');
+
+const session = {};
 
 export function init() {
-	localStorage['user-id'] = localStorage['user-id'] || uuid();
+	const user_id = user_logged_in();
 
-	const s = {
+	if (!user_id) {
+		console.info("User not logged in.");
+		return;
+	}
+
+	if (snapshot_id) {
+		console.info("Revisiting snapshot.");
+		return;
+	}
+
+	session.time = (new Date()).getTime();
+	session.snapshots = [];
+
+	API.post('sessions', null, { "payload": {
 		"time":         session.time,
-		"user_id":      localStorage['user-id'],
+		"user_id":      user_id,
 		"geography_id": GEOGRAPHY.id,
-	};
-
-	API.post('sessions', null, { "payload": s });
+	}});
 };
 
 export function snapshot() {
+	const user_id = user_logged_in();
+
+	if (!user_id) return;
+	if (snapshot_id) return;
+
 	const c = config_gen();
 
 	delete c.geography;
 
 	const s = {
-		"time":       time(),
+		"time":       (new Date()).getTime(),
 		"session_id": session.time,
 		"config":     c,
 	};

@@ -2,7 +2,7 @@ export function logged_in() {
 	const token = localStorage.getItem('token');
 
 	try {
-		return (token && jwt_decode(token)['email']);
+		return (token && jwt_decode(token)['id']);
 	} catch (e) {
 		return false;
 	}

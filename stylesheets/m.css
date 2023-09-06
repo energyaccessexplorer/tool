@@ -1,0 +1,30 @@
+body {
+  background-color: #E8E8E7;
+}
+
+#playground {
+  display: flex;
+  margin: auto;
+  width: 80em;
+}
+
+#search {
+  min-width: 40em;
+}
+
+.session-square {
+  padding: 1em 2em;
+  margin: 1em;
+  background-color: white;
+  width: 100%;
+}
+
+.date {
+  color: #6B6868;
+  font-style: italic;
+  font-size: 0.9em;
+}
+
+h4 {
+  color: var(--the-green);
+}

@@ -1,6 +1,7 @@
 <template id="ds-controls-template">
   <style>
-    @import "./ripple.css";
+    @import url("./ripple.css");
+    @import url("./buttons.css");
 
     main {
       background-color: var(--the-darker-white);
@@ -27,6 +28,20 @@
       cursor: pointer;
     }
 
+    ::slotted([slot=description]) {
+      display: block;
+
+      padding-bottom: 0.9em;
+      margin: auto 1em auto 3.8em;
+
+      color: #a3a3a3;
+    }
+
+    ::slotted([slot=description]:empty) {
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+
     [name=name] {
       flex: 1;
       display: block;
@@ -34,20 +49,11 @@
       line-height: 1.5em;
     }
 
-    [name=info],
     [name=checkbox] {
       flex: 0;
       display: block;
-    }
-
-    [name=checkbox] {
       margin-bottom: -4px;
       transform: scale(0.6);
-    }
-
-    content {
-      display: none;
-      padding: 0.7em;
     }
 
     .svg-interval {
@@ -59,11 +65,6 @@
       border-top: solid 1px #dfdfdf;
       margin-top: 1em;
       padding-top: 1em;
-    }
-
-    .weight-group,
-    .range-group {
-      padding: 0.9em 1.5em 0.9em 1.5em;
     }
 
     .ramp {
@@ -125,6 +126,19 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+
+    buttons {
+      visibility: hidden;
+      justify-content: flex-end;
+    }
+
+    :host(:hover) buttons {
+      visibility: visible;
+    }
+
+    :host(:not(.active)) buttons [name=card] {
+      display: none;
+    }
   </style>
 
   <main>
@@ -133,24 +147,15 @@
     <header ripple>
       <slot name="checkbox"></slot>
       <slot name="name"></slot>
-      <slot name="dropdown"></slot>
+
+      <buttons>
+        <slot name="card"></slot>
+        <slot name="info"></slot>
+      </buttons>
     </header>
 
     <content>
-      <div class="group">
-        <slot name="collection-list"></slot>
-        <slot name="mutant-options"></slot>
-      </div>
-
-      <div class="group range-group">
-        <slot name="range-slider"></slot>
-      </div>
-
-      <div class="advanced-controls">
-        <div class="group weight-group">
-          <slot name="weight-slider"></slot>
-        </div>
-      </div>
+      <slot name="description"></slot>
     </content>
   </main>
 </template>
@@ -158,6 +163,16 @@
 <template id="ds-card-template">
   <style>
     @import url("../lib/bootstrap-icons.css");
+    @import url("./buttons.css");
+
+    :host(:hover) buttons {
+      visibility: visible;
+    }
+
+    buttons {
+      flex-flow: column nowrap;
+      visibility: hidden;
+    }
 
     :host {
       background-color: var(--the-white);
@@ -201,15 +216,9 @@
       filter: drop-shadow( 0px 1px 1px rgba(0, 0, 0, 0.3));
     }
 
-    [layout=title] {
+    [name=title] {
       flex: 1;
       margin-right: 5px;
-    }
-
-    [layout=info],
-    [layout=close],
-    [layout=opacity] {
-      margin-left: 10px;
     }
 
     [name=info] svg {
@@ -224,13 +233,13 @@
       color: gray;
     }
 
-    .handle {
-      display: block;
+    handle {
+      display: flex;
       width: 22px;
-      margin-top: 10px;
       margin-left: 2px;
+      align-items: center;
 
-      color: #aaa;
+      color: #ccc;
       font-size: 1.8em;
 
       cursor: grab;
@@ -239,6 +248,10 @@
 
     [name=ramp] {
       font-size: 0.8em;
+    }
+
+    .weight-group {
+      margin-top: 2em;
     }
 
     .collection {
@@ -263,35 +276,38 @@
     }
   </style>
 
-  <div class="handle">
+  <handle>
     <i class="bi bi-grip-vertical"></i>
-  </div>
+  </handle>
 
   <main>
     <header>
-      <div layout="title">
-        <slot name="name"></slot>
-        <slot name="unit"></slot>
-      </div>
-
-      <div layout="opacity">
-        <slot name="opacity"></slot>
-      </div>
-
-      <div layout="info">
-        <slot name="info"></slot>
-      </div>
-
-      <div layout="close">
-        <slot name="close"></slot>
-      </div>
+      <slot name="name"></slot>
     </header>
 
     <content>
-      <slot name="svg"></slot>
+      <slot name="range"></slot>
       <slot name="ramp"></slot>
+
+      <div class="group">
+        <slot name="collection-list"></slot>
+        <slot name="mutant-options"></slot>
+      </div>
+
+      <div class="group advanced-controls" style="display: none;">
+        <div class="weight-group">
+          <slot name="weight"></slot>
+        </div>
+      </div>
     </content>
   </main>
+
+  <buttons>
+    <slot name="close"></slot>
+    <slot name="info"></slot>
+    <slot name="opacity"></slot>
+    <slot name="ctrls"></slot>
+  </buttons>
 </template>
 
 <template id="opacity-control">
@@ -352,5 +368,23 @@
     </style>
 
     <div class="ramp"></div>
+  </div>
+</template>
+
+<template id="controls-input">
+  <div style="position: absolute;
+              display: flex;
+              top: 73px;
+              margin-left: 10px;
+              opacity: 0.7;">
+    <span style="display: block;
+                 position: absolute;
+                 top: -37px;
+                 border-style: inset;
+                 border-color: transparent transparent black;
+                 border-radius: 2px;
+                 border-width: 33px;
+                 transform: scale(1, 0.125);">
+    </span>
   </div>
 </template>

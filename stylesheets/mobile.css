@@ -3,11 +3,7 @@
 }
 
 @media (max-width: 72em) {
-  .more-dropdown {
-    display: none !important;
-  }
-
-  .bottom-right-container {
+  #output-preview {
     display: none;
   }
 

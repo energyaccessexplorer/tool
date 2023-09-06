@@ -157,6 +157,9 @@ This is not fatal but the dataset is now disabled.`,
 		if (o.category.raster) {
 			const f = this.processed_files.find(x => x.func === 'raster');
 
+			if (this.category.controls.range === "multiselect")
+				this._domain_select = [];
+
 			if (!f) go = ok.call(this, 'raster');
 			else {
 				this.raster = {};
@@ -189,8 +192,12 @@ This is not fatal but the dataset is now disabled.`,
 
 		this.set_colorscale();
 
-		this.card = new dscard(this);
 		this.controls = new dscontrols(this);
+
+		if (this.id === 'admin-tiers') {
+			this.controls.remove();
+			delete this.controls;
+		}
 
 		switch (this.datatype) {
 		case 'points-timeline':
@@ -205,6 +212,7 @@ This is not fatal but the dataset is now disabled.`,
 		}
 
 		case 'raster-timeline':
+		case 'raster-valued':
 		case 'raster': {
 			this.download = this.raster.endpoint;
 			break;
@@ -216,6 +224,7 @@ This is not fatal but the dataset is now disabled.`,
 		}
 
 		case 'raster-mutant':
+		case 'raster-valued-mutant':
 		case 'polygons-boundaries': {
 			break;
 		}
@@ -313,12 +322,14 @@ This is not fatal but the dataset is now disabled.`,
 
 		const m = this.host = this.hosts[0];
 
+		this.csv = m.csv;
 		this.raster = m.raster;
 		this.vectors = m.vectors;
 		this.colorscale = m.colorscale;
 
 		this.domain = m.domain;
 		this._domain = m._domain;
+		this._domain_select = m._domain_select;
 	};
 
 	async mutate(host) {
@@ -326,12 +337,14 @@ This is not fatal but the dataset is now disabled.`,
 
 		this.host = host;
 
+		this.csv = host.csv;
 		this.raster = host.raster;
 		this.vectors = host.vectors;
 		this.colorscale = host.colorscale;
 
 		this.domain = host.domain;
 		this._domain = host._domain;
+		this._domain_select = host._domain_select;
 
 		this.opacity(1);
 		this.card.refresh();
@@ -450,6 +463,7 @@ This is not fatal but the dataset is now disabled.`,
 		}
 
 		case 'raster-timeline':
+		case 'raster-valued':
 		case 'raster': {
 			opts = {
 				"stops":     this.category.colorstops,
@@ -639,6 +653,7 @@ This is not fatal but the dataset is now disabled.`,
 			break;
 		}
 
+		case 'raster-valued-mutant':
 		case 'raster-mutant': {
 			MAPBOX.setPaintProperty(this.host.id, 'raster-opacity', v);
 			return;

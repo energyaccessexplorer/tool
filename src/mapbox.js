@@ -326,7 +326,7 @@ This is fatal. Thanks for all the fish.`,
 	return [[left,top], [right,top], [right,bottom], [left,bottom]];
 };
 
-export function map_pointer(content, x, y) {
+export function map_pointer({x = 0, y = 0}, ...contents) {
 	let p = qs('#map-pointer');
 
 	if (p) p.remove();
@@ -355,6 +355,9 @@ background-color: transparent;`,
 		pos = "C";
 	}
 
+	const content = ce('span');
+	content.append(...contents);
+
 	const mark = new bubblemessage({ "position": pos, "message": content, "close": cls }, (MOBILE ? document.body : p));
 
 	function drop() {
@@ -378,4 +381,28 @@ background-color: transparent;`,
 	return {
 		drop,
 	};
+};
+
+export function text_search({
+	query,
+	limit = 10,
+	box = GEOGRAPHY.envelope,
+	types = ['region', 'district', 'place', 'locality', 'neighborhood', 'poi'],
+}) {
+	const q = encodeURI(query);
+	const search = `?limit=${limit}&country=${GEOGRAPHY.cca2}&types=${types}&bbox=${box}&access_token=${mapboxgl.accessToken}`;
+
+	return fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${q}.json${search}`)
+		.then(r => r.json());
+};
+
+export function coords_search({
+	coords,
+	limit = 1,
+	types = ['poi', 'neighborhood', 'locality', 'place'],
+}) {
+	const search = `?limit=${limit}&types=${types}&access_token=${mapboxgl.accessToken}`;
+
+	return fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${coords}.json${search}`)
+		.then(r => r.json());
 };

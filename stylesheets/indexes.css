@@ -5,6 +5,7 @@
 }
 
 #indexes-list {
+  width: 100%;
   margin: 0;
   padding: 0;
   list-style-type: none;
@@ -35,7 +36,7 @@
 }
 
 #indexes-list .element[disabled] span.name:after {
-  content: '(no datasets selected)';
+  content: '(not enough datasets)';
   font-size: 9px;
   float: right;
   margin-right: 10px;
@@ -65,8 +66,12 @@
 
 #index-graphs-title {
   padding: 0.7em 1em;
-  text-align: left;
+  text-align: center;
   width: 100%;
+}
+
+#index-graphs-opacity {
+  position: relative;
 }
 
 #output-variant-select {
@@ -75,7 +80,9 @@
   background: none;
   padding: 0.7em 1em;
   border-top: solid 1px lightgray;
+  border-bottom: solid 1px lightgray;
   color: var(--the-color);
+  width: 100%;
 }
 
 .index-graphs-container {
@@ -111,18 +118,24 @@
   min-height: 3em;
 }
 
-#index-graphs-toolbox {
+#index-layer-toolbox {
   display: flex;
+  justify-content: space-around;
+  border-top: 1px solid lightgray;
 }
 
-#index-graphs-toolbox a {
-  position: relative;
-  padding-left: 0.5em;
+#index-layer-toolbox a {
+  display: block;
   cursor: pointer;
   color: var(--the-color);
-  margin-right: 5px;
+  padding: 1em 1.2em;
 }
 
-#index-graphs-toolbox a i {
+#index-layer-toolbox a:hover {
+  box-shadow: inset 0px 0px 5px rgb(0 0 0 / 5%);
+  background-color: rgba(0, 0, 0, 0.07);
+}
+
+#index-layer-toolbox a i {
   font-size: 1.4em;
 }

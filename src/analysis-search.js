@@ -1,6 +1,10 @@
 import bubblemessage from '../lib/bubblemessage.js';
 
 import {
+	coords_search as mapbox_coords_search,
+} from './mapbox.js';
+
+import {
 	plot_active as analysis_plot_active,
 } from './analysis.js';
 
@@ -13,12 +17,12 @@ let ul, input, resultscontainer;
 
 let resultsinfo;
 
-async function getpoints(n = 20) {
+export async function getpoints(n = 20) {
 	const a = await analysis_plot_active(U.output, false);
 
 	const threshold = a.raster.slice(0)
 		.sort((a,b) => a > b ? -1 : 1)
-		.slice(0, n)[n-1];
+		.slice(0,n)[n-1];
 
 	const points = a.raster.reduce((t,v,i) => {
 		if (v > 0 && v >= threshold)
@@ -27,24 +31,47 @@ async function getpoints(n = 20) {
 		return t;
 	}, []);
 
-	return points.map(t => ({ "v": t.v, "i": raster_pixel_to_coordinates(t.i) }));
+	return points
+		.sort((a,b) => a.v > b.v ? -1 : 1)
+		.map(t => ({ "v": t.v, "i": t.i, "c": raster_pixel_to_coordinates(t.i) }));
 };
 
 function pointto(p, a = false) {
 	const dict = [[ "v", ea_indexes[U.output]['name'] ]];
 	const props = { "v": ea_lowmedhigh_scale(p.v) };
 
-	search_pointto(p.i, dict, props, a);
+	search_pointto(p.c, dict, props, a);
 };
 
 function li(p) {
-	const c = (p.v ? Math.round((p.v).toFixed(2) * 100) : "") + " " + "[" + (p.i).map(c => +c.toFixed(3)).join(", ") + "]";
+	const pi3 = (p.c).map(c => +c.toFixed(3));
 
-	const el = ce('li', ce('code', c), {});
+	const pn = ce('span');
+
+	const el = ce('li', [
+		ce('code', 	"[" + pi3.join(", ") + "]", { "style": "font-size: 0.9em" } ),
+		pn,
+	]);
+
+	const t = (p.v ? Math.round((p.v).toFixed(2) * 100) : "");
+
+	el.setAttribute('group', t);
 
 	el.onmouseenter = pointto.bind(null, p);
 
 	el.onclick = zoom.bind(null, p, pointto.bind(null, p, true));
+
+	mapbox_coords_search({ "coords": p.c })
+		.then(r => {
+			if (!maybe(r, 'features', 'length')) return;
+
+			const name = r.features[0]['text'];
+			const path = r.features[0]['context'].reverse().slice(1).map(x => x.text);
+
+			if (path[path.length - 1] === name) path.splice(path[path.length - 1]);
+
+			pn.append(ce('span', path.join(', ') + ", ", { "class": "context" }), name);
+		});
 
 	return el;
 };
@@ -58,10 +85,37 @@ async function trigger({ points = getpoints, n = 20 }) {
 
 	resultsinfo.innerHTML = `Searching <b>analysis coordinates</b>. Top ${count} results:`;
 
-	results
+	const list = results
 		.sort((a,b) => a.v > b.v ? -1 : 1)
 		.slice(0,n)
-		.forEach(t => ul.append(li(t)));
+		.map(t => li(t));
+
+	const groups = {};
+	list.forEach(i => {
+		const a = i.getAttribute('group');
+		if (!groups[a]) groups[a] = [];
+
+		groups[a].push(i);
+	});
+
+	ul.append(...list);
+
+	for (const g in groups) {
+		const el = ul.querySelector(`[group='${g}']`);
+		const h = ce('h5', g + "%");
+
+		ul.insertBefore(h, el);
+
+		h.style = `
+font-size: 0.9em;
+background-color: rgba(${ea_analysis_colorscale.fn(g/100.0)});
+padding: 0.5em;
+padding-left: 1em;
+margin: 0.5em auto;
+margin-left: 0;
+width: calc(${g}% - 1.5em);
+`;
+	}
 
 	if (count > n)
 		qs('div.search-results-info', resultscontainer).innerHTML = `Searching <b>analysis coordinates</b>. Showing first ${n} of ${count}:`;

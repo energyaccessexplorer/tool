@@ -1,4 +1,5 @@
 .include ".env"
+default: reconfig build lint
 
 DIST = ./dist
 SRC = ./src
@@ -12,9 +13,7 @@ TIMESTAMP != date -u +'%Y-%m-%d--%T'
 GITSHA != git log -n1 --format=format:"%H" | head -c 8
 GITCLEAN != [ "`git diff --stat`" = '' ] || echo "-dirty"
 
-default: reconfig build lint
-
-build: build-a build-s
+build: build-a build-s build-m
 	@cp views/index.html ${DIST}/index.html
 
 lint:
@@ -27,6 +26,34 @@ deps:
 start:
 	${HTTP_SERVER} --port ${TOOL_PORT} --dir ${DIST}
 
+build-m:
+	@echo "Building my screen"
+	@mkdir -p ${DIST}/m
+
+	@mustache /dev/null ${VIEWS}/m.html > ${DIST}/m/index.html
+
+	@sed -ri 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/m/index.html
+
+	@cp ${SRC}/user.js \
+		${SRC}/m.js \
+		${LIB}/bind.js \
+		${DIST}/m/
+
+	@cat \
+		${LIB}/jwt-decode.js \
+		${LIB}/helpers.js \
+		> ${DIST}/m/libs.js
+
+	@echo -n "window.ea_settings = " | cat - \
+		settings.json \
+		> ${DIST}/m/main.js
+
+	@cat \
+		${CSS}/general.css \
+		${CSS}/m.css \
+		${CSS}/buttons.css \
+		> ${DIST}/m/main.css
+
 build-a:
 	@echo "Building analysis screen"
 	@mkdir -p ${DIST}/a
@@ -36,7 +63,39 @@ build-a:
 	@sed -ri 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/a/index.html
 
 	@cp ${CSS}/ripple.css ${DIST}/a/ripple.css
-	@cp ${SRC}/{browser,session,analysis,cards,config,controls,search,controls-search,geographies-search,vectors-search,analysis-search,locations-search,ds,parse,indexes,filtered,mapbox,overlord,plot,rasters,report,summary,timeline,user,views,help,a,qa}.js ${DIST}/a/
+	@cp ${CSS}/buttons.css ${DIST}/a/buttons.css
+	@cp \
+		${SRC}/admin-tiers.js \
+		${SRC}/browser.js \
+		${SRC}/session.js \
+		${SRC}/analysis.js \
+		${SRC}/cards.js \
+		${SRC}/config.js \
+		${SRC}/controls.js \
+		${SRC}/search.js \
+		${SRC}/controls-search.js \
+		${SRC}/symbols.js \
+		${SRC}/geographies-search.js \
+		${SRC}/vectors-search.js \
+		${SRC}/analysis-search.js \
+		${SRC}/locations-search.js \
+		${SRC}/ds.js \
+		${SRC}/parse.js \
+		${SRC}/indexes.js \
+		${SRC}/filtered.js \
+		${SRC}/mapbox.js \
+		${SRC}/overlord.js \
+		${SRC}/plot.js \
+		${SRC}/rasters.js \
+		${SRC}/report.js \
+		${SRC}/summary.js \
+		${SRC}/timeline.js \
+		${SRC}/user.js \
+		${SRC}/views.js \
+		${SRC}/help.js \
+		${SRC}/a.js \
+		${SRC}/qa.js \
+		${DIST}/a/
 
 	@cat \
 		${LIB}/d3.js \
@@ -67,6 +126,7 @@ build-a:
 		${CSS}/views.css \
 		${CSS}/filtered.css \
 		${CSS}/ripple.css \
+		${CSS}/buttons.css \
 		${CSS}/summary.css \
 		${CSS}/mobile.css \
 		${CSS}/cards.css \
@@ -80,7 +140,11 @@ build-s:
 
 	@sed -ri 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/s/index.html
 
-	@cp ${SRC}/{browser,user,s}.js ${DIST}/s/
+	@cp \
+		${SRC}/browser.js \
+		${SRC}/user.js \
+		${SRC}/s.js \
+		${DIST}/s/
 
 	@cat \
 		${LIB}/d3.js \
@@ -125,14 +189,14 @@ synced:
 deploy:
 	@touch ${env}.diff
 
-	patch -p1 --reverse --silent <development.diff
-	patch -p1 --silent <${env}.diff
+	@patch -p1 --reverse --silent <development.diff
+	@patch -p1 --silent <${env}.diff
 	bmake reconfig build sync env=${env}
 
 	@echo "--------"
 
-	patch -p1 --reverse --silent <${env}.diff
-	patch -p1 --silent <development.diff
+	@patch -p1 --reverse --silent <${env}.diff
+	@patch -p1 --silent <development.diff
 	bmake reconfig build env=development
 
 reconfig:

@@ -22,12 +22,13 @@ body {
 }
 
 #left-pane[open] {
-  min-width: 36em;
+  min-width: 40em;
 }
 
 #visual {
   display: flex;
-  flex: 1 0;
+  flex-grow: 1;
+  flex-shrink: 0;
   flex-flow: column nowrap;
   position: relative;
 }
@@ -61,14 +62,9 @@ body {
 }
 
 #filtered-pane,
-#indexes-pane,
-#cards-pane {
-  display: flex;
+#indexes-pane {
   flex-grow: 1;
-  flex-flow: column nowrap;
-
-  height: 100%;
-  width: inherit;
+  border-top: 1px solid lightgray;
 }
 
 #cards-list {
@@ -147,26 +143,32 @@ body {
 
   margin: 0;
   padding: 0;
-}
-
-#mapbox-container {
   z-index: 0;
 }
 
-.bottom-right-container {
+#output-preview {
   box-sizing: border-box;
 }
 
-.bottom-right-container .header {
+#output-preview .header {
   line-height: 3em;
 }
 
 #canvas-output-select {
   display: block;
   padding: 0.7em 1em;
+  width: 20em;
+  margin: auto;
+  margin-bottom: 1em;
 }
 
 canvas#output {
   max-height: 300px;
   max-width: 100%;
+}
+
+#canvas-output-select {
+  border: none;
+  font-size: 1em;
+  background-color: white;
 }

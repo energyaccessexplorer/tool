@@ -5,7 +5,7 @@ NORM_STOPS = d3.range(0, 1.000000001, 0.25);
 function colorscale(opts) {
 	let s;
 
-	let {intervals,stops,domain} = opts;
+	let {intervals,stops,domain,width} = opts;
 
 	if (!stops || !stops.length)
 		stops = ea_default_colorscale.stops;
@@ -42,7 +42,7 @@ function colorscale(opts) {
 		});
 
 		svg
-			.attr('width', "100%")
+			.attr('width', width || "100%")
 			.attr('height', h);
 
 		return svg.node();
@@ -95,6 +95,7 @@ function svg_pie(data, outer, inner, colors, inner_text, parse, bubble) {
 		.outerRadius(outer - (outer/15));
 
 	const svg = d3.create("svg")
+		.attr('xmlns', "http://www.w3.org/2000/svg")
 		.attr('class', 'svg-pie')
 		.attr("width", width)
 		.attr("height", height);
@@ -154,7 +155,7 @@ function svg_interval(opts = {}) {
 	const {sliders, domain, init, steps, width, callback1, callback2, end_callback} = opts;
 
 	const radius = 6;
-	const svgwidth = width || 256;
+	const svgwidth = width;
 	const svgheight = (radius * 2) + 2;
 	const linewidth = radius * 2;
 	const svgmin = radius + 1;
@@ -242,7 +243,7 @@ function svg_interval(opts = {}) {
 			.attr('x', +c1.attr('cx'))
 			.attr('width', (w < 0) ? 0 : w);
 
-		if (typeof callback === 'function') callback(norm(cx).toFixed(2));
+		if (typeof callback === 'function') callback(norm(cx).toFixed(2), cx);
 	};
 
 	let x_position;
@@ -287,8 +288,118 @@ function svg_interval(opts = {}) {
 	if (sliders === "single") c1.remove();
 
 	return {
-		"svg":    svg.node(),
-		"change": change,
+		"svg": svg.node(),
+		change,
+		c1,
+		c2,
+	};
+};
+
+function svg_interval_transparent(opts = {}) {
+	const {sliders, background, domain, init, steps, width, callback1, callback2, end_callback} = opts;
+
+	const radius = 6;
+	const svgwidth = width;
+	const svgheight = (radius * 2) + 2;
+	const linewidth = radius * 2;
+	const svgmin = radius;
+	const svgmax = svgwidth - (radius/2) - 1;
+
+	let norm = d3.scaleLinear().domain([svgmin, svgmax]).range([domain.min, domain.max]);
+	let denorm = norm.invert;
+
+	if (steps) {
+		norm = d3.scaleQuantize().domain([svgmin, svgmax]).range(steps);
+		denorm = d3.scaleLinear().domain([steps[0], steps[steps.length-1]]).range([svgmin, svgmax]);
+	}
+
+	const svg = d3.create("svg")
+		.attr('class', 'svg-interval transparent');
+
+	if (background) {
+		svg.node().append(background);
+
+		d3.select(background)
+			.attr("transform", "translate(0,4)");
+	}
+
+	const g = svg.append('g');
+	const c1 = g.append('circle');
+	const c2 = g.append('circle');
+
+	svg
+		.attr('width', svgwidth + 2)
+		.attr('height', svgheight + 2);
+
+	c1
+		.attr('r', radius)
+		.attr('cy', svgheight/2)
+		.attr('fill', 'white')
+		.attr('stroke', 'gray')
+		.attr('stroke-width', 0.2)
+		.style('cursor', 'grab');
+
+	c2
+		.attr('r', radius)
+		.attr('cy', svgheight/2)
+		.attr('fill', 'white')
+		.attr('stroke', 'gray')
+		.attr('stroke-width', 0.2)
+		.style('cursor', 'grab');
+
+	function dragged(c, cx, callback) {
+		if (steps) cx = denorm(norm(cx));
+		c.attr('cx', cx);
+
+		if (typeof callback === 'function') callback(norm(cx).toFixed(2), cx);
+	};
+
+	let x_position;
+
+	c1.call(
+		d3.drag()
+			.on('drag', _ => {
+				const c2x = c2.attr('cx');
+				const cx = x_position = Math.min(c2x, Math.max(d3.event.x, svgmin));
+
+				dragged(c1, cx, callback1);
+			})
+			.on('start', c1.raise.bind(c2))
+			.on('end', _ => {
+				if (typeof end_callback === 'function') end_callback(norm(x_position));
+			})
+			.touchable(MOBILE),
+	);
+
+	c2.call(
+		d3.drag()
+			.on('drag', _ => {
+				const c1x = c1.attr('cx');
+				const cx = x_position = Math.max(c1x, Math.min(d3.event.x, svgmax));
+
+				dragged(c2, cx, callback2);
+			})
+			.on('start', c2.raise.bind(c2))
+			.on('end', _ => {
+				if (typeof end_callback === 'function') end_callback(norm(x_position));
+			})
+			.touchable(MOBILE),
+	);
+
+	function change({min,max}) {
+		dragged(c1, denorm(min), callback1);
+		dragged(c2, denorm(max), callback2);
+	};
+
+	if (init) change(init);
+
+	if (sliders === "single") c1.remove();
+
+	return {
+		"svg": svg.node(),
+		change,
+		c1,
+		c2,
 	};
 };
 
@@ -352,6 +463,7 @@ function opacity_control({ fn, init }) {
 	let opacity_value = init ?? 1;
 
 	const grad = svg_interval({
+		"width":        256,
 		"init":         { "min": 0, "max": init ?? 1 },
 		"domain":       { "min": 0, "max": 1 },
 		"sliders":      'single',

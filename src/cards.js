@@ -1,141 +1,274 @@
 import DS from './ds.js';
 
-const cards_list = qs('#cards-pane #cards-list');
+import {
+	points_symbol,
+	lines_symbol,
+	polygons_symbol,
+	lines_legends_svg,
+	points_legends_svg,
+	polygons_legends_svg,
+} from './symbols.js';
 
-function points_symbol(opts) {
-	const {size,fill,stroke,strokewidth} = opts;
+import {
+	toggle_left_panel,
+} from './a.js';
 
-	const svg = d3.create('svg')
-		.attr('class', 'svg-point')
-		.attr('width', size)
-		.attr('height', size);
+const cards_list = qs('#cards-list');
 
-	svg
-		.append('circle')
-		.attr('r', (size/2) - 2)
-		.attr('cx', size/2)
-		.attr('cy', size/2)
-		.attr('fill', fill)
-		.attr('stroke', stroke)
-		.attr('stroke-width', strokewidth);
+const slider_width = 472;
 
-	return svg.node();
+async function mutant_options() {
+	const d = this.ds;
+
+	await until(_ => maybe(d.hosts, 'length') === d.config.mutant_targets.length);
+
+	const container = ce('div', null, { "class": 'control-option' });
+	const select = ce('select');
+
+	d.hosts.forEach(d => select.append(ce('option', d.name, { "value": d.id })));
+
+	select.value = d.host.id;
+
+	select.onchange = async e => {
+		const host = DST.get(e.target.value);
+
+		await d.mutate(host);
+
+		O.ds(d, { 'mutate': host });
+	};
+
+	container.append(select);
+
+	this.mutant_options = container;
+
+	slot_populate.call(this, {
+		"mutant-options": container,
+	});
 };
 
-function lines_symbol(opts) {
-	const {size,dasharray,stroke,width,fill} = opts;
+function ramp(...els) {
+	const r = tmpl('#ramp');
 
-	const svg = d3.create('svg')
-		.attr('width', size)
-		.attr('height', size);
+	for (const e of els)
+		qs('.ramp', r).append(e);
 
-	svg
-		.append('path')
-		.attr('d', "M 0.5625,23.71875 C 2.0625,8.0625 14.439788,10.706994 17.625,7.5 20.810212,4.2930056 23.71875,0.375 23.71875,0.375")
-		.attr('fill', fill)
-		.attr('stroke-dasharray', dasharray)
-		.attr('stroke', stroke)
-		.attr('stroke-width', width * 2);
+	const div = qs(':scope > div', r);
 
-	return svg.node();
+	if (!div) return r;
+	div.style['width'] = `${slider_width + 2}px`;
+	div.style['margin'] = 'auto';
+
+	return r;
 };
 
-function polygons_symbol(opts) {
-	const {size,stroke,strokewidth,fill,opacity} = opts;
-
-	const svg = d3.create('svg')
-		.attr('class', 'svg-polygon')
-		.attr('width', size)
-		.attr('height', size);
-
-	svg
-		.append('path')
-		.attr('d', "M 5.5532202,7.3474994 24.062506,2.1642083 26.51526,25.827 1.3896115,25.827438 Z")
-		.attr('fill', fill ?? 'none')
-		.attr('fill-opacity', opacity)
-		.attr('stroke', stroke)
-		.attr('stroke-width', strokewidth);
-
-	return svg.node();
-};
-
-function lines_legends_svg(l) {
-	const svg = d3.create('svg')
-		.attr('width', 24)
-		.attr('height', 24)
-		.attr('style', "vertical-align: middle;")
-		.attr('viewBox', "-3 0 32 32");
-
-	svg
-		.append('path')
-		.attr('d', "M 0.5625,23.71875 C 2.0625,8.0625 14.439788,10.706994 17.625,7.5 20.810212,4.2930056 23.71875,0.375 23.71875,0.375")
-		.attr('fill', 'none')
-		.attr('stroke', l['stroke'] || 'black')
-		.attr('stroke-width', l['stroke-width'])
-		.attr('stroke-dasharray', l['dasharray']);
-
-	return svg.node();
-};
-
-function points_legends_svg(l) {
-	const svg = d3.create('svg')
-		.attr('width', 24)
-		.attr('height', 24)
-		.attr('style', "vertical-align: middle;")
-		.attr('viewBox', "-3 0 32 32");
-
-	svg.append('circle')
-		.attr('r', 10)
-		.attr('cx', 12)
-		.attr('cy', 12)
-		.attr('fill', this.ds.vectors.fill)
-		.attr('stroke', l['stroke'] || 'black')
-		.attr('stroke-width', l['stroke-width']);
-
-	return svg.node();
-};
-
-function polygons_legends_svg(l) {
-	const svg = d3.create('svg')
-		.attr('width', 24)
-		.attr('height', 24)
-		.attr('style', "vertical-align: middle;")
-		.attr('viewBox', "-3 0 32 32");
-
-	svg
-		.append('path')
-		.attr('d', "M 5.5532202,7.3474994 24.062506,2.1642083 26.51526,25.827 1.3896115,25.827438 Z")
-		.attr('fill', this.ds.vectors.fill)
-		.attr('stroke', l['stroke']);
-
-	return svg.node();
-};
-
-function svg_el() {
+function value_multiselect() {
 	const ds = this.ds;
+
+	const inputs = ds.csv.data.map(x => {
+		const k = x['KEY'];
+
+		const i = ce('input', null, { "type": 'checkbox', "name": "", "value": k });
+		i.checked = true;
+		i.id = ds.id + "_" + k;
+
+		i.onchange = _ => {
+			ds._domain_select = [...new Set(inputs.filter(e => e.checked).map(e => +e.value))];
+			O.ds(ds, { 'domain': ds.domain });
+		};
+
+		return i;
+	});
+
+	ds._domain_select = ds.csv.data.map(r => +r['KEY']);
+
+	const elements = inputs.map((e,i) => {
+		const c = ds.colorscale.fn(+e.value);
+		const s = ce('span', null, { "style": `width: 20px; height: 14px; display: inline-block; background-color: rgba(${c}); margin: auto 1em;` });
+
+		const l = ce('label', s, { "for": e.id });
+		l.append(ds.csv.data[i]['VALUE']);
+
+		return ce('div', [e,l]);
+	});
+
+	return {
+		elements,
+	};
+};
+
+function range(interval) {
+	const ds = this.ds;
+	const cat = this.ds.category;
+
+	const domain = {};
+
+	let {min,max} = ds.domain;
+
+	const diff = Math.abs(max - min);
+	let d = 3 - Math.ceil(Math.log10(diff || 1));
+	if (d < 0) d = 0;
+
+	if (and(cat.unit === "%",
+	        or(and(min === 0, max === 100),
+	           and(min === 100, max === 0)))) d = 0;
+
+	const update = (x, i, el, cx) => {
+		el.value = (+x).toFixed(d);
+
+		const man = maybe(this, 'manual_' + i);
+		if (man) {
+			man.value = x;
+		}
+
+		const ctrl = maybe(this, 'cr_' + i);
+		if (ctrl?.style) {
+			ctrl.style.left = cx + "px";
+		}
+		domain[i] = parseFloat(x);
+	};
+
+	let step = 0.1 * Math.pow(10, Math.floor(Math.log10(Math.abs(ds.domain.max - ds.domain.min))));
+
+	this.cr_max = tmpl('#controls-input').firstElementChild;
+	this.cr_min = tmpl('#controls-input').firstElementChild;
+
+	this.manual_min = ce('input', null, {
+		"bind":  "min",
+		"type":  "number",
+		"min":   ds.domain.min,
+		"max":   ds.domain.max,
+		"step":  step,
+		"value": ds._domain.min,
+	});
+
+	this.manual_max = ce('input', null, {
+		"bind":  "max",
+		"type":  "number",
+		"min":   ds.domain.min,
+		"max":   ds.domain.max,
+		"step":  step,
+		"value": ds._domain.max,
+	});
+
+	const change = (e,i) => {
+		let v = +e.target.value;
+
+		const d = this.ds._domain;
+		d[i] = +v;
+
+		this.range_el.change(d);
+
+		O.ds(this.ds, { 'domain': d });
+	};
+
+	this.manual_min.onchange = debounce(e => change(e, 'min'));
+	this.manual_max.onchange = debounce(e => change(e, 'max'));
+
+	this.cr_min.append(this.manual_min);
+	this.cr_max.append(this.manual_max);
+
+	switch (maybe(cat, 'controls', 'range')) {
+	case 'single':
+		this.manual_min.setAttribute('disabled', true);
+		break;
+
+	case 'double':
+		break;
+
+	case null:
+	default:
+		break;
+	}
+
+	let steps;
+	if (maybe(cat, 'controls', 'range_steps')) {
+		steps = [];
+		const s = (ds.domain.max - ds.domain.min) / (cat.controls.range_steps - 1);
+
+		for (let i = 0; i < cat.controls.range_steps; i += 1)
+			steps[i] = ds.domain.min + (s * i);
+	}
+
+	const s = interval({
+		"background":   ds.colorscale?.svg.querySelector('g').cloneNode(true),
+		"sliders":      ds.category.controls.range,
+		"width":        slider_width,
+		"init":         ds._domain,
+		"domain":       ds.domain,
+		"steps":        steps,
+		"callback1":    (x, cx) => update(x, 'min', this.manual_min, cx),
+		"callback2":    (x, cx) => update(x, 'max', this.manual_max, cx),
+		"end_callback": _ => O.ds(ds, { 'domain': domain }),
+	});
+
+	return {
+		"elements": [s.svg, this.cr_min, this.cr_max],
+		"svg":      s.svg,
+		"change":   s.change,
+	};
+};
+
+function weight() {
+	const weights = [1,2,3,4,5];
+
+	const r = ramp(
+		ce('div', weights[0]),
+		ce('div', "importance", { "class": "unit-ramp" }),
+		ce('div', weights[weights.length - 1]),
+	);
+
+	const w = svg_interval({
+		"sliders":      "single",
+		"init":         { "min": 1, "max": this.weight },
+		"domain":       { "min": 1, "max": 5 },
+		"steps":        weights,
+		"width":        slider_width,
+		"end_callback": x => O.ds(this, { 'weight': x }),
+	});
+
+	const el = ce('div', [w.svg, r], { "style": "text-align: center;" });
+
+	return {
+		el,
+		"svg":    w.svg,
+		"change": w.change,
+		"ramp":   r,
+	};
+};
+
+function range_el() {
+	const ds = this.ds;
+	const cat = this.ds.category;
+
 	let d = ce('div');
-	let e = maybe(ds.colorscale, 'svg') || ce('div');
+	let e = "";
+	let r = "";
+	let t = "";
+	let o = "";
+	let g = undefined;
 
 	function ramp_domain() {
-		let {min,max} = this.ds.domain;
+		let {min,max} = ds.domain;
 
 		const diff = Math.abs(max - min);
 		let i = 3 - Math.ceil(Math.log10(diff || 1));
 		if (i < 0) i = 0;
 
-		if (and(this.ds.category.unit === "%",
+		if (and(cat.unit === "%",
 		        or(and(min === 0, max === 100),
 		           and(min === 100, max === 0)))) i = 0;
 
+		const u = coalesce(cat.controls.range_label, cat.unit, 'range');
+
 		return [
 			ce('div', min.toFixed(i)),
+			ce('div', u, { "class": "unit-ramp" }),
 			ce('div', max.toFixed(i)),
 		];
-	}
+	};
 
 	switch (ds.datatype) {
-	case 'points-timeline':
-	case 'points': {
+	case 'points-timeline': {
 		e = points_symbol({
 			"size":        24,
 			"fill":        ds.vectors.fill,
@@ -145,8 +278,33 @@ function svg_el() {
 		break;
 	}
 
-	case 'lines-timeline':
+	case 'points': {
+		if (ds.raster)
+			g = range.call(this, svg_interval);
+
+		e = points_symbol({
+			"size":        24,
+			"fill":        ds.vectors.fill,
+			"stroke":      ds.vectors.stroke,
+			"strokewidth": 2,
+		});
+		break;
+	}
+
+	case 'lines-timeline': {
+		e = points_symbol({
+			"size":        24,
+			"fill":        ds.vectors.fill,
+			"stroke":      ds.vectors.stroke,
+			"strokewidth": 2,
+		});
+		break;
+	}
+
 	case 'lines': {
+		if (ds.raster)
+			g = range.call(this, svg_interval);
+
 		e = lines_symbol({
 			"size":      28,
 			"dasharray": ds.vectors.dasharray,
@@ -157,8 +315,21 @@ function svg_el() {
 		break;
 	}
 
-	case 'polygons-boundaries':
+	case 'polygons-boundaries': {
+		e = polygons_symbol({
+			"size":        28,
+			"fill":        ds.vectors.fill,
+			"opacity":     ds.vectors.opacity,
+			"stroke":      ds.vectors.stroke,
+			"strokewidth": (ds.vectors.width - 1) || 1,
+		});
+		break;
+	}
+
 	case 'polygons': {
+		if (ds.raster)
+			g = range.call(this, svg_interval);
+
 		e = polygons_symbol({
 			"size":        28,
 			"fill":        ds.vectors.fill,
@@ -171,17 +342,30 @@ function svg_el() {
 
 	case 'polygons-valued':
 	case 'polygons-timeline': {
-		const r = tmpl('#ramp');
+		g = range.call(this, svg_interval_transparent);
 
-		if (ds.domain) {
-			qs('.ramp', r).append(...ramp_domain.call(this));
-		}
+		o = ce(
+			'span',
+			[
+				ce('div', null, {
+					"style": `
+	display: inline-block;
+	width: 64px;
+	height: 5px;
+	background-color: rgba(155,155,155,1);
+	margin: 15px 15px 0 0;
+	`,
+				}),
+				ce('div', "Not Available", { "style": "display: inline-block; font-size: x-small;" }),
+			]);
 
-		d.append(
-			r,
-			ce('div', null, { "style": "display: inline-block; width: 64px; height: 5px; background-color: rgba(155,155,155,1); margin: 15px 15px 0 0;" }),
-			ce('div', "Not Available", { "style": "display: inline-block; font-size: x-small;" }),
-		);
+		break;
+	}
+
+	case 'raster-valued-mutant':
+	case 'raster-valued':	{
+		if (this.ds._domain_select)
+			g = value_multiselect.call(this);
 
 		break;
 	}
@@ -189,27 +373,34 @@ function svg_el() {
 	case 'raster-mutant':
 	case 'raster-timeline':
 	case 'raster': {
-		const r = tmpl('#ramp');
-
-		if (ds.domain) {
-			qs('.ramp', r).append(...ramp_domain.call(this));
-			d.append(r);
-		}
+		g = range.call(this, svg_interval_transparent);
 
 		break;
 	}
 
 	case 'table': {
+		qs('content', this).remove();
 		break;
 	}
 
 	default: {
-		console.warn("dscard.svg_el could not decide datatype.", ds.id);
+		console.warn("dscard.range_el could not decide datatype.", ds.id);
 		break;
 	}
 	}
 
-	d.prepend(e);
+	if (ds.domain && !ds._domain_select) {
+		r = tmpl('#ramp');
+		qs('.ramp', r).append(...ramp_domain.call(this));
+	}
+
+	d.append(
+		...coalesce(maybe((this.range_el = g), 'elements'), []),
+		coalesce(t, ""),
+		coalesce(r, ""),
+		coalesce(o, ""),
+		coalesce(e, ""),
+	);
 
 	return d;
 };
@@ -225,13 +416,24 @@ export function init() {
 			_ => O.sort(),
 		);
 
-	const ca = ce('div', 'Clear all datasets', { "id": 'cards-clear-all' });
+	const ca = ce('span', 'Clear all datasets', { "class": 'cards-clear' });
 	ca.onclick = _ => {
 		DS.all("on").forEach(x => x.active(false));
 		O.view = U.view;
+		update();
 	};
 
-	qs('#cards-pane').prepend(ca);
+	const cp = ce('span', 'Clear filters', { "class": 'cards-clear' });
+	cp.onclick = _ => {
+		DS.all("on").forEach(d => {
+			O.ds(d, { "domain": d.domain });
+			d.card.refresh();
+		});
+
+		O.view = U.view;
+	};
+
+	qs('#cards #cards-clear-buttons').append(ca,cp);
 };
 
 export function update() {
@@ -250,6 +452,9 @@ export function update() {
 };
 
 export default class dscard extends HTMLElement {
+	manual_min;
+	manual_max;
+
 	constructor(d) {
 		if (!(d instanceof DS)) throw new Error(`dscard: Expected a ds but got ${d}`);
 		super();
@@ -260,6 +465,8 @@ export default class dscard extends HTMLElement {
 
 		this.opacity_value = 1;
 
+		this.show_advanced = false;
+
 		this.render();
 
 		return this;
@@ -268,17 +475,25 @@ export default class dscard extends HTMLElement {
 	render() {
 		this.setAttribute('bind', this.ds.id);
 
-		this.svg_el = svg_el.call(this);
+		this.content = qs('content', this);
+
+		if (this.ds.category.controls.weight)
+			this.weight_group = weight.call(this.ds);
+
+		if (this.ds.mutant) mutant_options.call(this);
 
 		attach.call(this, tmpl('#ds-card-template'));
 
 		slot_populate.call(this, Object.assign({}, this.ds, {
-			'svg':     this.svg_el,
+			'range':   range_el.call(this),
 			'info':    this.info(),
-			'unit':    (this.ds.category.unit && ce('span', `[${this.ds.category.unit}]`, { "style": "margin-left: 1em;" })),
 			'opacity': this.opacity(),
 			'close':   this.close(),
+			'weight':  maybe(this.weight_group, 'el'),
+			'ctrls':   maybe(this.weight_group, 'el') && this.ctrls(),
 		}));
+
+		this.legends();
 
 		return this;
 	};
@@ -288,21 +503,21 @@ export default class dscard extends HTMLElement {
 	};
 
 	refresh() {
-		qs('[slot=svg]', this)
-			.replaceChildren(this.svg_el = svg_el.call(this));
+		qs('[slot=range]', this)
+			.replaceChildren(this.range_el = range_el.call(this));
 
 		this.opacity_value = 1;
 		qs('[slot=opacity]', this)
 			.replaceChildren(this.opacity());
 	};
 
-	legends(ls, t) {
-		const it = qs('[slot=svg]', this);
+	legends() {
+		if (!this.ds.criteria || this.ds.criteria.length < 2) return;
 
 		const ul = ce('div', null, { "style": "font-size: smaller;" });
 
 		let f;
-		switch (t) {
+		switch (this.ds.datatype) {
 		case "lines":
 			f = lines_legends_svg;
 			break;
@@ -319,7 +534,7 @@ export default class dscard extends HTMLElement {
 			break;
 		}
 
-		for (let l of ls) {
+		for (let l of this.ds.criteria) {
 			let cb;
 
 			const li = ce(
@@ -349,7 +564,7 @@ export default class dscard extends HTMLElement {
 
 		this.legends_el = ul;
 
-		it.replaceChildren(ul);
+		qs('[slot=range]', this).append(ul);
 	};
 
 	info() {
@@ -358,6 +573,13 @@ export default class dscard extends HTMLElement {
 
 		return e;
 	};
+
+	ctrls() {
+		const e = font_icon('gear');
+		e.onclick = _ => qs('.advanced-controls', this).style.display = ((this.show_advanced = !this.show_advanced)) ? 'block' : 'none';
+
+		return e;
+	}
 
 	close() {
 		const e = font_icon('x-lg');
@@ -375,6 +597,11 @@ export default class dscard extends HTMLElement {
 			"init": maybe(this.ds, 'vectors', 'opacity'),
 		});
 	};
+
+	discover() {
+		toggle_left_panel('cards');
+		this.scrollIntoView();
+	}
 
 	static get all() {
 		return qsa('ds-card', cards_list, true);

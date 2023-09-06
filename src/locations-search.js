@@ -3,6 +3,10 @@ import {
 	zoom,
 } from './search.js';
 
+import {
+	text_search as mapbox_text_search,
+} from './mapbox.js';
+
 let ul, input, resultscontainer;
 
 let resultsinfo;
@@ -61,25 +65,18 @@ function li(p) {
 };
 
 function trigger(v) {
-	const token = mapboxgl.accessToken;
-	const q = encodeURI(v);
-
-	const box = GEOGRAPHY.envelope;
-
-	const types = ['region', 'district', 'place', 'locality', 'neighborhood', 'poi'];
-	const search = `?limit=10&country=${GEOGRAPHY.cca2}&types=${types}&bbox=${box}&access_token=${token}`;
-
-	fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${q}.json${search}`)
-		.then(r => r.json())
+	mapbox_text_search({ "query": v })
 		.then(r => {
-			if (r.features.length)
-				r.features.forEach(t => ul.append(li(t)));
-			else
+			if (!maybe(r, 'features', 'length')) {
 				resultsinfo.innerHTML = `No results for "${v}".`;
+				return;
+			}
+
+			r.features.forEach(t => ul.append(li(t)));
 		});
 };
 
-export function init() {
+export async function init() {
 	const panel = qs('#locations.search-panel');
 	input = ce('input', null, { "id": 'locations-search', "autocomplete": 'off', "class": 'search-input' });
 	input.setAttribute('placeholder', 'Search for a location');
@@ -101,9 +98,13 @@ export function init() {
 		trigger(this.value);
 	};
 
-	const n = GEOGRAPHY.name.replace(/\ ?(training|test)\ ?/i, '');
+	let n;
+	if (GEOGRAPHY.parent_id)
+		n = (await API.get('geographies', { "select": "name", "id": `eq.${GEOGRAPHY.parent_id}`}, { "one": true }))['name'];
+	else
+		n = GEOGRAPHY.name.replace(new RegExp("\\ ?\\(?(" + ENV.join('|') + ")\\)?", "i"), '');
 
-	fetch(`${ea_settings.world}/countries?select=cca2&or=(names->>official.eq.${n},name.eq.${n})`)
+	fetch(`${ea_settings.world}/countries?select=cca2&or=(names->>official.eq."${n}",name.eq."${n}")`)
 		.then(r => r.json())
 		.then(r => GEOGRAPHY.cca2 = maybe(r, 0, 'cca2'));
 };

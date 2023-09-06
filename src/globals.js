@@ -24,19 +24,19 @@ ea_params = {
 	"default": {
 		"view":    ['inputs', 'filtered', 'outputs'],
 		"output":  ['eai', 'ani', 'demand', 'supply'],
-		"variant": ['raster', '1', '2', '3'],
+		"variant": ['raster', '1', '2', '3', '4', '5', '6', '7', '8'],
 		"subdiv":  [],
 		"divtier": [],
-		"tab":     ['controls', 'vectors', 'analysis', 'locations', 'geographies'],
+		"tab":     ['controls', 'cards', 'vectors', 'analysis', 'locations', 'geographies'],
 	},
 
 	"timeline": {
 		"view":    ['timeline', 'filtered', 'outputs'],
 		"output":  ['eai', 'ani', 'demand', 'supply'],
-		"variant": ['raster', '1', '2', '3'],
+		"variant": ['raster', '1', '2', '3', '4', '5', '6', '7', '8'],
 		"subdiv":  [],
 		"divtier": [],
-		"tab":     ['controls', 'vectors', 'analysis', 'locations', 'geographies'],
+		"tab":     ['controls', 'cards', 'vectors', 'analysis', 'locations', 'geographies'],
 	},
 };
 

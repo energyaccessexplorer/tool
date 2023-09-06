@@ -13,7 +13,7 @@ import {
 } from './user.js';
 
 import {
-	datasets as analysis_datasets,
+	enough_datasets,
 	analysis,
 } from './analysis.js';
 
@@ -131,7 +131,7 @@ export function init() {
 	cos.value = U.output;
 	cos.onchange = x => { O.index = x.target.value; };
 
-	const toolbox = qs('#index-graphs-toolbox');
+	const toolbox = qs('#index-layer-toolbox');
 	const tools = {
 		"index-graphs-opacity": "Change opacity of the analysis layer",
 		"index-graphs-info":    "Info about different indexes",
@@ -210,7 +210,7 @@ export function list() {
 			ce('td', font_icon('collection'), { "class": 'analysis-to-dataset' }),
 		);
 
-		if (analysis_datasets(t) < 1)
+		if (!enough_datasets(t))
 			d.setAttribute('disabled', "");
 
 		return d;

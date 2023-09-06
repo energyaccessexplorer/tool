@@ -31,7 +31,7 @@ printline() {
 fetch() {
 	if curl --location \
 			--silent \
-			--fail \
+			--fail-with-body \
 			--output \
 			"$DEST/$1" "$2"; then
 		printline "$1"

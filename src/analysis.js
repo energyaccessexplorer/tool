@@ -197,7 +197,7 @@ export default async function run(type) {
  * returns DS to be plotted onto a canvas
  */
 
-export function datasets(type) {
+function datasets(type) {
 	return DS.array
 		.filter(d => and(d.on, d.raster, d.analysis))
 		.filter(d => {
@@ -208,7 +208,9 @@ export function datasets(type) {
 				return false;
 			}
 
-			if (typeof d.analysis_fn(type) !== 'function')
+			if (d._domain_select)
+				d._afn = _ => x => (d._domain_select.indexOf(x) > -1) ? 1 : -1;
+			else if (typeof d.analysis_fn(type) !== 'function')
 				d._afn = _ => x => (x < d._domain.min || x > d._domain.max) ? -1 : 1;
 			else
 				d._afn = d.analysis_fn;
@@ -351,4 +353,29 @@ export function priority(d, a, i) {
 	source.setData(jsonclone(source._data));
 
 	return o;
+};
+
+export function enough_datasets(t) {
+	if (["eai", "ani"].includes(t)) {
+		const required = ea_indexes[t].compound;
+
+		for (const r of required)
+			if (!DS.array.find(d => and(d.on, d.analysis, d.index === r))) return false;
+
+		return true;
+	}
+
+	else
+		return DS.array.filter(d => and(d.on, d.analysis, d.index === t)).length > 0;
+};
+
+export function medhigh_point_count(d, a) {
+	let count = 0;
+
+	for (let i = 0; i < d.length; i++) {
+		if ((d[i] === 0) && (a[i] > 0.6))
+			count += 1;
+	}
+
+	return count;
 };

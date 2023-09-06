@@ -1,26 +1,44 @@
-#cards-pane {
-  background-color: var(--the-white);
-}
-
 #cards-list {
   margin: 0;
   padding: 0;
   list-style-type: none;
-  background-color: var(--the-white);
-  overflow-y: scroll;
+  max-width: 40em;
 }
 
-#canvas-output-select {
-  border: none;
-  font-size: 1em;
-  background-color: white;
+#cards-clear-buttons {
+  border-bottom: solid 1px #d9d9d9;
+  display: flex;
+  justify-content: space-evenly;
 }
 
-#cards-clear-all {
+.cards-clear {
   line-height: 2.7em;
   font-size: 1.1em;
   text-align: center;
   color: var(--the-green);
   cursor: pointer;
-  border-bottom: solid 1px #d9d9d9;
+  flex-grow: 1;
+}
+
+input[bind="min"],
+input[bind="max"] {
+  width: 4em !important;
+  border: 1px solid rgba(0,0,0,1);
+  appearance: none;
+  padding: 2px 5px;
+  color: white;
+  text-align: center;
+  background: black;
+  border-radius: 2px;
+  z-index: 2;
+}
+
+input[bind="max"]::-webkit-outer-spin-button,
+input[bind="max"]::-webkit-inner-spin-button,
+input[bind="min"]::-webkit-outer-spin-button,
+input[bind="min"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  margin: 0 !important;
 }

@@ -20,7 +20,6 @@ Libraries have been chosen very strictly. The big ones are:
 - [geotiff](https://github.com/geotiffjs/geotiff.js) for raster parsing
 - [D3js](https://d3js.org) to generate interactive controls such as sliders,
   pie-charts, etc.
-- [jspdf](https://parall.ax/products/jspdf) reports export
 
 Other minor plugins/functions are used. See `dependencies.tsv`.
 

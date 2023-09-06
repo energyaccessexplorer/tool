@@ -1,12 +1,7 @@
 #summary-button {
-  text-align: center;
   font-size: 1.2em;
-  display: block;
-  white-space: nowrap;
-  padding: 0.7em 1em;
-  cursor: pointer;
-  border-top: 1px solid lightgray;
-  border-bottom: 1px solid lightgray;
+  font-weight: bold;
+  text-transform: uppercase;
 }
 
 #summary-graphs {

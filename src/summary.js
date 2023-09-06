@@ -125,7 +125,15 @@ async function summary() {
 	};
 
 	const pptx_button = ce('button', "Export Presentation", { "class": 'big-green-button' });
-	pptx_button.onclick = report_pptx;
+	pptx_button.onclick = async _ => {
+		loading(true);
+
+		await delay(0.1);
+		await report_pptx();
+		await delay(5);
+
+		loading(false);
+	};
 
 	content.append(graphs_tab, tables_tab);
 

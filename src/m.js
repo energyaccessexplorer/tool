@@ -34,6 +34,19 @@ function filtering(sessions) {
 	}, 300);
 };
 
+function download(sessions) {
+	const div = this.closest('.session-square');
+	const data = div.getAttribute('data');
+
+	const s = sessions.find(s => s.time === +data);
+	if (!s) return;
+
+	fake_blob_download(
+		JSON.stringify(s.snapshots[s.snapshots.length - 1]),
+		`energyaccessexplorer-config-${s.time}.json`,
+	);
+};
+
 function edit_title(sessions) {
 	const div = this.closest('.session-square');
 	const data = div.getAttribute('data');
@@ -93,6 +106,9 @@ function draw_sessions(sessions, geographies, container, trees) {
 
 	for (const p of document.querySelectorAll('.bi.bi-pencil'))
 		p.onclick = function() { edit_title.call(this, sessions); };
+
+	for (const p of document.querySelectorAll('.download'))
+		p.onclick = function() { download.call(this, sessions); };
 };
 
 export async function init() {

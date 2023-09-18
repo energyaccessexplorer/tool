@@ -90,6 +90,15 @@ input#search {
   font-size: 1.2em;
 }
 
+.download {
+  position: absolute;
+  bottom: 1.5em;
+  right: 1.5em;
+  color: var(--the-green);
+  font-size: 0.9em;
+  cursor: pointer;
+}
+
 select {
   padding: 0.7em 1.5em;
   font-size: 1.2em;

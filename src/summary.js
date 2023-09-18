@@ -222,7 +222,7 @@ export default async function analyse(raster) {
  * blocking manner.
  */
 
-function wrapper() {
+function summary_wrapper() {
 	const prom = new Promise((resolve, _) => {
 		loading(true);
 		setTimeout(_ => resolve("Success!"), 100);
@@ -233,4 +233,4 @@ function wrapper() {
 		.then(_ => loading(false));
 };
 
-qs('#summary-button').onclick = wrapper;
+qs('#summary-button').onclick = summary_wrapper;

@@ -424,7 +424,7 @@ function analysis(index) {
 		];
 
 		const health = DST.get('health');
-		if (health.on) {
+		if (health?.on) {
 			right_rows.push(
 				row({
 					"text":  "Number healthcare facilities, where demand is medium-high or high",
@@ -437,7 +437,7 @@ function analysis(index) {
 		}
 
 		const schools = DST.get('schools');
-		if (schools.on) {
+		if (schools?.on) {
 			right_rows.push(
 				row({
 					"text":  "Number schools, where demand is medium-high or high",
@@ -595,7 +595,7 @@ function analysis(index) {
 		}
 
 		if (points.length) {
-			const x = [[schools.on, "schools"], [health.on, "healthcare facilities"]].filter(t => t[0]).map(t => t[1]).join(' and ');
+			const x = [[schools?.on, "schools"], [health?.on, "healthcare facilities"]].filter(t => t[0]).map(t => t[1]).join(' and ');
 
 			right_rows.push(
 				row({

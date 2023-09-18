@@ -11,10 +11,10 @@ export function logged_in() {
 export function envs() {
 	const token = localStorage.getItem('token');
 
-	const p = ['production'];
+	let p = ['production'];
 
 	if (logged_in())
-		return coalesce(maybe(jwt_decode(token), 'data', 'envs'), p);
+		p = p.concat(maybe(jwt_decode(token), 'data', 'envs'));
 
 	return p;
 };

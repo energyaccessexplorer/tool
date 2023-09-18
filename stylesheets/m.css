@@ -3,20 +3,62 @@ body {
 }
 
 #playground {
-  display: flex;
+  display: block;
+  width: 60em;
   margin: auto;
-  width: 80em;
+  justify-content: center;
 }
 
-#search {
-  min-width: 40em;
+#playground main {
+  display: flex;
+}
+
+#banner {
+  height: 30em;
+  width: 100%;
+  background-color: white;
+  padding: 3em 7em;
+}
+
+#banner h1 {
+  color: black;
+  font-size: 5em;
+  margin-top: 0;
+  padding-top: 1em;
+}
+
+#banner h2 {
+  color: black;
+  font-size: 2em;
+  width: 12em;
+  margin-top: 3em;
+}
+
+#banner h3 {
+  color: black;
+  font-size: 1.7em;
+  padding-left: 0;
+}
+
+#sessions,
+#left {
+  width: 50%;
+}
+
+#sessions-controls {
+  display: flex;
+  justify-content: space-between;
+  height: 7em;
+  align-items: center;
+  margin-left: 1em;
 }
 
 .session-square {
   padding: 1em 2em;
-  margin: 1em;
+  margin-bottom: 1em;
+  margin-left: 1em;
   background-color: white;
-  width: 100%;
+  position: relative;
 }
 
 .date {
@@ -27,4 +69,29 @@ body {
 
 h4 {
   color: var(--the-green);
+}
+
+input#search {
+  min-width: 30em;
+  padding: 20px;
+  margin: 2em;
+  border: 1px solid #cfcfcf;
+  border-radius: 5px;
+}
+
+.title-edit {
+  position: absolute;
+  top: 1em;
+  right: 1em;
+}
+
+.title-input {
+  padding: 12px 7px;
+  font-size: 1.2em;
+}
+
+select {
+  padding: 0.7em 1.5em;
+  font-size: 1.2em;
+  width: 8em;
 }

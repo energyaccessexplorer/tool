@@ -1,21 +1,18 @@
-<template id="sessions">
-  <ul>
-    <li bind-each="_">
-    </li>
-  </ul>
-</template>
-
 <template id="session">
-  <div class="session-square">
+  <div class="session-square"
+       bind-attr="data"
+       bind-arg="time">
     <h4>
       <a bind-attr="href"
          bind-arg="url"
          target="_blank">
-        <span bind="last"></span>
+        <span class="title" bind="title"></span>
         &nbsp;
         <i class="bi bi-box-arrow-up-right"></i>
       </a>
     </h4>
+
+    <div class="title-edit"><span class="bi bi-pencil"></span></div>
 
     <p bind="date" class="date"></p>
 

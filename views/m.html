@@ -27,10 +27,37 @@
   <body>
     {{> views/nav}}
 
-    <div id="playground">
-      <div id="search"></div>
+    <div id="banner">
+      <h1>Energy Access Explorer User Panel</h1>
 
-      <div id="sessions"></div>
+      <h3>Welcome!</h3>
+
+      <h2>Saved Analysis</h2>
+    </div>
+
+    <div id="playground">
+      <main>
+        <div id="left">
+          <br><br><br>
+          <strong>Filter</strong><br><br>
+          <input id="search" placeholder="Filter by title or geography name">
+        </div>
+
+        <div id="sessions">
+          <div id="sessions-controls">
+            <strong id="sessions-count">0 Sessions</strong>
+
+            <span>
+              <label><strong>Sort by</strong></label>
+              &nbsp; &nbsp; &nbsp;
+              <select id="sort">
+                <option value="time">Date</option>
+                <option value="title">Title</option>
+              </select>
+            </span>
+          </div>
+        </div>
+      </main>
     </div>
 
     {{> views/loading}}

@@ -491,6 +491,7 @@ export default class dscard extends HTMLElement {
 			'close':   this.close(),
 			'weight':  maybe(this.weight_group, 'el'),
 			'ctrls':   maybe(this.weight_group, 'el') && this.ctrls(),
+			'list':    this.list_elements(),
 		}));
 
 		this.legends();
@@ -565,6 +566,15 @@ export default class dscard extends HTMLElement {
 		this.legends_el = ul;
 
 		qs('[slot=range]', this).append(ul);
+	};
+
+	list_elements() {
+		if (!this.ds.vectors?.geojson) return "";
+
+		const e = font_icon('table');
+		e.onclick = this.ds.features_table_modal.bind(this.ds);
+
+		return e;
 	};
 
 	info() {

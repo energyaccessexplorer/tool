@@ -546,6 +546,51 @@ This is not fatal but the dataset is now disabled.`,
 		}).show();
 	};
 
+	features_table_modal() {
+		const content = ce('table');
+		content.className = 'feature-table';
+
+		const features = this.vectors.geojson.features;
+
+		const rows = features.map(f => {
+			const columns = [];
+
+			for (const p in f.properties) {
+				if (p.match(/^__/)) continue;
+				columns.push(f.properties[p]);
+			}
+
+			columns.push(
+				ce('code', "["+f.geometry.coordinates.map(x => x.toFixed(3)).join(',')+"]"),
+			);
+
+			const tr = ce('tr');
+			tr.append(...columns.map(c => ce('td', c)));
+
+			return tr;
+		});
+
+		const head = ce('tr');
+
+		for (const p in features[0].properties) {
+			if (p.match(/^__/)) continue;
+			head.append(ce('th', p));
+		}
+
+		head.append(ce('th', "long/lat"));
+
+		rows.shift(head);
+
+		content.append(head, ...rows);
+
+		new modal({
+			"id":      'ds-features-table',
+			"header":  this.name + " - " + features.length + " features",
+			content,
+			"destroy": true,
+		}).show();
+	};
+
 	active() {
 		return this._active(...arguments)
 			.then(_ => {

@@ -41,3 +41,13 @@ input[type=checkbox]:checked {
 bubble-message {
   max-width: 42em;
 }
+
+.feature-table td,
+.feature-table th {
+  padding: 4px 7px;
+}
+
+#ds-features-table main {
+  overflow-y: scroll;
+  max-height: calc(100% - 8em);
+}

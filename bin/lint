@@ -1,5 +1,11 @@
 #!/bin/sh
 
+if [ `uname` = "Linux" ]; then
+	export DISPLAY=:0
+	export XAUTHORITY=$HOME/.Xauthority
+	export DBUS_SESSION_BUS_ADDRESS=unix:path=/tmp/dbus-1000
+fi
+
 if [ -z $1 ]; then
 	>&2 echo "I need an argument: A directory."
 	exit 1

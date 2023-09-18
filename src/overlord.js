@@ -33,10 +33,6 @@ import {
 } from './filtered.js';
 
 import {
-	snapshot as session_snapshot,
-} from './session.js';
-
-import {
 	plot_active as analysis_plot_active,
 } from './analysis.js';
 
@@ -192,8 +188,6 @@ export default class Overlord {
 
 			analysis_dataset_intersect.call(d, a.raster);
 		};
-
-		session_snapshot();
 	};
 
 	info_mode() {

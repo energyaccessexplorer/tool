@@ -189,14 +189,16 @@ synced:
 deploy:
 	@touch ${env}.diff
 
-	@patch -p1 --reverse --silent <development.diff
-	@patch -p1 --silent <${env}.diff
+	@echo "--------"
+
+	@patch --strip=1 --reverse <development.diff
+	@patch --strip=1 <${env}.diff
 	bmake reconfig build sync env=${env}
 
 	@echo "--------"
 
-	@patch -p1 --reverse --silent <${env}.diff
-	@patch -p1 --silent <development.diff
+	@patch --strip=1 --reverse <${env}.diff
+	@patch --strip=1 <development.diff
 	bmake reconfig build env=development
 
 reconfig:

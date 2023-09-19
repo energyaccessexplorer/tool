@@ -123,6 +123,9 @@ function tree($) {
 			if (!branch[i])
 				continue;
 
+			else if (!divisions[j+1])
+				continue;
+
 			else if (branch[i] === 1) {
 				const x = ce('div', divisions[j+1].csv.table[i]);
 				x.onclick = load.bind(null, j+1, i);

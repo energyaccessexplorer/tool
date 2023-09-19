@@ -6,6 +6,7 @@ import {
 
 import {
 	logged_in as user_logged_in,
+	register_login,
 } from './user.js';
 
 const snapshot_id = (new URL(location)).searchParams.get('snapshot');
@@ -47,40 +48,10 @@ padding: 7px 12px;
 	i.focus();
 };
 
-function register_login() {
-	const d = document.createElement('div');
-	const p1 = document.createElement('p');
-	const p2 = document.createElement('p');
-
-	p1.innerText = "In order to save an analysis, you need to be registered with us.";
-	p2.innerHTML = `
-<div style="display: flex; justify-content: space-around;">
-	<a href="/login">Login</a>
-	<a href="/subscribe/?select=account">Register</a>
-</div>
-`;
-
-	d.append(p1, p2);
-
-	const m = new modal({
-		"header":  "Register/Login",
-		"content": d,
-	});
-
-	m.show();
-};
-
 export function init() {
 	const user_id = user_logged_in();
 
-	const button = qs('#snapshot-button');
-
-	if (user_id)
-		button.onclick = snapshot;
-	else {
-		button.onclick = register_login;
-		return;
-	}
+	if (!user_id) return;
 
 	if (snapshot_id) {
 		console.info("Revisiting snapshot.");
@@ -100,7 +71,11 @@ export function init() {
 export function snapshot() {
 	const user_id = user_logged_in();
 
-	if (!user_id) return;
+	if (!user_id) {
+		register_login();
+		return;
+	}
+
 	if (snapshot_id) return;
 
 	if (!session.title) set_name(session);

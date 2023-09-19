@@ -10,6 +10,7 @@ import {
 
 import {
 	logged_in as user_logged_in,
+	register_login,
 } from './user.js';
 
 import {
@@ -20,6 +21,10 @@ import {
 import {
 	analysis_to_dataset,
 } from './overlord.js';
+
+import {
+	snapshot,
+} from  './session.js';
 
 const bubble = (v,e) => new bubblemessage({ "message": v + "%", "position": "C", "close": false, "noevents": true }, e);
 
@@ -111,6 +116,8 @@ export async function graphs(raster) {
 };
 
 export function init() {
+	const user_id = user_logged_in();
+
 	const url = new URL(location);
 
 	const r = tmpl('#ramp');
@@ -133,11 +140,8 @@ export function init() {
 
 	const toolbox = qs('#index-layer-toolbox');
 	const tools = {
-		"index-graphs-opacity": "Change opacity of the analysis layer",
-		"index-graphs-info":    "Info about different indexes",
-	};
-
-	const more_tools = {
+		"index-graphs-opacity":  "Change opacity of the analysis layer",
+		"index-graphs-info":     "Info about different indexes",
 		"index-graphs-download": "Download TIFF image of the current analysis",
 		"index-graphs-code":     "Download JSON file of the current analysis",
 	};
@@ -154,25 +158,30 @@ export function init() {
 	info.append(font_icon('info-circle'));
 	info.onclick = open_modal;
 
-	if (user_logged_in()) {
-		for (const i in more_tools)
-			toolbox.append(ce('a', null, { "id": i, "title": more_tools[i] }));
+	const download = qs('#index-graphs-download');
+	download.append(font_icon('image'));
+	download.onclick = async _ => {
+		if (!user_id) {
+			register_login();
+			return;
+		}
 
-		const download = qs('#index-graphs-download');
-		download.append(font_icon('image'));
-		download.onclick = async _ => {
-			const type = url.searchParams.get('output');
-			fake_blob_download((await analysis(type)).tiff, `energyaccessexplorer-${type}.tif`);
-		};
+		const type = url.searchParams.get('output');
+		fake_blob_download((await analysis(type)).tiff, `energyaccessexplorer-${type}.tif`);
+	};
 
-		const code = qs('#index-graphs-code');
-		code.append(font_icon('braces'));
-		code.onclick = _ => {
-			const conf = config_generate();
-			const time = (new Date()).getTime();
-			fake_blob_download(JSON.stringify(conf), `energyaccessexplorer-config-${time}.json`);
-		};
-	}
+	const code = qs('#index-graphs-code');
+	code.append(font_icon('braces'));
+	code.onclick = _ => {
+		if (!user_id) {
+			register_login();
+			return;
+		}
+
+		const conf = config_generate();
+		const time = (new Date()).getTime();
+		fake_blob_download(JSON.stringify(conf), `energyaccessexplorer-config-${time}.json`);
+	};
 
 	const graphs = tmpl('#index-graphs-container-template');
 

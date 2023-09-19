@@ -1,6 +1,10 @@
-.include ".env"
+.PATH: /t/mk
 default: reconfig build lint
+.include "env.mk"
 
+# for a static configuration:
+# .include ".env"
+#
 DIST = ./dist
 SRC = ./src
 BIN = ./bin

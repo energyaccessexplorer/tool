@@ -276,6 +276,8 @@ function load_view() {
 			}
 
 			if (!MAPBOX.getSource(`priority-source-${i}`)) {
+				if (i === 0) return;
+
 				MAPBOX.addSource(`priority-source-${i}`, {
 					"type": 'geojson',
 					"data": jsonclone(d.vectors.geojson),
@@ -283,6 +285,8 @@ function load_view() {
 			}
 
 			if (!MAPBOX.getLayer(`priority-layer-${i}`)) {
+				if (i === 0) return;
+
 				MAPBOX.addLayer({
 					"id":     `priority-layer-${i}`,
 					"source": `priority-source-${i}`,

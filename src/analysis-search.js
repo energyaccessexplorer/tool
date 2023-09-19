@@ -189,8 +189,4 @@ This file should be <strong>strictly</strong> formatted.
 
 	resultsinfo = ce('div', ce('b', "Analysis coordinates"), { "class": 'search-results-info' });
 	resultscontainer.prepend(resultsinfo);
-
-	input.onclick = function(_) {
-		trigger();
-	};
 };

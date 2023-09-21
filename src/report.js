@@ -385,10 +385,6 @@ function geography_indexes_right($) {
 };
 
 function analysis(index) {
-	const $ = this.addSlide();
-
-	analysis_left.call(this, $, index);
-
 	function row(d) {
 		return [
 			{
@@ -608,6 +604,12 @@ function analysis(index) {
 		break;
 	}
 	}
+
+	if (!right_rows.length) return;
+
+	const $ = this.addSlide();
+
+	analysis_left.call(this, $, index);
 
 	analysis_right.call(this, $, index, right_rows);
 

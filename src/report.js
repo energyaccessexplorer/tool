@@ -24,6 +24,8 @@ import {
 
 let CONFIG;
 
+const N_POINTS = 20;
+
 const green = "#00794C";
 const white = "#ffffff";
 const black = "#393F44";
@@ -894,7 +896,9 @@ export async function pptx() {
 	{
 		chapter.call(p, "" + (c++), "Top Locations");
 
-		const points = await toplocations_fetch(20).then(r => r.map(t => toplocation_prepare(t)));
+		const points = await toplocations_fetch(N_POINTS)
+			.then(r => r.slice(0, N_POINTS))
+			.then(r => r.map(t => toplocation_prepare(t)));
 
 		toplocations_list.call(p, points);
 		toplocations_index.call(p, 'demand', points);

@@ -149,6 +149,9 @@ export function init() {
 	for (const i in tools)
 		toolbox.append(ce('a', null, { "id": i, "title": tools[i] }));
 
+	const snap = qs('#snapshot-button');
+	snap.onclick = snapshot;
+
 	const opacity = qs('#index-graphs-opacity');
 	opacity.append(opacity_control({
 		"fn": x => MAPBOX.setPaintProperty('output-layer', 'raster-opacity', x),

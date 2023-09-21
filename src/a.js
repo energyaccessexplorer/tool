@@ -161,6 +161,8 @@ async function init_1() {
 		PARAMS = ea_params['timeline'];
 
 	U = new Proxy(url, Uproxy);
+	U.tab = null;
+	U.variant = null;
 
 	drawer_init();
 	views_init();

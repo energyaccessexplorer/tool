@@ -157,6 +157,12 @@ export function init() {
 		"fn": x => MAPBOX.setPaintProperty('output-layer', 'raster-opacity', x),
 	}));
 
+	// eventually do something about this...
+	//
+	const c = qs('.opacity-box', opacity);
+	c.style['right'] = 'unset';
+	c.style['left'] = '-2px';
+
 	const info = qs('#index-graphs-info');
 	info.append(font_icon('info-circle'));
 	info.onclick = open_modal;

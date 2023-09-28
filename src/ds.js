@@ -560,9 +560,11 @@ This is not fatal but the dataset is now disabled.`,
 				columns.push(f.properties[p]);
 			}
 
-			columns.push(
-				ce('code', "["+f.geometry.coordinates.map(x => x.toFixed(3)).join(',')+"]"),
-			);
+			if (f.geometry.coordinates.length === 2) {
+				columns.push(
+					ce('code', "["+f.geometry.coordinates.map(x => x.toFixed(3)).join(',')+"]"),
+				);
+			}
 
 			const tr = ce('tr');
 			tr.append(...columns.map(c => ce('td', c)));
@@ -577,7 +579,8 @@ This is not fatal but the dataset is now disabled.`,
 			head.append(ce('th', p));
 		}
 
-		head.append(ce('th', "long/lat"));
+		if (features[0].geometry?.coordinates.length === 2)
+			head.append(ce('th', "long/lat"));
 
 		rows.shift(head);
 

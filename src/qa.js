@@ -127,7 +127,7 @@ const _controls_batch = [
 		},
 		"mock": {
 			"action": function() {
-				delay(0.5).then(_ => {
+				delay(2).then(_ => {
 					const d = { "min": 0, "max": 15 };
 
 					DST.get('health').card.range_el.change(d);

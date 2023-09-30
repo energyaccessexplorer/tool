@@ -40,7 +40,7 @@ build-m:
 
 	@cp ${SRC}/user.js \
 		${SRC}/m.js \
-		${LIB}/bind.js \
+		${SRC}/bind.js \
 		${DIST}/m/
 
 	@cat \

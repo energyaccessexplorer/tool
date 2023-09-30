@@ -3,6 +3,11 @@ import modal from '../lib/modal.js';
 import bubblemessage from '../lib/bubblemessage.js';
 
 import {
+	logged_in as user_logged_in,
+	register_login,
+} from './user.js';
+
+import {
 	outputcanvas as plot_outputcanvas,
 } from './plot.js';
 
@@ -124,8 +129,15 @@ async function summary() {
 		this.innerText = ss ? "Summary Table" : "Summary Graphs";
 	};
 
+	const user_id = user_logged_in();
+
 	const pptx_button = ce('button', "Export Presentation", { "class": 'big-green-button' });
 	pptx_button.onclick = async _ => {
+		if (!user_id) {
+			register_login();
+			return;
+		}
+
 		loading(true);
 
 		await delay(0.1);

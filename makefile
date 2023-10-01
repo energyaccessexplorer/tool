@@ -99,6 +99,10 @@ build-a:
 		${SRC}/help.js \
 		${SRC}/a.js \
 		${SRC}/qa.js \
+		${SRC}/qa-controls.js \
+		${SRC}/qa-outputs.js \
+		${SRC}/qa-snapshot.js \
+		${SRC}/qa-indexes.js \
 		${DIST}/a/
 
 	@cat \

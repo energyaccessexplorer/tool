@@ -32,7 +32,6 @@ import {
 
 import {
 	init as cards_init,
-	update as cards_update,
 } from './cards.js';
 
 import {
@@ -218,7 +217,6 @@ async function init_2() {
 
 async function init_3() {
 	O.view = U.view;
-	cards_update();
 };
 
 export function clean() {

@@ -422,6 +422,8 @@ function load_view() {
 	}
 	}
 
+	cards_update();
+
 	views_buttons();
 };
 

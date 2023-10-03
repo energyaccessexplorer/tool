@@ -26,6 +26,36 @@ export function load_datasets(conf) {
 	return conf;
 };
 
+export function validate(conf) {
+	const base = [
+		'datasets',
+		'geography',
+		'zoom',
+		'center',
+		'theme',
+		'view',
+		'subdiv',
+		'divtier',
+		'tab',
+		'output',
+		'variant',
+	];
+
+	for (const b of base)
+		if (!conf.hasOwnProperty(b)) {
+			FLASH.push({
+				"type":    'error',
+				"timeout": 5000,
+				"title":   "Configuration File Error",
+				"message": "The provided configuration does not comply with the necessary format.",
+			});
+
+			return false;
+		}
+
+	return true;
+};
+
 export function generate() {
 	const datasets = dscard.all.map(d => d.ds)
 		.map(d => ({

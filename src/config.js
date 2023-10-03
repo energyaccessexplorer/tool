@@ -9,7 +9,7 @@ export function load_datasets(conf) {
 		const ds = list.find(t => d.name === t.id);
 
 		if (!ds) {
-			console.error("config load: Failed to find dataset for preset/param:", d);
+			console.warn("config load: No such dataset on this geography:", d);
 			return;
 		}
 

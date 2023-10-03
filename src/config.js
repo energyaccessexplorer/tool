@@ -14,8 +14,8 @@ export function load_datasets(conf) {
 		}
 
 		if (ds._domain) {
-			if (typeof d.domain.min === 'number') ds._domain.min = d.domain.min;
-			if (typeof d.domain.max === 'number') ds._domain.max = d.domain.max;
+			if (typeof d.domain.min === 'number') ds._domain.min = d._domain?.min || d.domain.min;
+			if (typeof d.domain.max === 'number') ds._domain.max = d._domain?.max || d.domain.max;
 		}
 		else
 			console.warn(`Could not initialise domain for '${ds.id}'. Valued polygons, right?`);

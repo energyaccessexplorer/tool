@@ -3,10 +3,10 @@ import DS from './ds.js';
 import dscard from './cards.js';
 
 export function load_datasets(conf) {
-	const list = DS.array.filter(d => conf.datasets.find(t => t.name === d.id));
+	const list = DS.array.filter(d => conf.datasets.find(t => t.name === d.id || t.id === d.id));
 
 	conf.datasets.forEach(d => {
-		const ds = list.find(t => d.name === t.id);
+		const ds = list.find(t => d.name === t.id || t.id === d.id);
 
 		if (!ds) {
 			console.warn("config load: No such dataset on this geography:", d);

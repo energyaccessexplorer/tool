@@ -445,8 +445,10 @@ export function update() {
 
 	if (cards.length) sortable(cards_list, 'disable');
 
-	for (let i of list)
+	for (let i of list) {
 		if (!cards_list.contains(i)) cards_list.prepend(i);
+		i.refresh();
+	}
 
 	if (cards.length) sortable(cards_list, 'enable');
 };

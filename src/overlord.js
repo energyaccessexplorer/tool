@@ -216,6 +216,9 @@ export default class Overlord {
 		const arr = c.datasets.filter(x => DST.get(x.name));
 		arr.forEach(x => DST.get(x.name).active(true, true));
 
+		cards_update();
+		O.sort();
+
 		return c;
 	};
 };

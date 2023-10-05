@@ -7,7 +7,7 @@ import selectlist from '../lib/selectlist.js';
 function preload_boundaries(id) {
 	return API.get('datasets', {
 		"select":        ['processed_files'],
-		"geography_id":     `eq.${id}`,
+		"geography_id":  `eq.${id}`,
 		"category_name": "in.(outline,boundaries)",
 	}).then(r => {
 		r.map(d => d['processed_files'].find(f => f['func'] === 'vectors'))

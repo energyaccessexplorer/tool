@@ -457,6 +457,10 @@ export default class dscard extends HTMLElement {
 	manual_min;
 	manual_max;
 
+	connectedCallback() {
+		delay(1).then(_ => this.refresh());
+	};
+
 	constructor(d) {
 		if (!(d instanceof DS)) throw new Error(`dscard: Expected a ds but got ${d}`);
 		super();

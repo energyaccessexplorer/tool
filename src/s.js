@@ -22,7 +22,7 @@ async function geography(c) {
 		"deployment":     `ov.{${ENV}}`,
 	});
 
-	if (c.datasets_count > 1) coll.unshift(c);
+	if (c.datasets_count > 2) coll.unshift(c); // 2 datasets: outline and admin-tiers
 
 	const data = {};
 	for (let x of coll) data[x.name] = x.name;

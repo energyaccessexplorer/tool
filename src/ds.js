@@ -582,7 +582,7 @@ This is not fatal but the dataset is now disabled.`,
 		if (features[0].geometry?.coordinates.length === 2)
 			head.append(ce('th', "long/lat"));
 
-		rows.shift(head);
+		rows.unshift(head);
 
 		content.append(head, ...rows);
 

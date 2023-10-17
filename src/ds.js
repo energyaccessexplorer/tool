@@ -242,10 +242,15 @@ This is not fatal but the dataset is now disabled.`,
 	category_overrides(ovrr) {
 		if (!ovrr) return;
 
-		const configs = ['domain', 'domain_init', 'raster', 'vectors', 'csv', 'analysis', 'timeline', 'controls'];
+		const configs = ['description', 'domain', 'domain_init', 'raster', 'vectors', 'csv', 'analysis', 'timeline', 'controls'];
 
 		for (let c of configs) {
 			if (!ovrr.hasOwnProperty(c)) continue;
+
+			if (typeof ovrr[c] !== 'object') {
+				this.category[c] = ovrr[c];
+				continue;
+			}
 
 			if (!maybe(this.category, c)) {
 				this.category[c] = jsonclone(ovrr[c]);

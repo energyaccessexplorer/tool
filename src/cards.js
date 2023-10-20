@@ -569,9 +569,9 @@ export default class dscard extends HTMLElement {
 			ul.append(li);
 		}
 
-		this.legends_el = ul;
-
-		qs('[slot=range]', this).append(ul);
+		slot_populate.call(this, {
+			"legends-list": ul,
+		});
 	};
 
 	list_elements() {

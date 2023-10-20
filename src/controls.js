@@ -64,7 +64,6 @@ export default class dscontrols extends HTMLElement {
 
 		slot_populate.call(this, Object.assign({}, this.ds, {
 			"checkbox":        this.checkbox.svg,
-			"collection-list": this.collection_list,
 			"description":     this.ds.description || this.ds.category.description,
 			"card":            this.card(),
 			"info":            this.info(),

@@ -162,7 +162,6 @@ const steps = [
 				delay(0.5).then(_ => {
 					const d = { "min": 0, "max": 15 };
 
-					DST.get('health').card.range_group.change(d);
 					DST.get('health')._domain = d;
 					O.view = U.view;
 				});

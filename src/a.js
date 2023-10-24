@@ -228,9 +228,6 @@ export function clean() {
 	DS.array.forEach(d => {
 		d._domain = jsonclone(d.domain);
 
-		if (maybe(d, 'controls', 'range_group'))
-			d.controls.range_group.change(d.domain);
-
 		if (maybe(d, 'controls', 'weight_group'))
 			d.controls.weight_group.change({ "min": 0, "max": maybe(d.category, 'analysis', 'weight') });
 	});

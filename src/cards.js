@@ -156,16 +156,14 @@ function range(interval) {
 	const change = (e,i) => {
 		let v = +e.target.value;
 
-		const d = this.ds._domain;
+		const d = ds._domain;
 		d[i] = +v;
 
-		this.range_el.change(d);
-
-		O.ds(this.ds, { 'domain': d });
+		O.ds(ds, { 'domain': d });
 	};
 
-	this.manual_min.onchange = debounce(e => change(e, 'min'));
-	this.manual_max.onchange = debounce(e => change(e, 'max'));
+	this.manual_min.onchange = debounce(e => change(e, 'min'), 150);
+	this.manual_max.onchange = debounce(e => change(e, 'max'), 150);
 
 	this.cr_min.append(this.manual_min);
 	this.cr_max.append(this.manual_max);

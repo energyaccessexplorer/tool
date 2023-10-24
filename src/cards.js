@@ -68,16 +68,19 @@ function value_multiselect() {
 		const k = x['KEY'];
 
 		const i = ce('input', null, { "type": 'checkbox', "name": "", "value": k });
-		i.checked = true;
+		i.checked = (!this.multiselection.length ? true : this.multiselection.indexOf(k) > -1);
 		i.id = ds.id + "_" + k;
 
 		i.onchange = _ => {
-			ds._domain_select = [...new Set(inputs.filter(e => e.checked).map(e => +e.value))];
+			this.multiselection = [...new Set(inputs.filter(e => e.checked).map(e => +e.value))];
+			ds._domain_select = this.multiselection;
 			O.ds(ds, { 'domain': ds.domain });
 		};
 
 		return i;
 	});
+
+	this.multiselection = [...new Set(inputs.map(e => +e.value))];
 
 	ds._domain_select = ds.csv.data.map(r => +r['KEY']);
 
@@ -456,6 +459,7 @@ export function update() {
 export default class dscard extends HTMLElement {
 	manual_min;
 	manual_max;
+	multiselection = [];
 
 	connectedCallback() {
 		delay(1).then(_ => this.refresh());

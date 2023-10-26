@@ -508,9 +508,11 @@ export function context(rc, f) {
 			props[k] = `<code>${v} ${d.category.unit}</code>`;
 		}
 
-		else if (and(v, d.vectors)) {
+		else if (and(Number.isFinite(v), d.vectors)) {
+			const l = v === 0 ? "< 1" : v;
+
 			dict.push([k, d.name]);
-			props[k] = `<code>${v} km (proximity to)</code>`;
+			props[k] = `<code>${l} km (proximity to)</code>`;
 		}
 
 		if (d.vectors) {

@@ -18,6 +18,12 @@
 
     <h4 bind="path"></h4>
 
+    <div class="env"
+         bind-differs="env"
+         bind-arg="production">
+      <strong bind="env"></strong>
+    </div>
+
     <div class="download"><span class="bi bi-download"></span>&nbsp;&nbsp;DOWNLOAD</div>
   </div>
 </template>

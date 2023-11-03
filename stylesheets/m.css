@@ -54,7 +54,7 @@ body {
 }
 
 .session-square {
-  padding: 1em 2em;
+  padding: 2em;
   margin-bottom: 1em;
   margin-left: 1em;
   background-color: white;
@@ -69,6 +69,7 @@ body {
 
 h4 {
   color: var(--the-green);
+  margin-top: 0em;
 }
 
 input#search {
@@ -81,13 +82,21 @@ input#search {
 
 .title-edit {
   position: absolute;
-  top: 1em;
-  right: 1em;
+  top: 1.5em;
+  right: 1.5em;
 }
 
 .title-input {
   padding: 12px 7px;
   font-size: 1.2em;
+}
+
+.env {
+  display: inline-block;
+  padding: 5px 7px;
+  background-color: #cdcdcd;
+  border-radius: 3px;
+  font-size: small;
 }
 
 .download {

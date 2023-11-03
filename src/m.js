@@ -78,6 +78,14 @@ function edit_title(sessions) {
 	m.show();
 };
 
+function base(e) {
+	if (location.hostname.match('localhost')) return "";
+
+	const subdomain = e === "production" ? "www" : e;
+
+	return `https://${subdomain}.energyaccessexplorer.org`;
+};
+
 function draw_sessions(sessions, geographies, container, trees) {
 	sessions.forEach(s => {
 		s.size = s.snapshots.length;
@@ -86,7 +94,7 @@ function draw_sessions(sessions, geographies, container, trees) {
 
 		s.last = s.snapshots[s.size - 1]['time'];
 
-		s.url = `/tool/a/?id=${s.geography_id}&snapshot=${s.last}`;
+		s.url = base(s.env) + `/tool/a/?id=${s.geography_id}&snapshot=${s.last}`;
 
 		const d = new Date(s.time);
 		s.date = d.toLocaleDateString() + " at " + d.toLocaleTimeString();

@@ -19,6 +19,10 @@ import {
 } from './locations-search.js';
 
 import {
+	init as config_init,
+} from './config.js';
+
+import {
 	init as views_init,
 	buttons as views_buttons,
 	right_pane as views_right_pane,
@@ -193,6 +197,7 @@ async function init_2() {
 	vectorssearch_init();
 	analysissearch_init();
 	locationssearch_init();
+	config_init();
 
 	indexes_init();
 

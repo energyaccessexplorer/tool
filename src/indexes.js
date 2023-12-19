@@ -5,14 +5,6 @@ import summary_analyse from './summary.js';
 import bubblemessage from '../lib/bubblemessage.js';
 
 import {
-	validate as config_validate,
-} from './config.js';
-
-import {
-	generate as config_generate,
-} from './config.js';
-
-import {
 	logged_in as user_logged_in,
 	register_login,
 } from './user.js';
@@ -147,8 +139,6 @@ export function init() {
 		"index-graphs-opacity":  "Change opacity of the analysis layer",
 		"index-graphs-info":     "Info about different indexes",
 		"index-graphs-download": "Download TIFF image of the current analysis",
-		"index-graphs-code":     "Download JSON file of the current analysis",
-		"index-graphs-load":     "Load JSON file as an analysis",
 	};
 
 	for (const i in tools)
@@ -182,48 +172,6 @@ export function init() {
 
 		const type = url.searchParams.get('output');
 		fake_blob_download((await analysis(type)).tiff, `energyaccessexplorer-${type}.tif`);
-	};
-
-	const code = qs('#index-graphs-code');
-	code.append(font_icon('box-arrow-in-down'));
-	code.onclick = _ => {
-		if (!user_id) {
-			register_login();
-			return;
-		}
-
-		const conf = config_generate();
-		const time = (new Date()).getTime();
-		fake_blob_download(JSON.stringify(conf), `energyaccessexplorer-config-${time}.json`);
-	};
-
-	const load = qs('#index-graphs-load');
-	load.append(font_icon('box-arrow-in-up'));
-	load.onclick = _ => {
-		if (!user_id) {
-			register_login();
-			return;
-		}
-
-		const input = document.createElement('input');
-		input.type = 'file';
-		input.click();
-
-		input.onchange = e => {
-			const file = e.target.files[0];
-
-			var reader = new FileReader();
-			reader.readAsText(file, 'UTF-8');
-
-			reader.onload = e => {
-				const conf = JSON.parse(e.target.result);
-				const valid = config_validate(conf);
-
-				if (valid) O.load_config(conf);
-
-				O.view = U.view;
-			};
-		};
 	};
 
 	const graphs = tmpl('#index-graphs-container-template');

@@ -39,6 +39,7 @@
         <a for="analysis" description="Top Locations"><i class="bi bi-bar-chart"></i></a>
         <a for="locations" description="Search POI's"><i class="bi bi-geo"></i></a>
         <a for="geographies" description="Change geographies"><i class="bi bi-globe"></i></a>
+        <a for="config" description="Up/Download Configuration"><ii class="bi bi-braces"></i></a>
       </div>
 
       <div id="left-pane">
@@ -73,6 +74,22 @@
 
         <div id="locations" class="search-panel">
           <div class="search-results"></div>
+        </div>
+
+        <div id="config" class="search-panel">
+          <div id="config-buttons">
+            <a id="config-download"
+               title="Download JSON file of the current analysis">
+              <i class="bi-box-arrow-in-down"></i>
+            </a>
+
+            <a id="config-upload"
+               title="Load JSON file as an analysis">
+              <i class="bi-box-arrow-in-up"></i>
+            </a>
+          </div>
+
+          <pre class="search-results"></pre>
         </div>
       </div>
 

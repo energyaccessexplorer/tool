@@ -2,6 +2,11 @@ import DS from './ds.js';
 
 import dscard from './cards.js';
 
+import {
+	logged_in as user_logged_in,
+	register_login,
+} from './user.js';
+
 export function load_datasets(conf) {
 	const list = DS.array.filter(d => conf.datasets.find(t => t.name === d.id || t.id === d.id));
 
@@ -84,4 +89,58 @@ export function generate() {
 	};
 
 	return config;
+};
+
+export function init() {
+	const user_id = user_logged_in();
+
+	const panel = qs('#config.search-panel');
+
+	const results = qs('.search-results', panel);
+
+	const code = qs('#config-download');
+	code.onclick = _ => {
+		if (!user_id) {
+			register_login();
+			return;
+		}
+
+		const conf = generate();
+		const time = (new Date()).getTime();
+
+		fake_blob_download(JSON.stringify(conf), `energyaccessexplorer-config-${time}.json`);
+
+		results.innerText = JSON.stringify(conf, null, "  ");
+	};
+
+	const load = qs('#config-upload');
+	load.onclick = _ => {
+		if (!user_id) {
+			register_login();
+			return;
+		}
+
+		const input = document.createElement('input');
+		input.type = 'file';
+		input.click();
+
+		input.onchange = e => {
+			const file = e.target.files[0];
+
+			var reader = new FileReader();
+			reader.readAsText(file, 'UTF-8');
+
+			reader.onload = e => {
+				const conf = JSON.parse(e.target.result);
+				const valid = validate(conf);
+
+				if (!valid) return;
+
+				O.load_config(conf);
+				results.innerText = JSON.stringify(conf, null, "  ");
+
+				O.view = U.view;
+			};
+		};
+	};
 };

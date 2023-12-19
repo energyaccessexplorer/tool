@@ -138,6 +138,7 @@ build-a:
 		${CSS}/summary.css \
 		${CSS}/mobile.css \
 		${CSS}/cards.css \
+		${CSS}/config.css \
 		> ${DIST}/a/main.css
 
 build-s:

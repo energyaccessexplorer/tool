@@ -65,6 +65,7 @@ export function init() {
 		"time":         session.time,
 		"user_id":      user_id,
 		"geography_id": GEOGRAPHY.id,
+		"env":          ENV[0],
 	}});
 };
 

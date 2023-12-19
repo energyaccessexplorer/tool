@@ -331,7 +331,18 @@ This is fatal. Thanks for all the fish.`;
 		admintiers(o);
 	})();
 
-	GEOGRAPHY.divisions = divisions.map(d => DS.array.find(t => t.dataset_id === d.dataset_id));
+	GEOGRAPHY.divisions = divisions
+		.map(d => DS.array.find(t => t.dataset_id === d.dataset_id))
+		.filter((d,i) => {
+			if (!d) {
+				console.error({
+					"title":   "Geography Divisions configuration error",
+					"message": `Divisions ${i} not found. Other datasets might fail to load...`,
+				});
+			}
+
+			return !!d;
+		});
 
 	ALL
 		.filter(d => !divisions.map(i => i.dataset_id).includes(d.id))

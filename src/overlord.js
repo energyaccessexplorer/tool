@@ -11,6 +11,7 @@ import {
 import {
 	priority,
 	analysis,
+	plot_active as analysis_plot_active,
 } from './analysis.js';
 
 import {
@@ -31,10 +32,6 @@ import {
 	valued_polygons as filtered_valued_polygons,
 	colors_array as filtered_colors_array,
 } from './filtered.js';
-
-import {
-	plot_active as analysis_plot_active,
-} from './analysis.js';
 
 import {
 	info_mode_change as mapbox_info_mode_change,

@@ -14,7 +14,7 @@ import {
 	zoom,
 } from './search.js';
 
-let ul, resultscontainer;
+let ul, resultscontainer, resultsinfo;
 
 function pointto(p, a = false) {
 	const dict = [[ "v", ea_indexes[U.output]['name'] ]];
@@ -72,6 +72,8 @@ function trigger() {
 	});
 
 	ul.append(...list);
+
+	resultsinfo.innerHTML = `${list.length} points selected:`;
 
 	for (const g in groups) {
 		const el = ul.querySelector(`[group='${g}']`);
@@ -228,4 +230,7 @@ This file should be <strong>strictly</strong> formatted.
 	resultscontainer = qs('#points .search-results');
 	ul = ce('ul');
 	resultscontainer.append(ul);
+
+	resultsinfo = ce('div', ce('b', "Picked points"), { "class": 'search-results-info' });
+	resultscontainer.prepend(resultsinfo);
 };

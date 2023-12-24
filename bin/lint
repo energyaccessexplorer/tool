@@ -1,11 +1,5 @@
 #!/bin/sh
 
-if [ `uname` = "Linux" ]; then
-	export DISPLAY=:0
-	export XAUTHORITY=$HOME/.Xauthority
-	export DBUS_SESSION_BUS_ADDRESS=unix:path=/tmp/dbus-1000
-fi
-
 if [ -z $1 ]; then
 	>&2 echo "I need an argument: A directory."
 	exit 1
@@ -16,12 +10,4 @@ if [ ! -d $1 ]; then
 	exit 1
 fi
 
-errors=`eslint --format unix --fix $1`
-
-if [ -z "$errors" ]; then
-	notify-send --urgency=low --expire-time=1000 "Lint" "EAE Tool - OK"
-else
-	notify-send --urgency=critical --expire-time=10000 "EAE - Linting" "\n$errors"
-	>&2 printf "$errors"
-	exit 1
-fi
+eslint --format unix --fix $1

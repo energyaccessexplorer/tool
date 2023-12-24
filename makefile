@@ -36,7 +36,7 @@ build-m:
 
 	@mustache /dev/null ${VIEWS}/m.html > ${DIST}/m/index.html
 
-	@sed -ri 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/m/index.html
+	@sed -r -i.orig 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/m/index.html
 
 	@cp ${SRC}/user.js \
 		${SRC}/m.js \
@@ -48,7 +48,7 @@ build-m:
 		${LIB}/helpers.js \
 		> ${DIST}/m/libs.js
 
-	@echo -n "window.ea_settings = " | cat - \
+	@printf "window.ea_settings = " | cat - \
 		settings.json \
 		> ${DIST}/m/main.js
 
@@ -64,7 +64,7 @@ build-a:
 
 	@mustache /dev/null ${VIEWS}/a.html > ${DIST}/a/index.html
 
-	@sed -ri 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/a/index.html
+	@sed -r -i.orig 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/a/index.html
 
 	@cp ${CSS}/ripple.css ${DIST}/a/ripple.css
 	@cp ${CSS}/buttons.css ${DIST}/a/buttons.css
@@ -116,7 +116,7 @@ build-a:
 		${LIB}/helpers.js \
 		> ${DIST}/a/libs.js
 
-	@echo -n "window.ea_settings = " | cat - \
+	@printf "window.ea_settings = " | cat - \
 		settings.json \
 		${SRC}/utils.js \
 		${SRC}/globals.js \
@@ -147,7 +147,7 @@ build-s:
 
 	@mustache /dev/null ${VIEWS}/s.html > ${DIST}/s/index.html
 
-	@sed -ri 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/s/index.html
+	@sed -r -i.orig 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/s/index.html
 
 	@cp \
 		${SRC}/browser.js \
@@ -161,7 +161,7 @@ build-s:
 		${LIB}/helpers.js \
 		> ${DIST}/s/libs.js
 
-	@echo -n "const ea_settings = " | cat - \
+	@printf "const ea_settings = " | cat - \
 		settings.json \
 		${SRC}/utils.js \
 		> ${DIST}/s/main.js

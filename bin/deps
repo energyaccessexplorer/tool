@@ -21,8 +21,8 @@ fi
 
 printline() {
 	if [ -t 1 ]; then
-		echo -en "\e[1A"
-		echo -e "\e[0K\r$1"
+		printf "\e[1A"
+		printf "\e[0K\r%s\n" "$1"
 	else
 		echo "$1"
 	fi

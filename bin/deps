@@ -42,7 +42,7 @@ fetch() {
 
 while read -r line
 do
-	IFS=' ' read target origin <<EOF
+	read -r target origin <<EOF
 `echo $line`
 EOF
 	printline "Fetching $origin"

@@ -12,7 +12,7 @@ import {
 
 import {
 	getpoints as toplocations_fetch,
-} from './analysis-search.js';
+} from './analysis.js';
 
 import {
 	generate as config_generate,

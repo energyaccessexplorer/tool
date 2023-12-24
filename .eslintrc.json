@@ -49,6 +49,7 @@
 		"OUTLINE": "writable",
 		"MAPBOX": "writable",
 		"INFOMODE": "writable",
+		"COORDINATES": "writable",
 		"NORM_STOPS": "writable",
 		"MOBILE": "writable",
 		"U": "writable",

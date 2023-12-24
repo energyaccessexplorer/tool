@@ -379,3 +379,22 @@ export function medhigh_point_count(d, a) {
 
 	return count;
 };
+
+export async function getpoints(n = 0) {
+	const a = await plot_active(U.output, false);
+
+	const threshold = a.raster.slice(0)
+		.sort((a,b) => a > b ? -1 : 1)
+		.slice(0,n)[n-1];
+
+	const points = a.raster.reduce((t,v,i) => {
+		if (v > 0 && v >= threshold)
+			t.push({i,v});
+
+		return t;
+	}, []);
+
+	return points
+		.sort((a,b) => a.v > b.v ? -1 : 1)
+		.map(t => ({ "v": t.v, "i": t.i, "c": raster_pixel_to_coordinates(t.i) }));
+};

@@ -83,6 +83,7 @@ build-a:
 		${SRC}/vectors-search.js \
 		${SRC}/analysis-search.js \
 		${SRC}/locations-search.js \
+		${SRC}/points-loading.js \
 		${SRC}/ds.js \
 		${SRC}/parse.js \
 		${SRC}/indexes.js \

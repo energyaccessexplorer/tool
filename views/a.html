@@ -39,7 +39,8 @@
         <a for="analysis" description="Top Locations"><i class="bi bi-bar-chart"></i></a>
         <a for="locations" description="Search POI's"><i class="bi bi-geo"></i></a>
         <a for="geographies" description="Change Geographies"><i class="bi bi-globe"></i></a>
-        <a for="config" description="Up/Download Configuration"><ii class="bi bi-braces"></i></a>
+        <a for="points" description="Points Loading"><i class="bi bi-crosshair"></i></a>
+        <a for="config" description="Up/Download Configuration"><i class="bi bi-braces"></i></a>
       </div>
 
       <div id="left-pane">
@@ -76,8 +77,26 @@
           <div class="search-results"></div>
         </div>
 
+        <div id="points" class="search-panel">
+          <div id="ponits-buttons" class="panel-buttons">
+            <a id="points-download"
+               title="Download CSV file of the currents points selection">
+              <i class="bi-box-arrow-in-down"></i>
+            </a>
+
+            <a id="points-upload">
+              <label for="points-input"
+                     title="Load a CSV file with points to find within the analysis">
+                <i class="bi-box-arrow-in-up"></i>
+              </label>
+            </a>
+          </div>
+
+          <div class="search-results"></div>
+        </div>
+
         <div id="config" class="search-panel">
-          <div id="config-buttons">
+          <div id="config-buttons" class="panel-buttons">
             <a id="config-download"
                title="Download JSON file of the current analysis">
               <i class="bi-box-arrow-in-down"></i>
@@ -174,6 +193,7 @@
     window.OUTLINE = null;
     window.MAPBOX = null;
     window.INFOMODE = false;
+    window.COORDINATES = [];
     window.MOBILE = false;
     window.O = null;
     window.U = null;

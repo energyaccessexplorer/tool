@@ -1,11 +1,9 @@
-import bubblemessage from '../lib/bubblemessage.js';
-
 import {
 	coords_search as mapbox_coords_search,
 } from './mapbox.js';
 
 import {
-	plot_active as analysis_plot_active,
+	getpoints,
 } from './analysis.js';
 
 import {
@@ -13,28 +11,7 @@ import {
 	zoom,
 } from './search.js';
 
-let ul, input, resultscontainer;
-
-let resultsinfo;
-
-export async function getpoints(n = 0) {
-	const a = await analysis_plot_active(U.output, false);
-
-	const threshold = a.raster.slice(0)
-		.sort((a,b) => a > b ? -1 : 1)
-		.slice(0,n)[n-1];
-
-	const points = a.raster.reduce((t,v,i) => {
-		if (v > 0 && v >= threshold)
-			t.push({i,v});
-
-		return t;
-	}, []);
-
-	return points
-		.sort((a,b) => a.v > b.v ? -1 : 1)
-		.map(t => ({ "v": t.v, "i": t.i, "c": raster_pixel_to_coordinates(t.i) }));
-};
+let ul, resultscontainer, resultsinfo;
 
 function pointto(p, a = false) {
 	const dict = [[ "v", ea_indexes[U.output]['name'] ]];
@@ -123,73 +100,11 @@ width: calc(${g}% - 1.5em);
 
 export function init() {
 	const panel = qs('#analysis.search-panel');
-	input = ce('span', "Analysis top locations", { "id": 'analysis-search', "class": 'search-input' });
-
-	const file_input = ce('input', null, { "type": "file", "id": "location-search-input", "style": "width: 0; height: 0;", "accept": "text/csv" });
-	const upload_icon = font_icon("box-arrow-in-up");
-	const upload = ce('label', upload_icon, { "class": "search-input", "for": "location-search-input" });
-
-	const msg = `
-<h1>Upload a CSV file</h1>
-
-This file should be <strong>strictly</strong> formatted.
-<ul>
-  <li>Two numbers per line: longitud and latitude</li>
-  <li>Separated by a comma</li>
-  <li>Decimal points</li>
-  <li>No quotation marks</li>
-  <li>Nothing more</li>
-</ul>
-
-<p>Example with two coordinates:</p>
-<pre>
-    -12.09156,9.05680
-    -10.90457,7.93582
-</pre>
-`;
-
-	let bubble;
-
-	upload.onmouseenter = _ => {
-		bubble = new bubblemessage({
-			"position": "E",
-			"message":  msg,
-			"close":    false,
-		}, upload_icon);
-
-		bubble.style['pointer-events'] = "none";
-	};
-
-	upload.onmouseleave = _ => bubble.remove();
-
-	file_input.onchange = function() {
-		if (!this.files.length) return;
-
-		var reader = new FileReader();
-
-		reader.onload = async function() {
-			const a = await analysis_plot_active(U.output, false);
-
-			const data = d3.csvParseRows(reader.result, d => {
-				const c = [parseFloat(d[0]), parseFloat(d[1])];
-
-				const p = coordinates_to_raster_pixel(c, {
-					"data":   a.raster,
-					"nodata": -1,
-				});
-
-				return { "v": p.value, "i": p.index, c };
-			});
-
-			trigger({ "points": _ => data, "n": data.length });
-		};
-
-		reader.readAsText(this.files[0]);
-	};
+	const input = ce('span', "Analysis top locations", { "id": 'analysis-search', "class": 'search-input' });
 
 	panel.addEventListener('activate', trigger);
 
-	panel.prepend(input, file_input, upload);
+	panel.prepend(input);
 
 	resultscontainer = qs('#analysis .search-results');
 	ul = ce('ul');

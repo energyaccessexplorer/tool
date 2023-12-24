@@ -106,3 +106,23 @@ div.nonmatch {
   color: #a9a9a9;
   font-size: 0.8em;
 }
+
+.search-panel .panel-buttons {
+  display: flex;
+  justify-content: space-evenly;
+  border-bottom: solid 1px #d9d9d9;
+}
+
+.search-panel .panel-buttons a {
+  display: block;
+  line-height: 2.8em;
+  font-size: 1.5em;
+  text-align: center;
+  color: var(--the-green);
+  cursor: pointer;
+  flex-grow: 1;
+}
+
+.search-panel .panel-buttons a label {
+  display: block;
+}

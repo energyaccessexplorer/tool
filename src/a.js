@@ -19,6 +19,10 @@ import {
 } from './locations-search.js';
 
 import {
+	init as points_init,
+} from './points-loading.js';
+
+import {
 	init as config_init,
 } from './config.js';
 
@@ -197,6 +201,7 @@ async function init_2() {
 	vectorssearch_init();
 	analysissearch_init();
 	locationssearch_init();
+	points_init();
 	config_init();
 
 	indexes_init();

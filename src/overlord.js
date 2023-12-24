@@ -434,6 +434,10 @@ function mapclick(e) {
 
 	const [dict, props] = context(rc, et);
 
+	COORDINATES.unshift({ "c": ll });
+
+	qs('#points.search-panel').dispatchEvent(new Event('activate'));
+
 	if (U.view === "outputs") {
 		const ac = coordinates_to_raster_pixel(ll, {
 			"data":   MAPBOX.getSource('output-source').raster,
@@ -461,12 +465,12 @@ function mapclick(e) {
 			return pois;
 		})
 		.then(p => {
-			map_pointer(
-				{
-					"x": maybe(e, 'originalEvent', 'pageX'),
-					"y": maybe(e, 'originalEvent', 'pageY'),
-				},
-				td, p);
+			const c = {
+				"x": maybe(e, 'originalEvent', 'pageX'),
+				"y": maybe(e, 'originalEvent', 'pageY'),
+			};
+
+			map_pointer(c, td, p);
 		});
 };
 

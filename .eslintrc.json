@@ -50,6 +50,7 @@
 		"MAPBOX": "writable",
 		"INFOMODE": "writable",
 		"COORDINATES": "writable",
+		"COORDINATESMODE": "writable",
 		"NORM_STOPS": "writable",
 		"MOBILE": "writable",
 		"U": "writable",

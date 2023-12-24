@@ -2,6 +2,7 @@ import bubblemessage from '../lib/bubblemessage.js';
 
 import {
 	coords_search as mapbox_coords_search,
+	info_mode_change,
 } from './mapbox.js';
 
 import {
@@ -116,8 +117,8 @@ async function reload() {
 			"nodata": -1,
 		});
 
-		return { "v": p.value, "i": p.index, "c": c.c };
-	});
+		return p ? { "v": p.value, "i": p.index, "c": c.c } : undefined;
+	}).filter(p => p);
 
 	trigger();
 };
@@ -146,7 +147,7 @@ This file should be <strong>strictly</strong> formatted.
 </pre>
 `;
 
-	let upbubble, downbubble;
+	let upbubble, downbubble, pickbubble;
 
 	upload.onmouseenter = _ => {
 		upbubble = new bubblemessage({
@@ -161,7 +162,7 @@ This file should be <strong>strictly</strong> formatted.
 	upload.onmouseleave = _ => upbubble.remove();
 
 	const download = qs('#points-download', panel);
-	const downmsg = `Download a CSV file with the points/values below.`;
+	const downmsg = `Download a CSV file with the points/values below`;
 
 	download.onmouseenter = _ => {
 		downbubble = new bubblemessage({
@@ -182,6 +183,28 @@ This file should be <strong>strictly</strong> formatted.
 		const time = (new Date()).getTime();
 
 		fake_blob_download(str, `energyaccessexplorer-points-${time}.csv`);
+	};
+
+	const pointspick = qs('#points-pick', panel);
+	const pickmsg = `Pick a sequence of points from the map`;
+
+	pointspick.onmouseenter = _ => {
+		pickbubble = new bubblemessage({
+			"position": "S",
+			"message":  pickmsg,
+			"close":    false,
+		}, qs('i', pointspick));
+
+		pickbubble.style['pointer-events'] = "none";
+	};
+
+	pointspick.onmouseleave = _ => pickbubble.remove();
+
+	pointspick.onclick = _ => {
+		INFOMODE = false;
+		info_mode_change();
+
+		COORDINATESMODE = true;
 	};
 
 	file_input.onchange = function() {

@@ -17,7 +17,7 @@ let ul, input, resultscontainer;
 
 let resultsinfo;
 
-export async function getpoints(n = 20) {
+export async function getpoints(n = 0) {
 	const a = await analysis_plot_active(U.output, false);
 
 	const threshold = a.raster.slice(0)
@@ -167,13 +167,21 @@ This file should be <strong>strictly</strong> formatted.
 
 		var reader = new FileReader();
 
-		reader.onload = function() {
-			const data = d3.csvParseRows(reader.result, d => ({
-				"v": null,
-				"i": [parseFloat(d[0]), parseFloat(d[1])],
-			}));
+		reader.onload = async function() {
+			const a = await analysis_plot_active(U.output, false);
 
-			trigger({ "points": async _ => data });
+			const data = d3.csvParseRows(reader.result, d => {
+				const c = [parseFloat(d[0]), parseFloat(d[1])];
+
+				const p = coordinates_to_raster_pixel(c, {
+					"data":   a.raster,
+					"nodata": -1,
+				});
+
+				return { "v": p.value, "i": p.index, c };
+			});
+
+			trigger({ "points": _ => data, "n": data.length });
 		};
 
 		reader.readAsText(this.files[0]);

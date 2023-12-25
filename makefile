@@ -19,6 +19,7 @@ GITCLEAN != [ "`git diff --stat`" = '' ] || echo "-dirty"
 
 build: build-a build-s build-m
 	@cp views/index.html ${DIST}/index.html
+	@find . -name '*.orig' -delete
 
 lint:
 	${BIN}/lint ${SRC}

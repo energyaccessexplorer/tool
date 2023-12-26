@@ -1,7 +1,7 @@
 import bubblemessage from '../lib/bubblemessage.js';
 
 import {
-	coords_search as mapbox_coords_search,
+	coords_search_pois as mapbox_coords_search_pois,
 	info_mode_change,
 } from './mapbox.js';
 
@@ -41,17 +41,8 @@ function li(p) {
 
 	el.onclick = zoom.bind(null, p, pointto.bind(null, p, true));
 
-	mapbox_coords_search({ "coords": p.c })
-		.then(r => {
-			if (!maybe(r, 'features', 'length')) return;
-
-			const name = r.features[0]['text'];
-			const path = r.features[0]['context'].reverse().slice(1).map(x => x.text);
-
-			if (path[path.length - 1] === name) path.splice(path[path.length - 1]);
-
-			pn.append(ce('span', path.join(', ') + ", ", { "class": "context" }), name);
-		});
+	mapbox_coords_search_pois({ "coords": p.c, "limit": 1 })
+		.then(r => pn.append(ce('span', maybe(r, 0, 'name'), { "class": "context" })));
 
 	return el;
 };

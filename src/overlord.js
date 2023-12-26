@@ -36,7 +36,7 @@ import {
 import {
 	info_mode_change as mapbox_info_mode_change,
 	map_pointer,
-	coords_search as mapbox_coords_search,
+	coords_search_pois as mapbox_coords_search_pois,
 } from './mapbox.js';
 
 import {
@@ -455,15 +455,14 @@ function mapclick(e) {
 
 	const td = table_data(dict, props, ll);
 
-	mapbox_coords_search({ "coords": ll, "limit": 10, "types": ["poi"] })
-		.catch(_ => ({ "features": [] }))
+	mapbox_coords_search_pois({ "coords": ll, "limit": 1 })
 		.then(r => {
-			if (!r.features.length) return "";
+			if (!r.length) return "";
 
 			const pois = ce('div', null, { "id": "pois" });
 			pois.append(ce('h5', "Points of interest"));
 
-			r.features.forEach(f => pois.append(ce('div', f.text, { "class": "small" })));
+			r.forEach(f => pois.append(ce('div', f.name, { "class": "small" })));
 
 			return pois;
 		})

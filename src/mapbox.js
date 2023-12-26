@@ -396,13 +396,29 @@ export function text_search({
 		.then(r => r.json());
 };
 
-export function coords_search({
+export function coords_search_pois({
 	coords,
-	limit = 1,
-	types = ['poi', 'neighborhood', 'locality', 'place'],
+	limit = 10,
+	radius = 500,
 }) {
-	const search = `?limit=${limit}&types=${types}&access_token=${mapboxgl.accessToken}`;
+	const query = [
+		`radius=${radius}`,
+		`limit=${limit}`,
+		`dedupe`,
+		`geometry=point`,
+		`access_token=${ea_settings.mapbox_token}`,
+	].join('&');
 
-	return fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${coords}.json${search}`)
-		.then(r => r.json());
+	return fetch(`https://api.mapbox.com/v4/mapbox.mapbox-streets-v8/tilequery/${coords}.json?${query}`)
+		.then(r => r.json())
+		.catch(_ => ({ "features": [] }))
+		.then(r => {
+			return uniqueby(
+				r.features.filter(f => maybe(f, 'properties', 'name')),
+				t => maybe(t, 'properties', 'name'),
+			).map(f => ({
+				"name":        f.properties.name,
+				"coordinates": f.geometry.coordinates,
+			}));
+		});
 };

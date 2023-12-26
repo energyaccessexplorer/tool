@@ -122,7 +122,7 @@ function front() {
 	$.addText(
 		[
 			{
-				"text":    "Energy Access Exporer Report",
+				"text":    "Energy Access Explorer Report",
 				"options": { "fontSize": 48, bold, breakLine },
 			}, {
 				"text":    GEOGRAPHY.name,

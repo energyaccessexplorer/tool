@@ -8,11 +8,12 @@ import '../lib/pptxgen.js';
 
 import {
 	medhigh_point_count,
+	getpoints as toplocations_fetch,
 } from './analysis.js';
 
 import {
-	getpoints as toplocations_fetch,
-} from './analysis.js';
+	coords_search_pois,
+} from './mapbox.js';
 
 import {
 	generate as config_generate,
@@ -695,16 +696,22 @@ function analysis_right($, index, rows) {
 	}
 };
 
-function toplocation_prepare(t) {
+async function toplocation_prepare(t) {
 	const r = {};
 
 	for (const k in SUMMARY)
 		r[k] = SUMMARY[k].raw_raster[t.i];
 
+	const poi = await coords_search_pois({ "coords": t.c, "limit": 1 });
+
 	return Object.assign(
 		r,
 		context(coordinates_to_raster_pixel(t.c))[1],
-		{ "long": t.c[0], "lat": t.c[1] },
+		{
+			"long": t.c[0],
+			"lat":  t.c[1],
+			"poi":  maybe(poi, 0, 'name'),
+		},
 	);
 };
 
@@ -726,7 +733,7 @@ function toplocations_list(points) {
 	const font = v => v > 0.80 ? black : white;
 
 	// const path = p => divs.map(d => p["_" + d]).join(" → ");
-
+	//
 	function row(p,i) {
 		return [
 			{
@@ -738,6 +745,9 @@ function toplocations_list(points) {
 				"options": { "fontSize": 9 },
 			})),
 			{
+				"text":    p.poi,
+				"options": { "align": "left", "fontSize": 8, "fontFace": "monospace" },
+			}, {
 				"text":    `[${(p.long).toFixed(4)}, ${(p.lat).toFixed(4)}]`,
 				"options": { "align": "center", "fontSize": 8, "fontFace": "monospace" },
 			}, {
@@ -766,6 +776,9 @@ function toplocations_list(points) {
 			"options": textopts({ "align": "center", bold }),
 		})),
 		{
+			"text":    "POI",
+			"options": textopts({ "align": "center", bold }),
+		}, {
 			"text":    "Long/Lat",
 			"options": textopts({ "align": "center", bold }),
 		}, {
@@ -783,11 +796,9 @@ function toplocations_list(points) {
 		},
 	];
 
-	const rows = [header];
+	const rows = [header, ...points.map((p,i) => row(p,i))];
 
-	rows.push(...points.map((p,i) => row(p,i)));
-
-	$.addTable(rows, textopts({ x, "y": 1, "w": "96%", "colW": [0.5, ...Array(divs.length).fill(1.5), 2, 1, 1, 1, 1], border }));
+	$.addTable(rows, textopts({ x, "y": 1, "w": "96%", "colW": [0.5, ...Array(divs.length).fill(1.5), 2, 2, 1, 1, 1, 1], border }));
 
 	footer($);
 };
@@ -898,7 +909,7 @@ export async function pptx() {
 
 		const points = await toplocations_fetch(N_POINTS)
 			.then(r => r.slice(0, N_POINTS))
-			.then(r => r.map(t => toplocation_prepare(t)));
+			.then(async r => await Promise.all(r.map(async t => await toplocation_prepare(t))));
 
 		toplocations_list.call(p, points);
 		toplocations_index.call(p, 'demand', points);

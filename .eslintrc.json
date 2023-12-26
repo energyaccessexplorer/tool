@@ -104,6 +104,7 @@
 		"table_data": "readonly",
 		"coordinates_to_raster_pixel": "readonly",
 		"raster_pixel_to_coordinates": "readonly",
+		"uniqueby": "readonly",
 		"jsonclone": "readonly"
 	}
 }

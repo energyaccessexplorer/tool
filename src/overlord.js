@@ -213,8 +213,11 @@ export default class Overlord {
 		const arr = c.datasets.filter(x => DST.get(x.name) || DST.get(x.id));
 		arr.forEach(x => (DST.get(x.name) || DST.get(x.id)).active(true, true));
 
-		MAPBOX.zoomTo(c.zoom);
-		MAPBOX.setCenter(c.center);
+		if (c.zoom)
+			MAPBOX.zoomTo(c.zoom);
+
+		if (c.center?.length === 2)
+			MAPBOX.setCenter(c.center);
 
 		cards_update();
 		O.sort();

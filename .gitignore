@@ -3,5 +3,5 @@
 /*.diff
 *.orig
 *.rej
-/package-lock.json
 /settings.json
+/.env

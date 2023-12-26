@@ -1,9 +1,30 @@
-.PATH: /t/mk
 default: reconfig build lint
-.include "env.mk"
 
-# for a static configuration:
-# .include ".env"
+.include ".env"
+
+# In .env:
+#
+# DB_NAME = eae
+# PG = postgres://postgres@localhost
+#
+# TITLE = "Energy Access Explorer"
+# WORLD = "https://world.example.org"
+# DOMAIN = "example.org"
+#
+# API_URL = "http://eae.localhost/api"
+#
+# SSH_USER = www
+# SSH_HOST = srv
+#
+# TOOL_PORT = 8000
+# TOOL_DEST = /var/www/path
+#
+# MAPBOX_THEME = "mapbox/light-v10"
+# MAPBOX_TOKEN = ""
+#
+# STORAGE_URL = "https://bucket.s3.storage.com/path/"
+#
+# HTTP_SERVER = httpserver
 #
 DIST = ./dist
 SRC = ./src
@@ -185,7 +206,7 @@ sync:
 		--delete-before \
 		--exclude=files \
 		--info=name1,progress0 \
-		${DIST}/ ${WEBSITE_SSH_USER}@${WEBSITE_HOST}:${TOOL_DEST}
+		${DIST}/ ${SSH_USER}@${SSH_HOST}:${TOOL_DEST}
 
 synced:
 	@rsync -OPr \
@@ -195,7 +216,7 @@ synced:
 		--delete-before \
 		--exclude=files \
 		--info=name1,progress0 \
-		${DIST}/ ${WEBSITE_SSH_USER}@${WEBSITE_HOST}:${TOOL_DEST}
+		${DIST}/ ${SSH_USER}@${SSH_HOST}:${TOOL_DEST}
 
 deploy:
 	@touch ${env}.diff

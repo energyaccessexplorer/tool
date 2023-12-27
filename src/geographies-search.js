@@ -58,7 +58,7 @@ async function load(x,y) {
 	const d = GEOGRAPHY.divisions[x];
 	await d.load('vectors');
 
-	d.vectors.geojson.features.forEach(f => f.properties.__visible = (f.id === y));
+	d.vectors.geojson.features.forEach(f => f.properties['__visible'] = (f.id === y));
 	MAPBOX.getSource(d.id).setData(DST.get(d.id).vectors.geojson);
 
 	if (d.on) d.raise();

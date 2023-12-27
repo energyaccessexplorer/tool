@@ -595,7 +595,7 @@ function reset_features_visibility() {
 	const fs = maybe(this, 'vectors', 'geojson');
 	if (!fs) return;
 
-	fs.features.forEach(f => f.properties.__visible = true);
+	fs.features.forEach(f => f.properties['__visible'] = true);
 
 	qsa('input[type="checkbox"]', this.card).forEach(c => c.checked = true);
 

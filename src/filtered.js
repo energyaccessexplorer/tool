@@ -64,7 +64,7 @@ export function valued_polygons() {
 		for (let i = 0; i < fs.length; i += 1) {
 			const x = result.includes(+fs[i].id);
 
-			fs[i].properties.__visible = x;
+			fs[i].properties['__visible'] = x;
 
 			if (x) {
 				const name = d.csv.table[fs[i].id];

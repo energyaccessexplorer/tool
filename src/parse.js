@@ -511,7 +511,7 @@ export async function polygons_indicator() {
 		f.id = f.properties[this.vectors.id];
 
 		let row = data.find(r => r[this.csv.key] === f.id);
-		f.properties.__color = this.colorscale ? s(maybe(row, col)) : this.vectors.fill || "transparent";
+		f.properties['__color'] = this.colorscale ? s(maybe(row, col)) : this.vectors.fill || "transparent";
 	}
 
 	this.update_source(this.vectors.geojson);

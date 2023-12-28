@@ -22,6 +22,8 @@ function slider(opts) {
 
 	const circle = g.append('circle');
 
+	const text = g.append('text');
+
 	svg
 		.attr('width', "100%")
 		.attr('height', svgheight + 2 + 30);
@@ -30,10 +32,12 @@ function slider(opts) {
 	const dates = ce('div', null, { "id": "timeline-dates-container" });
 	parent.append(dates);
 
-	steps.forEach(x => {
-		const s = ce('span', x, { "font-family": "monospace" });
-		dates.append(s);
-	});
+	dates.append(ce('span', steps[0], { "font-family": "monospace" }));
+	dates.append(ce('span', steps[steps.length - 1], { "font-family": "monospace" }));
+
+	text
+		.attr('id', 'timeline-number')
+		.attr('y', svgheight + 20);
 
 	gutter
 		.attr('stroke', '#42505B')
@@ -67,6 +71,9 @@ function slider(opts) {
 		current_step = nx;
 
 		if (nx !== v) drag(v = nx);
+
+		text.text(v);
+		text.attr('x', cx0 - 15);
 	};
 
 	function set(y) {
@@ -296,7 +303,7 @@ export async function init() {
 	});
 
 	tl.svg.style.left = (padding / 2) + "px";
-	parent.append(tl.svg);
+	parent.prepend(tl.svg);
 
 	return tl;
 };

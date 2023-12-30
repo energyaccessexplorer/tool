@@ -56,7 +56,8 @@ export function csv() {
 };
 
 function table_setup() {
-	if (!this.csv.key) return;
+	this.csv.column = this.config.csv_column;
+	this.csv.key = this.csv.data.columns[0];
 
 	this.csv.table = table_refresh.call(this);
 
@@ -75,27 +76,16 @@ function table_setup() {
 	this._domain = { min, max };
 };
 
-function table_refresh_timeline(t) {
-	const table = {};
-	const data = this.csv.data;
-	const k = this.csv.key;
-
-	for (let r of data)
-		table[r[k]] = r[t];
-
-	return table;
-};
-
 function table_refresh() {
 	const table = {};
 	const data = this.csv.data;
-	const v = this.csv.value;
 	const k = this.csv.key;
+	const v = this.datatype.match(/-timeline/) ? U.timeline : this.csv.column;
 
 	for (let r of data) {
 		const n = +r[v];
-		table[r[k]] = isNaN(n) ? r[v] : n;
-	};
+		table[r[k]] = isNaN(n) ? null : n;
+	}
 
 	return table;
 };
@@ -315,7 +305,7 @@ export function points() {
 			}
 		})
 		.then(_ => {
-			if (this.csv) vectors_timeline_csv.call(this);
+			if (this.csv) vectors_csv.call(this);
 
 			this.criteria = specs_set.call(
 				this,
@@ -390,7 +380,7 @@ export function lines() {
 			}
 		})
 		.then(_ => {
-			if (this.csv) vectors_timeline_csv.call(this);
+			if (this.csv) vectors_csv.call(this);
 
 			this.criteria = specs_set.call(
 				this,
@@ -431,17 +421,10 @@ export function polygons() {
 		})
 		.then(async _ => {
 			if (this.csv) {
-				if (this.category.name === 'indicator')
-					polygons_indicator.call(this);
-
-				else if (this.datatype.match(/polygons-boundaries/))
-					polygons_indicator.call(this);
-
-				else if (this.datatype.match(/raster-timeline/))
+				if (this.datatype.match(/raster-timeline/))
 					raster_timeline.call(this);
-
-				else if (this.datatype.match(/(lines|points|polygons)-timeline/))
-					vectors_timeline_csv.call(this);
+				else
+					vectors_csv.call(this);
 			}
 
 			this.criteria = specs_set.call(
@@ -474,22 +457,12 @@ export function polygons() {
 		});
 };
 
-export async function polygons_indicator() {
+export async function vectors_csv() {
 	await until(_ => this.csv.data && this.vectors.geojson);
 
-	let col = this.timeline ? U.timeline : this.csv.value;
+	const v = this.timeline ? U.timeline : this.csv.column;
 
-	if (this.timeline) {
-		if (or(this.datatype === 'polygons-timeline', !this.domain)) {
-			this.domain = {
-				"min": d3.min([].concat(...GEOGRAPHY.timeline_dates.map(d => this.csv.data.map(r => +r[d])))),
-				"max": d3.max([].concat(...GEOGRAPHY.timeline_dates.map(d => this.csv.data.map(r => +r[d])))),
-			};
-		}
-
-		this.csv.key = 'OBJECTID'; // TODO: this.csv.data.columns[0];
-		this.csv.table = table_refresh_timeline.call(this, U.timeline);
-	}
+	if (this.timeline) vectors_timeline.call(this);
 
 	let s;
 	const data = this.csv.data;
@@ -511,7 +484,7 @@ export async function polygons_indicator() {
 		f.id = f.properties[this.vectors.id];
 
 		let row = data.find(r => r[this.csv.key] === f.id);
-		f.properties['__color'] = this.colorscale ? s(maybe(row, col)) : this.vectors.fill || "transparent";
+		f.properties['__color'] = this.colorscale ? s(maybe(row, v)) : this.vectors.fill || "transparent";
 	}
 
 	this.update_source(this.vectors.geojson);
@@ -520,15 +493,13 @@ export async function polygons_indicator() {
 		Object.assign(this._domain, this.domain);
 };
 
-export async function vectors_timeline_csv() {
-	await until(_ => this.csv.data && this.vectors.geojson);
+function vectors_timeline() {
+	const values = [].concat(...GEOGRAPHY.timeline_dates.map(d => this.csv.data.map(r => +r[d])));
 
-	const data = this.csv.data;
+	if (or(this.datatype === 'polygons-timeline', !this.domain))
+		this.domain = { "min": d3.min(values), "max": d3.max(values) };
 
-	for (let f of this.vectors.geojson.features)
-		f.properties['__visible'] = !!data.find(r => r[this.csv.key] === f.id);
-
-	this.update_source(this.vectors.geojson);
+	this.csv.table = table_refresh.call(this);
 };
 
 export async function raster_timeline() {

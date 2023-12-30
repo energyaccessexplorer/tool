@@ -9,7 +9,6 @@ import {
 	raster as parse_raster,
 	points as parse_points,
 	polygons as parse_polygons,
-	polygons_indicator as parse_polygons_indicator, // TODO: move this...
 	lines as parse_lines,
 	fail as parse_fail,
 } from './parse.js';
@@ -128,8 +127,7 @@ This is not fatal but the dataset is now disabled.`,
 				this.vectors = {};
 				Object.assign(this.vectors, o.category.vectors, f);
 
-				if (this.category.name === 'boundaries')
-					this.vectors.id = this.config.vectors_id;
+				this.vectors.id = maybe(this, 'config', 'vectors_id');
 
 				let p; switch (this.vectors.shape_type) {
 				case 'points': {
@@ -177,9 +175,6 @@ This is not fatal but the dataset is now disabled.`,
 			else {
 				this.csv = {};
 				Object.assign(this.csv, o.category.csv, f);
-
-				this.csv.key = maybe(this.config, 'polygons_valued_columns', 'key');
-				this.csv.value = maybe(this.config, 'polygons_valued_columns', 'value');
 				this.csv.parse = parse_csv.bind(this);
 			}
 		}
@@ -625,6 +620,8 @@ This is not fatal but the dataset is now disabled.`,
 				}
 			}
 
+			this.set_colorscale();
+
 			if (this.controls) this.controls.loading(false);
 
 			if (this.disabled) return;
@@ -663,10 +660,6 @@ This is not fatal but the dataset is now disabled.`,
 
 		if (maybe(this, arg)) await this[arg].parse();
 		else throw new Error(`Loading Error: '${this.id}' tried to load '${arg}', but failed`);
-
-		// TODO: this should be in parse.js
-		if (this.datatype === 'polygons-timeline')
-			parse_polygons_indicator.call(this);
 
 		this.loading = false;
 	};

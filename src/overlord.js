@@ -19,9 +19,8 @@ import {
 } from './config.js';
 
 import {
-	polygons_indicator as parse_polygons_indicator,
+	vectors_csv as parse_vectors_csv,
 	raster_timeline as parse_raster_timeline,
-	vectors_timeline_csv as parse_vectors_timeline_csv,
 } from './parse.js';
 
 import {
@@ -120,14 +119,11 @@ export default class Overlord {
 		DS.array.forEach(async d => {
 			if (!d.on) return;
 
-			if (d.category.name.match(/indicator/))
-				parse_polygons_indicator.call(d);
-
-			else if (d.datatype.match(/raster-timeline/))
+			if (d.datatype.match(/raster-timeline/))
 				parse_raster_timeline.call(d);
 
 			else if (d.datatype.match(/(lines|points|polygons)-timeline/))
-				parse_vectors_timeline_csv.call(d);
+				parse_vectors_csv.call(d);
 		});
 	};
 
@@ -504,7 +500,7 @@ export function context(rc, f) {
 		if ((v + "").match('[0-9]\\.[0-9]{3}'))
 			v = v.toFixed(2);
 
-		if (maybe(d, 'csv', 'key')) { // (!d.category.name.match(/^(timeline-)?indicator/))
+		if (maybe(d, 'csv', 'key')) {
 			k = d.id + "_csv_" + d.csv.key;
 			v = d.csv.table[v];
 		}

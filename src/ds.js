@@ -552,6 +552,8 @@ This is not fatal but the dataset is now disabled.`,
 
 		const features = this.vectors.geojson.features;
 
+		const points = this.datatype.match(/points/);
+
 		const rows = features.map(f => {
 			const columns = [];
 
@@ -560,11 +562,10 @@ This is not fatal but the dataset is now disabled.`,
 				columns.push(f.properties[p]);
 			}
 
-			if (f.geometry.coordinates.length === 2) {
+			if (points)
 				columns.push(
 					ce('code', "["+f.geometry.coordinates.map(x => x.toFixed(3)).join(',')+"]"),
 				);
-			}
 
 			const tr = ce('tr');
 			tr.append(...columns.map(c => ce('td', c)));
@@ -579,8 +580,7 @@ This is not fatal but the dataset is now disabled.`,
 			head.append(ce('th', p));
 		}
 
-		if (features[0].geometry?.coordinates.length === 2)
-			head.append(ce('th', "long/lat"));
+		if (points) head.append(ce('th', "long/lat"));
 
 		rows.unshift(head);
 

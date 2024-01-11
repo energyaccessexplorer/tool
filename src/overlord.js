@@ -409,6 +409,8 @@ function load_view() {
 
 		O.sort();
 
+		analysis_plot_active(output, true);
+
 		output_preview.style.display = '';
 
 		timeline_lines_update();
@@ -558,12 +560,14 @@ export function context(rc, f) {
 	Object.keys(p)
 		.map(e => [e, p[e]])
 		.flat(2)
+		.filter(d => maybe(d, 'raster', 'data'))
 		.forEach(d => rows(d));
 
 	(function tier_rows() {
 		const g = GEOGRAPHY.divisions.slice(0);
 
 		const a = g
+			.filter(d => maybe(d, 'raster', 'data'))
 			.filter(d => maybe(d, 'csv', 'table', d.raster.data[x]))
 			.map(d => {
 				props["_" + d.name] = d.csv.table[d.raster.data[x]];

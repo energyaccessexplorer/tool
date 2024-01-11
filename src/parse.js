@@ -482,6 +482,7 @@ export async function vectors_csv() {
 
 	for (let f of this.vectors.geojson.features) {
 		f.id = f.properties[this.vectors.id];
+		f.properties['__visible'] = !empty(data.find(r => r[this.csv.key] === f.id));
 
 		let row = data.find(r => r[this.csv.key] === f.id);
 		f.properties['__color'] = this.colorscale ? s(maybe(row, v)) : this.vectors.fill || "transparent";

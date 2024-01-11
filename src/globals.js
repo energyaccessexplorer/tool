@@ -27,7 +27,7 @@ ea_params = {
 		"variant": ['raster', '1', '2', '3', '4', '5', '6', '7', '8'],
 		"subdiv":  [],
 		"divtier": [],
-		"tab":     ['controls', 'cards', 'vectors', 'analysis', 'locations', 'geographies'],
+		"tab":     ['controls', 'cards', 'vectors', 'analysis', 'geographies', 'locations', 'points', 'config'],
 	},
 
 	"timeline": {
@@ -36,7 +36,7 @@ ea_params = {
 		"variant": ['raster', '1', '2', '3', '4', '5', '6', '7', '8'],
 		"subdiv":  [],
 		"divtier": [],
-		"tab":     ['controls', 'cards', 'vectors', 'analysis', 'locations', 'geographies'],
+		"tab":     ['controls', 'cards', 'vectors', 'analysis', 'geographies', 'locations', 'points', 'config'],
 	},
 };
 

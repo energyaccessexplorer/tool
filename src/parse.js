@@ -56,8 +56,12 @@ export function csv() {
 };
 
 function table_setup() {
-	this.csv.column = this.config.csv_column;
-	this.csv.key = this.csv.data.columns[0];
+	// TODO: polygons_valued_columns will get replaced with
+	//
+	// this.csv.column = this.config.csv_column;
+	// this.csv.key = this.csv.data.columns[0];
+	this.csv.column = maybe(this.config, 'polygons_valued_columns', 'value');
+	this.csv.key = maybe(this.config, 'polygons_valued_columns', 'key');
 
 	this.csv.table = table_refresh.call(this);
 
@@ -84,7 +88,7 @@ function table_refresh() {
 
 	for (let r of data) {
 		const n = +r[v];
-		table[r[k]] = isNaN(n) ? null : n;
+		table[r[k]] = isNaN(n) ? r[v] : n;
 	}
 
 	return table;

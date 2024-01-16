@@ -1,0 +1,71 @@
+<nav>
+  <input id="toggle"
+         class="no-desktop"
+         type="checkbox">
+
+  <label for="toggle" class="no-desktop">
+    <svg style="width:24px;height:24px" viewBox="0 0 24 14">
+      <path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" />
+    </svg>
+  </label>
+
+  <a id="energy-access-link"
+     href="/">
+    <img src="/images/EAE Logo_Horizontal White.svg"
+         style="width: 280px; margin-top: 4px;">
+  </a>
+
+  <div id="navigation-links">
+    <a href="/tool/s"
+       class="toggleable">
+      Tool
+    </a>
+
+    <a href="/about"
+       class="toggleable">
+      About
+    </a>
+
+    <a href="/get-involved"
+       class="toggleable">
+      Get Involved
+    </a>
+
+    <a href="/user-stories"
+       class="toggleable">
+      User Stories
+    </a>
+
+    <a href="/partners"
+       class="toggleable">
+      Partners
+    </a>
+  </div>
+</nav>
+
+<script>
+  const c = document.querySelector('nav #navigation-links');
+  const m = document.createElement('a');
+  m.className = "toggleable";
+
+  if (localStorage['token']) {
+    m.href = '/tool/m';
+    m.innerText = 'My EAE';
+  } else {
+    m.href = '/login';
+    m.innerText = 'Login';
+  }
+
+  c.append(m);
+
+  (function() {
+    const links = document.querySelectorAll('nav #navigation-links a');
+
+    if (!links) return;
+
+    for (var l of links) {
+      if (location.pathname.match(new RegExp(l.getAttribute('href').split('/')[1])))
+        l.classList.add("active");
+    }
+  })();
+</script>

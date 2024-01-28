@@ -706,5 +706,9 @@ export async function analysis_to_dataset(t) {
 
 	d['summary']['analysis'] = a.analysis;
 
-	d.opacity(0.5);
+	d.opacity(1);
+
+	O.sort();
+
+	cards_update();
 };

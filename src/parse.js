@@ -231,6 +231,7 @@ function specs_set(fs, specs) {
 		"params":       ['__name'],
 		"__name":       this.name,
 		"radius":       this.vectors['radius'],
+		"fill":         this.vectors['fill'],
 		"stroke":       this.vectors['stroke'],
 		"stroke-width": this.vectors['stroke-width'],
 		"dasharray":    this.vectors['dasharray'],
@@ -257,6 +258,7 @@ function specs_set(fs, specs) {
 
 	for (let i = 0; i < fs.length; i += 1) {
 		fs[i].properties['__radius'] = this.vectors['radius'];
+		fs[i].properties['__fill'] = this.vectors['fill'];
 		fs[i].properties['__stroke'] = this.vectors['stroke'];
 		fs[i].properties['__stroke-width'] = this.vectors['stroke-width'];
 		fs[i].properties['__dasharray'] = mapbox_dasharray(this.vectors['dasharray']);
@@ -277,6 +279,9 @@ function specs_set(fs, specs) {
 
 			if (has(s, 'radius'))
 				fs[i].properties['__radius'] = c['radius'] = s['radius'];
+
+			if (has(s, 'fill'))
+				fs[i].properties['__fill'] = c['fill'] = s['fill'];
 
 			if (has(s, 'stroke'))
 				fs[i].properties['__stroke'] = c['stroke'] = s['stroke'];
@@ -442,10 +447,6 @@ export function polygons() {
 				"data": this.vectors.geojson,
 			});
 
-			const c = and(this.datatype.match("polygons-"), this.category.name !== 'outline') ?
-				['get', '__color'] :
-				this.vectors.fill;
-
 			this.add_layers({
 				"type":   'fill',
 				"filter": ['get', '__visible'],
@@ -453,9 +454,9 @@ export function polygons() {
 					"visibility": "none",
 				},
 				"paint": {
-					"fill-color":         c,
-					"fill-outline-color": ['get', '__stroke'],
+					"fill-color":         this.datatype === 'polygons-boundaries' ? this.vectors.fill : ['get', '__fill'],
 					"fill-opacity":       [ 'case', [ 'boolean', [ 'get', '__visible' ], true ], 1 * this.vectors.opacity, 0 ],
+					"fill-outline-color": ['get', '__stroke'],
 				},
 			});
 		});
@@ -489,7 +490,7 @@ export async function vectors_csv() {
 		f.properties['__visible'] = !empty(data.find(r => r[this.csv.key] === f.id));
 
 		let row = data.find(r => r[this.csv.key] === f.id);
-		f.properties['__color'] = this.colorscale ? s(maybe(row, v)) : this.vectors.fill || "transparent";
+		f.properties['__fill'] = this.colorscale ? s(maybe(row, v)) : this.vectors.fill || "transparent";
 	}
 
 	this.update_source(this.vectors.geojson);

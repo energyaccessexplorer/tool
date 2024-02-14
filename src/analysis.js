@@ -343,11 +343,11 @@ export function priority(d, a, i) {
 
 	for (const e in o) {
 		if (o[e]['average'] === -1) {
-			source._data.features.find(f => f.id === +e).properties['__color'] = "transparent";
+			source._data.features.find(f => f.id === +e).properties['__fill'] = "transparent";
 			continue;
 		}
 
-		source._data.features.find(f => f.id === +e).properties['__color'] = s(o[e]['average']);
+		source._data.features.find(f => f.id === +e).properties['__fill'] = s(o[e]['average']);
 	}
 
 	source.setData(jsonclone(source._data));

@@ -297,7 +297,7 @@ function load_view() {
 						"visibility": "none",
 					},
 					"paint": {
-						"fill-color":         [ "get", "__color" ],
+						"fill-color":         [ "get", "__fill" ],
 						"fill-outline-color": "black",
 						"fill-opacity":       1,
 					},

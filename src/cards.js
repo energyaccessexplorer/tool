@@ -130,7 +130,8 @@ function range(interval) {
 		domain[i] = parseFloat(x);
 	};
 
-	let step = 0.1 * Math.pow(10, Math.floor(Math.log10(Math.abs(ds.domain.max - ds.domain.min))));
+	let step = ds.raster.intervals ? undefined :
+		0.1 * Math.pow(10, Math.floor(Math.log10(Math.abs(ds.domain.max - ds.domain.min))));
 
 	this.cr_max = tmpl('#controls-input').firstElementChild;
 	this.cr_min = tmpl('#controls-input').firstElementChild;
@@ -162,8 +163,8 @@ function range(interval) {
 		O.ds(ds, { 'domain': d });
 	};
 
-	this.manual_min.onchange = debounce(e => change(e, 'min'), 150);
-	this.manual_max.onchange = debounce(e => change(e, 'max'), 150);
+	this.manual_min.oninput = debounce(e => change(e, 'min'), 150);
+	this.manual_max.oninput = debounce(e => change(e, 'max'), 150);
 
 	this.cr_min.append(this.manual_min);
 	this.cr_max.append(this.manual_max);
@@ -194,11 +195,13 @@ function range(interval) {
 		"background":   ds.colorscale?.svg.querySelector('g').cloneNode(true),
 		"sliders":      ds.category.controls.range,
 		"width":        slider_width,
-		"init":         ds._domain,
-		"domain":       ds.domain,
+		"init":         {
+			"min": this.ds.fn(ds._domain.min),
+			"max": this.ds.fn(ds._domain.max),
+		},
 		"steps":        steps,
-		"callback1":    (x, cx) => update(x, 'min', this.manual_min, cx),
-		"callback2":    (x, cx) => update(x, 'max', this.manual_max, cx),
+		"callback1":    (v, cx) => update(this.ds.fn.invert(v), 'min', this.manual_min, cx),
+		"callback2":    (v, cx) => update(this.ds.fn.invert(v), 'max', this.manual_max, cx),
 		"end_callback": _ => O.ds(ds, { 'domain': domain }),
 	});
 
@@ -341,8 +344,7 @@ function range_el() {
 		break;
 	}
 
-	case 'polygons-valued':
-	case 'polygons-timeline': {
+	case 'polygons-valued': {
 		g = range.call(this, svg_interval_transparent);
 
 		o = ce(
@@ -376,6 +378,19 @@ function range_el() {
 	case 'raster': {
 		g = range.call(this, svg_interval_transparent);
 
+		break;
+	}
+
+	case 'polygons-timeline': {
+		g = range.call(this, svg_interval_transparent);
+
+		e = polygons_symbol({
+			"size":        28,
+			"fill":        ds.vectors.fill,
+			"opacity":     ds.vectors.opacity,
+			"stroke":      ds.vectors.stroke,
+			"strokewidth": (ds.vectors.width - 1) || 1,
+		});
 		break;
 	}
 

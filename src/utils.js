@@ -2,6 +2,8 @@
 
 NORM_STOPS = d3.range(0, 1.000000001, 0.25);
 
+NORM_RANGE = s => d3.range(0, 1.000000001, 1 / (s - 1));
+
 function colorscale(opts) {
 	let s;
 
@@ -152,7 +154,7 @@ function svg_pie(data, outer, inner, colors, inner_text, parse, bubble) {
 };
 
 function svg_interval(opts = {}) {
-	const {sliders, domain, init, steps, width, callback1, callback2, end_callback} = opts;
+	const {sliders, init, steps, width, callback1, callback2, end_callback} = opts;
 
 	const radius = 6;
 	const svgwidth = width;
@@ -161,7 +163,7 @@ function svg_interval(opts = {}) {
 	const svgmin = radius + 1;
 	const svgmax = svgwidth - radius - 1;
 
-	let norm = d3.scaleLinear().domain([svgmin, svgmax]).range([domain.min, domain.max]);
+	let norm = d3.scaleLinear().domain([svgmin, svgmax]).range([0,1]);
 	let denorm = norm.invert;
 
 	if (steps) {
@@ -243,7 +245,7 @@ function svg_interval(opts = {}) {
 			.attr('x', +c1.attr('cx'))
 			.attr('width', (w < 0) ? 0 : w);
 
-		if (typeof callback === 'function') callback(norm(cx).toFixed(2), cx);
+		if (typeof callback === 'function') callback(norm(cx), cx);
 	};
 
 	let x_position;
@@ -296,7 +298,7 @@ function svg_interval(opts = {}) {
 };
 
 function svg_interval_transparent(opts = {}) {
-	const {sliders, background, domain, init, steps, width, callback1, callback2, end_callback} = opts;
+	const {sliders, background, init, steps, width, callback1, callback2, end_callback} = opts;
 
 	const radius = 6;
 	const svgwidth = width;
@@ -305,7 +307,7 @@ function svg_interval_transparent(opts = {}) {
 	const svgmin = radius;
 	const svgmax = svgwidth - (radius/2) - 1;
 
-	let norm = d3.scaleLinear().domain([svgmin, svgmax]).range([domain.min, domain.max]);
+	let norm = d3.scaleLinear().domain([svgmin, svgmax]).range([0,1]);
 	let denorm = norm.invert;
 
 	if (steps) {
@@ -351,7 +353,7 @@ function svg_interval_transparent(opts = {}) {
 		if (steps) cx = denorm(norm(cx));
 		c.attr('cx', cx);
 
-		if (typeof callback === 'function') callback(norm(cx).toFixed(2), cx);
+		if (typeof callback === 'function') callback(norm(cx), cx);
 	};
 
 	let x_position;

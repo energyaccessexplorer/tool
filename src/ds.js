@@ -185,7 +185,7 @@ This is not fatal but the dataset is now disabled.`,
 
 		this._domain = jsonclone(this.category.domain_init) || jsonclone(this.domain);
 
-		this.set_colorscale();
+		this.set_scales();
 
 		this.controls = new dscontrols(this);
 
@@ -436,18 +436,13 @@ This is not fatal but the dataset is now disabled.`,
 		}
 	};
 
-	set_colorscale() {
-		if (this.colorscale) {
-			console.log(this.id, "has a colorscale already");
-			return;
-		}
-
-		let opts;
+	set_scales() {
+		let color_opts;
 
 		switch (this.datatype) {
 		case 'polygons-valued': {
 			if (this.csv.key) {
-				opts = {
+				color_opts = {
 					"stops": this.category.colorstops,
 				};
 			}
@@ -455,7 +450,7 @@ This is not fatal but the dataset is now disabled.`,
 		}
 
 		case 'polygons-timeline': {
-			opts = {
+			color_opts = {
 				"stops": this.category.colorstops,
 			};
 
@@ -465,7 +460,7 @@ This is not fatal but the dataset is now disabled.`,
 		case 'raster-timeline':
 		case 'raster-valued':
 		case 'raster': {
-			opts = {
+			color_opts = {
 				"stops":     this.category.colorstops,
 				"domain":    this.domain,
 				"intervals": this.raster.intervals,
@@ -478,7 +473,22 @@ This is not fatal but the dataset is now disabled.`,
 			break;
 		}
 
-		if (opts) this.colorscale = colorscale(opts);
+		if (this.raster && this.domain) {
+			this.fn = d3.scaleLinear()
+				.domain([this.domain.min, this.domain.max])
+				.range([0,1]);
+		}
+
+		if (maybe(this.raster, 'intervals')) {
+			this.fn = d3.scaleLinear()
+				.domain(this.raster.intervals)
+				.range(NORM_RANGE(this.raster.intervals.length));
+		}
+
+		if (this.colorscale)
+			console.log(this.id, "has a colorscale already");
+		else if (color_opts)
+			this.colorscale = colorscale(color_opts);
 	};
 
 	info_modal() {
@@ -620,7 +630,7 @@ This is not fatal but the dataset is now disabled.`,
 				}
 			}
 
-			this.set_colorscale();
+			this.set_scales();
 
 			if (this.controls) this.controls.loading(false);
 

@@ -466,8 +466,8 @@ function opacity_control({ fn, init }) {
 
 	const grad = svg_interval({
 		"width":        256,
-		"init":         { "min": 0, "max": init ?? 1 },
 		"domain":       { "min": 0, "max": 1 },
+		"init":         { "min": 0, "max": opacity_value },
 		"sliders":      'single',
 		"callback2":    x => opacity_value = x,
 		"end_callback": _ => fn(+opacity_value),

@@ -115,19 +115,20 @@ function range(interval) {
 	        or(and(min === 0, max === 100),
 	           and(min === 100, max === 0)))) d = 0;
 
-	const update = (x, i, el, cx) => {
-		el.value = (+x).toFixed(d);
+	const update = (v, i, el, cx) => {
+		el.value = (+v).toFixed(d);
 
 		const man = maybe(this, 'manual_' + i);
 		if (man) {
-			man.value = x;
+			man.value = v;
 		}
 
 		const ctrl = maybe(this, 'cr_' + i);
 		if (ctrl?.style) {
 			ctrl.style.left = cx + "px";
 		}
-		domain[i] = parseFloat(x);
+
+		domain[i] = parseFloat(v);
 	};
 
 	let step = ds.raster.intervals ? undefined :

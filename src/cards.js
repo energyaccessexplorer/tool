@@ -99,7 +99,7 @@ function value_multiselect() {
 	};
 };
 
-function range(interval) {
+function range() {
 	const ds = this.ds;
 	const cat = this.ds.category;
 
@@ -131,7 +131,7 @@ function range(interval) {
 		domain[i] = parseFloat(v);
 	};
 
-	let step = ds.raster.intervals ? undefined :
+	const step = ds.raster.intervals ? undefined :
 		0.1 * Math.pow(10, Math.floor(Math.log10(Math.abs(ds.domain.max - ds.domain.min))));
 
 	this.cr_max = tmpl('#controls-input').firstElementChild;
@@ -172,14 +172,17 @@ function range(interval) {
 
 	switch (maybe(cat, 'controls', 'range')) {
 	case 'single':
-		this.manual_min.setAttribute('disabled', true);
+		this.cr_min = "";
 		break;
 
 	case 'double':
 		break;
 
 	case null:
+	case 'none':
 	default:
+		this.cr_min = "";
+		this.cr_max = "";
 		break;
 	}
 
@@ -192,7 +195,7 @@ function range(interval) {
 			steps[i] = ds.domain.min + (s * i);
 	}
 
-	const s = interval({
+	const s = svg_interval({
 		"background":   ds.colorscale?.svg.querySelector('g').cloneNode(true),
 		"sliders":      ds.category.controls.range,
 		"width":        slider_width,
@@ -216,6 +219,8 @@ function range(interval) {
 function weight() {
 	const weights = [1,2,3,4,5];
 
+	const s = d3.scaleLinear().domain(weights).range(NORM_STOPS);
+
 	const r = ramp(
 		ce('div', weights[0]),
 		ce('div', "importance", { "class": "unit-ramp" }),
@@ -224,11 +229,10 @@ function weight() {
 
 	const w = svg_interval({
 		"sliders":      "single",
-		"init":         { "min": 1, "max": this.weight },
-		"domain":       { "min": 1, "max": 5 },
+		"init":         { "min": 0, "max": weights[this.weight-1] },
 		"steps":        weights,
 		"width":        slider_width,
-		"end_callback": x => O.ds(this, { 'weight': x }),
+		"end_callback": v => O.ds(this, { 'weight': s.invert(v) }),
 	});
 
 	const el = ce('div', [w.svg, r], { "style": "text-align: center;" });
@@ -285,7 +289,7 @@ function range_el() {
 
 	case 'points': {
 		if (ds.raster)
-			g = range.call(this, svg_interval);
+			g = range.call(this);
 
 		e = points_symbol({
 			"size":        24,
@@ -308,7 +312,7 @@ function range_el() {
 
 	case 'lines': {
 		if (ds.raster)
-			g = range.call(this, svg_interval);
+			g = range.call(this);
 
 		e = lines_symbol({
 			"size":      28,
@@ -333,7 +337,7 @@ function range_el() {
 
 	case 'polygons': {
 		if (ds.raster)
-			g = range.call(this, svg_interval);
+			g = range.call(this);
 
 		e = polygons_symbol({
 			"size":        28,
@@ -346,7 +350,7 @@ function range_el() {
 	}
 
 	case 'polygons-valued': {
-		g = range.call(this, svg_interval_transparent);
+		g = range.call(this);
 
 		o = ce(
 			'span',
@@ -377,13 +381,13 @@ function range_el() {
 	case 'raster-mutant':
 	case 'raster-timeline':
 	case 'raster': {
-		g = range.call(this, svg_interval_transparent);
+		g = range.call(this);
 
 		break;
 	}
 
 	case 'polygons-timeline': {
-		g = range.call(this, svg_interval_transparent);
+		g = range.call(this);
 
 		e = polygons_symbol({
 			"size":        28,

@@ -286,7 +286,7 @@ export async function analysis(type) {
 
 	const arr = new Uint8Array(r.length).fill(-1);
 	for (let i = 0; i < r.length; i += 1)
-		arr[i] = (r[i] === -1) ? 0 : Math.floor(r[i] * 100);
+		arr[i] = (r[i] === -1) ? 255 : Math.round(r[i] * 254);
 
 	const metadata = {
 		"ImageWidth":      b.raster.width,
@@ -297,7 +297,7 @@ export async function analysis(type) {
 		"ModelTiepoint":   [ 0, 0, 0, env[0], env[3], 0 ],
 		"XResolution":     "1",
 		"YResolution":     "1",
-		"GDAL_NODATA":     "0",
+		"GDAL_NODATA":     "255",
 		"ModelPixelScale": [(env[2] - env[0]) / b.raster.width, (env[3] - env[1]) / b.raster.height, 0],
 	};
 

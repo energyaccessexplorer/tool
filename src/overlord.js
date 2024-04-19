@@ -181,6 +181,10 @@ export default class Overlord {
 
 			analysis_dataset_intersect.call(d, a.raster);
 		};
+
+		// this should not be here. waiting for commit().
+		//
+		timeline_visibility();
 	};
 
 	info_mode() {
@@ -220,9 +224,26 @@ export default class Overlord {
 
 		return c;
 	};
+
+	get datasets() {
+		return qsa('ds-card', qs('#cards-list'), true).map(c => c.ds);
+	}
 };
 
 const output_preview = qs('#output-preview');
+
+function timeline_visibility() {
+	const timeline = qs('#timeline');
+
+	if (!timeline) return;
+
+	let v = '';
+
+	if (O.datasets[0]?.timeline) ;
+	else v = 'none';
+
+	timeline.style.display = v;
+};
 
 function load_view() {
 	const timeline = qs('#timeline');

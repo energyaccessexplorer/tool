@@ -285,7 +285,7 @@ function multiline(opts) {
 
 export async function init() {
 	if (maybe(GEOGRAPHY, 'timeline'))
-		qs('#visual').append(ce('div', null, { "id": 'timeline' }));
+		qs('#maparea').append(ce('div', null, { "id": 'timeline' }));
 
 	await until(_ => GEOGRAPHY.timeline_dates.length > 0);
 

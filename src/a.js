@@ -162,10 +162,14 @@ async function init_1() {
 
 	session_init();
 
-	PARAMS = ea_params['default'];
-
-	if (GEOGRAPHY.timeline)
-		PARAMS = ea_params['timeline'];
+	PARAMS = {
+		"view":    ['inputs', 'filtered', 'outputs'],
+		"output":  ['eai', 'ani', 'demand', 'supply'],
+		"variant": ['raster', '1', '2', '3', '4', '5', '6', '7', '8'],
+		"subdiv":  [],
+		"divtier": [],
+		"tab":     ['controls', 'cards', 'vectors', 'analysis', 'geographies', 'locations', 'points', 'config'],
+	};
 
 	U = new Proxy(url, Uproxy);
 	U.tab = null;

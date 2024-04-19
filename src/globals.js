@@ -4,11 +4,6 @@ ea_views = {
 		"description": "Underlying data that go into the analysis",
 	},
 
-	"timeline": {
-		"name":        "Data",
-		"description": "Underlying data that go into the analysis",
-	},
-
 	"filtered": {
 		"name":        "Filtered Areas",
 		"description": "Filtered areas",
@@ -17,26 +12,6 @@ ea_views = {
 	"outputs": {
 		"name":        "Analysis",
 		"description": "Results of the analysis",
-	},
-};
-
-ea_params = {
-	"default": {
-		"view":    ['inputs', 'filtered', 'outputs'],
-		"output":  ['eai', 'ani', 'demand', 'supply'],
-		"variant": ['raster', '1', '2', '3', '4', '5', '6', '7', '8'],
-		"subdiv":  [],
-		"divtier": [],
-		"tab":     ['controls', 'cards', 'vectors', 'analysis', 'geographies', 'locations', 'points', 'config'],
-	},
-
-	"timeline": {
-		"view":    ['timeline', 'filtered', 'outputs'],
-		"output":  ['eai', 'ani', 'demand', 'supply'],
-		"variant": ['raster', '1', '2', '3', '4', '5', '6', '7', '8'],
-		"subdiv":  [],
-		"divtier": [],
-		"tab":     ['controls', 'cards', 'vectors', 'analysis', 'geographies', 'locations', 'points', 'config'],
 	},
 };
 

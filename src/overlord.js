@@ -375,6 +375,8 @@ function load_view() {
 
 		views_right_pane();
 
+		if (timeline) timeline_lines_update();
+
 		break;
 	}
 
@@ -394,26 +396,6 @@ function load_view() {
 		output_preview.style.display = '';
 
 		views_right_pane();
-
-		break;
-	}
-
-	case "timeline": {
-		if (timeline) timeline.style.display = '';
-
-		filtered_visibility('none');
-
-		output_visibility('none');
-
-		priority_visibility_pick();
-
-		O.sort();
-
-		analysis_plot_active(output, true);
-
-		output_preview.style.display = '';
-
-		timeline_lines_update();
 
 		break;
 	}

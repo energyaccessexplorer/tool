@@ -203,7 +203,7 @@ This file should be <strong>strictly</strong> formatted.
 	file_input.onchange = function() {
 		if (!this.files.length) return;
 
-		var reader = new FileReader();
+		const reader = new FileReader();
 
 		reader.onload = function() {
 			fileload(reader.result);

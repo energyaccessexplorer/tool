@@ -63,10 +63,10 @@ export default class dscontrols extends HTMLElement {
 		this.header.onclick = header_click.call(this);
 
 		slot_populate.call(this, Object.assign({}, this.ds, {
-			"checkbox":        this.checkbox.svg,
-			"description":     this.ds.description || this.ds.category.description,
-			"card":            this.card(),
-			"info":            this.info(),
+			"checkbox":    this.checkbox.svg,
+			"description": this.ds.description || this.ds.category.description,
+			"card":        this.card(),
+			"info":        this.info(),
 		}));
 
 		this.inject();

@@ -127,7 +127,7 @@ export function init() {
 		input.onchange = e => {
 			const file = e.target.files[0];
 
-			var reader = new FileReader();
+			const reader = new FileReader();
 			reader.readAsText(file, 'UTF-8');
 
 			reader.onload = e => {

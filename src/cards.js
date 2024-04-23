@@ -80,9 +80,9 @@ function value_multiselect() {
 		return i;
 	});
 
-	this.multiselection = [...new Set(inputs.map(e => +e.value))];
+	this.multiselection = this.multiselection.length ? this.multiselection : [...new Set(inputs.map(e => +e.value))];
 
-	ds._domain_select = ds.csv.data.map(r => +r['KEY']);
+	ds._domain_select = this.multiselection;
 
 	const elements = inputs.map((e,i) => {
 		const c = ds.colorscale.fn(+e.value);

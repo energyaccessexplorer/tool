@@ -387,8 +387,6 @@ function range_el() {
 	}
 
 	case 'polygons-timeline': {
-		g = range.call(this);
-
 		e = polygons_symbol({
 			"size":        28,
 			"fill":        ds.vectors.fill,

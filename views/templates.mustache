@@ -353,7 +353,7 @@
 </template>
 
 <template id="ramp">
-  <div>
+  <div class="ramp-container">
     <style>
       .ramp {
         display: flex;
@@ -372,16 +372,15 @@
   </div>
 </template>
 
-<template id="controls-input">
-  <div style="position: absolute;
+<template id="controls-manual-input">
+  <div class="controls-manual-container"
+       style="position: absolute;
               display: flex;
-              top: 73px;
-              margin-left: 10px;
               opacity: 0.7;">
     <span style="display: block;
                  position: absolute;
                  top: -37px;
-                 border-style: inset;
+                 border-style: outset;
                  border-color: transparent transparent black;
                  border-radius: 2px;
                  border-width: 33px;

@@ -33,6 +33,10 @@ input[bind="max"] {
   z-index: 2;
 }
 
+.controls-manual-container {
+  margin-left: 10px;
+}
+
 input[bind="max"]::-webkit-outer-spin-button,
 input[bind="max"]::-webkit-inner-spin-button,
 input[bind="min"]::-webkit-outer-spin-button,

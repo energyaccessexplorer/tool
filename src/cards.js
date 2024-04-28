@@ -134,8 +134,8 @@ function range() {
 	const step = ds.raster.intervals ? undefined :
 		0.1 * Math.pow(10, Math.floor(Math.log10(Math.abs(ds.domain.max - ds.domain.min))));
 
-	this.cr_max = tmpl('#controls-input').firstElementChild;
-	this.cr_min = tmpl('#controls-input').firstElementChild;
+	this.cr_max = tmpl('#controls-manual-input').firstElementChild;
+	this.cr_min = tmpl('#controls-manual-input').firstElementChild;
 
 	this.manual_min = ce('input', null, {
 		"bind":  "min",
@@ -249,10 +249,9 @@ function range_el() {
 	const ds = this.ds;
 	const cat = this.ds.category;
 
-	let d = ce('div');
+	let d = ce('div', null, { "class": "range-el" });
 	let e = "";
 	let r = "";
-	let t = "";
 	let o = "";
 	let g = undefined;
 
@@ -387,6 +386,8 @@ function range_el() {
 	}
 
 	case 'polygons-timeline': {
+		g = range.call(this);
+
 		e = polygons_symbol({
 			"size":        28,
 			"fill":        ds.vectors.fill,
@@ -415,7 +416,6 @@ function range_el() {
 
 	d.append(
 		...coalesce(maybe((this.range_el = g), 'elements'), []),
-		coalesce(t, ""),
 		coalesce(r, ""),
 		coalesce(o, ""),
 		coalesce(e, ""),

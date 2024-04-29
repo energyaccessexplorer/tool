@@ -182,3 +182,11 @@ canvas#output {
   font-size: 1em;
   background-color: white;
 }
+
+#timeline-graphs {
+  border-top: 1px solid lightgrey;
+}
+
+#timeline-graphs #lines-graph {
+  border-top: 1px solid #ebebeb;
+}

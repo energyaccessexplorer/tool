@@ -158,14 +158,28 @@ function range() {
 	const change = (e,i) => {
 		let v = +e.target.value;
 
+		const { min, max } = ds.domain;
+
 		const d = ds._domain;
+
+		if (or(
+			v < min,
+			v > max,
+			and(i === 'min', v > d['max']),
+			and(i === 'max', v < d['min']),
+		)) {
+			e.target.reportValidity();
+			e.target.setCustomValidity("Value out of range");
+			return;
+		}
+
 		d[i] = +v;
 
 		O.ds(ds, { 'domain': d });
 	};
 
-	this.manual_min.oninput = debounce(e => change(e, 'min'), 150);
-	this.manual_max.oninput = debounce(e => change(e, 'max'), 150);
+	this.manual_min.oninput = debounce(e => change(e, 'min'), 600);
+	this.manual_max.oninput = debounce(e => change(e, 'max'), 600);
 
 	this.cr_min.append(this.manual_min);
 	this.cr_max.append(this.manual_max);

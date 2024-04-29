@@ -555,8 +555,10 @@ function coordinates_to_raster_pixel(coords, raster) {
 	const [mx,my] = merc.forward([coords[0], coords[1]]);
 	const [bx,by] = merc.forward([GEOGRAPHY.envelope[0], GEOGRAPHY.envelope[3]]);
 
-	const plng = Math.round(Math.abs(mx - bx) / 1000);
-	const plat = Math.round(Math.abs(my - by) / 1000);
+	const s = GEOGRAPHY.resolution;
+
+	const plng = Math.round(Math.abs(mx - bx) / s);
+	const plat = Math.round(Math.abs(my - by) / s);
 
 	let a = null;
 
@@ -589,7 +591,9 @@ function raster_pixel_to_coordinates(i) {
 
 	const o = merc.forward([left, top]);
 
-	return merc.inverse([o[0] + (x * 1000), o[1] - (y * 1000)]);
+	const s = GEOGRAPHY.resolution;
+
+	return merc.inverse([o[0] + (x * s), o[1] - (y * s)]);
 };
 
 function jsonclone(o) {

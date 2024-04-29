@@ -402,6 +402,9 @@ This is not fatal but the dataset is now disabled.`,
 		}
 
 		case 'intervals': {
+			if (this.analysis.intervals != NORM_STOPS.length)
+				console.warn(this.id, "analysis intervals has wrong length!");
+
 			const q = d3.scaleQuantile()
 				.domain(this.analysis.intervals)
 				.range(NORM_STOPS);

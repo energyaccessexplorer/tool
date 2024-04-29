@@ -131,7 +131,7 @@ function range() {
 		domain[i] = parseFloat(v);
 	};
 
-	const step = ds.raster.intervals ? undefined :
+	const step = maybe(ds, 'raster', 'intervals') ? undefined :
 		0.1 * Math.pow(10, Math.floor(Math.log10(Math.abs(ds.domain.max - ds.domain.min))));
 
 	this.cr_max = tmpl('#controls-manual-input').firstElementChild;

@@ -239,7 +239,9 @@ function timeline_visibility() {
 
 	let v = '';
 
-	if (O.datasets[0]?.timeline) ;
+	const d = O.datasets[0];
+
+	if (maybe(d, 'timeline')) ;
 	else v = 'none';
 
 	timeline.style.display = v;

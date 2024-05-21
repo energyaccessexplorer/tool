@@ -30,13 +30,14 @@
     <div id="banner">
       <h1>Energy Access Explorer User Panel</h1>
 
-      <h3>Welcome!</h3>
-
-      <h2>Saved Analysis</h2>
+      <div id="tabs">
+        <div tab="saved-analysis" active>Saved Analysis</div>
+        <div tab="account">Account</div>
+      </div>
     </div>
 
     <div id="playground">
-      <main>
+      <main tab-content="saved-analysis" active>
         <div id="left">
           <br><br><br>
           <strong>Filter</strong><br><br>
@@ -56,6 +57,13 @@
               </select>
             </span>
           </div>
+        </div>
+      </main>
+
+      <main tab-content="account">
+        <div style="padding: 3em;">
+          <button id="change-password"
+                  style="padding: 5px 12px;">Change password</button>
         </div>
       </main>
     </div>

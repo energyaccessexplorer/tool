@@ -63,6 +63,7 @@ build-m:
 	@cp ${SRC}/user.js \
 		${SRC}/m.js \
 		${SRC}/bind.js \
+		${SRC}/tabs.js \
 		${DIST}/m/
 
 	@cat \

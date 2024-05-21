@@ -1,10 +1,13 @@
 import {
 	logged_in as user_logged_in,
+	email as user_email,
 } from './user.js';
 
 import bind from './bind.js';
 
 import modal from '../lib/modal.js';
+
+import tabs from './tabs.js';
 
 function unique(arr) {
 	return arr.filter((v,i,a) => a.indexOf(v) === i);
@@ -148,9 +151,9 @@ export async function init() {
 
 	const container = document.querySelector('#sessions');
 
-	document.querySelector("#sessions-count").innerText = sessions.length + " Analyses";
+	document.querySelector('#sessions-count').innerText = sessions.length + " Analyses";
 
-	document.querySelector("select").onchange = function() {
+	document.querySelector('select').onchange = function() {
 		const v = this.value;
 
 		const squares = document.getElementsByClassName('session-square');
@@ -165,7 +168,13 @@ export async function init() {
 		draw_sessions(sessions, geographies, container, trees);
 	};
 
+	document.querySelector('#change-password').onclick = function() {
+		window.location = `/password-reset?email=${user_email()}`;
+	};
+
 	draw_sessions(sessions, geographies, container, trees);
+
+	tabs(document.body);
 
 	loading(false);
 };

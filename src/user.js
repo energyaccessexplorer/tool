@@ -23,6 +23,16 @@ export function register_login() {
 	m.show();
 };
 
+export function email() {
+	const token = localStorage.getItem('token');
+
+	try {
+		return (token && jwt_decode(token)['email']);
+	} catch (e) {
+		return null;
+	}
+};
+
 export function logged_in() {
 	const token = localStorage.getItem('token');
 

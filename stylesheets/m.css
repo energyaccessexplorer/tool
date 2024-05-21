@@ -9,20 +9,36 @@ body {
   justify-content: center;
 }
 
-#playground main {
+#playground main[tab-content] {
+  display: none;
+}
+
+#playground main[tab-content][active] {
   display: flex;
 }
 
+#tabs {
+  display: flex;
+  justify-content: space-evenly;
+  margin-top: 3em;
+  cursor: pointer;
+}
+
+[tab] {
+  padding: 1em 3em;
+}
+
+[tab][active] {
+  background-color: #ebebeb;
+}
+
 #banner {
-  height: 30em;
-  width: 100%;
   background-color: white;
   padding: 3em 7em;
 }
 
 #banner h1 {
   color: black;
-  font-size: 5em;
   margin-top: 0;
   padding-top: 1em;
 }

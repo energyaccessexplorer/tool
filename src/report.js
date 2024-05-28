@@ -478,8 +478,8 @@ function analysis(index) {
 			}
 		}
 
-		const g = DST.get('ghi');
-		const w = DST.get('windspeed');
+		const ghi = DST.get('ghi');
+		const wind = DST.get('windspeed');
 
 		right_rows = [];
 
@@ -501,7 +501,7 @@ function analysis(index) {
 			);
 		}
 
-		if (g.on) {
+		if (ghi?.on) {
 			const data = [];
 			for (let i = 0; i < summary_raster.length; i++) {
 				if (summary_raster[i] === -1) continue;
@@ -518,7 +518,7 @@ function analysis(index) {
 			);
 		}
 
-		if (w.on) {
+		if (wind?.on) {
 			const data = [];
 			for (let i = 0; i < summary_raster.length; i++) {
 				if (summary_raster[i] === -1) continue;

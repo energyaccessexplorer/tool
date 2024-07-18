@@ -154,7 +154,10 @@ export default class dscontrols extends HTMLElement {
 
 	info() {
 		const e = font_icon('info-circle');
-		e.onclick = this.ds.info_modal.bind(this.ds);
+		e.onclick = v => {
+			v.stopPropagation();
+			this.ds.info_modal();
+		};
 
 		return e;
 	};

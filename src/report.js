@@ -505,9 +505,9 @@ function analysis(index) {
 			const data = [];
 			for (let i = 0; i < summary_raster.length; i++) {
 				if (summary_raster[i] === -1) continue;
-				else if (g.raster.data[i] === g.raster.nodata) continue;
+				else if (ghi.raster.data[i] === ghi.raster.nodata) continue;
 
-				data.push(g.raster.data[i]);
+				data.push(ghi.raster.data[i]);
 			}
 
 			right_rows.push(
@@ -522,9 +522,9 @@ function analysis(index) {
 			const data = [];
 			for (let i = 0; i < summary_raster.length; i++) {
 				if (summary_raster[i] === -1) continue;
-				else if (w.raster.data[i] === w.raster.nodata) continue;
+				else if (wind.raster.data[i] === wind.raster.nodata) continue;
 
-				data.push(w.raster.data[i]);
+				data.push(wind.raster.data[i]);
 			}
 
 			right_rows.push(

@@ -77,21 +77,32 @@ export function snapshot() {
 		return;
 	}
 
-	if (snapshot_id) return;
+	const config = config_gen();
 
-	if (!session.title) set_name(session);
+	delete config.geography;
 
-	const c = config_gen();
+	async function patch() {
+		await API.patch('snapshots', { "time": `eq.${snapshot_id}` }, { "payload": { config } });
 
-	delete c.geography;
-
-	const s = {
-		"time":       (new Date()).getTime(),
-		"session_id": session.time,
-		"config":     c,
+		FLASH.push({ "title": "Updated Analysis", "type": "success" });
 	};
 
-	session.snapshots.push(s);
+	function post() {
+		const s = {
+			"time":       (new Date()).getTime(),
+			"session_id": session.time,
+			config,
+		};
 
-	API.post('snapshots', null, { "payload": s });
+		if (!session.title) set_name(session);
+
+		session.snapshots.push(s);
+
+		API.post('snapshots', null, { "payload": s });
+	};
+
+	if (snapshot_id)
+		patch();
+	else
+		post();
 };

@@ -43,29 +43,4 @@
   </div>
 </nav>
 
-<script>
-  const c = document.querySelector('nav #navigation-links');
-  const m = document.createElement('a');
-  m.className = "toggleable";
-
-  if (localStorage['token']) {
-    m.href = '/tool/m';
-    m.innerText = 'My EAE';
-  } else {
-    m.href = '/login';
-    m.innerText = 'Login';
-  }
-
-  c.append(m);
-
-  (function() {
-    const links = document.querySelectorAll('nav #navigation-links a');
-
-    if (!links) return;
-
-    for (var l of links) {
-      if (location.pathname.match(new RegExp(l.getAttribute('href').split('/')[1])))
-        l.classList.add("active");
-    }
-  })();
-</script>
+<script src="/javascripts/nav.js"></script>

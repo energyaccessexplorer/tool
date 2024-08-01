@@ -9,7 +9,7 @@ import {
 	register_login,
 } from './user.js';
 
-const snapshot_id = (new URL(location)).searchParams.get('snapshot');
+const url = new URL(location);
 
 const session = {};
 
@@ -53,6 +53,8 @@ export function init() {
 
 	if (!user_id) return;
 
+	const snapshot_id = url.searchParams.get('snapshot');
+
 	if (snapshot_id) {
 		console.info("Revisiting snapshot.");
 		return;
@@ -77,6 +79,8 @@ export function snapshot() {
 		return;
 	}
 
+	const snapshot_id = url.searchParams.get('snapshot');
+
 	const config = config_gen();
 
 	delete config.geography;
@@ -98,7 +102,9 @@ export function snapshot() {
 
 		session.snapshots.push(s);
 
-		API.post('snapshots', null, { "payload": s });
+		API.post('snapshots', null, { "payload": s })
+			.then(_ => url.searchParams.set('snapshot', s['time']))
+			.then(_ => history.replaceState(null, null, url));
 	};
 
 	if (snapshot_id)

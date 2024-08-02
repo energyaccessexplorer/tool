@@ -1,5 +1,7 @@
 import bubblemessage from '../lib/bubblemessage.js';
 
+import modal from '../lib/modal.js';
+
 import {
 	coords_search_pois as mapbox_coords_search_pois,
 	info_mode_change,
@@ -140,7 +142,7 @@ This file should be <strong>strictly</strong> formatted.
 </pre>
 `;
 
-	let upbubble, downbubble, pickbubble;
+	let upbubble, downbubble, pickbubble, inputbubble;
 
 	upload.onmouseenter = _ => {
 		upbubble = new bubblemessage({
@@ -198,6 +200,57 @@ This file should be <strong>strictly</strong> formatted.
 		info_mode_change();
 
 		COORDINATESMODE = true;
+	};
+
+	const pointsinput = qs('#points-input', panel);
+	const inputmsg = `Input coordinates manually`;
+
+	pointsinput.onmouseenter = _ => {
+		inputbubble = new bubblemessage({
+			"position": "S",
+			"message":  inputmsg,
+			"close":    false,
+		}, qs('i', pointsinput));
+
+		inputbubble.style['pointer-events'] = "none";
+	};
+
+	pointsinput.onmouseleave = _ => inputbubble.remove();
+
+	pointsinput.onclick = _ => {
+		const content = tmpl('#points-input-form', {});
+		const header = "Input Longitude/Latitude";
+
+		const m = new modal({
+			"id":      'points-input-modal',
+			header,
+			content,
+			"destroy": true,
+		});
+
+		const form = qs('form', m.dialog);
+
+		const c = MAPBOX.getCenter();
+		const e = GEOGRAPHY.envelope;
+
+		const lng = qs('#lng', form);
+		lng.value = c.lng.toFixed(4);
+		lng.min = e[0].toFixed(4);
+		lng.max = e[2].toFixed(4);
+
+		const lat = qs('#lat', form);
+		lat.value = c.lat.toFixed(4);
+		lat.min = e[1].toFixed(4);
+		lat.max = e[3].toFixed(4);
+
+		form.onsubmit = function(e) {
+			e.preventDefault();
+
+			COORDINATES.unshift({ "c": [+qs('#lng', form).value, +qs('#lat', form).value] });
+			qs('#points.search-panel').dispatchEvent(new Event('activate'));
+		};
+
+		m.show();
 	};
 
 	file_input.onchange = function() {

@@ -229,9 +229,7 @@ const steps = [
 	},
 ];
 
-const bubblefn = (m, el) => new bubblemessage(m, el);
-
-const HELP = new nanny({ steps, bubblefn });
+const HELP = new nanny({ steps, "bubblefn": (m, el) => new bubblemessage(m, el) });
 
 export function init() {
 	qs('#drawer-help').onclick = run;

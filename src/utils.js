@@ -122,7 +122,7 @@ function svg_pie(data, outer, inner, colors, inner_text, parse, bubble) {
 		.append("path")
 		.attr("fill", (d,i) => colors[i])
 		.attr("d", arc)
-		.on("mouseenter", function(d) { if (bubble) n = bubble(parse(d.value), svg.node()); }, this)
+		.on("mouseenter", function(d) { if (bubble) n = bubble(parse(d.value), this, d); })
 		.on("mouseleave", function(_) { if (n) n.remove(); })
 		.each(function(d) { this._current = d; });
 

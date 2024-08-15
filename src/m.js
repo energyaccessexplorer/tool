@@ -9,6 +9,8 @@ import modal from '../lib/modal.js';
 
 import tabs from './tabs.js';
 
+const user_id = user_logged_in();
+
 function unique(arr) {
 	return arr.filter((v,i,a) => a.indexOf(v) === i);
 };
@@ -122,9 +124,8 @@ function draw_sessions(sessions, geographies, container, trees) {
 		p.onclick = function() { download.call(this, sessions); };
 };
 
-export async function init() {
-	const user_id = user_logged_in();
 
+export async function init() {
 	if (!user_id) {
 		console.warn("NOT logged in.");
 		loading(false);

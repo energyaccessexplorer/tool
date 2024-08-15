@@ -149,6 +149,16 @@ async function init_1() {
 	GEOGRAPHY.timeline = maybe(GEOGRAPHY, 'configuration', 'timeline');
 	layout();
 
+	const mac = navigator.userAgent.indexOf('Mac') > -1;
+
+	if (window.devicePixelRatio !== 1) alert(`
+Energy Access Explorer is optimised for display settings that differ from yours.
+
+If the layout feels cramped, try zooming out to ${Math.round(1/window.devicePixelRatio * 100)}%.
+
+Try zooming out. On your OS, you can do this by pressing (${mac ? "⌘" : "ctrl"} −) a couple times.
+`);
+
 	O = new Overlord();
 
 	MAPBOX = mapbox_init();

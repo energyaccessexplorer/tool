@@ -1,5 +1,7 @@
 import modal from '../lib/modal.js';
 
+import bind from './bind.js';
+
 import dscard from './cards.js';
 
 import dscontrols from './controls.js';

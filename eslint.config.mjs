@@ -51,7 +51,6 @@ export default [{
 			"or": "readonly",
 			"coalesce": "readonly",
 			"attach": "readonly",
-			"bind": "readonly",
 			"tmpl": "readonly",
 			"slot_populate": "readonly",
 			"Whatever": "readonly",

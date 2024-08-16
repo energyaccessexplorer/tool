@@ -1,6 +1,5 @@
 import {
-	logged_in as user_logged_in,
-	email as user_email,
+	extract as user_extract,
 } from './user.js';
 
 import bind from './bind.js';
@@ -9,7 +8,7 @@ import modal from '../lib/modal.js';
 
 import tabs from './tabs.js';
 
-const user_id = user_logged_in();
+const user_id = user_extract('id');
 
 function unique(arr) {
 	return arr.filter((v,i,a) => a.indexOf(v) === i);
@@ -170,7 +169,7 @@ export async function init() {
 	};
 
 	document.querySelector('#change-password').onclick = function() {
-		window.location = `/password-reset?email=${user_email()}`;
+		window.location = `/password-reset?email=${user_extract('email')}`;
 	};
 
 	draw_sessions(sessions, geographies, container, trees);

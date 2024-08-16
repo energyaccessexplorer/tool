@@ -5,7 +5,7 @@ import {
 } from './config.js';
 
 import {
-	logged_in as user_logged_in,
+	extract as user_extract,
 	register_login,
 } from './user.js';
 
@@ -49,7 +49,7 @@ padding: 7px 12px;
 };
 
 export function init() {
-	const user_id = user_logged_in();
+	const user_id = user_extract('id');
 
 	if (!user_id) return;
 
@@ -72,7 +72,7 @@ export function init() {
 };
 
 export function snapshot() {
-	const user_id = user_logged_in();
+	const user_id = user_extract('id');
 
 	if (!user_id) {
 		register_login();

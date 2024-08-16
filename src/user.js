@@ -23,33 +23,27 @@ export function register_login() {
 	m.show();
 };
 
-export function email() {
+export function extract(...path) {
 	const token = localStorage.getItem('token');
 
+	if (!token) {
+		console.warn("Could not fetch token from localStorage.");
+		return null;
+	};
+
 	try {
-		return (token && jwt_decode(token)['email']);
+		return maybe(jwt_decode(token), ...path);
 	} catch (e) {
+		console.warning(e);
 		return null;
 	}
 };
 
-export function logged_in() {
-	const token = localStorage.getItem('token');
-
-	try {
-		return (token && jwt_decode(token)['id']);
-	} catch (e) {
-		return false;
-	}
-};
-
 export function envs() {
-	const token = localStorage.getItem('token');
-
 	let p = ['production'];
 
-	if (logged_in())
-		p = p.concat(maybe(jwt_decode(token), 'data', 'envs'));
+	if (extract('id'))
+		p = p.concat(coalesce(extract('data', 'envs'), []));
 
 	return p;
 };

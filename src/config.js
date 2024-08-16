@@ -3,7 +3,7 @@ import DS from './ds.js';
 import dscard from './cards.js';
 
 import {
-	logged_in as user_logged_in,
+	extract as user_extract,
 	register_login,
 } from './user.js';
 
@@ -92,7 +92,7 @@ export function generate() {
 };
 
 export function init() {
-	const user_id = user_logged_in();
+	const user_id = user_extract('id');
 
 	const panel = qs('#config.search-panel');
 

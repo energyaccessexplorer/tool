@@ -5,7 +5,7 @@ import summary_analyse from './summary.js';
 import bubblemessage from '../lib/bubblemessage.js';
 
 import {
-	logged_in as user_logged_in,
+	extract as user_extract,
 	register_login,
 } from './user.js';
 
@@ -112,7 +112,7 @@ export async function graphs(raster) {
 };
 
 export function init() {
-	const user_id = user_logged_in();
+	const user_id = user_extract('id');
 
 	const url = new URL(location);
 

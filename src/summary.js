@@ -3,7 +3,7 @@ import modal from '../lib/modal.js';
 import bubblemessage from '../lib/bubblemessage.js';
 
 import {
-	logged_in as user_logged_in,
+	extract as user_extract,
 	register_login,
 } from './user.js';
 
@@ -129,7 +129,7 @@ async function summary() {
 		this.innerText = ss ? "Summary Table" : "Summary Graphs";
 	};
 
-	const user_id = user_logged_in();
+	const user_id = user_extract('id');
 
 	const pptx_button = ce('button', "Export Presentation", { "class": 'big-green-button' });
 	pptx_button.onclick = async _ => {

@@ -413,7 +413,7 @@ export function coords_search_pois({
 		.then(r => r.json())
 		.catch(_ => ({ "features": [] }))
 		.then(r => {
-			return uniqueby(
+			return unique_by(
 				r.features.filter(f => maybe(f, 'properties', 'name')),
 				t => maybe(t, 'properties', 'name'),
 			).map(f => ({

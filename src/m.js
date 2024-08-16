@@ -10,10 +10,6 @@ import tabs from './tabs.js';
 
 const user_id = user_extract('id');
 
-function unique(arr) {
-	return arr.filter((v,i,a) => a.indexOf(v) === i);
-};
-
 function loading(bool) {
 	qs('#app-loading').style['display'] = bool ? 'block' : 'none';
 };

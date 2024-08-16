@@ -43,7 +43,7 @@ build: build-a build-s build-m
 	@find . -name '*.orig' -delete
 
 lint:
-	${BIN}/lint ${SRC}
+	@ ${BIN}/lint ${SRC}
 
 deps:
 	@mkdir -p ${LIB}/fonts

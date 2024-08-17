@@ -64,7 +64,6 @@ build-m:
 		${SRC}/user.js \
 		${SRC}/utils.js \
 		${SRC}/m.js \
-		${SRC}/bind.js \
 		${SRC}/tabs.js \
 		${DIST}/m/
 
@@ -95,7 +94,6 @@ build-a:
 	@cp ${CSS}/ripple.css ${DIST}/a/ripple.css
 	@cp ${CSS}/buttons.css ${DIST}/a/buttons.css
 	@cp \
-		${SRC}/bind.js \
 		${SRC}/utils.js \
 		${SRC}/admin-tiers.js \
 		${SRC}/browser.js \

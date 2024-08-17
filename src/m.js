@@ -6,7 +6,7 @@ import {
 	extract as user_extract,
 } from './user.js';
 
-import bind from './bind.js';
+import bind from '../lib/bind.js';
 
 import modal from '../lib/modal.js';
 

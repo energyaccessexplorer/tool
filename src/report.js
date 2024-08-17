@@ -7,6 +7,7 @@ import '../lib/jszip.js';
 import '../lib/pptxgen.js';
 
 import {
+	analysis_colorscale,
 	medhigh_point_count,
 	getpoints as toplocations_fetch,
 } from './analysis.js';
@@ -340,7 +341,7 @@ function geography_indexes_right($) {
 		return Object.assign({}, tabletextopts, { bold, "color": white, "align": "center" }, o);
 	};
 
-	const cs = ea_analysis_colorscale.stops;
+	const cs = analysis_colorscale.stops;
 
 	function table(c, y) {
 		const rows = [
@@ -627,7 +628,7 @@ function analysis_left($, index) {
 		textopts({ x, "y": 1, bold, "w": "45%" }),
 	);
 
-	const s = btoa(new XMLSerializer().serializeToString(ea_analysis_colorscale.svg));
+	const s = btoa(new XMLSerializer().serializeToString(analysis_colorscale.svg));
 
 	$.addImage({
 		x,
@@ -728,7 +729,7 @@ function toplocations_list(points) {
 		.domain([0,1])
 		.range(["low", "low-med", "medium", "med-high", "high"])(v);
 
-	const color = v => d3.rgb(...ea_analysis_colorscale.fn(v)).formatHex();
+	const color = v => d3.rgb(...analysis_colorscale.fn(v)).formatHex();
 
 	const font = v => v > 0.80 ? black : white;
 

@@ -57,15 +57,3 @@ measure of selected data sets under both Demand and Supply categories indicating
 energy demand, low economic activity, and low access to infrastructure and resources.`,
 	},
 };
-
-ea_default_colorscale = colorscale({
-	"stops":  d3.schemeRdBu[5].reverse(),
-	"domain": { "min": 0, "max": 1 },
-});
-
-ea_analysis_colorscale = colorscale({
-	"stops":  NORM_STOPS.map(x => d3.interpolateMagma(x)),
-	"domain": { "min": 0, "max": 1 },
-});
-
-ea_lowmedhigh_scale = d3.scaleQuantize().domain([0,1]).range(["Low", "Low-Medium", "Medium", "Medium-High", "High"]);

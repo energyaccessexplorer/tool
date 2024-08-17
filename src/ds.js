@@ -20,6 +20,15 @@ import {
 	crop_to,
 } from './rasters.js';
 
+import {
+	analysis_colorscale,
+} from './analysis.js';
+
+export const default_colorscale = colorscale({
+	"stops":  d3.schemeRdBu[5].reverse(),
+	"domain": { "min": 0, "max": 1 },
+});
+
 export default class DS {
 	constructor(o) {
 		this.id = o.name || o.category.name;
@@ -404,12 +413,12 @@ This is not fatal but the dataset is now disabled.`,
 		}
 
 		case 'intervals': {
-			if (this.analysis.intervals != NORM_STOPS.length)
+			if (this.analysis.intervals != default_colorscale.stops.length)
 				console.warn(this.id, "analysis intervals has wrong length!");
 
 			const q = d3.scaleQuantile()
 				.domain(this.analysis.intervals)
-				.range(NORM_STOPS);
+				.range(default_colorscale.intervals);
 
 			s = x => and(x >= min, x <= max) ? q(x) : -1;
 
@@ -448,7 +457,8 @@ This is not fatal but the dataset is now disabled.`,
 		case 'polygons-valued': {
 			if (this.csv.key) {
 				color_opts = {
-					"stops": this.category.colorstops,
+					"domain": default_colorscale.intervals,
+					"stops":  this.category.colorstops,
 				};
 			}
 			break;
@@ -456,7 +466,8 @@ This is not fatal but the dataset is now disabled.`,
 
 		case 'polygons-timeline': {
 			color_opts = {
-				"stops": this.category.colorstops,
+				"domain": default_colorscale.intervals,
+				"stops":  this.category.colorstops,
 			};
 
 			break;
@@ -487,7 +498,7 @@ This is not fatal but the dataset is now disabled.`,
 		if (maybe(this.raster, 'intervals')) {
 			this.fn = d3.scaleLinear()
 				.domain(this.raster.intervals)
-				.range(NORM_RANGE(this.raster.intervals.length));
+				.range(uniform_split(this.raster.intervals.length));
 		}
 
 		if (this.colorscale)

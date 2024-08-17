@@ -13,6 +13,15 @@ const filter_types = ["key-delta", "exclusion-buffer", "inclusion-buffer"];
 
 const inclusion_filters = ["key-delta", "inclusion-buffer"];
 
+export const analysis_colorscale = colorscale({
+	"stops":  uniform_split(5).map(x => d3.interpolateMagma(x)),
+	"domain": { "min": 0, "max": 1 },
+});
+
+export const lowmedhigh_scale = d3.scaleQuantize()
+	.domain([0,1])
+	.range(["Low", "Low-Medium", "Medium", "Medium-High", "High"]);
+
 /*
  * run
  *
@@ -339,7 +348,7 @@ export function priority(d, a, i) {
 	const actives = Object.keys(o).filter(k => o[k]['average'] !== -1);
 	const averages = actives.map(k => o[k]['average']);
 
-	const s = d3.scaleQuantile().domain([Math.min(...averages),Math.max(...averages)]).range(ea_analysis_colorscale.stops);
+	const s = d3.scaleQuantile().domain([Math.min(...averages),Math.max(...averages)]).range(analysis_colorscale.stops);
 
 	for (const e in o) {
 		if (o[e]['average'] === -1) {

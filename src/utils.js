@@ -1,18 +1,13 @@
 /* eslint no-unused-vars: "off" */
 
-NORM_RANGE = s => d3.range(0, 1.000000001, 1 / (s - 1));
+export function uniform_split(n) {
+	return d3.range(0, 1.000000001, 1 / (n - 1));
+};
 
-NORM_STOPS = NORM_RANGE(5);
-
-function colorscale(opts) {
+export function colorscale(opts) {
 	let s;
 
-	let {intervals,stops,domain,width} = opts;
-
-	if (!stops || !stops.length)
-		stops = ea_default_colorscale.stops;
-
-	if (!domain) domain = NORM_STOPS;
+	let { intervals, stops, domain, width } = opts;
 
 	if (maybe(intervals, 'length')) {
 		s = d3.scaleQuantile()
@@ -76,7 +71,7 @@ function colorscale(opts) {
 		"domain":    domain,
 		"fn":        x => rgba(s(x)),
 		"stops":     stops,
-		"intervals": intervals,
+		"intervals": intervals || s.domain(),
 		"svg":       color_steps(stops),
 	};
 };
@@ -167,7 +162,7 @@ function svg_interval(opts = {}) {
 	let denorm = norm.invert;
 
 	if (steps) {
-		norm = d3.scaleQuantize().domain([svgmin, svgmax]).range(NORM_RANGE(steps.length));
+		norm = d3.scaleQuantize().domain([svgmin, svgmax]).range(uniform_split(steps.length));
 		denorm = d3.scaleLinear().domain([0,1]).range([svgmin, svgmax]);
 	}
 

@@ -12,6 +12,7 @@ import {
 import {
 	enough_datasets,
 	analysis,
+	analysis_colorscale,
 } from './analysis.js';
 
 import {
@@ -22,12 +23,9 @@ import {
 	snapshot,
 } from  './session.js';
 
-const bubble = (v,e) => new bubblemessage({ "message": v + "%", "position": "C", "close": false, "noevents": true }, e);
+const PIES = {};
 
-const PIES = {
-	"population": svg_pie([[0], [0], [0], [0], [0]], 70, 0, ea_analysis_colorscale.stops, null, null, bubble),
-	"area":       svg_pie([[0], [0], [0], [0], [0]], 70, 0, ea_analysis_colorscale.stops, null, null, bubble),
-};
+const bubble = (v,e) => new bubblemessage({ "message": v + "%", "position": "C", "close": false, "noevents": true }, e);
 
 function radio(init, callback) {
 	const size = 20;
@@ -112,6 +110,9 @@ export async function graphs(raster) {
 };
 
 export function init() {
+	PIES["population"] = svg_pie([[0], [0], [0], [0], [0]], 70, 0, analysis_colorscale.stops, null, null, bubble);
+	PIES["area"]       = svg_pie([[0], [0], [0], [0], [0]], 70, 0, analysis_colorscale.stops, null, null, bubble);
+
 	const user_id = user_extract('id');
 
 	const url = new URL(location);
@@ -125,7 +126,7 @@ export function init() {
 	);
 
 	const scale = ce('div', null, { "class": 'index-graphs-scale' });
-	scale.append(ea_analysis_colorscale.svg, r);
+	scale.append(analysis_colorscale.svg, r);
 
 	const cos = qs('#canvas-output-select');
 	for (let i in ea_indexes)

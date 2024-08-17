@@ -4,6 +4,8 @@ import {
 
 import {
 	getpoints,
+	analysis_colorscale,
+	lowmedhigh_scale,
 } from './analysis.js';
 
 import {
@@ -15,7 +17,7 @@ let ul, resultscontainer, resultsinfo;
 
 function pointto(p, a = false) {
 	const dict = [[ "v", ea_indexes[U.output]['name'] ]];
-	const props = { "v": ea_lowmedhigh_scale(p.v) };
+	const props = { "v": lowmedhigh_scale(p.v) };
 
 	search_pointto(p.c, dict, props, a);
 };
@@ -76,7 +78,7 @@ async function trigger({ points = getpoints, n = 20 }) {
 
 		h.style = `
 font-size: 0.9em;
-background-color: rgba(${ea_analysis_colorscale.fn(g/100.0)});
+background-color: rgba(${analysis_colorscale.fn(g/100.0)});
 padding: 0.5em;
 padding-left: 1em;
 margin: 0.5em auto;

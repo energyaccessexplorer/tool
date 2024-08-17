@@ -233,7 +233,9 @@ function range() {
 function weight() {
 	const weights = [1,2,3,4,5];
 
-	const s = d3.scaleLinear().domain(weights).range(NORM_STOPS);
+	const s = d3.scaleLinear()
+		.domain(weights)
+		.range(uniform_split(5));
 
 	const r = ramp(
 		ce('div', weights[0]),

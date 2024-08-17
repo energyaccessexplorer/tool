@@ -30,8 +30,6 @@ export default [{
 			"INFOMODE": "writable",
 			"COORDINATES": "writable",
 			"COORDINATESMODE": "writable",
-			"NORM_STOPS": "writable",
-			"NORM_RANGE": "writable",
 			"MOBILE": "writable",
 			"U": "writable",
 			"O": "writable",

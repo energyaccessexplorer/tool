@@ -2,6 +2,14 @@ import modal from '../lib/modal.js';
 
 import bubblemessage from '../lib/bubblemessage.js';
 
+import analysis_run, {
+	analysis_colorscale,
+} from './analysis.js';
+
+import {
+	default_colorscale,
+} from './ds.js';
+
 import {
 	extract as user_extract,
 	register_login,
@@ -14,8 +22,6 @@ import {
 import {
 	pptx as report_pptx,
 } from './report.js';
-
-import analysis_run from './analysis.js';
 
 /*
  * summary
@@ -46,7 +52,7 @@ async function summary() {
 	SUMMARY = {};
 
 	const scale = ce('div');
-	scale.append(ea_analysis_colorscale.svg.cloneNode(true), r);
+	scale.append(analysis_colorscale.svg.cloneNode(true), r);
 
 	const bubble = (v,e) => new bubblemessage({ "message": v + "%", "position": "C", "close": false, "noevents": true }, e);
 
@@ -57,8 +63,8 @@ async function summary() {
 		SUMMARY[idxn] = await analyse(raster);
 		SUMMARY[idxn]['raw_raster'] = raster;
 
-		let ppie = svg_pie(SUMMARY[idxn]['population-density']['distribution'].map(x => [x]), 75, 0, ea_analysis_colorscale.stops, null, null, bubble);
-		let apie = svg_pie(SUMMARY[idxn]['area']['distribution'].map(x => [x]), 75, 0, ea_analysis_colorscale.stops, null, null, bubble);
+		let ppie = svg_pie(SUMMARY[idxn]['population-density']['distribution'].map(x => [x]), 75, 0, analysis_colorscale.stops, null, null, bubble);
+		let apie = svg_pie(SUMMARY[idxn]['area']['distribution'].map(x => [x]), 75, 0, analysis_colorscale.stops, null, null, bubble);
 
 		const container = tmpl('#index-graphs-container-template');
 		qs('.index-graphs-group #area-number', container).parentElement.append(apie.svg);
@@ -91,7 +97,7 @@ async function summary() {
 
 	graphs.append(ce('div', scale.cloneNode(true), { "class": "index-graphs-scale" }));
 
-	const s = ea_analysis_colorscale.stops;
+	const s = analysis_colorscale.stops;
 
 	const lowmedhigh = i => ["low", "low-med", "medium", "med-high", "high"][i];
 
@@ -176,7 +182,9 @@ export default async function analyse(raster) {
 
 	let a = new Float32Array(raster.length).fill(-1);
 
-	let f = d3.scaleQuantize().domain([0,1]).range(NORM_STOPS);
+	let f = d3.scaleQuantize()
+		.domain([0,1])
+		.range(default_colorscale.intervals);
 
 	for (let i = 0; i < raster.length; i += 1) {
 		const r = raster[i];

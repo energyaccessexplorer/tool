@@ -1,3 +1,7 @@
+import {
+	analysis_colorscale,
+} from './analysis.js';
+
 export function drawcanvas(opts) {
 	const {canvas, data, width, height, nodata, colorscale} = opts;
 
@@ -42,6 +46,6 @@ export function outputcanvas(data, canvas = null) {
 		"width":      OUTLINE.raster.width,
 		"height":     OUTLINE.raster.height,
 		"nodata":     -1,
-		"colorscale": ea_analysis_colorscale,
+		"colorscale": analysis_colorscale,
 	});
 };

@@ -11,6 +11,8 @@ import {
 import {
 	priority,
 	analysis,
+	analysis_colorscale,
+	lowmedhigh_scale,
 	plot_active as analysis_plot_active,
 } from './analysis.js';
 
@@ -455,7 +457,7 @@ function mapclick(e) {
 
 		if (Number.isFinite(maybe(ac, 'value'))) {
 			dict.unshift(["_analysis_name", ea_indexes[U.output]['name']], null);
-			props["_analysis_name"] = ea_lowmedhigh_scale(ac.value);
+			props["_analysis_name"] = lowmedhigh_scale(ac.value);
 		}
 	}
 
@@ -665,7 +667,7 @@ let analysis_count = 0;
 export async function analysis_to_dataset(t) {
 	const category = await API.get("categories", { "select": "*", "name": "eq.analysis" }, { "one": true });
 
-	category.colorstops = ea_analysis_colorscale.stops;
+	category.colorstops = analysis_colorscale.stops;
 
 	analysis_count++;
 

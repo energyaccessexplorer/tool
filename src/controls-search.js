@@ -1,6 +1,10 @@
 import DS from './ds.js';
 
 import {
+	elem_collapse,
+} from './utils.js';
+
+import {
 	toggle_ds,
 } from './controls.js';
 

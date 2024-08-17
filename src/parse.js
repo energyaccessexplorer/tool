@@ -1,4 +1,9 @@
 import {
+	super_error,
+	coordinates_to_raster_pixel,
+} from './utils.js';
+
+import {
 	drawcanvas as plot_drawcanvas,
 } from './plot.js';
 

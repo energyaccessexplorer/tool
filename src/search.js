@@ -1,4 +1,9 @@
 import {
+	coordinates_to_raster_pixel,
+	table_data,
+} from './utils.js';
+
+import {
 	fit as mapbox_fit,
 	map_pointer,
 } from './mapbox.js';

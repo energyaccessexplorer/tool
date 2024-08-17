@@ -11,6 +11,11 @@ import {
 } from './ds.js';
 
 import {
+	svg_pie,
+	loading,
+} from './utils.js';
+
+import {
 	extract as user_extract,
 	register_login,
 } from './user.js';

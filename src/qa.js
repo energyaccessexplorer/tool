@@ -1,3 +1,7 @@
+import {
+	elem_collapse,
+} from './utils.js';
+
 import nanny from '../lib/nanny.js';
 
 import bubblemessage from '../lib/bubblemessage.js';

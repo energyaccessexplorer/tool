@@ -1,6 +1,12 @@
 import DS from './ds.js';
 
 import {
+	svg_interval,
+	opacity_control,
+	uniform_split,
+} from './utils.js';
+
+import {
 	points_symbol,
 	lines_symbol,
 	polygons_symbol,

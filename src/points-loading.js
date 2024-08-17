@@ -1,3 +1,7 @@
+import {
+	coordinates_to_raster_pixel,
+} from './utils.js';
+
 import bubblemessage from '../lib/bubblemessage.js';
 
 import modal from '../lib/modal.js';

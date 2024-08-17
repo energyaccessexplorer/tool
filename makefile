@@ -60,7 +60,9 @@ build-m:
 
 	@sed -r -i.orig 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/m/index.html
 
-	@cp ${SRC}/user.js \
+	@cp \
+		${SRC}/user.js \
+		${SRC}/utils.js \
 		${SRC}/m.js \
 		${SRC}/bind.js \
 		${SRC}/tabs.js \
@@ -93,6 +95,7 @@ build-a:
 	@cp ${CSS}/buttons.css ${DIST}/a/buttons.css
 	@cp \
 		${SRC}/bind.js \
+		${SRC}/utils.js \
 		${SRC}/admin-tiers.js \
 		${SRC}/browser.js \
 		${SRC}/session.js \
@@ -143,7 +146,6 @@ build-a:
 
 	@printf "window.ea_settings = " | cat - \
 		settings.json \
-		${SRC}/utils.js \
 		${SRC}/globals.js \
 		> ${DIST}/a/main.js
 
@@ -175,6 +177,7 @@ build-s:
 	@sed -r -i.orig 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/s/index.html
 
 	@cp \
+		${SRC}/utils.js \
 		${SRC}/browser.js \
 		${SRC}/user.js \
 		${SRC}/s.js \
@@ -188,7 +191,6 @@ build-s:
 
 	@printf "const ea_settings = " | cat - \
 		settings.json \
-		${SRC}/utils.js \
 		> ${DIST}/s/main.js
 
 	@cat \

@@ -1,4 +1,11 @@
 import {
+	loading,
+	jsonclone,
+	elem_collapse,
+	super_error,
+} from './utils.js';
+
+import {
 	init as controlssearch_init,
 } from './controls-search.js';
 

@@ -1,3 +1,9 @@
+import {
+	colorscale,
+	jsonclone,
+	uniform_split,
+} from './utils.js';
+
 import modal from '../lib/modal.js';
 
 import bind from './bind.js';
@@ -19,10 +25,6 @@ import {
 	average,
 	crop_to,
 } from './rasters.js';
-
-import {
-	analysis_colorscale,
-} from './analysis.js';
 
 export const default_colorscale = colorscale({
 	"stops":  d3.schemeRdBu[5].reverse(),

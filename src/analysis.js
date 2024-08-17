@@ -1,6 +1,13 @@
 import DS from './ds.js';
 
 import {
+	uniform_split,
+	colorscale,
+	jsonclone,
+	raster_pixel_to_coordinates,
+} from './utils.js';
+
+import {
 	outputcanvas as plot_outputcanvas,
 } from './plot.js';
 

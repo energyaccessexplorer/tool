@@ -1,5 +1,9 @@
 /* global PptxGenJS */
 
+import {
+	coordinates_to_raster_pixel,
+} from './utils.js';
+
 import DS from './ds.js';
 
 import '../lib/jszip.js';

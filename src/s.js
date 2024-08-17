@@ -1,3 +1,8 @@
+import {
+	svg_pie,
+	loading,
+} from './utils.js';
+
 import modal from '../lib/modal.js';
 
 import bubblemessage from '../lib/bubblemessage.js';

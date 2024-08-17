@@ -1,5 +1,3 @@
-/* eslint no-unused-vars: "off" */
-
 export function uniform_split(n) {
 	return d3.range(0, 1.000000001, 1 / (n - 1));
 };
@@ -76,7 +74,7 @@ export function colorscale(opts) {
 	};
 };
 
-function svg_pie(data, outer, inner, colors, inner_text, parse, bubble) {
+export function svg_pie(data, outer, inner, colors, inner_text, parse, bubble) {
 	if (typeof parse !== 'function')
 		parse = x => (x * 100).toFixed(2);
 
@@ -148,13 +146,12 @@ function svg_pie(data, outer, inner, colors, inner_text, parse, bubble) {
 	};
 };
 
-function svg_interval(opts = {}) {
+export function svg_interval(opts = {}) {
 	const {sliders, background, init, steps, width, callback1, callback2, end_callback} = opts;
 
 	const radius = 6;
 	const svgwidth = width;
 	const svgheight = (radius * 2) + 2;
-	const linewidth = radius * 2;
 	const svgmin = radius;
 	const svgmax = svgwidth - (radius/2) - 1;
 
@@ -307,61 +304,7 @@ function svg_interval(opts = {}) {
 	};
 };
 
-function svg_checkbox(init, callback) { // this is not used anywhere
-	const size = 24;
-
-	const svg = d3.create("svg")
-		.attr('class', 'svg-checkbox');
-
-	const g = svg.append('g');
-
-	const gutter = g.append('rect');
-
-	const check = g.append('path');
-
-	let status = init || false;
-
-	const active = getComputedStyle(document.body).getPropertyValue('--the-yellow');
-
-	svg
-		.attr('width', size)
-		.attr('height', size)
-		.style('cursor', 'pointer');
-
-	gutter
-		.attr('x', 0)
-		.attr('y', 0)
-		.attr('rx', 1)
-		.attr('ry', 1)
-		.attr('stroke', 'gray')
-		.attr('stroke-width', 0.2)
-		.attr('width', size)
-		.attr('height', size);
-
-	check
-		.attr('fill', 'white')
-		.attr('stroke', 'white')
-		.attr('d', "M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z");
-
-	function change(s,x) {
-		gutter
-			.attr('stroke', (s ? active : '#aaaaaa'))
-			.style('fill', (s ? active : 'white'));
-
-		if ((typeof callback === 'function') && x) callback(s);
-	};
-
-	svg.on('click', change.bind(this, status = !status, true));
-
-	change(status, false);
-
-	return {
-		"svg":    svg.node(),
-		"change": change,
-	};
-};
-
-function opacity_control({ fn, init }) {
+export function opacity_control({ fn, init }) {
 	const o = tmpl('#opacity-control');
 
 	let opacity_value = init ?? 1;
@@ -382,7 +325,7 @@ function opacity_control({ fn, init }) {
 	return o;
 };
 
-function elem_collapse(el, t, open) {
+export function elem_collapse(el, t, open) {
 	function triangle(d) {
 		let t;
 
@@ -440,11 +383,11 @@ function elem_collapse(el, t, open) {
 	}
 };
 
-function loading(bool) {
+export function loading(bool) {
 	qs('#app-loading').style['display'] = bool ? 'block' : 'none';
 };
 
-function super_error(t, m, e = "error") {
+export function super_error(t, m, e = "error") {
 	FLASH.push({
 		"type":    e,
 		"timeout": 0,
@@ -460,7 +403,7 @@ function super_error(t, m, e = "error") {
 	qs('#playground').remove();
 };
 
-function table_data(dict, props, lnglat) {
+export function table_data(dict, props, lnglat) {
 	const t = ce('table');
 	const s = ce('tr', [ce('td', "&nbsp;"), ce('td', "&nbsp;")]);
 
@@ -521,11 +464,11 @@ function table_data(dict, props, lnglat) {
  *        full description.
  */
 
-function coordinates_to_raster_pixel(coords, raster) {
+export function coordinates_to_raster_pixel(coords, raster) {
 	const b = OUTLINE.raster;
 
 	if (coords.length !== 2)
-		throw new Error(`ea_coordinates_raster_pixel: expected and array of length 2. Got ${coords}`);
+		throw new Error(`coordinates_to_raster_pixel: expected and array of length 2. Got ${coords}`);
 
 	const merc = new SphericalMercator({ "size": 1 });
 
@@ -557,9 +500,9 @@ function coordinates_to_raster_pixel(coords, raster) {
 	return a;
 };
 
-function raster_pixel_to_coordinates(i) {
+export function raster_pixel_to_coordinates(i) {
 	const r = OUTLINE.raster;
-	const [left,bottom,right,top] = GEOGRAPHY.envelope;
+	const [ left, _bottom, _right, top ] = GEOGRAPHY.envelope;
 
 	const merc = new SphericalMercator({ "size": 1 });
 
@@ -573,6 +516,6 @@ function raster_pixel_to_coordinates(i) {
 	return merc.inverse([o[0] + (x * s), o[1] - (y * s)]);
 };
 
-function jsonclone(o) {
+export function jsonclone(o) {
 	return JSON.parse(JSON.stringify(o));
 };

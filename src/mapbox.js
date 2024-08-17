@@ -1,3 +1,7 @@
+import {
+	super_error,
+} from './utils.js';
+
 import bubblemessage from '../lib/bubblemessage.js';
 
 const default_styles = [{

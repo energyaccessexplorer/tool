@@ -1,3 +1,9 @@
+import {
+	jsonclone,
+	coordinates_to_raster_pixel,
+	table_data,
+} from './utils.js';
+
 import DS from './ds.js';
 
 import dscard, {

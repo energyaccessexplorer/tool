@@ -1,3 +1,7 @@
+import {
+	elem_collapse,
+} from './utils.js';
+
 import DS from './ds.js';
 
 import {

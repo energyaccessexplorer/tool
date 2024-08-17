@@ -1,3 +1,8 @@
+import {
+	svg_pie,
+	opacity_control,
+} from './utils.js';
+
 import modal from '../lib/modal.js';
 
 import summary_analyse from './summary.js';

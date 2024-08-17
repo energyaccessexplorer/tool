@@ -56,6 +56,7 @@ export default [{
 			"slot_populate": "readonly",
 			"Whatever": "readonly",
 			"same": "readonly",
+			"json_clone": "readonly",
 			"font_icon": "readonly",
 			"fake_blob_download": "readonly",
 			"unique": "readonly",

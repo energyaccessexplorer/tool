@@ -1,6 +1,5 @@
 import {
 	colorscale,
-	jsonclone,
 	uniform_split,
 } from './utils.js';
 
@@ -103,7 +102,7 @@ This is not fatal but the dataset is now disabled.`,
 			}
 
 			this.raster = b.raster;
-			this.vectors = jsonclone(b.vectors);
+			this.vectors = json_clone(b.vectors);
 			Object.assign(this.vectors, this.category.vectors);
 
 			this.vectors.id = b.config.vectors_id;
@@ -196,7 +195,7 @@ This is not fatal but the dataset is now disabled.`,
 
 		this.domain = o.category.domain;
 
-		this._domain = jsonclone(this.category.domain_init) || jsonclone(this.domain);
+		this._domain = json_clone(this.category.domain_init) || json_clone(this.domain);
 
 		this.set_scales();
 
@@ -261,7 +260,7 @@ This is not fatal but the dataset is now disabled.`,
 			}
 
 			if (!maybe(this.category, c)) {
-				this.category[c] = jsonclone(ovrr[c]);
+				this.category[c] = json_clone(ovrr[c]);
 				continue;
 			}
 

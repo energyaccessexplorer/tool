@@ -1,5 +1,4 @@
 import {
-	jsonclone,
 	coordinates_to_raster_pixel,
 	table_data,
 } from './utils.js';
@@ -313,7 +312,7 @@ function load_view() {
 
 				MAPBOX.addSource(`priority-source-${i}`, {
 					"type": 'geojson',
-					"data": jsonclone(d.vectors.geojson),
+					"data": json_clone(d.vectors.geojson),
 				});
 			}
 

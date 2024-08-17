@@ -3,7 +3,6 @@ import DS from './ds.js';
 import {
 	uniform_split,
 	colorscale,
-	jsonclone,
 	raster_pixel_to_coordinates,
 } from './utils.js';
 
@@ -366,7 +365,7 @@ export function priority(d, a, i) {
 		source._data.features.find(f => f.id === +e).properties['__fill'] = s(o[e]['average']);
 	}
 
-	source.setData(jsonclone(source._data));
+	source.setData(json_clone(source._data));
 
 	return o;
 };

@@ -1,6 +1,5 @@
 import {
 	loading,
-	jsonclone,
 	elem_collapse,
 	super_error,
 } from './utils.js';
@@ -257,7 +256,7 @@ export function clean() {
 	DS.all("on").forEach(d => d.active(false, false));
 
 	DS.array.forEach(d => {
-		d._domain = jsonclone(d.domain);
+		d._domain = json_clone(d.domain);
 
 		if (maybe(d, 'controls', 'weight_group'))
 			d.controls.weight_group.change({ "min": 0, "max": maybe(d.category, 'analysis', 'weight') });

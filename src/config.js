@@ -79,7 +79,7 @@ export function generate() {
 		"geography": GEOGRAPHY.id,
 		"zoom":      MAPBOX.getZoom(),
 		"center":    MAPBOX.getCenter(),
-		"theme":     ea_settings.mapbox_theme,
+		"theme":     EAE['settings'].mapbox_theme,
 		"view":      U.view,
 		"subdiv":    U.subdiv,
 		"divtier":   U.divtier,

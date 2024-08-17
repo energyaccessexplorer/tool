@@ -23,7 +23,7 @@
     <link href="/tool/lib/mapbox-gl.css" rel="stylesheet" />
     <link href="./main.css" rel="stylesheet" />
 
-    <script>document.title = ea_settings.title;</script>
+    <script>document.title = EAE['settings'].title;</script>
   </head>
 
   <body>
@@ -203,7 +203,7 @@
     import pgrest from '../lib/pgrest.js';
 
     window.FLASH = new flash();
-    window.API = new pgrest(ea_settings.database, FLASH);
+    window.API = new pgrest(EAE['settings'].database, FLASH);
 
     window.GEOGRAPHY = null;
     window.OUTLINE = null;

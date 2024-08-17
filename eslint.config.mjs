@@ -33,6 +33,7 @@ export default [{
 			"COORDINATES": "writable",
 			"COORDINATESMODE": "writable",
 			"MOBILE": "writable",
+			"EAE": "writable",
 			"U": "writable",
 			"O": "writable",
 			"ENV": "writable",
@@ -59,10 +60,6 @@ export default [{
 			"fake_blob_download": "readonly",
 			"unique": "readonly",
 			"unique_by": "readonly",
-			"ea_settings": "readonly",
-			"ea_views": "writable",
-			"ea_params": "writable",
-			"ea_indexes": "writable",
 		},
 
 		"ecmaVersion": "latest",

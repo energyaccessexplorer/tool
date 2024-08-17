@@ -49,7 +49,7 @@ const steps = [
 		"lazy":   true,
 		"target": 'body',
 		"mark":   {
-			"title":    `Welcome to ${ea_settings.title}`,
+			"title":    `Welcome to ${EAE['settings'].title}`,
 			"message":  welcome,
 			"align":    "middle",
 			"position": "C",

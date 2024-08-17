@@ -61,8 +61,8 @@ export default async function run(type) {
 	// analysis.
 	//
 	const singles = {};
-	for (let i in ea_indexes) {
-		const compound = ea_indexes[i].compound;
+	for (let i in EAE['indexes']) {
+		const compound = EAE['indexes'][i].compound;
 		if (compound.length < 2) singles[i] = 0;
 	}
 
@@ -263,7 +263,7 @@ export async function plot_active(type, doindexes) {
 	const a = await run(type);
 	plot_outputcanvas(a.raster);
 
-	const index = ea_indexes[type];
+	const index = EAE['indexes'][type];
 
 	if (!type || !index) {
 		console.warn("plot_active: Too early...",
@@ -373,7 +373,7 @@ export function priority(d, a, i) {
 
 export function enough_datasets(t) {
 	if (["eai", "ani"].includes(t)) {
-		const required = ea_indexes[t].compound;
+		const required = EAE['indexes'][t].compound;
 
 		for (const r of required)
 			if (!DS.array.find(d => and(d.on, d.analysis, d.index === r))) return false;

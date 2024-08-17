@@ -25,7 +25,7 @@ import {
 let ul, resultscontainer, resultsinfo;
 
 function pointto(p, a = false) {
-	const dict = [[ "v", ea_indexes[U.output]['name'] ]];
+	const dict = [[ "v", EAE['indexes'][U.output]['name'] ]];
 	const props = { "v": lowmedhigh_scale(p.v) };
 
 	search_pointto(p.c, dict, props, a);

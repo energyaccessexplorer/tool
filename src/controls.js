@@ -99,13 +99,13 @@ export default class dscontrols extends HTMLElement {
 
 		function create_tab(name) {
 			const t = ce('div', humanformat(name), { "id": 'controls-tab-' + name, "class": 'controls-branch-tab up-title' });
-			if (ea_indexes[name]) t.setAttribute('bind', name);
+			if (EAE['indexes'][name]) t.setAttribute('bind', name);
 			return t;
 		};
 
 		function create_branch(name) {
 			const t = ce('div', null, { "id": 'controls-branch-' + name, "class": 'controls-branch' });
-			if (ea_indexes[name]) t.setAttribute('bind', name);
+			if (EAE['indexes'][name]) t.setAttribute('bind', name);
 			return t;
 		};
 

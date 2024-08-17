@@ -1,21 +1,4 @@
-ea_views = {
-	"inputs": {
-		"name":        "Data",
-		"description": "Underlying data that go into the analysis",
-	},
-
-	"filtered": {
-		"name":        "Filtered Areas",
-		"description": "Filtered areas",
-	},
-
-	"outputs": {
-		"name":        "Analysis",
-		"description": "Results of the analysis",
-	},
-};
-
-ea_indexes = {
+EAE['indexes'] = {
 	"eai": {
 		"name":        "Energy Access Potential",
 		"compound":    ["demand", "supply"],

@@ -211,7 +211,7 @@ async function presets_init() {
 			return parseInt(i);
 	};
 
-	d3.csv(ea_settings.storage + "presets.csv")
+	d3.csv(EAE['settings'].storage + "presets.csv")
 		.then(function(rows) {
 			rows.forEach(r => {
 				const preset = presets[+r.preset_index];
@@ -272,7 +272,7 @@ export function init() {
 
 			const _name = co.name.replace(new RegExp("\\ ?\\(?(" + ENV.join('|') + ")\\)?", "i"), '');
 
-			fetch(`${ea_settings.world}/countries?select=flag&or=(names->>official.eq."${_name}",name.eq."${_name}")`)
+			fetch(`${EAE['settings'].world}/countries?select=flag&or=(names->>official.eq."${_name}",name.eq."${_name}")`)
 				.then(r => r.json())
 				.then(r => {
 					const data = r[0];

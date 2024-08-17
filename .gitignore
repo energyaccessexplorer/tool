@@ -3,5 +3,5 @@
 /*.diff
 *.orig
 *.rej
-/settings.json
+/settings.tmp.json
 /.env

@@ -134,8 +134,8 @@ export function init() {
 	scale.append(analysis_colorscale.svg, r);
 
 	const cos = qs('#canvas-output-select');
-	for (let i in ea_indexes)
-		cos.append(ce('option', ea_indexes[i]['name'], { "value": i }));
+	for (let i in EAE['indexes'])
+		cos.append(ce('option', EAE['indexes'][i]['name'], { "value": i }));
 
 	cos.value = U.output;
 	cos.onchange = x => { O.index = x.target.value; };
@@ -232,8 +232,8 @@ export function list() {
 		O.index = this.getAttribute('bind');
 	};
 
-	for (let t in ea_indexes) {
-		const node = i_elem(t, ea_indexes[t]['name'], ea_indexes[t]['description']);
+	for (let t in EAE['indexes']) {
+		const node = i_elem(t, EAE['indexes'][t]['name'], EAE['indexes'][t]['description']);
 
 		qs('.radio', node).append(radio(t === U.output));
 
@@ -250,10 +250,10 @@ export function list() {
 function open_modal() {
 	const c = ce('div');
 
-	for (let i in ea_indexes) {
+	for (let i in EAE['indexes']) {
 		c.append(
-			ce('h3', ea_indexes[i]['name']),
-			ce('p', ea_indexes[i]['info']),
+			ce('h3', EAE['indexes'][i]['name']),
+			ce('p', EAE['indexes'][i]['info']),
 		);
 	}
 

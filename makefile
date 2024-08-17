@@ -73,8 +73,9 @@ build-m:
 		${LIB}/helpers.js \
 		> ${DIST}/m/libs.js
 
-	@printf "window.ea_settings = " | cat - \
-		settings.json \
+	@echo "window.EAE = {};" | cat - \
+		settings.tmp.json \
+		${SRC}/eae.part.js \
 		> ${DIST}/m/main.js
 
 	@cat \
@@ -144,9 +145,9 @@ build-a:
 		${LIB}/helpers.js \
 		> ${DIST}/a/libs.js
 
-	@printf "window.ea_settings = " | cat - \
-		settings.json \
-		${SRC}/globals.js \
+	@echo "window.EAE = {};" | cat - \
+		settings.tmp.json \
+		${SRC}/eae.part.js \
 		> ${DIST}/a/main.js
 
 	@cat \
@@ -189,8 +190,8 @@ build-s:
 		${LIB}/helpers.js \
 		> ${DIST}/s/libs.js
 
-	@printf "const ea_settings = " | cat - \
-		settings.json \
+	@echo "window.EAE = {};" | cat - \
+		settings.tmp.json \
 		> ${DIST}/s/main.js
 
 	@cat \
@@ -238,7 +239,10 @@ deploy:
 	bmake reconfig build env=development
 
 reconfig:
-	@echo "Building settings.json - ${env}"
+	@echo "Building settings.tmp.json - ${env}"
+
+	@printf "\n%s" "EAE['settings'] = " > settings.tmp.json
+
 	@echo '{}' \
 		| jq '.domain = ${DOMAIN}' \
 		| jq '.world = ${WORLD}' \
@@ -247,4 +251,6 @@ reconfig:
 		| jq '.storage = ${STORAGE_URL}' \
 		| jq '.mapbox_token = ${MAPBOX_TOKEN}' \
 		| jq '.mapbox_theme = ${MAPBOX_THEME}' \
-		> settings.json
+		>> settings.tmp.json
+
+	@sed -i -e '$$s/$$/;\n/' settings.tmp.json

@@ -104,7 +104,7 @@ export async function init() {
 	else
 		n = GEOGRAPHY.name.replace(new RegExp("\\ ?\\(?(" + ENV.join('|') + ")\\)?", "i"), '');
 
-	fetch(`${ea_settings.world}/countries?select=cca2&or=(names->>official.eq."${n}",name.eq."${n}")`)
+	fetch(`${EAE['settings'].world}/countries?select=cca2&or=(names->>official.eq."${n}",name.eq."${n}")`)
 		.then(r => r.json())
 		.then(r => GEOGRAPHY.cca2 = maybe(r, 0, 'cca2'));
 };

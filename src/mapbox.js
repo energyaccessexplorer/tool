@@ -99,7 +99,7 @@ class MapboxInfoControl {
 };
 
 export function init() {
-	mapboxgl.accessToken = ea_settings.mapbox_token;
+	mapboxgl.accessToken = EAE['settings'].mapbox_token;
 
 	const mb = new mapboxgl.Map({
 		"container":             'mapbox-container',
@@ -127,7 +127,7 @@ export function init() {
 };
 
 export function theme_init(theme) {
-	MAPBOX.setStyle(theme_pick(ea_settings.mapbox_theme = theme));
+	MAPBOX.setStyle(theme_pick(EAE['settings'].mapbox_theme = theme));
 };
 
 function projection_control_popup(_) {
@@ -193,7 +193,7 @@ function theme_control_popup(_) {
 		radios.append(e);
 	}
 
-	let current = qs(`input[value="${ea_settings.mapbox_theme}"]`, radios);
+	let current = qs(`input[value="${EAE['settings'].mapbox_theme}"]`, radios);
 	if (current) current.setAttribute('checked', true);
 
 	qsa('input[name="mapbox_theme"]', radios)
@@ -296,7 +296,7 @@ export function change_theme(theme, soft) {
 	MAPBOX.once('style.load', go);
 
 	if (!soft)
-		MAPBOX.setStyle(theme_pick(ea_settings.mapbox_theme = theme));
+		MAPBOX.setStyle(theme_pick(EAE['settings'].mapbox_theme = theme));
 
 	if (theme === "") go();
 };
@@ -410,7 +410,7 @@ export function coords_search_pois({
 		`limit=${limit}`,
 		`dedupe`,
 		`geometry=point`,
-		`access_token=${ea_settings.mapbox_token}`,
+		`access_token=${EAE['settings'].mapbox_token}`,
 	].join('&');
 
 	return fetch(`https://api.mapbox.com/v4/mapbox.mapbox-streets-v8/tilequery/${coords}.json?${query}`)

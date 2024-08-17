@@ -78,7 +78,7 @@ async function summary() {
 		graphs.append(
 			ce('div',
 			   [
-				   ce('div', ea_indexes[idxn]['name'], { "class": 'up-title' }),
+				   ce('div', EAE['indexes'][idxn]['name'], { "class": 'up-title' }),
 				   container,
 				   ce('div', (SUMMARY[idxn]['area']['total'] === 0) ? ce('code', "(no datasets selected)") : null, { "style": "text-align: center; font-size: smaller;" }),
 			   ],
@@ -98,7 +98,7 @@ async function summary() {
 		SUMMARY[idxn]['area']['pie'] = apie;
 	};
 
-	await Promise.all(Object.keys(ea_indexes).map(i => get_summaries(i)));
+	await Promise.all(Object.keys(EAE['indexes']).map(i => get_summaries(i)));
 
 	graphs.append(ce('div', scale.cloneNode(true), { "class": "index-graphs-scale" }));
 
@@ -119,7 +119,7 @@ async function summary() {
 		s.forEach((x,i) => thr.append(ce('th', lowmedhigh(i), { "style": `background-color: ${x};`})));
 
 		for (let k in SUMMARY) {
-			let tr = ce('tr', ce('td', ea_indexes[k]['name'], { "class": 'index-name' }));
+			let tr = ce('tr', ce('td', EAE['indexes'][k]['name'], { "class": 'index-name' }));
 			s.forEach((x,i) => tr.append(ce('td', (SUMMARY[k][j]['amounts'][i]).toLocaleString())));
 
 			tbody.append(tr);

@@ -462,7 +462,7 @@ function mapclick(e) {
 		});
 
 		if (Number.isFinite(maybe(ac, 'value'))) {
-			dict.unshift(["_analysis_name", ea_indexes[U.output]['name']], null);
+			dict.unshift(["_analysis_name", EAE['indexes'][U.output]['name']], null);
 			props["_analysis_name"] = lowmedhigh_scale(ac.value);
 		}
 	}

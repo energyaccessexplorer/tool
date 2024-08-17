@@ -173,7 +173,7 @@ On your OS, you can do this by pressing (${mac ? "⌘" : "ctrl"} −) a couple t
 
 	if (MOBILE) mobile();
 
-	mapbox_theme_init(ea_settings.mapbox_theme);
+	mapbox_theme_init(EAE['settings'].mapbox_theme);
 
 	GEOGRAPHY.timeline_dates = maybe(GEOGRAPHY, 'configuration', 'timeline_dates');
 

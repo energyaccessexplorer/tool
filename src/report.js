@@ -251,7 +251,7 @@ function selected_datasets() {
 };
 
 function selected_datasets_index($, index) {
-	title($, `Selected ${ea_indexes[index]['name']} Datasets`);
+	title($, `Selected ${EAE['indexes'][index]['name']} Datasets`);
 
 	const rows = [[
 		{
@@ -320,7 +320,7 @@ function geography_indexes_left($) {
 
 	let y = 2;
 	for (const i of ['eai', 'demand', 'supply', 'ani']) {
-		const index = ea_indexes[i];
+		const index = EAE['indexes'][i];
 
 		$.addText(
 			[
@@ -362,7 +362,7 @@ function geography_indexes_right($) {
 		for (const k of Object.keys(SUMMARY)) {
 			const r = [];
 
-			r.push({ "text": ea_indexes[k]['name'], "options": { bold } });
+			r.push({ "text": EAE['indexes'][k]['name'], "options": { bold } });
 
 			r.push(...SUMMARY[k][c]['amounts'].map(i => ({ "text": (i).toLocaleString() })));
 
@@ -625,7 +625,7 @@ function analysis(index) {
 };
 
 function analysis_left($, index) {
-	title($, ea_indexes[index]['name']);
+	title($, EAE['indexes'][index]['name']);
 
 	$.addText(
 		long_index_texts[index],
@@ -813,7 +813,7 @@ function toplocations_index(index, points) {
 
 	const border = tableborder;
 
-	title($, `High Priority Locations for Energy Interventions (${ea_indexes[index]['name']} Info)`);
+	title($, `High Priority Locations for Energy Interventions (${EAE['indexes'][index]['name']} Info)`);
 
 	const datasets = DS.array.filter(d => and(d.on, d.index === index));
 

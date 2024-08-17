@@ -480,7 +480,7 @@ export async function vectors_csv() {
 		if (!data) console.warn(this.id, "has no csv.data");
 
 		const l = d3.scaleQuantize().domain([this.domain.min, this.domain.max]).range(this.colorscale.stops);
-		s = x => or(null === x, undefined === x, x === "") ? "rgba(155,155,155,1)" : l(+x);
+		s = x => or(nil(x), x === "") ? "rgba(155,155,155,1)" : l(+x);
 
 		this.csv.scale = l;
 	}
@@ -492,7 +492,7 @@ export async function vectors_csv() {
 
 	for (let f of this.vectors.geojson.features) {
 		f.id = f.properties[this.vectors.id];
-		f.properties['__visible'] = !empty(data.find(r => r[this.csv.key] === f.id));
+		f.properties['__visible'] = !nil(data.find(r => r[this.csv.key] === f.id));
 
 		let row = data.find(r => r[this.csv.key] === f.id);
 		f.properties['__fill'] = this.colorscale ? s(maybe(row, v)) : this.vectors.fill || "transparent";

@@ -47,7 +47,7 @@ export default [{
 			"until": "readonly",
 			"maybe": "readonly",
 			"has": "readonly",
-			"empty": "readonly",
+			"nil": "readonly",
 			"and": "readonly",
 			"or": "readonly",
 			"coalesce": "readonly",

@@ -82,6 +82,23 @@ function edit_title(sessions) {
 	m.show();
 };
 
+function drop(sessions) {
+	const div = this.closest('.session-square');
+	const data = div.getAttribute('data');
+
+	const s = sessions.find(s => s.time === +data);
+	if (!s) return;
+
+	if (!confirm(`Are you sure you want to delete this analysis? '${s.title}'`)) return;
+
+	API.delete('sessions', {
+		"time": `eq.${s.time}`,
+	}).then(_ => {
+		div.remove();
+		API.flash.push({ "message": `Analysis '${s.title}' deleted.`, "type": "success" });
+	});
+};
+
 function base(e) {
 	if (location.hostname.match('localhost')) return "";
 
@@ -118,6 +135,9 @@ function draw_sessions(sessions, geographies, container, trees) {
 
 	for (const p of document.querySelectorAll('.bi.bi-pencil'))
 		p.onclick = function() { edit_title.call(this, sessions); };
+
+	for (const p of document.querySelectorAll('.bi.bi-x-lg'))
+		p.onclick = function() { drop.call(this, sessions); };
 
 	for (const p of document.querySelectorAll('.download'))
 		p.onclick = function() { download.call(this, sessions); };

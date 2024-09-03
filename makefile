@@ -222,17 +222,34 @@ synced:
 		${DIST}/ ${SSH_USER}@${SSH_HOST}:${TOOL_DEST}
 
 deploy:
-	@touch ${env}.diff
+	@touch ${env}.diff development.diff
 
+	@echo "DRY-RUN development => ${env}"
 	@echo "--------"
+	patch --dry-run --strip=1 --reverse <development.diff
+	@echo "--------"
+	patch --dry-run --strip=1 <${env}.diff
 
+	@echo ""
+	@echo "PATCH development => ${env}"
+	@echo "--------"
 	@patch --strip=1 --reverse <development.diff
+	@echo "--------"
 	@patch --strip=1 <${env}.diff
 	bmake reconfig build sync env=${env}
 
+	@echo ""
+	@echo "DRY-RUN ${env} => development"
 	@echo "--------"
+	patch --dry-run --strip=1 --reverse <${env}.diff
+	@echo "--------"
+	patch --dry-run --strip=1 <development.diff
 
+	@echo ""
+	@echo "PATCH ${env} => development"
+	@echo "--------"
 	@patch --strip=1 --reverse <${env}.diff
+	@echo "--------"
 	@patch --strip=1 <development.diff
 	bmake reconfig build env=development
 

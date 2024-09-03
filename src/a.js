@@ -201,6 +201,8 @@ On your OS, you can do this by pressing (${mac ? "⌘" : "ctrl"} −) a couple t
 async function init_2() {
 	await dsinit(GEOGRAPHY.id);
 
+	indexes_init();
+
 	let conf = localStorage.getItem('config');
 	if (conf) conf = JSON.parse(conf);
 
@@ -223,8 +225,6 @@ async function init_2() {
 	locationssearch_init();
 	points_init();
 	config_init();
-
-	indexes_init();
 
 	toggle_left_panel(U.tab);
 
@@ -472,7 +472,7 @@ function mobile() {
 	};
 
 	for (let e of tabs) {
-		e.onclick = function(_) {
+		e.onclick = function() {
 			for (let t of tabs) t.classList.remove('active');
 
 			mobile_switch(this.getAttribute('bind'));

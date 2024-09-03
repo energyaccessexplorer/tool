@@ -34,7 +34,7 @@ export function extract(...path) {
 	try {
 		return maybe(jwt_decode(token), ...path);
 	} catch (e) {
-		console.warning(e);
+		console.warn(e);
 		return null;
 	}
 };

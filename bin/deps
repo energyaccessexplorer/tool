@@ -32,11 +32,12 @@ fetch() {
 	if curl --location \
 			--silent \
 			--fail-with-body \
-			--output \
-			"$DEST/$1" "$2"; then
+			--output "$DEST/$1" \
+			"$2"; then
 		printline "$1"
 	else
 		printf "%s\n\n" "FAILED to fetch $1!"
+		exit 1
 	fi
 }
 

@@ -454,9 +454,18 @@ This is not fatal but the dataset is now disabled.`,
 	set_scales() {
 		let color_opts;
 
+		function colorstops_check() {
+			if (!this.category.colorstops) {
+				console.warn(`${this.id}, (${this.datatype}), has no colorstops configured. Using default`);
+				this.category.colorstops = default_colorscale.stops;
+			}
+		};
+
 		switch (this.datatype) {
 		case 'polygons-valued': {
 			if (this.csv.key) {
+				colorstops_check.call(this);
+
 				color_opts = {
 					"domain": default_colorscale.intervals,
 					"stops":  this.category.colorstops,
@@ -466,6 +475,8 @@ This is not fatal but the dataset is now disabled.`,
 		}
 
 		case 'polygons-timeline': {
+			colorstops_check.call(this);
+
 			color_opts = {
 				"domain": default_colorscale.intervals,
 				"stops":  this.category.colorstops,
@@ -477,6 +488,8 @@ This is not fatal but the dataset is now disabled.`,
 		case 'raster-timeline':
 		case 'raster-valued':
 		case 'raster': {
+			colorstops_check.call(this);
+
 			color_opts = {
 				"stops":     this.category.colorstops,
 				"domain":    this.domain,

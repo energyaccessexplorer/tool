@@ -87,12 +87,14 @@ function radio(init, callback) {
 export async function graphs(raster) {
 	const t = await summary_analyse(raster);
 
+	const e = (1000/GEOGRAPHY.resolution)**2;
+
 	let g = maybe(t, 'population-density'); if (g) {
 		g['distribution'].forEach((x,i) => PIES['population']['data'][i].push(x));
 
 		PIES['population'].change(1);
 
-		qs('#population-number').innerHTML = g['total'].toLocaleString() + "&nbsp;" + "people";
+		qs('#population-number').innerHTML = Math.round(g['total'] / e).toLocaleString() + "&nbsp;" + "people";
 
 		g['distribution'].forEach((x,i) => PIES['population']['data'][i].shift());
 	} else {
@@ -105,7 +107,7 @@ export async function graphs(raster) {
 
 		PIES['area'].change(1);
 
-		qs('#area-number').innerHTML = g['total'].toLocaleString() + "&nbsp;" + "km<sup>2</sup>";
+		qs('#area-number').innerHTML = Math.round(g['total'] / e).toLocaleString() + "&nbsp;" + "km<sup>2</sup>";
 
 		g['distribution'].forEach((x,i) => PIES['area']['data'][i].shift());
 	} else {

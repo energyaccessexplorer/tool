@@ -193,7 +193,7 @@ async function overview() {
 		new modal({
 			"id":      'overview-modal',
 			"header":  r.name,
-			"content": tmpl('#country-overview', r),
+			"content": tmpl('#country-overview'),
 			"footer":  ce(
 				'div',
 				"<strong>Source:</strong> World Bank, World Development Indicators (latest data) crosschecked with values reported by local stakeholders/partners.",

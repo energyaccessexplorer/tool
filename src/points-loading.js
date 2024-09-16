@@ -224,7 +224,7 @@ This file should be <strong>strictly</strong> formatted.
 	pointsinput.onmouseleave = _ => inputbubble.remove();
 
 	pointsinput.onclick = _ => {
-		const content = tmpl('#points-input-form', {});
+		const content = tmpl('#points-input-form');
 		const header = "Input Longitude/Latitude";
 
 		const m = new modal({

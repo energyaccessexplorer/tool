@@ -455,7 +455,7 @@ This is not fatal but the dataset is now disabled.`,
 		let color_opts;
 
 		function colorstops_check() {
-			if (!this.category.colorstops) {
+			if (!maybe(this.category, 'colorstops', 'length')) {
 				console.warn(`${this.id}, (${this.datatype}), has no colorstops configured. Using default`);
 				this.category.colorstops = default_colorscale.stops;
 			}
@@ -574,7 +574,7 @@ This is not fatal but the dataset is now disabled.`,
 				});
 		} else {
 			const m = Object.assign({}, this.metadata, { "category-description": this.category.description });
-			content = tmpl('#ds-info-modal', m);
+			content = tmpl('#ds-info-modal');
 			bind(content, m);
 		}
 

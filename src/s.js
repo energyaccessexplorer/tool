@@ -1,5 +1,4 @@
 import {
-	svg_pie,
 	loading,
 } from './utils.js';
 
@@ -137,73 +136,6 @@ function usertype(gid) {
 	}).show();
 };
 
-async function overview() {
-	let r;
-
-	await fetch('https://wri-public-data.s3.amazonaws.com/EnergyAccess/Country%20indicators/eae_country_indicators.csv')
-		.then(r => r.text())
-		.then(t => d3.csvParse(t))
-		.then(d => (r = d.find(x => x.name === GEOGRAPHY.name)));
-
-	const bubble = v => new bubblemessage({ "message": v + "%", "position": "W", "close": false, "noevents": true });
-
-	if (r) {
-		r['urban_population'] = (100 - r['rural_population']).toFixed(1);
-
-		if (r['urban_electrification'] > 0) {
-			let eru = svg_pie(
-				[
-					[100 - r['urban_electrification']],
-					[r['urban_electrification']],
-				],
-				50, 0,
-				[
-					getComputedStyle(document.body).getPropertyValue('--the-light-green'),
-					getComputedStyle(document.body).getPropertyValue('--the-green'),
-				],
-				"",
-				x => x,
-				bubble,
-			);
-
-			r['urban_electrification_pie'] = eru.svg;
-			eru.change(0);
-		}
-
-		if (r['rural_electrification'] > 0) {
-			let err = svg_pie(
-				[
-					[100 - (r['rural_electrification'])],
-					[r['rural_electrification']],
-				],
-				50, 0,
-				[
-					getComputedStyle(document.body).getPropertyValue('--the-light-green'),
-					getComputedStyle(document.body).getPropertyValue('--the-green'),
-				],
-				"",
-				x => x,
-				bubble,
-			);
-
-			r['rural_electrification_pie'] = err.svg;
-			err.change(0);
-		}
-
-		new modal({
-			"id":      'overview-modal',
-			"header":  r.name,
-			"content": tmpl('#country-overview'),
-			"footer":  ce(
-				'div',
-				"<strong>Source:</strong> World Bank, World Development Indicators (latest data) crosschecked with values reported by local stakeholders/partners.",
-				{ "style": "font-size: small; max-width: 30em; margin-left: auto; margin-right: 0;" },
-			),
-			"destroy": true,
-		}).show();
-	}
-};
-
 async function presets_init() {
 	function intornot(str) {
 		const i = parseInt(str);
@@ -308,6 +240,4 @@ export function init() {
 		});
 
 	presets_init();
-
-	if (ENV === "nothing") overview();
 };

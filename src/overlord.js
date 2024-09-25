@@ -220,16 +220,22 @@ export default class Overlord {
 		const arr = c.datasets.filter(x => DST.get(x.name) || DST.get(x.id));
 		arr.forEach(x => (DST.get(x.name) || DST.get(x.id)).active(true, true));
 
-		if (c.zoom)
-			MAPBOX.zoomTo(c.zoom);
-
-		if (c.center?.length === 2)
-			MAPBOX.setCenter(c.center);
-
 		cards_update();
-		O.sort();
 
-		return c;
+		toggle_left_panel(c.tab);
+
+		(async function() {
+			await until(_ => DS.array.filter(d => d.loading).length === 0)
+				.catch(_ => console.warn("Couldn't wait longer for loading datasets...", DS.array.filter(d => d.loading)));
+
+			O.sort();
+
+			if (c.zoom)
+				MAPBOX.zoomTo(c.zoom);
+
+			if (c.center?.length === 2)
+				MAPBOX.setCenter(c.center);
+		})();
 	};
 
 	get datasets() {

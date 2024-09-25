@@ -203,7 +203,7 @@ async function init_2() {
 
 	indexes_init();
 
-	let conf = localStorage.getItem('config');
+	let conf = sessionStorage.getItem('config');
 	if (conf) conf = JSON.parse(conf);
 
 	const url = new URL(location);
@@ -247,6 +247,7 @@ async function init_2() {
 
 async function init_3() {
 	O.view = U.view;
+	O.load_config();
 };
 
 export function clean() {

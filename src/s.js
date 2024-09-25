@@ -115,8 +115,7 @@ function usertype(gid) {
 		const p = ce('p', t.description);
 		const li = ce('li', ce('a', [ce('h3', t.name), p], { "href": `/tool/a?id=${gid}&output=${output}&view=${view}&variant=${variant}` }));
 		li.onclick = function() {
-			localStorage.setItem('config', JSON.stringify(t));
-			localStorage.setItem('user-type', t.name);
+			sessionStorage.setItem('config', JSON.stringify(t));
 		};
 
 		ul.append(li);

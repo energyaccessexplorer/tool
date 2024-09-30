@@ -64,6 +64,11 @@ function radio(init, callback) {
 		.attr('cy', (size/2));
 
 	function change(s,i) {
+		gtag('event', 'select_option', {
+			'event_category': 'Option',
+			'event_label': 'User selects an index option',
+			'value': i.name
+		});
 		center
 			.style('fill', (s ? active : 'white'))
 			.style('stroke', (s ? active : 'white'));
@@ -140,7 +145,14 @@ export function init() {
 		cos.append(ce('option', EAE['indexes'][i]['name'], { "value": i }));
 
 	cos.value = U.output;
-	cos.onchange = x => { O.index = x.target.value; };
+	cos.onchange = x => {
+		O.index = x.target.value;
+		gtag('event', 'select_option', {
+			'event_category': 'Option',
+			'event_label': 'User selects an analysis option',
+			'value': x.target.value
+		});
+	};
 
 	const toolbox = qs('#index-layer-toolbox');
 	const tools = {

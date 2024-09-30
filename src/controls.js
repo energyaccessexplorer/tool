@@ -213,6 +213,12 @@ function toggle_switch(init, callback) {
 
 	let status = init || false;
 
+	if (status) gtag('event', 'checkbox_checked', {
+		'event_category': 'Layer',
+		'event_label': 'User adds a layer to the map',
+		'value': init.id
+	});
+
 	const active = getComputedStyle(document.body).getPropertyValue('--the-yellow');
 
 	svg

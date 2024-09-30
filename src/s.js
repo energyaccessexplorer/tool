@@ -183,6 +183,11 @@ export function init() {
 		for (let co of geographies) {
 			const d = ce('div', ce('h2', co.name, { "class": 'country-name' }), { "class": 'country-item', "ripple": "" });
 			d.onclick = async _ => {
+				gtag('event', 'button_click', {
+					'event_category': 'Country',
+					'event_label': 'User selects a country',
+					'value': c.id
+				});
 				preload_boundaries(co.id);
 				setTimeout(_ => geography(co), 350);
 			};

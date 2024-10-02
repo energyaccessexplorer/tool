@@ -50,7 +50,7 @@ padding: 7px 12px;
 		gtag("event", "analysis_submit", {
 			"event_category": "Submit",
 			"event_label": "User shares analysis",
-			"value": this.getAttribute('description')
+			"value": session.time
 		});
 
 		return false;

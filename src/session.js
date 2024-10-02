@@ -32,7 +32,6 @@ padding: 7px 12px;
 	});
 
 	f.onsubmit = function(e) {
-		const user_id = user_extract('id');
 		e.preventDefault();
 
 		m.remove();
@@ -40,18 +39,6 @@ padding: 7px 12px;
 		API.patch('sessions', { "time": `eq.${s.time}` }, { "payload": {
 			"title": i.value,
 		}});
-		
-		gtag("set", "analysis_properties", {
-			"title": i.value,
-			"time":         session.time,
-			"user_id":      user_id,
-			"geography_id": GEOGRAPHY.id,
-		  });
-		gtag("event", "analysis_submit", {
-			"event_category": "Submit",
-			"event_label": "User shares analysis",
-			"value": this.getAttribute('description')
-		});
 
 		return false;
 	};

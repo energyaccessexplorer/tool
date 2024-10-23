@@ -1,11 +1,7 @@
 default: reconfig build lint
 
 .include ".env"
-
-# In .env:
-#
-# DB_NAME = eae
-# PG = postgres://postgres@localhost
+# in .env:
 #
 # TITLE = "Energy Access Explorer"
 # WORLD = "https://world.example.org"
@@ -14,17 +10,14 @@ default: reconfig build lint
 # API_URL = "http://eae.localhost/api"
 #
 # SSH_USER = www
-# SSH_HOST = srv
+# SSH_HOST = srv.example.org
 #
-# TOOL_PORT = 8000
 # TOOL_DEST = /var/www/path
 #
 # MAPBOX_THEME = "mapbox/light-v10"
 # MAPBOX_TOKEN = ""
 #
 # STORAGE_URL = "https://bucket.s3.storage.com/path/"
-#
-# HTTP_SERVER = httpserver
 #
 DIST = ./dist
 SRC = ./src
@@ -48,9 +41,6 @@ lint:
 deps:
 	@mkdir -p ${LIB}/fonts
 	DEST=${LIB} ${BIN}/deps
-
-start:
-	${HTTP_SERVER} --port ${TOOL_PORT} --dir ${DIST}
 
 build-m:
 	@echo "Building my screen"
@@ -236,6 +226,7 @@ deploy:
 	@patch --strip=1 --reverse <development.diff
 	@echo "--------"
 	@patch --strip=1 <${env}.diff
+
 	bmake reconfig build sync env=${env}
 
 	@echo ""

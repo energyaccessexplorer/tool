@@ -33,14 +33,9 @@ jobs:
           	MAPBOX_THEME = "${{ vars.MAPBOX_THEME }}"
           EOF
 
-      - name: Install dependencies
-        run: |
-          mkdir -p dist/lib/fonts
-          DEST=dist/lib ./bin/deps
-
       - name: Run make
         run: |
-          bmake reconfig build env=test
+          bmake deps reconfig build env=test
 
       - name: Deploy website
         run: |

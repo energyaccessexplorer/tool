@@ -1,0 +1,74 @@
+name: PR DEPLOY
+
+on:
+  pull_request:
+    branches: [ trunk ]
+
+  repository_dispatch:
+    types: [ trigger-workflow ]
+
+env:
+  BRANCH_NAME: ${{ github.event.client_payload.branch_name || github.head_ref || github.ref_name }}
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get install -y bmake curl jq ruby-mustache
+
+      - name: Build .env
+        run: |
+          cat <<- EOF >.env
+          	DOMAIN = "${{ vars.DOMAIN }}"
+          	WORLD = "${{ vars.WORLD_URL }}"
+          	TITLE = "${{ vars.TITLE }}"
+          	API_URL = "${{ vars.API_URL }}"
+          	STORAGE_URL = "${{ vars.STORAGE_URL }}"
+          	MAPBOX_TOKEN = "${{ vars.MAPBOX_TOKEN }}"
+          	MAPBOX_THEME = "${{ vars.MAPBOX_THEME }}"
+          EOF
+
+      - name: Install dependencies
+        run: |
+          mkdir -p dist/lib/fonts
+          DEST=dist/lib ./bin/deps
+
+      - name: Run make
+        run: |
+          bmake reconfig build env=test
+
+      - name: Deploy website
+        run: |
+          curl -X POST \
+            --location \
+            --header "Authorization: Bearer ${{ secrets.PR_DEPLOY_TOKEN }}" \
+            --header "Accept: application/vnd.github+json" \
+            --header "X-GitHub-Api-Version: 2022-11-28" \
+            --data "{\"event_type\": \"trigger-workflow\", \"client_payload\": {\"branch_name\": \"$BRANCH_NAME\"}}" \
+            https://api.github.com/repos/energyaccessexplorer/website/dispatches
+
+      - name: Make destination directory
+        uses: appleboy/ssh-action@v1.1.0
+        with:
+          host:     ${{ secrets.PR_DEPLOY_HOST }}
+          username: ${{ secrets.PR_DEPLOY_USER }}
+          port:     ${{ secrets.PR_DEPLOY_PORT }}
+          key:      ${{ secrets.PR_DEPLOY_KEY }}
+          script:   |
+            mkdir -p ${{ secrets.PR_DEPLOY_PATH }}/${{ env.BRANCH_NAME }}
+
+      - name: Deploy the thing
+        uses: burnett01/rsync-deployments@7.0.1
+        with:
+          switches: --recursive --verbose
+          path: dist/
+          remote_path: ${{ secrets.PR_DEPLOY_PATH }}/$BRANCH_NAME/tool/
+          remote_host: ${{ secrets.PR_DEPLOY_HOST }}
+          remote_port: ${{ secrets.PR_DEPLOY_PORT }}
+          remote_user: ${{ secrets.PR_DEPLOY_USER }}
+          remote_key:  ${{ secrets.PR_DEPLOY_KEY }}

@@ -59,6 +59,10 @@ EOF
 	fi
 
 	fetch "$target" "$origin"
+
+	if echo "$DEST/$target" | grep -E '.js$' >/dev/null; then
+		printf "\n\n" >> "$DEST/$target"
+	fi
 done <dependencies.tsv
 
 printline "deps finished"

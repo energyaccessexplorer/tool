@@ -37,6 +37,10 @@ jobs:
         run: |
           bmake deps reconfig build env=test
 
+      - name: Patch for relative paths
+        run: |
+          patch -p1 <relative-paths.diff
+
       - name: Deploy website
         run: |
           curl -X POST \

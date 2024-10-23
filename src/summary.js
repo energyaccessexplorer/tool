@@ -54,6 +54,8 @@ async function summary() {
 		ce('div', "High"),
 	);
 
+	GTAG_EVENT_LABEL = 'User selects REPORT button and then selects an option to export the data'
+
 	SUMMARY = {};
 
 	const scale = ce('div');
@@ -136,6 +138,12 @@ async function summary() {
 		graphs_tab.classList.toggle('hidden');
 		tables_tab.classList.toggle('hidden');
 
+		gtag('event', 'button_click', {
+			'event_category': 'Option',
+			'event_label': GTAG_EVENT_LABEL,
+			'value': "Summary Graphs"
+		});
+
 		this.innerText = ss ? "Summary Table" : "Summary Graphs";
 	};
 
@@ -147,6 +155,12 @@ async function summary() {
 			register_login();
 			return;
 		}
+
+		gtag('event', 'button_click', {
+			'event_category': 'Option',
+			'event_label': GTAG_EVENT_LABEL,
+			'value': "Export Presentation"
+		});
 
 		loading(true);
 

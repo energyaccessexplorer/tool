@@ -51,3 +51,16 @@ bubble-message {
   overflow-y: scroll;
   max-height: calc(100% - 8em);
 }
+
+#share-link-input {
+  font-family: monospace;
+  font-size: 1.2em;
+  padding: 7px 5px;
+  color: #414141;
+  width: 32em;
+  text-align: center;
+}
+
+#share-link-copy-button {
+  padding: 0 12px;
+}

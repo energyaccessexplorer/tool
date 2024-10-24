@@ -139,3 +139,30 @@
 #index-layer-toolbox a i {
   font-size: 1.4em;
 }
+
+#big-buttons {
+  display: flex;
+  padding: 1em;
+  flex-flow: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+#big-buttons button {
+  white-space: nowrap;
+}
+
+#save-snapshot-button, #share-snapshot-button {
+  width: calc(50% - 2em);
+  display: inline-block;
+  background-color: var(--the-white);
+  color: var(--the-color) !important;
+  border: 2px solid #a5aeb5 !important;
+  font-size: 0.85em;
+  margin-top: 1em;
+  width: calc(50% - 0.5em);
+}
+
+#save-snapshot-button i, #share-snapshot-button i {
+  margin-right: 1em;
+}

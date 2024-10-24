@@ -85,10 +85,11 @@ export function snapshot() {
 
 	delete config.geography;
 
-	async function patch() {
-		await API.patch('snapshots', { "time": `eq.${snapshot_id}` }, { "payload": { config } });
+	function patch() {
+		API.patch('snapshots', { "time": `eq.${snapshot_id}` }, { "payload": { config } })
+			.then(_ => FLASH.push({ "title": "Updated Analysis", "type": "success" }));
 
-		FLASH.push({ "title": "Updated Analysis", "type": "success" });
+		return snapshot_id;
 	};
 
 	function post() {
@@ -103,12 +104,12 @@ export function snapshot() {
 		session.snapshots.push(s);
 
 		API.post('snapshots', null, { "payload": s })
+			.then(_ => FLASH.push({ "title": "Created Analysis", "type": "success" }))
 			.then(_ => url.searchParams.set('snapshot', s['time']))
 			.then(_ => history.replaceState(null, null, url));
+
+		return s['time'];
 	};
 
-	if (snapshot_id)
-		patch();
-	else
-		post();
+	return snapshot_id ? patch() : post();
 };

@@ -16,7 +16,6 @@ button {
 
 .big-green-button {
   text-align: center;
-  margin: 1em;
   background-color: var(--the-green);
   color: white !important;
   text-decoration: none;

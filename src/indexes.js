@@ -3,6 +3,8 @@ import {
 	opacity_control,
 } from './utils.js';
 
+import bind from '../lib/bind.js';
+
 import modal from '../lib/modal.js';
 
 import summary_analyse from './summary.js';
@@ -152,8 +154,11 @@ export function init() {
 	for (const i in tools)
 		toolbox.append(ce('a', null, { "id": i, "title": tools[i] }));
 
-	const snap = qs('#snapshot-button');
+	const snap = qs('#save-snapshot-button');
 	snap.onclick = snapshot;
+
+	const share = qs('#share-snapshot-button');
+	share.onclick = share_url;
 
 	const opacity = qs('#index-graphs-opacity');
 	opacity.append(opacity_control({
@@ -247,6 +252,46 @@ export function list() {
 	}
 
 	indexes_list.append(...nodes);
+};
+
+function share_url() {
+	const id = snapshot();
+	const c = tmpl('#share-link-modal-content');
+
+	const u = new URL(location);
+	const url = `${u.protocol}//${u.hostname}/tool/p?${id}`;
+
+	function copy() {
+		if (!navigator.clipboard) {
+			FLASH.push({
+				"type":    'error',
+				"timeout": 2000,
+				"title":   "Clipboard functionality not available",
+			});
+
+			this.closest('button').remove();
+
+			return;
+		}
+
+		navigator.clipboard.writeText(url)
+			.then(_ => {
+				FLASH.push({
+					"type":    'success',
+					"timeout": 2000,
+					"title":   "Link copied!",
+				});
+			});
+	};
+
+	bind(c, { url, copy });
+
+	new modal({
+		"id":      'share-link-modal',
+		"header":  "Share link",
+		"content": c,
+		"destroy": true,
+	}).show();
 };
 
 function open_modal() {

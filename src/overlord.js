@@ -23,6 +23,7 @@ import {
 
 import {
 	load_datasets as config_load_datasets,
+	generate as config_generate,
 } from './config.js';
 
 import {
@@ -212,7 +213,10 @@ export default class Overlord {
 		O.view = U.view;
 	};
 
-	load_config(c) {
+	set config(c) {
+		if (and(!c, sessionStorage['config']))
+			c = JSON.parse(sessionStorage['config']);
+
 		if (!c) return;
 
 		config_load_datasets(c);
@@ -237,6 +241,14 @@ export default class Overlord {
 				MAPBOX.setCenter(c.center);
 		})();
 	};
+
+	get config() {
+		return config_generate();
+	}
+
+	store_config() {
+		sessionStorage.setItem('config', JSON.stringify(config_generate()));
+	}
 
 	get datasets() {
 		return qsa('ds-card', qs('#cards-list'), true).map(c => c.ds);

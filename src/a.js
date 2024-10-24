@@ -209,12 +209,14 @@ async function init_2() {
 	const url = new URL(location);
 	const stamp = url.searchParams.get('snapshot');
 	if (stamp) {
+		sessionStorage.removeItem('config');
+
 		conf = await API.get('snapshots', { "time": `eq.${stamp}` }, { "one": true })
 			.catch(_ => {})
 			.then(r => r['config']);
 	}
 
-	O.load_config(conf);
+	O.config = conf;
 
 	O.index = U.output;
 
@@ -247,7 +249,7 @@ async function init_2() {
 
 async function init_3() {
 	O.view = U.view;
-	O.load_config();
+	O.config = null;
 };
 
 export function clean() {

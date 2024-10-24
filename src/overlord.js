@@ -1,4 +1,8 @@
 import {
+	toggle_left_panel,
+} from './a.js';
+
+import {
 	coordinates_to_raster_pixel,
 	table_data,
 } from './utils.js';

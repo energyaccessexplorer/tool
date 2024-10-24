@@ -32,7 +32,7 @@ GITSHA != git log -n1 --format=format:"%H" | head -c 8
 GITCLEAN != [ "`git diff --stat`" = '' ] || echo "-dirty"
 
 build: build-a build-s build-m
-	@cp views/index.html ${DIST}/index.html
+	@mustache /dev/null views/index.mustache > ${DIST}/index.html
 	@find . -name '*.orig' -delete
 
 lint:

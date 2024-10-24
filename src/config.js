@@ -136,7 +136,7 @@ export function init() {
 
 				if (!valid) return;
 
-				O.load_config(conf);
+				O.config = conf;
 				results.innerText = JSON.stringify(conf, null, "  ");
 
 				O.view = U.view;

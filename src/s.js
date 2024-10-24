@@ -36,7 +36,7 @@ async function geography(c) {
 			const x = coll.find(x => x.name === this.value);
 
 			if (maybe(x, 'configuration', 'exclude_sector_presets')) {
-				window.location = `/tool/a?id=${x.id}`;
+				window.location = `${window.BASE}/tool/a?id=${x.id}`;
 				return;
 			}
 
@@ -113,7 +113,7 @@ function usertype(gid) {
 		const { output, view, variant } = t;
 
 		const p = ce('p', t.description);
-		const li = ce('li', ce('a', [ce('h3', t.name), p], { "href": `/tool/a?id=${gid}&output=${output}&view=${view}&variant=${variant}` }));
+		const li = ce('li', ce('a', [ce('h3', t.name), p], { "href": `${window.BASE}/tool/a?id=${gid}&output=${output}&view=${view}&variant=${variant}` }));
 		li.onclick = function() {
 			sessionStorage.setItem('config', JSON.stringify(t));
 		};

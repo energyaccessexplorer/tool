@@ -1,0 +1,8 @@
+<script>
+  document.title = EAE['settings'].title;
+
+  window.BASE = "";
+
+  if (location.hostname.match(/^(test|dev)/))
+    window.BASE = location.pathname.split('/').splice(0,2).join('/');
+</script>

@@ -1,5 +1,9 @@
 import DS from './ds.js';
 
+import modal from '../lib/modal.js';
+
+import bind from '../lib/bind.js';
+
 import {
 	svg_interval,
 	opacity_control,
@@ -22,6 +26,8 @@ import {
 const cards_list = qs('#cards-list');
 
 const slider_width = 472;
+
+const filters = {};
 
 async function mutant_options() {
 	const d = this.ds;
@@ -446,6 +452,68 @@ function range_el() {
 	return d;
 };
 
+function filter_modal() {
+	const content = tmpl('#ds-attributes-filter-modal');
+	bind(content, this);
+
+	if (nil(filters[this.id])) filters[this.id] = {};
+
+	const filterout = debounce(_ => {
+		const fs = this.vectors.geojson.features;
+
+		for (let i = 0; i < fs.length; i += 1) {
+			let v = false;
+
+			for (const k in filters[this.id]) {
+				const f = filters[this.id][k];
+				if (f.includes(fs[i].properties[k])) v = true;
+			}
+
+			fs[i].properties['__visible'] = v;
+		}
+
+		this.update_source(this.vectors.geojson);
+	}, 300);
+
+	for (const a of this.config.attributes_map) {
+		if (this.config.properties_search?.includes(a.dataset)) continue;
+
+		const o = unique(this.vectors.geojson.features.map(f => f.properties[a.dataset]));
+
+		const e = tmpl('#ds-attributes-filter');
+		bind(e, {
+			"dataset": a.dataset,
+			"target":  a.target,
+			"options": o.map(t => ({ "name": t })),
+		});
+
+		const s = qs('select', e);
+
+		s.onchange = ev => {
+			const f = filters[this.id][a.dataset] = [];
+
+			for (const t of ev.target.options)
+				if (t.selected) f.push(t.value);
+
+			filterout();
+		};
+
+		for (const o of qsa('option', s)) {
+			if (maybe(filters, this.id, s.getAttribute('name'))?.includes(o.value))
+				o.setAttribute('selected', '');
+		}
+
+		content.append(e);
+	}
+
+	new modal({
+		"id":      'ds-filter',
+		"header":  this.name,
+		content,
+		"destroy": true,
+	}).show();
+};
+
 export function init() {
 	sortable(cards_list, {
 		'items':                'ds-card',
@@ -534,6 +602,7 @@ export default class dscard extends HTMLElement {
 
 		slot_populate.call(this, Object.assign({}, this.ds, {
 			'range':   range_el.call(this),
+			'filter':  this.filter(),
 			'info':    this.info(),
 			'opacity': this.opacity(),
 			'close':   this.close(),
@@ -628,6 +697,16 @@ export default class dscard extends HTMLElement {
 	info() {
 		const e = font_icon('info-circle');
 		e.onclick = this.ds.info_modal.bind(this.ds);
+
+		return e;
+	};
+
+	filter() {
+		if (!maybe(this.ds, 'config', 'attributes_map', 'length'))
+			return "";
+
+		const e = font_icon('filter');
+		e.onclick = filter_modal.bind(this.ds);
 
 		return e;
 	};

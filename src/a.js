@@ -533,6 +533,11 @@ function drawer_init() {
 				this.classList.contains('active') ? null :
 					this.getAttribute('for'),
 			);
+			gtag('event', 'button_click', {
+				'event_category': 'Option',
+				'event_label': 'User selects an option from the left panel',
+				'value': this.getAttribute('description')
+			});
 		};
 
 		a.onmouseenter = function() {

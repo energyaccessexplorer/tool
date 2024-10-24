@@ -124,6 +124,30 @@
   </div>
 </template>
 
+<template id="ds-attributes-filter-modal">
+  <p>Filtered attributes only show on the data view. The analysis is not affected by this filtering.</p>
+
+  <p>TIP 1: (de)select multiple items by holding the CTRL key (CMD on mac) and clicking on the option.</p>
+  <p>TIP 2: (de)select a continuos range of options by selecting the start option, holding SHIFT key, and clicking on the last option.</p>
+  <p>TIP 3: use CTRL-A (CMD-A on mac) to select all the options in the <b>focused</b> select box.</p>
+</template>
+
+<template id="ds-attributes-filter">
+  <p bind="target"></p>
+
+  <select multiple
+          bind-attr="name"
+          bind-arg="dataset">
+    <option>-- none --</option>
+
+    <option bind-each="options"
+            bind-attr="value"
+            bind-arg="name"
+            bind="name">
+    </option>
+  </select>
+</template>
+
 <template id="index-graphs-container-template">
   <div class="index-graphs-container">
     <div class="index-graphs-group">

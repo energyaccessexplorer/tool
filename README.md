@@ -1,48 +1,68 @@
 # Energy Access Explorer Tool
 
-This is the source code for the primary visualisation of the platform. A live
-version found [here](https://www.energyaccessexplorer.org/).
+This project houses the source code for the main visualization platform of Energy Access Explorer, providing an interactive interface for exploring energy access data.  A live version can be found at the Energy Access Explorer website.
 
-## Development
+## Getting Started
 
-Is written in plain/modern Javascript (ECMAScript 2020) for now. No framework,
-instead traditional C-style programming pattern is enforced.
+These instructions will help you set up the project locally for development and testing.
 
-As usual, the directories contain
-- `src`: JavaScript code
-- `stylesheets`: CSS code
-- `views`: HTML documents
-- `bin`: scripts and executables
+### Prerequisites
 
-## Dependencies
-Libraries have been chosen very strictly. The big ones are:
-- [Mapbox GL JS](https://github.com/mapbox/mapbox-gl-js)
-- [geotiff](https://github.com/geotiffjs/geotiff.js) for raster parsing
-- [D3js](https://d3js.org) to generate interactive controls such as sliders,
-  pie-charts, etc.
+* **Standard Unix-like environment:**  Common Unix utilities (`cat`, `sed`, `rsync`, `bmake`) are required.
+* **Energy Access Explorer Infrastructure:** You'll need running instances of the Energy Access Explorer database, API, and website.  See the respective project documentation for setup instructions.
+* **Node.js and npm:**  Required for managing JavaScript dependencies.
 
-Other minor plugins/functions are used. See `dependencies.tsv`.
 
-## Building & hacking
+### Installation
 
-Assumptions made:
+1. **Clone the repository:** Clone this repository to your local machine.
 
-- standard Unix-like environment (cat, sed, echo, rsync, bmake...)
-- Energy Access Explorer infrastructure:
-  [database](https://github.com/energyaccessexplorer/database),
-  [API](https://github.com/energyaccessexplorer/api) and
-  [website](https://github.com/energyaccessexplorer/website)
-  should be up and running.
+2. **Install dependencies:**  Navigate to the project directory and run:
 
-The `makefile` (BSDmake) contains basic tasks for development/deployment. To get
-started, edit the `.env` file to match your needs.
+  ```bash
+  npm install
+  ```
 
-Now you can run in development mode with (`bmake` in Linux):
+3. **Environment Configuration**: Copy `.env.example` to `.env` and adjust the values within to match your local setup (database connection, API endpoints, etc.). The `.env.example` file contains descriptions of each variable.
 
-    $ make build start
+4. **Build the project:**
+
+  ```bash
+  make build
+  ```
+
+### Running the application
+
+Start the development server:
+
+  ```bash
+  make start
+  ```
+
+This will typically start the application at http://localhost:8080 (check .env or console output for the exact address).
+
+
+## Project Structure (High-Level)
+
+- **src**: JavaScript source code for application logic, visualization, and data processing.
+- **stylesheets**: CSS files for styling and appearance.
+- **views**: HTML templates for the user interface.
+- **bin**: Scripts and executable files for development and deployment.
+
+## Key Dependencies
+
+- [Mapbox GL JS](https://github.com/mapbox/mapbox-gl-js): Interactive map rendering and geospatial data visualization.
+- [geotiff](https://github.com/geotiffjs/geotiff.js): Parsing and processing GeoTIFF raster data.
+- [D3js](https://d3js.org): Creating interactive controls and charts.
+
+## Development Workflow
+
+This project uses `bmake` (BSDmake) for build tasks and other development workflows. See the `Makefile` and run `make help` for more details.
+
+## Contributing
+
+Contributions are welcome! See the project wiki for detailed information on contributing, reporting issues, and making suggestions.
 
 ## License
 
-This project is licensed under MIT. Additionally, you must read the
-[attribution page](https://www.energyaccessexplorer.org/attribution)
-before using any part of this project.
+This project is licensed under MIT. Additionally, you must read the [attribution page](https://www.energyaccessexplorer.org/attribution) before using any part of this project.

@@ -1,59 +1,61 @@
 # Energy Access Explorer Tool
 
-This project houses the source code for the main visualization platform of Energy Access Explorer, providing an interactive interface for exploring energy access data.  A live version can be found at the Energy Access Explorer website.
+This is the source code for the primary visualisation of the platform. A live
+version found [here](https://www.energyaccessexplorer.org/).
 
-## Getting Started
+## Development
 
-These instructions will help you set up the project locally for development and testing.
+Is written in plain/modern Javascript (ECMAScript 2020) for now. No framework,
+instead traditional C-style programming pattern is enforced.
 
-### Prerequisites
-
-* **Standard Unix-like environment:**  Common Unix utilities (`cat`, `sed`, `rsync`, `bmake`) are required.
-* **Energy Access Explorer Infrastructure:** You'll need running instances of the Energy Access Explorer database, API, and website.  See the respective project documentation for setup instructions.
-* **Node.js and npm:**  Required for managing JavaScript dependencies.
-
-
-### Installation
-
-1. **Clone the repository:** Clone this repository to your local machine.
-
-2. **Install dependencies:**  Navigate to the project directory and run:
-
-  ```bash
-  npm install
-  ```
-
-3. **Environment Configuration**: Copy `.env.example` to `.env` and adjust the values within to match your local setup (database connection, API endpoints, etc.). The `.env.example` file contains descriptions of each variable.
-
-4. **Build the project:**
-
-  ```bash
-  make build
-  ```
-
-### Running the application
-
-Start the development server:
-
-  ```bash
-  make start
-  ```
-
-This will typically start the application at http://localhost:8080 (check .env or console output for the exact address).
-
-
-## Project Structure (High-Level)
-
+As usual, the directories contain
 - **src**: JavaScript source code for application logic, visualization, and data processing.
 - **stylesheets**: CSS files for styling and appearance.
 - **views**: HTML templates for the user interface.
 - **bin**: Scripts and executable files for development and deployment.
 
-## Key Dependencies
-
+## Dependencies
+Libraries have been chosen very strictly. The big ones are:
 - [Mapbox GL JS](https://github.com/mapbox/mapbox-gl-js): Interactive map rendering and geospatial data visualization.
 - [geotiff](https://github.com/geotiffjs/geotiff.js): Parsing and processing GeoTIFF raster data.
 - [D3js](https://d3js.org): Creating interactive controls and charts.
+
+Other minor plugins/functions are used. See `dependencies.tsv`.
+
+## Building & hacking
+
+Assumptions made:
+
+- standard Unix-like environment (cat, sed, echo, rsync, bmake...)
+- Energy Access Explorer infrastructure:
+  [database](https://github.com/energyaccessexplorer/database),
+  [API](https://github.com/energyaccessexplorer/api) and
+  [website](https://github.com/energyaccessexplorer/website)
+  should be up and running.
+
+The `makefile` (BSDmake) contains basic tasks for development/deployment. To get
+started, edit the `.env` file to match your needs.
+
+Now you can run in development mode with (`bmake` in Linux):
+    bash```
+    $ make build start
+    ```
+
+## Common Make Commands
+
+- `build-a:` Builds the "analysis" screen, creating the necessary files in the `dist/a` directory. This includes HTML, JavaScript, CSS, and other assets required for the analysis functionality.
+- `build-m:` Builds the "my screen" or "my data" section of the application, compiling resources into `dist/m`.
+- `build-s:` Builds the "select" or "dataset selection" screen, preparing the files within `dist/s`. This likely handles the interface for choosing datasets to visualize.
+- `build:`  The main build command. It invokes `build-a`, `build-s`, and `build-m` to build all parts of the application.
+- `default:` The default target, which runs `reconfig`, `build`, and `lint`. This is what executes if you just run `make` without specifying a target.
+- `deploy:` Deploys the built application to a remote server specified in the `.env` file. This involves creating and applying patch files and then running `sync`.
+- `deps:` Installs project dependencies and sets up necessary font files in the `lib` directory.
+- `help:` Generates and updates the "Available Make Commands" section in the `README.md` file.
+- `lint:`  Performs code linting using the linting tool specified in the `BIN` variable. This helps maintain code quality and consistency.
+- `reconfig:`  Reconfigures the project based on environment variables defined in the `.env` file. It generates a `settings.tmp.json` file containing project settings.
+- `start:` Starts a local development server using the `HTTP_SERVER` specified in your .env file to serve the built application.
+- `sync:` Synchronizes the `dist` directory with a remote server, effectively deploying the application.  Uses `rsync` to efficiently transfer only changed files.
+- `synced:` Performs a dry run of the `sync` command. This simulates the synchronization process without actually transferring any files, allowing you to preview what would be transferred.
 
 ## Development Workflow
 
@@ -65,4 +67,6 @@ Contributions are welcome! See the project wiki for detailed information on cont
 
 ## License
 
-This project is licensed under MIT. Additionally, you must read the [attribution page](https://www.energyaccessexplorer.org/attribution) before using any part of this project.
+This project is licensed under MIT. Additionally, you must read the
+[attribution page](https://www.energyaccessexplorer.org/attribution)
+before using any part of this project.

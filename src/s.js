@@ -186,7 +186,7 @@ export function init() {
 				gtag('event', 'button_click', {
 					'event_category': 'Country',
 					'event_label': 'User selects a country',
-					'value': c.id
+					'value': co.name
 				});
 				preload_boundaries(co.id);
 				setTimeout(_ => geography(co), 350);

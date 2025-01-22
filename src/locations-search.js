@@ -1,8 +1,11 @@
 import {
 	pointto as search_pointto,
 	zoom,
-	font_icon
 } from './search.js';
+
+import {
+	font_icon
+} from './utils.js';
 
 import {
 	text_search as mapbox_text_search,

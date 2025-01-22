@@ -1,6 +1,7 @@
 import {
 	svg_pie,
 	opacity_control,
+	font_icon
 } from './utils.js';
 
 import bind from '../lib/bind.js';

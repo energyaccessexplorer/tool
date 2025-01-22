@@ -1,6 +1,7 @@
 import {
 	pointto as search_pointto,
 	zoom,
+	font_icon
 } from './search.js';
 
 import {

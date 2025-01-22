@@ -4,6 +4,7 @@ import {
 	svg_interval,
 	opacity_control,
 	uniform_split,
+	font_icon
 } from './utils.js';
 
 import {

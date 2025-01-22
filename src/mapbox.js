@@ -1,5 +1,6 @@
 import {
 	super_error,
+	font_icon
 } from './utils.js';
 
 import bubblemessage from '../lib/bubblemessage.js';

@@ -2,6 +2,7 @@ import {
 	loading,
 	elem_collapse,
 	super_error,
+	font_icon
 } from './utils.js';
 
 import {

@@ -1,5 +1,6 @@
 import {
 	elem_collapse,
+	font_icon
 } from './utils.js';
 
 import DS from './ds.js';

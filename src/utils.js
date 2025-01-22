@@ -1,3 +1,30 @@
+export function font_icon(i) {
+    const iconsheet = {
+        "edit": "pencil-fill",
+        "show": "eye-fill",
+        "image": "card-image",
+        "test": "cone",
+        "staging": "shield-lock",
+        "production": "check-circle",
+        "open-tab": "box-arrow-in-up-right",
+        "upload": "cloud-upload",
+        "copy": "link",
+        "link": "link",
+        "fkey": "intersect",
+        "goto": "arrow-right-square",
+        "build": "wrench",
+        "drafts": "envelope-open",
+    };
+
+    let v = iconsheet[i];
+    if (undefined === v)
+        v = i;
+
+    return ce('i', null, {
+        class: "bi-" + v
+    });
+}
+
 export function uniform_split(n) {
 	return d3.range(0, 1.000000001, 1 / (n - 1));
 };

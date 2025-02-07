@@ -86,6 +86,8 @@ export default class dscontrols extends HTMLElement {
 	turn(t) {
 		this.main.classList[this.ds.on ? 'add' : 'remove']('active');
 		this.classList[this.ds.on ? 'add' : 'remove']('active');
+		this.setAttribute('tabindex', 0);
+		this.setAttribute('id', t.id);
 
 		if (this.checkbox) this.checkbox.change(t);
 	};

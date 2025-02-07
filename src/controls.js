@@ -57,6 +57,9 @@ export default class dscontrols extends HTMLElement {
 	};
 
 	render() {
+		this.setAttribute('tabindex', 0);
+		this.setAttribute('id', t.id);
+
 		this.checkbox = toggle_switch.call(this.ds, this.on);
 
 		attach.call(this, tmpl('#ds-controls-template'));
@@ -86,8 +89,6 @@ export default class dscontrols extends HTMLElement {
 	turn(t) {
 		this.main.classList[this.ds.on ? 'add' : 'remove']('active');
 		this.classList[this.ds.on ? 'add' : 'remove']('active');
-		this.setAttribute('tabindex', 0);
-		this.setAttribute('id', t.id);
 
 		if (this.checkbox) this.checkbox.change(t);
 	};

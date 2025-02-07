@@ -4,10 +4,6 @@ import {
 } from './search.js';
 
 import {
-	font_icon
-} from './utils.js';
-
-import {
 	text_search as mapbox_text_search,
 } from './mapbox.js';
 

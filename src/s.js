@@ -184,7 +184,7 @@ export async function init() {
 
 	function list(geographies) {
 		for (let co of geographies) {
-			const d = ce('div', ce('h2', co.name, { "class": 'country-name' }), { "id": co.name, "class": 'country-item', "ripple": "" });
+			const d = ce('a', ce('h2', co.name, { "class": 'country-name' }), { "id": co.name, "class": 'country-item', "ripple": "" });
 			d.onclick = async _ => {
 				// gtag('event', 'country', {
 				// 	'event_category': 'Country',

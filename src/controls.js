@@ -87,6 +87,13 @@ export default class dscontrols extends HTMLElement {
 		this.main.classList[this.ds.on ? 'add' : 'remove']('active');
 		this.classList[this.ds.on ? 'add' : 'remove']('active');
 
+		console.log('layer_selected', init.id, this.ds.on);
+		gtag('event', 'layer_selected', {
+			'event_category': 'Layer',
+			'event_label': init.id,
+			'value': this.ds.on
+		});
+
 		if (this.checkbox) this.checkbox.change(t);
 	};
 
@@ -215,12 +222,6 @@ function toggle_switch(init, callback) {
 	let status = init || false;
 
 	const active = getComputedStyle(document.body).getPropertyValue('--the-yellow');
-
-	gtag('event', 'layer_selected', {
-		'event_category': 'Layer',
-		'event_label': init.id,
-		'value': active
-	});
 
 	svg
 		.attr('width', svgwidth)

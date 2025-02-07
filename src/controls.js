@@ -214,7 +214,11 @@ function toggle_switch(init, callback) {
 
 	let status = init || false;
 
-	if (status) gtag('event', 'layer_selected', { 'value': init.id });
+	if (status) gtag('event', 'layer_selected', {
+		'event_category': 'Layer',
+		'event_label': init.id,
+		'value': 1
+	});
 
 	const active = getComputedStyle(document.body).getPropertyValue('--the-yellow');
 

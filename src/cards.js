@@ -4,7 +4,7 @@ import {
 	svg_interval,
 	opacity_control,
 	uniform_split,
-	font_icon
+	bi_icon,
 } from './utils.js';
 
 import {
@@ -620,28 +620,28 @@ export default class dscard extends HTMLElement {
 	list_elements() {
 		if (!this.ds.vectors?.geojson) return "";
 
-		const e = font_icon('table');
+		const e = bi_icon('table');
 		e.onclick = this.ds.features_table_modal.bind(this.ds);
 
 		return e;
 	};
 
 	info() {
-		const e = font_icon('info-circle');
+		const e = bi_icon('info-circle');
 		e.onclick = this.ds.info_modal.bind(this.ds);
 
 		return e;
 	};
 
 	ctrls() {
-		const e = font_icon('gear');
+		const e = bi_icon('gear');
 		e.onclick = _ => qs('.advanced-controls', this).style.display = ((this.show_advanced = !this.show_advanced)) ? 'block' : 'none';
 
 		return e;
 	}
 
 	close() {
-		const e = font_icon('x-lg');
+		const e = bi_icon('x-lg');
 		e.onclick = O.ds.bind(null, this.ds, { 'active': false });
 
 		return e;

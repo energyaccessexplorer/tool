@@ -1,7 +1,7 @@
 import {
 	svg_pie,
 	opacity_control,
-	font_icon
+	bi_icon,
 } from './utils.js';
 
 import bind from '../lib/bind.js';
@@ -185,11 +185,11 @@ export function init() {
 	c.style['left'] = '-2px';
 
 	const info = qs('#index-graphs-info');
-	info.append(font_icon('info-circle'));
+	info.append(bi_icon('info-circle'));
 	info.onclick = open_modal;
 
 	const download = qs('#index-graphs-download');
-	download.append(font_icon('image'));
+	download.append(bi_icon('card-image'));
 	download.onclick = async _ => {
 		if (!user_id) {
 			register_login();
@@ -233,7 +233,7 @@ export function list() {
 				ce('span', null, { "class": 'radio' }),
 				ce('span', v, { "class": 'name' }),
 			], { "ripple": "" }),
-			ce('td', font_icon('collection'), { "class": 'analysis-to-dataset' }),
+			ce('td', bi_icon('collection'), { "class": 'analysis-to-dataset' }),
 		);
 
 		if (!enough_datasets(t))

@@ -1,5 +1,6 @@
 import {
 	loading,
+	self,
 } from './utils.js';
 
 import modal from '../lib/modal.js';
@@ -164,7 +165,9 @@ async function presets_init() {
 		});
 };
 
-export function init() {
+export async function init() {
+	await self();
+
 	const playground = qs('#playground');
 
 	function hextostring(hex) {
@@ -230,11 +233,20 @@ export function init() {
 		loading(false);
 	};
 
-	API.get("geographies", {
+	const params = {
 		"select":     ['*', 'datasets_count'],
 		"adm":        "eq.0",
 		"deployment": `ov.{${ENV}}`,
-	})
+	};
+
+	if (or(ENV.includes('training'), ENV.includes('staging'))) {
+		params['circle'] = "not.is.null"; // whatever: everything.
+
+		if (!["director", "root"].includes(SELF.role))
+			params['circle'] = `in.(${SELF.data.circles})`;
+	}
+
+	API.get("geographies", params)
 		.then(r => list(r))
 		.catch(error => {
 			FLASH.push({

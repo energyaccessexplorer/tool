@@ -58,29 +58,34 @@ export default class dscontrols extends HTMLElement {
 
 	render() {
 		this.setAttribute('tabindex', 0);
-		this.setAttribute('id', t.id);
-
+	  
+		if (!this.ds || !this.ds.id) {
+		  throw new Error('dscontrols: Missing or invalid `ds` object.');
+		}
+	  
+		this.setAttribute('id', this.ds.id);
+	  
 		this.checkbox = toggle_switch.call(this.ds, this.on);
-
+	  
 		attach.call(this, tmpl('#ds-controls-template'));
-
+	  
 		this.main = qs('main', this);
 		this.header = qs('header', this);
 		this.spinner = qs('.loading', this);
-
+	  
 		this.header.onclick = header_click.call(this);
-
+	  
 		slot_populate.call(this, Object.assign({}, this.ds, {
-			"checkbox":    this.checkbox.svg,
-			"description": this.ds.description || this.ds.category.description,
-			"card":        this.card(),
-			"info":        this.info(),
+		  "checkbox":    this.checkbox.svg,
+		  "description": this.ds.description || this.ds.category.description,
+		  "card":        this.card(),
+		  "info":        this.info(),
 		}));
-
+	  
 		this.inject();
-
+	  
 		return this;
-	};
+	};	  
 
 	loading(t) {
 		this.spinner.style.display = t ? 'block' : 'none';

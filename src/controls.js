@@ -214,13 +214,13 @@ function toggle_switch(init, callback) {
 
 	let status = init || false;
 
-	if (status) gtag('event', 'layer_selected', {
+	const active = getComputedStyle(document.body).getPropertyValue('--the-yellow');
+
+	gtag('event', 'layer_selected', {
 		'event_category': 'Layer',
 		'event_label': init.id,
-		'value': 1
+		'value': active
 	});
-
-	const active = getComputedStyle(document.body).getPropertyValue('--the-yellow');
 
 	svg
 		.attr('width', svgwidth)

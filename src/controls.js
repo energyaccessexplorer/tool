@@ -87,12 +87,6 @@ export default class dscontrols extends HTMLElement {
 		this.main.classList[this.ds.on ? 'add' : 'remove']('active');
 		this.classList[this.ds.on ? 'add' : 'remove']('active');
 
-		gtag('event', 'layer_selected', {
-			'event_category': 'Layer',
-			'event_label': init.id,
-			'value': this.ds.on
-		});
-
 		if (this.checkbox) this.checkbox.change(t);
 	};
 

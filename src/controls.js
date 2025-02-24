@@ -57,7 +57,7 @@ export default class dscontrols extends HTMLElement {
 	};
 
 	render() {
-		this.checkbox = toggle_switch.call(this.ds, this.on);
+		this.checkbox = toggle_switch.call(this.ds.name, this.ds, this.on);
 
 		attach.call(this, tmpl('#ds-controls-template'));
 
@@ -87,7 +87,6 @@ export default class dscontrols extends HTMLElement {
 		this.main.classList[this.ds.on ? 'add' : 'remove']('active');
 		this.classList[this.ds.on ? 'add' : 'remove']('active');
 
-		console.log('layer_selected', init.id, this.ds.on);
 		gtag('event', 'layer_selected', {
 			'event_category': 'Layer',
 			'event_label': init.id,
@@ -203,7 +202,7 @@ export function toggle_ds() {
 		});
 };
 
-function toggle_switch(init, callback) {
+function toggle_switch(ds, init, callback) {
 	const radius = 10;
 	const svgwidth = 38;
 	const svgheight = (radius * 2) + 2;
@@ -211,7 +210,9 @@ function toggle_switch(init, callback) {
 	const svgmax = svgwidth - radius - 1;
 
 	const svg = d3.create("svg")
-		.attr('class', 'svg-checkbox');
+		.attr('class', 'svg-checkbox')
+		.attr('data-layer-name', ds.name)
+		.attr('id', ds.id);
 
 	const g = svg.append('g');
 

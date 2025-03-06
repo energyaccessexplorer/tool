@@ -76,8 +76,6 @@ export default class DS {
 
 		DST.set(this.id, this);
 
-		this.loaded = false;
-
 		this.init(o);
 	};
 
@@ -681,13 +679,10 @@ This is not fatal but the dataset is now disabled.`,
 	};
 
 	loadall() {
-		if (this.loaded) return Whatever;
-
 		return Whatever
 			.then(_ => this.load('csv'))
 			.then(_ => this.load('vectors'))
-			.then(_ => this.load('raster'))
-			.then(_ => (this.loaded = true));
+			.then(_ => this.load('raster'));
 	};
 
 	async load(arg) {

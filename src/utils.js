@@ -1,3 +1,13 @@
+export async function self() {
+	try {
+		const id = jwt_decode(localStorage['token']).id;
+		SELF = (await API.get('users', { "id": `eq.${id}` }, { "one": true }));
+	} catch (err) {
+		console.warn(err);
+		SELF = { "data": { "circles": [], "envs": [] } };
+	}
+};
+
 export function uniform_split(n) {
 	return d3.range(0, 1.000000001, 1 / (n - 1));
 };
@@ -383,8 +393,12 @@ export function elem_collapse(el, t, open) {
 	}
 };
 
-export function loading(bool) {
-	qs('#app-loading').style['display'] = bool ? 'block' : 'none';
+export function loading(msg, perc) {
+	const el = qs('#app-loading');
+	el.style['display'] = msg ? 'block' : 'none';
+	qs('#loading-message', el).innerText = (typeof msg === 'string') ? msg : "Loading...";
+
+	if (perc) console.log("perc?", perc);
 };
 
 export function super_error(t, m, e = "error") {
@@ -514,4 +528,23 @@ export function raster_pixel_to_coordinates(i) {
 	const s = GEOGRAPHY.resolution;
 
 	return merc.inverse([o[0] + (x * s), o[1] - (y * s)]);
+};
+
+export function extent_contained(extent, raster) {
+	const [left,bottom,right,top] = extent;
+
+	const f = (x,y) => {
+		const v = maybe(coordinates_to_raster_pixel([x,y], raster), 'value');
+		return and(v, v !== raster.nodata);
+	};
+
+	return or(f(left, top),
+	          f(left, bottom),
+	          f(right, top),
+	          f(right, bottom),
+	          f((right - left) / 2, (top - bottom) / 2));
+};
+
+export function bi_icon(v) {
+	return ce('i', null, { "class": "bi-" + v });
 };

@@ -1,8 +1,23 @@
 import {
+	vectors_csv as parse_vectors_csv,
+	raster_timeline as parse_raster_timeline,
+} from './parse.js';
+
+import {
 	loading,
 	elem_collapse,
 	super_error,
+	bi_icon,
+	self,
 } from './utils.js';
+
+import {
+	analysis_dataset_intersect,
+} from './complicated.js';
+
+import {
+	recount as controls_recount,
+} from './controls.js';
 
 import {
 	init as controlssearch_init,
@@ -10,6 +25,7 @@ import {
 
 import {
 	init as geographiessearch_init,
+	load as geographiessearch_load,
 } from './geographies-search.js';
 
 import {
@@ -29,135 +45,240 @@ import {
 } from './points-loading.js';
 
 import {
+	priority,
+	plot_active as analysis_plot_active,
+} from './analysis.js';
+
+import {
+	lines_update as timeline_lines_update,
+} from './timeline.js';
+
+import {
+	valued_polygons as filtered_valued_polygons,
+	colors_array as filtered_colors_array,
+} from './filtered.js';
+
+import {
 	init as config_init,
+	load_datasets,
 } from './config.js';
 
 import {
-	init as views_init,
 	buttons as views_buttons,
+	init as views_init,
 	right_pane as views_right_pane,
 } from './views.js';
 
 import {
 	init as mapbox_init,
-	fit as mapbox_fit,
-	theme_init as mapbox_theme_init,
 } from './mapbox.js';
 
 import {
 	init as cards_init,
+	update as cards_update,
 } from './cards.js';
 
 import {
 	init as indexes_init,
+	list as indexes_list,
 } from './indexes.js';
-
-import {
-	init as help_init,
-} from './help.js';
 
 import {
 	init as timeline_init,
 } from './timeline.js';
 
 import {
-	select_tab as controls_select_tab,
-} from './controls-search.js';
-
-import {
-	init as session_init,
-} from './session.js';
-
-import {
 	run as qa_run,
 } from './qa.js';
+
+import {
+	sort as mapbox_sort,
+	fit as mapbox_fit,
+} from './mapbox.js';
 
 import DS from './ds.js';
 
 import admintiers from './admin-tiers.js';
 
-import Overlord from './overlord.js';
-
 import bubblemessage from '../lib/bubblemessage.js';
 
-const Uproxy = {
-	"get": function(url,p) {
-		const i = url.searchParams.get(p);
+COMMIT = debounce(function() {
+	if (DEBUG || ENV.includes("test")) console.trace("commit!", ...arguments);
 
-		let v;
-		switch (p) {
-		case "subdiv":
-		case "divtier": {
-			const x = parseInt(i);
-			v = (isNaN(x)) ? null : x;
+	if (!OUTLINE.raster.data) {
+		console.warn("waiting for OUTLINE...");
+		COMMIT();
+
+		return;
+	}
+
+	reload(...arguments);
+
+	window.dispatchEvent(new Event('resize'));
+}, 300);
+
+function state_get(conf, p) {
+	switch (p) {
+	case "tab":
+	case "subdiv":
+	case "divtier":
+	case "index":
+	case "variant":
+	case "center":
+	case "zoom":
+	case "timeline":
+	case "view": {
+		return conf[p];
+	}
+
+	case "config": {
+		return conf;
+	}
+
+	case "datasets": {
+		return conf.datasets.map(d => DST.get(d.id));
+	}
+
+	default: {
+		throw new Error(`Unknown attribute '${p}'`);
+	}
+	}
+};
+
+function state_set(conf, p, v) {
+	switch (p) {
+	case "tab": {
+		if (!['controls', 'cards', 'vectors', 'analysis', 'geographies', 'locations', 'points', 'config'].includes(v))
+			return false;
+
+		break;
+	}
+
+	case "subdiv": {
+		if (v >= 0) break;
+		return false;
+	}
+
+	case "divtier": {
+		if (and(v >= 0, v < 10)) break;
+		return false;
+	}
+
+	case "variant": {
+		if (v === "raster") break;
+		if ([1, 2, 3, 4, 5, 6, 7, 8, 9].includes(+v)) {
+			v = +v;
 			break;
 		}
 
-		default: {
-			v = (i === "" ? null : i);
+		return false;
+	}
+
+	case "index": {
+		if (['eai', 'ani', 'demand', 'supply'].includes(v)) break;
+		return false;
+	}
+
+	case "view": {
+		if (['data', 'filtered', 'analysis'].includes(v)) break;
+		return false;
+	}
+
+	case "datasets": {
+		if (v.every(d => d instanceof DS)) {
+			v = unique(v);
 			break;
 		}
-		}
+		return false;
+	}
 
-		return v;
-	},
+	case "zoom": {
+		if (and(v >= 0, v <= 20)) break;
+		return false;
+	}
 
-	"set": function(url,t,v) {
-		switch (t) {
-		case "tab":
-		case "output":
-		case "variant":
-		case "view": {
-			if (!PARAMS[t].includes(v)) v = PARAMS[t][0];
-			url.searchParams.set(t,v);
-			break;
-		}
+	case "center": {
+		if (v.hasOwnProperty('lng') && v.hasOwnProperty('lat')) break;
+		return false;
+	}
 
-		case "timeline": {
-			url.searchParams.set(t, v || GEOGRAPHY.timeline_dates.slice(-1)[0]);
-			break;
-		}
+	case "timeline": {
+		if (!isNaN(new Date(v))) break;
+		return false;
+	}
 
-		case "subdiv":
-		case "divtier": {
-			url.searchParams.set(t, parseInt(v) || 0);
-			break;
-		}
+	default: {
+		throw new Error(`Unknown attribute '${p}'`);
+	}
+	}
 
-		default: {
-			throw new TypeError(`U: I'm not allowed to set '${t}'`);
-		}
-		}
+	conf[p] = v;
+	COMMIT(p,v);
 
-		history.replaceState(null, null, url);
-
-		return true;
-	},
+	return true;
 };
 
 export function init() {
+	self();
+
 	Whatever
 		.then(init_1)
 		.then(init_2)
-		.then(init_3);
+		.then(init_3)
+		.then(init_4);
 };
 
 async function init_1() {
 	const url = new URL(location);
 	const id = url.searchParams.get('id');
 
+	let conf = sessionStorage.getItem('config');
+	if (conf) conf = JSON.parse(conf);
+
+	const s = url.searchParams.get('snapshot');
+	if (s) {
+		loading("Fetching snapshot...");
+
+		sessionStorage.removeItem('config');
+
+		conf = await API.get('rpc/snapshot', { "_time": s }, { "one": true })
+			.catch(_ => {})
+			.then(r => SNAPSHOT = r)
+			.then(r => r['config']);
+	}
+
+	conf = conf ?? {
+		"index":    "eai",
+		"view":     "analysis",
+		"variant":  "raster",
+		"tab":      "controls",
+		"datasets": [],
+	};
+
+	STATE = new Proxy(conf, { "get": state_get, "set": state_set });
+
+	drawer_init();
+	cards_init();
+
+	loading("Fetching geography...");
+
 	GEOGRAPHY = await API.get("geographies", {
 		"id":     `eq.${id}`,
 		"select": ['*', 'parent_sort_branches', 'parent_sort_subbranches', 'parent_sort_datasets'],
 	}, { "one": true });
 
+	views_init();
+
 	MOBILE = screen.width < 1152;
+
 	GEOGRAPHY.timeline = maybe(GEOGRAPHY, 'configuration', 'timeline');
+	GEOGRAPHY.timeline_dates = maybe(GEOGRAPHY, 'configuration', 'timeline_dates');
+
 	layout();
 
 	const mac = navigator.userAgent.indexOf('Mac') > -1;
 
-	if (window.devicePixelRatio !== 1) alert(`
+	if (!MOBILE && window.devicePixelRatio !== 1) alert(`
 Energy Access Explorer is optimised for display settings that differ from yours.
 
 If the layout feels cramped, try zooming out to ${Math.round(1/window.devicePixelRatio * 100)}%.
@@ -165,145 +286,34 @@ If the layout feels cramped, try zooming out to ${Math.round(1/window.devicePixe
 On your OS, you can do this by pressing (${mac ? "⌘" : "ctrl"} −) a couple times.
 `);
 
-	O = new Overlord();
+	loading("Inialising mapbox...");
 
-	MAPBOX = mapbox_init();
-	MAPBOX.coords = mapbox_fit(GEOGRAPHY.envelope);
+	mapbox_init();
 
 	if (MOBILE) mobile();
 
-	mapbox_theme_init(EAE['settings'].mapbox_theme);
-
-	GEOGRAPHY.timeline_dates = maybe(GEOGRAPHY, 'configuration', 'timeline_dates');
-
-	session_init();
-
-	PARAMS = {
-		"view":    ['inputs', 'filtered', 'outputs'],
-		"output":  ['eai', 'ani', 'demand', 'supply'],
-		"variant": ['raster', '1', '2', '3', '4', '5', '6', '7', '8'],
-		"subdiv":  [],
-		"divtier": [],
-		"tab":     ['controls', 'cards', 'vectors', 'analysis', 'geographies', 'locations', 'points', 'config'],
-	};
-
-	U = new Proxy(url, Uproxy);
-	U.tab = null;
-	U.variant = null;
-
-	drawer_init();
-	views_init();
-	cards_init();
-
-	loading(false);
+	return conf;
 };
 
-async function init_2() {
-	await dsinit(GEOGRAPHY.id);
-
-	indexes_init();
-
-	let conf = sessionStorage.getItem('config');
-	if (conf) conf = JSON.parse(conf);
-
-	const url = new URL(location);
-	const stamp = url.searchParams.get('snapshot');
-	if (stamp) {
-		sessionStorage.removeItem('config');
-
-		conf = await API.get('snapshots', { "time": `eq.${stamp}` }, { "one": true })
-			.catch(_ => {})
-			.then(r => r['config']);
-	}
-
-	O.config = conf;
-
-	O.index = U.output;
-
-	controlssearch_init();
-	geographiessearch_init();
-	vectorssearch_init();
-	analysissearch_init();
-	locationssearch_init();
-	points_init();
-	config_init();
-
-	toggle_left_panel(U.tab);
-
-	if (GEOGRAPHY.timeline) timeline_init();
-
-	if (!MOBILE && !GEOGRAPHY.timeline) {
-		try {
-			help_init();
-		} catch(e) {
-			console.warn("Disabling the nanny helper.", e);
-
-			qs('#drawer-help').remove();
-		}
-	}
-
-	await Promise.all(DS.all("on").map(d => d._active(true, false)));
-
-	qa_run();
-};
-
-async function init_3() {
-	O.view = U.view;
-	O.config = null;
-};
-
-export function clean() {
-	U.output = 'eai';
-	U.view = 'inputs';
-
-	DS.all("on").forEach(d => d.active(false, false));
-
-	DS.array.forEach(d => {
-		d._domain = json_clone(d.domain);
-
-		if (maybe(d, 'controls', 'weight_group'))
-			d.controls.weight_group.change({ "min": 0, "max": maybe(d.category, 'analysis', 'weight') });
-	});
-
-	qs('input#controls-search').value = "";
-	qs('input#controls-search').dispatchEvent(new Event('input'));
-
-	for (let e of qsa('.controls-subbranch'))
-		elem_collapse(qs('.controls-container', e), e);
-
-	O.view = 'inputs';
-};
-
-/*
- * dsinit
- *
- * 1. fetch the datasets list from the API
- * 2. generate DS objects
- * 3. initialise mutants and collections
- *
- * @param "id" uuid
- * @param "inputs" string[] with DS.id's
- *
- * returns DS[]
- */
-
-async function dsinit(id) {
+async function init_2(conf) {
 	let select = ["*", "datatype", "category:categories(*)"];
 
 	const divisions = maybe(GEOGRAPHY.configuration, 'divisions').filter(d => d.dataset_id !== null);
 
 	GEOGRAPHY.divisions = [];
 
+	loading("Fetching datasets...");
+
 	const ALL = await API.get("datasets", {
-		"geography_id": `eq.${id}`,
+		"geography_id": `eq.${GEOGRAPHY.id}`,
 		"select":       select,
 		"deployment":   `ov.{${ENV}}`,
 		"flagged":      "is.false",
 	});
 
 	await (async function outline() {
-		const OUTLINE_JSON = ALL.find(d => d.id === divisions[0].dataset_id);
-		if (!OUTLINE_JSON) {
+		const json = ALL.find(d => d.id === divisions[0].dataset_id);
+		if (!json) {
 			const m = `
 Failed to get the geography's OUTLINE.
 This is fatal. Thanks for all the fish.`;
@@ -313,7 +323,8 @@ This is fatal. Thanks for all the fish.`;
 			throw new Error("No OUTLINE");
 		}
 
-		OUTLINE = new DS(OUTLINE_JSON);
+		OUTLINE = new DS(json);
+
 		await OUTLINE.load('vectors');
 		await OUTLINE.load('raster');
 
@@ -321,6 +332,8 @@ This is fatal. Thanks for all the fish.`;
 	})();
 
 	await (function fetch_divisions() {
+		loading("Fetching divisions...");
+
 		const divisions_ids = divisions.slice(1).map(d => d.dataset_id);
 
 		return Promise.all(
@@ -339,6 +352,8 @@ This is fatal. Thanks for all the fish.`;
 
 	(async function fetch_admintiers() {
 		let o = ALL.find(x => x.category.name === 'admin-tiers');
+
+		loading("Fetching admintrative tiers...");
 
 		if (!o) {
 			const pid = maybe(
@@ -359,6 +374,8 @@ This is fatal. Thanks for all the fish.`;
 		admintiers(o);
 	})();
 
+	loading("Setting up datasets...");
+
 	GEOGRAPHY.divisions = divisions
 		.map(d => DS.array.find(t => t.dataset_id === d.dataset_id))
 		.filter((d,i) => {
@@ -367,9 +384,11 @@ This is fatal. Thanks for all the fish.`;
 					"title":   "Geography Divisions configuration error",
 					"message": `Divisions ${i} not found. Other datasets might fail to load...`,
 				});
+
+				return false;
 			}
 
-			return !!d;
+			return true;
 		});
 
 	ALL
@@ -381,21 +400,294 @@ This is fatal. Thanks for all the fish.`;
 	// mutant attributes (order is never guaranteed)
 	//
 	DS.array.filter(d => d.mutant).forEach(d => d.mutant_init());
+
+	await load_datasets(conf.datasets);
+};
+
+async function init_3() {
+	loading("Setting up UI elements...");
+
+	indexes_init();
+	controlssearch_init();
+	geographiessearch_init();
+	vectorssearch_init();
+	analysissearch_init();
+	locationssearch_init();
+	points_init();
+	config_init();
+	timeline_init();
+	qa_run();
+};
+
+async function init_4() {
+	left_panel("controls");
+	qs('#left-pane').style.display = '';
+	qs('#left-pane input[id="controls-search"]').focus();
+
+	qs('#right-pane').style.display = '';
+
+	COMMIT("datasets");
+	delay(0.3).then(_ => mapbox_fit(GEOGRAPHY.envelope));
+
+	loading(false);
+};
+
+async function reload(k,v) {
+	if (k === "center") {
+		MAPBOX.setCenter(v, false);
+		return;
+	}
+
+	if (k === "zoom") {
+		MAPBOX.setZoom(v, false);
+		return;
+	}
+
+	if (k === "tab") {
+		left_panel(v);
+		return;
+	}
+
+	if (or(k === "subdiv", k === "divtier"))
+		geographiessearch_load(STATE.divtier, STATE.subdiv);
+
+	const timeline = qs('#timeline');
+	const output_preview = qs('#output-preview');
+
+	const {view, index} = STATE;
+
+	(function special_layers() {
+		if (!MAPBOX.getSource('output-source')) {
+			MAPBOX.addSource('output-source', {
+				"type":        'canvas',
+				"canvas":      'output',
+				"animate":     false,
+				"coordinates": MAPBOX.coords,
+			});
+		}
+
+		if (!MAPBOX.getLayer('output-layer')) {
+			MAPBOX.addLayer({
+				"id":     'output-layer',
+				"source": 'output-source',
+				"type":   'raster',
+				"layout": {
+					"visibility": "none",
+				},
+				"paint": {
+					"raster-resampling": "nearest",
+				},
+			}, MAPBOX.first_symbol);
+		}
+
+		GEOGRAPHY.divisions.forEach((d,i) => {
+			if (!MAPBOX.getSource(`filtered-source-${i}`)) {
+				MAPBOX.addSource(`filtered-source-${i}`, {
+					"type": 'geojson',
+					"data": d.vectors.geojson,
+				});
+			}
+
+			if (!MAPBOX.getLayer(`filtered-layer-${i}`)) {
+				MAPBOX.addLayer({
+					"id":     `filtered-layer-${i}`,
+					"source": `filtered-source-${i}`,
+					"type":   'fill',
+					"layout": {
+						"visibility": "none",
+					},
+					"paint": {
+						"fill-color":         filtered_colors_array[i],
+						"fill-outline-color": "black",
+						"fill-opacity":       [ "case", [ "boolean", [ "get", "__visible" ], true ], 0.5, 0 ],
+					},
+				}, MAPBOX.first_symbol);
+			}
+
+			if (!MAPBOX.getSource(`priority-source-${i}`)) {
+				if (i === 0) return;
+
+				MAPBOX.addSource(`priority-source-${i}`, {
+					"type": 'geojson',
+					"data": json_clone(d.vectors.geojson),
+				});
+			}
+
+			if (!MAPBOX.getLayer(`priority-layer-${i}`)) {
+				if (i === 0) return;
+
+				MAPBOX.addLayer({
+					"id":     `priority-layer-${i}`,
+					"source": `priority-source-${i}`,
+					"type":   'fill',
+					"layout": {
+						"visibility": "none",
+					},
+					"paint": {
+						"fill-color":         [ "get", "__fill" ],
+						"fill-outline-color": "black",
+						"fill-opacity":       1,
+					},
+				}, MAPBOX.first_symbol);
+			}
+		});
+	})();
+
+	function filtered_visibility(v) {
+		const a = STATE.datasets.map(d => maybe(d, 'config', 'divisions_tier'));
+
+		GEOGRAPHY.divisions.forEach((_,i) => {
+			let y = (a.indexOf(i) < 0) ? 'none' : v;
+
+			if (MAPBOX.getLayer(`filtered-layer-${i}`))
+				MAPBOX.setLayoutProperty(`filtered-layer-${i}`, 'visibility', y);
+		});
+	};
+
+	function output_visibility(v) {
+		if (MAPBOX.getLayer('output-layer'))
+			MAPBOX.setLayoutProperty('output-layer', 'visibility', v);
+	};
+
+	function priority_visibility_pick() {
+		const x = STATE.variant !== "raster";
+
+		GEOGRAPHY.divisions.forEach((d,i) => {
+			const t = STATE.variant;
+
+			if (MAPBOX.getLayer(`priority-layer-${i}`))
+				MAPBOX.setLayoutProperty(`priority-layer-${i}`, 'visibility', x && (t === i) ? "visible" : "none");
+		});
+	};
+
+	function datasets_visibility(v) {
+		return Promise.all(STATE.datasets.map(x => x.active(true, v)));
+	};
+
+	if (k === "datasets") {
+		controls_recount();
+
+		const a = await analysis_plot_active(index, true);
+
+		const t = STATE.variant;
+
+		if (GEOGRAPHY.divisions[t])
+			priority(GEOGRAPHY.divisions[t], a, t);
+	}
+
+	switch (view) {
+	case "analysis": {
+		indexes_list();
+
+		await datasets_visibility(false);
+
+		if (timeline) timeline.style.display = 'none';
+
+		filtered_visibility('none');
+
+		output_visibility(STATE.variant === 'raster' ? 'visible' : 'none');
+
+		priority_visibility_pick();
+
+		views_right_pane();
+
+		output_preview.style.display = 'none';
+
+		break;
+	}
+
+	case "data": {
+		filtered_visibility('none');
+
+		output_visibility('none');
+
+		priority_visibility_pick();
+
+		output_preview.style.display = '';
+
+		views_right_pane();
+
+		await datasets_visibility(true);
+
+		if (timeline) timeline_lines_update();
+
+		break;
+	}
+
+	case "filtered": {
+		if (timeline) timeline.style.display = 'none';
+
+		await datasets_visibility(false);
+
+		filtered_visibility('visible');
+
+		output_visibility('none');
+
+		priority_visibility_pick();
+
+		filtered_valued_polygons();
+
+		output_preview.style.display = '';
+
+		views_right_pane();
+
+		break;
+	}
+
+	default: {
+		throw new Error(`Invalid view '${view}'`);
+	}
+	}
+
+	if (k === "datasets") {
+		cards_update();
+		mapbox_sort();
+
+		STATE.datasets.forEach(async d => {
+			if (d.datatype.match(/raster-timeline/))
+				parse_raster_timeline.call(d);
+
+			else if (d.datatype.match(/(lines|points|polygons)-timeline/))
+				parse_vectors_csv.call(d);
+		});
+	}
+
+	views_buttons(view);
+
+	timeline_visibility();
+};
+
+export function clean() {
+	STATE.index = 'eai';
+	STATE.view = 'data';
+
+	STATE.datasets.forEach(d => d.active(false, false));
+
+	COMMIT("datasets");
+
+	DS.array.forEach(d => {
+		d._domain = json_clone(d.domain);
+
+		if (maybe(d, 'controls', 'weight_group'))
+			d.controls.weight_group.change({ "min": 0, "max": maybe(d.category, 'analysis', 'weight') });
+	});
+
+	qs('input#controls-search').value = "";
+	qs('input#controls-search').dispatchEvent(new Event('input'));
+
+	for (let e of qsa('.controls-subbranch'))
+		elem_collapse(qs('.controls-container', e), e);
 };
 
 function layout() {
 	const n = qs('nav');
 	const p = qs('#playground');
 	const w = qs('#mobile-switcher');
-
-	const m = qs('#maparea', p);
 	const t = qs('#timeline');
 
 	function set_heights() {
 		p.style['height'] = window.innerHeight - n.clientHeight - (MOBILE ? w.clientHeight : 0) + "px";
 	};
-
-	if (MOBILE) m.style['width'] = screen.width + "px";
 
 	if (GEOGRAPHY.timeline)
 		console.warn("TODO #timeline-graphs", qs('#timeline-graphs'));
@@ -409,20 +701,12 @@ function layout() {
 };
 
 function mobile() {
-	controls_select_tab(qs('#controls-tab-all'), "all");
-
-	for (let el of qsa('.controls-subbranch')) {
-		elem_collapse(qs('.controls-container', el), el);
-	}
-
 	const switcher = qs('#mobile-switcher');
 
-	const svgcontrols = ce('div', font_icon('list-task'), { "bind": 'controls', "ripple": "" });
-	const map = ce('div', font_icon('globe'), { "bind": 'map', "ripple": "" });
-	const inputs = ce('div', font_icon('layers-fill'), { "bind": 'inputs', "ripple": "" });
-	const outputs = ce('div', font_icon('pie-chart-fill'), { "bind": 'outputs', "ripple": "" });
+	const map = ce('div', bi_icon('map'), { "bind": 'map', "ripple": "" });
+	const outputs = ce('div', bi_icon('pie-chart'), { "bind": 'outputs', "ripple": "" });
 
-	const tabs = [svgcontrols, map, inputs, outputs];
+	const tabs = [map, outputs];
 
 	function mobile_switch(v) {
 		switch (v) {
@@ -436,37 +720,26 @@ function mobile() {
 			break;
 		}
 
-		case 'right': {
-			for (let e of ['#left-pane'])
+		case 'outputs': {
+			for (let e of ['#left-pane', '#views'])
 				qs(e).style.display = 'none';
 
 			for (let e of ['#right-pane'])
 				qs(e).style.display = '';
 
-			break;
-		}
-
-		case 'outputs':
-		case 'inputs': {
-			for (let e of ['#left-pane'])
-				qs(e).style.display = 'none';
-
-			for (let e of ['#right-pane'])
-				qs(e).style.display = '';
-
-			U.view = v;
+			STATE.view = v;
 
 			views_right_pane();
-			views_buttons();
+
 			break;
 		}
 
 		case 'map':
 		default: {
-			for (let e of ['#right-pane', '#left-pane', '#views'])
+			for (let e of ['#right-pane', '#views'])
 				qs(e).style.display = 'none';
 
-			for (let e of ['#views'])
+			for (let e of ['#left-pane', '#views'])
 				qs(e).style.display = '';
 
 			break;
@@ -488,7 +761,7 @@ function mobile() {
 	map.click();
 };
 
-export function toggle_left_panel(t) {
+export function left_panel(t) {
 	for (let m of qsa('bubble-message')) m.remove();
 
 	for (let e of qsa('#left-pane > div'))
@@ -520,8 +793,6 @@ export function toggle_left_panel(t) {
 
 	const tl = qs('#timeline');
 	if (tl) tl.dispatchEvent(rs);
-
-	U.tab = t;
 };
 
 function drawer_init() {
@@ -531,10 +802,8 @@ function drawer_init() {
 
 	for (let a of as) {
 		a.onclick = function() {
-			toggle_left_panel(
-				this.classList.contains('active') ? null :
-					this.getAttribute('for'),
-			);
+			if (!this.classList.contains('active'))
+				STATE.tab = this.getAttribute('for');
 		};
 
 		a.onmouseenter = function() {
@@ -551,6 +820,50 @@ function drawer_init() {
 			if (p) p.remove();
 		};
 	}
+};
 
-	toggle_left_panel(U.tab);
+export async function sort(ordered) {
+	if (ordered) STATE.datasets = ordered;
+
+	await mapbox_sort();
+
+	const a = ordered[0];
+	if (!a.summary) return;
+
+	for (const d of ordered) {
+		if (!a.summary) {
+			reset_features_visibility.call(d);
+			continue;
+		}
+
+		analysis_dataset_intersect.call(d, a.raster);
+	};
+};
+
+function reset_features_visibility() {
+	const fs = maybe(this, 'vectors', 'geojson');
+	if (!fs) return;
+
+	fs.features.forEach(f => f.properties['__visible'] = true);
+
+	qsa('input[type="checkbox"]', this.card).forEach(c => c.checked = true);
+
+	const source = MAPBOX.getSource(this.id);
+	if (source) source.setData(fs);
+	else console.debug("reset_features_visibility: could not find source '%s'. First load? -> OK.", this.id);
+};
+
+function timeline_visibility() {
+	const timeline = qs('#timeline');
+
+	if (!timeline) return;
+
+	let v = '';
+
+	const d = qsa('ds-card', qs('#cards-list'), true).map(c => c.ds)[0];
+
+	if (maybe(d, 'timeline')) ;
+	else v = 'none';
+
+	timeline.style.display = v;
 };

@@ -1,32 +1,52 @@
-<template id="session">
-  <div class="session-square"
+<template id="snapshot">
+  <div class="snapshot-square"
        bind-attr="data"
        bind-arg="time">
-    <h4>
+    <header>
+      <strong class="title"
+              bind="title"></strong>
+
+      <p class="path"
+         bind="path"></p>
+
+      <div class="title-edit">
+        <span class="bi bi-pencil"></span>
+        <span class="bi bi-x-lg"></span>
+      </div>
+    </header>
+
+    <content>
+      <p bind="date"
+         class="date"></p>
+
+      <div class="env"
+           bind-differs="env"
+           bind-arg="production">
+        <strong bind="env"></strong>
+      </div>
+    </content>
+
+    <footer>
       <a bind-attr="href"
          bind-arg="url"
          target="_blank">
-        <span class="title" bind="title"></span>
-        &nbsp;
         <i class="bi bi-box-arrow-up-right"></i>
+        Open
       </a>
-    </h4>
 
-    <div class="title-edit">
-      <span class="bi bi-pencil"></span>
-      <span class="bi bi-x-lg"></span>
-    </div>
+      <span>
+        <button class="download">
+          <i class="bi bi-download"></i>
+          Download
+        </button>
 
-    <p bind="date" class="date"></p>
+        &nbsp;
 
-    <h4 bind="path"></h4>
-
-    <div class="env"
-         bind-differs="env"
-         bind-arg="production">
-      <strong bind="env"></strong>
-    </div>
-
-    <div class="download"><span class="bi bi-download"></span>&nbsp;&nbsp;DOWNLOAD</div>
+        <button class="share">
+          <i class="bi bi-share"></i>
+          Share
+        </button>
+      </span>
+    </footer>
   </div>
 </template>

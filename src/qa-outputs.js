@@ -1,3 +1,7 @@
+import {
+	info_mode_change,
+} from './mapbox.js';
+
 const mark = Object.freeze({
 	"title":    null,
 	"position": 'C',
@@ -8,7 +12,7 @@ const mark = Object.freeze({
 export default [
 	{
 		mark,
-		"target": '#view-outputs',
+		"target": '#view-analysis',
 		"listen": {
 			"action": 'click',
 		},
@@ -17,7 +21,7 @@ export default [
 		mark,
 		"target": '#mapbox-container',
 		"run":    function() {
-			if (!INFOMODE) O.info_mode();
+			if (!INFOMODE) info_mode_change();
 			MAPBOX.fire('click', { "lngLat": MAPBOX.getCenter() });
 		},
 		"listen": {

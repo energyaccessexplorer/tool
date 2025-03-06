@@ -9,6 +9,7 @@ on:
 
 env:
   BRANCH_NAME: ${{ github.event.client_payload.branch_name || github.head_ref || github.ref_name }}
+  DESTINATION: ${{ github.event.client_payload.destination || github.head_ref || github.ref_name }}
 
 jobs:
   build-deploy:
@@ -16,6 +17,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BRANCH_NAME }}
 
       - name: Install build dependencies
         run: |
@@ -23,7 +26,7 @@ jobs:
 
       - name: Build .env
         run: |
-          printf "/$BRANCH_NAME" > views/base.mustache
+          printf "/$DESTINATION" > views/base.mustache
 
           cat <<- EOF >.env
           	DOMAIN = "${{ vars.DOMAIN }}"
@@ -43,16 +46,6 @@ jobs:
         run: |
           patch -p1 <relative-paths.diff
 
-      - name: Deploy website
-        run: |
-          curl -X POST \
-            --location \
-            --header "Authorization: Bearer ${{ secrets.PR_DEPLOY_TOKEN }}" \
-            --header "Accept: application/vnd.github+json" \
-            --header "X-GitHub-Api-Version: 2022-11-28" \
-            --data "{\"event_type\": \"trigger-workflow\", \"client_payload\": {\"branch_name\": \"$BRANCH_NAME\"}}" \
-            https://api.github.com/repos/energyaccessexplorer/website/dispatches
-
       - name: Make destination directory
         uses: appleboy/ssh-action@v1.1.0
         with:
@@ -61,14 +54,14 @@ jobs:
           port:     ${{ secrets.PR_DEPLOY_PORT }}
           key:      ${{ secrets.PR_DEPLOY_KEY }}
           script:   |
-            mkdir -p ${{ secrets.PR_DEPLOY_PATH }}/${{ env.BRANCH_NAME }}
+            mkdir -p ${{ secrets.PR_DEPLOY_PATH }}/${{ env.DESTINATION }}
 
       - name: Deploy the thing
         uses: burnett01/rsync-deployments@7.0.1
         with:
           switches: --recursive --verbose
           path: dist/
-          remote_path: ${{ secrets.PR_DEPLOY_PATH }}/$BRANCH_NAME/tool/
+          remote_path: ${{ secrets.PR_DEPLOY_PATH }}/$DESTINATION/tool/
           remote_host: ${{ secrets.PR_DEPLOY_HOST }}
           remote_port: ${{ secrets.PR_DEPLOY_PORT }}
           remote_user: ${{ secrets.PR_DEPLOY_USER }}

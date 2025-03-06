@@ -389,3 +389,27 @@
     </span>
   </div>
 </template>
+
+<template id="share-link-modal-content">
+  <p>
+    Sharing the following link will load the Energy Access Explorer platform in
+    the current state: layers and analysis.
+
+    Users might need the necessary permissions to view this snapshot fully.
+  </p>
+
+  <div style="display:flex; flex-flow: row nowrap;">
+    <input id="share-link-input"
+           type="text"
+           bind="url"
+           disabled
+           focus />
+
+    <button type="button"
+            id="share-link-copy-button">
+      <i class="bi bi-copy"
+         bind-listen="click"
+         bind-func="copy"></i>
+    </button>
+  </div>
+</template>

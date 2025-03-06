@@ -4,10 +4,6 @@ import {
 	elem_collapse,
 } from './utils.js';
 
-import {
-	toggle_ds,
-} from './controls.js';
-
 const contents_el = qs('#controls-contents');
 
 const tabs_el = qs('#controls-tabs');
@@ -67,12 +63,11 @@ export function select_tab(tab, name) {
 	for (let e of qsa('.controls-branch-tab', tabs_el))
 		e.classList.remove('active');
 
-	for (let e of qsa('.controls-branch', contents_el)) {
-		let all = (name === 'all');
-		e.style.display = all ? '' : 'none';
-	}
+	for (let e of qsa('.controls-branch', contents_el))
+		e.style.display = name === 'all' ? '' : 'none';
 
-	tab.classList.add('active');
+	if (tab) tab.classList.add('active');
+	else console.error("select_tab: could not find tab named", name);
 
 	const b = qs('#controls-branch-' + name, contents_el);
 	if (b) b.style.display = 'block';
@@ -117,7 +112,7 @@ export function init() {
 
 		const c = Array.from(qsa('ds-controls', contents_el)).find(d => d.style.display !== 'none');
 
-		if (c) toggle_ds.call(c.ds);
+		if (c) c.ds.turn();
 	};
 
 	const tab_all = ce('div', "all", { "id": 'controls-tab-all', "class": 'controls-branch-tab up-title' });

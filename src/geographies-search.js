@@ -44,10 +44,7 @@ function trigger(value) {
 	resultsinfo.innerText = l ? l + " results" : defaultinfo;
 };
 
-async function load(x,y) {
-	U.divtier = x;
-	U.subdiv = y;
-
+export async function load(x,y) {
 	const fs = maybe(GEOGRAPHY.divisions, x, 'vectors', 'geojson', 'features');
 	if (!fs) return;
 
@@ -60,10 +57,6 @@ async function load(x,y) {
 
 	d.vectors.geojson.features.forEach(f => f.properties['__visible'] = (f.id === y));
 	MAPBOX.getSource(d.id).setData(DST.get(d.id).vectors.geojson);
-
-	if (d.on) d.raise();
-
-	O.view = U.view;
 };
 
 export async function init() {
@@ -99,8 +92,6 @@ export async function init() {
 	details = resultscontainer.querySelectorAll('details');
 
 	resultscontainer.prepend(resultsinfo);
-
-	load(0,0);
 };
 
 function tree($) {
@@ -113,10 +104,8 @@ function tree($) {
 		s.onclick = _ => {
 			const t = d.getAttribute('open') === null;
 
-			if (t)
-				load(j, y);
-			else
-				load(j-1, d.parentElement.subdiv);
+			STATE.divtier = t ? j : j-1;
+			STATE.subdiv  = t ? y : d.parentElement.subdiv;
 		};
 
 		for (let i = 0; i < branch.length; i++) {
@@ -128,7 +117,10 @@ function tree($) {
 
 			else if (branch[i] === 1) {
 				const x = ce('div', divisions[j+1].csv.table[i]);
-				x.onclick = load.bind(null, j+1, i);
+				x.onclick = _ => {
+					STATE.divtier = j+1;
+					STATE.subdiv  = i;
+				};
 				d.append(x);
 			}
 
@@ -140,7 +132,10 @@ function tree($) {
 	};
 
 	const t = subtree($, 0, GEOGRAPHY.name);
-	t.querySelector('summary').onclick = load.bind(null, 0, 0);
+	t.querySelector('summary').onclick = _ => {
+		STATE.divtier = 0;
+		STATE.subdiv = 0;
+	};
 	t.subdiv = 0;
 
 	return t;

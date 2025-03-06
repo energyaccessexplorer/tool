@@ -25,7 +25,7 @@ import {
 let ul, resultscontainer, resultsinfo;
 
 function pointto(p, a = false) {
-	const dict = [[ "v", EAE['indexes'][U.output]['name'] ]];
+	const dict = [[ "v", EAE['indexes'][STATE.index]['name'] ]];
 	const props = { "v": lowmedhigh_scale(p.v) };
 
 	search_pointto(p.c, dict, props, a);
@@ -93,7 +93,7 @@ width: calc(${g}% - 1.5em);
 };
 
 async function fileload(data) {
-	const a = await analysis_plot_active(U.output, false);
+	const a = await analysis_plot_active(STATE.index, false);
 
 	COORDINATES = d3.csvParseRows(data, d => {
 		const c = [parseFloat(d[0]), parseFloat(d[1])];
@@ -110,7 +110,7 @@ async function fileload(data) {
 };
 
 async function reload() {
-	const a = await analysis_plot_active(U.output, false);
+	const a = await analysis_plot_active(STATE.index, false);
 
 	COORDINATES = COORDINATES.map(c => {
 		const p = coordinates_to_raster_pixel(c.c, {

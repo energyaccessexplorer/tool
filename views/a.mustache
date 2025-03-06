@@ -8,11 +8,11 @@
     <meta name="MobileOptimized" content="640">
     <meta name="mobile-web-app-capable" content="yes" />
 
+    <link rel="icon" href="{{> views/base}}/images/EAE Logo_Emblem.svg">
+
     <link rel="stylesheet" href="../lib/bootstrap-icons.css">
 
     <script type="module" src="./browser.js"></script>
-
-    {{> views/cookie}}
 
     <script src="./libs.js?v=--TIMESTAMP--"></script>
     <script src="./main.js?v=--TIMESTAMP--"></script>
@@ -43,7 +43,7 @@
         <a for="config" description="Up/Download Configuration"><i class="bi bi-braces"></i></a>
       </div>
 
-      <div id="left-pane">
+      <div id="left-pane" style="display: none;">
         <div id="cards" class="search-panel">
           <div id="cards-clear-buttons"></div>
           <div id="cards-list" class="search-results"></div>
@@ -137,20 +137,29 @@
         </div>
       </div>
 
-      <div id="right-pane">
-        <button id="summary-button"
-                class="big-green-button">Report</button>
+      <div id="right-pane"
+           style="display: none;">
+        <div id="big-buttons">
+          <button id="summary-button"
+                  class="big-green-button">Report</button>
 
-        <button id="snapshot-button"
-                class="big-green-button"
-                style="margin-top: 0em;">Save Analysis</button>
+          <button id="save-snapshot-button"
+                  class="big-green-button">
+            <i class="bi bi-floppy2-fill"></i><span>Save Analysis</span>
+          </button>
+
+          <button id="share-snapshot-button"
+                  class="big-green-button">
+            <i class="bi bi-share-fill"></i><span>Share Analysis</span>
+          </button>
+        </div>
 
         <div id="filtered-pane" style="display: none;">
           <div class="up-title">Considered geographies</div>
           <div id="filtered-subgeographies"></div>
         </div>
 
-        <div id="indexes-pane" style="display: none;">
+        <div id="indexes-pane">
           <div id="index-graphs">
             <div id="index-graphs-title" class="up-title"></div>
             <div id="index-graphs-description"></div>
@@ -171,10 +180,6 @@
         </div>
 
         <div id="drawer-right-pane">
-          <div id="drawer-help">
-            Help
-          </div>
-
           <div>
             Disclaimer
             <div id="disclaimer-message">
@@ -206,16 +211,18 @@
     window.API = new pgrest(EAE['settings'].database, FLASH);
 
     window.GEOGRAPHY = null;
+    window.SNAPSHOT = null;
     window.OUTLINE = null;
     window.MAPBOX = null;
     window.INFOMODE = false;
     window.COORDINATESMODE = false;
     window.COORDINATES = [];
     window.MOBILE = false;
-    window.O = null;
-    window.U = null;
     window.DST = new Map();
-    window.PARAMS = null;
+    window.SELF = null;
+    window.STATE = null;
+    window.DEBUG = true;
+    window.COMMIT = null;
     window.SUMMARY = null;
   </script>
 
@@ -229,6 +236,4 @@
   {{> views/a-templates}}
 
   {{> views/templates}}
-
-  {{> views/gapps}}
 </html>

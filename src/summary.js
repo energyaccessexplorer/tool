@@ -28,16 +28,6 @@ import {
 	pptx as report_pptx,
 } from './report.js';
 
-/*
- * summary
- *
- * Given the current dataset selection, calculate the population impact through
- * the 'population-density' dataset on all Indexes. Draw some pie graphs and a
- * modal about it.
- *
- * This is triggered by the "Snapshot" button.
- */
-
 async function summary() {
 	const pop = DST.get('population-density');
 	await pop.load('raster');

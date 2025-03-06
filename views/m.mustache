@@ -8,7 +8,7 @@
     <meta name="MobileOptimized" content="640">
     <meta name="mobile-web-app-capable" content="yes" />
 
-    {{> views/cookie}}
+    <link rel="icon" href="{{> views/base}}/images/EAE Logo_Emblem.svg">
 
     <script src="./libs.js?v=--TIMESTAMP--"></script>
     <script src="./main.js?v=--TIMESTAMP--"></script>
@@ -28,34 +28,34 @@
     {{> views/nav}}
 
     <div id="banner">
-      <h1>Energy Access Explorer User Panel</h1>
+      <h1>My EAE</h1>
 
       <div id="tabs">
-        <div tab="saved-analysis" active>Saved Analysis</div>
-        <div tab="account">Account</div>
+        <div tab="saved-analysis" active>
+          <i class="bi bi-folder-fill"></i>
+          Saved Analysis
+        </div>
+
+        <div tab="account">
+          <i class="bi bi-person-fill"></i>
+          Account
+        </div>
       </div>
     </div>
 
     <div id="playground">
       <main tab-content="saved-analysis" active>
-        <div id="left">
-          <br><br><br>
-          <strong>Filter</strong><br><br>
-          <input id="search" placeholder="Filter by title or geography name">
-        </div>
+        <input id="search"
+               placeholder="Filter by title or geography name">
 
-        <div id="sessions">
-          <div id="sessions-controls">
-            <strong id="sessions-count">0 Sessions</strong>
+        <select id="sort">
+          <option value="time">Sort by: Date</option>
+          <option value="title">Sort by: Title</option>
+        </select>
 
-            <span>
-              <label><strong>Sort by</strong></label>
-              &nbsp; &nbsp; &nbsp;
-              <select id="sort">
-                <option value="time">Date</option>
-                <option value="title">Title</option>
-              </select>
-            </span>
+        <div id="snapshots">
+          <div id="snapshots-controls">
+            <strong id="snapshots-count">0 Analyses</strong>
           </div>
         </div>
       </main>
@@ -82,12 +82,12 @@
 
   {{> views/m-templates}}
 
+  {{> views/templates}}
+
   {{> views/env }}
 
   <script type="module">
     import {init} from './m.js';
     init();
   </script>
-
-  {{> views/gapps}}
 </html>

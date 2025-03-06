@@ -4,8 +4,12 @@ import {
 } from './utils.js';
 
 import {
+	context,
+} from './complicated.js';
+
+import {
 	fit as mapbox_fit,
-	map_pointer,
+	pointer as mapbox_pointer,
 } from './mapbox.js';
 
 let pointer;
@@ -17,14 +21,14 @@ export function pointto(coords, dict, props, a = false) {
 
 	const rc = coordinates_to_raster_pixel(coords, OUTLINE.raster);
 
-	if (a) O.context(rc, dict, props);
+	if (a) context(rc, dict, props);
 
 	const td = table_data(dict, props, coords);
 
 	const box = maparea.getBoundingClientRect();
 
 	if (pointer) pointer.drop();
-	pointer = map_pointer({"x": box.x + x, "y": box.y + y}, td);
+	pointer = mapbox_pointer({"x": box.x + x, "y": box.y + y}, td);
 };
 
 export function zoom(p, fn) {

@@ -67,11 +67,7 @@ bubble-message pre {
 
 @media (max-width: 72em) {
   body {
-	overflow: unset;
-  }
-
-  dialog main {
-	max-width: calc(100% - 40px) !important;
+    overflow: unset;
   }
 
   #playground {
@@ -80,15 +76,15 @@ bubble-message pre {
   }
 
   .flag {
-	width: 100px;
-	height: 100px;
+    width: 100px;
+    height: 100px;
   }
 
   .country-item {
     display: flex;
     padding: 1em;
     width: unset;
-	font-size: 1.2em;
+    font-size: 1.2em;
   }
 
   .country-item svg {
@@ -100,6 +96,6 @@ bubble-message pre {
     order: 2;
     vertical-align: middle;
     padding-left: 1em;
-	line-height: 1.6em;
+    line-height: 1.6em;
   }
 }

@@ -8,9 +8,9 @@
     <meta name="MobileOptimized" content="640">
     <meta name="mobile-web-app-capable" content="yes" />
 
-    <script type="module" src="./browser.js"></script>
+    <link rel="icon" href="{{> views/base}}/images/EAE Logo_Emblem.svg">
 
-    {{> views/cookie}}
+    <script type="module" src="./browser.js"></script>
 
     <script src="./libs.js?v=--TIMESTAMP--"></script>
     <script src="./main.js?v=--TIMESTAMP--"></script>
@@ -39,6 +39,7 @@
     window.FLASH = new flash();
     window.API = new pgrest(EAE['settings'].database, FLASH);
     window.MOBILE = window.innerWidth < 1152;
+    window.SELF = null;
   </script>
 
   {{> views/env }}
@@ -47,8 +48,6 @@
     import {init} from './s.js';
     init();
   </script>
-
-  {{> views/gapps}}
 
   <!-- load the tool's into cache -->
   <script defer src="../a/libs.js?v=--TIMESTAMP--"></script>

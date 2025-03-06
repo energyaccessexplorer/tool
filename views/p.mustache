@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    <meta name="HandheldFriendly" content="true">
+    <meta name="MobileOptimized" content="640">
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <link rel="icon" href="{{> views/base}}/images/EAE Logo_Emblem.svg">
+
+    <script src="./libs.js?v=--TIMESTAMP--"></script>
+    <script src="./main.js?v=--TIMESTAMP--"></script>
+
+    <link rel="stylesheet" href="../lib/bootstrap-icons.css">
+
+    <link href="../stylesheets/style.css" rel="stylesheet" />
+    <link href="../stylesheets/nav.css" rel="stylesheet" />
+    <link href="../stylesheets/thumbnails.css" rel="stylesheet" />
+
+    <link href="./main.css" rel="stylesheet" />
+
+    <script>window.BASE = "{{> views/base}}";</script>
+  </head>
+
+  <body></body>
+
+  <script type="module">
+    import flash from '../lib/flash.js';
+    import pgrest from '../lib/pgrest.js';
+
+    window.FLASH = new flash();
+    window.API = new pgrest(EAE['settings'].database, FLASH);
+  </script>
+
+  {{> views/p-templates}}
+
+  {{> views/env }}
+
+  <script type="module">
+    import {init} from './p.js';
+    init();
+  </script>
+</html>

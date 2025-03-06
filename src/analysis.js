@@ -1,5 +1,3 @@
-import DS from './ds.js';
-
 import {
 	uniform_split,
 	colorscale,
@@ -45,7 +43,7 @@ export default async function run(type) {
 
 	const it = new Float32Array(OUTLINE.raster.data.length).fill(-1);
 
-	const dt = U.divtier;
+	const dt = STATE.divtier;
 	let divraster;
 	if (dt > 0)
 		divraster = maybe(GEOGRAPHY.divisions, dt, 'raster');
@@ -123,7 +121,7 @@ export default async function run(type) {
 
 	if (list.length === 1 && full_weight === 0) return { "raster": it };
 
-	const sd = U.subdiv;
+	const sd = STATE.subdiv;
 	const subdiv = and(typeof sd === 'number', divraster);
 
 	for (let i = 0; i < it.length; i += 1) {
@@ -186,7 +184,7 @@ export default async function run(type) {
 		it[i] = (r === -1) ? -1 : f(r);
 	}
 
-	console.log("Finished analysis.run in:", performance.now() - t0, weights, tots);
+	console.info("Finished analysis.run in:", performance.now() - t0, weights, tots);
 
 	return {
 		min,
@@ -213,8 +211,8 @@ export default async function run(type) {
  */
 
 function datasets(type) {
-	return DS.array
-		.filter(d => and(d.on, d.raster, d.analysis))
+	return STATE.datasets
+		.filter(d => and(d.raster, d.analysis))
 		.filter(d => {
 			if (d.datatype === 'polygons-boundaries') return false;
 
@@ -375,13 +373,13 @@ export function enough_datasets(t) {
 		const required = EAE['indexes'][t].compound;
 
 		for (const r of required)
-			if (!DS.array.find(d => and(d.on, d.analysis, d.index === r))) return false;
+			if (!STATE.datasets.find(d => and(d.analysis, d.index === r))) return false;
 
 		return true;
 	}
 
 	else
-		return DS.array.filter(d => and(d.on, d.analysis, d.index === t)).length > 0;
+		return STATE.datasets.filter(d => and(d.analysis, d.index === t)).length > 0;
 };
 
 export function medhigh_point_count(d, a) {
@@ -396,7 +394,7 @@ export function medhigh_point_count(d, a) {
 };
 
 export async function getpoints(n = 0) {
-	const a = await plot_active(U.output, false);
+	const a = await plot_active(STATE.index, false);
 
 	const threshold = a.raster.slice(0)
 		.sort((a,b) => a > b ? -1 : 1)

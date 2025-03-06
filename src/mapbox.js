@@ -1,6 +1,17 @@
 import {
 	super_error,
+	bi_icon,
+	table_data,
+	coordinates_to_raster_pixel,
 } from './utils.js';
+
+import {
+	context,
+} from './complicated.js';
+
+import {
+	lowmedhigh_scale,
+} from './analysis.js';
 
 import bubblemessage from '../lib/bubblemessage.js';
 
@@ -37,7 +48,7 @@ class MapboxThemeControl {
 		this._container.className = 'mapboxgl-ctrl';
 		this._container.classList.add('mapboxgl-ctrl-group');
 
-		let button = ce('button', ce('div', font_icon('layers-fill'), { "style": "transform: scale(0.75)" }), { "type": 'button', "class": 'mapboxgl-ctrl-icon'});
+		let button = ce('button', ce('div', bi_icon('layers-fill'), { "style": "transform: scale(0.75)" }), { "type": 'button', "class": 'mapboxgl-ctrl-icon'});
 
 		this._container.append(button);
 
@@ -59,7 +70,7 @@ class MapboxProjectionControl {
 		this._container.className = 'mapboxgl-ctrl';
 		this._container.classList.add('mapboxgl-ctrl-group');
 
-		let button = ce('button', ce('div', font_icon('dribbble'), { "style": "transform: scale(0.75)" }), { "type": 'button', "class": 'mapboxgl-ctrl-icon'});
+		let button = ce('button', ce('div', bi_icon('dribbble'), { "style": "transform: scale(0.75)" }), { "type": 'button', "class": 'mapboxgl-ctrl-icon'});
 
 		this._container.append(button);
 
@@ -81,7 +92,7 @@ class MapboxInfoControl {
 		this._container.className = 'mapboxgl-ctrl';
 		this._container.classList.add('mapboxgl-ctrl-group');
 
-		let button = ce('button', ce('div', font_icon('info-circle'), { "style": "transform: scale(0.75)" }), { "type": 'button', "class": 'mapboxgl-ctrl-icon'});
+		let button = ce('button', ce('div', bi_icon('info-circle'), { "style": "transform: scale(0.75)" }), { "type": 'button', "class": 'mapboxgl-ctrl-icon'});
 
 		this._container.append(button);
 
@@ -101,33 +112,28 @@ class MapboxInfoControl {
 export function init() {
 	mapboxgl.accessToken = EAE['settings'].mapbox_token;
 
-	const mb = new mapboxgl.Map({
+	MAPBOX = new mapboxgl.Map({
 		"container":             'mapbox-container',
 		"trackResize":           true,
 		"preserveDrawingBuffer": true, // this allows us to get canvas.toDataURL()
 		"style":                 theme_pick(""),
 	});
 
-	mb.addControl(new mapboxgl.NavigationControl({ "showCompass": false }));
+	MAPBOX.addControl(new mapboxgl.NavigationControl({ "showCompass": false }));
 
-	mb.zoomTo(mb.getZoom() * 0.95, {"duration": 0});
-	mb.doubleClickZoom.disable();
-	mb.dragRotate.disable();
-	mb.touchZoomRotate.disableRotation();
+	MAPBOX.zoomTo(MAPBOX.getZoom() * 0.95, {"duration": 0});
+	MAPBOX.doubleClickZoom.disable();
+	MAPBOX.dragRotate.disable();
+	MAPBOX.touchZoomRotate.disableRotation();
 
-	if (O.map) {
-		mb.on('click', e => O.map('click', e));
+	MAPBOX.on('click', click);
 
-		mb.addControl((new MapboxThemeControl()), 'top-right');
-		mb.addControl((new MapboxProjectionControl()), 'top-right');
-		mb.addControl((new MapboxInfoControl()), 'top-right');
-	}
+	MAPBOX.addControl((new MapboxThemeControl()), 'top-right');
+	MAPBOX.addControl((new MapboxProjectionControl()), 'top-right');
+	MAPBOX.addControl((new MapboxInfoControl()), 'top-right');
 
-	return mb;
-};
-
-export function theme_init(theme) {
-	MAPBOX.setStyle(theme_pick(EAE['settings'].mapbox_theme = theme));
+	MAPBOX.coords = fit(GEOGRAPHY.envelope);
+	MAPBOX.setStyle(theme_pick(EAE['settings'].mapbox_theme));
 };
 
 function projection_control_popup(_) {
@@ -288,7 +294,7 @@ export function change_theme(theme, soft) {
 		const c = MAPBOX.getStyle().layers.find(l => l.type === 'symbol');
 		MAPBOX.first_symbol = maybe(c, 'id');
 
-		await O.theme_changed();
+		await until(_ => MAPBOX.isStyleLoaded());
 
 		worldview();
 	};
@@ -299,6 +305,8 @@ export function change_theme(theme, soft) {
 		MAPBOX.setStyle(theme_pick(EAE['settings'].mapbox_theme = theme));
 
 	if (theme === "") go();
+
+	COMMIT();
 };
 
 export function fit(bounds, animate = false) {
@@ -330,7 +338,7 @@ This is fatal. Thanks for all the fish.`,
 	return [[left,top], [right,top], [right,bottom], [left,bottom]];
 };
 
-export function map_pointer({x = 0, y = 0}, ...contents) {
+export function pointer({x = 0, y = 0}, ...contents) {
 	let p = qs('#map-pointer');
 
 	if (p) p.remove();
@@ -424,5 +432,69 @@ export function coords_search_pois({
 				"name":        f.properties.name,
 				"coordinates": f.geometry.coordinates,
 			}));
+		});
+};
+
+export async function sort() {
+	const datasets = STATE.datasets.map(d => d.mutant ? d.host : d);
+
+	const layers = [].concat(...datasets.map(d => d._layers));
+
+	await Promise.all(layers.map(i => until(_ => MAPBOX.getLayer(i))));
+
+	for (let i = 0; i < layers.length; i++) {
+		MAPBOX.moveLayer(
+			layers[i],
+			(i === 0) ? MAPBOX.first_symbol : layers[i-1],
+		);
+	}
+};
+
+function click(e) {
+	if (!INFOMODE) return;
+
+	const p = MAPBOX.queryRenderedFeatures(e.point);
+
+	const ll = [e.lngLat.lng, e.lngLat.lat];
+	const rc = coordinates_to_raster_pixel(ll, OUTLINE.raster);
+
+	const [dict, props] = context(rc, p[0]);
+
+	COORDINATES.unshift({ "c": ll });
+
+	qs('#points.search-panel').dispatchEvent(new Event('activate'));
+
+	if (STATE.view === "analysis") {
+		const ac = coordinates_to_raster_pixel(ll, {
+			"data":   MAPBOX.getSource('output-source').raster,
+			"nodata": -1,
+		});
+
+		if (Number.isFinite(maybe(ac, 'value'))) {
+			dict.unshift(["_analysis_name", EAE['indexes'][STATE.index]['name']], null);
+			props["_analysis_name"] = lowmedhigh_scale(ac.value);
+		}
+	}
+
+	const td = table_data(dict, props, ll);
+
+	coords_search_pois({ "coords": ll, "limit": 1 })
+		.then(r => {
+			if (!r.length) return "";
+
+			const pois = ce('div', null, { "id": "pois" });
+			pois.append(ce('h5', "Points of interest"));
+
+			r.forEach(f => pois.append(ce('div', f.name, { "class": "small" })));
+
+			return pois;
+		})
+		.then(p => {
+			const c = {
+				"x": maybe(e, 'originalEvent', 'pageX'),
+				"y": maybe(e, 'originalEvent', 'pageY'),
+			};
+
+			pointer(c, td, p);
 		});
 };

@@ -7,6 +7,10 @@ import {
 	text_search as mapbox_text_search,
 } from './mapbox.js';
 
+import {
+	bi_icon,
+} from './utils.js';
+
 let ul, input, resultscontainer;
 
 let resultsinfo;
@@ -55,7 +59,7 @@ function li(p) {
 
 	const el = ce('li', p._name, {});
 
-	el.prepend(ce('span', font_icon(icon(p.place_type)), { "style": "font-size: 1.2em; margin-right: 0.8em;" }));
+	el.prepend(ce('span', bi_icon(icon(p.place_type)), { "style": "font-size: 1.2em; margin-right: 0.8em;" }));
 
 	el.onmouseenter = _ => pointto(p);
 

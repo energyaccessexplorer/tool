@@ -16,7 +16,6 @@ button {
 
 .big-green-button {
   text-align: center;
-  margin: 1em;
   background-color: var(--the-green);
   color: white !important;
   text-decoration: none;
@@ -59,15 +58,14 @@ dialog header {
 
 dialog .close {
   position: absolute;
-  top: 0.5em;
-  right: 0.5em;
+  top: 0.1em;
+  right: 0.2em;
   text-decoration: none;
-  font-size: 1.4em;
-  line-height: 1em;
+  font-size: 2.5em;
   width: 1em;
-  display: block;
+  height: 1em;
   text-align: center;
-  vertical-align: middle;
+  cursor: pointer;
   color: var(--the-white);
 }
 
@@ -138,6 +136,23 @@ bubble-message .bubble-message-close-button::before {
   background-color: white;
   text-align: center;
   border-top: solid 1px lightgray;
+}
+
+#share-link-modal p {
+  max-width: 32em;
+}
+
+#share-link-input {
+  font-family: monospace;
+  font-size: 1.2em;
+  padding: 7px 5px;
+  color: #414141;
+  width: 32em;
+  text-align: center;
+}
+
+#share-link-copy-button {
+  padding: 0 12px;
 }
 
 @keyframes pulse {

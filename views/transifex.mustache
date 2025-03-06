@@ -1,0 +1,14 @@
+<script>
+  (function() {
+    if (location.hostname.match(/(localhost|linux)/)) return;
+
+    window.liveSettings = {api_key:"e0fbb2a78c9b473f8c265e3bb1ca1a29"};
+
+    const s = document.createElement('script');
+    s.async = true;
+    s.type = "text/javascript";
+    s.src = "//cdn.transifex.com/live.js";
+
+    document.head.append(s);
+  })();
+</script>

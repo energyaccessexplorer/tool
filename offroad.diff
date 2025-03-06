@@ -1,0 +1,77 @@
+--- a/src/s.js
++++ b/src/s.js
+@@ -20,11 +20,7 @@ function preload_boundaries(id) {
+ };
+ 
+ async function geography(c) {
+-	const coll = await API.get("geographies", {
+-		"datasets_count": "gt.0",
+-		"parent_id":      `eq.${c.id}`,
+-		"deployment":     `ov.{${ENV}}`,
+-	});
++	const coll = [c, c.subgeographies].filter(x => x).flat();
+ 
+ 	if (c.datasets_count > 2) coll.unshift(c); // 2 datasets: outline and admin-tiers
+ 
+@@ -203,15 +203,11 @@ export function init() {
+ 
+ 			const _name = co.name.replace(new RegExp("\\ ?\\(?(" + ENV.join('|') + ")\\)?", "i"), '');
+ 
+-			fetch(`${EAE['settings'].world}/countries?select=flag&or=(names->>official.eq."${_name}",name.eq."${_name}")`)
+-				.then(r => r.json())
++			fetch(EAE['settings'].database + `/flags?name=eq.${co.name}`)
++				.then(r => r.text())
+ 				.then(r => {
+-					const data = r[0];
+-
+-					if (!data) return;
+-
+ 					d.append(ce('img', null, {
+-						"src":   URL.createObjectURL((new Blob([hextostring(data['flag'])], {"type": 'image/svg+xml'}))),
++						"src":   URL.createObjectURL((new Blob([r], {type: 'image/svg+xml'}))),
+ 						"class": "flag",
+ 					}));
+ 				});
+--- a/src/a.js
++++ b/src/a.js
+@@ -146,6 +146,8 @@ async function init_1() {
+ 	const url = new URL(location);
+ 	const id = url.searchParams.get('id');
+ 
++	qs('#snapshot-button').remove();
++
+ 	GEOGRAPHY = await API.get("geographies", {
+ 		"id":     `eq.${id}`,
+ 		"select": ['*', 'parent_sort_branches', 'parent_sort_subbranches', 'parent_sort_datasets'],
+@@ -176,8 +178,6 @@ On your OS, you can do this by pressing (${mac ? "⌘" : "ctrl"} −) a couple t
+ 
+ 	GEOGRAPHY.timeline_dates = maybe(GEOGRAPHY, 'configuration', 'timeline_dates');
+ 
+-	session_init();
+-
+ 	PARAMS = {
+ 		"view":    ['inputs', 'filtered', 'outputs'],
+ 		"output":  ['eai', 'ani', 'demand', 'supply'],
+--- a/src/indexes.js
++++ b/src/indexes.js
+@@ -24,10 +24,6 @@ import {
+ 	analysis_to_dataset,
+ } from './overlord.js';
+ 
+-import {
+-	snapshot,
+-} from  './session.js';
+-
+ const PIES = {};
+ 
+ const bubble = (v,e) => new bubblemessage({ "message": v + "%", "position": "C", "close": false, "noevents": true }, e);
+@@ -152,9 +148,6 @@ export function init() {
+ 	for (const i in tools)
+ 		toolbox.append(ce('a', null, { "id": i, "title": tools[i] }));
+ 
+-	const snap = qs('#snapshot-button');
+-	snap.onclick = snapshot;
+-
+ 	const opacity = qs('#index-graphs-opacity');
+ 	opacity.append(opacity_control({
+ 		"fn": x => MAPBOX.setPaintProperty('output-layer', 'raster-opacity', x),

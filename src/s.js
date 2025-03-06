@@ -1,5 +1,6 @@
 import {
 	loading,
+	self,
 } from './utils.js';
 
 import modal from '../lib/modal.js';
@@ -69,39 +70,44 @@ async function geography(c) {
 const presets = [
 	{
 		"name":        "Strategic and Integrated Energy Planning",
-		"output":      "eai",
-		"view":        "outputs",
+		"index":       "eai",
+		"view":        "analysis",
 		"description": "Electrification planning agencies are able to link electrification and development outcomes.",
 		"variant":     "raster",
+		"tab":         "controls",
 	},
 	{
 		"name":        "The expansion of clean energy markets",
-		"output":      "eai",
-		"view":        "outputs",
+		"index":       "eai",
+		"view":        "analysis",
 		"description": "Technology suppliers (whether mini grid developers or solar home system providers) can get a better understanding of aspects of affordability and level of service needed.",
 		"variant":     "raster",
+		"tab":         "controls",
 	},
 	{
 		"name":        "Impact investment",
-		"output":      "ani",
-		"view":        "outputs",
+		"index":       "ani",
+		"view":        "analysis",
 		"description": "Donors and development finance institutions can identify areas where grants and support will have the most impact.",
 		"variant":     "raster",
+		"tab":         "controls",
 	},
 	{
 		"name":        "Bottom-up assessment of energy needs",
-		"output":      "demand",
-		"view":        "outputs",
+		"index":       "demand",
+		"view":        "analysis",
 		"description": "Service delivery institutions in the health, education and agriculture sectors are able to estimate energy needs associated to development services.",
 		"variant":     "raster",
+		"tab":         "controls",
 	},
 	{
 		"name":        "Generate custom geospatial analysis based on your own criteria",
 		"description": null,
-		"output":      "eai",
-		"view":        "inputs",
+		"index":       "eai",
+		"view":        "data",
 		"datasets":    [],
 		"variant":     "raster",
+		"tab":         "controls",
 	},
 ];
 
@@ -110,10 +116,8 @@ function usertype(gid) {
 
 	const ul = ce('ul');
 	for (const t of presets) {
-		const { output, view, variant } = t;
-
 		const p = ce('p', t.description);
-		const li = ce('li', ce('a', [ce('h3', t.name), p], { "href": `${window.BASE}/tool/a?id=${gid}&output=${output}&view=${view}&variant=${variant}` }));
+		const li = ce('li', ce('a', [ce('h3', t.name), p], { "href": `${window.BASE}/tool/a?id=${gid}` }));
 		li.onclick = function() {
 			sessionStorage.setItem('config', JSON.stringify(t));
 		};
@@ -122,7 +126,8 @@ function usertype(gid) {
 	}
 
 	// move the "own criteria" entry to the beggining. CAREFUL: The rest of the presets are ordered with presets.tsv below..."
-	ul.prepend(ul.lastElementChild);
+	if (MOBILE) ul.lastElementChild.remove();
+	else ul.prepend(ul.lastElementChild);
 
 	content.append(ul);
 
@@ -163,7 +168,9 @@ async function presets_init() {
 		});
 };
 
-export function init() {
+export async function init() {
+	await self();
+
 	const playground = qs('#playground');
 
 	function hextostring(hex) {
@@ -187,8 +194,9 @@ export function init() {
 			};
 
 			const intro = maybe(co, 'configuration', 'introduction');
-			if (intro) {
+			if (intro && !MOBILE) {
 				let p;
+
 				d.onmouseenter = _ => {
 					p = new bubblemessage({
 						"message":  ce('pre', intro),
@@ -196,6 +204,7 @@ export function init() {
 						"position": "C",
 					}, d);
 				};
+
 				d.onmouseleave = _ => {
 					p.remove();
 				};
@@ -222,11 +231,20 @@ export function init() {
 		loading(false);
 	};
 
-	API.get("geographies", {
+	const params = {
 		"select":     ['*', 'datasets_count'],
 		"adm":        "eq.0",
 		"deployment": `ov.{${ENV}}`,
-	})
+	};
+
+	if (or(ENV.includes('training'), ENV.includes('staging'))) {
+		params['circle'] = "not.is.null"; // whatever: everything.
+
+		if (!["director", "root"].includes(SELF.role))
+			params['circle'] = `in.(${SELF.data.circles})`;
+	}
+
+	API.get("geographies", params)
 		.then(r => list(r))
 		.catch(error => {
 			FLASH.push({

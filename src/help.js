@@ -7,11 +7,15 @@ import {
 } from './controls.js';
 
 import {
+	info_mode_change,
+} from './mapbox.js';
+
+import {
 	select_tab as controls_select_tab,
 } from './controls-search.js';
 
 import {
-	toggle_left_panel,
+	left_panel,
 	clean,
 } from './a.js';
 
@@ -71,7 +75,7 @@ const steps = [
 			return this.ds.controls;
 		},
 		"run": function() {
-			toggle_left_panel('controls');
+			left_panel('controls');
 			controls_select_tab(qs('#controls-tab-census'), "census");
 			controls_dig(this.ds);
 		},
@@ -163,7 +167,6 @@ const steps = [
 					const d = { "min": 0, "max": 15 };
 
 					DST.get('health')._domain = d;
-					O.view = U.view;
 				});
 			},
 		},
@@ -210,13 +213,13 @@ const steps = [
 			"position": "C",
 			"align":    "middle",
 		},
-		"run":    function() { if (!INFOMODE) O.info_mode(); },
+		"run":    function() { if (!INFOMODE) info_mode_change(); },
 		"listen": {
 			"action": 'click',
 		},
 	},
 	{
-		"target": '#view-outputs',
+		"target": '#view-analysis',
 		"mark":   {
 			"title":    "9/9",
 			"message":  "Analysis indicates low hanging fruits (energy access potential index) areas where demand or supply are likely to be higher (demand and supply index) and areas where finance assistance is needed the most",
@@ -232,10 +235,12 @@ const steps = [
 const HELP = new nanny({ steps, "bubblefn": (m, el) => new bubblemessage(m, el) });
 
 export function init() {
+	if (MOBILE && GEOGRAPHY.timeline) return;
+
 	qs('#drawer-help').onclick = run;
 
-	if (![null, "inputs"].includes(U.view)) return;
-	if (DS.all("on").length) return;
+	if (STATE.view !== 'data') return;
+	if (STATE.datasets.length) return;
 
 	HELP.start();
 };

@@ -1,5 +1,6 @@
 import {
 	elem_collapse,
+	bi_icon,
 } from './utils.js';
 
 import DS from './ds.js';
@@ -28,17 +29,23 @@ function branch_recount() {
 	}
 };
 
-function subbranch_recount() {
-	const subbranch = this.closest('.controls-subbranch');
-
-	const t = qsa('ds-controls', subbranch, true)
+export function subbranch_recount(s) {
+	const t = qsa('ds-controls', s, true)
 		.filter(c => c.ds.on)
 		.length;
 
-	const count = qs('.count', subbranch);
+	const count = qs('.count', s);
 
 	count.innerText = t;
 	count.style.visibility = t ? 'visible' : 'hidden';
+};
+
+export function recount() {
+	for (const subbranch of qsa('.controls-subbranch')) {
+		subbranch_recount(subbranch);
+	}
+
+	branch_recount();
 };
 
 const tabs_el = qs('#controls-tabs');
@@ -157,7 +164,7 @@ export default class dscontrols extends HTMLElement {
 	};
 
 	info() {
-		const e = font_icon('info-circle');
+		const e = bi_icon('info-circle');
 		e.onclick = v => {
 			v.stopPropagation();
 			this.ds.info_modal();
@@ -167,7 +174,7 @@ export default class dscontrols extends HTMLElement {
 	};
 
 	card() {
-		const e = font_icon('list-task');
+		const e = bi_icon('list-task');
 		e.onclick = v => {
 			v.stopPropagation();
 			this.ds.card.discover();
@@ -185,14 +192,6 @@ function humanformat(s) {
 		.replace('-', ' ')
 		.replace(/^([a-z])/, x => x.toUpperCase())
 		.replace(/ ([a-z])/g, x => x.toUpperCase());
-};
-
-export function toggle_ds() {
-	O.ds(this, { 'active': (this.on = !this.on) })
-		.then(_ => {
-			subbranch_recount.call(this.controls);
-			branch_recount();
-		});
 };
 
 function toggle_switch(init, callback) {
@@ -267,7 +266,7 @@ function header_click() {
 		const svg = this.checkbox.svg;
 
 		if (e.target.closest('svg') === svg)
-			toggle_ds.call(this.ds);
+			this.ds.turn();
 
 		else
 			svg.dispatchEvent(new Event('click', { "bubbles": true }));

@@ -2,8 +2,6 @@ import {
 	pointto as search_pointto,
 } from './search.js';
 
-import DS from './ds.js';
-
 export const colors_array = ["transparent", "red", "#0059ff", "#d6d600", "green", "#d600c6", "#00cad6", "#6a4801", "black"];
 
 function pointto(f, dsname, name) {
@@ -22,14 +20,14 @@ export function valued_polygons() {
 
 	lists.replaceChildren();
 
-	const datasets = DS.array.filter(d => and(d.on, d.datatype.match("polygons-(valued|timeline)"), maybe(d, 'csv', 'data')));
+	const datasets = STATE.datasets.filter(d => and(d.datatype.match("polygons-(valued|timeline)"), maybe(d, 'csv', 'data')));
 
 	function matches(d) {
 		return d.csv.data
 			.filter(r => {
 				let c;
 				if (d.datatype.match("polygons-(timeline)"))
-					c = U.timeline;
+					c = STATE.timeline;
 				else if (d.datatype.match("polygons-(valued)"))
 					c = d.csv.column;
 

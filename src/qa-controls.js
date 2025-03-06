@@ -5,7 +5,7 @@ import {
 } from './controls.js';
 
 import {
-	toggle_left_panel,
+	left_panel,
 } from './a.js';
 
 const mark = Object.freeze({
@@ -84,7 +84,7 @@ export default [
 			"close":    false,
 		},
 		"run": function() {
-			toggle_left_panel('cards');
+			left_panel('cards');
 		},
 		"wait": function() {
 			return or(
@@ -99,7 +99,6 @@ export default [
 
 					DST.get('health').card.range_el.change(d);
 					DST.get('health')._domain = d;
-					O.view = U.view;
 				});
 			},
 		},

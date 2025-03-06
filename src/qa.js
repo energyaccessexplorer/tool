@@ -6,14 +6,12 @@ import nanny from '../lib/nanny.js';
 
 import bubblemessage from '../lib/bubblemessage.js';
 
-import DS from './ds.js';
-
 import {
 	select_tab as controls_select_tab,
 } from './controls-search.js';
 
 import {
-	toggle_left_panel,
+	left_panel,
 } from './a.js';
 
 import controls from './qa-controls.js';
@@ -30,18 +28,18 @@ const batches = {
 			"lazy":   true,
 			"target": 'body',
 			"run":    function() {
-				U.output = 'eai';
-				U.view = 'inputs';
+				STATE.index = 'eai';
+				STATE.view = 'data';
 
-				DS.all("on").forEach(d => d.active(false, false));
+				STATE.datasets.forEach(d => d.active(false, false));
+
+				COMMIT("datasets");
 
 				for (let e of qsa('.controls-subbranch'))
 					elem_collapse(qs('.controls-container', e), e);
 
-				toggle_left_panel('controls');
+				left_panel('controls');
 				controls_select_tab(qs('#controls-tab-census'), "census");
-
-				O.view = U.view;
 			},
 			"listen": {
 				"el":     _ => qs('body'),

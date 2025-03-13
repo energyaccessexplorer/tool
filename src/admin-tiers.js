@@ -4,6 +4,8 @@ export default async function(o) {
 	const ds = new DS(o);
 	await ds.load('csv');
 
+	ds.geography_id = o.geography_id;
+
 	const data = ds.csv.data;
 	const columns = data.columns;
 

@@ -98,10 +98,6 @@
   border-top: 1px solid lightgray;
 }
 
-.snapshot-square footer button {
-  padding: 7px 12px;
-}
-
 .snapshot-square footer button i,
 .snapshot-square footer a i {
   margin-right: 0.5em;

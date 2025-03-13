@@ -99,26 +99,50 @@ function edit_title(snapshots) {
 	const s = snapshots.find(s => s.time === +data);
 	if (!s) return;
 
-	const input = document.createElement('input');
-	input.className = "title-input";
+	const i = document.createElement('input');
+	const f = document.createElement('form');
+	const x = document.createElement('button');
 
-	input.oninput = debounce(function() {
+	i.value = s.title;
+	i.setAttribute('required', '');
+
+	i.style = `
+font-size: 1.2em;
+padding: 7px 12px;
+`;
+
+	f.id = "save-analysis";
+	f.append(i);
+
+	x.type = "submit";
+	x.innerText = "Save";
+	x.setAttribute('form', 'save-analysis');
+
+	const m = new modal({
+		"header":  "Set Analysis Title",
+		"content": f,
+		"footer":  x,
+	});
+
+	f.onsubmit = function(e) {
+		e.preventDefault();
+		m.remove();
+
+		s.title = i.value;
+
 		API.patch('snapshots', {
 			"time": `eq.${s.time}`,
 		}, {
 			"payload": {
-				"title": input.value,
+				"title": i.value,
 			},
 		}).then(_ => {
-			div.querySelector('.title').innerText = input.value;
+			div.querySelector('.title').innerText = i.value;
 			API.flash.push({ "message": "Title updated", "type": "success" });
 		});
-	}, 300);
 
-	const m = new modal({
-		"header":  "Edit title",
-		"content": input,
-	});
+		return false;
+	};
 
 	m.show();
 };
@@ -175,7 +199,7 @@ function draw_snapshots(snapshots, geographies, container, trees) {
 	for (const p of document.querySelectorAll('.bi.bi-pencil'))
 		p.onclick = function() { edit_title.call(this, snapshots); };
 
-	for (const p of document.querySelectorAll('.bi.bi-x-lg'))
+	for (const p of document.querySelectorAll('.bi.bi-trash3'))
 		p.onclick = function() { drop.call(this, snapshots); };
 
 	for (const p of document.querySelectorAll('.download'))

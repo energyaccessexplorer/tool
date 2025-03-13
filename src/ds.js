@@ -337,9 +337,28 @@ This is not fatal but the dataset is now disabled.`,
 	};
 
 	mutant_init() {
-		this.hosts = this.config.mutant_targets.map(i => DST.get(i));
+		this.hosts = this.config.mutant_targets.map(i => {
+			const ds = DST.get(i);
 
-		const m = this.host = this.hosts[0];
+			if (!ds) {
+				const msg = `'${this.id}' claims to have host '${i}'. No such DS '${i}.'`;
+				FLASH.push({
+					"type":    'error',
+					"timeout": 10000,
+					"title":   "Dataset/File error",
+					"message": `
+${msg}
+
+This is not fatal but the dataset is now disabled.`,
+				});
+
+				this.disable(msg);
+			}
+
+			return ds;
+		});
+
+		const m = this.host = this.hosts.filter(Boolean)[0];
 
 		this.csv = m.csv;
 		this.raster = m.raster;
@@ -755,7 +774,7 @@ This is not fatal but the dataset is now disabled.`,
 		if (this.on) copy = [this, ...STATE.datasets];
 		else copy.splice(copy.indexOf(this), 1);
 
-		STATE.datasets = copy;
+		STATE.datasets = copy.filter(Boolean);
 
 		COMMIT("datasets");
 	};

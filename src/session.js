@@ -11,10 +11,12 @@ import {
 
 const url = new URL(location);
 
-function set_name(s, callback) {
+function edit_title(s, callback) {
 	const i = document.createElement('input');
 	const f = document.createElement('form');
+	const x = document.createElement('button');
 
+	i.value = s.title ?? "";
 	i.setAttribute('required', '');
 
 	i.style = `
@@ -22,11 +24,17 @@ font-size: 1.2em;
 padding: 7px 12px;
 `;
 
+	f.id = "save-analysis";
 	f.append(i);
 
+	x.type = "submit";
+	x.innerText = "Save";
+	x.setAttribute('form', 'save-analysis');
+
 	const m = new modal({
-		"header":  "Save Analysis",
+		"header":  "Set Analysis Title",
 		"content": f,
+		"footer":  x,
 	});
 
 	f.onsubmit = function(e) {
@@ -75,7 +83,7 @@ export function snapshot(callback) {
 			config,
 		};
 
-		set_name(s, _ => {
+		edit_title(s, _ => {
 			API.post('snapshots', null, { "payload": s })
 				.then(_ => FLASH.push({ "title": "Created Analysis", "type": "success" }))
 				.then(_ => url.searchParams.set('snapshot', s['time']))

@@ -49,8 +49,7 @@ export async function load(x,y) {
 	if (!fs) return;
 
 	const geometry = fs.find(f => f['id'] === y);
-	if (geometry)
-		mapbox_fit(geojsonExtent(geometry), true);
+	if (geometry) mapbox_fit(geojsonExtent(geometry), true);
 
 	const d = GEOGRAPHY.divisions[x];
 	await d.load('vectors');
@@ -68,11 +67,11 @@ export async function init() {
 
 	resultscontainer = qs('#geographies .search-results');
 
-	input.oninput = function(_) {
+	input.oninput = function() {
 		trigger(this.value);
 	};
 
-	input.onfocus = function(_) {
+	input.onfocus = function() {
 		this.value = "";
 		trigger(this.value);
 	};
@@ -80,10 +79,12 @@ export async function init() {
 	const x = await until(_ => maybe(DST.get('admin-tiers'), 'tree'))
 		.catch(err => {
 			console.debug(err);
-			throw "NO ADMIN TIERS";
+			throw new Error("NO ADMIN TIERS");
 		});
 
 	const d = await tree(x);
+	if (!d) return ce('details');
+
 	d.setAttribute('open', '');
 
 	resultscontainer.replaceChildren(d);
@@ -96,6 +97,21 @@ export async function init() {
 
 function tree($) {
 	const divisions = GEOGRAPHY.divisions;
+	const adm = GEOGRAPHY.adm;
+
+	const a = DST.get('admin-tiers');
+
+	try {
+		if (and(adm !== 0, GEOGRAPHY.id != a.geography_id)) {
+			const i = divisions[1].vectors.geojson.features[0].id;
+			$ = $[a.csv.data.find(x => x['TIER'+(adm+1)] === i)['TIER'+adm]]; // figure out which adm-tier GEOGRAPHY belongs to
+
+			if (!$) throw new Error("Failed finding current geography in parent's admin-tier", a.csv.data, adm, i);
+		}
+	} catch (err) {
+		console.warn("Failed to create geography tree. Feature is still experimental.", err);
+		return null;
+	}
 
 	function subtree(branch, j, title, y) {
 		const s = ce('summary', title);
@@ -117,10 +133,12 @@ function tree($) {
 
 			else if (branch[i] === 1) {
 				const x = ce('div', divisions[j+1].csv.table[i]);
+
 				x.onclick = _ => {
 					STATE.divtier = j+1;
 					STATE.subdiv  = i;
 				};
+
 				d.append(x);
 			}
 

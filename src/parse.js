@@ -453,7 +453,7 @@ export function polygons() {
 					"visibility": "none",
 				},
 				"paint": {
-					"fill-color":         this.datatype === 'polygons-boundaries' ? this.vectors.fill : ['get', '__fill'],
+					"fill-color":         ['get', '__fill'],
 					"fill-opacity":       [ 'case', [ 'boolean', [ 'get', '__visible' ], true ], 1 * this.vectors.opacity, 0 ],
 					"fill-outline-color": ['get', '__stroke'],
 				},
@@ -487,7 +487,7 @@ export function vectors_csv() {
 		f.properties['__visible'] = !nil(data.find(r => r[this.csv.key] === f.id));
 
 		let row = data.find(r => r[this.csv.key] === f.id);
-		f.properties['__fill'] = this.colorscale ? s(maybe(row, v)) : this.vectors.fill || "transparent";
+		f.properties['__fill'] = this.colorscale ? s(maybe(row, v)) : this.vectors.fill;
 	}
 
 	this.update_source(this.vectors.geojson);

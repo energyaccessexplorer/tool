@@ -59,11 +59,6 @@ import {
 } from './filtered.js';
 
 import {
-	init as config_init,
-	load_datasets,
-} from './config.js';
-
-import {
 	buttons as views_buttons,
 	init as views_init,
 	right_pane as views_right_pane,
@@ -296,7 +291,7 @@ On your OS, you can do this by pressing (${mac ? "⌘" : "ctrl"} −) a couple t
 };
 
 async function init_2(conf) {
-	let select = ["*", "datatype", "category:categories(*)"];
+	let select = ["*", "datatype:type", "category:categories(*)"];
 
 	const divisions = maybe(GEOGRAPHY.configuration, 'divisions').filter(d => d.dataset_id !== null);
 
@@ -414,7 +409,6 @@ async function init_3() {
 	analysissearch_init();
 	locationssearch_init();
 	points_init();
-	config_init();
 	timeline_init();
 	qa_run();
 };
@@ -866,4 +860,30 @@ function timeline_visibility() {
 	else v = 'none';
 
 	timeline.style.display = v;
+};
+
+function load_datasets(array) {
+	return Promise.all(array.map(d => {
+		const ds = DS.array.find(t => t.id === d.name || t.name === d.id || t.id === d.id);
+
+		if (!ds) {
+			console.warn("config load: No such dataset on this geography:", d);
+			return;
+		}
+
+		if (ds._domain) {
+			if (typeof d.domain.min === 'number') ds._domain.min = d._domain?.min || d.domain.min;
+			if (typeof d.domain.max === 'number') ds._domain.max = d._domain?.max || d.domain.max;
+		} else
+			console.warn(`Could not initialise domain for '${ds.id}' - ${ds.datatype}.`);
+
+		ds.selection = d.selection;
+
+		if (and(maybe(d.selection, 0), ds.mutant))
+			ds.mutate(DST.get(d.selection[0]));
+
+		if (typeof d.weight === 'number') ds.weight = d.weight;
+
+		return ds.turn(true);
+	}));
 };

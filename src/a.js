@@ -244,7 +244,7 @@ async function init_1() {
 
 	conf = conf ?? {
 		"index":    "eai",
-		"view":     "analysis",
+		"view":     "data",
 		"variant":  "raster",
 		"tab":      "controls",
 		"datasets": [],
@@ -281,7 +281,7 @@ If the layout feels cramped, try zooming out to ${Math.round(1/window.devicePixe
 On your OS, you can do this by pressing (${mac ? "⌘" : "ctrl"} −) a couple times.
 `);
 
-	loading("Inialising mapbox...");
+	loading("Initialising mapbox...");
 
 	mapbox_init();
 
@@ -291,7 +291,7 @@ On your OS, you can do this by pressing (${mac ? "⌘" : "ctrl"} −) a couple t
 };
 
 async function init_2(conf) {
-	let select = ["*", "datatype:type", "category:categories(*)"];
+	let select = ["*", "type", "category:categories(*)"];
 
 	const divisions = maybe(GEOGRAPHY.configuration, 'divisions').filter(d => d.dataset_id !== null);
 
@@ -348,7 +348,7 @@ This is fatal. Thanks for all the fish.`;
 	(async function fetch_admintiers() {
 		let o = ALL.find(x => x.category.name === 'admin-tiers');
 
-		loading("Fetching admintrative tiers...");
+		loading("Fetching administrative tiers...");
 
 		if (!o) {
 			const pid = maybe(
@@ -394,7 +394,7 @@ This is fatal. Thanks for all the fish.`;
 	// We need all the datasets to be initialised _before_ setting
 	// mutant attributes (order is never guaranteed)
 	//
-	DS.array.filter(d => d.mutant).forEach(d => d.mutant_init());
+	DS.array.filter(d => d.hosts).forEach(d => d.mutant_init());
 
 	await load_datasets(conf.datasets);
 };
@@ -638,10 +638,10 @@ async function reload(k,v) {
 		mapbox_sort();
 
 		STATE.datasets.forEach(async d => {
-			if (d.datatype.match(/raster-timeline/))
+			if (d.type.match(/raster-timeline/))
 				parse_raster_timeline.call(d);
 
-			else if (d.datatype.match(/(lines|points|polygons)-timeline/))
+			else if (d.type.match(/(lines|points|polygons)-timeline/))
 				parse_vectors_csv.call(d);
 		});
 	}
@@ -875,11 +875,11 @@ function load_datasets(array) {
 			if (typeof d.domain.min === 'number') ds._domain.min = d._domain?.min || d.domain.min;
 			if (typeof d.domain.max === 'number') ds._domain.max = d._domain?.max || d.domain.max;
 		} else
-			console.warn(`Could not initialise domain for '${ds.id}' - ${ds.datatype}.`);
+			console.warn(`Could not initialise domain for '${ds.id}' - ${ds.type}.`);
 
 		ds.selection = d.selection;
 
-		if (and(maybe(d.selection, 0), ds.mutant))
+		if (and(maybe(d.selection, 0), ds.hosts))
 			ds.mutate(DST.get(d.selection[0]));
 
 		if (typeof d.weight === 'number') ds.weight = d.weight;

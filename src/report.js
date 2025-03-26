@@ -446,10 +446,10 @@ function analysis(index) {
 
 	case 'supply': {
 		// TODO: points? any points?
-		const points = STATE.datasets.filter(d => and(d.index === index, d.datatype === 'points'));
+		const points = STATE.datasets.filter(d => and(d.index === index, d.type === 'points'));
 
 		// TODO: lines? transmission + distribution?
-		const lines = STATE.datasets.filter(d => and(d.index === index, d.datatype === 'lines'));
+		const lines = STATE.datasets.filter(d => and(d.index === index, d.type === 'lines'));
 
 		let points_count = 0;
 		for (const d of points) {
@@ -545,7 +545,7 @@ function analysis(index) {
 		}
 
 		const points = STATE.datasets.filter(d => and(or(d.id === 'health', d.id === "schools")));
-		const lines = STATE.datasets.filter(d => and((d.index === 'supply'), d.datatype === 'lines'));
+		const lines = STATE.datasets.filter(d => and((d.index === 'supply'), d.type === 'lines'));
 
 		const health = DST.get('health');
 		const schools = DST.get('schools');

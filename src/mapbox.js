@@ -436,7 +436,7 @@ export function coords_search_pois({
 };
 
 export async function sort() {
-	const datasets = STATE.datasets.map(d => d.mutant ? d.host : d);
+	const datasets = STATE.datasets.map(d => d.hosts ? d.host : d);
 
 	const layers = [].concat(...datasets.map(d => d._layers));
 

@@ -42,10 +42,6 @@ jobs:
         run: |
           bmake deps reconfig build env=test
 
-      - name: Patch for relative paths
-        run: |
-          patch -p1 <relative-paths.diff
-
       - name: Make destination directory
         uses: appleboy/ssh-action@v1.1.0
         with:

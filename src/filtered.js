@@ -20,15 +20,15 @@ export function valued_polygons() {
 
 	lists.replaceChildren();
 
-	const datasets = STATE.datasets.filter(d => and(d.datatype.match("polygons-(valued|timeline)"), maybe(d, 'csv', 'data')));
+	const datasets = STATE.datasets.filter(d => and(d.type.match("polygons-(valued|timeline)"), maybe(d, 'csv', 'data')));
 
 	function matches(d) {
 		return d.csv.data
 			.filter(r => {
 				let c;
-				if (d.datatype.match("polygons-(timeline)"))
+				if (d.type.match("polygons-(timeline)"))
 					c = STATE.timeline;
-				else if (d.datatype.match("polygons-(valued)"))
+				else if (d.type.match("polygons-(valued)"))
 					c = d.csv.column;
 
 				const v = +r[c];

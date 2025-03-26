@@ -15,7 +15,7 @@ function pointto(f, a = false) {
 	if (!t[0]) return;
 
 	const [x,y] = (_ => {
-		if (ds.datatype === 'points')
+		if (ds.type === 'points')
 			return t[0].geometry.coordinates;
 		else {
 			const ext = geojsonExtent(t[0]);
@@ -74,7 +74,7 @@ async function reset() {
 		li.onmouseenter = pointto.bind(null, f, false);
 		li.onclick = _ => {
 			const p = (_ => {
-				if (ds.datatype === 'points')
+				if (ds.type === 'points')
 					return { "center": f.geometry.coordinates };
 				else {
 					return { "bbox": geojsonExtent(f) };

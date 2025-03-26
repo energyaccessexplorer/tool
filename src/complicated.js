@@ -145,7 +145,7 @@ export async function analysis_to_dataset(t) {
 	const d = new DS({
 		"name":            `analysis-${t}-` + analysis_count,
 		"name_long":       `Analysis ${t.toUpperCase()} - ` + analysis_count,
-		"datatype":        "raster",
+		"type":            "raster",
 		"category":        category,
 		"processed_files": [{
 			"func":     "raster",
@@ -188,10 +188,10 @@ export async function analysis_to_dataset(t) {
 export function analysis_dataset_intersect(raster) {
 	const { data, nodata } = raster;
 
-	if (this.datatype === 'raster') return;
+	if (this.type === 'raster') return;
 
 	let fn;
-	switch (this.datatype) {
+	switch (this.type) {
 	case 'polygons':
 		fn = p => extent_contained(p.properties['__extent'], raster);
 		break;

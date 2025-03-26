@@ -39,7 +39,7 @@ export default class DS {
 
 		this.category = o.category;
 
-		this.datatype = o.datatype;
+		this.type = o.type;
 
 		this.source_files = o.source_files;
 
@@ -53,9 +53,7 @@ export default class DS {
 
 		this._layers = [];
 
-		let config = o.configuration || {};
-
-		this.config = config;
+		this.config = {};
 
 		this.analysis = this.category.analysis;
 
@@ -72,7 +70,15 @@ export default class DS {
 
 		this.metadata = o.metadata;
 
-		this.mutant = !!maybe(config.mutant_targets, 'length');
+		this.hosts = null;
+
+		if (o.mutant_configuration) {
+			this.config = o.mutant_configuration;
+			this.hosts = Object.assign([], o.mutant_configuration.hosts);
+		}
+		else if (o.vectors_configuration) {
+			this.config = o.vectors_configuration;
+		}
 
 		DST.set(this.id, this);
 
@@ -213,7 +219,7 @@ This is not fatal but the dataset is now disabled.`,
 			delete this.controls;
 		}
 
-		switch (this.datatype) {
+		switch (this.type) {
 		case 'points-timeline':
 		case 'lines-timeline':
 		case 'polygons-timeline':
@@ -337,11 +343,11 @@ This is not fatal but the dataset is now disabled.`,
 	};
 
 	mutant_init() {
-		this.hosts = this.config.mutant_targets.map(i => {
-			const ds = DST.get(i);
+		for (const [i,h] of this.hosts.entries()) {
+			const ds = DST.get(h);
 
 			if (!ds) {
-				const msg = `'${this.id}' claims to have host '${i}'. No such DS '${i}.'`;
+				const msg = `'${this.id}' claims to have host '${h}'. No such DS.`;
 				FLASH.push({
 					"type":    'error',
 					"timeout": 10000,
@@ -353,10 +359,12 @@ This is not fatal but the dataset is now disabled.`,
 				});
 
 				this.disable(msg);
+
+				return;
 			}
 
-			return ds;
-		});
+			this.hosts[i] = ds;
+		}
 
 		const m = this.host = this.hosts.filter(Boolean)[0];
 
@@ -483,12 +491,12 @@ This is not fatal but the dataset is now disabled.`,
 
 		function colorstops_check() {
 			if (!maybe(this.category, 'colorstops', 'length')) {
-				console.warn(`${this.id}, (${this.datatype}), has no colorstops configured. Using default`);
+				console.warn(`${this.id}, (${this.type}), has no colorstops configured. Using default`);
 				this.category.colorstops = default_colorscale.stops;
 			}
 		};
 
-		switch (this.datatype) {
+		switch (this.type) {
 		case 'polygons-valued': {
 			if (this.csv.key) {
 				colorstops_check.call(this);
@@ -555,7 +563,7 @@ This is not fatal but the dataset is now disabled.`,
 
 			const datasets = this.summary.analysis.datasets.slice(0);
 			const averages = datasets
-				.filter(d => d.datatype === 'raster')
+				.filter(d => d.type === 'raster')
 				.map(d => ({
 					"ds":     d,
 					"raster": average(crop_to(d.raster, { "data": this.summary.analysis.raster, "nodata": -1 })),
@@ -574,7 +582,7 @@ This is not fatal but the dataset is now disabled.`,
 					this.summary.analysis.datasets
 						.filter(d => d.analysis.index === k)
 						.forEach(d => {
-							switch (d.datatype) {
+							switch (d.type) {
 							case 'raster-timeline':
 							case 'raster': {
 								const f = averages.find(a => a.ds === d);
@@ -618,7 +626,7 @@ This is not fatal but the dataset is now disabled.`,
 
 		const features = this.vectors.geojson.features;
 
-		const points = this.datatype.match(/points/);
+		const points = this.type.match(/points/);
 
 		const rows = features.map(f => {
 			const columns = [];
@@ -688,7 +696,7 @@ This is not fatal but the dataset is now disabled.`,
 
 		if (!this.card) this.card = new dscard(this);
 
-		if (this.mutant) this.mutate(this.host);
+		if (this.hosts) this.mutate(this.host);
 
 		if (this.controls) this.controls.turn(v);
 
@@ -709,8 +717,8 @@ This is not fatal but the dataset is now disabled.`,
 
 		this.loading = true;
 
-		if (this.mutant) {
-			await until(_ => maybe(this.hosts, 'length') === this.config.mutant_targets.length);
+		if (this.hosts) {
+			await until(_ => this.hosts.every(d => d instanceof DS));
 			return Promise.all(this.hosts.map(d => d.load(arg)));
 		}
 
@@ -723,7 +731,7 @@ This is not fatal but the dataset is now disabled.`,
 	opacity(v) {
 		let t = [];
 
-		switch (this.datatype) {
+		switch (this.type) {
 		case 'points': {
 			t = ['circle-opacity', 'circle-stroke-opacity'];
 			break;
@@ -755,7 +763,7 @@ This is not fatal but the dataset is now disabled.`,
 		}
 
 		default: {
-			console.warn("ds.opacity: undecided datatype", this.id, this.datatype);
+			console.warn("ds.opacity: undecided type", this.id, this.type);
 			break;
 		}
 		}

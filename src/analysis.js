@@ -214,7 +214,7 @@ function datasets(type) {
 	return STATE.datasets
 		.filter(d => and(d.raster, d.analysis))
 		.filter(d => {
-			if (d.datatype === 'polygons-boundaries') return false;
+			if (d.type === 'polygons-boundaries') return false;
 
 			if (!and(d.domain, d._domain)) {
 				console.debug(`Discarding '${d.id}'. Domain is not set yet.`);

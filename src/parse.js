@@ -72,7 +72,7 @@ function table_setup() {
 
 	if (or(this.domain,
 	       !this.csv.table,
-	       this.datatype === 'polygons-boundaries'))
+	       this.type === 'polygons-boundaries'))
 		return;
 
 	const arr = [];
@@ -89,7 +89,7 @@ function table_refresh() {
 	const table = {};
 	const data = this.csv.data;
 	const k = this.csv.key;
-	const v = this.datatype.match(/-timeline/) ? STATE.timeline : this.csv.column;
+	const v = this.type.match(/-timeline/) ? STATE.timeline : this.csv.column;
 
 	for (let r of data) {
 		const n = +r[v];
@@ -143,11 +143,12 @@ export function raster() {
 			this.raster.width = image.getWidth();
 			this.raster.height = image.getHeight();
 			this.raster.nodata = parseFloat(image.fileDirectory.GDAL_NODATA);
+			this.raster.tiff = tiff;
 
 			if (this.timeline)
 				this.timeline.rasters = rasters;
 
-			if (this.datatype.match(/raster(-timeline)?/) && !this.domain) {
+			if (this.type.match(/raster(-timeline)?/) && !this.domain) {
 				let min, max; min = max = this.raster.nodata;
 				for (let v of this.raster.data) {
 					if (v === this.raster.nodata) continue;
@@ -173,7 +174,7 @@ OUTLINE: ${OUTLINE.raster.width} × ${OUTLINE.raster.height}`);
 
 		this.drawraster = draw;
 
-		if (this.datatype.match(/raster/)) draw.call(this);
+		if (this.type.match(/raster/)) draw.call(this);
 	};
 
 	let t;
@@ -499,7 +500,7 @@ export function vectors_csv() {
 function vectors_timeline() {
 	const values = [].concat(...GEOGRAPHY.timeline_dates.map(d => this.csv.data.map(r => +r[d])));
 
-	if (or(this.datatype === 'polygons-timeline', !this.domain))
+	if (or(this.type === 'polygons-timeline', !this.domain))
 		this.domain = { "min": d3.min(values), "max": d3.max(values) };
 
 	this.csv.table = table_refresh.call(this);

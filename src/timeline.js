@@ -324,7 +324,7 @@ export function lines_draw() {
 	if (!tiercsv) return;
 
 	const datasets = STATE.datasets
-		.filter(d => and(d.datatype === 'polygons-timeline', maybe(d, 'csv', 'data')));
+		.filter(d => and(d.type === 'polygons-timeline', maybe(d, 'csv', 'data')));
 
 	if (!datasets.length) return;
 
@@ -390,7 +390,7 @@ export async function lines_update() {
 
 	if (!(maybe(GEOGRAPHY.divisions, STATE.divtier, 'csv'))) return;
 
-	const datasets = STATE.datasets.filter(d => d.datatype === 'polygons-timeline');
+	const datasets = STATE.datasets.filter(d => d.type === 'polygons-timeline');
 
 	if (and(datasets.length, STATE.subdiv > -1))
 		lines_draw();

@@ -720,6 +720,9 @@ export default class dscard extends HTMLElement {
 		if (!maybe(this.ds, 'config', 'attributes_map', 'length'))
 			return "";
 
+		if (this.ds.config.attributes_map.every(a => this.ds.config.properties_search.includes(a.dataset)))
+			return "";
+
 		const e = bi_icon('filter');
 		e.onclick = filter_modal.bind(this.ds);
 

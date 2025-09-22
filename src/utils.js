@@ -1,10 +1,15 @@
 export async function self() {
+	SELF = {};
+
+	const token = localStorage['token'];
+
+	if (!token) return;
+
 	try {
-		const id = jwt_decode(localStorage['token']).id;
+		const id = jwt_decode(token).id;
 		SELF = (await API.get('users', { "id": `eq.${id}` }, { "one": true }));
 	} catch (err) {
-		console.warn(err);
-		SELF = { "data": { "circles": [], "envs": [] } };
+		console.warn("token:", token, err);
 	}
 };
 

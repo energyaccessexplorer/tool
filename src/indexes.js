@@ -90,18 +90,12 @@ function radio(init, callback) {
 export async function graphs(raster) {
 	const t = await summary_analyse(raster);
 
-	const e = (1000/GEOGRAPHY.resolution)**2;
-
-	const outline_raster = DST.get('outline').raster;
-	const outline_cover = outline_raster.data.filter(x => x != outline_raster.nodata).length;
-	const f = GEOGRAPHY.area ? (GEOGRAPHY.area / outline_cover) : (1/e);
-
 	let g = maybe(t, 'population-density'); if (g) {
 		g['distribution'].forEach((x,i) => PIES['population']['data'][i].push(x));
 
 		PIES['population'].change(1);
 
-		qs('#population-number').innerHTML = Math.round(g['total'] / e).toLocaleString() + "&nbsp;" + "people";
+		qs('#population-number').innerHTML = Math.round(g['total']).toLocaleString() + "&nbsp;" + "people";
 
 		g['distribution'].forEach((x,i) => PIES['population']['data'][i].shift());
 	} else {
@@ -114,7 +108,7 @@ export async function graphs(raster) {
 
 		PIES['area'].change(1);
 
-		qs('#area-number').innerHTML = Math.round(g['total'] * f).toLocaleString() + "&nbsp;" + "km<sup>2</sup>";
+		qs('#area-number').innerHTML = Math.round(g['total']).toLocaleString() + "&nbsp;" + "km<sup>2</sup>";
 
 		g['distribution'].forEach((x,i) => PIES['area']['data'][i].shift());
 	} else {
@@ -207,9 +201,8 @@ export function init() {
 			return;
 		}
 
-		const url = new URL(location);
-		const type = url.searchParams.get('output');
-		fake_blob_download((await analysis(type)).tiff, `energyaccessexplorer-${type}.tif`);
+		const t = STATE.index;
+		fake_blob_download((await analysis(t)).tiff, `energyaccessexplorer-${t}.tif`);
 	};
 
 	const graphs = tmpl('#index-graphs-container-template');

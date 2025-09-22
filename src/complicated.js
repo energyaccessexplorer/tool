@@ -210,14 +210,14 @@ export function analysis_dataset_intersect(raster) {
 	}
 
 	let count = 0;
-	for (const p of this.vectors.geojson.features) {
+	for (const p of this.vectors.data.features) {
 		const x = fn(p);
 		p.properties['__visible'] = x;
 
 		if (x) count += 1;
 	}
 
-	MAPBOX.getSource(this.id).setData(DST.get(this.id).vectors.geojson);
+	MAPBOX.getSource(this.id).setData(DST.get(this.id).vectors.data);
 
 	return count;
 };

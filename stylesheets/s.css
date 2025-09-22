@@ -1,7 +1,3 @@
-body {
-  overflow: hidden;
-}
-
 #playground {
   width: 1200px;
   display: flex;

@@ -41,7 +41,8 @@ deps:
 	@ mkdir -p ${LIB}/fonts
 	DEST=${LIB} ${BIN}/deps
 
-	@ sed -i'' 's/var PptxGenJS=/window.PptxGenJS=/' ${LIB}/pptxgen.js
+	@ sed -i.orig 's/var PptxGenJS=/window.PptxGenJS=/' ${LIB}/pptxgen.js
+	@ rm ${LIB}/pptxgen.js.orig
 
 	@ echo '{}' >/tmp/empty.json
 
@@ -52,6 +53,7 @@ build-m:
 	@ mustache /tmp/empty.json ${VIEWS}/m.mustache > ${DIST}/m/index.html
 
 	@ sed -r -i.orig 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/m/index.html
+	@ rm ${DIST}/m/index.html.orig
 
 	@ cp \
 		${SRC}/user.js \
@@ -84,6 +86,7 @@ build-p:
 	@ mustache /tmp/empty.json ${VIEWS}/p.mustache > ${DIST}/p/index.html
 
 	@ sed -r -i.orig 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/p/index.html
+	@ rm ${DIST}/p/index.html.orig
 
 	@ cp \
 		${SRC}/user.js \
@@ -114,6 +117,7 @@ build-a:
 	@ mustache /tmp/empty.json ${VIEWS}/a.mustache > ${DIST}/a/index.html
 
 	@ sed -r -i.orig 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/a/index.html
+	@ rm ${DIST}/a/index.html.orig
 
 	@ cp ${CSS}/ripple.css ${DIST}/a/ripple.css
 	@ cp ${CSS}/buttons.css ${DIST}/a/buttons.css
@@ -198,6 +202,7 @@ build-s:
 	@ mustache /tmp/empty.json ${VIEWS}/s.mustache > ${DIST}/s/index.html
 
 	@ sed -r -i.orig 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/s/index.html
+	@ rm ${DIST}/s/index.html.orig
 
 	@ cp \
 		${SRC}/utils.js \
@@ -244,6 +249,11 @@ synced:
 		--info=name1,progress0 \
 		${DIST}/ ${SSH_USER}@${SSH_HOST}:${TOOL_DEST}
 
+deploy-all:
+	bmake deploy env=production
+	bmake deploy env=staging
+	bmake deploy env=training
+
 deploy:
 	@ touch ${env}.diff development.diff
 
@@ -289,4 +299,5 @@ reconfig:
 		| jq '.mapbox_theme = ${MAPBOX_THEME}' \
 		>> settings.tmp.json
 
-	@ sed -i'' -e '$$s/$$/;\n/' settings.tmp.json
+	@ sed -i.orig -e '$$s/$$/;\n/' settings.tmp.json
+	@ rm settings.tmp.json.orig

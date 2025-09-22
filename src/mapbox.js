@@ -254,14 +254,8 @@ export function info_mode_change() {
 
 async function worldview() {
 	let v = "US";
-	switch (GEOGRAPHY.circle) {
-	case "india":
-		v = "IN";
-		break;
 
-	default:
-		break;
-	}
+	if (GEOGRAPHY.circles.includes("india")) v = "IN";
 
 	if (!MAPBOX.getLayer('admin-0-boundary-disputed')) return;
 

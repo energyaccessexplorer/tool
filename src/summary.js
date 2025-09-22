@@ -109,7 +109,7 @@ async function summary() {
 
 		for (let k in SUMMARY) {
 			let tr = ce('tr', ce('td', EAE['indexes'][k]['name'], { "class": 'index-name' }));
-			s.forEach((x,i) => tr.append(ce('td', (SUMMARY[k][j]['amounts'][i]).toLocaleString())));
+			s.forEach((x,i) => tr.append(ce('td', Math.round(SUMMARY[k][j]['amounts'][i]).toLocaleString())));
 
 			tbody.append(tr);
 		}
@@ -176,17 +176,18 @@ export default async function analyse(raster) {
 
 	let a = new Float32Array(raster.length).fill(-1);
 
-	let f = d3.scaleQuantize()
+	const fn = d3.scaleQuantize()
 		.domain([0,1])
 		.range(default_colorscale.intervals);
 
 	for (let i = 0; i < raster.length; i += 1) {
 		const r = raster[i];
-		a[i] = (r === -1) ? -1 : f(r);
+		a[i] = (r === -1) ? -1 : fn(r);
 	}
 
 	let population_groups = [0, 0, 0, 0, 0];
 	let area_groups = [0, 0, 0, 0, 0];
+	let covered = 0;
 
 	for (let i = 0; i < a.length; i += 1) {
 		let x = a[i];
@@ -202,25 +203,36 @@ export default async function analyse(raster) {
 		else if (x >= 0.8 && x <= 1)  t = 4;
 
 		if (x !== -1) {
+			covered += 1;
 			area_groups[t] += 1;
 			population_groups[t] += v;
 		}
 	}
 
+	const e = (1000/GEOGRAPHY.resolution)**2;
+	const c = OUTLINE.raster.data.filter(x => x !== OUTLINE.raster.nodata).length;
+
 	const ptotal = population_groups.reduce((a,b) => a + b, 0);
 	const atotal = area_groups.reduce((a,b) => a + b, 0);
+
+	const s = STATE.divtier ?
+		x => x / e :
+		d3.scaleLinear()
+			.domain([0, c])
+			.range([0, (GEOGRAPHY.area || c/e)])
+			.clamp(true);
 
 	const o = {};
 	if (ds.id === 'population-density')
 		o['population-density'] = {
-			"total":        ptotal,
-			"amounts":      population_groups,
+			"total":        ptotal / e,
+			"amounts":      population_groups.map(x => x / e),
 			"distribution": population_groups.reduce((a,b) => { a.push(b/ptotal); return a; }, []),
 		};
 
 	o['area'] = {
-		"total":        atotal,
-		"amounts":      area_groups,
+		"total":        s(covered),
+		"amounts":      area_groups.map(x => s(x)),
 		"distribution": area_groups.reduce((a,b) => { a.push(b/atotal); return a; }, []),
 	};
 

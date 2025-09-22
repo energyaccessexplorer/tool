@@ -624,7 +624,7 @@ This is not fatal but the dataset is now disabled.`,
 		const content = ce('table');
 		content.className = 'feature-table';
 
-		const features = this.vectors.geojson.features;
+		const features = this.vectors.data.features;
 
 		const points = this.type.match(/points/);
 
@@ -722,8 +722,10 @@ This is not fatal but the dataset is now disabled.`,
 			return Promise.all(this.hosts.map(d => d.load(arg)));
 		}
 
-		if (maybe(this, arg)) await this[arg].parse();
-		else throw new Error(`Loading Error: '${this.id}' tried to load '${arg}', but failed`);
+		if (maybe(this, arg))
+			await this[arg].parse();
+		else
+			throw new Error(`Loading Error: '${this.id}' tried to load '${arg}', but failed`);
 
 		this.loading = false;
 	};

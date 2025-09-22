@@ -45,7 +45,7 @@ function trigger(value) {
 };
 
 export async function load(x,y) {
-	const fs = maybe(GEOGRAPHY.divisions, x, 'vectors', 'geojson', 'features');
+	const fs = maybe(GEOGRAPHY.divisions, x, 'vectors', 'data', 'features');
 	if (!fs) return;
 
 	const geometry = fs.find(f => f['id'] === y);
@@ -54,8 +54,8 @@ export async function load(x,y) {
 	const d = GEOGRAPHY.divisions[x];
 	await d.load('vectors');
 
-	d.vectors.geojson.features.forEach(f => f.properties['__visible'] = (f.id === y));
-	MAPBOX.getSource(d.id).setData(DST.get(d.id).vectors.geojson);
+	d.vectors.data.features.forEach(f => f.properties['__visible'] = (f.id === y));
+	MAPBOX.getSource(d.id).setData(DST.get(d.id).vectors.data);
 };
 
 export async function init() {
@@ -103,7 +103,7 @@ function tree($) {
 
 	try {
 		if (and(adm !== 0, GEOGRAPHY.id != a.geography_id)) {
-			const i = divisions[1].vectors.geojson.features[0].id;
+			const i = divisions[1].vectors.data.features[0].id;
 			$ = $[a.csv.data.find(x => x['TIER'+(adm+1)] === i)['TIER'+adm]]; // figure out which adm-tier GEOGRAPHY belongs to
 
 			if (!$) throw new Error("Failed finding current geography in parent's admin-tier", a.csv.data, adm, i);

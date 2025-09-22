@@ -676,7 +676,7 @@ export default class dscard extends HTMLElement {
 			);
 
 			cb.onchange = _ => {
-				const fs = this.ds.vectors.geojson.features;
+				const fs = this.ds.vectors.data.features;
 
 				for (let i = 0; i < fs.length; i += 1)
 					if (same(fs[i].properties['__criteria'], l))
@@ -686,7 +686,7 @@ export default class dscard extends HTMLElement {
 					.filter(c => c[1].checked)
 					.map(c => c[0] || 'default');
 
-				MAPBOX.getSource(this.ds.id).setData(this.ds.vectors.geojson);
+				MAPBOX.getSource(this.ds.id).setData(this.ds.vectors.data);
 			};
 
 			const id = l[l.params[0]] || 'default';
@@ -701,7 +701,7 @@ export default class dscard extends HTMLElement {
 	};
 
 	list_elements() {
-		if (!this.ds.vectors?.geojson) return "";
+		if (!maybe(this.ds, 'vectors', 'data')) return "";
 
 		const e = bi_icon('table');
 		e.onclick = this.ds.features_table_modal.bind(this.ds);

@@ -237,11 +237,10 @@ export async function init() {
 		"deployment": `ov.{${ENV}}`,
 	};
 
-	if (or(ENV.includes('training'), ENV.includes('staging'))) {
-		params['circle'] = "not.is.null"; // whatever: everything.
-
-		if (!["director", "root"].includes(SELF.role))
-			params['circle'] = `in.(${SELF.data.circles})`;
+	if (and(or(ENV.includes('training'),
+	           ENV.includes('staging')),
+	        !["director", "root"].includes(SELF.role))) {
+		params['with_access'] = "is.true";
 	}
 
 	API.get("geographies", params)

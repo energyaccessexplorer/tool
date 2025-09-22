@@ -323,7 +323,7 @@ This is fatal. Thanks for all the fish.`;
 		await OUTLINE.load('vectors');
 		await OUTLINE.load('raster');
 
-		OUTLINE.vectors.geojson.features[0].id = 0;
+		OUTLINE.vectors.data.features[0].id = 0;
 	})();
 
 	await (function fetch_divisions() {
@@ -442,13 +442,18 @@ async function reload(k,v) {
 		return;
 	}
 
-	if (or(k === "subdiv", k === "divtier"))
+	if (k === "datasets") {
+		controls_recount();
+	}
+
+	if (or(k === "subdiv", k === "divtier")) {
 		geographiessearch_load(STATE.divtier, STATE.subdiv);
+	}
 
 	const timeline = qs('#timeline');
 	const output_preview = qs('#output-preview');
 
-	const {view, index} = STATE;
+	const {view, index, variant} = STATE;
 
 	(function special_layers() {
 		if (!MAPBOX.getSource('output-source')) {
@@ -478,7 +483,7 @@ async function reload(k,v) {
 			if (!MAPBOX.getSource(`filtered-source-${i}`)) {
 				MAPBOX.addSource(`filtered-source-${i}`, {
 					"type": 'geojson',
-					"data": d.vectors.geojson,
+					"data": d.vectors.data,
 				});
 			}
 
@@ -503,7 +508,7 @@ async function reload(k,v) {
 
 				MAPBOX.addSource(`priority-source-${i}`, {
 					"type": 'geojson',
-					"data": json_clone(d.vectors.geojson),
+					"data": json_clone(d.vectors.data),
 				});
 			}
 
@@ -544,13 +549,11 @@ async function reload(k,v) {
 	};
 
 	function priority_visibility_pick() {
-		const x = STATE.variant !== "raster";
+		const x = variant !== "raster";
 
 		GEOGRAPHY.divisions.forEach((d,i) => {
-			const t = STATE.variant;
-
 			if (MAPBOX.getLayer(`priority-layer-${i}`))
-				MAPBOX.setLayoutProperty(`priority-layer-${i}`, 'visibility', x && (t === i) ? "visible" : "none");
+				MAPBOX.setLayoutProperty(`priority-layer-${i}`, 'visibility', x && (variant === i) ? "visible" : "none");
 		});
 	};
 
@@ -558,16 +561,10 @@ async function reload(k,v) {
 		return Promise.all(STATE.datasets.map(x => x.active(true, v)));
 	};
 
-	if (k === "datasets") {
-		controls_recount();
+	const a = await analysis_plot_active(index, true);
 
-		const a = await analysis_plot_active(index, true);
-
-		const t = STATE.variant;
-
-		if (GEOGRAPHY.divisions[t])
-			priority(GEOGRAPHY.divisions[t], a, t);
-	}
+	if (GEOGRAPHY.divisions[variant])
+		priority(GEOGRAPHY.divisions[variant], a, variant);
 
 	switch (view) {
 	case "analysis": {
@@ -579,7 +576,7 @@ async function reload(k,v) {
 
 		filtered_visibility('none');
 
-		output_visibility(STATE.variant === 'raster' ? 'visible' : 'none');
+		output_visibility(variant === 'raster' ? 'visible' : 'none');
 
 		priority_visibility_pick();
 
@@ -835,7 +832,7 @@ export async function sort(ordered) {
 };
 
 function reset_features_visibility() {
-	const fs = maybe(this, 'vectors', 'geojson');
+	const fs = maybe(this, 'vectors', 'data');
 	if (!fs) return;
 
 	fs.features.forEach(f => f.properties['__visible'] = true);

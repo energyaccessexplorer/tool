@@ -257,6 +257,8 @@ function weight_group() {
 		COMMIT("datasets");
 	};
 
+	this.weight = el;
+
 	return el;
 };
 
@@ -509,7 +511,7 @@ function ramp() {
 };
 
 function opacity() {
-	return svg_interval({
+	this.opacity = svg_interval({
 		"init":      { "min": 0, "max": this.opacity_value },
 		"sliders":   'single',
 		"height":    8,
@@ -518,7 +520,9 @@ function opacity() {
 			this.opacity_value = x;
 			this.ds.opacity(x);
 		},
-	}).svg;
+	});
+
+	return this.opacity.svg;
 };
 
 export function init() {
@@ -552,6 +556,9 @@ export function init() {
 		STATE.datasets.forEach(d => {
 			d._domain = Object.assign({}, d.domain, d.category.domain_init);
 			d._domain_select = d.domain_select ? [...d.domain_select] : undefined;
+			d.weight = 3;
+			d.opacity(1);
+
 			d.card.values();
 
 			if (d.vectors?.data) {
@@ -567,7 +574,7 @@ export function init() {
 	};
 
 	let collapsed = true;
-	const collapse_all = function() {
+	const expand_all = function() {
 		collapsed = !collapsed;
 
 		STATE.datasets.forEach(d => d.card.toggle_settings(!collapsed));
@@ -580,7 +587,7 @@ export function init() {
 		remove_all,
 		visible_all,
 		reset_all,
-		collapse_all,
+		expand_all,
 	});
 };
 
@@ -644,7 +651,7 @@ export default class dscard extends HTMLElement {
 			"value-checkboxes": value_checkboxes.call(this),
 			"pvna":             (this.ds.type === 'polygons-valued'),
 			"info":             this.ds.info_modal.bind(this.ds),
-			"index":            this.ds.index?.replace('ani', 'ANI').replace('eai', 'EAI') || "Filter",
+			"index":            this.ds.index?.replace(/(ani|eai)/, "Filter"),
 			"specs":            specs.call(this),
 			"symbol":           symbol.call(this),
 			"colorscale":       colorscale.call(this),
@@ -671,6 +678,16 @@ export default class dscard extends HTMLElement {
 
 		if (this.manual_min) this.manual_min.value = d['min'];
 		if (this.manual_max) this.manual_max.value = d['max'];
+
+		if (this.weight) this.weight.value = this.ds.weight;
+
+		this.opacity_value = this.ds.opacity;
+		this.opacity.change({
+			"min": 0,
+			"max": 1,
+		});
+
+		this.ds.visibility(true);
 
 		if (this.range_svg) {
 			this.range_svg.change({

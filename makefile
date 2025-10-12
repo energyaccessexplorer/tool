@@ -1,30 +1,28 @@
 default: reconfig build lint
 
-# .include ".env"
+.include ".env"
 # in .env:
 #
-TITLE = "Energy Access Explorer"
-WORLD = "https://world.example.org"
-DOMAIN = "example.org"
-
-API_URL = "http://eae.localhost/api"
-
-SSH_USER = www
-SSH_HOST = srv.example.org
-
-TOOL_DEST = /var/www/path
-
-MAPBOX_THEME = "mapbox/light-v10"
-MAPBOX_TOKEN = ""
-
-STORAGE_URL = "https://bucket.s3.storage.com/path/"
-
+# TITLE = "Energy Access Explorer"
+# WORLD = "https://world.example.org"
+# DOMAIN = "example.org"
+#
+# API_URL = "http://eae.localhost/api"
+#
+# SSH_USER = www
+# SSH_HOST = srv.example.org
+#
+# TOOL_DEST = /var/www/path
+#
+# MAPBOX_THEME = "mapbox/light-v10"
+# MAPBOX_TOKEN = ""
+#
+# STORAGE_URL = "https://bucket.s3.storage.com/path/"
 #
 DIST = ./dist
 SRC = ./src
 BIN = ./bin
 VIEWS = ./views
-TEMPLATES = ./templates
 CSS = ./stylesheets
 LIB = ${DIST}/lib
 

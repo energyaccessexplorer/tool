@@ -8,7 +8,7 @@
     <meta name="MobileOptimized" content="640">
     <meta name="mobile-web-app-capable" content="yes" />
 
-    <link rel="icon" href="{{> views/base}}/images/EAE Logo_Emblem.svg">
+    <link rel="icon" href="{{template "base" .}}/images/EAE Logo_Emblem.svg">
 
     <link rel="stylesheet" href="../lib/bootstrap-icons.css">
 
@@ -17,17 +17,17 @@
     <script src="./libs.js?v=--TIMESTAMP--"></script>
     <script src="./main.js?v=--TIMESTAMP--"></script>
 
-    <link href="{{> views/base}}/stylesheets/style.css" rel="stylesheet" />
-    <link href="{{> views/base}}/stylesheets/nav.css" rel="stylesheet" />
+    <link href="{{template "base" .}}/stylesheets/style.css" rel="stylesheet" />
+    <link href="{{template "base" .}}/stylesheets/nav.css" rel="stylesheet" />
 
-    <link href="{{> views/base}}/tool/lib/mapbox-gl.css" rel="stylesheet" />
+    <link href="{{template "base" .}}/tool/lib/mapbox-gl.css" rel="stylesheet" />
     <link href="./main.css" rel="stylesheet" />
 
-    {{> views/head}}
+    {{template "head" .}}
   </head>
 
   <body>
-    {{> views/nav}}
+    {{template "nav" .}}
 
     <div id="mobile-switcher"></div>
 
@@ -249,7 +249,7 @@
       </div>
     </div>
 
-    {{> views/loading}}
+    {{template "loading" .}}
   </body>
 
   <template id="controls-template">
@@ -523,7 +523,7 @@
     <p>
       There are 4 different methods to generate a prioritization, depending on
       the aim of your analysis; these are known as the different
-      “indexes”. Energy Access Potential is the standard recommended index as it
+      "indexes". Energy Access Potential is the standard recommended index as it
       is an aggregation across demand and supply categories.
     </p>
 
@@ -736,7 +736,7 @@
     </buttons>
   </template>
 
-  {{> views/env }}
+  {{template "env" .}}
 
   <script type="module">
     import flash from '../lib/flash.js';

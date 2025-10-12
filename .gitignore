@@ -6,3 +6,5 @@
 /settings.tmp.json
 /.env
 /.LASTDEPLOY
+node_modules
+bin/template-compiler

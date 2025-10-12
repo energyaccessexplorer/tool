@@ -1,38 +1,48 @@
 default: reconfig build lint
 
-.include ".env"
+# .include ".env"
 # in .env:
 #
-# TITLE = "Energy Access Explorer"
-# WORLD = "https://world.example.org"
-# DOMAIN = "example.org"
-#
-# API_URL = "http://eae.localhost/api"
-#
-# SSH_USER = www
-# SSH_HOST = srv.example.org
-#
-# TOOL_DEST = /var/www/path
-#
-# MAPBOX_THEME = "mapbox/light-v10"
-# MAPBOX_TOKEN = ""
-#
-# STORAGE_URL = "https://bucket.s3.storage.com/path/"
+TITLE = "Energy Access Explorer"
+WORLD = "https://world.example.org"
+DOMAIN = "example.org"
+
+API_URL = "http://eae.localhost/api"
+
+SSH_USER = www
+SSH_HOST = srv.example.org
+
+TOOL_DEST = /var/www/path
+
+MAPBOX_THEME = "mapbox/light-v10"
+MAPBOX_TOKEN = ""
+
+STORAGE_URL = "https://bucket.s3.storage.com/path/"
+
 #
 DIST = ./dist
 SRC = ./src
 BIN = ./bin
 VIEWS = ./views
+TEMPLATES = ./templates
 CSS = ./stylesheets
 LIB = ${DIST}/lib
 
 TIMESTAMP != date -u +'%Y-%m-%d--%T'
 
-clean:
-	@ rm -rf ${LIB} ${DIST}
+# Build Go template compiler
+${BIN}/template-compiler: template-compiler/main.go go.mod
+	@ echo "Building Go template compiler"
+	@ go build -o ${BIN}/template-compiler ./template-compiler
 
-build: deps build-a build-s build-m build-p
-	@ mustache /tmp/empty.json views/index.mustache > ${DIST}/index.html
+clean:
+	@ rm -rf ${LIB} ${DIST} ${BIN}/template-compiler
+
+build: deps build-go-templates build-a build-s build-m build-p
+	@ ${BIN}/template-compiler -template=index -output=${DIST}/index.html
+
+build-go-templates: ${BIN}/template-compiler
+	@ echo "Building Go templates"
 
 lint:
 	@ ${BIN}/lint ${SRC}
@@ -50,7 +60,7 @@ build-m:
 	@ echo "Building my screen"
 	@ mkdir -p ${DIST}/m
 
-	@ mustache /tmp/empty.json ${VIEWS}/m.mustache > ${DIST}/m/index.html
+	@ ${BIN}/template-compiler -template=m -output=${DIST}/m/index.html
 
 	@ sed -r -i.orig 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/m/index.html
 	@ rm ${DIST}/m/index.html.orig
@@ -82,7 +92,7 @@ build-p:
 	@ echo "Building snapshot screen"
 	@ mkdir -p ${DIST}/p
 
-	@ mustache /tmp/empty.json ${VIEWS}/p.mustache > ${DIST}/p/index.html
+	@ ${BIN}/template-compiler -template=p -output=${DIST}/p/index.html
 
 	@ sed -r -i.orig 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/p/index.html
 	@ rm ${DIST}/p/index.html.orig
@@ -112,7 +122,7 @@ build-a:
 	@ echo "Building analysis screen"
 	@ mkdir -p ${DIST}/a
 
-	@ mustache /tmp/empty.json ${VIEWS}/a.mustache > ${DIST}/a/index.html
+	@ ${BIN}/template-compiler -template=a -output=${DIST}/a/index.html
 
 	@ sed -r -i.orig 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/a/index.html
 	@ rm ${DIST}/a/index.html.orig
@@ -195,7 +205,7 @@ build-s:
 	@ echo "Building select screen"
 	@ mkdir -p ${DIST}/s
 
-	@ mustache /tmp/empty.json ${VIEWS}/s.mustache > ${DIST}/s/index.html
+	@ ${BIN}/template-compiler -template=s -output=${DIST}/s/index.html
 
 	@ sed -r -i.orig 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/s/index.html
 	@ rm ${DIST}/s/index.html.orig

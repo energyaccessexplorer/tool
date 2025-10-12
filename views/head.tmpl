@@ -1,10 +1,11 @@
-{{> views/hotjar}}
+{{define "head"}}
+{{template "hotjar" .}}
 
-{{> views/google}}
+{{template "google" .}}
 
-{{> views/transifex}}
+{{template "transifex" .}}
 
-{{> views/cookie}}
+{{template "cookie" .}}
 
 <script>
   document.title = EAE['settings'].title;
@@ -14,3 +15,4 @@
   if (location.hostname.match(/^(test|dev)/))
     window.BASE = location.pathname.split('/').splice(0,2).join('/');
 </script>
+{{end}}

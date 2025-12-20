@@ -12,8 +12,7 @@
 
 #index-graphs {
   display: flex;
-  flex-flow: row wrap;
-  justify-content: space-around;
+  flex-flow: column nowrap;
 }
 
 #index-graphs-title {
@@ -22,29 +21,47 @@
   width: 100%;
 }
 
-.index-graphs-container {
+.index-graphs-section {
   display: flex;
-  flex-flow: row nowrap;
-  justify-content: space-around;
+  flex-flow: column nowrap;
+  padding: 1em;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.index-graphs-section:last-child {
+  border-bottom: none;
+}
+
+.section-title {
+  font-weight: bold;
+  font-size: 1em;
+  margin-bottom: 0.5em;
   text-align: center;
-  width: 100%;
 }
 
 .index-graphs-group {
-  width: 150px;
-}
-
-.index-graphs-group div {
-  margin: 1em auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0.5em 0;
 }
 
 .indexes-pie-label {
   font-size: small;
   color: #919191;
+  margin-top: 0.5em;
+}
+
+.index-graphs-scale-container {
+  margin: 1em auto;
+  width: 100%;
 }
 
 .index-graphs-scale {
-  margin: 1em 2em;
+  margin: 0 auto;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
 }
 
 #index-graphs-description {

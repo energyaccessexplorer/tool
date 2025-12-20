@@ -87,15 +87,6 @@ export function init() {
 
 	const user_id = user_extract('id');
 
-	const r = bind(tmpl('#ramp'), {
-		"left":   "Low",
-		"middle": "Medium",
-		"right":  "High",
-	});
-
-	const scale = ce('div', null, { "class": 'index-graphs-scale' });
-	scale.append(analysis_colorscale_svg.cloneNode(true), r);
-
 	const snap = qs('#save-snapshot-button');
 	snap.onclick = _ => {
 		if (snapshot())
@@ -135,16 +126,30 @@ export function init() {
 
 	const graphs = tmpl('#index-graphs-container-template');
 
-	qs('.index-graphs-group #area-number', graphs).parentElement.append(PIES['area'].svg);
-	qs('.index-graphs-group #population-number', graphs).parentElement.append(PIES['population'].svg);
+	const graphSections = graphs.querySelectorAll('.index-graphs-section');
+	setupGraphSection(graphSections[0], PIES['area']);
+	setupGraphSection(graphSections[1], PIES['population']);
 
-	qs('#index-graphs').append(graphs, scale);
+	qs('#index-graphs').append(graphs);
 
 	const collapse = qs('#right-panel-collapse');
 	collapse.onclick = toggle.bind(qs('#right-panel'));
 
 	high_priority_areas_panel_init();
 };
+
+function setupGraphSection(section, pie) {
+	qs('.index-graphs-group', section).append(pie.svg);
+
+	const ramp = bind(tmpl('#ramp'), {
+		"left":   "Low",
+		"middle": "Medium",
+		"right":  "High",
+	});
+	const scale = ce('div', null, { "class": 'index-graphs-scale' });
+	scale.append(analysis_colorscale_svg.cloneNode(true), ramp);
+	qs('.index-graphs-scale-container', section).append(scale);
+}
 
 function share_url() {
 	const c = tmpl('#share-link-modal-content');

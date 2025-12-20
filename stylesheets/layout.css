@@ -53,7 +53,9 @@ body {
   display: flex;
   flex-flow: column nowrap;
   width: 24em;
+  max-height: calc(100vh - 10em);
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 #right-panel .graphs {

@@ -55,11 +55,19 @@
   line-height: 1.5;
 }
 
-.index-graphs-group {
+.graph-and-scale {
   display: flex;
+  flex-flow: row nowrap;
   justify-content: center;
   align-items: center;
-  margin: 0.5em 0;
+  gap: 2em;
+  margin: 1em 0;
+}
+
+.index-graphs-group {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
 }
 
 .indexes-pie-label {
@@ -69,15 +77,33 @@
 }
 
 .index-graphs-scale-container {
-  margin: 1em auto;
-  width: 100%;
+  display: flex;
+  align-items: center;
 }
 
-.index-graphs-scale {
-  margin: 0 auto;
+.discrete-scale {
   display: flex;
   flex-flow: column nowrap;
+  gap: 0.5em;
+}
+
+.scale-item {
+  display: flex;
+  flex-flow: row nowrap;
   align-items: center;
+  gap: 0.5em;
+}
+
+.scale-circle {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.scale-label {
+  font-size: 0.85em;
+  color: #555;
 }
 
 #index-graphs-description {

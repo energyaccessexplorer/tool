@@ -23,7 +23,6 @@ import {
 import {
 	analysis,
 	analysis_colorscale,
-	analysis_colorscale_svg,
 } from './analysis.js';
 
 import {
@@ -43,6 +42,44 @@ const PIES = {};
 
 const bubble = (v,e) => new bubblemessage({ "message": v + "%", "position": "C", "close": false, "noevents": true }, e);
 
+function updateGraphSection(section, distribution, total, unit, description) {
+	const labels = ['Low', 'Low - medium', 'Medium', 'Medium - high', 'High'];
+
+	const scale = ce('dl', null, { "class": 'discrete-scale' });
+
+	analysis_colorscale.stops.slice().reverse().map((color, i) => {
+		const idx = analysis_colorscale.stops.length - 1 - i;
+		const count = Math.round(distribution[idx] * total);
+		const value = `${count.toLocaleString()} ${unit}`;
+
+		const circle = ce('span', null, { "class": 'scale-circle' });
+		circle.style.backgroundColor = color;
+
+		const dt = ce('dt', null, { "class": 'scale-item' });
+		dt.append(circle, ce('strong', labels[idx]));
+
+		const dd = ce('dd', value);
+
+		scale.append(dt, dd);
+	});
+
+	const scaleContainer = qs('.index-graphs-scale-container', section);
+	scaleContainer.innerHTML = '';
+	scaleContainer.append(scale);
+
+	qs('.indexes-pie-label', section).innerHTML = total.toLocaleString() + "&nbsp;" + unit;
+	qs('.section-description', section).innerHTML = description;
+}
+
+function createGraphSection(title, type, numberId, descId) {
+	const section = tmpl('#index-graph-section-template');
+	qs('.section-title', section).textContent = title;
+	qs('.indexes-pie-label', section).id = numberId;
+	qs('.section-description', section).id = descId;
+	qs('.index-graphs-group', section).append(PIES[type].svg);
+	return section;
+}
+
 export async function graphs(raster) {
 	const t = await summary_analyse(raster);
 
@@ -59,9 +96,12 @@ export async function graphs(raster) {
 
 		const totalPop = Math.round(g['total'] / e);
 		const highPop = Math.round(g['distribution'][4] / e);
+		const description = `Showing energy access potential for areas affecting
+			${totalPop.toLocaleString()} people, of whom ${highPop.toLocaleString()} people
+			are situated in areas of high energy access potential.`;
+		const section = qs('#population-number').closest('.index-graphs-section');
 
-		qs('#population-number').innerHTML = totalPop.toLocaleString() + "&nbsp;" + "people";
-		qs('#population-description').innerHTML = `Showing energy access potential for areas affecting ${totalPop.toLocaleString()} people, of whom ${highPop.toLocaleString()} people are situated in areas of high energy access potential.`;
+		updateGraphSection(section, g['distribution'], totalPop, 'people', description);
 
 		g['distribution'].forEach((x,i) => PIES['population']['data'][i].shift());
 	} else {
@@ -76,9 +116,12 @@ export async function graphs(raster) {
 
 		const totalArea = Math.round(g['total'] * f);
 		const highArea = Math.round(g['distribution'][4] * f);
+		const description = `Showing energy access potential for areas spanning
+			${totalArea.toLocaleString()} km², of which ${highArea.toLocaleString()} km² has
+			high energy access potential.`;
+		const section = qs('#area-number').closest('.index-graphs-section');
 
-		qs('#area-number').innerHTML = totalArea.toLocaleString() + "&nbsp;" + "km<sup>2</sup>";
-		qs('#area-description').innerHTML = `Showing energy access potential for areas spanning ${totalArea.toLocaleString()} km², of which ${highArea.toLocaleString()} km² has high energy access potential.`;
+		updateGraphSection(section, g['distribution'], totalArea, 'km²', description);
 
 		g['distribution'].forEach((x,i) => PIES['area']['data'][i].shift());
 	} else {
@@ -132,32 +175,17 @@ export function init() {
 		fake_blob_download((await analysis(type)).tiff, `energyaccessexplorer-${type}.tif`);
 	};
 
-	const graphs = tmpl('#index-graphs-container-template');
+	const container = ce('div');
+	container.append(createGraphSection('Area share', 'area', 'area-number', 'area-description'));
+	container.append(createGraphSection('Population share', 'population', 'population-number', 'population-description'));
 
-	const graphSections = graphs.querySelectorAll('.index-graphs-section');
-	setupGraphSection(graphSections[0], PIES['area']);
-	setupGraphSection(graphSections[1], PIES['population']);
-
-	qs('#index-graphs').append(graphs);
+	qs('#index-graphs').append(container);
 
 	const collapse = qs('#right-panel-collapse');
 	collapse.onclick = toggle.bind(qs('#right-panel'));
 
 	high_priority_areas_panel_init();
 };
-
-function setupGraphSection(section, pie) {
-	qs('.index-graphs-group', section).append(pie.svg);
-
-	const ramp = bind(tmpl('#ramp'), {
-		"left":   "Low",
-		"middle": "Medium",
-		"right":  "High",
-	});
-	const scale = ce('div', null, { "class": 'index-graphs-scale' });
-	scale.append(analysis_colorscale_svg.cloneNode(true), ramp);
-	qs('.index-graphs-scale-container', section).append(scale);
-}
 
 function share_url() {
 	const c = tmpl('#share-link-modal-content');

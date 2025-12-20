@@ -57,7 +57,11 @@ export async function graphs(raster) {
 
 		PIES['population'].change(1);
 
-		qs('#population-number').innerHTML = Math.round(g['total'] / e).toLocaleString() + "&nbsp;" + "people";
+		const totalPop = Math.round(g['total'] / e);
+		const highPop = Math.round(g['distribution'][4] / e);
+
+		qs('#population-number').innerHTML = totalPop.toLocaleString() + "&nbsp;" + "people";
+		qs('#population-description').innerHTML = `Showing energy access potential for areas affecting ${totalPop.toLocaleString()} people, of whom ${highPop.toLocaleString()} people are situated in areas of high energy access potential.`;
 
 		g['distribution'].forEach((x,i) => PIES['population']['data'][i].shift());
 	} else {
@@ -70,7 +74,11 @@ export async function graphs(raster) {
 
 		PIES['area'].change(1);
 
-		qs('#area-number').innerHTML = Math.round(g['total'] * f).toLocaleString() + "&nbsp;" + "km<sup>2</sup>";
+		const totalArea = Math.round(g['total'] * f);
+		const highArea = Math.round(g['distribution'][4] * f);
+
+		qs('#area-number').innerHTML = totalArea.toLocaleString() + "&nbsp;" + "km<sup>2</sup>";
+		qs('#area-description').innerHTML = `Showing energy access potential for areas spanning ${totalArea.toLocaleString()} km², of which ${highArea.toLocaleString()} km² has high energy access potential.`;
 
 		g['distribution'].forEach((x,i) => PIES['area']['data'][i].shift());
 	} else {

@@ -97,15 +97,15 @@ width: calc(${g}% - 1.5em);
 		qs('div.search-results-info', resultscontainer).innerHTML = `Searching <b>analysis coordinates</b>. Showing first ${n} of ${count}:`;
 };
 
+// Export this function to be called when analysis updates
+export function update() {
+	trigger({});
+};
+
 export function init() {
-	const panel = qs('#analysis.search-panel');
-	const input = ce('span', "Analysis top locations", { "id": 'analysis-search', "class": 'search-input' });
+	// Target the right panel container instead of left panel
+	resultscontainer = qs('#right-panel #analysis-locations-section .search-results');
 
-	panel.addEventListener('activate', trigger);
-
-	panel.prepend(input);
-
-	resultscontainer = qs('#analysis .search-results');
 	ul = ce('ul');
 	resultscontainer.append(ul);
 

@@ -11,9 +11,9 @@ import summary_analyse from './summary.js';
 import bubblemessage from '../lib/bubblemessage.js';
 
 import {
-	init as high_priority_areas_panel_init,
-	update as high_priority_areas_panel_update,
-} from './analysis-locations-right-panel.js';
+	init as analysis_locations_panel_init,
+	update as analysis_locations_panel_update,
+} from './analysis-search.js';
 
 import {
 	extract as user_extract,
@@ -129,7 +129,7 @@ export async function graphs(raster) {
 		if (an) an.closest('.index-graphs-group').remove();
 	}
 
-	high_priority_areas_panel_update();
+	analysis_locations_panel_update();
 };
 
 export function init() {
@@ -181,10 +181,13 @@ export function init() {
 
 	qs('#index-graphs').append(container);
 
+	const analysis_locations = tmpl('#analysis-locations-template');
+	qs('#analysis-locations').replaceWith(analysis_locations);
+
 	const collapse = qs('#right-panel-collapse');
 	collapse.onclick = toggle.bind(qs('#right-panel'));
 
-	high_priority_areas_panel_init();
+	analysis_locations_panel_init();
 };
 
 function share_url() {

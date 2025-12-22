@@ -140,7 +140,6 @@ build-a:
 		${SRC}/geographies-search.js \
 		${SRC}/vectors-search.js \
 		${SRC}/analysis-search.js \
-		${SRC}/high-priority-areas-panel.js \
 		${SRC}/locations-search.js \
 		${SRC}/points-loading.js \
 		${SRC}/ds.js \

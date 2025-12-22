@@ -19,7 +19,7 @@ import {
 	qs,
 } from '../lib/helpers.js';
 
-let ul, resultscontainer, resultsinfo;
+let ul, resultscontainer, resultsinfo, section;
 
 function pointto(p, a = false) {
 	const dict = [[ "v", EAE['indexes'][STATE.index]['name'] ]];
@@ -51,6 +51,28 @@ function li(p) {
 
 	return el;
 };
+
+function toggle_section() {
+	const chevron = qs('.section-chevron', section);
+
+	if (chevron.classList.contains('disabled')) return;
+
+	const isCollapsed = section.getAttribute('data-collapsed') === 'true';
+	section.setAttribute('data-collapsed', !isCollapsed);
+}
+
+function set_section_state(hasValidData) {
+	const chevron = qs('.section-chevron', section);
+	const content = qs('.section-content', section);
+
+	if (!hasValidData) {
+		chevron.classList.add('disabled');
+		section.setAttribute('data-collapsed', 'true');
+	} else {
+		chevron.classList.remove('disabled');
+		if (content) { content.style.maxHeight = content.scrollHeight + 'px'; }
+	}
+}
 
 async function trigger({ points = getpoints, n = 20 }) {
 	ul.replaceChildren();
@@ -95,6 +117,8 @@ width: calc(${g}% - 1.5em);
 
 	if (count > n)
 		qs('div.search-results-info', resultscontainer).innerHTML = `Searching <b>analysis coordinates</b>. Showing first ${n} of ${count}:`;
+
+	set_section_state(count > 0);
 };
 
 // Export this function to be called when analysis updates
@@ -103,12 +127,17 @@ export function update() {
 };
 
 export function init() {
-	// Target the right panel container instead of left panel
-	resultscontainer = qs('#right-panel #analysis-locations-section .search-results');
+	section = qs('#right-panel #analysis-locations-section');
+	resultscontainer = qs('.search-results', section);
 
 	ul = ce('ul');
 	resultscontainer.append(ul);
 
 	resultsinfo = ce('div', ce('b', "Analysis coordinates"), { "class": 'search-results-info' });
 	resultscontainer.prepend(resultsinfo);
+
+	const title = qs('.section-title', section);
+	if (title) {
+		title.onclick = toggle_section;
+	}
 };

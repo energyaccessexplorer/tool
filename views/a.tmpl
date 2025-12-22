@@ -651,13 +651,18 @@
   </template>
 
   <template id="analysis-locations-template">
-    <div id="analysis-locations-section">
-      <h2 class="section-title">High priority areas</h2>
-      <div class="section-subtitle">
-        Showing areas (1km2) with the highest prioritization scores based on
-        your analysis criteria.
+    <div id="analysis-locations-section" class="collapsible-section" data-collapsed="true">
+      <h2 class="section-title">
+        <span class="section-title-text">High priority areas</span>
+        <i class="bi bi-chevron-down section-chevron"></i>
+      </h2>
+      <div class="section-content">
+        <div class="section-subtitle">
+          Showing areas (1km2) with the highest prioritization scores based on
+          your analysis criteria.
+        </div>
+        <div class="search-results"></div>
       </div>
-      <div class="search-results"></div>
     </div>
   </template>
 

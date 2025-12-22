@@ -11,7 +11,6 @@ import {
 
 import {
 	graphs as indexes_graphs,
-	updated_plot as indexes_updated_plot,
 } from './right-panel.js';
 
 import {
@@ -279,8 +278,6 @@ export async function plot_active(type, doindexes) {
 
 		return a;
 	}
-
-	indexes_updated_plot(type, index);
 
 	// 'animate' is set to false on mapbox's configuration, since we don't want
 	// mapbox eating the CPU at 60FPS for nothing.

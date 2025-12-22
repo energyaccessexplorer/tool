@@ -192,11 +192,11 @@ export function init() {
 		fake_blob_download((await analysis(type)).tiff, `energyaccessexplorer-${type}.tif`);
 	};
 
-	const container = ce('div');
-	container.append(create_graph_section('Area share', 'area', 'area-number', 'area-description'));
-	container.append(create_graph_section('Population share', 'population', 'population-number', 'population-description'));
+	const areaSection = create_graph_section('Area share', 'area', 'area-number', 'area-description');
+	const populationSection = create_graph_section('Population share', 'population', 'population-number', 'population-description');
 
-	qs('#index-graphs').append(container);
+	qs('#analysis-sections-wrapper').append(areaSection);
+	qs('#analysis-sections-wrapper').append(populationSection);
 
 	const analysis_locations = tmpl('#analysis-locations-template');
 	qs('#analysis-locations').replaceWith(analysis_locations);
@@ -247,9 +247,7 @@ function share_url() {
 	}).show();
 };
 
-export function updated_plot(type, index) {
-	qs('#index-graphs-title').innerText = index['name'];
-	qs('#index-graphs-subtext').innerText = index['subtext'];
+export function updated_plot(_type, _index) {
 };
 
 function toggle() {

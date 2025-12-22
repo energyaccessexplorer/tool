@@ -61,7 +61,7 @@ import {
 } from './timeline.js';
 
 import {
-	valued_polygons as filtered_valued_polygons,
+	valued_polygons as _filtered_valued_polygons,
 	colors_array as filtered_colors_array,
 } from './filtered.js';
 
@@ -600,7 +600,6 @@ async function reload(k,v) {
 	if (timeline) timeline_lines_update();
 
 	filtered_visibility('none');
-	filtered_valued_polygons();
 
 	if (k === "layers") {
 		await mapbox_sort();

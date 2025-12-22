@@ -91,10 +91,6 @@ body {
   padding: 0 0.5em;
 }
 
-#filtered-pane,
-#index-graphs {
-  border-top: 1px solid lightgray;
-}
 
 #cards-list {
   flex-grow: 1;

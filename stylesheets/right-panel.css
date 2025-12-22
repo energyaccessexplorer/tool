@@ -61,10 +61,11 @@
 #analysis-sections-wrapper {
   display: flex;
   flex-direction: column;
+  gap: 12px;
+  padding: 12px;
 }
 
 #analysis-sections-wrapper > div {
-  padding: 1em;
   flex-shrink: 0;
 }
 
@@ -129,40 +130,34 @@
 .index-graphs-section {
   display: flex;
   flex-flow: column nowrap;
-  padding: 1em;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.index-graphs-section:last-child {
-  border-bottom: none;
 }
 
 .section-title {
-  font-weight: bold;
-  font-size: 1.1em;
-  margin-bottom: 0.3em;
-  text-align: center;
-  position: relative;
-  cursor: pointer;
-  padding-right: 30px;
+  font-family: 'Acumin Pro', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 24px;
+  color: #1A1919;
+  margin: 0;
 }
 
-.section-title .section-chevron {
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+.visibility-toggle-switch {
   transition: transform 0.3s ease;
-  font-size: 0.9em;
+  font-size: 16px;
+  color: #3D3B3B;
+  cursor: pointer;
+  padding: 4px;
+  margin: -4px;
 }
 
-.section-title .section-chevron.disabled {
+.visibility-toggle-switch.disabled {
   opacity: 0.3;
   cursor: not-allowed;
 }
 
-.collapsible-section[data-collapsed="true"] .section-chevron {
-  transform: translateY(-50%) rotate(-90deg);
+.collapsible-section[data-collapsed="true"] .visibility-toggle-switch {
+  transform: rotate(-90deg);
 }
 
 .collapsible-section .section-content {
@@ -180,11 +175,13 @@
 }
 
 .section-subtitle {
-  font-size: 0.85em;
-  color: #666;
-  text-align: center;
-  margin-bottom: 1em;
-  line-height: 1.4;
+  font-family: 'Acumin Pro', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: #5C5959;
+  margin: 0;
 }
 
 .section-description {
@@ -225,13 +222,6 @@
   display: flex;
   flex-flow: column nowrap;
   gap: 0.5em;
-}
-
-#analysis-locations-section {
-  display: flex;
-  flex-flow: column nowrap;
-  padding: 1em;
-  border-bottom: 1px solid #e0e0e0;
 }
 
 #analysis-locations-section .search-results {

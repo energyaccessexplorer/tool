@@ -58,27 +58,6 @@ function li(p) {
 	return el;
 };
 
-function toggle_section() {
-	const chevron = qs('.section-chevron', section);
-
-	if (chevron.classList.contains('disabled')) return;
-
-	const isCollapsed = section.getAttribute('data-collapsed') === 'true';
-	section.setAttribute('data-collapsed', !isCollapsed);
-}
-
-function set_section_state(hasValidData) {
-	const chevron = qs('.section-chevron', section);
-	const content = qs('.section-content', section);
-
-	if (!hasValidData) {
-		chevron.classList.add('disabled');
-		section.setAttribute('data-collapsed', 'true');
-	} else {
-		chevron.classList.remove('disabled');
-		if (content) { content.style.maxHeight = 'none'; }
-	}
-}
 
 function render_pagination() {
 	if (!paginationContainer) return;
@@ -203,11 +182,10 @@ async function trigger() {
 
 	if (count === 0) {
 		resultsinfo.innerHTML = `Searching <b>analysis coordinates</b>. Top 0 results:`;
-		set_section_state(false);
+		if (section) section.setAttribute('collapsed', '');
 		return;
 	}
 
-	set_section_state(true);
 	render_page(paginationState.currentPage);
 };
 
@@ -227,9 +205,4 @@ export function init() {
 
 	resultsinfo = ce('div', ce('b', "Analysis coordinates"), { "class": 'search-results-info' });
 	resultscontainer.prepend(resultsinfo);
-
-	const title = qs('.section-title', section);
-	if (title) {
-		title.onclick = toggle_section;
-	}
 };

@@ -180,3 +180,22 @@ ds-controls:not(.active) buttons [bind=card] {
   font-weight: 700;
   line-height: 24px;
 }
+
+.button-info {
+  flex-direction: row-reverse;
+  padding: 6px 8px;
+  gap: 6px;
+  height: 24px;
+}
+
+.button-info i {
+  width: 10px;
+  height: 10px;
+  font-size: 10px;
+}
+
+.button-info span {
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 16px;
+}

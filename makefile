@@ -125,6 +125,8 @@ build-a:
 	@ sed -r -i.orig 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/a/index.html
 	@ rm ${DIST}/a/index.html.orig
 
+	@ mkdir -p ${DIST}/a/components
+
 	@ cp \
 		${SRC}/utils.js \
 		${SRC}/admin-tiers.js \
@@ -163,6 +165,10 @@ build-a:
 		${SRC}/qa-indexes.js \
 		${SRC}/a.js \
 		${DIST}/a/
+
+	@ cp \
+		${SRC}/components/card.js \
+		${DIST}/a/components/
 
 	@ cat \
 		${LIB}/d3.js \

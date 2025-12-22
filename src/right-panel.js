@@ -42,7 +42,7 @@ const PIES = {};
 
 const bubble = (v,e) => new bubblemessage({ "message": v + "%", "position": "C", "close": false, "noevents": true }, e);
 
-function updateGraphSection(section, distribution, total, unit, description) {
+function update_graph_section(section, distribution, total, unit, description) {
 	const labels = ['Low', 'Low - medium', 'Medium', 'Medium - high', 'High'];
 
 	const scale = ce('dl', null, { "class": 'discrete-scale' });
@@ -63,15 +63,15 @@ function updateGraphSection(section, distribution, total, unit, description) {
 		scale.append(dt, dd);
 	});
 
-	const scaleContainer = qs('.index-graphs-scale-container', section);
-	scaleContainer.innerHTML = '';
-	scaleContainer.append(scale);
+	const scale_container = qs('.index-graphs-scale-container', section);
+	scale_container.innerHTML = '';
+	scale_container.append(scale);
 
 	qs('.indexes-pie-label', section).innerHTML = total.toLocaleString() + "&nbsp;" + unit;
 	qs('.section-description', section).innerHTML = description;
 }
 
-function createGraphSection(title, type, numberId, descId) {
+function create_graph_section(title, type, numberId, descId) {
 	const section = tmpl('#index-graph-section-template');
 	qs('.section-title', section).textContent = title;
 	qs('.indexes-pie-label', section).id = numberId;
@@ -101,7 +101,7 @@ export async function graphs(raster) {
 			are situated in areas of high energy access potential.`;
 		const section = qs('#population-number').closest('.index-graphs-section');
 
-		updateGraphSection(section, g['distribution'], totalPop, 'people', description);
+		update_graph_section(section, g['distribution'], totalPop, 'people', description);
 
 		g['distribution'].forEach((x,i) => PIES['population']['data'][i].shift());
 	} else {
@@ -121,7 +121,7 @@ export async function graphs(raster) {
 			high energy access potential.`;
 		const section = qs('#area-number').closest('.index-graphs-section');
 
-		updateGraphSection(section, g['distribution'], totalArea, 'km²', description);
+		update_graph_section(section, g['distribution'], totalArea, 'km²', description);
 
 		g['distribution'].forEach((x,i) => PIES['area']['data'][i].shift());
 	} else {
@@ -176,8 +176,8 @@ export function init() {
 	};
 
 	const container = ce('div');
-	container.append(createGraphSection('Area share', 'area', 'area-number', 'area-description'));
-	container.append(createGraphSection('Population share', 'population', 'population-number', 'population-description'));
+	container.append(create_graph_section('Area share', 'area', 'area-number', 'area-description'));
+	container.append(create_graph_section('Population share', 'population', 'population-number', 'population-description'));
 
 	qs('#index-graphs').append(container);
 

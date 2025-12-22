@@ -89,6 +89,8 @@ export async function graphs(raster) {
 	const outline_cover = outline_raster.data.filter(x => x != outline_raster.nodata).length;
 	const f = GEOGRAPHY.area ? (GEOGRAPHY.area / outline_cover) : (1/e);
 
+	let hasValidData = false;
+
 	let g = maybe(t, 'population-density'); if (g) {
 		g['distribution'].forEach((x,i) => PIES['population']['data'][i].push(x));
 
@@ -104,6 +106,8 @@ export async function graphs(raster) {
 		update_graph_section(section, g['distribution'], totalPop, 'people', description);
 
 		g['distribution'].forEach((x,i) => PIES['population']['data'][i].shift());
+
+		if (!isNaN(totalPop) && totalPop > 0) hasValidData = true;
 	} else {
 		const pn = qs('#population-number');
 		if (pn) pn.closest('.index-graphs-group').remove();
@@ -124,12 +128,25 @@ export async function graphs(raster) {
 		update_graph_section(section, g['distribution'], totalArea, 'km²', description);
 
 		g['distribution'].forEach((x,i) => PIES['area']['data'][i].shift());
+
+		if (!isNaN(totalArea) && totalArea > 0) hasValidData = true;
 	} else {
 		const an = qs('#area-number');
 		if (an) an.closest('.index-graphs-group').remove();
 	}
 
 	analysis_locations_panel_update();
+
+	const blankState = qs('#analysis-blank-state');
+	const sectionsWrapper = qs('#analysis-sections-wrapper');
+
+	if (hasValidData) {
+		blankState.style.display = 'none';
+		sectionsWrapper.style.display = 'block';
+	} else {
+		blankState.style.display = 'flex';
+		sectionsWrapper.style.display = 'none';
+	}
 };
 
 export function init() {

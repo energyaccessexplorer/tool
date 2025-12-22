@@ -121,7 +121,6 @@ width: calc(${g}% - 1.5em);
 	set_section_state(count > 0);
 };
 
-// Export this function to be called when analysis updates
 export function update() {
 	trigger({});
 };

@@ -199,3 +199,32 @@
   cursor: pointer;
   padding: 1em;
 }
+
+#analysis-blank-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  padding: 3em 2em;
+}
+
+#analysis-sections-wrapper {
+  display: none;
+}
+
+.blank-state-content {
+  text-align: center;
+  color: #999;
+}
+
+.blank-state-icon {
+  font-size: 3em;
+  margin-bottom: 0.5em;
+  opacity: 0.5;
+}
+
+.blank-state-message {
+  font-size: 1.1em;
+  margin: 0;
+  color: #666;
+}

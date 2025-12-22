@@ -253,13 +253,17 @@ export function updated_plot(type, index) {
 };
 
 function toggle() {
-	const caret = this.querySelector('#right-panel-collapse span');
+	const button = qs('#right-panel-collapse', this);
+	const icon = qs('i', button);
+	const text = qs('span', button);
 
 	if (this.getAttribute('closed') === '') {
 		this.removeAttribute('closed');
-		caret.className = 'bi-caret-up-fill';
+		icon.className = 'bi bi-eye-slash';
+		text.textContent = 'Hide';
 	} else {
 		this.setAttribute('closed', '');
-		caret.className = 'bi-caret-down-fill';
+		icon.className = 'bi bi-eye';
+		text.textContent = 'Show';
 	}
 };

@@ -186,72 +186,82 @@
       </div>
 
       <div id="right-panel">
-        <span id="right-panel-collapse">
-          <span class="bi-caret-up-fill"></span>
-          Analysis
-        </span>
-
-        <div id="big-buttons">
-          <button id="summary-button"
-                  class="big-green-button">Report</button>
-
-          <button id="save-snapshot-button"
-                  class="big-green-button">
-            <i class="bi bi-floppy2-fill"></i><span>Save Analysis</span>
-          </button>
-
-          <button id="share-snapshot-button"
-                  class="big-green-button">
-            <i class="bi bi-share-fill"></i><span>Share Analysis</span>
-          </button>
-        </div>
-
-        <div id="analysis-blank-state">
-          <div class="blank-state-content">
-            <i class="bi bi-clipboard-data blank-state-icon"></i>
-            <p class="blank-state-message">Choose a dataset to perform an analysis</p>
+        <header id="right-panel-header">
+          <div class="header-top">
+            <h2 class="header-title">Analysis results</h2>
+            <button id="right-panel-collapse" class="button-icon">
+              <i class="bi bi-eye-slash"></i>
+              <span>Hide</span>
+            </button>
           </div>
-        </div>
+          <p class="header-subtitle">Click on an area on the map to learn more about it.</p>
 
-        <div id="analysis-sections-wrapper">
-          <div id="analysis-locations"></div>
+          <div id="right-panel-top-actions">
+            <button id="summary-button" class="button-icon top-action-button">
+              <i class="bi bi-file-text"></i>
+              <span>Report</span>
+            </button>
 
-          <div id="index-graphs">
-            <div id="index-graphs-title" class="up-title"></div>
-            <div id="index-graphs-subtext"></div>
+            <button id="disclaimer-button" class="button-icon top-action-button">
+              <i class="bi bi-info-circle"></i>
+              <span>Disclaimer</span>
+              <div id="disclaimer-message">
+                <p>
+                  The maps are for illustrative purposes and do not imply the
+                  expression of any opinion on the part of WRI, concerning the
+                  legal status of any country or territory or concerning the
+                  delimitation of frontiers or boundaries.
+                </p>
+
+                <p>
+                  If you use this platform, partially or entirely, you must follow
+                  the <a href="https://www.energyaccessexplorer.org/attribution/">attribution instructions</a>.
+                </p>
+              </div>
+            </button>
           </div>
+        </header>
 
-          <div id="filtered-pane" style="display: none;">
-            <div class="up-title">Considered geographies</div>
-            <div id="filtered-subgeographies"></div>
-          </div>
-        </div>
-
-        <div class="spacer"></div>
-
-        <div id="drawer-right-panel">
-          <div id="tiff-download"
-               title="Download TIFF image of the current analysis">
-            Export
-          </div>
-
-          <div>
-            Disclaimer
-            <div id="disclaimer-message">
-              <p>
-                The maps are for illustrative purposes and do not imply the
-                expression of any opinion on the part of WRI, concerning the
-                legal status of any country or territory or concerning the
-                delimitation of frontiers or boundaries.
-              </p>
-
-              <p>
-                If you use this platform, partially or entirely, you must follow
-                the <a href="https://www.energyaccessexplorer.org/attribution/">attribution instructions</a>.
-              </p>
+        <div id="right-panel-content">
+          <div id="analysis-blank-state">
+            <div class="blank-state-content">
+              <i class="bi bi-clipboard-data blank-state-icon"></i>
+              <p class="blank-state-message">Choose a dataset to perform an analysis</p>
             </div>
           </div>
+
+          <div id="analysis-sections-wrapper">
+            <div id="analysis-locations"></div>
+
+            <div id="index-graphs">
+              <div id="index-graphs-title" class="up-title"></div>
+              <div id="index-graphs-subtext"></div>
+            </div>
+
+            <div id="filtered-pane" style="display: none;">
+              <div class="up-title">Considered geographies</div>
+              <div id="filtered-subgeographies"></div>
+            </div>
+          </div>
+
         </div>
+
+        <footer id="right-panel-footer">
+          <button id="save-snapshot-button" class="button-icon button-icon-mid footer-action-button">
+            <i class="bi bi-bookmark"></i>
+            <span>Save</span>
+          </button>
+
+          <button id="share-snapshot-button" class="button-icon button-icon-mid footer-action-button">
+            <i class="bi bi-share"></i>
+            <span>Share</span>
+          </button>
+
+          <button id="tiff-download" class="button-icon button-icon-mid footer-action-button" title="Download TIFF image of the current analysis">
+            <i class="bi bi-download"></i>
+            <span>Export</span>
+          </button>
+        </footer>
       </div>
     </div>
 

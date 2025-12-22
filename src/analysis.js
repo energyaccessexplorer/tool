@@ -421,3 +421,18 @@ export async function getpoints(n = 0) {
 		.sort((a,b) => a.v > b.v ? -1 : 1)
 		.map(t => ({ "v": t.v, "i": t.i, "c": raster_pixel_to_coordinates(t.i) }));
 };
+
+export async function getallpoints() {
+	const a = await plot_active(STATE.index, false);
+
+	const points = a.raster.reduce((t,v,i) => {
+		if (v > 0)
+			t.push({i,v});
+
+		return t;
+	}, []);
+
+	return points
+		.sort((a,b) => a.v > b.v ? -1 : 1)
+		.map(t => ({ "v": t.v, "i": t.i, "c": raster_pixel_to_coordinates(t.i) }));
+};

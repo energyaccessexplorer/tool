@@ -3,7 +3,7 @@ import {
 } from './mapbox.js';
 
 import {
-	getpoints,
+	getallpoints,
 	analysis_colorscale,
 	lowmedhigh_scale,
 } from './analysis.js';
@@ -19,7 +19,13 @@ import {
 	qs,
 } from '../lib/helpers.js';
 
-let ul, resultscontainer, resultsinfo, section;
+let ul, resultscontainer, resultsinfo, section, paginationContainer;
+
+const paginationState = {
+	"allResults":   [],
+	"currentPage":  1,
+	"itemsPerPage": 10,
+};
 
 function pointto(p, a = false) {
 	const dict = [[ "v", EAE['indexes'][STATE.index]['name'] ]];
@@ -70,23 +76,89 @@ function set_section_state(hasValidData) {
 		section.setAttribute('data-collapsed', 'true');
 	} else {
 		chevron.classList.remove('disabled');
-		if (content) { content.style.maxHeight = content.scrollHeight + 'px'; }
+		if (content) { content.style.maxHeight = 'none'; }
 	}
 }
 
-async function trigger({ points = getpoints, n = 20 }) {
+function render_pagination() {
+	if (!paginationContainer) return;
+
+	paginationContainer.replaceChildren();
+
+	const totalPages = Math.ceil(paginationState.allResults.length / paginationState.itemsPerPage);
+	const totalCount = paginationState.allResults.length;
+	const startIdx = (paginationState.currentPage - 1) * paginationState.itemsPerPage;
+	const endIdx = Math.min(startIdx + paginationState.itemsPerPage, totalCount);
+
+	if (totalPages <= 1 && totalCount > 0) {
+		const infoText = ce('div', `Showing ${totalCount.toLocaleString()} result${totalCount !== 1 ? 's' : ''}`, { "class": 'pagination-info' });
+		paginationContainer.append(infoText);
+		return;
+	}
+
+	if (totalCount === 0) return;
+
+	const infoText = ce('div', `Showing ${(startIdx + 1).toLocaleString()}-${endIdx.toLocaleString()} of ${totalCount.toLocaleString()}`, { "class": 'pagination-info' });
+	paginationContainer.append(infoText);
+
+	const paginationDiv = ce('div', null, { "class": 'pagination' });
+
+	const prevBtn = ce('button', null, { "class": 'pagination-btn chevron' });
+	prevBtn.innerHTML = '<i class="bi bi-chevron-left"></i>';
+	prevBtn.disabled = paginationState.currentPage === 1;
+	prevBtn.onclick = () => {
+		if (paginationState.currentPage > 1) {
+			paginationState.currentPage--;
+			render_page(paginationState.currentPage);
+		}
+	};
+	paginationDiv.append(prevBtn);
+
+	let startPage = Math.max(1, paginationState.currentPage - 1);
+	const endPage = Math.min(totalPages, startPage + 2);
+
+	if (endPage - startPage < 2) {
+		startPage = Math.max(1, endPage - 2);
+	}
+
+	for (let i = startPage; i <= endPage; i++) {
+		const pageBtn = ce('button', String(i), { "class": 'pagination-btn page-number' });
+		if (i === paginationState.currentPage) {
+			pageBtn.classList.add('active');
+		}
+		pageBtn.onclick = () => {
+			paginationState.currentPage = i;
+			render_page(paginationState.currentPage);
+		};
+		paginationDiv.append(pageBtn);
+	}
+
+	const nextBtn = ce('button', null, { "class": 'pagination-btn chevron' });
+	nextBtn.innerHTML = '<i class="bi bi-chevron-right"></i>';
+	nextBtn.disabled = paginationState.currentPage === totalPages;
+	nextBtn.onclick = () => {
+		if (paginationState.currentPage < totalPages) {
+			paginationState.currentPage++;
+			render_page(paginationState.currentPage);
+		}
+	};
+	paginationDiv.append(nextBtn);
+
+	paginationContainer.append(paginationDiv);
+}
+
+function render_page(page) {
 	ul.replaceChildren();
 
-	const results = await points(n);
+	const totalCount = paginationState.allResults.length;
+	const startIdx = (page - 1) * paginationState.itemsPerPage;
+	const endIdx = Math.min(startIdx + paginationState.itemsPerPage, totalCount);
 
-	const count = results.length;
+	const pageResults = paginationState.allResults.slice(startIdx, endIdx);
 
-	resultsinfo.innerHTML = `Searching <b>analysis coordinates</b>. Top ${count} results:`;
+	resultsinfo.innerHTML = `Searching <b>analysis coordinates</b>:`;
 
-	const list = results
-		.sort((a,b) => a.v > b.v ? -1 : 1)
-		.slice(0,n)
-		.map(t => li(t));
+	const list = pageResults.map(t => li(t));
 
 	const groups = {};
 	list.forEach(i => {
@@ -115,14 +187,32 @@ width: calc(${g}% - 1.5em);
 `;
 	}
 
-	if (count > n)
-		qs('div.search-results-info', resultscontainer).innerHTML = `Searching <b>analysis coordinates</b>. Showing first ${n} of ${count}:`;
+	render_pagination();
+}
 
-	set_section_state(count > 0);
+async function trigger() {
+	ul.replaceChildren();
+	if (paginationContainer) paginationContainer.replaceChildren();
+
+	const results = await getallpoints();
+
+	paginationState.allResults = results.sort((a,b) => a.v > b.v ? -1 : 1);
+	paginationState.currentPage = 1;
+
+	const count = paginationState.allResults.length;
+
+	if (count === 0) {
+		resultsinfo.innerHTML = `Searching <b>analysis coordinates</b>. Top 0 results:`;
+		set_section_state(false);
+		return;
+	}
+
+	set_section_state(true);
+	render_page(paginationState.currentPage);
 };
 
 export function update() {
-	trigger({});
+	trigger();
 };
 
 export function init() {
@@ -131,6 +221,9 @@ export function init() {
 
 	ul = ce('ul');
 	resultscontainer.append(ul);
+
+	paginationContainer = ce('div', null, { "class": 'pagination-container' });
+	resultscontainer.append(paginationContainer);
 
 	resultsinfo = ce('div', ce('b', "Analysis coordinates"), { "class": 'search-results-info' });
 	resultscontainer.prepend(resultsinfo);

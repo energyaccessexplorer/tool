@@ -254,11 +254,9 @@ export function info_mode_change() {
 
 	if (INFOMODE) {
 		b.classList.add('active');
-		qs('canvas.mapboxgl-canvas').style.cursor = 'crosshair';
 	}
 	else {
 		b.classList.remove('active');
-		qs('canvas.mapboxgl-canvas').style.cursor = 'auto';
 	}
 };
 
@@ -455,8 +453,6 @@ export async function sort() {
 };
 
 function click(e) {
-	if (!INFOMODE) return;
-
 	const p = MAPBOX.queryRenderedFeatures(e.point);
 
 	const ll = [e.lngLat.lng, e.lngLat.lat];

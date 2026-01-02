@@ -19,7 +19,7 @@ import {
 	qs,
 } from '../lib/helpers.js';
 
-let ul, resultscontainer, resultsinfo, section, paginationContainer;
+let ul, resultscontainer, section, paginationContainer;
 
 const paginationState = {
 	"allResults":   [],
@@ -36,33 +36,38 @@ function pointto(p, a = false) {
 
 function li(p) {
 	const pi3 = (p.c).map(c => +c.toFixed(3));
+	const score = (p.v ? Math.round((p.v).toFixed(2) * 100) : "");
 
-	const pn = ce('span');
+	const targetIcon = ce('i', null, { "class": "bi bi-crosshair location-target-icon" });
 
-	const el = ce('li', [
-		ce('code', 	"[" + pi3.join(", ") + "]", { "style": "font-size: 0.9em" } ),
-		pn,
-	]);
+	const locationName = ce('div', null, { "class": "location-name" });
+	const coordinates = ce('div', `[${pi3.join(", ")}]`, { "class": "location-coordinates" });
 
-	const t = (p.v ? Math.round((p.v).toFixed(2) * 100) : "");
+	const locationInfo = ce('div', [locationName, coordinates], { "class": "location-info" });
 
-	el.setAttribute('group', t);
+	const chevron = ce('i', null, { "class": "bi bi-chevron-right location-chevron" });
 
+	const content = ce('div', [targetIcon, locationInfo, chevron], { "class": "location-item-content" });
+	const el = ce('li', [content], { "class": "location-item" });
+
+	el.setAttribute('data-score', score);
 	el.onmouseenter = pointto.bind(null, p);
-
 	el.onclick = zoom.bind(null, p, pointto.bind(null, p, true));
 
 	mapbox_coords_search_pois({ "coords": p.c, "limit": 1 })
-		.then(r => pn.append(ce('span', maybe(r, 0, 'name'), { "class": "context" })));
+		.then(r => locationName.textContent = maybe(r, 0, 'name') || 'Unknown location');
 
 	return el;
 };
 
 
 function render_pagination() {
-	if (!paginationContainer) return;
-
-	paginationContainer.replaceChildren();
+	if (!paginationContainer) {
+		paginationContainer = ce('div', null, { "class": 'pagination-container' });
+		resultscontainer.append(paginationContainer);
+	} else {
+		paginationContainer.replaceChildren();
+	}
 
 	const totalPages = Math.ceil(paginationState.allResults.length / paginationState.itemsPerPage);
 	const totalCount = paginationState.allResults.length;
@@ -127,7 +132,12 @@ function render_pagination() {
 }
 
 function render_page(page) {
-	ul.replaceChildren();
+	if (!ul) {
+		ul = ce('ul', null, { "class": 'locations-list' });
+		resultscontainer.append(ul);
+	} else {
+		ul.replaceChildren();
+	}
 
 	const totalCount = paginationState.allResults.length;
 	const startIdx = (page - 1) * paginationState.itemsPerPage;
@@ -135,42 +145,46 @@ function render_page(page) {
 
 	const pageResults = paginationState.allResults.slice(startIdx, endIdx);
 
-	resultsinfo.innerHTML = `Searching <b>analysis coordinates</b>:`;
-
-	const list = pageResults.map(t => li(t));
-
-	const groups = {};
-	list.forEach(i => {
-		const a = i.getAttribute('group');
-		if (!groups[a]) groups[a] = [];
-
-		groups[a].push(i);
+	const scoreCounts = {};
+	paginationState.allResults.forEach(item => {
+		const score = item.v ? Math.round((item.v).toFixed(2) * 100) : "";
+		scoreCounts[score] = (scoreCounts[score] || 0) + 1;
 	});
 
-	ul.append(...list);
+	let currentScore = null;
+	let currentGroup = null;
 
-	for (const g in groups) {
-		const el = ul.querySelector(`[group='${g}']`);
-		const h = ce('h5', g + "%");
+	let currentGroupList = null;
 
-		ul.insertBefore(h, el);
+	pageResults.forEach(item => {
+		const score = item.v ? Math.round((item.v).toFixed(2) * 100) : "";
+		const groupCount = scoreCounts[score];
 
-		h.style = `
-font-size: 0.9em;
-background-color: rgba(${analysis_colorscale.fn(g/100.0)});
-padding: 0.5em;
-padding-left: 1em;
-margin: 0.5em auto;
-margin-left: 0;
-width: calc(${g}% - 1.5em);
-`;
-	}
+		if (score !== currentScore) {
+			currentScore = score;
+			currentGroup = ce('li', null, { "class": "location-group" });
+			currentGroup.setAttribute('data-score', score);
+
+			const scoreText = ce('span', `${score}% priority score`);
+			const areaCount = groupCount === 1 ? '1 area' : `${groupCount} areas`;
+			const areaBadge = ce('span', areaCount, { "class": "location-area-badge" });
+			const groupHeader = ce('div', [scoreText, areaBadge], { "class": "location-group-header" });
+
+			currentGroupList = ce('ul', null, { "class": "location-group-list" });
+
+			currentGroup.append(groupHeader, currentGroupList);
+			ul.append(currentGroup);
+		}
+
+		const listItem = li(item);
+		currentGroupList.append(listItem);
+	});
 
 	render_pagination();
 }
 
 async function trigger() {
-	ul.replaceChildren();
+	if (ul) ul.replaceChildren();
 	if (paginationContainer) paginationContainer.replaceChildren();
 
 	const results = await getallpoints();
@@ -181,7 +195,6 @@ async function trigger() {
 	const count = paginationState.allResults.length;
 
 	if (count === 0) {
-		resultsinfo.innerHTML = `Searching <b>analysis coordinates</b>. Top 0 results:`;
 		if (section) section.setAttribute('collapsed', '');
 		return;
 	}
@@ -195,14 +208,5 @@ export function update() {
 
 export function init() {
 	section = qs('#right-panel #analysis-locations-section');
-	resultscontainer = qs('.search-results', section);
-
-	ul = ce('ul');
-	resultscontainer.append(ul);
-
-	paginationContainer = ce('div', null, { "class": 'pagination-container' });
-	resultscontainer.append(paginationContainer);
-
-	resultsinfo = ce('div', ce('b', "Analysis coordinates"), { "class": 'search-results-info' });
-	resultscontainer.prepend(resultsinfo);
+	resultscontainer = qs('.locations-paginated-list', section);
 };

@@ -55,10 +55,13 @@ function update_graph_section(section, distribution, total, unit, description) {
 		const circle = ce('span', null, { "class": 'scale-circle' });
 		circle.style.backgroundColor = color;
 
-		const dt = ce('dt', null, { "class": 'scale-item' });
-		dt.append(circle, ce('strong', labels[idx]));
+		const spacer = ce('div', null, { "class": 'scale-item-spacer' });
+		spacer.append(circle);
 
-		const dd = ce('dd', value);
+		const dt = ce('dt', null, { "class": 'scale-item-label' });
+		dt.append(spacer, ce('span', labels[idx]));
+
+		const dd = ce('dd', value, { "class": 'scale-item-value' });
 
 		scale.append(dt, dd);
 	});
@@ -158,7 +161,7 @@ export function init() {
 	const snap = qs('#save-snapshot-button');
 	snap.onclick = _ => {
 		if (snapshot())
-			qs('span', snap).innerText = "Update Analysis";
+			qs('span', snap).innerText = "Update";
 	};
 
 	const suid = maybe(SNAPSHOT, 'user_id');
@@ -166,7 +169,7 @@ export function init() {
 	if (and(suid, suid !== SELF.id))
 		qs('span', snap).innerText = "Duplicate Analysis";
 	else if (and(suid, suid === SELF.id))
-		qs('span', snap).innerText = "Update Analysis";
+		qs('span', snap).innerText = "Update";
 
 	const share = qs('#share-snapshot-button');
 	share.onclick = _ => {
@@ -178,7 +181,7 @@ export function init() {
 
 		}
 		if (snapshot(share_url))
-			qs('span', snap).innerText = "Update Analysis";
+			qs('span', snap).innerText = "Update";
 	};
 
 	const download = qs('#tiff-download');

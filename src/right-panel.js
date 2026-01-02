@@ -63,21 +63,25 @@ function update_graph_section(section, distribution, total, unit, description) {
 
 		const dd = ce('dd', value, { "class": 'scale-item-value' });
 
-		scale.append(dt, dd);
+		const wrapper = ce('div', null, { "class": 'scale-item' });
+		wrapper.append(dt, dd);
+
+		scale.append(wrapper);
 	});
 
 	const scale_container = qs('.index-graphs-scale-container', section);
 	scale_container.innerHTML = '';
 	scale_container.append(scale);
 
-	qs('.indexes-pie-label', section).innerHTML = total.toLocaleString() + "&nbsp;" + unit;
-	qs('.section-description', section).innerHTML = description;
+	const descEl = qs('.section-description', section);
+	descEl.innerHTML = '';
+	descEl.append(description);
 }
 
 function create_graph_section(title, type, numberId, descId) {
 	const section = tmpl('#index-graph-section-template');
 	qs('.section-title', section).textContent = title;
-	qs('.indexes-pie-label', section).id = numberId;
+	qs('.index-graphs-group', section).id = numberId;
 	qs('.section-description', section).id = descId;
 	qs('.index-graphs-group', section).append(PIES[type].svg);
 	return section;
@@ -101,9 +105,16 @@ export async function graphs(raster) {
 
 		const totalPop = Math.round(g['total'] / e);
 		const highPop = Math.round(g['distribution'][4] / e);
-		const description = `Showing energy access potential for areas affecting
-			${totalPop.toLocaleString()} people, of whom ${highPop.toLocaleString()} people
-			are situated in areas of high energy access potential.`;
+
+		const description = document.createDocumentFragment();
+		description.append(
+			'Showing energy access potential for areas affecting ',
+			ce('strong', totalPop.toLocaleString() + ' people'),
+			', of whom ',
+			ce('strong', highPop.toLocaleString() + ' people'),
+			' are situated in areas of high energy access potential.',
+		);
+
 		const section = qs('#population-number').closest('.index-graphs-section');
 
 		update_graph_section(section, g['distribution'], totalPop, 'people', description);
@@ -123,9 +134,16 @@ export async function graphs(raster) {
 
 		const totalArea = Math.round(g['total'] * f);
 		const highArea = Math.round(g['distribution'][4] * f);
-		const description = `Showing energy access potential for areas spanning
-			${totalArea.toLocaleString()} km², of which ${highArea.toLocaleString()} km² has
-			high energy access potential.`;
+
+		const description = document.createDocumentFragment();
+		description.append(
+			'Showing energy access potential for areas spanning ',
+			ce('strong', totalArea.toLocaleString() + ' km²'),
+			', of which ',
+			ce('strong', highArea.toLocaleString() + ' km²'),
+			' has high energy access potential.',
+		);
+
 		const section = qs('#area-number').closest('.index-graphs-section');
 
 		update_graph_section(section, g['distribution'], totalArea, 'km²', description);

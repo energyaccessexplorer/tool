@@ -198,6 +198,16 @@
   gap: 12px;
 }
 
+.share-graph .section-description {
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: #414141;
+  margin: 0;
+  text-align: left;
+  width: 100%;
+}
+
 .share-graph .graph-and-scale {
   display: flex;
   flex-direction: row;
@@ -234,16 +244,26 @@
   margin: 0;
 }
 
+.share-graph .scale-item {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  gap: 0;
+  margin: 0;
+}
+
 .share-graph .scale-item-label {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
   padding: 0;
-  gap: 8px;
+  gap: 12px;
   font-weight: 400;
   font-size: 16px;
   line-height: 24px;
   color: #1A1919;
+  margin: 0;
+  height: 24px;
 }
 
 .share-graph .scale-item-spacer {
@@ -270,8 +290,10 @@
   font-weight: 400;
   font-size: 12px;
   line-height: 16px;
+  height: 16px;
   color: #5C5959;
-  margin: 0 0 0 28px;
+  margin: 0 0 0 32px;
+  padding: 0;
 }
 
 

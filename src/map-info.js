@@ -53,22 +53,20 @@ export default class mapinfo extends HTMLElement {
 			}
 		};
 
-		const bc = "rgba(0,0,0,1)";
-		let cs, f;
+		const lineWidth = 4;
+		const gap = 10;
 
 		switch (position) {
 		case "N":
 		case "north": {
 			halign();
-			cs = (this.clientWidth / 2);
-			f = 1/4;
 
-			this.caret.style['border-width'] = cs + "px";
-			this.caret.style['border-top-color'] = bc;
-			this.caret.style['transform'] = `scale(1, ${f})`;
-			this.caret.style['top'] = this.clientHeight - ((this.clientWidth * (3/8)) + 0.5) + "px";
+			this.arrow.style['width'] = lineWidth + "px";
+			this.arrow.style['height'] = gap + "px";
+			this.arrow.style['left'] = (this.clientWidth / 2 - lineWidth / 2) + "px";
+			this.arrow.style['top'] = this.clientHeight + "px";
 
-			y -= this.clientHeight + (cs * f);
+			y -= this.clientHeight + gap;
 
 			break;
 		}
@@ -76,15 +74,13 @@ export default class mapinfo extends HTMLElement {
 		case "E":
 		case "east": {
 			valign();
-			cs = (this.clientHeight / 2);
-			f = 1/2;
 
-			this.caret.style['border-width'] = cs + "px";
-			this.caret.style['border-right-color'] = bc;
-			this.caret.style['transform'] = `scale(${f}, 1)`;
-			this.caret.style['left'] = -((this.clientHeight * (3/4)) - 1.5) + "px";
+			this.arrow.style['width'] = gap + "px";
+			this.arrow.style['height'] = lineWidth + "px";
+			this.arrow.style['left'] = -gap + "px";
+			this.arrow.style['top'] = (this.clientHeight / 2 - lineWidth / 2) + "px";
 
-			x += elbox.width + (cs * f);
+			x += elbox.width + gap;
 
 			break;
 		}
@@ -92,15 +88,13 @@ export default class mapinfo extends HTMLElement {
 		case "S":
 		case "south": {
 			halign();
-			cs = (this.clientWidth / 2);
-			f = 1/4;
 
-			this.caret.style['border-width'] = cs + "px";
-			this.caret.style['border-bottom-color'] = bc;
-			this.caret.style['transform'] = `scale(1, ${f})`;
-			this.caret.style['top'] = (-1) * ((this.clientWidth * (5/8)) - 0.5) + "px";
+			this.arrow.style['width'] = lineWidth + "px";
+			this.arrow.style['height'] = gap + "px";
+			this.arrow.style['left'] = (this.clientWidth / 2 - lineWidth / 2) + "px";
+			this.arrow.style['top'] = -gap + "px";
 
-			y += elbox.height + (cs * f);
+			y += elbox.height + gap;
 
 			break;
 		}
@@ -108,15 +102,13 @@ export default class mapinfo extends HTMLElement {
 		case "W":
 		case "west": {
 			valign();
-			cs = (this.clientHeight / 2);
-			f = 1/2;
 
-			this.caret.style['border-width'] = cs + "px";
-			this.caret.style['border-left-color'] = bc;
-			this.caret.style['transform'] = `scale(${f}, 1)`;
-			this.caret.style['left'] = this.clientWidth - ((this.clientHeight * (1/4)) + 1.5) + "px";
+			this.arrow.style['width'] = gap + "px";
+			this.arrow.style['height'] = lineWidth + "px";
+			this.arrow.style['left'] = this.clientWidth + "px";
+			this.arrow.style['top'] = (this.clientHeight / 2 - lineWidth / 2) + "px";
 
-			x -= this.clientWidth + (cs * f);
+			x -= this.clientWidth + gap;
 
 			if (this.close_button)
 				this.prepend(this.close_button);
@@ -126,7 +118,7 @@ export default class mapinfo extends HTMLElement {
 
 		case "C":
 		case "center": {
-			this.caret.style['display'] = 'none';
+			this.arrow.style['display'] = 'none';
 
 			valign();
 			halign();
@@ -151,8 +143,8 @@ export default class mapinfo extends HTMLElement {
 		if (noevents)
 			this.style['pointer-events'] = "none";
 
-		this.caret = document.createElement('span');
-		this.caret.className = 'caret';
+		this.arrow = document.createElement('span');
+		this.arrow.className = 'arrow';
 
 		this.main = document.createElement('main');
 
@@ -178,7 +170,7 @@ export default class mapinfo extends HTMLElement {
 			this.main.append(content);
 		}
 
-		this.append(this.caret, this.main);
+		this.append(this.arrow, this.main);
 
 		if (close !== false) {
 			this.close_button = document.createElement('div');
@@ -192,11 +184,15 @@ export default class mapinfo extends HTMLElement {
 			this.append(this.close_button);
 		}
 
-		if (hidden) this.style['display'] = "none";
+		this.style['visibility'] = 'hidden';
 
 		document.body.append(this);
 
 		this.align();
+
+		this.style['visibility'] = 'visible';
+
+		if (hidden) this.style['display'] = "none";
 	}
 };
 

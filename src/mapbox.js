@@ -340,7 +340,7 @@ This is fatal. Thanks for all the fish.`,
 	return [[left,top], [right,top], [right,bottom], [left,bottom]];
 };
 
-export function pointer({x = 0, y = 0}, ...contents) {
+export function pointer({x = 0, y = 0, lngLat = null}, ...contents) {
 	let p = qs('#map-pointer');
 
 	if (p) p.remove();
@@ -349,14 +349,14 @@ export function pointer({x = 0, y = 0}, ...contents) {
 		"id":    "map-pointer",
 		"style": `
 position: absolute;
-left: ${x - 10}px;
-top: ${y - 10}px;
-height: 20px;
-width: 20px;
-background-color: transparent;`,
+left: ${x - 8}px;
+top: ${y - 8}px;`,
 	});
 
 	for (const e of qsa('bubble-message'))
+		e.remove();
+
+	for (const e of qsa('map-info'))
 		e.remove();
 
 	document.body.append(p);
@@ -374,7 +374,29 @@ background-color: transparent;`,
 
 	const mark = new mapinfo({ "position": pos, "message": content, "close": cls }, (MOBILE ? document.body : p));
 
+	function updatePosition() {
+		if (!lngLat) return;
+
+		const point = MAPBOX.project(lngLat);
+		const mapContainer = MAPBOX.getContainer().getBoundingClientRect();
+
+		const newX = mapContainer.left + point.x;
+		const newY = mapContainer.top + point.y;
+
+		p.style.left = (newX - 8) + "px";
+		p.style.top = (newY - 8) + "px";
+
+		mark.align();
+	}
+
+	let onMove;
+	if (lngLat) {
+		onMove = () => updatePosition();
+		MAPBOX.on('move', onMove);
+	}
+
 	function drop() {
+		if (onMove) MAPBOX.off('move', onMove);
 		p.remove();
 		mark.remove();
 	};
@@ -489,8 +511,9 @@ function click(e) {
 		})
 		.then(p => {
 			const c = {
-				"x": maybe(e, 'originalEvent', 'pageX'),
-				"y": maybe(e, 'originalEvent', 'pageY'),
+				"x":      maybe(e, 'originalEvent', 'pageX'),
+				"y":      maybe(e, 'originalEvent', 'pageY'),
+				"lngLat": e.lngLat,
 			};
 
 			pointer(c, td, p);

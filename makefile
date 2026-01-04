@@ -214,7 +214,6 @@ build-s:
 		${SRC}/utils.js \
 		${SRC}/browser.js \
 		${SRC}/user.js \
-		${SRC}/bubblemessage.js \
 		${SRC}/s.js \
 		${DIST}/s/
 

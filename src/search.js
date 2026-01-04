@@ -32,7 +32,7 @@ export function pointto(coords, dict, props, a = false) {
 	const box = maparea.getBoundingClientRect();
 
 	if (pointer) pointer.drop();
-	pointer = mapbox_pointer({"x": box.x + x, "y": box.y + y}, td);
+	pointer = mapbox_pointer({"x": box.x + x, "y": box.y + y, "lngLat": {"lng": coords[0], "lat": coords[1]}}, td);
 };
 
 export function zoom(p, fn) {

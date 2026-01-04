@@ -4,7 +4,6 @@ import {
 
 import {
 	getallpoints,
-	analysis_colorscale,
 	lowmedhigh_scale,
 } from './analysis.js';
 

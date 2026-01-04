@@ -23,7 +23,7 @@ import {
 	until,
 } from '../lib/helpers.js';
 
-import bubblemessage from '../lib/bubblemessage.js';
+import mapinfo from './map-info.js';
 
 const default_styles = [{
 	"name":  "Basic (default)",
@@ -372,7 +372,7 @@ background-color: transparent;`,
 	const content = ce('span');
 	content.append(...contents);
 
-	const mark = new bubblemessage({ "position": pos, "message": content, "close": cls }, (MOBILE ? document.body : p));
+	const mark = new mapinfo({ "position": pos, "message": content, "close": cls }, (MOBILE ? document.body : p));
 
 	function drop() {
 		p.remove();

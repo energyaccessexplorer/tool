@@ -369,10 +369,10 @@ top: ${y - 8}px;`,
 		pos = "C";
 	}
 
-	const content = ce('span');
-	content.append(...contents);
+	const fragment = document.createDocumentFragment();
+	fragment.append(...contents);
 
-	const mark = new mapinfo({ "position": pos, "message": content, "close": cls }, (MOBILE ? document.body : p));
+	const mark = new mapinfo({ "position": pos, "message": fragment, "close": cls }, (MOBILE ? document.body : p));
 
 	function updatePosition() {
 		if (!lngLat) return;

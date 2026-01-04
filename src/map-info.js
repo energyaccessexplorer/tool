@@ -162,7 +162,7 @@ export default class mapinfo extends HTMLElement {
 		if (message) {
 			const content = document.createElement('content');
 
-			if (message instanceof Element)
+			if (message instanceof Element || message instanceof DocumentFragment)
 				content.append(message);
 			else
 				content.innerHTML = message;

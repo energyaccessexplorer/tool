@@ -1,17 +1,12 @@
 import {
 	super_error,
 	bi_icon,
-	table_data,
 	coordinates_to_raster_pixel,
 } from './utils.js';
 
 import {
 	context,
 } from './complicated.js';
-
-import {
-	lowmedhigh_scale,
-} from './analysis.js';
 
 import {
 	ce,
@@ -340,7 +335,7 @@ This is fatal. Thanks for all the fish.`,
 	return [[left,top], [right,top], [right,bottom], [left,bottom]];
 };
 
-export function pointer({x = 0, y = 0, lngLat = null}, ...contents) {
+export function pointer({x = 0, y = 0, lngLat = null}, data) {
 	let p = qs('#map-pointer');
 
 	if (p) p.remove();
@@ -369,10 +364,7 @@ top: ${y - 8}px;`,
 		pos = "C";
 	}
 
-	const fragment = document.createDocumentFragment();
-	fragment.append(...contents);
-
-	const mark = new mapinfo({ "position": pos, "message": fragment, "close": cls }, (MOBILE ? document.body : p));
+	const mark = new mapinfo({ "position": pos, "data": data, "close": cls }, (MOBILE ? document.body : p));
 
 	function updatePosition() {
 		if (!lngLat) return;
@@ -474,48 +466,42 @@ export async function sort() {
 	}
 };
 
-function click(e) {
-	const p = MAPBOX.queryRenderedFeatures(e.point);
-
-	const ll = [e.lngLat.lng, e.lngLat.lat];
+export function show_location_info(ll, position) {
 	const rc = coordinates_to_raster_pixel(ll, OUTLINE.raster);
 
-	const [dict, props] = context(rc, p[0]);
-
-	COORDINATES.unshift({ "c": ll });
-
-	qs('#points.search-panel').dispatchEvent(new Event('activate'));
+	const p = MAPBOX.queryRenderedFeatures(MAPBOX.project(ll));
+	const [fields, props] = context(rc, p[0]);
 
 	const ac = coordinates_to_raster_pixel(ll, {
 		"data":   MAPBOX.getSource('output-source').raster,
 		"nodata": -1,
 	});
 
+	let analysis_value = null;
+	let analysis_name = null;
 	if (Number.isFinite(maybe(ac, 'value'))) {
-		dict.unshift(["_analysis_name", EAE['indexes'][STATE.index]['name']], null);
-		props["_analysis_name"] = lowmedhigh_scale(ac.value);
+		analysis_value = ac.value;
+		analysis_name = EAE['indexes'][STATE.index]['name'];
 	}
-
-	const td = table_data(dict, props, ll);
 
 	coords_search_pois({ "coords": ll, "limit": 1 })
 		.then(r => {
-			if (!r.length) return "";
-
-			const pois = ce('div', null, { "id": "pois" });
-			pois.append(ce('h5', "Points of interest"));
-
-			r.forEach(f => pois.append(ce('div', f.name, { "class": "small" })));
-
-			return pois;
-		})
-		.then(p => {
-			const c = {
-				"x":      maybe(e, 'originalEvent', 'pageX'),
-				"y":      maybe(e, 'originalEvent', 'pageY'),
-				"lngLat": e.lngLat,
-			};
-
-			pointer(c, td, p);
+			const feature_name = maybe(r, 0, 'name') || null;
+			pointer(position, { fields, props, ll, analysis_value, analysis_name, feature_name });
 		});
+}
+
+function click(e) {
+	const ll = [e.lngLat.lng, e.lngLat.lat];
+
+	COORDINATES.unshift({ "c": ll });
+	qs('#points.search-panel').dispatchEvent(new Event('activate'));
+
+	const position = {
+		"x":      maybe(e, 'originalEvent', 'pageX'),
+		"y":      maybe(e, 'originalEvent', 'pageY'),
+		"lngLat": e.lngLat,
+	};
+
+	show_location_info(ll, position);
 };

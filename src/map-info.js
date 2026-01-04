@@ -1,3 +1,72 @@
+import {
+	lowmedhigh_scale,
+} from './analysis.js';
+
+import {
+	maybe,
+} from '../lib/helpers.js';
+
+function extract_map_info_data(fields, props, ll, analysis_value, analysis_name, feature_name) {
+	let feature = null;
+	let feature_type = null;
+	const data = [];
+
+	const feature_entry = fields.find(d => d && d[0] && d[0].startsWith('_') && !d[0].includes('analysis'));
+
+	if (feature_entry) {
+		const category_html = feature_entry[1];
+		const category = category_html.match(/<strong[^>]*>(.*?)<\/strong>/)?.[1] || '';
+		const name = feature_name || props['Facility Name'] || props['name'];
+
+		if (name) {
+			feature = name;
+			if (category) {
+				feature_type = category;
+			}
+		}
+	}
+
+	if (Number.isFinite(analysis_value)) {
+		if (analysis_name) {
+			data.push([analysis_name, lowmedhigh_scale(analysis_value)]);
+		}
+		const percentage = (analysis_value * 100).toFixed(1);
+		data.push(["Priority score", `${percentage}%`]);
+	}
+
+	if (maybe(ll, 'length') === 2) {
+		data.push(["Coordinates", `[${ll[0].toFixed(5)}, ${ll[1].toFixed(5)}]`]);
+	}
+
+	const divisions = fields
+		.filter(d => d && d[0] && d[0].startsWith('_') && !d[0].includes('analysis'))
+		.filter(d => d !== feature_entry)
+		.map(d => props[d[0]])
+		.filter(v => v);
+
+	if (divisions.length) {
+		data.push(["Location", divisions.join(', ')]);
+	}
+
+	for (const e of fields) {
+		if (!e) continue;
+		if (e[0].startsWith('_')) continue;
+		if (e[0].includes('analysis')) continue;
+
+		// Skip facility/feature name fields - they're shown in the header
+		const fieldName = e[0].toLowerCase();
+		if (fieldName === 'facility name' || fieldName === 'name' || fieldName === 'facility_name') continue;
+
+		if (!props[e[0]]) continue;
+
+		const label = e.hasOwnProperty(1) ? e[1] : e[0];
+		const value = props[e[0]].toString();
+		data.push([label, value]);
+	}
+
+	return { feature, feature_type, data };
+}
+
 export default class mapinfo extends HTMLElement {
 	constructor(opts, el = document.body) {
 		if (!(el instanceof Node)) throw new DOMError("mapinfo", `'${el}' is not an Node`);
@@ -135,38 +204,59 @@ export default class mapinfo extends HTMLElement {
 	}
 
 	render() {
-		const { hidden, title, message, close, close_callback, max_width, noevents } = this.opts;
+		const { "data": rawData, close } = this.opts;
 
-		if (typeof max_width === 'number')
-			this.style['max-width'] = max_width + "px";
-
-		if (noevents)
-			this.style['pointer-events'] = "none";
+		// Extract and process the map info data
+		const { fields, props, ll, analysis_value, analysis_name, feature_name } = rawData;
+		const data = extract_map_info_data(fields, props, ll, analysis_value, analysis_name, feature_name);
 
 		this.arrow = document.createElement('span');
 		this.arrow.className = 'arrow';
 
 		this.main = document.createElement('main');
 
-		if (title) {
+		if (data.feature || data.feature_type) {
 			const header = document.createElement('header');
+			const headerInner = document.createElement('div');
+			headerInner.className = 'header-inner';
 
-			if (title instanceof Element)
-				header.append(title);
-			else
-				header.innerHTML = title;
+			if (data.feature) {
+				const titleDiv = document.createElement('div');
+				titleDiv.className = 'title';
+				titleDiv.innerHTML = data.feature;
+				headerInner.append(titleDiv);
+			}
 
+			if (data.feature_type) {
+				const captionDiv = document.createElement('div');
+				captionDiv.className = 'caption';
+				captionDiv.innerHTML = data.feature_type;
+				headerInner.append(captionDiv);
+			}
+
+			header.append(headerInner);
 			this.main.append(header);
 		}
 
-		if (message) {
+		if (data.data && data.data.length) {
 			const content = document.createElement('content');
+			const table = document.createElement('table');
 
-			if (message instanceof Element || message instanceof DocumentFragment)
-				content.append(message);
-			else
-				content.innerHTML = message;
+			for (const row of data.data) {
+				if (row === null) continue;
 
+				const tr = document.createElement('tr');
+				const td1 = document.createElement('td');
+				const td2 = document.createElement('td');
+
+				td1.textContent = row[0];
+				td2.innerHTML = row[1];
+
+				tr.append(td1, td2);
+				table.append(tr);
+			}
+
+			content.append(table);
 			this.main.append(content);
 		}
 
@@ -178,7 +268,6 @@ export default class mapinfo extends HTMLElement {
 
 			this.close_button.onclick = _ => {
 				if (this) this.remove();
-				if (typeof close_callback === 'function') close_callback();
 			};
 
 			this.append(this.close_button);
@@ -191,8 +280,6 @@ export default class mapinfo extends HTMLElement {
 		this.align();
 
 		this.style['visibility'] = 'visible';
-
-		if (hidden) this.style['display'] = "none";
 	}
 };
 

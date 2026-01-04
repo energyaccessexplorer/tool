@@ -163,6 +163,7 @@ build-a:
 		${SRC}/qa-outputs.js \
 		${SRC}/qa-snapshot.js \
 		${SRC}/qa-indexes.js \
+		${SRC}/map-info.js \
 		${SRC}/a.js \
 		${DIST}/a/
 
@@ -203,6 +204,7 @@ build-a:
 		${CSS}/config.css \
 		${CSS}/card.css	\
 		${CSS}/control.css \
+		${CSS}/map-info.css \
 		> ${DIST}/a/main.css
 
 build-s:
@@ -218,6 +220,7 @@ build-s:
 		${SRC}/utils.js \
 		${SRC}/browser.js \
 		${SRC}/user.js \
+		${SRC}/bubblemessage.js \
 		${SRC}/s.js \
 		${DIST}/s/
 
@@ -236,6 +239,7 @@ build-s:
 		${CSS}/maparea.css \
 		${CSS}/ripple.css \
 		${CSS}/mobile.css \
+		${CSS}/map-info.css \
 		> ${DIST}/s/main.css
 
 sync:

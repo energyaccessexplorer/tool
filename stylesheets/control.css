@@ -214,6 +214,7 @@ ds-controls:not(.active) buttons [bind=card] {
   line-height: 24px;
   color: #F2FDF9;
   cursor: pointer;
+  text-decoration: none;
 }
 
 .primary-button:hover {
@@ -247,6 +248,7 @@ ds-controls:not(.active) buttons [bind=card] {
   line-height: 24px;
   color: #3D3B3B;
   cursor: pointer;
+  text-decoration: none;
 }
 
 .secondary-button:hover {

@@ -11,6 +11,33 @@ import {
 
 const url = new URL(location);
 
+function request_authentication() {
+	const message = document.createElement('p');
+	message.textContent = 'Create a My EAE account, or sign in to your existing account in order to save your current analysis view and receive important updates about the Energy Access Explorer platform.';
+
+	const createAccountButton = document.createElement('a');
+	createAccountButton.href = '/subscribe/?select=account';
+	createAccountButton.target = '_blank';
+	createAccountButton.className = 'primary-button';
+	createAccountButton.textContent = 'Create account';
+
+	const signInButton = document.createElement('a');
+	signInButton.href = '/login';
+	signInButton.className = 'secondary-button';
+	signInButton.textContent = 'Sign in';
+
+	const footer = document.createDocumentFragment();
+	footer.append(createAccountButton, signInButton);
+
+	const m = new modal({
+		"header":  "Save analysis to My EAE",
+		"content": message,
+		"footer":  footer,
+	});
+
+	m.show();
+}
+
 function saved_analysis_modal(s, updateCallback, saveAsNewCallback) {
 	const content = document.createDocumentFragment();
 
@@ -135,7 +162,7 @@ export function snapshot(callback) {
 	const user_id = user_extract('id');
 
 	if (!user_id) {
-		register_login();
+		request_authentication();
 		return;
 	}
 

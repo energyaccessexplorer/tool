@@ -123,7 +123,7 @@ export default class mapinfo extends HTMLElement {
 		};
 
 		const lineWidth = 4;
-		const gap = 10;
+		const gap = 50;
 
 		switch (position) {
 		case "N":
@@ -199,12 +199,15 @@ export default class mapinfo extends HTMLElement {
 			break;
 		}
 
-		this.style.left = (x < 0 ? 0 : x) + window.scrollX + "px";
-		this.style.top = (y < 0 ? 0 : y) + window.scrollY + "px";
+		const maparea = document.querySelector('#maparea');
+		const mapareaBox = maparea.getBoundingClientRect();
+
+		this.style.left = (x - mapareaBox.left) + "px";
+		this.style.top = (y - mapareaBox.top) + "px";
 	}
 
 	render() {
-		const { "data": rawData, close } = this.opts;
+		const { "data": rawData, close, onClose } = this.opts;
 
 		// Extract and process the map info data
 		const { fields, props, ll, analysis_value, analysis_name, feature_name } = rawData;
@@ -215,28 +218,38 @@ export default class mapinfo extends HTMLElement {
 
 		this.main = document.createElement('main');
 
-		if (data.feature || data.feature_type) {
-			const header = document.createElement('header');
-			const headerInner = document.createElement('div');
-			headerInner.className = 'header-inner';
+		const header = document.createElement('header');
 
-			if (data.feature) {
-				const titleDiv = document.createElement('div');
-				titleDiv.className = 'title';
-				titleDiv.innerHTML = data.feature;
-				headerInner.append(titleDiv);
-			}
+		const headerContent = document.createElement('div');
+		headerContent.className = 'header-content';
 
-			if (data.feature_type) {
-				const captionDiv = document.createElement('div');
-				captionDiv.className = 'caption';
-				captionDiv.innerHTML = data.feature_type;
-				headerInner.append(captionDiv);
-			}
-
-			header.append(headerInner);
-			this.main.append(header);
+		if (data.feature) {
+			const titleDiv = document.createElement('div');
+			titleDiv.className = 'title';
+			titleDiv.innerHTML = data.feature;
+			headerContent.append(titleDiv);
 		}
+
+		if (data.feature_type) {
+			const captionDiv = document.createElement('div');
+			captionDiv.className = 'caption';
+			captionDiv.innerHTML = data.feature_type;
+			headerContent.append(captionDiv);
+		}
+
+		const closeContainer = document.createElement('div');
+		closeContainer.className = 'close-button-container';
+
+		const closeButton = document.createElement('div');
+		closeButton.className = 'close-button';
+		closeButton.onclick = () => {
+			if (onClose) onClose();
+			else this.remove();
+		};
+
+		closeContainer.append(closeButton);
+		header.append(headerContent, closeContainer);
+		this.main.append(header);
 
 		if (data.data && data.data.length) {
 			const content = document.createElement('content');
@@ -262,20 +275,10 @@ export default class mapinfo extends HTMLElement {
 
 		this.append(this.arrow, this.main);
 
-		if (close !== false) {
-			this.close_button = document.createElement('div');
-			this.close_button.className = 'map-info-close-button';
-
-			this.close_button.onclick = _ => {
-				if (this) this.remove();
-			};
-
-			this.append(this.close_button);
-		}
-
 		this.style['visibility'] = 'hidden';
 
-		document.body.append(this);
+		const maparea = document.querySelector('#maparea');
+		maparea.append(this);
 
 		this.align();
 

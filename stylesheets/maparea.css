@@ -1,5 +1,7 @@
 #maparea {
+  position: relative;
   background-color: var(--the-white);
+  overflow: hidden;
 }
 
 canvas.mapboxgl-canvas {

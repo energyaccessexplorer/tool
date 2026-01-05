@@ -82,122 +82,20 @@ export default class mapinfo extends HTMLElement {
 	}
 
 	align() {
-		const { position, align } = this.opts;
 		const elbox = this.el.getBoundingClientRect();
-
-		let x = elbox.x;
-		let y = elbox.y;
-
-		const halign = _ => {
-			switch (align) {
-			case "start":
-				x += 0;
-				break;
-
-			case "end":
-				x += elbox.width - this.clientWidth;
-				break;
-
-			case "middle":
-			default:
-				x += (elbox.width / 2) - (this.clientWidth / 2);
-				break;
-			}
-		};
-
-		const valign = _ => {
-			switch (align) {
-			case "start":
-				y -= this.clientHeight / 2;
-				break;
-
-			case "end":
-				y += elbox.height - (this.clientHeight / 2);
-				break;
-
-			case "middle":
-			default:
-				y = elbox.y + (elbox.height / 2) - (this.clientHeight / 2);
-				break;
-			}
-		};
 
 		const lineWidth = 4;
 		const gap = 50;
 
-		switch (position) {
-		case "N":
-		case "north": {
-			halign();
+		// Position map-info to the right of the pointer
+		const x = elbox.x + elbox.width + gap;
+		const y = elbox.y - (this.clientHeight / 2) + (elbox.height / 2);
 
-			this.arrow.style['width'] = lineWidth + "px";
-			this.arrow.style['height'] = gap + "px";
-			this.arrow.style['left'] = (this.clientWidth / 2 - lineWidth / 2) + "px";
-			this.arrow.style['top'] = this.clientHeight + "px";
-
-			y -= this.clientHeight + gap;
-
-			break;
-		}
-
-		case "E":
-		case "east": {
-			valign();
-
-			this.arrow.style['width'] = gap + "px";
-			this.arrow.style['height'] = lineWidth + "px";
-			this.arrow.style['left'] = -gap + "px";
-			this.arrow.style['top'] = (this.clientHeight / 2 - lineWidth / 2) + "px";
-
-			x += elbox.width + gap;
-
-			break;
-		}
-
-		case "S":
-		case "south": {
-			halign();
-
-			this.arrow.style['width'] = lineWidth + "px";
-			this.arrow.style['height'] = gap + "px";
-			this.arrow.style['left'] = (this.clientWidth / 2 - lineWidth / 2) + "px";
-			this.arrow.style['top'] = -gap + "px";
-
-			y += elbox.height + gap;
-
-			break;
-		}
-
-		case "W":
-		case "west": {
-			valign();
-
-			this.arrow.style['width'] = gap + "px";
-			this.arrow.style['height'] = lineWidth + "px";
-			this.arrow.style['left'] = this.clientWidth + "px";
-			this.arrow.style['top'] = (this.clientHeight / 2 - lineWidth / 2) + "px";
-
-			x -= this.clientWidth + gap;
-
-			if (this.close_button)
-				this.prepend(this.close_button);
-
-			break;
-		}
-
-		case "C":
-		case "center": {
-			this.arrow.style['display'] = 'none';
-
-			valign();
-			halign();
-
-			break;
-		}
-
-		default:
-			break;
-		}
+		// Position arrow connecting pointer to map-info
+		this.arrow.style['width'] = gap + "px";
+		this.arrow.style['height'] = lineWidth + "px";
+		this.arrow.style['left'] = -gap + "px";
+		this.arrow.style['top'] = (this.clientHeight / 2 - lineWidth / 2) + "px";
 
 		const maparea = document.querySelector('#maparea');
 		const mapareaBox = maparea.getBoundingClientRect();

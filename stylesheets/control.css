@@ -261,6 +261,36 @@ ds-controls:not(.active) buttons [bind=card] {
   border: 1px solid #C9C9C9;
 }
 
+.button-small {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 6px 8px;
+  gap: 6px;
+  height: 28px;
+  background: #FFFFFF;
+  border: 1px solid #E7E6E6;
+  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 16px;
+  color: #3D3B3B;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.button-small:hover {
+  background: #F6F6F6;
+  border: 1px solid #D0CFCF;
+}
+
+.button-small:active {
+  background: #E7E6E6;
+  border: 1px solid #C9C9C9;
+}
+
 .text-input-wrapper {
   display: flex;
   flex-direction: column;

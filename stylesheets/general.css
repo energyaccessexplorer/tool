@@ -192,3 +192,86 @@ dialog pre {
   max-width: 850px;
   white-space: pre-line;
 }
+
+toast-notification {
+  position: fixed;
+  left: 25px;
+  bottom: 25px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 12px;
+  gap: 12px;
+  width: 384px;
+  background: #EBF5F2;
+  border: 1px solid #009E77;
+  box-shadow: 0px 10px 15px -3px rgba(0, 0, 0, 0.1), 0px 4px 6px -4px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  z-index: 9999;
+}
+
+toast-notification .toast-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  align-self: flex-start;
+  padding: 2px 0px 0px;
+  width: 20px;
+  height: 22px;
+}
+
+toast-notification .toast-icon i {
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
+  color: #009E77;
+}
+
+toast-notification .toast-content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0px;
+  gap: 16px;
+  flex: 1;
+}
+
+toast-notification .toast-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0px;
+  flex: 1;
+}
+
+toast-notification .toast-label {
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: #00664D;
+  align-self: stretch;
+  margin: 0;
+}
+
+toast-notification .toast-caption {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: #00664D;
+  opacity: 0.8;
+  align-self: stretch;
+  margin: 0;
+}
+
+toast-notification .toast-footer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0px;
+  gap: 8px;
+}
+
+toast-notification .toast-footer div {
+  display: flex;
+  align-items: center;
+}

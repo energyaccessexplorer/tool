@@ -1,4 +1,5 @@
 import modal from '../lib/modal.js';
+import Toast from './components/toast.js';
 
 import {
 	generate as config_gen,
@@ -104,6 +105,7 @@ function edit_title(s, callback) {
 	i.value = s.title ?? "";
 	i.setAttribute('required', '');
 	i.className = 'text-input';
+	i.name = 'title';
 
 	const label = document.createElement('label');
 	label.className = 'text-input-label required';
@@ -173,7 +175,22 @@ export function snapshot(callback) {
 
 	function patch() {
 		API.patch('snapshots', { "time": `eq.${snapshot_id}` }, { "payload": { config } })
-			.then(_ => FLASH.push({ "title": "Updated Analysis", "type": "success" }));
+			.then(_ => {
+				const toast = new Toast({
+					"label":   'Analysis updated successfully',
+					"caption": 'Your analysis was updated in your My EAE account.',
+				});
+
+				const action = document.createElement('a');
+				action.href = '/tool/m/';
+				action.target = '_blank';
+				action.className = 'button-small';
+				action.textContent = 'View in My EAE';
+				action.slot = 'action';
+
+				toast.append(action);
+				toast.show();
+			});
 
 		return snapshot_id;
 	};
@@ -192,7 +209,22 @@ export function snapshot(callback) {
 			SNAPSHOT = s;
 
 			API.post('snapshots', null, { "payload": s })
-				.then(_ => FLASH.push({ "title": "Created Analysis", "type": "success" }))
+				.then(_ => {
+					const toast = new Toast({
+						"label":   'Analysis saved successfully',
+						"caption": 'Your analysis was saved to your My EAE account.',
+					});
+
+					const action = document.createElement('a');
+					action.href = '/tool/m/';
+					action.target = '_blank';
+					action.className = 'button-small';
+					action.textContent = 'View in My EAE';
+					action.slot = 'action';
+
+					toast.append(action);
+					toast.show();
+				})
 				.then(_ => url.searchParams.set('snapshot', s['time']))
 				.then(_ => history.replaceState(null, null, url))
 				.then(_ => typeof callback === 'function' ? callback() : _);

@@ -169,6 +169,7 @@ build-a:
 
 	@ cp \
 		${SRC}/components/card.js \
+		${SRC}/components/toast.js \
 		${DIST}/a/components/
 
 	@ cat \

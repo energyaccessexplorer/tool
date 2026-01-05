@@ -105,7 +105,7 @@ export default class mapinfo extends HTMLElement {
 	}
 
 	render() {
-		const { "data": rawData, close, onClose } = this.opts;
+		const { "data": rawData, onClose } = this.opts;
 
 		// Extract and process the map info data
 		const { fields, props, ll, analysis_value, analysis_name, feature_name } = rawData;

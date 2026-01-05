@@ -1,12 +1,4 @@
 import {
-	coordinates_to_raster_pixel,
-} from './utils.js';
-
-import {
-	context,
-} from './complicated.js';
-
-import {
 	fit as mapbox_fit,
 	show_location_info,
 } from './mapbox.js';
@@ -16,7 +8,7 @@ import {
 	qsa,
 } from '../lib/helpers.js';
 
-export function pointto(coords, dict, props, a = false) {
+export function pointto(coords, dict, props, centerPointer = false) {
 	const maparea = qs('#maparea');
 
 	const {x,y} = MAPBOX.project(coords);
@@ -29,7 +21,7 @@ export function pointto(coords, dict, props, a = false) {
 		"lngLat": {"lng": coords[0], "lat": coords[1]},
 	};
 
-	show_location_info(coords, position);
+	show_location_info(coords, position, centerPointer);
 };
 
 export function zoom(p, fn) {

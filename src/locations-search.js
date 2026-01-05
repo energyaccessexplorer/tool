@@ -21,11 +21,11 @@ let ul, input, resultscontainer;
 
 let resultsinfo;
 
-function pointto(p, a = false) {
+function pointto(p, centerPointer = false) {
 	const dict = [[ "name", "Name" ]];
 	const props = { "name": p._name };
 
-	search_pointto(p.center, dict, props, a);
+	search_pointto(p.center, dict, props, centerPointer);
 };
 
 async function reset(v) {

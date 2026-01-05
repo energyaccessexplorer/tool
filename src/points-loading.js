@@ -32,11 +32,11 @@ import {
 
 let ul, resultscontainer, resultsinfo;
 
-function pointto(p, a = false) {
+function pointto(p, centerPointer = false) {
 	const dict = [[ "v", EAE['indexes'][STATE.index]['name'] ]];
 	const props = { "v": lowmedhigh_scale(p.v) };
 
-	search_pointto(p.c, dict, props, a);
+	search_pointto(p.c, dict, props, centerPointer);
 };
 
 function li(p) {

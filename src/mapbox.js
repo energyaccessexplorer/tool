@@ -454,7 +454,7 @@ export async function sort() {
 	}
 };
 
-export function show_location_info(ll, position) {
+export function show_location_info(ll, position, centerPointer = true) {
 	const rc = coordinates_to_raster_pixel(ll, OUTLINE.raster);
 
 	const p = MAPBOX.queryRenderedFeatures(MAPBOX.project(ll));
@@ -476,6 +476,8 @@ export function show_location_info(ll, position) {
 		.then(r => {
 			const feature_name = maybe(r, 0, 'name') || null;
 			pointer(position, { fields, props, ll, analysis_value, analysis_name, feature_name });
+
+			if (!centerPointer) return;
 
 			delay(0.1).then(() => {
 				const mapInfo = qs('map-info');

@@ -364,7 +364,14 @@ top: ${y - 8}px;`,
 		pos = "C";
 	}
 
-	const mark = new mapinfo({ "position": pos, "data": data, "close": cls }, (MOBILE ? document.body : p));
+	function drop() {
+		if (p._preventDrop) return;
+		if (onMove) MAPBOX.off('move', onMove);
+		p.remove();
+		mark.remove();
+	};
+
+	const mark = new mapinfo({ "position": pos, "data": data, "close": cls, "onClose": drop }, (MOBILE ? document.body : p));
 
 	function updatePosition() {
 		if (!lngLat) return;
@@ -386,25 +393,6 @@ top: ${y - 8}px;`,
 		onMove = () => updatePosition();
 		MAPBOX.on('move', onMove);
 	}
-
-	function drop() {
-		if (onMove) MAPBOX.off('move', onMove);
-		p.remove();
-		mark.remove();
-	};
-
-	p.addEventListener('mouseleave', drop);
-
-	let _clk;
-	function clk() {
-		drop();
-		document.removeEventListener('click', _clk);
-	};
-
-	delay(0.2).then(_ => {
-		_clk = clk;
-		document.addEventListener('click', _clk);
-	});
 
 	return {
 		drop,
@@ -488,6 +476,93 @@ export function show_location_info(ll, position) {
 		.then(r => {
 			const feature_name = maybe(r, 0, 'name') || null;
 			pointer(position, { fields, props, ll, analysis_value, analysis_name, feature_name });
+
+			delay(0.1).then(() => {
+				const mapInfo = qs('map-info');
+				if (!mapInfo) return;
+
+				const mapContainer = qs('#maparea').getBoundingClientRect();
+				const mapInfoBox = mapInfo.getBoundingClientRect();
+				const rightPanel = qs('#right-panel');
+				const leftPanel = qs('#left-panel');
+
+				let visibleLeft = mapContainer.left;
+				let visibleRight = mapContainer.right;
+
+				if (leftPanel) {
+					const leftBox = leftPanel.getBoundingClientRect();
+					if (leftBox.width > 0) {
+						visibleLeft = Math.max(visibleLeft, leftBox.right);
+					}
+				}
+
+				if (rightPanel) {
+					const rightBox = rightPanel.getBoundingClientRect();
+					if (rightBox.width > 0) {
+						visibleRight = Math.min(visibleRight, rightBox.left);
+					}
+				}
+
+				const controlsPadding = 60;
+
+				const visibleTop = mapContainer.top;
+				const visibleBottom = mapContainer.bottom - controlsPadding;
+
+				visibleLeft += controlsPadding;
+
+				const isFullyVisible =
+					mapInfoBox.left >= visibleLeft &&
+					mapInfoBox.right <= visibleRight &&
+					mapInfoBox.top >= visibleTop &&
+					mapInfoBox.bottom <= visibleBottom;
+
+				if (!isFullyVisible) {
+					let offsetX = 0;
+					let offsetY = 0;
+
+					if (mapInfoBox.right > visibleRight) {
+						offsetX = mapInfoBox.right - visibleRight;
+					} else if (mapInfoBox.left < visibleLeft) {
+						offsetX = mapInfoBox.left - visibleLeft;
+					}
+
+					if (mapInfoBox.bottom > visibleBottom) {
+						offsetY = mapInfoBox.bottom - visibleBottom;
+					} else if (mapInfoBox.top < visibleTop) {
+						const pointer = qs('#map-pointer');
+						const pointerBox = pointer ? pointer.getBoundingClientRect() : null;
+						if (pointerBox) {
+							offsetY = mapInfoBox.top - pointerBox.top;
+						} else {
+							offsetY = mapInfoBox.top - visibleTop;
+						}
+					}
+
+					const currentCenter = MAPBOX.getCenter();
+
+					const centerPoint = MAPBOX.project(currentCenter);
+					const targetPoint = {
+						"x": centerPoint.x + offsetX,
+						"y": centerPoint.y + offsetY,
+					};
+
+					const targetCenter = MAPBOX.unproject(targetPoint);
+
+					const p = qs('#map-pointer');
+					if (p) {
+						p._preventDrop = true;
+
+						MAPBOX.once('moveend', () => {
+							if (p) p._preventDrop = false;
+						});
+					}
+
+					MAPBOX.easeTo({
+						"center":   targetCenter,
+						"duration": 300,
+					});
+				}
+			});
 		});
 }
 

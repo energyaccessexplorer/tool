@@ -30,7 +30,6 @@ import {
 } from  './session.js';
 
 import {
-	and,
 	ce,
 	fake_blob_download,
 	maybe,

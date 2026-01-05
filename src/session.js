@@ -6,7 +6,6 @@ import {
 
 import {
 	extract as user_extract,
-	register_login,
 } from './user.js';
 
 const url = new URL(location);

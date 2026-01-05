@@ -178,16 +178,8 @@ export function init() {
 
 	const snap = qs('#save-snapshot-button');
 	snap.onclick = _ => {
-		if (snapshot())
-			qs('span', snap).innerText = "Update";
+		snapshot();
 	};
-
-	const suid = maybe(SNAPSHOT, 'user_id');
-
-	if (and(suid, suid !== SELF.id))
-		qs('span', snap).innerText = "Duplicate Analysis";
-	else if (and(suid, suid === SELF.id))
-		qs('span', snap).innerText = "Update";
 
 	const share = qs('#share-snapshot-button');
 	share.onclick = _ => {
@@ -196,10 +188,9 @@ export function init() {
 		if (u.searchParams.get('snapshot')) {
 			share_url();
 			return;
-
 		}
-		if (snapshot(share_url))
-			qs('span', snap).innerText = "Update";
+
+		snapshot(share_url);
 	};
 
 	const download = qs('#tiff-download');

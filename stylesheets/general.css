@@ -57,50 +57,6 @@ button i ~ span  {
   fill: var(--the-white) !important;
 }
 
-dialog main {
-  background-color: white;
-  margin: auto;
-  max-width: 1200px;
-  width: fit-content;
-  width: -moz-fit-content;
-  margin-top: 80px !important;
-}
-
-dialog header {
-  padding: 1em;
-  padding-left: 1.3em;
-  font-size: 1.2em;
-  background-color: var(--the-green);
-  color: var(--the-white);
-  position: relative;
-}
-
-dialog .close {
-  position: absolute;
-  top: 0.1em;
-  right: 0.2em;
-  text-decoration: none;
-  font-size: 2.5em;
-  width: 1em;
-  height: 1em;
-  text-align: center;
-  cursor: pointer;
-  color: var(--the-white);
-}
-
-dialog content {
-  padding: 1.5em 1.5em 0.75em !important;
-}
-
-dialog footer {
-  padding: 0.75em 1.5em 1.5em !important;
-}
-
-dialog pre {
-  max-width: 850px;
-  white-space: pre-line;
-}
-
 bubble-message {
   background-color: rgba(0,0,0,1);
   border-radius: 3px;
@@ -176,4 +132,63 @@ canvas#output {
   0%   { opacity: 0.7; }
   50%  { opacity: 1.0; }
   100% { opacity: 0.7; }
+}
+
+dialog main {
+  background-color: white;
+  margin: auto;
+  max-width: 1200px;
+  width: fit-content;
+  width: -moz-fit-content;
+  margin-top: 80px !important;
+}
+
+dialog header {
+  padding: 1em;
+  padding-left: 1.3em;
+  font-size: 1.2em;
+  background-color: var(--the-green);
+  color: var(--the-white);
+  position: relative;
+}
+
+dialog .close {
+  position: absolute;
+  top: 0.1em;
+  right: 0.2em;
+  text-decoration: none;
+  font-size: 2.5em;
+  width: 1em;
+  height: 1em;
+  text-align: center;
+  cursor: pointer;
+  color: var(--the-white);
+}
+
+dialog content {
+  display: flex !important;
+  flex-direction: column;
+  gap: 16px;
+  padding: 1.5em 1.5em 0.75em !important;
+  width: 590px;
+}
+
+dialog content p {
+  font-size: 16px;
+  line-height: 24px;
+  color: #575656;
+  margin: 0;
+}
+
+dialog footer {
+  display: flex !important;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 0.75em 1.5em 1.5em !important;
+}
+
+dialog pre {
+  max-width: 850px;
+  white-space: pre-line;
 }

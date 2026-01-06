@@ -62,14 +62,7 @@
 }
 
 #right-panel[closed] {
-  height: auto;
-  background: transparent;
-}
-
-#right-panel[closed] #right-panel-header,
-#right-panel[closed] #right-panel-content,
-#right-panel[closed] #right-panel-footer {
-  display: none;
+  transform: translateX(100%);
 }
 
 .top-action-button {

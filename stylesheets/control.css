@@ -183,13 +183,13 @@ ds-controls:not(.active) buttons [bind=card] {
 
 .button-icon-sm {
   padding: 6px 8px;
-  gap: 6px;
+  gap: 3px;
 }
 
 .button-icon-sm i {
-  width: 10px;
-  height: 10px;
-  font-size: 10px;
+  width: 14px;
+  height: 14px;
+  font-size: 14px;
 }
 
 .button-icon-sm span {

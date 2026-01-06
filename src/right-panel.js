@@ -212,8 +212,12 @@ export function init() {
 	const analysis_locations = tmpl('#analysis-locations-template');
 	qs('#analysis-locations').replaceWith(analysis_locations);
 
-	const collapse = qs('#right-panel-collapse');
-	collapse.onclick = toggle.bind(qs('#right-panel'));
+	const panel = qs('#right-panel');
+	const hideButton = qs('#right-panel-hide');
+	const showButton = qs('#right-panel-show');
+
+	hideButton.onclick = () => hide(panel, hideButton, showButton);
+	showButton.onclick = () => show(panel, hideButton, showButton);
 
 	analysis_locations_panel_init();
 };
@@ -261,18 +265,14 @@ function share_url() {
 export function updated_plot(_type, _index) {
 };
 
-function toggle() {
-	const button = qs('#right-panel-collapse', this);
-	const icon = qs('i', button);
-	const text = qs('span', button);
+function hide(panel, hideButton, showButton) {
+	panel.setAttribute('closed', '');
+	hideButton.style.display = 'none';
+	showButton.style.display = 'flex';
+}
 
-	if (this.getAttribute('closed') === '') {
-		this.removeAttribute('closed');
-		icon.className = 'bi bi-eye-slash';
-		text.textContent = 'Hide';
-	} else {
-		this.setAttribute('closed', '');
-		icon.className = 'bi bi-eye';
-		text.textContent = 'Show';
-	}
+function show(panel, hideButton, showButton) {
+	panel.removeAttribute('closed');
+	hideButton.style.display = 'flex';
+	showButton.style.display = 'none';
 };

@@ -157,15 +157,15 @@ export async function graphs(raster) {
 
 	analysis_locations_panel_update();
 
-	const blankState = qs('#analysis-blank-state');
-	const sectionsWrapper = qs('#analysis-sections-wrapper');
+	const panel = qs('#right-panel');
+	const hideButton = qs('#right-panel-hide');
+	const showButton = qs('#right-panel-show');
 
 	if (hasValidData) {
-		blankState.style.display = 'none';
-		sectionsWrapper.style.display = 'block';
+		showButton.disabled = false;
 	} else {
-		blankState.style.display = 'flex';
-		sectionsWrapper.style.display = 'none';
+		showButton.disabled = true;
+		hide(panel, hideButton, showButton);
 	}
 };
 
@@ -267,12 +267,14 @@ export function updated_plot(_type, _index) {
 
 function hide(panel, hideButton, showButton) {
 	panel.setAttribute('closed', '');
-	hideButton.style.display = 'none';
+	const header = qs('#right-panel-header');
+	header.style.display = 'none';
 	showButton.style.display = 'flex';
 }
 
 function show(panel, hideButton, showButton) {
 	panel.removeAttribute('closed');
-	hideButton.style.display = 'flex';
+	const header = qs('#right-panel-header');
+	header.style.display = 'block';
 	showButton.style.display = 'none';
 };

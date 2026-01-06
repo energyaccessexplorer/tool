@@ -67,6 +67,11 @@
   color: #3D3B3B;
 }
 
+#right-panel-show:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 #right-panel-top-actions {
   display: none;
   flex-direction: row;
@@ -76,14 +81,6 @@
   margin-top: 12px;
   padding-top: 12px;
   border-top: 1px solid #E7E6E6;
-}
-
-#analysis-blank-state {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 3em 2em;
-  flex-shrink: 0;
 }
 
 #analysis-sections-wrapper {
@@ -329,23 +326,6 @@
 
 #drawer-right-panel {
   display: none;
-}
-
-.blank-state-content {
-  text-align: center;
-  color: #999;
-}
-
-.blank-state-icon {
-  font-size: 3em;
-  margin-bottom: 0.5em;
-  opacity: 0.5;
-}
-
-.blank-state-message {
-  font-size: 1.1em;
-  margin: 0;
-  color: #666;
 }
 
 .pagination-container {

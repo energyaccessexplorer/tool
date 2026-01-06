@@ -185,12 +185,12 @@
         </div>
       </div>
 
-      <div id="right-panel">
-        <button id="right-panel-show" class="button-icon" style="display: none;">
+      <div id="right-panel" closed>
+        <button id="right-panel-show" class="button-icon" disabled>
           <span>Show analysis results</span>
           <i class="bi bi-eye-fill"></i>
         </button>
-        <header id="right-panel-header">
+        <header id="right-panel-header" style="display: none;">
           <div class="header-top">
             <h2 class="header-title">Analysis results</h2>
             <button id="right-panel-hide" class="button-icon">
@@ -227,12 +227,6 @@
         </header>
 
         <div id="right-panel-content">
-          <div id="analysis-blank-state">
-            <div class="blank-state-content">
-              <i class="bi bi-clipboard-data blank-state-icon"></i>
-              <p class="blank-state-message">Choose a dataset to perform an analysis</p>
-            </div>
-          </div>
 
           <div id="analysis-sections-wrapper">
             <div id="analysis-locations"></div>

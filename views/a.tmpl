@@ -185,7 +185,7 @@
         </div>
       </div>
 
-      <button id="right-panel-show" class="button-icon button-icon-mid" disabled>
+      <button id="right-panel-show" class="button-icon button-icon-mid">
         <span>Show analysis results</span>
         <i class="bi bi-eye-fill"></i>
       </button>
@@ -228,6 +228,16 @@
         </header>
 
         <div id="right-panel-content">
+          <div id="analysis-blank-state">
+            <div class="blank-state-content">
+              <svg class="blank-state-icon" width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M64 60.25H60.25V22.5H48.875V60.25H45.125V37.5H33.875V60.25H30.125V30H18.875V60.25H15.125V41.25H3.75V60.25H0V64H64V60.25Z" fill="#A0D4C1"/>
+                <path d="M63.999 15V0H48.874V3.75H57.598L39.499 21.7236L24.499 6.72361L0.549023 30.5494L3.20002 33.2006L24.499 12.0264L39.499 27.0264L60.249 6.40137V15H63.999Z" fill="#A0D4C1"/>
+              </svg>
+              <p class="blank-state-title">Add data to prioritize analysis</p>
+              <p class="blank-state-subtitle">Select a dataset from the left panel to add it to the map and start your prioritization analysis.</p>
+            </div>
+          </div>
 
           <div id="analysis-sections-wrapper">
             <div id="analysis-locations"></div>

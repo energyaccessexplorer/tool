@@ -34,11 +34,6 @@
   z-index: 3;
 }
 
-#right-panel-show:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
 #right-panel-top-actions {
   display: none;
   flex-direction: row;
@@ -48,6 +43,39 @@
   margin-top: 12px;
   padding-top: 12px;
   border-top: 1px solid #E7E6E6;
+}
+
+#analysis-blank-state {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  flex-shrink: 0;
+}
+
+.blank-state-content {
+  text-align: center;
+  max-width: 274px;
+}
+
+.blank-state-icon {
+  margin-bottom: 16px;
+}
+
+.blank-state-title {
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 24px;
+  color: #3D3B3B;
+  margin: 0 0 8px 0;
+}
+
+.blank-state-subtitle {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: #5C5959;
+  margin: 0;
 }
 
 #analysis-sections-wrapper {

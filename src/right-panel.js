@@ -157,15 +157,24 @@ export async function graphs(raster) {
 
 	analysis_locations_panel_update();
 
-	const panel = qs('#right-panel');
-	const hideButton = qs('#right-panel-hide');
-	const showButton = qs('#right-panel-show');
+	const blankState = qs('#analysis-blank-state');
+	const sectionsWrapper = qs('#analysis-sections-wrapper');
+	const saveButton = qs('#save-snapshot-button');
+	const shareButton = qs('#share-snapshot-button');
+	const downloadButton = qs('#tiff-download');
 
 	if (hasValidData) {
-		showButton.disabled = false;
+		blankState.style.display = 'none';
+		sectionsWrapper.style.display = 'flex';
+		if (saveButton) saveButton.disabled = false;
+		if (shareButton) shareButton.disabled = false;
+		if (downloadButton) downloadButton.disabled = false;
 	} else {
-		showButton.disabled = true;
-		hide(panel, hideButton, showButton);
+		blankState.style.display = 'flex';
+		sectionsWrapper.style.display = 'none';
+		if (saveButton) saveButton.disabled = true;
+		if (shareButton) shareButton.disabled = true;
+		if (downloadButton) downloadButton.disabled = true;
 	}
 };
 

@@ -181,6 +181,23 @@ ds-controls:not(.active) buttons [bind=card] {
   line-height: 24px;
 }
 
+.button-icon-sm {
+  padding: 6px 8px;
+  gap: 6px;
+}
+
+.button-icon-sm i {
+  width: 10px;
+  height: 10px;
+  font-size: 10px;
+}
+
+.button-icon-sm span {
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 16px;
+}
+
 .button-info {
   flex-direction: row-reverse;
   padding: 6px 8px;

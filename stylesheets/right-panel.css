@@ -26,45 +26,12 @@
   margin: 0;
 }
 
-#right-panel-hide {
-  gap: 8px;
-  padding: 8px 12px;
-  font-size: 14px;
-  color: #3D3B3B;
-  min-width: 95px;
-}
-
-#right-panel-hide i {
-  font-size: 16px;
-  color: #5C5959;
-}
-
 #right-panel-show {
   position: absolute;
   top: 25px;
   right: 25px;
-  background: #FFFFFF;
-  border: 1px solid #E7E6E6;
   box-shadow: 0px 4px 6px -1px rgba(0, 0, 0, 0.1), 0px 2px 4px -2px rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
-  padding: 8px 16px;
-  gap: 8px;
-  height: 40px;
   z-index: 3;
-}
-
-#right-panel-show span {
-  font-weight: 700;
-  font-size: 16px;
-  line-height: 24px;
-  color: #3D3B3B;
-}
-
-#right-panel-show i {
-  width: 16px;
-  height: 16px;
-  font-size: 16px;
-  color: #3D3B3B;
 }
 
 #right-panel-show:disabled {

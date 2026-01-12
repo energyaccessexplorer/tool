@@ -13,7 +13,8 @@ import bind from '../lib/bind.js';
 function extract_map_info_data(fields, props, ll, analysis_value, analysis_name, feature_name) {
 	let feature = null;
 	let feature_type = null;
-	const data = [];
+	const basicData = [];
+	const detailedData = [];
 
 	const feature_entry = fields.find(d => d && d[0] && d[0].startsWith('_') && !d[0].includes('analysis'));
 
@@ -32,14 +33,20 @@ function extract_map_info_data(fields, props, ll, analysis_value, analysis_name,
 
 	if (Number.isFinite(analysis_value)) {
 		if (analysis_name) {
-			data.push({ "label": analysis_name, "value": lowmedhigh_scale(analysis_value) });
+			const analysisData = { "label": analysis_name, "value": lowmedhigh_scale(analysis_value) };
+			basicData.push(analysisData);
+			detailedData.push(analysisData);
 		}
 		const percentage = (analysis_value * 100).toFixed(1);
-		data.push({ "label": "Priority score", "value": `${percentage}%` });
+		const priorityData = { "label": "Priority score", "value": `${percentage}%` };
+		basicData.push(priorityData);
+		detailedData.push(priorityData);
 	}
 
 	if (maybe(ll, 'length') === 2 && feature) {
-		data.push({ "label": "Coordinates", "value": `[${ll[0].toFixed(5)}, ${ll[1].toFixed(5)}]` });
+		const coordData = { "label": "Coordinates", "value": `[${ll[0].toFixed(5)}, ${ll[1].toFixed(5)}]` };
+		basicData.push(coordData);
+		detailedData.push(coordData);
 	}
 
 	const divisions = fields
@@ -49,7 +56,9 @@ function extract_map_info_data(fields, props, ll, analysis_value, analysis_name,
 		.filter(v => v);
 
 	if (divisions.length) {
-		data.push({ "label": "Location", "value": divisions.join(', ') });
+		const locationData = { "label": "Location", "value": divisions.join(', ') };
+		basicData.push(locationData);
+		detailedData.push(locationData);
 	}
 
 	for (const e of fields) {
@@ -64,18 +73,22 @@ function extract_map_info_data(fields, props, ll, analysis_value, analysis_name,
 
 		const label = e.hasOwnProperty(1) ? e[1] : e[0];
 		const value = props[e[0]].toString();
-		data.push({ label, value });
+		detailedData.push({ label, value });
 	}
+
+	const hasLayerData = STATE.datasets.length > 0;
 
 	const coordinates = maybe(ll, 'length') === 2 ? `[${ll[0].toFixed(5)}, ${ll[1].toFixed(5)}]` : null;
 
 	return {
 		feature,
 		feature_type,
-		data,
+		basicData,
+		detailedData,
 		"coordinate-title": !feature && coordinates,
 		coordinates,
-		"has-data":         data.length > 0,
+		"has-basic":        basicData.length > 0,
+		"has-detailed":     hasLayerData,
 	};
 }
 
@@ -135,6 +148,21 @@ export default class mapinfo extends HTMLElement {
 			if (onClose) onClose();
 			else this.remove();
 		};
+
+		const analyseButton = qs('.analyse-button', this);
+		if (analyseButton) {
+			analyseButton.onclick = () => {
+				const basicSection = qs('content:not(.detailed-data)', this);
+				const detailedSection = qs('.detailed-data', this);
+				const buttonContainer = qs('.analyse-button-container', this);
+
+				if (basicSection) basicSection.classList.add('hidden');
+				if (detailedSection) detailedSection.classList.remove('hidden');
+				if (buttonContainer) buttonContainer.remove();
+
+				this.align();
+			};
+		}
 
 		this.style['visibility'] = 'hidden';
 

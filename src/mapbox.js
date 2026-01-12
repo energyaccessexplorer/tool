@@ -44,8 +44,6 @@ const projections = [{
 	"value": "mercator",
 }];
 
-let info_mode_button;
-
 class MapboxThemeControl {
 	onAdd(map) {
 		this._map = map;
@@ -90,29 +88,6 @@ class MapboxProjectionControl {
 	};
 };
 
-class MapboxInfoControl {
-	onAdd(map) {
-		this._map = map;
-		this._container = document.createElement('div');
-		this._container.className = 'mapboxgl-ctrl';
-		this._container.classList.add('mapboxgl-ctrl-group');
-
-		const button = ce('button', ce('div', bi_icon('info-circle'), { "style": "transform: scale(0.75)" }), { "type": 'button', "class": 'mapboxgl-ctrl-icon'});
-
-		this._container.append(button);
-
-		button.addEventListener('click', info_mode_change);
-
-		info_mode_button = button;
-
-		return this._container;
-	};
-
-	onRemove() {
-		this._container.parentNode.removeChild(this._container);
-		this._map = undefined;
-	};
-};
 
 export function init() {
 	mapboxgl.accessToken = EAE['settings'].mapbox_token;
@@ -135,7 +110,6 @@ export function init() {
 
 	MAPBOX.addControl((new MapboxThemeControl()), 'top-left');
 	MAPBOX.addControl((new MapboxProjectionControl()), 'top-left');
-	MAPBOX.addControl((new MapboxInfoControl()), 'top-left');
 
 	MAPBOX.coords = fit(GEOGRAPHY.envelope);
 	MAPBOX.setStyle(theme_pick(EAE['settings'].mapbox_theme));
@@ -243,17 +217,6 @@ function theme_pick(theme) {
 	});
 };
 
-export function info_mode_change() {
-	INFOMODE = !INFOMODE;
-	const b = info_mode_button;
-
-	if (INFOMODE) {
-		b.classList.add('active');
-	}
-	else {
-		b.classList.remove('active');
-	}
-};
 
 async function worldview() {
 	let v = "US";

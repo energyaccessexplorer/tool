@@ -7,10 +7,6 @@ import {
 } from './controls.js';
 
 import {
-	info_mode_change,
-} from './mapbox.js';
-
-import {
 	select_tab as controls_select_tab,
 } from './controls-search.js';
 
@@ -221,7 +217,6 @@ const steps = [
 			"position": "C",
 			"align":    "middle",
 		},
-		"run":    function() { if (!INFOMODE) info_mode_change(); },
 		"listen": {
 			"action": 'click',
 		},

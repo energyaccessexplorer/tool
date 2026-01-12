@@ -8,7 +8,6 @@ import modal from '../lib/modal.js';
 
 import {
 	coords_search_pois as mapbox_coords_search_pois,
-	info_mode_change,
 } from './mapbox.js';
 
 import {
@@ -210,9 +209,6 @@ This file should be <strong>strictly</strong> formatted.
 	pointspick.onmouseleave = _ => pickbubble.remove();
 
 	pointspick.onclick = _ => {
-		INFOMODE = false;
-		info_mode_change();
-
 		COORDINATESMODE = true;
 	};
 

@@ -20,6 +20,8 @@ import {
 
 import mapinfo from './map-info.js';
 
+let current_map_info_drop = null;
+
 const default_styles = [{
 	"name":  "Basic (default)",
 	"value": "mapbox/basic-v9",
@@ -298,6 +300,10 @@ This is fatal. Thanks for all the fish.`,
 	return [[left,top], [right,top], [right,bottom], [left,bottom]];
 };
 
+export function drop_map_info() {
+	if (current_map_info_drop) current_map_info_drop();
+}
+
 export function pointer({x = 0, y = 0, lngLat = null}, data) {
 	let p = qs('#map-pointer');
 
@@ -438,7 +444,8 @@ export function show_location_info(ll, position, centerPointer = true) {
 	coords_search_pois({ "coords": ll, "limit": 1 })
 		.then(r => {
 			const feature_name = maybe(r, 0, 'name') || null;
-			pointer(position, { fields, props, ll, analysis_value, analysis_name, feature_name });
+			const { drop } = pointer(position, { fields, props, ll, analysis_value, analysis_name, feature_name });
+			current_map_info_drop = drop;
 
 			if (!centerPointer) return;
 

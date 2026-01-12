@@ -108,6 +108,15 @@ map-info header .title {
 	color: #1A1919;
 }
 
+map-info header .title.coordinate-title {
+	gap: 8px;
+}
+
+map-info header .title.coordinate-title i {
+	font-size: 16px;
+	color: #3D3B3B;
+}
+
 map-info header .caption {
 	width: 100%;
 	font-weight: 400;

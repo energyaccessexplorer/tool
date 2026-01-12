@@ -736,6 +736,33 @@
     </buttons>
   </template>
 
+  <template id="map-info-template">
+    <span class="arrow"></span>
+    <main>
+      <header>
+        <div class="header-content">
+          <div class="title" bind-cond="feature" bind="feature"></div>
+          <div class="title coordinate-title" bind-cond="coordinate-title">
+            <i class="bi-crosshair"></i>
+            <span bind="coordinates"></span>
+          </div>
+          <div class="caption" bind-cond="feature_type" bind="feature_type"></div>
+        </div>
+        <div class="close-button-container">
+          <div class="close-button"></div>
+        </div>
+      </header>
+      <content bind-cond="has-data">
+        <table bind-each="data">
+          <tr>
+            <td bind="label"></td>
+            <td bind="value"></td>
+          </tr>
+        </table>
+      </content>
+    </main>
+  </template>
+
   {{template "env" .}}
 
   <script type="module">

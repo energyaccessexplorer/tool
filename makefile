@@ -52,8 +52,6 @@ deps:
 	@ sed -i.orig 's/var PptxGenJS=/window.PptxGenJS=/' ${LIB}/pptxgen.js
 	@ rm ${LIB}/pptxgen.js.orig
 
-	@ echo '{}' >/tmp/empty.json
-
 build-m:
 	@ echo "Building my screen"
 	@ mkdir -p ${DIST}/m
@@ -301,3 +299,5 @@ reconfig:
 
 	@ sed -i.orig -e '$$s/$$/;\n/' settings.tmp.json
 	@ rm settings.tmp.json.orig
+
+.PHONY: templates

@@ -22,11 +22,11 @@ jobs:
 
       - name: Install build dependencies
         run: |
-          sudo apt-get install -y bmake curl jq ruby-mustache
+          sudo apt-get install -y bmake curl jq
 
       - name: Build .env
         run: |
-          printf "/$DESTINATION" > views/base.mustache
+          printf "{{define \"base\"}}/${{ env.DESTINATION }}{{end}}" > views/base.tmpl
 
           cat <<- EOF >.env
           	DOMAIN = "${{ vars.DOMAIN }}"

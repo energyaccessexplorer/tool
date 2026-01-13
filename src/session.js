@@ -9,74 +9,22 @@ import {
 	extract as user_extract,
 } from './user.js';
 
+import {
+	qs,
+	tmpl,
+} from '../lib/helpers.js';
+
+import bind from '../lib/bind.js';
+
 const url = new URL(location);
 
 function request_authentication() {
-	const message = document.createElement('p');
-	message.textContent = 'Create a My EAE account, or sign in to your existing account in order to save your current analysis view and receive important updates about the Energy Access Explorer platform.';
+	const template = tmpl('#request-authentication-modal-template');
+	const children = Array.from(template.children);
 
-	const createAccountButton = document.createElement('a');
-	createAccountButton.href = '/subscribe/?select=account';
-	createAccountButton.target = '_blank';
-	createAccountButton.className = 'primary-button';
-	createAccountButton.textContent = 'Create account';
-
-	const signInButton = document.createElement('a');
-	signInButton.href = '/login';
-	signInButton.className = 'secondary-button';
-	signInButton.textContent = 'Sign in';
-
+	const content = children[0];
 	const footer = document.createDocumentFragment();
-	footer.append(createAccountButton, signInButton);
-
-	const m = new modal({
-		"header":  "Save analysis to My EAE",
-		"content": message,
-		"footer":  footer,
-	});
-
-	m.show();
-}
-
-function saved_analysis_modal(s, updateCallback, saveAsNewCallback) {
-	const content = document.createDocumentFragment();
-
-	const message = document.createElement('p');
-	message.textContent = 'You are currently viewing an analysis already saved to your My EAE account. You can either update your existing saved analysis, or save your changes as a new analysis.';
-
-	const infoBox = document.createElement('div');
-	infoBox.className = 'saved-analysis-info';
-
-	const nameRow = document.createElement('div');
-	nameRow.className = 'saved-analysis-name';
-
-	const bookmarkIcon = document.createElement('i');
-	bookmarkIcon.className = 'bi bi-bookmark-fill';
-
-	const nameText = document.createElement('span');
-	nameText.textContent = s.title || 'Untitled Analysis';
-
-	nameRow.append(bookmarkIcon, nameText);
-
-	const lastViewedText = document.createElement('div');
-	lastViewedText.className = 'saved-analysis-last-viewed';
-	const lastViewedDate = new Date(s.time);
-	lastViewedText.textContent = `Last viewed on ${lastViewedDate.toLocaleDateString()}.`;
-
-	infoBox.append(nameRow, lastViewedText);
-
-	content.append(message, infoBox);
-
-	const updateButton = document.createElement('button');
-	updateButton.className = 'button primary-button';
-	updateButton.textContent = 'Update saved analysis';
-
-	const saveAsNewButton = document.createElement('button');
-	saveAsNewButton.className = 'button secondary-button';
-	saveAsNewButton.textContent = 'Save as new analysis';
-
-	const footer = document.createDocumentFragment();
-	footer.append(updateButton, saveAsNewButton);
+	footer.append(...children.slice(1));
 
 	const m = new modal({
 		"header":  "Save analysis to My EAE",
@@ -84,53 +32,53 @@ function saved_analysis_modal(s, updateCallback, saveAsNewCallback) {
 		"footer":  footer,
 	});
 
-	updateButton.onclick = () => {
-		m.remove();
-		updateCallback();
-	};
+	m.show();
+}
 
-	saveAsNewButton.onclick = () => {
-		m.remove();
-		saveAsNewCallback();
-	};
+function saved_analysis_modal(s, updateCallback, saveAsNewCallback) {
+	const lastViewedDate = new Date(s.time);
+	const lastViewed = `Last viewed on ${lastViewedDate.toLocaleDateString()}.`;
+
+	const template = tmpl('#saved-analysis-modal-template');
+
+	bind(template, {
+		"title":        s.title || 'Untitled Analysis',
+		"last-viewed":  lastViewed,
+		"update":       () => {
+			m.remove();
+			updateCallback();
+		},
+		"saveAsNew":    () => {
+			m.remove();
+			saveAsNewCallback();
+		},
+	});
+
+	const children = Array.from(template.children);
+	const content = document.createDocumentFragment();
+	content.append(children[0], children[1]);
+
+	const footer = document.createDocumentFragment();
+	footer.append(...children.slice(2));
+
+	const m = new modal({
+		"header":  "Save analysis to My EAE",
+		"content": content,
+		"footer":  footer,
+	});
 
 	m.show();
 }
 
 function edit_title(s, callback) {
-	const i = document.createElement('input');
-	const f = document.createElement('form');
-	const x = document.createElement('button');
+	const template = tmpl('#edit-title-form-template');
+	const children = Array.from(template.children);
+
+	const f = children[0];
+	const i = qs('input', f);
+	const x = children[1];
 
 	i.value = s.title ?? "";
-	i.setAttribute('required', '');
-	i.className = 'text-input';
-	i.name = 'title';
-
-	const label = document.createElement('label');
-	label.className = 'text-input-label required';
-	label.textContent = 'Analysis title';
-
-	const hint = document.createElement('div');
-	hint.className = 'text-input-hint';
-	hint.textContent = 'Enter a memorable name for the current configuration.';
-
-	const labelWrapper = document.createElement('div');
-	labelWrapper.className = 'text-input-wrapper';
-	labelWrapper.append(label, hint);
-
-	const fieldWrapper = document.createElement('div');
-	fieldWrapper.className = 'field-wrapper';
-	fieldWrapper.append(i);
-
-	f.id = "save-analysis";
-	f.className = 'save-analysis-form';
-	f.append(labelWrapper, fieldWrapper);
-
-	x.type = "submit";
-	x.innerText = "Save analysis";
-	x.className = 'primary-button';
-	x.setAttribute('form', 'save-analysis');
 	x.disabled = i.value.trim() === '';
 
 	i.addEventListener('input', () => {

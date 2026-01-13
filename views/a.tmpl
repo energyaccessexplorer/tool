@@ -831,6 +831,42 @@
     </div>
   </template>
 
+  <template id="request-authentication-modal-template">
+    <p>
+      Create a My EAE account, or sign in to your existing account in order to save your current analysis view and receive important updates about the Energy Access Explorer platform.
+    </p>
+    <a href="/subscribe/?select=account" target="_blank" class="primary-button">Create account</a>
+    <a href="/login" class="secondary-button">Sign in</a>
+  </template>
+
+  <template id="saved-analysis-modal-template">
+    <p>
+      You are currently viewing an analysis already saved to your My EAE account. You can either update your existing saved analysis, or save your changes as a new analysis.
+    </p>
+    <div class="saved-analysis-info">
+      <div class="saved-analysis-name">
+        <i class="bi bi-bookmark-fill"></i>
+        <span bind="title"></span>
+      </div>
+      <div class="saved-analysis-last-viewed" bind="last-viewed"></div>
+    </div>
+    <button class="button primary-button" bind-listen="click" bind-func="update">Update saved analysis</button>
+    <button class="button secondary-button" bind-listen="click" bind-func="saveAsNew">Save as new analysis</button>
+  </template>
+
+  <template id="edit-title-form-template">
+    <form id="save-analysis" class="save-analysis-form">
+      <div class="text-input-wrapper">
+        <label class="text-input-label required">Analysis title</label>
+        <div class="text-input-hint">Enter a memorable name for the current configuration.</div>
+      </div>
+      <div class="field-wrapper">
+        <input class="text-input" name="title" required />
+      </div>
+    </form>
+    <button type="submit" form="save-analysis" class="primary-button">Save analysis</button>
+  </template>
+
   {{template "env" .}}
 
   <script type="module">

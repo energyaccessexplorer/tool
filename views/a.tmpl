@@ -814,6 +814,23 @@
     </main>
   </template>
 
+  <template id="toast-notification-template">
+    <div class="toast-icon">
+      <i class="bi bi-check-circle-fill"></i>
+    </div>
+    <div class="toast-content">
+      <header class="toast-header">
+        <h1 class="toast-label" bind="label"></h1>
+        <p class="toast-caption" bind="caption"></p>
+      </header>
+      <footer class="toast-footer">
+        <div>
+          <slot name="action"></slot>
+        </div>
+      </footer>
+    </div>
+  </template>
+
   {{template "env" .}}
 
   <script type="module">

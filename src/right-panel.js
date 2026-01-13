@@ -51,21 +51,14 @@ function update_graph_section(section, distribution, total, unit, description) {
 		const count = Math.round(distribution[idx] * total);
 		const value = `${count.toLocaleString()} ${unit}`;
 
-		const circle = ce('span', null, { "class": 'scale-circle' });
-		circle.style.backgroundColor = color;
+		const item = tmpl('#discrete-scale-item-template');
+		bind(item, {
+			"color": function(el) { el.style.backgroundColor = color; },
+			"label": labels[idx],
+			"value": value,
+		});
 
-		const spacer = ce('div', null, { "class": 'scale-item-spacer' });
-		spacer.append(circle);
-
-		const dt = ce('dt', null, { "class": 'scale-item-label' });
-		dt.append(spacer, ce('span', labels[idx]));
-
-		const dd = ce('dd', value, { "class": 'scale-item-value' });
-
-		const wrapper = ce('div', null, { "class": 'scale-item' });
-		wrapper.append(dt, dd);
-
-		scale.append(wrapper);
+		scale.append(item);
 	});
 
 	const scale_container = qs('.index-graphs-scale-container', section);

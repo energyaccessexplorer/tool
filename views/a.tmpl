@@ -867,6 +867,18 @@
     <button type="submit" form="save-analysis" class="primary-button">Save analysis</button>
   </template>
 
+  <template id="discrete-scale-item-template">
+    <div class="scale-item">
+      <dt class="scale-item-label">
+        <div class="scale-item-spacer">
+          <span class="scale-circle" bind-init="color"></span>
+        </div>
+        <span bind="label"></span>
+      </dt>
+      <dd class="scale-item-value" bind="value"></dd>
+    </div>
+  </template>
+
   {{template "env" .}}
 
   <script type="module">

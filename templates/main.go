@@ -20,7 +20,7 @@ func main() {
 	flag.Parse()
 
 	if *templateName == "" || *outputFile == "" {
-		fmt.Println("Usage: template-compiler -template=<name> -output=<file> [-data=<json>] [-templates=<dir>]")
+		fmt.Println("Usage: templates -template=<name> -output=<file> [-data=<json>] [-templates=<dir>]")
 		os.Exit(1)
 	}
 

@@ -1,4 +1,6 @@
-class ComponentCard extends HTMLElement {
+import { tmpl, qs } from '../lib/helpers.js';
+
+class PanelSection extends HTMLElement {
 	constructor() {
 		super();
 		this.isCollapsed = false;
@@ -63,11 +65,14 @@ class ComponentCard extends HTMLElement {
 		const actions = this.querySelector('[slot="actions"]');
 		const body = Array.from(this.children).filter(el => !el.hasAttribute('slot'));
 
-		this.innerHTML = this.template(isCollapsible);
+		const templateId = isCollapsible ? '#panel-section-collapsible-template' : '#panel-section-template';
+		const content = tmpl(templateId);
+		this.innerHTML = '';
+		this.appendChild(content);
 
-		const titleGroup = this.querySelector('.card-title-group');
-		const actionsContainer = this.querySelector('.card-actions');
-		const bodyContainer = this.querySelector('.card-body');
+		const titleGroup = qs('.card-title-group', this);
+		const actionsContainer = qs('.card-actions', this);
+		const bodyContainer = qs('.card-body', this);
 
 		if (title) {
 			title.classList.add('card-title', 'section-title');
@@ -84,21 +89,7 @@ class ComponentCard extends HTMLElement {
 
 		body.forEach(el => bodyContainer.appendChild(el));
 	}
-
-	template(isCollapsible) {
-		return `
-			<div class="card-section" data-collapsed="false">
-				<div class="card-header">
-					<div class="card-title-group"></div>
-					<div class="card-actions">
-						${isCollapsible ? '<i class="bi bi-chevron-down visibility-toggle-switch"></i>' : ''}
-					</div>
-				</div>
-				<div class="card-body"></div>
-			</div>
-		`;
-	}
 }
 
-customElements.define('component-card', ComponentCard);
-export default ComponentCard;
+customElements.define('panel-section', PanelSection);
+export default PanelSection;

@@ -675,7 +675,7 @@
   </template>
 
   <template id="analysis-locations-template">
-    <component-card id="analysis-locations-section" collapsible collapsed>
+    <panel-section id="analysis-locations-section" collapsible collapsed>
       <h2 slot="title">High priority areas</h2>
       <div slot="description">
         Showing areas (1km2) with the highest prioritization scores based on
@@ -688,7 +688,7 @@
         </button>
       </div>
       <div class="locations-paginated-list"></div>
-    </component-card>
+    </panel-section>
   </template>
 
   <template id="geographies-search-item">
@@ -879,6 +879,28 @@
     </div>
   </template>
 
+  <template id="panel-section-template">
+    <div class="card-section" data-collapsed="false">
+      <div class="card-header">
+        <div class="card-title-group"></div>
+        <div class="card-actions"></div>
+      </div>
+      <div class="card-body"></div>
+    </div>
+  </template>
+
+  <template id="panel-section-collapsible-template">
+    <div class="card-section" data-collapsed="false">
+      <div class="card-header">
+        <div class="card-title-group"></div>
+        <div class="card-actions">
+          <i class="bi bi-chevron-down visibility-toggle-switch"></i>
+        </div>
+      </div>
+      <div class="card-body"></div>
+    </div>
+  </template>
+
   {{template "env" .}}
 
   <script type="module">
@@ -904,7 +926,7 @@
   </script>
 
   <script type="module">
-    import './components/card.js';
+    import './panel-section.js';
     import {init} from './a.js';
     init();
   </script>

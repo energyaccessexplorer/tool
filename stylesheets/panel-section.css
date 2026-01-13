@@ -1,0 +1,45 @@
+panel-section {
+  display: block;
+  margin-bottom: 12px;
+}
+
+panel-section:last-child {
+  margin-bottom: 0;
+}
+
+panel-section .card-section[data-collapsed="true"] .card-header {
+  border-bottom: none;
+}
+
+panel-section .card-section[data-collapsed="true"] .visibility-toggle-switch {
+  transform: rotate(-90deg);
+}
+
+panel-section .card-section[data-collapsed="true"] .card-body {
+  max-height: 0 !important;
+  opacity: 0;
+  padding: 0;
+  pointer-events: none;
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+}
+
+panel-section .visibility-toggle-switch {
+  transition: transform 0.3s ease;
+  font-size: 16px;
+  color: #3D3B3B;
+  cursor: pointer;
+  padding: 4px;
+  margin: -4px;
+}
+
+panel-section .visibility-toggle-switch.disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+panel-section .card-body {
+  overflow: visible;
+  max-height: none;
+  transition: opacity 0.3s ease;
+}

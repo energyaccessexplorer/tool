@@ -162,11 +162,11 @@ build-a:
 		${SRC}/qa-snapshot.js \
 		${SRC}/qa-indexes.js \
 		${SRC}/map-info.js \
+		${SRC}/panel-section.js \
 		${SRC}/a.js \
 		${DIST}/a/
 
 	@ cp \
-		${SRC}/components/card.js \
 		${SRC}/components/toast.js \
 		${DIST}/a/components/
 
@@ -204,6 +204,7 @@ build-a:
 		${CSS}/card.css	\
 		${CSS}/control.css \
 		${CSS}/map-info.css \
+		${CSS}/panel-section.css \
 		> ${DIST}/a/main.css
 
 build-s:

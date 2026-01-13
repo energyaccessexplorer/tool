@@ -653,25 +653,17 @@
   </template>
 
   <template id="index-graph-section-template">
-    <div class="index-graphs-section card-section">
-      <div class="card-header">
-        <div class="card-title-group">
-          <h2 class="card-title section-title"></h2>
-          <div class="card-description section-subtitle">
-            Energy access potential across all selected geographic areas.
-          </div>
+    <panel-section class="index-graphs-section">
+      <span slot="title"></span>
+      <span slot="description">Energy access potential across all selected geographic areas.</span>
+      <div class="share-graph">
+        <div class="section-description"></div>
+        <div class="graph-and-scale">
+          <div class="index-graphs-scale-container"></div>
+          <div class="index-graphs-group"></div>
         </div>
       </div>
-      <div class="card-body">
-        <div class="share-graph">
-          <div class="section-description"></div>
-          <div class="graph-and-scale">
-            <div class="index-graphs-scale-container"></div>
-            <div class="index-graphs-group"></div>
-          </div>
-        </div>
-      </div>
-    </div>
+    </panel-section>
   </template>
 
   <template id="analysis-locations-template">

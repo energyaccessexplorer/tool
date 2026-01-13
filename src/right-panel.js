@@ -72,7 +72,7 @@ function update_graph_section(section, distribution, total, unit, description) {
 
 function create_graph_section(title, type, numberId, descId) {
 	const section = tmpl('#index-graph-section-template');
-	qs('.section-title', section).textContent = title;
+	qs('[slot="title"]', section).textContent = title;
 	qs('.index-graphs-group', section).id = numberId;
 	qs('.section-description', section).id = descId;
 	qs('.index-graphs-group', section).append(PIES[type].svg);

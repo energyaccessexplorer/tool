@@ -30,13 +30,12 @@
   position: absolute;
   top: 25px;
   right: 25px;
-  box-shadow: 0px 4px 6px -1px rgba(0, 0, 0, 0.1), 0px 2px 4px -2px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
   z-index: 3;
 }
 
 #right-panel-top-actions {
   display: none;
-  flex-direction: row;
   justify-content: space-between;
   align-items: center;
   gap: 8px;
@@ -78,10 +77,20 @@
   margin: 0;
 }
 
-#analysis-sections-wrapper {
+#analysis-sections-wrapper,
+.share-graph,
+.share-graph .discrete-scale,
+.share-graph .scale-item {
   display: flex;
   flex-direction: column;
+}
+
+#analysis-sections-wrapper,
+.share-graph {
   gap: 12px;
+}
+
+#analysis-sections-wrapper {
   padding: 12px;
 }
 
@@ -170,24 +179,6 @@
   cursor: not-allowed;
 }
 
-.collapsible-section[data-collapsed="true"] .visibility-toggle-switch {
-  transform: rotate(-90deg);
-}
-
-.collapsible-section .section-content {
-  overflow: visible;
-  max-height: none;
-  transition: opacity 0.3s ease;
-}
-
-.collapsible-section[data-collapsed="true"] .section-content {
-  max-height: 0 !important;
-  opacity: 0;
-  pointer-events: none;
-  overflow: hidden;
-  transition: max-height 0.3s ease, opacity 0.3s ease;
-}
-
 .section-subtitle {
   font-style: normal;
   font-weight: 400;
@@ -206,11 +197,8 @@
 }
 
 .share-graph {
-  display: flex;
-  flex-direction: column;
   align-items: flex-start;
   padding: 12px 16px 16px;
-  gap: 12px;
 }
 
 .share-graph .section-description {
@@ -225,7 +213,6 @@
 
 .share-graph .graph-and-scale {
   display: flex;
-  flex-direction: row;
   justify-content: center;
   align-items: center;
   padding: 0;
@@ -251,8 +238,6 @@
 }
 
 .share-graph .discrete-scale {
-  display: flex;
-  flex-direction: column;
   align-items: flex-start;
   padding: 0;
   gap: 8px;
@@ -260,8 +245,6 @@
 }
 
 .share-graph .scale-item {
-  display: flex;
-  flex-direction: column;
   padding: 0;
   gap: 0;
   margin: 0;
@@ -269,7 +252,6 @@
 
 .share-graph .scale-item-label {
   display: flex;
-  flex-direction: row;
   align-items: flex-start;
   padding: 0;
   gap: 12px;
@@ -283,7 +265,6 @@
 
 .share-graph .scale-item-spacer {
   display: flex;
-  flex-direction: row;
   align-items: center;
   padding: 2px 0 0;
   gap: 10px;
@@ -309,11 +290,6 @@
   color: #5C5959;
   margin: 0 0 0 32px;
   padding: 0;
-}
-
-
-#drawer-right-panel {
-  display: none;
 }
 
 .pagination-container {

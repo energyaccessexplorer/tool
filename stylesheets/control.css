@@ -147,10 +147,7 @@ ds-controls:not(.active) buttons [bind=card] {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.button-icon i {
-  color: #3D3B3B;
-}
-
+.button-icon i,
 .button-icon span {
   color: #3D3B3B;
 }
@@ -223,21 +220,30 @@ ds-controls:not(.active) buttons [bind=card] {
   line-height: 16px;
 }
 
-.primary-button {
+.primary-button,
+.secondary-button,
+.button-small {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 8px 16px;
-  background: #00794C;
-  border: 1px solid #006640;
-  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   border-radius: 4px;
   font-weight: 700;
-  font-size: 16px;
-  line-height: 24px;
-  color: #F2FDF9;
   cursor: pointer;
   text-decoration: none;
+}
+
+.primary-button,
+.secondary-button {
+  padding: 8px 16px;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.primary-button {
+  background: #00794C;
+  border: 1px solid #006640;
+  color: #F2FDF9;
 }
 
 .primary-button:hover {
@@ -258,60 +264,32 @@ ds-controls:not(.active) buttons [bind=card] {
 }
 
 .secondary-button {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 8px 16px;
   background: #FFFFFF;
   border: 1px solid #E7E6E6;
-  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
-  border-radius: 4px;
-  font-weight: 700;
-  font-size: 16px;
-  line-height: 24px;
   color: #3D3B3B;
-  cursor: pointer;
-  text-decoration: none;
 }
 
-.secondary-button:hover {
-  background: #F6F6F6;
-  border: 1px solid #D0CFCF;
-}
-
-.secondary-button:active {
-  background: #E7E6E6;
-  border: 1px solid #C9C9C9;
-}
-
-.button-small {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  padding: 6px 8px;
-  gap: 6px;
-  height: 28px;
-  background: #FFFFFF;
-  border: 1px solid #E7E6E6;
-  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
-  border-radius: 4px;
-  font-weight: 700;
-  font-size: 12px;
-  line-height: 16px;
-  color: #3D3B3B;
-  cursor: pointer;
-  text-decoration: none;
-}
-
+.secondary-button:hover,
 .button-small:hover {
   background: #F6F6F6;
   border: 1px solid #D0CFCF;
 }
 
+.secondary-button:active,
 .button-small:active {
   background: #E7E6E6;
   border: 1px solid #C9C9C9;
+}
+
+.button-small {
+  padding: 6px 8px;
+  gap: 6px;
+  height: 28px;
+  background: #FFFFFF;
+  border: 1px solid #E7E6E6;
+  font-size: 12px;
+  line-height: 16px;
+  color: #3D3B3B;
 }
 
 .text-input-wrapper {
@@ -345,7 +323,7 @@ ds-controls:not(.active) buttons [bind=card] {
   height: 40px;
   background: #FFFFFF;
   border: 1px solid #C9C9C9;
-  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   border-radius: 4px;
   font-size: 16px;
   line-height: 24px;

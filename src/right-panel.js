@@ -52,7 +52,7 @@ export async function graphs(raster) {
 
 		PIES['population'].change(1);
 
-		qs('#population-number').innerHTML = Math.round(g['total'] / e).toLocaleString() + "&nbsp;" + "people";
+		qs('#population-number').innerHTML = Math.round(g['total']).toLocaleString() + "&nbsp;" + "people";
 
 		g['distribution'].forEach((x,i) => PIES['population']['data'][i].shift());
 	} else {

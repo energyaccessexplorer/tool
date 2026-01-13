@@ -1,10 +1,10 @@
 import {
 	coords_search_pois as mapbox_coords_search_pois,
+	show_location_info,
 } from './mapbox.js';
 
 import {
 	getallpoints,
-	analysis_colorscale,
 	lowmedhigh_scale,
 } from './analysis.js';
 
@@ -27,11 +27,25 @@ const paginationState = {
 	"itemsPerPage": 10,
 };
 
-function pointto(p, a = false) {
+function pointto(p, centerPointer = false) {
 	const dict = [[ "v", EAE['indexes'][STATE.index]['name'] ]];
 	const props = { "v": lowmedhigh_scale(p.v) };
 
-	search_pointto(p.c, dict, props, a);
+	search_pointto(p.c, dict, props, centerPointer);
+};
+
+function show_info_on_hover(p) {
+	const maparea = qs('#maparea');
+	const {x, y} = MAPBOX.project(p.c);
+	const box = maparea.getBoundingClientRect();
+
+	const position = {
+		"x":      box.x + x,
+		"y":      box.y + y,
+		"lngLat": {"lng": p.c[0], "lat": p.c[1]},
+	};
+
+	show_location_info(p.c, position, false);
 };
 
 function li(p) {
@@ -51,7 +65,7 @@ function li(p) {
 	const el = ce('li', [content], { "class": "location-item" });
 
 	el.setAttribute('data-score', score);
-	el.onmouseenter = pointto.bind(null, p);
+	el.onmouseenter = show_info_on_hover.bind(null, p);
 	el.onclick = zoom.bind(null, p, pointto.bind(null, p, true));
 
 	mapbox_coords_search_pois({ "coords": p.c, "limit": 1 })

@@ -1,42 +1,32 @@
 import {
-	coordinates_to_raster_pixel,
-	table_data,
-} from './utils.js';
-
-import {
-	context,
-} from './complicated.js';
-
-import {
 	fit as mapbox_fit,
-	pointer as mapbox_pointer,
+	show_location_info,
 } from './mapbox.js';
 
 import {
 	qs,
+	qsa,
 } from '../lib/helpers.js';
 
-let pointer;
-
-export function pointto(coords, dict, props, a = false) {
+export function pointto(coords, dict, props, centerPointer = false) {
 	const maparea = qs('#maparea');
 
 	const {x,y} = MAPBOX.project(coords);
 
-	const rc = coordinates_to_raster_pixel(coords, OUTLINE.raster);
-
-	if (a) context(rc, dict, props);
-
-	const td = table_data(dict, props, coords);
-
 	const box = maparea.getBoundingClientRect();
 
-	if (pointer) pointer.drop();
-	pointer = mapbox_pointer({"x": box.x + x, "y": box.y + y}, td);
+	const position = {
+		"x":      box.x + x,
+		"y":      box.y + y,
+		"lngLat": {"lng": coords[0], "lat": coords[1]},
+	};
+
+	show_location_info(coords, position, centerPointer);
 };
 
 export function zoom(p, fn) {
-	if (pointer) pointer.drop();
+	for (const e of qsa('map-info'))
+		e.remove();
 
 	if (p.bbox)
 		mapbox_fit(p.bbox, true);

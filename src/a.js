@@ -67,6 +67,9 @@ import {
 
 import {
 	init as mapbox_init,
+	sort as mapbox_sort,
+	fit as mapbox_fit,
+	drop_map_info,
 } from './mapbox.js';
 
 import {
@@ -81,11 +84,6 @@ import {
 import {
 	run as qa_run,
 } from './qa.js';
-
-import {
-	sort as mapbox_sort,
-	fit as mapbox_fit,
-} from './mapbox.js';
 
 import {
 	init as right_panel_init,
@@ -616,6 +614,8 @@ async function reload(k,v) {
 			else if (d.type.match(/(lines|points|polygons)-timeline/))
 				parse_vectors_csv.call(d);
 		});
+
+		drop_map_info();
 	}
 
 	priority_visibility_pick();

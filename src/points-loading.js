@@ -8,7 +8,6 @@ import modal from '../lib/modal.js';
 
 import {
 	coords_search_pois as mapbox_coords_search_pois,
-	info_mode_change,
 } from './mapbox.js';
 
 import {
@@ -32,11 +31,11 @@ import {
 
 let ul, resultscontainer, resultsinfo;
 
-function pointto(p, a = false) {
+function pointto(p, centerPointer = false) {
 	const dict = [[ "v", EAE['indexes'][STATE.index]['name'] ]];
 	const props = { "v": lowmedhigh_scale(p.v) };
 
-	search_pointto(p.c, dict, props, a);
+	search_pointto(p.c, dict, props, centerPointer);
 };
 
 function li(p) {
@@ -210,9 +209,6 @@ This file should be <strong>strictly</strong> formatted.
 	pointspick.onmouseleave = _ => pickbubble.remove();
 
 	pointspick.onclick = _ => {
-		INFOMODE = false;
-		info_mode_change();
-
 		COORDINATESMODE = true;
 	};
 

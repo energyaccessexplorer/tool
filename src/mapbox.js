@@ -1,17 +1,12 @@
 import {
 	super_error,
 	bi_icon,
-	table_data,
 	coordinates_to_raster_pixel,
 } from './utils.js';
 
 import {
 	context,
 } from './complicated.js';
-
-import {
-	lowmedhigh_scale,
-} from './analysis.js';
 
 import {
 	ce,
@@ -23,7 +18,9 @@ import {
 	until,
 } from '../lib/helpers.js';
 
-import bubblemessage from '../lib/bubblemessage.js';
+import mapinfo from './map-info.js';
+
+let current_map_info_drop = null;
 
 const default_styles = [{
 	"name":  "Basic (default)",
@@ -48,8 +45,6 @@ const projections = [{
 	"name":  "Mercator",
 	"value": "mercator",
 }];
-
-let info_mode_button;
 
 class MapboxThemeControl {
 	onAdd(map) {
@@ -95,29 +90,6 @@ class MapboxProjectionControl {
 	};
 };
 
-class MapboxInfoControl {
-	onAdd(map) {
-		this._map = map;
-		this._container = document.createElement('div');
-		this._container.className = 'mapboxgl-ctrl';
-		this._container.classList.add('mapboxgl-ctrl-group');
-
-		const button = ce('button', ce('div', bi_icon('info-circle'), { "style": "transform: scale(0.75)" }), { "type": 'button', "class": 'mapboxgl-ctrl-icon'});
-
-		this._container.append(button);
-
-		button.addEventListener('click', info_mode_change);
-
-		info_mode_button = button;
-
-		return this._container;
-	};
-
-	onRemove() {
-		this._container.parentNode.removeChild(this._container);
-		this._map = undefined;
-	};
-};
 
 export function init() {
 	mapboxgl.accessToken = EAE['settings'].mapbox_token;
@@ -140,7 +112,6 @@ export function init() {
 
 	MAPBOX.addControl((new MapboxThemeControl()), 'top-left');
 	MAPBOX.addControl((new MapboxProjectionControl()), 'top-left');
-	MAPBOX.addControl((new MapboxInfoControl()), 'top-left');
 
 	MAPBOX.coords = fit(GEOGRAPHY.envelope);
 	MAPBOX.setStyle(theme_pick(EAE['settings'].mapbox_theme));
@@ -248,18 +219,6 @@ function theme_pick(theme) {
 	});
 };
 
-export function info_mode_change() {
-	INFOMODE = !INFOMODE;
-	const b = info_mode_button;
-
-	if (INFOMODE) {
-		b.classList.add('active');
-	}
-	else {
-		b.classList.remove('active');
-	}
-};
-
 async function worldview() {
 	let v = "US";
 
@@ -340,7 +299,11 @@ This is fatal. Thanks for all the fish.`,
 	return [[left,top], [right,top], [right,bottom], [left,bottom]];
 };
 
-export function pointer({x = 0, y = 0}, ...contents) {
+export function drop_map_info() {
+	if (current_map_info_drop) current_map_info_drop();
+}
+
+export function pointer({x = 0, y = 0, lngLat = null}, data) {
 	let p = qs('#map-pointer');
 
 	if (p) p.remove();
@@ -349,14 +312,14 @@ export function pointer({x = 0, y = 0}, ...contents) {
 		"id":    "map-pointer",
 		"style": `
 position: absolute;
-left: ${x - 10}px;
-top: ${y - 10}px;
-height: 20px;
-width: 20px;
-background-color: transparent;`,
+left: ${x - 8}px;
+top: ${y - 8}px;`,
 	});
 
 	for (const e of qsa('bubble-message'))
+		e.remove();
+
+	for (const e of qsa('map-info'))
 		e.remove();
 
 	document.body.append(p);
@@ -369,28 +332,35 @@ background-color: transparent;`,
 		pos = "C";
 	}
 
-	const content = ce('span');
-	content.append(...contents);
-
-	const mark = new bubblemessage({ "position": pos, "message": content, "close": cls }, (MOBILE ? document.body : p));
-
 	function drop() {
+		if (p._preventDrop) return;
+		if (onMove) MAPBOX.off('move', onMove);
 		p.remove();
 		mark.remove();
 	};
 
-	p.addEventListener('mouseleave', drop);
+	const mark = new mapinfo({ "position": pos, "data": data, "close": cls, "onClose": drop }, (MOBILE ? document.body : p));
 
-	let _clk;
-	function clk() {
-		drop();
-		document.removeEventListener('click', _clk);
-	};
+	function updatePosition() {
+		if (!lngLat) return;
 
-	delay(0.2).then(_ => {
-		_clk = clk;
-		document.addEventListener('click', _clk);
-	});
+		const point = MAPBOX.project(lngLat);
+		const mapContainer = MAPBOX.getContainer().getBoundingClientRect();
+
+		const newX = mapContainer.left + point.x;
+		const newY = mapContainer.top + point.y;
+
+		p.style.left = (newX - 8) + "px";
+		p.style.top = (newY - 8) + "px";
+
+		mark.align();
+	}
+
+	let onMove;
+	if (lngLat) {
+		onMove = () => updatePosition();
+		MAPBOX.on('move', onMove);
+	}
 
 	return {
 		drop,
@@ -452,47 +422,132 @@ export async function sort() {
 	}
 };
 
-function click(e) {
-	const p = MAPBOX.queryRenderedFeatures(e.point);
-
-	const ll = [e.lngLat.lng, e.lngLat.lat];
+export function show_location_info(ll, position, centerPointer = true) {
 	const rc = coordinates_to_raster_pixel(ll, OUTLINE.raster);
 
-	const [dict, props] = context(rc, p[0]);
-
-	COORDINATES.unshift({ "c": ll });
-
-	qs('#points.search-panel').dispatchEvent(new Event('activate'));
+	const p = MAPBOX.queryRenderedFeatures(MAPBOX.project(ll));
+	const [fields, props] = context(rc, p[0]);
 
 	const ac = coordinates_to_raster_pixel(ll, {
 		"data":   MAPBOX.getSource('output-source').raster,
 		"nodata": -1,
 	});
 
+	let analysis_value = null;
+	let analysis_name = null;
 	if (Number.isFinite(maybe(ac, 'value'))) {
-		dict.unshift(["_analysis_name", EAE['indexes'][STATE.index]['name']], null);
-		props["_analysis_name"] = lowmedhigh_scale(ac.value);
+		analysis_value = ac.value;
+		analysis_name = EAE['indexes'][STATE.index]['name'];
 	}
-
-	const td = table_data(dict, props, ll);
 
 	coords_search_pois({ "coords": ll, "limit": 1 })
 		.then(r => {
-			if (!r.length) return "";
+			const feature_name = maybe(r, 0, 'name') || null;
+			const { drop } = pointer(position, { fields, props, ll, analysis_value, analysis_name, feature_name });
+			current_map_info_drop = drop;
 
-			const pois = ce('div', null, { "id": "pois" });
-			pois.append(ce('h5', "Points of interest"));
+			if (!centerPointer) return;
 
-			r.forEach(f => pois.append(ce('div', f.name, { "class": "small" })));
+			delay(0.1).then(() => {
+				const mapInfo = qs('map-info');
+				if (!mapInfo) return;
 
-			return pois;
-		})
-		.then(p => {
-			const c = {
-				"x": maybe(e, 'originalEvent', 'pageX'),
-				"y": maybe(e, 'originalEvent', 'pageY'),
-			};
+				const mapContainer = qs('#maparea').getBoundingClientRect();
+				const mapInfoBox = mapInfo.getBoundingClientRect();
+				const rightPanel = qs('#right-panel');
+				const leftPanel = qs('#left-panel');
 
-			pointer(c, td, p);
+				let visibleLeft = mapContainer.left;
+				let visibleRight = mapContainer.right;
+
+				if (leftPanel) {
+					const leftBox = leftPanel.getBoundingClientRect();
+					if (leftBox.width > 0) {
+						visibleLeft = Math.max(visibleLeft, leftBox.right);
+					}
+				}
+
+				if (rightPanel) {
+					const rightBox = rightPanel.getBoundingClientRect();
+					if (rightBox.width > 0) {
+						visibleRight = Math.min(visibleRight, rightBox.left);
+					}
+				}
+
+				const controlsPadding = 60;
+
+				const visibleTop = mapContainer.top;
+				const visibleBottom = mapContainer.bottom - controlsPadding;
+
+				visibleLeft += controlsPadding;
+
+				const isFullyVisible =
+					mapInfoBox.left >= visibleLeft &&
+					mapInfoBox.right <= visibleRight &&
+					mapInfoBox.top >= visibleTop &&
+					mapInfoBox.bottom <= visibleBottom;
+
+				if (!isFullyVisible) {
+					let offsetX = 0;
+					let offsetY = 0;
+
+					if (mapInfoBox.right > visibleRight) {
+						offsetX = mapInfoBox.right - visibleRight;
+					} else if (mapInfoBox.left < visibleLeft) {
+						offsetX = mapInfoBox.left - visibleLeft;
+					}
+
+					if (mapInfoBox.bottom > visibleBottom) {
+						offsetY = mapInfoBox.bottom - visibleBottom;
+					} else if (mapInfoBox.top < visibleTop) {
+						const pointer = qs('#map-pointer');
+						const pointerBox = pointer ? pointer.getBoundingClientRect() : null;
+						if (pointerBox) {
+							offsetY = mapInfoBox.top - pointerBox.top;
+						} else {
+							offsetY = mapInfoBox.top - visibleTop;
+						}
+					}
+
+					const currentCenter = MAPBOX.getCenter();
+
+					const centerPoint = MAPBOX.project(currentCenter);
+					const targetPoint = {
+						"x": centerPoint.x + offsetX,
+						"y": centerPoint.y + offsetY,
+					};
+
+					const targetCenter = MAPBOX.unproject(targetPoint);
+
+					const p = qs('#map-pointer');
+					if (p) {
+						p._preventDrop = true;
+
+						MAPBOX.once('moveend', () => {
+							if (p) p._preventDrop = false;
+						});
+					}
+
+					MAPBOX.easeTo({
+						"center":   targetCenter,
+						"duration": 300,
+					});
+				}
+			});
 		});
+}
+
+function click(e) {
+	const ll = [e.lngLat.lng, e.lngLat.lat];
+
+	COORDINATES.unshift({ "c": ll });
+	qs('#points.search-panel').dispatchEvent(new Event('activate'));
+
+	const position = {
+		"x":      maybe(e, 'originalEvent', 'pageX'),
+		"y":      maybe(e, 'originalEvent', 'pageY'),
+		"lngLat": e.lngLat,
+	};
+
+	show_location_info(ll, position);
 };

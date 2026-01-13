@@ -52,8 +52,6 @@ deps:
 	@ sed -i.orig 's/var PptxGenJS=/window.PptxGenJS=/' ${LIB}/pptxgen.js
 	@ rm ${LIB}/pptxgen.js.orig
 
-	@ echo '{}' >/tmp/empty.json
-
 build-m:
 	@ echo "Building my screen"
 	@ mkdir -p ${DIST}/m
@@ -163,6 +161,7 @@ build-a:
 		${SRC}/qa-outputs.js \
 		${SRC}/qa-snapshot.js \
 		${SRC}/qa-indexes.js \
+		${SRC}/map-info.js \
 		${SRC}/a.js \
 		${DIST}/a/
 
@@ -203,6 +202,7 @@ build-a:
 		${CSS}/config.css \
 		${CSS}/card.css	\
 		${CSS}/control.css \
+		${CSS}/map-info.css \
 		> ${DIST}/a/main.css
 
 build-s:
@@ -236,6 +236,7 @@ build-s:
 		${CSS}/maparea.css \
 		${CSS}/ripple.css \
 		${CSS}/mobile.css \
+		${CSS}/map-info.css \
 		> ${DIST}/s/main.css
 
 sync:
@@ -304,3 +305,5 @@ reconfig:
 
 	@ sed -i.orig -e '$$s/$$/;\n/' settings.tmp.json
 	@ rm settings.tmp.json.orig
+
+.PHONY: templates

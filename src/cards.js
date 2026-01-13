@@ -646,12 +646,12 @@ export default class dscard extends HTMLElement {
 
 	bind() {
 		bind(this, Object.assign({}, this.ds, {
-			"unit-label":       coalesce(this.ds.category.controls.range_label, this.ds.category.unit, 'Range'),
+			"unit-label":       coalesce(this.ds.category.controls.range_label, this.ds.category.unit, "Range"),
 			"range":            maybe(range.call(this), 'svg'),
 			"value-checkboxes": value_checkboxes.call(this),
 			"pvna":             (this.ds.type === 'polygons-valued'),
 			"info":             this.ds.info_modal.bind(this.ds),
-			"index":            this.ds.index?.replace(/(ani|eai)/, "Filter"),
+			"index":            coalesce(this.ds.index, "Filter").replace(/(ani|eai)/, "Filter"),
 			"specs":            specs.call(this),
 			"symbol":           symbol.call(this),
 			"colorscale":       colorscale.call(this),

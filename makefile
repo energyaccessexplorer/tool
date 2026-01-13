@@ -28,7 +28,6 @@ LIB = ${DIST}/lib
 
 TIMESTAMP != date -u +'%Y-%m-%d--%T'
 
-# Build Go template compiler
 ${BIN}/template-compiler: template-compiler/main.go go.mod
 	@ echo "Building Go template compiler"
 	@ go build -o ${BIN}/template-compiler ./template-compiler

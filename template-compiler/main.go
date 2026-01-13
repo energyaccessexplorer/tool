@@ -24,13 +24,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Parse all templates in the directory
 	tmpl, err := template.ParseGlob(filepath.Join(*templateDir, "*.tmpl"))
 	if err != nil {
 		log.Fatalf("Failed to parse templates: %v", err)
 	}
 
-	// Load data if provided
 	var data interface{} = struct{}{}
 	if *dataFile != "" {
 		jsonData, err := os.ReadFile(*dataFile)
@@ -42,19 +40,16 @@ func main() {
 		}
 	}
 
-	// Create output directory if it doesn't exist
 	if err := os.MkdirAll(filepath.Dir(*outputFile), 0755); err != nil {
 		log.Fatalf("Failed to create output directory: %v", err)
 	}
 
-	// Create output file
 	outFile, err := os.Create(*outputFile)
 	if err != nil {
 		log.Fatalf("Failed to create output file: %v", err)
 	}
 	defer outFile.Close()
 
-	// Execute template
 	if err := tmpl.ExecuteTemplate(outFile, *templateName+".tmpl", data); err != nil {
 		log.Fatalf("Failed to execute template: %v", err)
 	}

@@ -163,12 +163,9 @@ build-a:
 		${SRC}/qa-indexes.js \
 		${SRC}/map-info.js \
 		${SRC}/panel-section.js \
+		${SRC}/toast.js \
 		${SRC}/a.js \
 		${DIST}/a/
-
-	@ cp \
-		${SRC}/components/toast.js \
-		${DIST}/a/components/
 
 	@ cat \
 		${LIB}/d3.js \

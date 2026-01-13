@@ -1,5 +1,5 @@
 import modal from '../lib/modal.js';
-import Toast from './components/toast.js';
+import Toast from './toast.js';
 
 import {
 	generate as config_gen,

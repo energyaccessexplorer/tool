@@ -1,5 +1,5 @@
-import bind from '../../lib/bind.js';
-import { tmpl } from '../../lib/helpers.js';
+import bind from '../lib/bind.js';
+import { tmpl } from '../lib/helpers.js';
 
 export default class Toast extends HTMLElement {
 	constructor(options) {

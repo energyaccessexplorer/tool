@@ -20,6 +20,8 @@ import {
 
 import mapinfo from './map-info.js';
 
+let current_map_info_drop = null;
+
 const default_styles = [{
 	"name":  "Basic (default)",
 	"value": "mapbox/basic-v9",
@@ -43,8 +45,6 @@ const projections = [{
 	"name":  "Mercator",
 	"value": "mercator",
 }];
-
-let info_mode_button;
 
 class MapboxThemeControl {
 	onAdd(map) {
@@ -90,29 +90,6 @@ class MapboxProjectionControl {
 	};
 };
 
-class MapboxInfoControl {
-	onAdd(map) {
-		this._map = map;
-		this._container = document.createElement('div');
-		this._container.className = 'mapboxgl-ctrl';
-		this._container.classList.add('mapboxgl-ctrl-group');
-
-		const button = ce('button', ce('div', bi_icon('info-circle'), { "style": "transform: scale(0.75)" }), { "type": 'button', "class": 'mapboxgl-ctrl-icon'});
-
-		this._container.append(button);
-
-		button.addEventListener('click', info_mode_change);
-
-		info_mode_button = button;
-
-		return this._container;
-	};
-
-	onRemove() {
-		this._container.parentNode.removeChild(this._container);
-		this._map = undefined;
-	};
-};
 
 export function init() {
 	mapboxgl.accessToken = EAE['settings'].mapbox_token;
@@ -135,7 +112,6 @@ export function init() {
 
 	MAPBOX.addControl((new MapboxThemeControl()), 'top-left');
 	MAPBOX.addControl((new MapboxProjectionControl()), 'top-left');
-	MAPBOX.addControl((new MapboxInfoControl()), 'top-left');
 
 	MAPBOX.coords = fit(GEOGRAPHY.envelope);
 	MAPBOX.setStyle(theme_pick(EAE['settings'].mapbox_theme));
@@ -243,18 +219,6 @@ function theme_pick(theme) {
 	});
 };
 
-export function info_mode_change() {
-	INFOMODE = !INFOMODE;
-	const b = info_mode_button;
-
-	if (INFOMODE) {
-		b.classList.add('active');
-	}
-	else {
-		b.classList.remove('active');
-	}
-};
-
 async function worldview() {
 	let v = "US";
 
@@ -334,6 +298,10 @@ This is fatal. Thanks for all the fish.`,
 
 	return [[left,top], [right,top], [right,bottom], [left,bottom]];
 };
+
+export function drop_map_info() {
+	if (current_map_info_drop) current_map_info_drop();
+}
 
 export function pointer({x = 0, y = 0, lngLat = null}, data) {
 	let p = qs('#map-pointer');
@@ -475,7 +443,8 @@ export function show_location_info(ll, position, centerPointer = true) {
 	coords_search_pois({ "coords": ll, "limit": 1 })
 		.then(r => {
 			const feature_name = maybe(r, 0, 'name') || null;
-			pointer(position, { fields, props, ll, analysis_value, analysis_name, feature_name });
+			const { drop } = pointer(position, { fields, props, ll, analysis_value, analysis_name, feature_name });
+			current_map_info_drop = drop;
 
 			if (!centerPointer) return;
 

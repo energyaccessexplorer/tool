@@ -16,17 +16,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ env.BRANCH_NAME }}
 
       - name: Install build dependencies
         run: |
-          sudo apt-get install -y bmake curl jq ruby-mustache
+          sudo apt-get install -y bmake curl jq
 
       - name: Build .env
         run: |
-          printf "/$DESTINATION" > views/base.mustache
+          printf "{{define \"base\"}}/${{ env.DESTINATION }}{{end}}" > views/base.tmpl
 
           cat <<- EOF >.env
           	DOMAIN = "${{ vars.DOMAIN }}"
@@ -43,7 +43,7 @@ jobs:
           bmake deps reconfig build env=test
 
       - name: Make destination directory
-        uses: appleboy/ssh-action@v1.1.0
+        uses: appleboy/ssh-action@v1.2.2
         with:
           host:     ${{ secrets.PR_DEPLOY_HOST }}
           username: ${{ secrets.PR_DEPLOY_USER }}
@@ -53,7 +53,7 @@ jobs:
             mkdir -p ${{ secrets.PR_DEPLOY_PATH }}/${{ env.DESTINATION }}
 
       - name: Deploy the thing
-        uses: burnett01/rsync-deployments@7.0.1
+        uses: burnett01/rsync-deployments@7.1.0
         with:
           switches: --recursive --verbose
           path: dist/

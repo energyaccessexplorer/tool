@@ -776,6 +776,44 @@
     </buttons>
   </template>
 
+  <template id="map-info-template">
+    <span class="arrow"></span>
+    <main>
+      <header>
+        <div class="header-content">
+          <div class="title" bind-cond="feature" bind="feature"></div>
+          <div class="title coordinate-title" bind-cond="coordinate-title">
+            <i class="bi-crosshair"></i>
+            <span bind="coordinates"></span>
+          </div>
+          <div class="caption" bind-cond="feature_type" bind="feature_type"></div>
+        </div>
+        <div class="close-button-container">
+          <div class="close-button"></div>
+        </div>
+      </header>
+      <content bind-cond="has-basic">
+        <table>
+          <tr bind-each="basicData">
+            <td bind="label"></td>
+            <td bind="value"></td>
+          </tr>
+        </table>
+      </content>
+      <content class="detailed-data hidden" bind-cond="has-detailed">
+        <table>
+          <tr bind-each="detailedData">
+            <td bind="label"></td>
+            <td bind="value"></td>
+          </tr>
+        </table>
+      </content>
+      <div class="analyse-button-container" bind-cond="has-detailed">
+        <button class="analyse-button">Analyse selected area</button>
+      </div>
+    </main>
+  </template>
+
   {{template "env" .}}
 
   <script type="module">
@@ -789,7 +827,6 @@
     window.SNAPSHOT = null;
     window.OUTLINE = null;
     window.MAPBOX = null;
-    window.INFOMODE = false;
     window.COORDINATESMODE = false;
     window.COORDINATES = [];
     window.MOBILE = false;

@@ -108,6 +108,15 @@ map-info header .title {
 	color: #1A1919;
 }
 
+map-info header .title.coordinate-title {
+	gap: 8px;
+}
+
+map-info header .title.coordinate-title i {
+	font-size: 16px;
+	color: #3D3B3B;
+}
+
 map-info header .caption {
 	width: 100%;
 	font-weight: 400;
@@ -199,4 +208,45 @@ map-info .arrow {
 	top: 0;
 	background: #FFFFFF;
 	pointer-events: none;
+}
+
+map-info .detailed-data.hidden,
+map-info content.hidden {
+	display: none;
+}
+
+map-info .analyse-button-container {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	padding: 12px 16px;
+	border-top: 1px solid #E7E6E6;
+}
+
+map-info .analyse-button {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	padding: 8px 16px;
+	gap: 8px;
+	background: #00794C;
+	border: 1px solid #006640;
+	border-radius: 4px;
+	font-weight: 600;
+	font-size: 14px;
+	line-height: 20px;
+	color: #F2FDF9;
+	cursor: pointer;
+	width: 100%;
+	transition: background-color 0.2s ease;
+}
+
+map-info .analyse-button:hover {
+	background: #006640;
+}
+
+map-info .analyse-button:active {
+	background: #005533;
 }

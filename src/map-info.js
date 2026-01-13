@@ -4,12 +4,17 @@ import {
 
 import {
 	maybe,
+	tmpl,
+	qs,
 } from '../lib/helpers.js';
+
+import bind from '../lib/bind.js';
 
 function extract_map_info_data(fields, props, ll, analysis_value, analysis_name, feature_name) {
 	let feature = null;
 	let feature_type = null;
-	const data = [];
+	const basicData = [];
+	const detailedData = [];
 
 	const feature_entry = fields.find(d => d && d[0] && d[0].startsWith('_') && !d[0].includes('analysis'));
 
@@ -28,14 +33,20 @@ function extract_map_info_data(fields, props, ll, analysis_value, analysis_name,
 
 	if (Number.isFinite(analysis_value)) {
 		if (analysis_name) {
-			data.push([analysis_name, lowmedhigh_scale(analysis_value)]);
+			const analysisData = { "label": analysis_name, "value": lowmedhigh_scale(analysis_value) };
+			basicData.push(analysisData);
+			detailedData.push(analysisData);
 		}
 		const percentage = (analysis_value * 100).toFixed(1);
-		data.push(["Priority score", `${percentage}%`]);
+		const priorityData = { "label": "Priority score", "value": `${percentage}%` };
+		basicData.push(priorityData);
+		detailedData.push(priorityData);
 	}
 
-	if (maybe(ll, 'length') === 2) {
-		data.push(["Coordinates", `[${ll[0].toFixed(5)}, ${ll[1].toFixed(5)}]`]);
+	if (maybe(ll, 'length') === 2 && feature) {
+		const coordData = { "label": "Coordinates", "value": `[${ll[0].toFixed(5)}, ${ll[1].toFixed(5)}]` };
+		basicData.push(coordData);
+		detailedData.push(coordData);
 	}
 
 	const divisions = fields
@@ -45,7 +56,9 @@ function extract_map_info_data(fields, props, ll, analysis_value, analysis_name,
 		.filter(v => v);
 
 	if (divisions.length) {
-		data.push(["Location", divisions.join(', ')]);
+		const locationData = { "label": "Location", "value": divisions.join(', ') };
+		basicData.push(locationData);
+		detailedData.push(locationData);
 	}
 
 	for (const e of fields) {
@@ -53,7 +66,6 @@ function extract_map_info_data(fields, props, ll, analysis_value, analysis_name,
 		if (e[0].startsWith('_')) continue;
 		if (e[0].includes('analysis')) continue;
 
-		// Skip facility/feature name fields - they're shown in the header
 		const fieldName = e[0].toLowerCase();
 		if (fieldName === 'facility name' || fieldName === 'name' || fieldName === 'facility_name') continue;
 
@@ -61,10 +73,23 @@ function extract_map_info_data(fields, props, ll, analysis_value, analysis_name,
 
 		const label = e.hasOwnProperty(1) ? e[1] : e[0];
 		const value = props[e[0]].toString();
-		data.push([label, value]);
+		detailedData.push({ label, value });
 	}
 
-	return { feature, feature_type, data };
+	const hasLayerData = STATE.datasets.length > 0;
+
+	const coordinates = maybe(ll, 'length') === 2 ? `[${ll[0].toFixed(5)}, ${ll[1].toFixed(5)}]` : null;
+
+	return {
+		feature,
+		feature_type,
+		basicData,
+		detailedData,
+		"coordinate-title": !feature && coordinates,
+		coordinates,
+		"has-basic":        basicData.length > 0,
+		"has-detailed":     hasLayerData,
+	};
 }
 
 export default class mapinfo extends HTMLElement {
@@ -107,71 +132,37 @@ export default class mapinfo extends HTMLElement {
 	render() {
 		const { "data": rawData, onClose } = this.opts;
 
-		// Extract and process the map info data
 		const { fields, props, ll, analysis_value, analysis_name, feature_name } = rawData;
 		const data = extract_map_info_data(fields, props, ll, analysis_value, analysis_name, feature_name);
 
-		this.arrow = document.createElement('span');
-		this.arrow.className = 'arrow';
+		const content = tmpl('#map-info-template');
+		bind(content, data);
 
-		this.main = document.createElement('main');
+		this.append(content);
 
-		const header = document.createElement('header');
+		this.arrow = qs('.arrow', this);
+		this.main = qs('main', this);
 
-		const headerContent = document.createElement('div');
-		headerContent.className = 'header-content';
-
-		if (data.feature) {
-			const titleDiv = document.createElement('div');
-			titleDiv.className = 'title';
-			titleDiv.innerHTML = data.feature;
-			headerContent.append(titleDiv);
-		}
-
-		if (data.feature_type) {
-			const captionDiv = document.createElement('div');
-			captionDiv.className = 'caption';
-			captionDiv.innerHTML = data.feature_type;
-			headerContent.append(captionDiv);
-		}
-
-		const closeContainer = document.createElement('div');
-		closeContainer.className = 'close-button-container';
-
-		const closeButton = document.createElement('div');
-		closeButton.className = 'close-button';
+		const closeButton = qs('.close-button', this);
 		closeButton.onclick = () => {
 			if (onClose) onClose();
 			else this.remove();
 		};
 
-		closeContainer.append(closeButton);
-		header.append(headerContent, closeContainer);
-		this.main.append(header);
+		const analyseButton = qs('.analyse-button', this);
+		if (analyseButton) {
+			analyseButton.onclick = () => {
+				const basicSection = qs('content:not(.detailed-data)', this);
+				const detailedSection = qs('.detailed-data', this);
+				const buttonContainer = qs('.analyse-button-container', this);
 
-		if (data.data && data.data.length) {
-			const content = document.createElement('content');
-			const table = document.createElement('table');
+				if (basicSection) basicSection.classList.add('hidden');
+				if (detailedSection) detailedSection.classList.remove('hidden');
+				if (buttonContainer) buttonContainer.remove();
 
-			for (const row of data.data) {
-				if (row === null) continue;
-
-				const tr = document.createElement('tr');
-				const td1 = document.createElement('td');
-				const td2 = document.createElement('td');
-
-				td1.textContent = row[0];
-				td2.innerHTML = row[1];
-
-				tr.append(td1, td2);
-				table.append(tr);
-			}
-
-			content.append(table);
-			this.main.append(content);
+				this.align();
+			};
 		}
-
-		this.append(this.arrow, this.main);
 
 		this.style['visibility'] = 'hidden';
 

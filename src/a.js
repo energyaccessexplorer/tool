@@ -61,7 +61,6 @@ import {
 } from './timeline.js';
 
 import {
-	valued_polygons as filtered_valued_polygons,
 	colors_array as filtered_colors_array,
 } from './filtered.js';
 

@@ -901,6 +901,36 @@
     </div>
   </template>
 
+  <template id="location-item-template">
+    <li class="location-item">
+      <div class="location-item-content">
+        <i class="bi bi-crosshair location-target-icon"></i>
+        <div class="location-info">
+          <div class="location-name" bind="location-name"></div>
+          <div class="location-coordinates" bind="coordinates"></div>
+        </div>
+        <i class="bi bi-chevron-right location-chevron"></i>
+      </div>
+    </li>
+  </template>
+
+  <template id="location-group-template">
+    <li class="location-group">
+      <div class="location-group-header">
+        <span bind="score-text"></span>
+        <span class="location-area-badge" bind="area-count"></span>
+      </div>
+      <ul class="location-group-list"></ul>
+    </li>
+  </template>
+
+  <template id="pagination-template">
+    <div class="pagination-container">
+      <div class="pagination-info" bind="info-text"></div>
+      <div class="pagination"></div>
+    </div>
+  </template>
+
   {{template "env" .}}
 
   <script type="module">

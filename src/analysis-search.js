@@ -17,7 +17,10 @@ import {
 	ce,
 	maybe,
 	qs,
+	tmpl,
 } from '../lib/helpers.js';
+
+import bind from '../lib/bind.js';
 
 let ul, resultscontainer, section, paginationContainer;
 
@@ -52,54 +55,54 @@ function li(p) {
 	const pi3 = (p.c).map(c => +c.toFixed(3));
 	const score = (p.v ? Math.round((p.v).toFixed(2) * 100) : "");
 
-	const targetIcon = ce('i', null, { "class": "bi bi-crosshair location-target-icon" });
+	const template = tmpl('#location-item-template');
+	const el = template.firstElementChild;
 
-	const locationName = ce('div', null, { "class": "location-name" });
-	const coordinates = ce('div', `[${pi3.join(", ")}]`, { "class": "location-coordinates" });
-
-	const locationInfo = ce('div', [locationName, coordinates], { "class": "location-info" });
-
-	const chevron = ce('i', null, { "class": "bi bi-chevron-right location-chevron" });
-
-	const content = ce('div', [targetIcon, locationInfo, chevron], { "class": "location-item-content" });
-	const el = ce('li', [content], { "class": "location-item" });
+	bind(template, {
+		"location-name": "",
+		"coordinates":   `[${pi3.join(", ")}]`,
+	});
 
 	el.setAttribute('data-score', score);
 	el.onmouseenter = show_info_on_hover.bind(null, p);
 	el.onclick = zoom.bind(null, p, pointto.bind(null, p, true));
 
+	const locationName = qs('.location-name', el);
 	mapbox_coords_search_pois({ "coords": p.c, "limit": 1 })
 		.then(r => locationName.textContent = maybe(r, 0, 'name') || 'Unknown location');
 
-	return el;
+	return template;
 };
 
 
 function render_pagination() {
 	if (!paginationContainer) {
-		paginationContainer = ce('div', null, { "class": 'pagination-container' });
-		resultscontainer.append(paginationContainer);
-	} else {
-		paginationContainer.replaceChildren();
+		const template = tmpl('#pagination-template');
+		resultscontainer.append(template);
+		paginationContainer = qs('.pagination-container', resultscontainer);
 	}
+
+	const paginationInfo = qs('.pagination-info', paginationContainer);
+	const paginationDiv = qs('.pagination', paginationContainer);
+
+	if (paginationInfo) paginationInfo.textContent = '';
+	if (paginationDiv) paginationDiv.replaceChildren();
 
 	const totalPages = Math.ceil(paginationState.allResults.length / paginationState.itemsPerPage);
 	const totalCount = paginationState.allResults.length;
 	const startIdx = (paginationState.currentPage - 1) * paginationState.itemsPerPage;
 	const endIdx = Math.min(startIdx + paginationState.itemsPerPage, totalCount);
 
+	if (!paginationInfo || !paginationDiv) return;
+
 	if (totalPages <= 1 && totalCount > 0) {
-		const infoText = ce('div', `Showing ${totalCount.toLocaleString()} result${totalCount !== 1 ? 's' : ''}`, { "class": 'pagination-info' });
-		paginationContainer.append(infoText);
+		paginationInfo.textContent = `Showing ${totalCount.toLocaleString()} result${totalCount !== 1 ? 's' : ''}`;
 		return;
 	}
 
 	if (totalCount === 0) return;
 
-	const infoText = ce('div', `Showing ${(startIdx + 1).toLocaleString()}-${endIdx.toLocaleString()} of ${totalCount.toLocaleString()}`, { "class": 'pagination-info' });
-	paginationContainer.append(infoText);
-
-	const paginationDiv = ce('div', null, { "class": 'pagination' });
+	paginationInfo.textContent = `Showing ${(startIdx + 1).toLocaleString()}-${endIdx.toLocaleString()} of ${totalCount.toLocaleString()}`;
 
 	const prevBtn = ce('button', null, { "class": 'pagination-btn chevron' });
 	prevBtn.innerHTML = '<i class="bi bi-chevron-left"></i>';
@@ -141,8 +144,6 @@ function render_pagination() {
 		}
 	};
 	paginationDiv.append(nextBtn);
-
-	paginationContainer.append(paginationDiv);
 }
 
 function render_page(page) {
@@ -176,18 +177,21 @@ function render_page(page) {
 
 		if (score !== currentScore) {
 			currentScore = score;
-			currentGroup = ce('li', null, { "class": "location-group" });
+			const template = tmpl('#location-group-template');
+			currentGroup = template.firstElementChild;
+
 			currentGroup.setAttribute('data-score', score);
 
-			const scoreText = ce('span', `${score}% priority score`);
 			const areaCount = groupCount === 1 ? '1 area' : `${groupCount} areas`;
-			const areaBadge = ce('span', areaCount, { "class": "location-area-badge" });
-			const groupHeader = ce('div', [scoreText, areaBadge], { "class": "location-group-header" });
 
-			currentGroupList = ce('ul', null, { "class": "location-group-list" });
+			bind(template, {
+				"score-text": `${score}% priority score`,
+				"area-count": areaCount,
+			});
 
-			currentGroup.append(groupHeader, currentGroupList);
-			ul.append(currentGroup);
+			currentGroupList = qs('.location-group-list', currentGroup);
+
+			ul.append(template);
 		}
 
 		const listItem = li(item);

@@ -95,7 +95,7 @@ function share(snapshots) {
 
 	new modal({
 		"id":      'share-link-modal',
-		"header":  "Share link",
+		"header":  "Share analysis view",
 		"content": c,
 		"destroy": true,
 	}).show();

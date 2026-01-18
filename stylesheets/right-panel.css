@@ -520,11 +520,24 @@ dialog .saved-analysis-info {
   border-radius: 4px;
 }
 
-dialog .save-analysis-form {
-  display: flex;
+dialog .save-analysis-form,
+dialog.modal .save-analysis-form {
+  display: flex !important;
   flex-direction: column;
   gap: 8px;
   width: 380px;
+}
+
+dialog .save-analysis-form .field-wrapper,
+dialog.modal .save-analysis-form .field-wrapper {
+  display: block;
+  width: 100%;
+}
+
+dialog .save-analysis-form .text-input,
+dialog.modal .save-analysis-form .text-input {
+  display: block;
+  width: 100%;
 }
 
 dialog .saved-analysis-name {

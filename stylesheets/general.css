@@ -111,17 +111,20 @@ bubble-message .bubble-message-close-button::before {
   max-width: 32em;
 }
 
+#share-link-input-wrapper {
+  display: flex;
+  gap: 16px;
+}
+
 #share-link-input {
-  font-family: monospace;
-  font-size: 1.2em;
-  padding: 7px 5px;
-  color: #414141;
-  width: 32em;
-  text-align: center;
+  flex: 1;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 #share-link-copy-button {
-  padding: 0 12px;
+  width: 130px;
+  flex-shrink: 0;
 }
 
 canvas#output {
@@ -165,12 +168,19 @@ dialog .close {
   color: var(--the-white);
 }
 
-dialog content {
+dialog content,
+dialog.modal content {
   display: flex !important;
   flex-direction: column;
   gap: 16px;
   padding: 1.5em 1.5em 0.75em !important;
   width: 590px;
+}
+
+dialog content form,
+dialog.modal content form {
+  display: flex;
+  flex-direction: column;
 }
 
 dialog content p {

@@ -1,5 +1,6 @@
 import {
 	svg_pie,
+	copy_to_clipboard,
 } from './utils.js';
 
 import bind from '../lib/bind.js';
@@ -231,30 +232,7 @@ function share_url() {
 	const id = u.searchParams.get('snapshot');
 	const url = `${u.protocol}//${u.hostname}${window.BASE}/tool/p?${id}`;
 
-	function copy() {
-		if (!navigator.clipboard) {
-			FLASH.push({
-				"type":    'error',
-				"timeout": 2000,
-				"title":   "Clipboard functionality not available",
-			});
-
-			this.closest('button').remove();
-
-			return;
-		}
-
-		navigator.clipboard.writeText(url)
-			.then(_ => {
-				FLASH.push({
-					"type":    'success',
-					"timeout": 2000,
-					"title":   "Link copied!",
-				});
-			});
-	};
-
-	bind(c, { url, copy });
+	bind(c, { url, "copy": function() { copy_to_clipboard(url, this); } });
 
 	new modal({
 		"id":      'share-link-modal',

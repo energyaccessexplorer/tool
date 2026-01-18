@@ -97,7 +97,7 @@ export async function graphs(raster) {
 		PIES['population'].change(1);
 
 		const totalPop = Math.round(g['total'] / e);
-		const highPop = Math.round(g['distribution'][4] / e);
+		const highPop = Math.round(g['distribution'][4] * totalPop);
 
 		const description = document.createDocumentFragment();
 		description.append(
@@ -126,7 +126,7 @@ export async function graphs(raster) {
 		PIES['area'].change(1);
 
 		const totalArea = Math.round(g['total'] * f);
-		const highArea = Math.round(g['distribution'][4] * f);
+		const highArea = Math.round(g['distribution'][4] * totalArea);
 
 		const description = document.createDocumentFragment();
 		description.append(

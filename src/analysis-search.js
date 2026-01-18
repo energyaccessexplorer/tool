@@ -1,5 +1,6 @@
 import {
 	coords_search_pois as mapbox_coords_search_pois,
+	fit as mapbox_fit,
 	show_location_info,
 } from './mapbox.js';
 
@@ -22,7 +23,7 @@ import {
 
 import bind from '../lib/bind.js';
 
-let ul, resultscontainer, section, paginationContainer;
+let ul, resultscontainer, section, paginationContainer, descriptionEl;
 
 const paginationState = {
 	"allResults":   [],
@@ -51,7 +52,7 @@ function show_info_on_hover(p) {
 	show_location_info(p.c, position, false);
 };
 
-function li(p) {
+function raster_item(p) {
 	const pi3 = (p.c).map(c => +c.toFixed(3));
 	const score = (p.v ? Math.round((p.v).toFixed(2) * 100) : "");
 
@@ -74,6 +75,45 @@ function li(p) {
 	return template;
 };
 
+function admin_area_item(item, rank) {
+	const template = tmpl('#admin-area-item-template');
+	const el = template.firstElementChild;
+
+	bind(template, {
+		"rank":          rank,
+		"location-name": item.name,
+	});
+
+	if (item.feature) {
+		el.onclick = () => mapbox_fit(geojsonExtent(item.feature), true);
+	}
+
+	return template;
+};
+
+function get_division_results(variant) {
+	const division = GEOGRAPHY.divisions[variant];
+	if (!division || !division.priorityData || !division.vectors) return [];
+
+	const features = division.vectors.data.features;
+	const priorityData = division.priorityData;
+	const nameTable = maybe(division, 'csv', 'table') || {};
+
+	return Object.keys(priorityData)
+		.filter(id => priorityData[id].average > 0)
+		.map(id => {
+			const feature = features.find(f => f.id === +id);
+			const name = nameTable[id] || `Area ${id}`;
+
+			return {
+				"id":      +id,
+				"v":       priorityData[id].average,
+				"name":    name,
+				"feature": feature,
+			};
+		})
+		.sort((a, b) => a.v > b.v ? -1 : 1);
+};
 
 function render_pagination() {
 	if (!paginationContainer) {
@@ -154,58 +194,64 @@ function render_page(page) {
 		ul.replaceChildren();
 	}
 
+	const isRaster = STATE.variant === 'raster';
 	const totalCount = paginationState.allResults.length;
 	const startIdx = (page - 1) * paginationState.itemsPerPage;
 	const endIdx = Math.min(startIdx + paginationState.itemsPerPage, totalCount);
 
 	const pageResults = paginationState.allResults.slice(startIdx, endIdx);
 
-	const scoreCounts = {};
-	paginationState.allResults.forEach(item => {
-		const score = item.v ? Math.round((item.v).toFixed(2) * 100) : "";
-		scoreCounts[score] = (scoreCounts[score] || 0) + 1;
-	});
+	if (isRaster) {
+		const scoreCounts = {};
+		paginationState.allResults.forEach(item => {
+			const score = item.v ? Math.round((item.v).toFixed(2) * 100) : "";
+			scoreCounts[score] = (scoreCounts[score] || 0) + 1;
+		});
 
-	let currentScore = null;
-	let currentGroup = null;
+		let currentScore = null;
+		let currentGroupList = null;
 
-	let currentGroupList = null;
+		pageResults.forEach(item => {
+			const score = item.v ? Math.round((item.v).toFixed(2) * 100) : "";
+			const groupCount = scoreCounts[score];
 
-	pageResults.forEach(item => {
-		const score = item.v ? Math.round((item.v).toFixed(2) * 100) : "";
-		const groupCount = scoreCounts[score];
+			if (score !== currentScore) {
+				currentScore = score;
+				const template = tmpl('#location-group-template');
+				const currentGroup = template.firstElementChild;
 
-		if (score !== currentScore) {
-			currentScore = score;
-			const template = tmpl('#location-group-template');
-			currentGroup = template.firstElementChild;
+				currentGroup.setAttribute('data-score', score);
 
-			currentGroup.setAttribute('data-score', score);
+				const areaCount = groupCount === 1 ? '1 area' : `${groupCount} areas`;
 
-			const areaCount = groupCount === 1 ? '1 area' : `${groupCount} areas`;
+				bind(template, {
+					"score-text": `${score}% priority score`,
+					"area-count": areaCount,
+				});
 
-			bind(template, {
-				"score-text": `${score}% priority score`,
-				"area-count": areaCount,
-			});
+				currentGroupList = qs('.location-group-list', currentGroup);
 
-			currentGroupList = qs('.location-group-list', currentGroup);
+				ul.append(template);
+			}
 
-			ul.append(template);
-		}
-
-		const listItem = li(item);
-		currentGroupList.append(listItem);
-	});
+			currentGroupList.append(raster_item(item));
+		});
+	} else {
+		pageResults.forEach((item, i) => ul.append(admin_area_item(item, startIdx + i + 1)));
+	}
 
 	render_pagination();
 }
 
 async function trigger() {
 	if (ul) ul.replaceChildren();
-	if (paginationContainer) paginationContainer.replaceChildren();
+	if (paginationContainer) {
+		paginationContainer.remove();
+		paginationContainer = null;
+	}
 
-	const results = await getallpoints();
+	const isRaster = STATE.variant === 'raster';
+	const results = isRaster ? await getallpoints() : get_division_results(STATE.variant);
 
 	paginationState.allResults = results.sort((a,b) => a.v > b.v ? -1 : 1);
 	paginationState.currentPage = 1;
@@ -215,6 +261,11 @@ async function trigger() {
 	if (count === 0) {
 		if (section) section.setAttribute('collapsed', '');
 		return;
+	}
+
+	if (descriptionEl) {
+		const areaType = isRaster ? 'areas (1km²)' : (GEOGRAPHY.divisions[STATE.variant]?.name || 'areas');
+		descriptionEl.textContent = `Showing ${areaType} with the highest prioritization scores based on your analysis criteria.`;
 	}
 
 	render_page(paginationState.currentPage);
@@ -227,4 +278,5 @@ export function update() {
 export function init() {
 	section = qs('#right-panel #analysis-locations-section');
 	resultscontainer = qs('.locations-paginated-list', section);
+	descriptionEl = qs('[slot="description"]', section);
 };

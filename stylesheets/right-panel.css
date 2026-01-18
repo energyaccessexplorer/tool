@@ -452,6 +452,14 @@
   height: 16px;
 }
 
+.locations-paginated-list .admin-area-rank {
+  padding: 2px 6px;
+  background: #CBEEE2;
+  border-radius: 2px;
+  font-weight: 700;
+  color: #023120;
+}
+
 .locations-paginated-list .location-chevron {
   font-size: 14px;
   color: #3D3B3B;

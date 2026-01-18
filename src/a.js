@@ -590,7 +590,7 @@ async function reload(k,v) {
 	const a = await analysis_plot_active(index, true);
 
 	if (GEOGRAPHY.divisions[variant])
-		priority(GEOGRAPHY.divisions[variant], a, variant);
+		GEOGRAPHY.divisions[variant].priorityData = priority(GEOGRAPHY.divisions[variant], a, variant);
 
 	indexes_list();
 

@@ -28,11 +28,6 @@ select {
   border-radius: 3px;
 }
 
-a i ~ span,
-button i ~ span  {
-  margin-left: 0.75em;
-}
-
 .big-green-button {
   text-align: center;
   background-color: var(--the-green);

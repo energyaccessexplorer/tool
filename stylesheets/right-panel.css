@@ -611,6 +611,7 @@ dialog .saved-analysis-last-viewed {
 }
 
 .high-priority-areas-list-all-table-container {
+  width: 740px;
   max-height: 50vh;
   overflow: auto;
   background: #FFFFFF;
@@ -619,7 +620,6 @@ dialog .saved-analysis-last-viewed {
 }
 
 .high-priority-areas-list-all-table {
-  width: 100%;
   border-collapse: collapse;
 }
 

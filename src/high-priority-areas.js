@@ -116,57 +116,57 @@ import bind from '../lib/bind.js';
 
 import modal from '../lib/modal.js';
 
+function get_row(item, is_raster, analysis_name) {
+	let fields = [];
+	let props = {};
+	let ll = null;
+	let info = null;
+
+	if (is_raster) {
+		ll = item.c;
+		const rc = coordinates_to_raster_pixel(ll, OUTLINE.raster);
+		[fields, props] = context(rc, null);
+	} else {
+		info = { "variant": STATE.variant, "name": item.name };
+	}
+
+	const { detailedData } = area_info(
+		fields, props, ll, item.v, analysis_name, null, info,
+	);
+
+	const row = {};
+	if (ll) {
+		row["Longitude"] = ll[0].toFixed(5);
+		row["Latitude"] = ll[1].toFixed(5);
+	}
+
+	for (const data of detailedData) {
+		row[data.label] = data.value.replace(/<[^>]*>/g, '').trim();
+	}
+
+	return row;
+}
+
 function prepare_data(results) {
 	const is_raster = STATE.variant === 'raster';
 	const analysis_name = EAE['indexes'][STATE.index]['name'];
 
-	const get_row = (item) => {
-		let fields = [];
-		let props = {};
-		let ll = null;
-		let info = null;
-
-		if (is_raster) {
-			ll = item.c;
-			const rc = coordinates_to_raster_pixel(ll, OUTLINE.raster);
-			[fields, props] = context(rc, null);
-		} else {
-			info = { "variant": STATE.variant, "name": item.name };
-		}
-
-		const { detailedData } = area_info(
-			fields, props, ll, item.v, analysis_name, null, info,
-		);
-
-		const row = {};
-		if (ll) {
-			row["Longitude"] = ll[0].toFixed(5);
-			row["Latitude"] = ll[1].toFixed(5);
-		}
-
-		for (const data of detailedData) {
-			row[data.label] = data.value.replace(/<[^>]*>/g, '').trim();
-		}
-
-		return row;
-	};
-
-	const headers = ["Priority score", ...Object.keys(get_row(results[0])).filter(h => h !== "Priority score")];
+	const headers = ["Priority score", ...Object.keys(get_row(results[0], is_raster, analysis_name)).filter(h => h !== "Priority score")];
 	const area_type = is_raster ? '1km²' : (GEOGRAPHY.divisions[STATE.variant]?.name || 'areas');
 
-	return { headers, get_row, area_type, analysis_name };
+	return { headers, area_type, analysis_name, is_raster };
 }
 
-function* generate_rows(results, get_row, start = 0, count = results.length - start) {
+function* generate_rows(results, is_raster, analysis_name, start = 0, count = results.length - start) {
 	const end = Math.min(start + count, results.length);
 	for (let i = start; i < end; i++) {
-		yield get_row(results[i]);
+		yield get_row(results[i], is_raster, analysis_name);
 	}
 }
 
 export async function download(results, event) {
 	const data = prepare_data(results);
-	const { headers, get_row, analysis_name } = data;
+	const { headers, is_raster, analysis_name } = data;
 	const button = event.currentTarget;
 
 	button.disabled = true;
@@ -189,7 +189,7 @@ export async function download(results, event) {
 
 	const rows = [];
 	let i = 0;
-	for (const row_data of generate_rows(results, get_row)) {
+	for (const row_data of generate_rows(results, is_raster, analysis_name)) {
 		rows.push(headers.map(h => escape_csv(row_data[h])).join(','));
 		if (++i % 100 === 0) await new Promise(resolve => setTimeout(resolve, 0));
 	}
@@ -208,7 +208,7 @@ export function view_all(results) {
 	const data = prepare_data(results);
 	if (!data) return;
 
-	const { headers, get_row, area_type, analysis_name } = data;
+	const { headers, is_raster, area_type, analysis_name } = data;
 
 	const BATCH_SIZE = 50;
 	let loaded_count = 0;
@@ -229,7 +229,7 @@ export function view_all(results) {
 	sentinel.innerHTML = `<td colspan="${headers.length}"></td>`;
 
 	function load_batch() {
-		for (const row_data of generate_rows(results, get_row, loaded_count, BATCH_SIZE)) {
+		for (const row_data of generate_rows(results, is_raster, analysis_name, loaded_count, BATCH_SIZE)) {
 			const tr = document.createElement('tr');
 			headers.forEach(header => {
 				const td = document.createElement('td');

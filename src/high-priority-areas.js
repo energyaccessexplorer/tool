@@ -202,7 +202,17 @@ export async function download(results, event) {
 	}
 
 	const csv_content = [headers.join(','), ...rows].join('\n');
-	const filename = `energyaccessexplorer-${analysis_name.toLowerCase().replace(/\s+/g, '-')}-high-priority-areas-${Date.now()}.csv`;
+	const now = new Date();
+	const date_str = [
+		now.getFullYear(),
+		String(now.getMonth() + 1).padStart(2, '0'),
+		String(now.getDate()).padStart(2, '0'),
+	].join('');
+	const time_str = [
+		String(now.getHours()).padStart(2, '0'),
+		String(now.getMinutes()).padStart(2, '0'),
+	].join('');
+	const filename = `${date_str}${time_str}-eae-${analysis_name.toLowerCase().replace(/\s+/g, '-')}.csv`;
 
 	fake_blob_download(csv_content, filename, 'text/csv;charset=utf-8');
 
@@ -220,6 +230,7 @@ export function view_all(results) {
 	const BATCH_SIZE = 50;
 	let loaded_count = 0;
 	let observer = null;
+	const selected_indices = new Set();
 
 	const content = tmpl('#high-priority-areas-list-all-template');
 	bind(content, {
@@ -234,25 +245,62 @@ export function view_all(results) {
 
 	const table_container = qs('.high-priority-areas-list-all-table-container', content);
 	const tbody = qs('tbody', content);
+	const selection_overlay = qs('.selection-overlay', content);
+	const selection_count = qs('.selection-count', content);
+	const select_all_checkbox = qs('.select-all-checkbox', content);
+	const download_selected_button = qs('.download-selected-button', content);
 
-	const sentinel = document.createElement('tr');
-	sentinel.className = 'sentinel-row';
-	sentinel.innerHTML = `<td colspan="${headers.length}"></td>`;
+	const scroll_trigger = document.createElement('tr');
+	scroll_trigger.className = 'scroll_trigger-row';
+	scroll_trigger.innerHTML = `<td colspan="${headers.length + 1}"></td>`;
+
+	function update_selection_overlay() {
+		const count = selected_indices.size;
+		if (count > 0) {
+			selection_overlay.classList.remove('hidden');
+			select_all_checkbox.classList.remove('hidden');
+			selection_count.textContent = `${count} row${count > 1 ? 's' : ''} currently selected.`;
+		} else {
+			selection_overlay.classList.add('hidden');
+			select_all_checkbox.classList.add('hidden');
+		}
+	}
+
+	function uncheck_all() {
+		selected_indices.clear();
+		tbody.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+		select_all_checkbox.checked = false;
+		update_selection_overlay();
+	}
+
+	select_all_checkbox.addEventListener('change', uncheck_all);
+
+	download_selected_button.addEventListener('click', (event) => {
+		const selected_results = Array.from(selected_indices).sort((a, b) => a - b).map(i => results[i]);
+		download(selected_results, event);
+	});
 
 	function load_batch() {
 		for (const row_data of generate_rows(results, is_raster, analysis_name, loaded_count, BATCH_SIZE)) {
-			const tr = document.createElement('tr');
-			headers.forEach(header => {
-				const td = document.createElement('td');
-				td.textContent = row_data[header] || '';
-				tr.append(td);
+			const row_index = loaded_count;
+			const row = tmpl('#high-priority-areas-row-template');
+			bind(row, {
+				"cells":     headers.map(header => ({ "value": row_data[header] || '' })),
+				"on_select": function() {
+					if (this.checked) {
+						selected_indices.add(row_index);
+					} else {
+						selected_indices.delete(row_index);
+					}
+					update_selection_overlay();
+				},
 			});
-			tbody.append(tr);
+			tbody.append(row);
 			loaded_count++;
 		}
 
 		if (loaded_count < results.length) {
-			tbody.append(sentinel);
+			tbody.append(scroll_trigger);
 		} else if (observer) {
 			observer.disconnect();
 		}
@@ -272,7 +320,7 @@ export function view_all(results) {
 		observer = new IntersectionObserver((entries) => {
 			entries.forEach(entry => {
 				if (entry.isIntersecting && loaded_count < results.length) {
-					sentinel.remove();
+					scroll_trigger.remove();
 					load_batch();
 				}
 			});
@@ -283,7 +331,7 @@ export function view_all(results) {
 		});
 
 		if (loaded_count < results.length) {
-			observer.observe(sentinel);
+			observer.observe(scroll_trigger);
 		}
 	});
 }

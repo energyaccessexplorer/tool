@@ -114,7 +114,7 @@ export async function graphs(raster) {
 
 		update_graph_section(section, g['distribution'], totalPop, 'people', description);
 
-		g['distribution'].forEach((x,i) => PIES['population']['data'][i].shift());
+		g['distribution'].forEach((_,i) => PIES['population']['data'][i].shift());
 
 		if (!isNaN(totalPop) && totalPop > 0) hasValidData = true;
 	} else {
@@ -143,7 +143,7 @@ export async function graphs(raster) {
 
 		update_graph_section(section, g['distribution'], totalArea, 'km²', description);
 
-		g['distribution'].forEach((x,i) => PIES['area']['data'][i].shift());
+		g['distribution'].forEach((_,i) => PIES['area']['data'][i].shift());
 
 		if (!isNaN(totalArea) && totalArea > 0) hasValidData = true;
 	} else {
@@ -219,11 +219,21 @@ export function init() {
 	qs('#analysis-locations').replaceWith(analysis_locations);
 
 	const panel = qs('#right-panel');
+	const header = qs('#right-panel-header');
 	const hideButton = qs('#right-panel-hide');
 	const showButton = qs('#right-panel-show');
 
-	hideButton.onclick = () => hide(panel, hideButton, showButton);
-	showButton.onclick = () => show(panel, hideButton, showButton);
+	hideButton.onclick = () => {
+		panel.setAttribute('closed', '');
+		header.style.display = 'none';
+		showButton.style.display = 'flex';
+	};
+
+	showButton.onclick = () => {
+		panel.removeAttribute('closed');
+		header.style.display = 'block';
+		showButton.style.display = 'none';
+	};
 
 	analysis_locations_panel_init();
 };
@@ -246,18 +256,4 @@ function share_url() {
 };
 
 export function updated_plot(_type, _index) {
-};
-
-function hide(panel, hideButton, showButton) {
-	panel.setAttribute('closed', '');
-	const header = qs('#right-panel-header');
-	header.style.display = 'none';
-	showButton.style.display = 'flex';
-}
-
-function show(panel, hideButton, showButton) {
-	panel.removeAttribute('closed');
-	const header = qs('#right-panel-header');
-	header.style.display = 'block';
-	showButton.style.display = 'none';
 };

@@ -954,6 +954,9 @@
         <table class="high-priority-areas-list-all-table">
           <thead>
             <tr>
+              <th class="checkbox-column">
+                <input type="checkbox" class="select-all-checkbox hidden">
+              </th>
               <th bind-each="headers">
                 <div class="th-content">
                   <span bind="name"></span>
@@ -964,6 +967,12 @@
           </thead>
           <tbody></tbody>
         </table>
+        <div class="selection-overlay hidden">
+          <span class="selection-count"></span>
+          <button class="button-icon button-icon-mid download-selected-button">
+            <span>Download selected rows</span>
+          </button>
+        </div>
       </div>
     </div>
   </template>
@@ -979,6 +988,15 @@
         <span>Data download will include a summary of your analysis.</span>
       </div>
     </div>
+  </template>
+
+  <template id="high-priority-areas-row-template">
+    <tr>
+      <td class="checkbox-column">
+        <input type="checkbox" bind-listen="change" bind-func="on_select">
+      </td>
+      <td bind-each="cells" bind="value"></td>
+    </tr>
   </template>
 
   {{template "env" .}}

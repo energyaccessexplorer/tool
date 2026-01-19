@@ -584,3 +584,112 @@ dialog .saved-analysis-last-viewed {
   color: #5C5959;
   margin-left: 28px;
 }
+
+/* High Priority Areas List All Modal */
+#high-priority-areas-list-all main {
+  width: 976px;
+  max-width: 90vw;
+}
+
+#high-priority-areas-list-all content {
+  padding: 16px !important;
+  width: auto !important;
+  background: #F9F9F9;
+}
+
+.high-priority-areas-list-all-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.high-priority-areas-list-all-subtitle {
+  margin: 0;
+  font-size: 16px;
+  line-height: 24px;
+  color: #575656;
+}
+
+.high-priority-areas-list-all-table-container {
+  max-height: 50vh;
+  overflow: auto;
+  background: #FFFFFF;
+  border: 2px solid #E7E6E6;
+  border-radius: 4px;
+}
+
+.high-priority-areas-list-all-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.high-priority-areas-list-all-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.high-priority-areas-list-all-table th {
+  padding: 12px 8px;
+  text-align: left;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 16px;
+  color: #3D3B3B;
+  background: #F6F6F6;
+  border-bottom: 1px solid #E7E6E6;
+  white-space: nowrap;
+}
+
+.high-priority-areas-list-all-table th .th-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.high-priority-areas-list-all-table th .sort-icon {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: #C9C9C9;
+  font-size: 10px;
+}
+
+.high-priority-areas-list-all-table td {
+  padding: 12px 8px;
+  font-size: 12px;
+  line-height: 16px;
+  color: #3D3B3B;
+  background: #FFFFFF;
+  border-bottom: 1px solid #E7E6E6;
+  white-space: nowrap;
+}
+
+.high-priority-areas-list-all-table tbody tr:hover td {
+  background: #FAFAFA;
+}
+
+.high-priority-areas-list-all-table .sentinel-row {
+  height: 1px;
+}
+
+.high-priority-areas-list-all-footer {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 16px 24px;
+  border-top: 1px solid #E7E6E6;
+  background: #FFFFFF;
+}
+
+.high-priority-areas-list-all-footer .download-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #5C5959;
+  font-size: 14px;
+}
+
+.high-priority-areas-list-all-footer .download-info i {
+  color: #9E9E9E;
+}

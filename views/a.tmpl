@@ -683,7 +683,7 @@
       </div>
       <div class="locations-paginated-list"></div>
       <footer class="locations-footer">
-        <button id="view-all-locations" class="button-icon button-icon-mid">
+        <button id="view-all-locations" class="button-icon button-icon-mid" bind-listen="click" bind-func="view_all_locations">
           <i class="bi bi-table"></i>
           <span>View all</span>
         </button>
@@ -944,6 +944,37 @@
     <div class="pagination-container">
       <div class="pagination-info" bind="info-text"></div>
       <div class="pagination"></div>
+    </div>
+  </template>
+
+  <template id="high-priority-areas-list-all-template">
+    <div class="high-priority-areas-list-all-content">
+      <p class="high-priority-areas-list-all-subtitle" bind="analysis-name"></p>
+      <div class="high-priority-areas-list-all-table-container">
+        <table class="high-priority-areas-list-all-table">
+          <thead>
+            <tr>
+              <th bind-each="headers">
+                <div class="th-content">
+                  <span bind="name"></span>
+                  <span class="sort-icon"><i class="bi bi-chevron-expand"></i></span>
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="high-priority-areas-list-all-footer">
+        <button class="button-icon button-icon-mid" bind-listen="click" bind-func="download">
+          <i class="bi bi-download"></i>
+          <span>Download all (.csv)</span>
+        </button>
+        <div class="download-info">
+          <i class="bi bi-info-circle"></i>
+          <span>Data download will include a summary of your analysis.</span>
+        </div>
+      </div>
     </div>
   </template>
 

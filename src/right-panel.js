@@ -15,6 +15,7 @@ import {
 	init as analysis_locations_panel_init,
 	update as analysis_locations_panel_update,
 	download_locations_data,
+	view_all_locations,
 } from './analysis-search.js';
 
 import {
@@ -214,7 +215,7 @@ export function init() {
 	qs('#analysis-sections-wrapper').append(populationSection);
 
 	const analysis_locations = tmpl('#analysis-locations-template');
-	bind(analysis_locations, { "download_locations_data": download_locations_data });
+	bind(analysis_locations, { download_locations_data, view_all_locations });
 	qs('#analysis-locations').replaceWith(analysis_locations);
 
 	const panel = qs('#right-panel');

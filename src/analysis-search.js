@@ -15,20 +15,12 @@ import {
 } from './search.js';
 
 import {
-	coordinates_to_raster_pixel,
-} from './utils.js';
-
-import {
-	context,
-} from './complicated.js';
-
-import {
-	extract_map_info_data,
-} from './map-info.js';
+	download as high_priority_areas_download,
+	view_all as high_priority_areas_view_all,
+} from './high-priority-areas.js';
 
 import {
 	ce,
-	fake_blob_download,
 	maybe,
 	qs,
 	tmpl,
@@ -288,94 +280,12 @@ export function update() {
 	trigger();
 };
 
-function get_point_data(item, area_info = null) {
-	const is_admin_area = area_info !== null;
-	const analysis_name = EAE['indexes'][STATE.index]['name'];
-
-	let fields = [];
-	let props = {};
-	let ll = null;
-
-	if (!is_admin_area) {
-		ll = item.c;
-		const rc = coordinates_to_raster_pixel(ll, OUTLINE.raster);
-		[fields, props] = context(rc, null);
-	}
-
-	const analysis_value = item.v;
-
-	const { detailedData } = extract_map_info_data(
-		fields, props, ll, analysis_value, analysis_name, null, area_info,
-	);
-
-	const row = {};
-	if (ll) {
-		row["Longitude"] = ll[0].toFixed(5);
-		row["Latitude"] = ll[1].toFixed(5);
-	}
-
-	for (const data of detailedData) {
-		const clean_value = data.value.replace(/<[^>]*>/g, '').trim();
-		row[data.label] = clean_value;
-	}
-
-	return row;
+export function download_locations_data(_, event) {
+	high_priority_areas_download(paginationState.allResults, event);
 }
 
-export async function download_locations_data(_, event) {
-	if (!paginationState.allResults.length) return;
-
-	const button = event.currentTarget;
-	button.disabled = true;
-	button.querySelector('span').textContent = 'Generating...';
-
-	const warn_before_unload = (e) => {
-		e.preventDefault();
-		e.returnValue = '';
-	};
-	window.addEventListener('beforeunload', warn_before_unload);
-
-	const is_raster = STATE.variant === 'raster';
-	const rows = [];
-	let headers = [];
-
-	const escape_csv = (val) => {
-		if (val === null || val === undefined) return '';
-		const str = String(val);
-		if (str.includes(',') || str.includes('"') || str.includes('\n')) {
-			return `"${str.replace(/"/g, '""')}"`;
-		}
-		return str;
-	};
-
-	const items = paginationState.allResults;
-
-	for (let i = 0; i < items.length; i++) {
-		const item = items[i];
-		const area_info = is_raster ? null : { "variant": STATE.variant, "name": item.name };
-		const row_data = get_point_data(item, area_info);
-
-		if (headers.length === 0) {
-			headers = Object.keys(row_data);
-		}
-		rows.push(headers.map(h => escape_csv(row_data[h])).join(','));
-
-		if (i % 100 === 0 && i > 0) {
-			await new Promise(resolve => setTimeout(resolve, 0));
-		}
-	}
-
-	const csv_content = [headers.join(','), ...rows].join('\n');
-
-	const timestamp = new Date().getTime();
-	const analysis_name = EAE['indexes'][STATE.index]['name'].toLowerCase().replace(/\s+/g, '-');
-	const filename = `energyaccessexplorer-${analysis_name}-high-priority-areas-${timestamp}.csv`;
-
-	fake_blob_download(csv_content, filename, 'text/csv;charset=utf-8');
-
-	window.removeEventListener('beforeunload', warn_before_unload);
-	button.disabled = false;
-	button.querySelector('span').textContent = 'Download data';
+export function view_all_locations() {
+	high_priority_areas_view_all(paginationState.allResults);
 }
 
 export function init() {

@@ -10,23 +10,33 @@ import {
 
 import bind from '../lib/bind.js';
 
-function extract_map_info_data(fields, props, ll, analysis_value, analysis_name, feature_name) {
+export function extract_map_info_data(fields, props, ll, analysis_value, analysis_name, feature_name, area_info = null) {
+	const is_admin_area = area_info !== null;
+
 	let feature = null;
 	let feature_type = null;
 	const basicData = [];
 	const detailedData = [];
 
-	const feature_entry = fields.find(d => d && d[0] && d[0].startsWith('_') && !d[0].includes('analysis'));
+	if (is_admin_area) {
+		feature = area_info.name;
+		const division_name = maybe(GEOGRAPHY, 'divisions', area_info.variant, 'name');
+		if (division_name) {
+			feature_type = division_name;
+		}
+	} else {
+		const feature_entry = fields.find(d => d && d[0] && d[0].startsWith('_') && !d[0].includes('analysis'));
 
-	if (feature_entry) {
-		const category_html = feature_entry[1];
-		const category = category_html.match(/<strong[^>]*>(.*?)<\/strong>/)?.[1] || '';
-		const name = feature_name || props['Facility Name'] || props['name'];
+		if (feature_entry) {
+			const category_html = feature_entry[1];
+			const category = category_html.match(/<strong[^>]*>(.*?)<\/strong>/)?.[1] || '';
+			const name = feature_name || props['Facility Name'] || props['name'];
 
-		if (name) {
-			feature = name;
-			if (category) {
-				feature_type = category;
+			if (name) {
+				feature = name;
+				if (category) {
+					feature_type = category;
+				}
 			}
 		}
 	}
@@ -43,12 +53,13 @@ function extract_map_info_data(fields, props, ll, analysis_value, analysis_name,
 		detailedData.push(priorityData);
 	}
 
-	if (maybe(ll, 'length') === 2 && feature) {
+	if (!is_admin_area && maybe(ll, 'length') === 2 && feature) {
 		const coordData = { "label": "Coordinates", "value": `[${ll[0].toFixed(5)}, ${ll[1].toFixed(5)}]` };
 		basicData.push(coordData);
 		detailedData.push(coordData);
 	}
 
+	const feature_entry = fields.find(d => d && d[0] && d[0].startsWith('_') && !d[0].includes('analysis'));
 	const divisions = fields
 		.filter(d => d && d[0] && d[0].startsWith('_') && !d[0].includes('analysis'))
 		.filter(d => d !== feature_entry)
@@ -61,19 +72,21 @@ function extract_map_info_data(fields, props, ll, analysis_value, analysis_name,
 		detailedData.push(locationData);
 	}
 
-	for (const e of fields) {
-		if (!e) continue;
-		if (e[0].startsWith('_')) continue;
-		if (e[0].includes('analysis')) continue;
+	if (!is_admin_area) {
+		for (const e of fields) {
+			if (!e) continue;
+			if (e[0].startsWith('_')) continue;
+			if (e[0].includes('analysis')) continue;
 
-		const fieldName = e[0].toLowerCase();
-		if (fieldName === 'facility name' || fieldName === 'name' || fieldName === 'facility_name') continue;
+			const fieldName = e[0].toLowerCase();
+			if (fieldName === 'facility name' || fieldName === 'name' || fieldName === 'facility_name') continue;
 
-		if (!props[e[0]]) continue;
+			if (!props[e[0]]) continue;
 
-		const label = e.hasOwnProperty(1) ? e[1] : e[0];
-		const value = props[e[0]].toString();
-		detailedData.push({ label, value });
+			const label = e.hasOwnProperty(1) ? e[1] : e[0];
+			const value = props[e[0]].toString();
+			detailedData.push({ label, value });
+		}
 	}
 
 	const hasLayerData = STATE.datasets.length > 0;

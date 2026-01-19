@@ -27,8 +27,10 @@ import {
 export function context(rc, f) {
 	const dict = [];
 	const props = {};
+	const values = {};
+	const units = {};
 
-	if (!rc) return [dict, props];
+	if (!rc) return [dict, props, { values, units }];
 
 	const controls = controls_list();
 
@@ -57,6 +59,8 @@ export function context(rc, f) {
 		if (d.category.unit) {
 			dict.push([k, d.name]);
 			props[k] = `<code>${v} ${d.category.unit}</code>`;
+			values[k] = v;
+			units[k] = d.category.unit;
 		}
 
 		else if (and(Number.isFinite(v), d.vectors)) {
@@ -64,6 +68,8 @@ export function context(rc, f) {
 
 			dict.push([k, d.name]);
 			props[k] = `<code>${l} km (proximity to)</code>`;
+			values[k] = l;
+			units[k] = "km (proximity to)";
 		}
 
 		if (d.vectors) {
@@ -134,7 +140,7 @@ export function context(rc, f) {
 		}
 	});
 
-	return [dict,props];
+	return [dict, props, { values, units }];
 };
 
 let analysis_count = 0;

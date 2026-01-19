@@ -426,7 +426,7 @@ export function show_location_info(ll, position, centerPointer = true) {
 	const rc = coordinates_to_raster_pixel(ll, OUTLINE.raster);
 
 	const p = MAPBOX.queryRenderedFeatures(MAPBOX.project(ll));
-	const [fields, props] = context(rc, p[0]);
+	const [fields, props, _] = context(rc, p[0]);
 
 	const ac = coordinates_to_raster_pixel(ll, {
 		"data":   MAPBOX.getSource('output-source').raster,

@@ -17,7 +17,7 @@ import {
 	tmpl,
 } from '../lib/helpers.js';
 
-export function area_info(fields, props, ll, analysis_value, analysis_name, feature_name, area_info = null) {
+export function area_info(fields, props, ll, analysis_value, analysis_name, feature_name, area_info = null, raw = { "values": {}, "units": {} }) {
 	const is_admin_area = area_info !== null;
 
 	let feature = null;
@@ -80,19 +80,22 @@ export function area_info(fields, props, ll, analysis_value, analysis_name, feat
 	}
 
 	if (!is_admin_area) {
-		for (const e of fields) {
-			if (!e) continue;
-			if (e[0].startsWith('_')) continue;
-			if (e[0].includes('analysis')) continue;
+		for (const field of fields) {
+			if (!field) continue;
+			if (field[0].startsWith('_')) continue;
+			if (field[0].includes('analysis')) continue;
 
-			const fieldName = e[0].toLowerCase();
-			if (fieldName === 'facility name' || fieldName === 'name' || fieldName === 'facility_name') continue;
+			const field_name = field[0].toLowerCase();
+			if (field_name === 'facility name' || field_name === 'name' || field_name === 'facility_name') continue;
 
-			if (!props[e[0]]) continue;
+			if (!props[field[0]]) continue;
 
-			const label = e.hasOwnProperty(1) ? e[1] : e[0];
-			const value = props[e[0]].toString();
-			detailedData.push({ label, value });
+			const key = field[0];
+			const label = field.hasOwnProperty(1) ? field[1] : key;
+			const value = props[key].toString();
+			const rawValue = raw.values[key];
+			const unit = raw.units[key];
+			detailedData.push({ label, value, rawValue, unit });
 		}
 	}
 
@@ -119,19 +122,20 @@ import modal from '../lib/modal.js';
 function get_row(item, is_raster, analysis_name) {
 	let fields = [];
 	let props = {};
+	let raw = { "values": {}, "units": {} };
 	let ll = null;
 	let info = null;
 
 	if (is_raster) {
 		ll = item.c;
 		const rc = coordinates_to_raster_pixel(ll, OUTLINE.raster);
-		[fields, props] = context(rc, null);
+		[fields, props, raw] = context(rc, null);
 	} else {
 		info = { "variant": STATE.variant, "name": item.name };
 	}
 
 	const { detailedData } = area_info(
-		fields, props, ll, item.v, analysis_name, null, info,
+		fields, props, ll, item.v, analysis_name, null, info, raw,
 	);
 
 	const row = {};
@@ -141,7 +145,10 @@ function get_row(item, is_raster, analysis_name) {
 	}
 
 	for (const data of detailedData) {
-		row[data.label] = data.value.replace(/<[^>]*>/g, '').trim();
+		const header = data.unit ? `${data.label} - ${data.unit}` : data.label;
+		let value = data.rawValue !== undefined ? data.rawValue : data.value;
+		if (value === "< 1") value = 1;
+		row[header] = value;
 	}
 
 	return row;
@@ -218,7 +225,11 @@ export function view_all(results) {
 	bind(content, {
 		"analysis-name": analysis_name,
 		"headers":       headers.map(name => ({ name })),
-		"download":      (_, event) => download(results, event),
+	});
+
+	const footer = tmpl('#high-priority-areas-list-all-footer-template');
+	bind(footer, {
+		"download": (_, event) => download(results, event),
 	});
 
 	const table_container = qs('.high-priority-areas-list-all-table-container', content);
@@ -253,6 +264,7 @@ export function view_all(results) {
 		"id":      'high-priority-areas-list-all',
 		"header":  `High priority areas (${area_type})`,
 		"content": content,
+		"footer":  footer,
 		"destroy": true,
 	});
 

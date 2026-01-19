@@ -677,9 +677,6 @@ dialog .saved-analysis-last-viewed {
   display: flex;
   align-items: center;
   gap: 24px;
-  padding: 16px 24px;
-  border-top: 1px solid #E7E6E6;
-  background: #FFFFFF;
 }
 
 .high-priority-areas-list-all-footer .download-info {

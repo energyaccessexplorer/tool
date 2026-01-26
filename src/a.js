@@ -52,6 +52,7 @@ import {
 } from './points-loading.js';
 
 import {
+	aggregate_layer_values,
 	priority,
 	plot_active as analysis_plot_active,
 } from './analysis.js';
@@ -589,8 +590,10 @@ async function reload(k,v) {
 
 	const a = await analysis_plot_active(index, true);
 
-	if (GEOGRAPHY.divisions[variant])
+	if (GEOGRAPHY.divisions[variant]) {
 		GEOGRAPHY.divisions[variant].priorityData = priority(GEOGRAPHY.divisions[variant], a, variant);
+		GEOGRAPHY.divisions[variant].layerData = aggregate_layer_values(GEOGRAPHY.divisions[variant]);
+	}
 
 	indexes_list();
 

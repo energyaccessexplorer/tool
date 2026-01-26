@@ -2,6 +2,7 @@ import {
 	uniform_split,
 	colorscale,
 	colorscale_svg,
+	coordinates_to_raster_pixel,
 	raster_pixel_to_coordinates,
 } from './utils.js';
 
@@ -374,6 +375,89 @@ export function priority(d, a, i) {
 
 	return o;
 };
+
+export function aggregate_layer_values(division) {
+	const divisions = division.raster.data;
+	const layer_data = {};
+	const area_ids = [];
+
+	for (const e of divisions) if (e !== -1 && area_ids.indexOf(e) === -1) area_ids.push(e);
+
+	for (const dataset of STATE.datasets) {
+		if (!and(dataset.raster, dataset.raster.data)) continue;
+		if (dataset.category.name === 'boundaries') continue;
+		if (dataset.category.name === 'outline') continue;
+
+		const is_point_layer = !!dataset.vectors;
+		const layer_id = dataset.id;
+
+		layer_data[layer_id] = {
+			"name":           dataset.name,
+			"unit":           dataset.category.unit,
+			"is_point_layer": is_point_layer,
+			"areas":          {},
+		};
+
+		for (const area_id of area_ids) {
+			layer_data[layer_id].areas[area_id] = { "values": [], "result": null };
+		}
+
+		if (is_point_layer) {
+			aggregate_point_values(divisions, dataset, layer_data, layer_id, area_ids);
+		} else {
+			aggregate_scalar_values(divisions, dataset, layer_data, layer_id, area_ids);
+		}
+	}
+
+	return layer_data;
+};
+
+function aggregate_point_values(division_raster, dataset, layer_data, layer_id, area_ids) {
+	const features = maybe(dataset, 'vectors', 'data', 'features') || [];
+
+	for (const feature of features) {
+		const coords = maybe(feature, 'geometry', 'coordinates');
+		if (!coords) continue;
+
+		const pixel = coordinates_to_raster_pixel(coords, OUTLINE.raster);
+		if (!pixel) continue;
+
+		const area_id = division_raster[pixel.index];
+		if (area_id === -1) continue;
+		if (!layer_data[layer_id].areas[area_id]) continue;
+
+		layer_data[layer_id].areas[area_id].values.push(1);
+	}
+
+	for (const area_id of area_ids) {
+		const values = layer_data[layer_id].areas[area_id].values;
+		layer_data[layer_id].areas[area_id].result = {
+			"type":  'points',
+			"count": values.length,
+		};
+	}
+}
+
+function aggregate_scalar_values(division_raster, dataset, layer_data, layer_id, area_ids) {
+	division_raster.forEach((area_id, i) => {
+		if (area_id === -1) return;
+
+		const v = dataset.raster.data[i];
+		if (v === dataset.raster.nodata) return;
+
+		layer_data[layer_id].areas[area_id].values.push(v);
+	});
+
+	for (const area_id of area_ids) {
+		const values = layer_data[layer_id].areas[area_id].values;
+		if (values.length === 0) continue;
+
+		layer_data[layer_id].areas[area_id].result = {
+			"type":    'scalar',
+			"average": values.reduce((a, b) => a + b, 0) / values.length,
+		};
+	}
+}
 
 export function enough_datasets(t) {
 	if (["eai", "ani"].includes(t)) {

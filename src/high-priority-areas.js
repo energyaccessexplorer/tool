@@ -79,24 +79,22 @@ export function area_info(fields, props, ll, analysis_value, analysis_name, feat
 		detailedData.push(locationData);
 	}
 
-	if (!is_admin_area) {
-		for (const field of fields) {
-			if (!field) continue;
-			if (field[0].startsWith('_')) continue;
-			if (field[0].includes('analysis')) continue;
+	for (const field of fields) {
+		if (!field) continue;
+		if (field[0].startsWith('_')) continue;
+		if (field[0].includes('analysis')) continue;
 
-			const field_name = field[0].toLowerCase();
-			if (field_name === 'facility name' || field_name === 'name' || field_name === 'facility_name') continue;
+		const field_name = field[0].toLowerCase();
+		if (field_name === 'facility name' || field_name === 'name' || field_name === 'facility_name') continue;
 
-			if (!props[field[0]]) continue;
+		if (props[field[0]] === undefined || props[field[0]] === null) continue;
 
-			const key = field[0];
-			const label = field.hasOwnProperty(1) ? field[1] : key;
-			const value = props[key].toString();
-			const rawValue = raw.values[key];
-			const unit = raw.units[key];
-			detailedData.push({ label, value, rawValue, unit });
-		}
+		const key = field[0];
+		const label = field.hasOwnProperty(1) ? field[1] : key;
+		const value = props[key].toString();
+		const rawValue = raw.values[key];
+		const unit = raw.units[key];
+		detailedData.push({ label, value, rawValue, unit });
 	}
 
 	const hasLayerData = STATE.datasets.length > 0;
@@ -132,9 +130,35 @@ function get_row(item, is_raster, analysis_name) {
 		[fields, props, raw] = context(rc, null);
 	} else {
 		info = { "variant": STATE.variant, "name": item.name };
+
+		const layer_data = maybe(GEOGRAPHY, 'divisions', STATE.variant, 'layerData');
+		if (layer_data) {
+			for (const layer_id in layer_data) {
+				const layer = layer_data[layer_id];
+				const area_result = maybe(layer, 'areas', item.id, 'result');
+
+				if (!area_result) continue;
+
+				let value, unit;
+				if (area_result.type === 'points') {
+					value = area_result.count;
+					unit = 'count';
+				} else {
+					value = typeof area_result.average === 'number'
+						? parseFloat(area_result.average.toFixed(2))
+						: area_result.average;
+					unit = layer.unit || '';
+				}
+
+				fields.push([layer_id, layer.name]);
+				props[layer_id] = value;
+				raw.values[layer_id] = value;
+				raw.units[layer_id] = unit;
+			}
+		}
 	}
 
-	const { detailedData } = area_info(
+	const { feature, feature_type, detailedData } = area_info(
 		fields, props, ll, item.v, analysis_name, null, info, raw,
 	);
 
@@ -142,6 +166,10 @@ function get_row(item, is_raster, analysis_name) {
 	if (ll) {
 		row["Longitude"] = ll[0].toFixed(5);
 		row["Latitude"] = ll[1].toFixed(5);
+	}
+
+	if (feature && feature_type) {
+		row[feature_type] = feature;
 	}
 
 	for (const data of detailedData) {

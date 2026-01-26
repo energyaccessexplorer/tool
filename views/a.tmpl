@@ -654,6 +654,67 @@
     </div>
   </template>
 
+  <template id="export-options-modal-content">
+    <div class="export-options-grid">
+      <div class="card-section export-option-card">
+        <div class="export-option-icon">
+          <i class="bi bi-easel"></i>
+        </div>
+        <h3 class="card-title">Summary presentation</h3>
+        <p class="card-description">A summary presentation explaining the outputs of your current analysis view.</p>
+        <button type="button" class="button-small" bind-listen="click" bind-func="export_ppt">
+          <i class="bi bi-download"></i>
+          <span>Download .ppt</span>
+        </button>
+      </div>
+
+      <div class="card-section export-option-card">
+        <div class="export-option-icon">
+          <i class="bi bi-image"></i>
+        </div>
+        <h3 class="card-title">Map TIFF</h3>
+        <p class="card-description">A TIFF file of the prioritization raster image generated from your analysis.</p>
+        <button type="button" class="button-small" bind-listen="click" bind-func="export_tiff">
+          <i class="bi bi-download"></i>
+          <span>Download .TIFF</span>
+        </button>
+      </div>
+
+      <div class="card-section export-option-card">
+        <div class="export-option-icon">
+          <i class="bi bi-table"></i>
+        </div>
+        <h3 class="card-title">High priority areas</h3>
+        <p class="card-description">A table of the highest priority 1km² areas from your analysis.</p>
+        <button type="button" class="button-small" bind-listen="click" bind-func="export_csv">
+          <i class="bi bi-download"></i>
+          <span>Download .csv</span>
+        </button>
+      </div>
+
+      <div class="card-section export-option-card">
+        <div class="export-option-icon">
+          <i class="bi bi-pie-chart"></i>
+        </div>
+        <h3 class="card-title">Population and area share</h3>
+        <p class="card-description">CSV data for the population and area share.</p>
+        <button type="button" class="button-small" bind-listen="click" bind-func="export_share_csv">
+          <i class="bi bi-download"></i>
+          <span>Download .csv</span>
+        </button>
+      </div>
+    </div>
+  </template>
+
+  <template id="export-options-modal-footer">
+    <div class="modal-footer-bar">
+      <button type="button" class="button-icon button-icon-mid" bind-listen="click" bind-func="export_all">
+        <i class="bi bi-file-earmark-zip"></i>
+        <span>Download all</span>
+      </button>
+    </div>
+  </template>
+
   <template id="index-graph-section-template">
     <panel-section class="index-graphs-section">
       <span slot="title"></span>
@@ -998,12 +1059,12 @@
   </template>
 
   <template id="high-priority-areas-list-all-footer-template">
-    <div class="high-priority-areas-list-all-footer">
+    <div class="modal-footer-bar">
       <button class="button-icon button-icon-mid" bind-listen="click" bind-func="download">
         <i class="bi bi-download"></i>
         <span>Download all (.csv)</span>
       </button>
-      <div class="download-info">
+      <div class="info">
         <i class="bi bi-info-circle"></i>
         <span>Data download will include a summary of your analysis.</span>
       </div>

@@ -1,13 +1,15 @@
 import {
 	svg_pie,
 	copy_to_clipboard,
+	loading,
+	export_filename,
 } from './utils.js';
 
 import bind from '../lib/bind.js';
 
 import modal from '../lib/modal.js';
 
-import summary_analyse from './summary.js';
+import summary_analyse, { generate_summary_data } from './summary.js';
 
 import bubblemessage from '../lib/bubblemessage.js';
 
@@ -16,6 +18,7 @@ import {
 	update as analysis_locations_panel_update,
 	download_locations_data,
 	view_all_locations,
+	get_locations_results,
 } from './analysis-search.js';
 
 import {
@@ -33,12 +36,24 @@ import {
 } from  './session.js';
 
 import {
+	pptx_blob as report_pptx_blob,
+	pptx_download as report_pptx_download,
+} from './report.js';
+
+import {
+	generate_csv_content as generate_high_priority_csv,
+} from './high-priority-areas.js';
+
+import {
 	ce,
+	delay,
 	fake_blob_download,
 	maybe,
 	qs,
 	tmpl,
 } from '../lib/helpers.js';
+
+const user_id = user_extract('id');
 
 const PIES = {};
 
@@ -178,8 +193,6 @@ export function init() {
 	PIES["population"] = svg_pie([[0], [0], [0], [0], [0]], 70, 0, analysis_colorscale.stops, null, null, bubble);
 	PIES["area"]       = svg_pie([[0], [0], [0], [0], [0]], 70, 0, analysis_colorscale.stops, null, null, bubble);
 
-	const user_id = user_extract('id');
-
 	const snap = qs('#save-snapshot-button');
 	snap.onclick = _ => {
 		snapshot();
@@ -198,14 +211,13 @@ export function init() {
 	};
 
 	const download = qs('#tiff-download');
-	download.onclick = async _ => {
+	download.onclick = _ => {
 		if (!user_id) {
 			register_login();
 			return;
 		}
 
-		const type = STATE.index;
-		fake_blob_download((await analysis(type)).tiff, `energyaccessexplorer-${type}.tif`);
+		show_export_modal();
 	};
 
 	const areaSection = create_graph_section('Area share', 'area', 'area-number', 'area-description');
@@ -251,6 +263,108 @@ function share_url() {
 		"id":      'share-link-modal',
 		"header":  "Share link",
 		"content": c,
+		"destroy": true,
+	}).show();
+};
+
+function generate_share_csv_content() {
+	const levels = ['low', 'low-med', 'medium', 'med-high', 'high'];
+	const columns = [];
+	const data = [];
+
+	for (const type of ['area', 'population-density']) {
+		const label = type === 'area' ? 'km2' : 'people';
+		for (const k of Object.keys(SUMMARY)) {
+			const name = `${EAE['indexes'][k]['name']} (${label})`;
+			columns.push(name);
+			data.push(SUMMARY[k][type]['amounts'].map(x => Math.round(x)));
+		}
+	}
+
+	const headers = ['Level', ...columns];
+	const rows = [
+		headers.join(','),
+		...levels.map((level, i) => [level, ...data.map(col => col[i])].join(',')),
+	];
+
+	return rows.join('\n');
+}
+
+function download_share_csv() {
+	const csv = generate_share_csv_content();
+	const blob = new Blob([csv], { "type": 'text/csv' });
+	fake_blob_download(blob, export_filename('population-area-share', 'csv'));
+}
+
+async function export_all(button) {
+	button.disabled = true;
+	button.querySelector('span').textContent = 'Generating...';
+
+	await delay(0.1);
+	await generate_summary_data();
+
+	const zip = new JSZip();
+	const type = STATE.index;
+	const index_name = EAE['indexes'][type]['name'].toLowerCase().replace(/\s+/g, '-');
+
+	const [pptx_blob, tiff_blob, high_priority_csv, share_csv] = await Promise.all([
+		report_pptx_blob(),
+		analysis(type).then(a => a.tiff),
+		generate_high_priority_csv(get_locations_results()),
+		Promise.resolve(generate_share_csv_content()),
+	]);
+
+	zip.file(export_filename('summary', 'pptx', { "timestamp": false }), pptx_blob);
+	zip.file(export_filename(`${index_name}-map`, 'tif', { "timestamp": false }), tiff_blob);
+	zip.file(export_filename(`${index_name}-high-priority-areas`, 'csv', { "timestamp": false }), high_priority_csv);
+	zip.file(export_filename('population-area-share', 'csv', { "timestamp": false }), share_csv);
+
+	const zip_blob = await zip.generateAsync({ "type": 'blob' });
+	fake_blob_download(zip_blob, export_filename('export', 'zip'));
+
+	button.disabled = false;
+	button.querySelector('span').textContent = 'Download all';
+}
+
+function show_export_modal() {
+	const content = tmpl('#export-options-modal-content');
+
+	bind(content, {
+		"export_ppt": async function() {
+			this.disabled = true;
+			this.querySelector('span').textContent = 'Generating...';
+
+			await delay(0.1);
+			await generate_summary_data();
+			await report_pptx_download();
+
+			this.disabled = false;
+			this.querySelector('span').textContent = 'Download .ppt';
+		},
+		"export_tiff": async () => {
+			const type = STATE.index;
+			const index_name = EAE['indexes'][type]['name'].toLowerCase().replace(/\s+/g, '-');
+			fake_blob_download((await analysis(type)).tiff, export_filename(`${index_name}-map`, 'tif'));
+		},
+		"export_csv":       (e) => download_locations_data(null, e),
+		"export_share_csv": async () => {
+			await generate_summary_data();
+			download_share_csv();
+		},
+	});
+
+	const footer = tmpl('#export-options-modal-footer');
+	bind(footer, {
+		"export_all": function() { export_all(this); },
+	});
+
+	const header = ce('span', 'Export options', { "class": 'modal-title' });
+
+	new modal({
+		"id":      'export-options-modal',
+		"header":  header,
+		"content": content,
+		"footer":  footer,
 		"destroy": true,
 	}).show();
 };

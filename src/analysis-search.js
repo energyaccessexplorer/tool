@@ -320,6 +320,10 @@ export function view_all_locations() {
 	high_priority_areas_view_all(paginationState.allResults);
 }
 
+export function get_locations_results() {
+	return paginationState.allResults;
+}
+
 export function init() {
 	section = qs('#right-panel #analysis-locations-section');
 	resultscontainer = qs('.locations-paginated-list', section);

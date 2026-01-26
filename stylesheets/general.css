@@ -180,6 +180,7 @@ dialog.modal content {
   gap: 16px;
   padding: 1.5em 1.5em 0.75em !important;
   width: 590px;
+  background-color: #F9F9F9;
 }
 
 dialog content form,
@@ -195,11 +196,31 @@ dialog content p {
   margin: 0;
 }
 
-dialog footer {
+dialog footer,
+dialog.modal footer {
   display: flex !important;
   align-items: flex-start;
   gap: 16px;
   padding: 0.75em 1.5em 1.5em !important;
+  border-top: 1px solid #E7E6E6;
+}
+
+.modal-footer-bar {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.modal-footer-bar .info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #5C5959;
+  font-size: 14px;
+}
+
+.modal-footer-bar .info i {
+  color: #9E9E9E;
 }
 
 dialog pre {

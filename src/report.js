@@ -1,5 +1,6 @@
 import {
 	coordinates_to_raster_pixel,
+	export_filename,
 } from './utils.js';
 
 import '../lib/jszip.js';
@@ -925,5 +926,15 @@ export async function pptx() {
 		toplocations_index.call(p, 'supply', points);
 	}
 
-	p.writeFile({ "filename": null });
+	return p;
+};
+
+export async function pptx_blob() {
+	const p = await pptx();
+	return p.write('blob');
+};
+
+export async function pptx_download() {
+	const p = await pptx();
+	p.writeFile({ "filename": export_filename('summary', 'pptx') });
 };

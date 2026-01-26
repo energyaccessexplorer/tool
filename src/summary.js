@@ -38,29 +38,19 @@ import {
 	tmpl,
 } from '../lib/helpers.js';
 
-async function summary() {
+export async function generate_summary_data() {
+	if (typeof SUMMARY !== 'undefined' && SUMMARY && Object.keys(SUMMARY).length > 0) {
+		return SUMMARY;
+	}
+
 	const pop = DST.get('population-density');
 	await pop.load('raster');
 
-	const content = ce('div');
-
-	const graphs = ce('div', null, { "id": "summary-graphs" });
-	const graphs_tab = ce('div', graphs, { "class": 'tab' });
-
-	const r = bind(tmpl('#ramp'), {
-		"left":   "Low",
-		"middle": "Medium",
-		"right":  "High",
-	});
-
 	SUMMARY = {};
-
-	const scale = ce('div');
-	scale.append(analysis_colorscale_svg.cloneNode(true), r);
 
 	const bubble = (v,e) => new bubblemessage({ "message": v + "%", "position": "C", "close": false, "noevents": true }, e);
 
-	async function get_summaries(idxn) {
+	async function get_summary(idxn) {
 		const raster = (await analysis_run(idxn)).raster;
 
 		SUMMARY[idxn] = await analyse(raster);
@@ -68,19 +58,6 @@ async function summary() {
 
 		const ppie = svg_pie(SUMMARY[idxn]['population-density']['distribution'].map(x => [x]), 75, 0, analysis_colorscale.stops, null, null, bubble);
 		const apie = svg_pie(SUMMARY[idxn]['area']['distribution'].map(x => [x]), 75, 0, analysis_colorscale.stops, null, null, bubble);
-
-		const container = tmpl('#index-graphs-container-template');
-		qs('.index-graphs-group #area-number', container).parentElement.append(apie.svg);
-		qs('.index-graphs-group #population-number', container).parentElement.append(ppie.svg);
-
-		graphs.append(
-			ce('div',
-			   [
-				   ce('div', EAE['indexes'][idxn]['name'], { "class": 'up-title' }),
-				   container,
-				   ce('div', (SUMMARY[idxn]['area']['total'] === 0) ? ce('code', "(no datasets selected)") : null, { "style": "text-align: center; font-size: smaller;" }),
-			   ],
-			   { "class": 'index-group' }));
 
 		ppie.change(0);
 		apie.change(0);
@@ -94,9 +71,47 @@ async function summary() {
 		SUMMARY[idxn]['canvas'] = c;
 		SUMMARY[idxn]['population-density']['pie'] = ppie;
 		SUMMARY[idxn]['area']['pie'] = apie;
-	};
+	}
 
-	await Promise.all(Object.keys(EAE['indexes']).map(i => get_summaries(i)));
+	await Promise.all(Object.keys(EAE['indexes']).map(i => get_summary(i)));
+
+	return SUMMARY;
+}
+
+async function summary() {
+	await generate_summary_data();
+
+	const content = ce('div');
+
+	const graphs = ce('div', null, { "id": "summary-graphs" });
+	const graphs_tab = ce('div', graphs, { "class": 'tab' });
+
+	const r = bind(tmpl('#ramp'), {
+		"left":   "Low",
+		"middle": "Medium",
+		"right":  "High",
+	});
+
+	const scale = ce('div');
+	scale.append(analysis_colorscale_svg.cloneNode(true), r);
+
+	for (const idxn of Object.keys(EAE['indexes'])) {
+		const apie = SUMMARY[idxn]['area']['pie'];
+		const ppie = SUMMARY[idxn]['population-density']['pie'];
+
+		const container = tmpl('#index-graphs-container-template');
+		qs('.index-graphs-group #area-number', container).parentElement.append(apie.svg);
+		qs('.index-graphs-group #population-number', container).parentElement.append(ppie.svg);
+
+		graphs.append(
+			ce('div',
+			   [
+				   ce('div', EAE['indexes'][idxn]['name'], { "class": 'up-title' }),
+				   container,
+				   ce('div', (SUMMARY[idxn]['area']['total'] === 0) ? ce('code', "(no datasets selected)") : null, { "style": "text-align: center; font-size: smaller;" }),
+			   ],
+			   { "class": 'index-group' }));
+	}
 
 	graphs.append(ce('div', scale.cloneNode(true), { "class": "index-graphs-scale" }));
 

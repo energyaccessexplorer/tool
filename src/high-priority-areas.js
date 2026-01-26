@@ -1,5 +1,6 @@
 import {
 	coordinates_to_raster_pixel,
+	export_filename,
 } from './utils.js';
 
 import {
@@ -271,23 +272,36 @@ export async function download(results, event) {
 	}
 
 	const csv_content = [headers.join(','), ...rows].join('\n');
-	const now = new Date();
-	const date_str = [
-		now.getFullYear(),
-		String(now.getMonth() + 1).padStart(2, '0'),
-		String(now.getDate()).padStart(2, '0'),
-	].join('');
-	const time_str = [
-		String(now.getHours()).padStart(2, '0'),
-		String(now.getMinutes()).padStart(2, '0'),
-	].join('');
-	const filename = `${date_str}${time_str}-eae-${analysis_name.toLowerCase().replace(/\s+/g, '-')}.csv`;
+	const filename = export_filename(`${analysis_name.toLowerCase().replace(/\s+/g, '-')}-high-priority-areas`, 'csv');
 
 	fake_blob_download(csv_content, filename, 'text/csv;charset=utf-8');
 
 	window.removeEventListener('beforeunload', warn_before_unload);
 	button.disabled = false;
 	button.querySelector('span').textContent = 'Download data';
+}
+
+export async function generate_csv_content(results) {
+	const data = prepare_data(results);
+	const { headers, is_raster, analysis_name } = data;
+
+	const escape_csv = (val) => {
+		if (!val) return '';
+		const str = String(val);
+		if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+			return `"${str.replace(/"/g, '""')}"`;
+		}
+		return str;
+	};
+
+	const rows = [];
+	let i = 0;
+	for (const row_data of generate_rows(results, is_raster, analysis_name)) {
+		rows.push(headers.map(h => escape_csv(row_data[h])).join(','));
+		if (++i % 100 === 0) await new Promise(resolve => setTimeout(resolve, 0));
+	}
+
+	return [headers.join(','), ...rows].join('\n');
 }
 
 export function view_all(results) {

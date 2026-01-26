@@ -1,6 +1,7 @@
 import {
 	coords_search_pois as mapbox_coords_search_pois,
 	fit as mapbox_fit,
+	show_admin_area_info,
 	show_location_info,
 } from './mapbox.js';
 
@@ -80,6 +81,36 @@ function raster_item(p) {
 	return template;
 };
 
+function get_admin_area_position(item) {
+	const bounds = geojsonExtent(item.feature);
+	const center = [(bounds[0] + bounds[2]) / 2, (bounds[1] + bounds[3]) / 2];
+
+	const maparea = qs('#maparea');
+	const { x, y } = MAPBOX.project(center);
+	const box = maparea.getBoundingClientRect();
+
+	return {
+		"x":      box.x + x,
+		"y":      box.y + y,
+		"lngLat": { "lng": center[0], "lat": center[1] },
+	};
+}
+
+function show_admin_info_on_hover(item) {
+	if (!item.feature) return;
+	show_admin_area_info(item, get_admin_area_position(item), false);
+}
+
+function show_admin_info_on_click(item) {
+	if (!item.feature) return;
+
+	mapbox_fit(geojsonExtent(item.feature), true);
+
+	MAPBOX.once('moveend', () => {
+		show_admin_area_info(item, get_admin_area_position(item), true);
+	});
+}
+
 function admin_area_item(item, rank) {
 	const template = tmpl('#admin-area-item-template');
 	const el = template.firstElementChild;
@@ -90,7 +121,8 @@ function admin_area_item(item, rank) {
 	});
 
 	if (item.feature) {
-		el.onclick = () => mapbox_fit(geojsonExtent(item.feature), true);
+		el.onmouseenter = () => show_admin_info_on_hover(item);
+		el.onclick = () => show_admin_info_on_click(item);
 	}
 
 	return template;

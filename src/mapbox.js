@@ -9,6 +9,10 @@ import {
 } from './complicated.js';
 
 import {
+	get_admin_area_layer_data,
+} from './high-priority-areas.js';
+
+import {
 	ce,
 	delay,
 	maybe,
@@ -446,95 +450,120 @@ export function show_location_info(ll, position, centerPointer = true) {
 			const { drop } = pointer(position, { fields, props, ll, analysis_value, analysis_name, feature_name });
 			current_map_info_drop = drop;
 
-			if (!centerPointer) return;
-
-			delay(0.1).then(() => {
-				const mapInfo = qs('map-info');
-				if (!mapInfo) return;
-
-				const mapContainer = qs('#maparea').getBoundingClientRect();
-				const mapInfoBox = mapInfo.getBoundingClientRect();
-				const rightPanel = qs('#right-panel');
-				const leftPanel = qs('#left-panel');
-
-				let visibleLeft = mapContainer.left;
-				let visibleRight = mapContainer.right;
-
-				if (leftPanel) {
-					const leftBox = leftPanel.getBoundingClientRect();
-					if (leftBox.width > 0) {
-						visibleLeft = Math.max(visibleLeft, leftBox.right);
-					}
-				}
-
-				if (rightPanel) {
-					const rightBox = rightPanel.getBoundingClientRect();
-					if (rightBox.width > 0) {
-						visibleRight = Math.min(visibleRight, rightBox.left);
-					}
-				}
-
-				const controlsPadding = 60;
-
-				const visibleTop = mapContainer.top;
-				const visibleBottom = mapContainer.bottom - controlsPadding;
-
-				visibleLeft += controlsPadding;
-
-				const isFullyVisible =
-					mapInfoBox.left >= visibleLeft &&
-					mapInfoBox.right <= visibleRight &&
-					mapInfoBox.top >= visibleTop &&
-					mapInfoBox.bottom <= visibleBottom;
-
-				if (!isFullyVisible) {
-					let offsetX = 0;
-					let offsetY = 0;
-
-					if (mapInfoBox.right > visibleRight) {
-						offsetX = mapInfoBox.right - visibleRight;
-					} else if (mapInfoBox.left < visibleLeft) {
-						offsetX = mapInfoBox.left - visibleLeft;
-					}
-
-					if (mapInfoBox.bottom > visibleBottom) {
-						offsetY = mapInfoBox.bottom - visibleBottom;
-					} else if (mapInfoBox.top < visibleTop) {
-						const pointer = qs('#map-pointer');
-						const pointerBox = pointer ? pointer.getBoundingClientRect() : null;
-						if (pointerBox) {
-							offsetY = mapInfoBox.top - pointerBox.top;
-						} else {
-							offsetY = mapInfoBox.top - visibleTop;
-						}
-					}
-
-					const currentCenter = MAPBOX.getCenter();
-
-					const centerPoint = MAPBOX.project(currentCenter);
-					const targetPoint = {
-						"x": centerPoint.x + offsetX,
-						"y": centerPoint.y + offsetY,
-					};
-
-					const targetCenter = MAPBOX.unproject(targetPoint);
-
-					const p = qs('#map-pointer');
-					if (p) {
-						p._preventDrop = true;
-
-						MAPBOX.once('moveend', () => {
-							if (p) p._preventDrop = false;
-						});
-					}
-
-					MAPBOX.easeTo({
-						"center":   targetCenter,
-						"duration": 300,
-					});
-				}
-			});
+			if (centerPointer) ensure_map_info_visible();
 		});
+}
+
+function ensure_map_info_visible() {
+	delay(0.1).then(() => {
+		const mapInfo = qs('map-info');
+		if (!mapInfo) return;
+
+		const mapContainer = qs('#maparea').getBoundingClientRect();
+		const mapInfoBox = mapInfo.getBoundingClientRect();
+		const rightPanel = qs('#right-panel');
+		const leftPanel = qs('#left-panel');
+
+		let visibleLeft = mapContainer.left;
+		let visibleRight = mapContainer.right;
+
+		if (leftPanel) {
+			const leftBox = leftPanel.getBoundingClientRect();
+			if (leftBox.width > 0) {
+				visibleLeft = Math.max(visibleLeft, leftBox.right);
+			}
+		}
+
+		if (rightPanel) {
+			const rightBox = rightPanel.getBoundingClientRect();
+			if (rightBox.width > 0) {
+				visibleRight = Math.min(visibleRight, rightBox.left);
+			}
+		}
+
+		const controlsPadding = 60;
+
+		const visibleTop = mapContainer.top;
+		const visibleBottom = mapContainer.bottom - controlsPadding;
+
+		visibleLeft += controlsPadding;
+
+		const isFullyVisible =
+			mapInfoBox.left >= visibleLeft &&
+			mapInfoBox.right <= visibleRight &&
+			mapInfoBox.top >= visibleTop &&
+			mapInfoBox.bottom <= visibleBottom;
+
+		if (!isFullyVisible) {
+			let offsetX = 0;
+			let offsetY = 0;
+
+			if (mapInfoBox.right > visibleRight) {
+				offsetX = mapInfoBox.right - visibleRight;
+			} else if (mapInfoBox.left < visibleLeft) {
+				offsetX = mapInfoBox.left - visibleLeft;
+			}
+
+			if (mapInfoBox.bottom > visibleBottom) {
+				offsetY = mapInfoBox.bottom - visibleBottom;
+			} else if (mapInfoBox.top < visibleTop) {
+				const ptr = qs('#map-pointer');
+				const pointerBox = ptr ? ptr.getBoundingClientRect() : null;
+				if (pointerBox) {
+					offsetY = mapInfoBox.top - pointerBox.top;
+				} else {
+					offsetY = mapInfoBox.top - visibleTop;
+				}
+			}
+
+			const currentCenter = MAPBOX.getCenter();
+
+			const centerPoint = MAPBOX.project(currentCenter);
+			const targetPoint = {
+				"x": centerPoint.x + offsetX,
+				"y": centerPoint.y + offsetY,
+			};
+
+			const targetCenter = MAPBOX.unproject(targetPoint);
+
+			const p = qs('#map-pointer');
+			if (p) {
+				p._preventDrop = true;
+
+				MAPBOX.once('moveend', () => {
+					if (p) p._preventDrop = false;
+				});
+			}
+
+			MAPBOX.easeTo({
+				"center":   targetCenter,
+				"duration": 300,
+			});
+		}
+	});
+}
+
+export function show_admin_area_info(item, position, centerPointer = false) {
+	const variant = STATE.variant;
+	const [fields, props, raw] = get_admin_area_layer_data(variant, item.id);
+
+	const info = { "variant": variant, "name": item.name };
+	const analysis_name = EAE['indexes'][STATE.index]['name'];
+
+	const { drop } = pointer(position, {
+		fields,
+		props,
+		"ll":             null,
+		"analysis_value": item.v,
+		"analysis_name":  analysis_name,
+		"feature_name":   item.name,
+		"area_info":      info,
+		raw,
+	});
+
+	current_map_info_drop = drop;
+
+	if (centerPointer) ensure_map_info_visible();
 }
 
 function click(e) {

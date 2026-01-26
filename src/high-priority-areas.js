@@ -17,6 +17,40 @@ import {
 	tmpl,
 } from '../lib/helpers.js';
 
+export function get_admin_area_layer_data(variant, area_id) {
+	const fields = [];
+	const props = {};
+	const raw = { "values": {}, "units": {} };
+
+	const layer_data = maybe(GEOGRAPHY, 'divisions', variant, 'layerData');
+	if (layer_data) {
+		for (const layer_id in layer_data) {
+			const layer = layer_data[layer_id];
+			const area_result = maybe(layer, 'areas', area_id, 'result');
+
+			if (!area_result) continue;
+
+			let value, unit;
+			if (area_result.type === 'points') {
+				value = area_result.count;
+				unit = 'count';
+			} else {
+				value = typeof area_result.average === 'number'
+					? parseFloat(area_result.average.toFixed(2))
+					: area_result.average;
+				unit = layer.unit || '';
+			}
+
+			fields.push([layer_id, layer.name]);
+			props[layer_id] = value;
+			raw.values[layer_id] = value;
+			raw.units[layer_id] = unit;
+		}
+	}
+
+	return [fields, props, raw];
+}
+
 export function area_info(fields, props, ll, analysis_value, analysis_name, feature_name, area_info = null, raw = { "values": {}, "units": {} }) {
 	const is_admin_area = area_info !== null;
 
@@ -130,32 +164,7 @@ function get_row(item, is_raster, analysis_name) {
 		[fields, props, raw] = context(rc, null);
 	} else {
 		info = { "variant": STATE.variant, "name": item.name };
-
-		const layer_data = maybe(GEOGRAPHY, 'divisions', STATE.variant, 'layerData');
-		if (layer_data) {
-			for (const layer_id in layer_data) {
-				const layer = layer_data[layer_id];
-				const area_result = maybe(layer, 'areas', item.id, 'result');
-
-				if (!area_result) continue;
-
-				let value, unit;
-				if (area_result.type === 'points') {
-					value = area_result.count;
-					unit = 'count';
-				} else {
-					value = typeof area_result.average === 'number'
-						? parseFloat(area_result.average.toFixed(2))
-						: area_result.average;
-					unit = layer.unit || '';
-				}
-
-				fields.push([layer_id, layer.name]);
-				props[layer_id] = value;
-				raw.values[layer_id] = value;
-				raw.units[layer_id] = unit;
-			}
-		}
+		[fields, props, raw] = get_admin_area_layer_data(STATE.variant, item.id);
 	}
 
 	const { feature, feature_type, detailedData } = area_info(

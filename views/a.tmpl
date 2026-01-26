@@ -957,7 +957,7 @@
               <th class="checkbox-column">
                 <input type="checkbox" class="select-all-checkbox hidden">
               </th>
-              <th bind-each="headers">
+              <th bind-each="headers" bind-listen="click" bind-func="on_sort">
                 <div class="th-content">
                   <span bind="name"></span>
                   <span class="sort-icon"><i class="bi bi-chevron-expand"></i></span>

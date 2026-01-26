@@ -655,6 +655,19 @@ dialog .saved-analysis-last-viewed {
   font-size: 10px;
 }
 
+.high-priority-areas-list-all-table th:not(.checkbox-column) {
+  cursor: pointer;
+}
+
+.high-priority-areas-list-all-table th:not(.checkbox-column):hover {
+  background: #F5F5F5;
+}
+
+.high-priority-areas-list-all-table th .sort-icon .bi-caret-up-fill,
+.high-priority-areas-list-all-table th .sort-icon .bi-caret-down-fill {
+  color: #3D3B3B;
+}
+
 .high-priority-areas-list-all-table td {
   padding: 12px 8px;
   font-size: 12px;

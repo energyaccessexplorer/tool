@@ -154,6 +154,38 @@ function get_row(item, is_raster, analysis_name) {
 	return row;
 }
 
+function get_sort_value(item, column, is_raster, analysis_name) {
+	if (column === "Priority score" || column === analysis_name) return item.v;
+	if (column === "Longitude" && item.c) return item.c[0];
+	if (column === "Latitude" && item.c) return item.c[1];
+
+	const row = get_row(item, is_raster, analysis_name);
+	const value = row[column];
+	return value && parseFloat(value) || value;
+}
+
+function sort_results(results, column, desc, is_raster, analysis_name) {
+	const sorted = [...results];
+	const mult = desc ? -1 : 1;
+
+	sorted.sort((a, b) => {
+		const valA = get_sort_value(a, column, is_raster, analysis_name);
+		const valB = get_sort_value(b, column, is_raster, analysis_name);
+
+		if (valA == null && valB == null) return 0;
+		if (valA == null) return 1;
+		if (valB == null) return -1;
+
+		if (typeof valA === 'number' && typeof valB === 'number') {
+			return (valA - valB) * mult;
+		}
+
+		return String(valA).localeCompare(String(valB)) * mult;
+	});
+
+	return sorted;
+}
+
 function prepare_data(results) {
 	const is_raster = STATE.variant === 'raster';
 	const analysis_name = EAE['indexes'][STATE.index]['name'];
@@ -232,10 +264,37 @@ export function view_all(results) {
 	let observer = null;
 	const selected_indices = new Set();
 
+	const sort = {
+		"column":  headers[0],
+		"desc":    true,
+		"results": results,
+	};
+
+	function get_icon_class(header) {
+		if (sort.column !== header) return "bi bi-chevron-expand";
+		return sort.desc ? "bi bi-caret-down-fill" : "bi bi-caret-up-fill";
+	}
+
+	function handle_sort(header) {
+		const is_priority = header === headers[0] || header === analysis_name;
+
+		if (sort.column === header) {
+			sort.desc = !sort.desc;
+		} else {
+			sort.column = header;
+			sort.desc = is_priority;
+		}
+
+		refresh_table();
+	}
+
 	const content = tmpl('#high-priority-areas-list-all-template');
 	bind(content, {
 		"analysis-name": analysis_name,
-		"headers":       headers.map(name => ({ name })),
+		"headers":       headers.map(name => ({
+			name,
+			"on_sort": () => handle_sort(name),
+		})),
 	});
 
 	const footer = tmpl('#high-priority-areas-list-all-footer-template');
@@ -273,15 +332,36 @@ export function view_all(results) {
 		update_selection_overlay();
 	}
 
+	function update_sort_icons() {
+		document.querySelectorAll('.high-priority-areas-list-all-table th:not(.checkbox-column)').forEach((th, i) => {
+			const icon = th.querySelector('.sort-icon i');
+			if (icon) icon.className = get_icon_class(headers[i]);
+		});
+	}
+
+	function refresh_table() {
+		sort.results = sort_results(results, sort.column, sort.desc, is_raster, analysis_name);
+		tbody.innerHTML = '';
+		loaded_count = 0;
+		selected_indices.clear();
+		update_selection_overlay();
+		update_sort_icons();
+		load_batch();
+
+		if (observer && loaded_count < sort.results.length) {
+			observer.observe(scroll_trigger);
+		}
+	}
+
 	select_all_checkbox.addEventListener('change', uncheck_all);
 
 	download_selected_button.addEventListener('click', (event) => {
-		const selected_results = Array.from(selected_indices).sort((a, b) => a - b).map(i => results[i]);
-		download(selected_results, event);
+		const selected = Array.from(selected_indices).sort((a, b) => a - b).map(i => sort.results[i]);
+		download(selected, event);
 	});
 
 	function load_batch() {
-		for (const row_data of generate_rows(results, is_raster, analysis_name, loaded_count, BATCH_SIZE)) {
+		for (const row_data of generate_rows(sort.results, is_raster, analysis_name, loaded_count, BATCH_SIZE)) {
 			const row_index = loaded_count;
 			const row = tmpl('#high-priority-areas-row-template');
 			bind(row, {
@@ -299,13 +379,14 @@ export function view_all(results) {
 			loaded_count++;
 		}
 
-		if (loaded_count < results.length) {
+		if (loaded_count < sort.results.length) {
 			tbody.append(scroll_trigger);
 		} else if (observer) {
 			observer.disconnect();
 		}
 	}
 
+	update_sort_icons();
 	load_batch();
 
 	const m = new modal({
@@ -319,7 +400,7 @@ export function view_all(results) {
 	m.show(() => {
 		observer = new IntersectionObserver((entries) => {
 			entries.forEach(entry => {
-				if (entry.isIntersecting && loaded_count < results.length) {
+				if (entry.isIntersecting && loaded_count < sort.results.length) {
 					scroll_trigger.remove();
 					load_batch();
 				}
@@ -330,7 +411,7 @@ export function view_all(results) {
 			"threshold":  0,
 		});
 
-		if (loaded_count < results.length) {
+		if (loaded_count < sort.results.length) {
 			observer.observe(scroll_trigger);
 		}
 	});

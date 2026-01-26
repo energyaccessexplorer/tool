@@ -144,10 +144,20 @@ dialog main {
 dialog header {
   padding: 1em;
   padding-left: 1.3em;
-  font-size: 1.2em;
   background-color: var(--the-green);
   color: var(--the-white);
   position: relative;
+}
+
+dialog header .modal-title {
+  font-size: 24px;
+  line-height: 32px;
+}
+
+dialog header .modal-subtitle {
+  font-size: 16px;
+  line-height: 24px;
+  color: #F2FDF9;
 }
 
 dialog .close {

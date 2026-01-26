@@ -259,59 +259,75 @@ export function view_all(results) {
 
 	const { headers, is_raster, area_type, analysis_name } = data;
 
-	const BATCH_SIZE = 50;
-	let loaded_count = 0;
-	let observer = null;
 	const selected_indices = new Set();
 
-	const sort = {
-		"column":  headers[0],
-		"desc":    true,
-		"results": results,
+	const state = {
+		"sort_column": headers[0],
+		"sort_desc":   true,
+		"results":     results,
+		"page":        1,
+		"per_page":    10,
 	};
 
+	function total_pages() {
+		return Math.ceil(state.results.length / state.per_page);
+	}
+
 	function get_icon_class(header) {
-		if (sort.column !== header) return "bi bi-chevron-expand";
-		return sort.desc ? "bi bi-caret-down-fill" : "bi bi-caret-up-fill";
+		if (state.sort_column !== header) return "bi bi-chevron-expand";
+		return state.sort_desc ? "bi bi-caret-down-fill" : "bi bi-caret-up-fill";
 	}
 
 	function handle_sort(header) {
 		const is_priority = header === headers[0] || header === analysis_name;
 
-		if (sort.column === header) {
-			sort.desc = !sort.desc;
+		if (state.sort_column === header) {
+			state.sort_desc = !state.sort_desc;
 		} else {
-			sort.column = header;
-			sort.desc = is_priority;
+			state.sort_column = header;
+			state.sort_desc = is_priority;
 		}
 
-		refresh_table();
+		state.results = sort_results(results, state.sort_column, state.sort_desc, is_raster, analysis_name);
+		state.page = 1;
+		render_page();
+		update_sort_icons();
 	}
 
 	const content = tmpl('#high-priority-areas-list-all-template');
+
+	const tbody = qs('tbody', content);
+	const selection_overlay = qs('.selection-overlay', content);
+	const selection_count = qs('.selection-count', content);
+	const select_all_checkbox = qs('.select-all-checkbox', content);
+	const page_numbers_container = qs('.page-numbers', content);
+
 	bind(content, {
 		"analysis-name": analysis_name,
 		"headers":       headers.map(name => ({
 			name,
 			"on_sort": () => handle_sort(name),
 		})),
+		"on_prev":           () => go_to_page(state.page - 1),
+		"on_next":           () => go_to_page(state.page + 1),
+		"download_selected": (_, event) => {
+			const selected = Array.from(selected_indices).sort((a, b) => a - b).map(i => state.results[i]);
+			download(selected, event);
+		},
+		"on_uncheck_all":     () => uncheck_all(),
+		"on_per_page_change": function() {
+			state.per_page = parseInt(this.value, 10);
+			state.page = 1;
+			selected_indices.clear();
+			update_selection_overlay();
+			render_page();
+		},
 	});
 
 	const footer = tmpl('#high-priority-areas-list-all-footer-template');
 	bind(footer, {
 		"download": (_, event) => download(results, event),
 	});
-
-	const table_container = qs('.high-priority-areas-list-all-table-container', content);
-	const tbody = qs('tbody', content);
-	const selection_overlay = qs('.selection-overlay', content);
-	const selection_count = qs('.selection-count', content);
-	const select_all_checkbox = qs('.select-all-checkbox', content);
-	const download_selected_button = qs('.download-selected-button', content);
-
-	const scroll_trigger = document.createElement('tr');
-	scroll_trigger.className = 'scroll_trigger-row';
-	scroll_trigger.innerHTML = `<td colspan="${headers.length + 1}"></td>`;
 
 	function update_selection_overlay() {
 		const count = selected_indices.size;
@@ -339,31 +355,88 @@ export function view_all(results) {
 		});
 	}
 
-	function refresh_table() {
-		sort.results = sort_results(results, sort.column, sort.desc, is_raster, analysis_name);
-		tbody.innerHTML = '';
-		loaded_count = 0;
-		selected_indices.clear();
-		update_selection_overlay();
-		update_sort_icons();
-		load_batch();
+	function get_page_numbers() {
+		const total = total_pages();
+		const current = state.page;
+		const delta = 1;
+		const pages = [];
+		const middle = Math.ceil(total / 2);
 
-		if (observer && loaded_count < sort.results.length) {
-			observer.observe(scroll_trigger);
+		if (total <= 7) {
+			for (let i = 1; i <= total; i++) pages.push(i);
+			return pages;
+		}
+
+		pages.push(1);
+
+		const range_start = Math.max(2, current - delta);
+		const range_end = Math.min(total - 1, current + delta);
+		const near_start = current <= delta + 2;
+		const near_end = current >= total - delta - 1;
+
+		if (near_start) {
+			for (let i = 2; i <= delta + 2; i++) pages.push(i);
+			pages.push('...');
+			pages.push(middle);
+			pages.push('...');
+		} else if (near_end) {
+			pages.push('...');
+			pages.push(middle);
+			pages.push('...');
+			for (let i = total - delta - 1; i <= total - 1; i++) pages.push(i);
+		} else {
+			if (range_start > 2) {
+				pages.push('...');
+			} else if (range_start === 2) {
+				pages.push(2);
+			}
+
+			for (let i = range_start; i <= range_end; i++) {
+				if (i > 1 && i < total && !pages.includes(i)) {
+					pages.push(i);
+				}
+			}
+
+			if (range_end < total - 1) {
+				pages.push('...');
+			} else if (range_end === total - 1 && !pages.includes(total - 1)) {
+				pages.push(total - 1);
+			}
+		}
+
+		pages.push(total);
+
+		return pages;
+	}
+
+	function render_pagination() {
+		const pages = get_page_numbers();
+
+		page_numbers_container.innerHTML = '';
+		for (const p of pages) {
+			if (p === '...') {
+				page_numbers_container.append(tmpl('#page-ellipsis-template'));
+			} else {
+				const item = tmpl('#page-number-template');
+				bind(item, {
+					"value":    p,
+					"on_click": () => go_to_page(p),
+				});
+				if (p === state.page) item.firstElementChild.classList.add('active');
+				page_numbers_container.append(item);
+			}
 		}
 	}
 
-	select_all_checkbox.addEventListener('change', uncheck_all);
+	function render_page() {
+		tbody.innerHTML = '';
+		const start = (state.page - 1) * state.per_page;
 
-	download_selected_button.addEventListener('click', (event) => {
-		const selected = Array.from(selected_indices).sort((a, b) => a - b).map(i => sort.results[i]);
-		download(selected, event);
-	});
-
-	function load_batch() {
-		for (const row_data of generate_rows(sort.results, is_raster, analysis_name, loaded_count, BATCH_SIZE)) {
-			const row_index = loaded_count;
+		for (const row_data of generate_rows(state.results, is_raster, analysis_name, start, state.per_page)) {
+			const row_index = start + tbody.children.length;
 			const row = tmpl('#high-priority-areas-row-template');
+			const is_selected = selected_indices.has(row_index);
+
 			bind(row, {
 				"cells":     headers.map(header => ({ "value": row_data[header] || '' })),
 				"on_select": function() {
@@ -375,44 +448,40 @@ export function view_all(results) {
 					update_selection_overlay();
 				},
 			});
+
+			if (is_selected) {
+				row.querySelector('input[type="checkbox"]').checked = true;
+			}
+
 			tbody.append(row);
-			loaded_count++;
 		}
 
-		if (loaded_count < sort.results.length) {
-			tbody.append(scroll_trigger);
-		} else if (observer) {
-			observer.disconnect();
-		}
+		render_pagination();
+	}
+
+	function go_to_page(page) {
+		const total = total_pages();
+		if (page < 1 || page > total) return;
+		state.page = page;
+		render_page();
 	}
 
 	update_sort_icons();
-	load_batch();
+	render_page();
+
+	const header = tmpl('#modal-header-template');
+	bind(header, {
+		"title":    `High priority areas (${area_type})`,
+		"subtitle": analysis_name,
+	});
 
 	const m = new modal({
 		"id":      'high-priority-areas-list-all',
-		"header":  `High priority areas (${area_type})`,
+		"header":  header,
 		"content": content,
 		"footer":  footer,
 		"destroy": true,
 	});
 
-	m.show(() => {
-		observer = new IntersectionObserver((entries) => {
-			entries.forEach(entry => {
-				if (entry.isIntersecting && loaded_count < sort.results.length) {
-					scroll_trigger.remove();
-					load_batch();
-				}
-			});
-		}, {
-			"root":       table_container,
-			"rootMargin": '100px',
-			"threshold":  0,
-		});
-
-		if (loaded_count < sort.results.length) {
-			observer.observe(scroll_trigger);
-		}
-	});
+	m.show();
 }

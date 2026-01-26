@@ -361,6 +361,12 @@
   color: #1A1919;
 }
 
+.page-numbers {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
 .footer-action-button {
   flex: 1;
 }
@@ -586,21 +592,33 @@ dialog .saved-analysis-last-viewed {
 }
 
 /* High Priority Areas List All Modal */
-#high-priority-areas-list-all main {
-  width: 976px;
-  max-width: 90vw;
+@media (min-width: 768px) {
+  #high-priority-areas-list-all main {
+    display: flex;
+    flex-direction: column;
+    width: 70vw !important;
+    height: 80vh;
+  }
+
+  #high-priority-areas-list-all content {
+    flex: 1;
+    overflow: hidden;
+  }
 }
 
 #high-priority-areas-list-all content {
   padding: 16px !important;
-  width: auto !important;
   background: #F9F9F9;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .high-priority-areas-list-all-content {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  height: 100%;
+  width: 100%;
 }
 
 .high-priority-areas-list-all-subtitle {
@@ -611,8 +629,7 @@ dialog .saved-analysis-last-viewed {
 }
 
 .high-priority-areas-list-all-table-container {
-  width: 740px;
-  max-height: 50vh;
+  flex: 1;
   overflow: auto;
   background: #FFFFFF;
   border: 2px solid #E7E6E6;
@@ -620,6 +637,7 @@ dialog .saved-analysis-last-viewed {
 }
 
 .high-priority-areas-list-all-table {
+  width: 100%;
   border-collapse: collapse;
 }
 

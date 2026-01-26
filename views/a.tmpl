@@ -955,7 +955,7 @@
           <thead>
             <tr>
               <th class="checkbox-column">
-                <input type="checkbox" class="select-all-checkbox hidden">
+                <input type="checkbox" class="select-all-checkbox hidden" bind-listen="change" bind-func="on_uncheck_all">
               </th>
               <th bind-each="headers" bind-listen="click" bind-func="on_sort">
                 <div class="th-content">
@@ -969,8 +969,28 @@
         </table>
         <div class="selection-overlay hidden">
           <span class="selection-count"></span>
-          <button class="button-icon button-icon-mid download-selected-button">
+          <button class="button-icon button-icon-mid" bind-listen="click" bind-func="download_selected">
             <span>Download selected rows</span>
+          </button>
+        </div>
+      </div>
+      <div class="pagination-container">
+        <div class="per-page-control">
+          <select class="per-page-select" bind-listen="change" bind-func="on_per_page_change">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+          <span class="per-page-label">Per page</span>
+        </div>
+        <div class="pagination">
+          <button class="pagination-btn chevron" bind-listen="click" bind-func="on_prev">
+            <i class="bi bi-chevron-left"></i>
+          </button>
+          <div class="page-numbers"></div>
+          <button class="pagination-btn chevron" bind-listen="click" bind-func="on_next">
+            <i class="bi bi-chevron-right"></i>
           </button>
         </div>
       </div>
@@ -997,6 +1017,21 @@
       </td>
       <td bind-each="cells" bind="value"></td>
     </tr>
+  </template>
+
+  <template id="page-number-template">
+    <button class="pagination-btn page-number" bind-listen="click" bind-func="on_click" bind="value"></button>
+  </template>
+
+  <template id="page-ellipsis-template">
+    <span class="page-ellipsis">...</span>
+  </template>
+
+  <template id="modal-header-template">
+    <div>
+      <div class="modal-title" bind="title"></div>
+      <div class="modal-subtitle" bind="subtitle"></div>
+    </div>
   </template>
 
   {{template "env" .}}

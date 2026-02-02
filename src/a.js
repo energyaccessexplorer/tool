@@ -457,6 +457,8 @@ async function reload(k,v) {
 		return;
 	}
 
+	drop_map_info();
+
 	if (k === "datasets") {
 		controls_recount();
 	}
@@ -616,8 +618,6 @@ async function reload(k,v) {
 			else if (d.type.match(/(lines|points|polygons)-timeline/))
 				parse_vectors_csv.call(d);
 		});
-
-		drop_map_info();
 	}
 
 	priority_visibility_pick();

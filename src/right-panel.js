@@ -281,8 +281,14 @@ function generate_share_csv_content() {
 		}
 	}
 
+	const indexCount = Object.keys(SUMMARY).length;
+	const areaShareCells = ['Area share', ...Array(indexCount - 1).fill('')];
+	const populationShareCells = ['Population share', ...Array(indexCount - 1).fill('')];
+	const categoryRow = ['', ...areaShareCells, ...populationShareCells];
+
 	const headers = ['Level', ...columns];
 	const rows = [
+		categoryRow.join(','),
 		headers.join(','),
 		...levels.map((level, i) => [level, ...data.map(col => col[i])].join(',')),
 	];

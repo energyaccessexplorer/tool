@@ -377,10 +377,35 @@ export function elem_collapse(el, t, open) {
 	}
 };
 
-export function loading(msg, _perc) {
+export function loading(msg, opts) {
 	const el = qs('#app-loading');
 	el.style['display'] = msg ? 'block' : 'none';
 	qs('#loading-message', el).innerText = (typeof msg === 'string') ? msg : "Loading...";
+
+	const progress_el = qs('#loading-progress', el);
+	const cancel_el = qs('#loading-cancel', el);
+
+	if (!msg || !opts) {
+		progress_el.style.display = 'none';
+		cancel_el.style.display = 'none';
+		cancel_el.onclick = null;
+		return;
+	}
+
+	if (typeof opts.progress === 'number') {
+		progress_el.style.display = '';
+		progress_el.innerText = `${Math.round(opts.progress)}%`;
+	} else {
+		progress_el.style.display = 'none';
+	}
+
+	if (typeof opts.cancel === 'function') {
+		cancel_el.style.display = '';
+		cancel_el.onclick = opts.cancel;
+	} else {
+		cancel_el.style.display = 'none';
+		cancel_el.onclick = null;
+	}
 };
 
 export function super_error(t, m, e = "error") {

@@ -311,3 +311,8 @@ toast-notification .toast-footer div {
   display: flex;
   align-items: center;
 }
+
+.loading p button {
+    margin: auto;
+}
+

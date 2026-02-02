@@ -312,8 +312,8 @@ export function update() {
 	trigger();
 };
 
-export function download_locations_data(_, event) {
-	high_priority_areas_download(paginationState.allResults, event);
+export function download_locations_data() {
+	high_priority_areas_download(paginationState.allResults);
 }
 
 export function view_all_locations() {

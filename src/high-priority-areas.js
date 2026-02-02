@@ -1,6 +1,7 @@
 import {
 	coordinates_to_raster_pixel,
 	export_filename,
+	loading,
 } from './utils.js';
 
 import {
@@ -265,13 +266,16 @@ function* generate_rows(results, is_raster, analysis_name, start = 0, count = re
 	}
 }
 
-export async function download(results, event) {
+export async function download(results) {
 	const data = prepare_data(results);
 	const { headers, is_raster, analysis_name } = data;
-	const button = event.currentTarget;
 
-	button.disabled = true;
-	button.querySelector('span').textContent = 'Generating...';
+	let cancelled = false;
+
+	loading("Generating...", {
+		"progress": 0,
+		"cancel":   () => { cancelled = true; },
+	});
 
 	const warn_before_unload = (e) => {
 		e.preventDefault();
@@ -288,21 +292,30 @@ export async function download(results, event) {
 		return str;
 	};
 
+	const total = results.length;
 	const rows = [];
 	let i = 0;
 	for (const row_data of generate_rows(results, is_raster, analysis_name)) {
+		if (cancelled) break;
+
 		rows.push(headers.map(h => escape_csv(row_data[h])).join(','));
-		if (++i % 100 === 0) await new Promise(resolve => setTimeout(resolve, 0));
+		if (++i % 100 === 0) {
+			loading("Generating...", {
+				"progress": (i / total) * 100,
+				"cancel":   () => { cancelled = true; },
+			});
+			await new Promise(resolve => setTimeout(resolve, 0));
+		}
 	}
 
-	const csv_content = [headers.join(','), ...rows].join('\n');
-	const filename = export_filename(`${analysis_name.toLowerCase().replace(/\s+/g, '-')}-high-priority-areas`, 'csv');
-
-	fake_blob_download(csv_content, filename, 'text/csv;charset=utf-8');
-
 	window.removeEventListener('beforeunload', warn_before_unload);
-	button.disabled = false;
-	button.querySelector('span').textContent = 'Download data';
+	loading(false);
+
+	if (!cancelled) {
+		const csv_content = [headers.join(','), ...rows].join('\n');
+		const filename = export_filename(`${analysis_name.toLowerCase().replace(/\s+/g, '-')}-high-priority-areas`, 'csv');
+		fake_blob_download(csv_content, filename, 'text/csv;charset=utf-8');
+	}
 }
 
 export async function generate_csv_content(results) {
@@ -385,9 +398,9 @@ export function view_all(results) {
 		})),
 		"on_prev":           () => go_to_page(state.page - 1),
 		"on_next":           () => go_to_page(state.page + 1),
-		"download_selected": (_, event) => {
+		"download_selected": () => {
 			const selected = Array.from(selected_indices).sort((a, b) => a - b).map(i => state.results[i]);
-			download(selected, event);
+			download(selected);
 		},
 		"on_uncheck_all":     () => uncheck_all(),
 		"on_per_page_change": function() {
@@ -401,7 +414,7 @@ export function view_all(results) {
 
 	const footer = tmpl('#high-priority-areas-list-all-footer-template');
 	bind(footer, {
-		"download": (_, event) => download(results, event),
+		"download": () => download(results),
 	});
 
 	function update_selection_overlay() {

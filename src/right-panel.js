@@ -302,12 +302,20 @@ function download_share_csv() {
 	fake_blob_download(blob, export_filename('population-area-share', 'csv'));
 }
 
-async function export_all(button) {
-	button.disabled = true;
-	button.querySelector('span').textContent = 'Generating...';
+async function export_all() {
+	let cancelled = false;
 
+	const update = (progress) => loading("Generating...", {
+		"progress": progress,
+		"cancel":   () => { cancelled = true; },
+	});
+
+	update(0);
 	await delay(0.1);
 	await generate_summary_data();
+
+	if (cancelled) { loading(false); return; }
+	update(20);
 
 	const zip = new JSZip();
 	const type = STATE.index;
@@ -320,16 +328,26 @@ async function export_all(button) {
 		Promise.resolve(generate_share_csv_content()),
 	]);
 
+	if (cancelled) { loading(false); return; }
+	update(70);
+
 	zip.file(export_filename('summary', 'pptx', { "timestamp": false }), pptx_blob);
 	zip.file(export_filename(`${index_name}-map`, 'tif', { "timestamp": false }), tiff_blob);
 	zip.file(export_filename(`${index_name}-high-priority-areas`, 'csv', { "timestamp": false }), high_priority_csv);
 	zip.file(export_filename('population-area-share', 'csv', { "timestamp": false }), share_csv);
 
-	const zip_blob = await zip.generateAsync({ "type": 'blob' });
-	fake_blob_download(zip_blob, export_filename('export', 'zip'));
+	const zip_blob = await zip.generateAsync({
+		"type": 'blob',
+	}, (metadata) => {
+		if (cancelled) return;
+		update(70 + (metadata.percent * 0.3));
+	});
 
-	button.disabled = false;
-	button.querySelector('span').textContent = 'Download all';
+	loading(false);
+
+	if (!cancelled) {
+		fake_blob_download(zip_blob, export_filename('export', 'zip'));
+	}
 }
 
 function show_export_modal() {
@@ -337,31 +355,33 @@ function show_export_modal() {
 
 	bind(content, {
 		"export_ppt": async function() {
-			this.disabled = true;
-			this.querySelector('span').textContent = 'Generating...';
+			loading("Generating...");
 
 			await delay(0.1);
 			await generate_summary_data();
 			await report_pptx_download();
 
-			this.disabled = false;
-			this.querySelector('span').textContent = 'Download .ppt';
+			loading(false);
 		},
 		"export_tiff": async () => {
+			loading("Generating...");
 			const type = STATE.index;
 			const index_name = EAE['indexes'][type]['name'].toLowerCase().replace(/\s+/g, '-');
 			fake_blob_download((await analysis(type)).tiff, export_filename(`${index_name}-map`, 'tif'));
+			loading(false);
 		},
-		"export_csv":       (e) => download_locations_data(null, e),
+		"export_csv":       () => download_locations_data(),
 		"export_share_csv": async () => {
+			loading("Generating...");
 			await generate_summary_data();
 			download_share_csv();
+			loading(false);
 		},
 	});
 
 	const footer = tmpl('#export-options-modal-footer');
 	bind(footer, {
-		"export_all": function() { export_all(this); },
+		"export_all": () => export_all(),
 	});
 
 	const header = ce('span', 'Export options', { "class": 'modal-title' });

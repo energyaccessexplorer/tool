@@ -122,16 +122,20 @@ export function area_info(fields, props, ll, analysis_value, analysis_name, feat
 	}
 
 	const feature_entry = fields.find(d => d && d[0] && d[0].startsWith('_') && !d[0].includes('analysis'));
-	const divisions = fields
-		.filter(d => d && d[0] && d[0].startsWith('_') && !d[0].includes('analysis'))
-		.filter(d => d !== feature_entry)
-		.map(d => props[d[0]])
-		.filter(v => v);
+	const allDivisionFields = fields.filter(d => d && d[0] && d[0].startsWith('_') && !d[0].includes('analysis'));
+	const divisionFieldsForBasic = allDivisionFields.filter(d => d !== feature_entry);
 
-	if (divisions.length) {
-		const locationData = { "label": "Location", "value": divisions.join(', ') };
-		basicData.push(locationData);
-		detailedData.push(locationData);
+	const divisionValues = divisionFieldsForBasic.map(d => props[d[0]]).filter(v => v);
+
+	if (divisionValues.length) {
+		basicData.push({ "label": "Location", "value": divisionValues.join(', ') });
+	}
+
+	for (const field of allDivisionFields) {
+		const value = props[field[0]];
+		if (value) {
+			detailedData.push({ "label": field[1], "value": value });
+		}
 	}
 
 	for (const field of fields) {

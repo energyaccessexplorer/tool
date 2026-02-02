@@ -116,15 +116,32 @@ export function context(rc, f) {
 		.forEach(d => rows(d));
 
 	(function tier_rows() {
-		const g = GEOGRAPHY.divisions.slice(0);
+		const g = GEOGRAPHY.divisions.slice(1);
+		const adminTiers = maybe(DST.get('admin-tiers'), 'csv', 'data');
 
-		const a = g
-			.filter(d => maybe(d, 'raster', 'data'))
-			.filter(d => maybe(d, 'csv', 'table', d.raster.data[x]))
-			.map(d => {
-				props["_" + d.name] = d.csv.table[d.raster.data[x]];
+		// Find a known tier value to lookup the admin-tiers row
+		let tierRow = null;
+		for (const [i, d] of g.entries()) {
+			const tierIndex = i + 1;
+			const rasterId = maybe(d, 'raster', 'data', x);
+			if (rasterId !== undefined && adminTiers) {
+				tierRow = adminTiers.find(row => row[`TIER${tierIndex}`] === rasterId);
+				if (tierRow) break;
+			}
+		}
+
+		const a = g.map((d, i) => {
+			const tierIndex = i + 1;
+			const rasterId = maybe(d, 'raster', 'data', x);
+			const tierId = rasterId ?? maybe(tierRow, `TIER${tierIndex}`);
+			const name = maybe(d, 'csv', 'table', tierId);
+
+			if (name) {
+				props["_" + d.name] = name;
 				return ["_" + d.name, d.name];
-			});
+			}
+			return null;
+		}).filter(Boolean);
 
 		if (dict.length) a.unshift(null);
 

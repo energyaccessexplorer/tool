@@ -309,25 +309,11 @@ export function drop_map_info() {
 }
 
 export function pointer({x = 0, y = 0, lngLat = null}, data) {
-	let p = qs('#map-pointer');
-
-	if (p) p.remove();
-
-	p = ce('div', null, {
-		"id":    "map-pointer",
-		"style": `
-position: absolute;
-left: ${x - 8}px;
-top: ${y - 8}px;`,
-	});
-
 	for (const e of qsa('bubble-message'))
 		e.remove();
 
 	for (const e of qsa('map-info'))
 		e.remove();
-
-	document.body.append(p);
 
 	let cls = false;
 	let pos = "W";
@@ -338,13 +324,12 @@ top: ${y - 8}px;`,
 	}
 
 	function drop() {
-		if (p._preventDrop) return;
+		if (mark._preventDrop) return;
 		if (onMove) MAPBOX.off('move', onMove);
-		p.remove();
 		mark.remove();
 	};
 
-	const mark = new mapinfo({ "position": pos, "data": data, "close": cls, "onClose": drop }, (MOBILE ? document.body : p));
+	const mark = new mapinfo({ "position": pos, "data": data, "close": cls, "onClose": drop, "point": { x, y } });
 
 	function updatePosition() {
 		if (!lngLat) return;
@@ -355,10 +340,7 @@ top: ${y - 8}px;`,
 		const newX = mapContainer.left + point.x;
 		const newY = mapContainer.top + point.y;
 
-		p.style.left = (newX - 8) + "px";
-		p.style.top = (newY - 8) + "px";
-
-		mark.align();
+		mark.updatePoint(newX, newY);
 	}
 
 	let onMove;
@@ -508,8 +490,8 @@ function ensure_map_info_visible() {
 			if (mapInfoBox.bottom > visibleBottom) {
 				offsetY = mapInfoBox.bottom - visibleBottom;
 			} else if (mapInfoBox.top < visibleTop) {
-				const ptr = qs('#map-pointer');
-				const pointerBox = ptr ? ptr.getBoundingClientRect() : null;
+				const map_info_dot = qs('map-info .dot');
+				const pointerBox = map_info_dot ? map_info_dot.getBoundingClientRect() : null;
 				if (pointerBox) {
 					offsetY = mapInfoBox.top - pointerBox.top;
 				} else {
@@ -527,12 +509,12 @@ function ensure_map_info_visible() {
 
 			const targetCenter = MAPBOX.unproject(targetPoint);
 
-			const p = qs('#map-pointer');
-			if (p) {
-				p._preventDrop = true;
+			const map_info = qs('map-info');
+			if (map_info) {
+				map_info._preventDrop = true;
 
 				MAPBOX.once('moveend', () => {
-					if (p) p._preventDrop = false;
+					if (map_info) map_info._preventDrop = false;
 				});
 			}
 

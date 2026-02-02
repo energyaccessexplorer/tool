@@ -10,40 +10,46 @@ import {
 import bind from '../lib/bind.js';
 
 export default class mapinfo extends HTMLElement {
-	constructor(opts, el = document.body) {
-		if (!(el instanceof Node)) throw new DOMError("mapinfo", `'${el}' is not an Node`);
-
+	constructor(opts) {
 		super();
 
-		this.el = el;
 		this.opts = opts;
+		this.point = opts.point || { "x": 0, "y": 0 };
 
 		this.render();
 
 		return this;
 	}
 
-	align() {
-		const elbox = this.el.getBoundingClientRect();
+	updatePoint(x, y) {
+		this.point = { x, y };
+		this.align();
+	}
 
+	align() {
 		const lineWidth = 4;
 		const gap = 50;
-
-		// Position map-info to the right of the pointer
-		const x = elbox.x + elbox.width + gap;
-		const y = elbox.y - (this.clientHeight / 2) + (elbox.height / 2);
-
-		// Position arrow connecting pointer to map-info
-		this.arrow.style['width'] = gap + "px";
-		this.arrow.style['height'] = lineWidth + "px";
-		this.arrow.style['left'] = -gap + "px";
-		this.arrow.style['top'] = (this.clientHeight / 2 - lineWidth / 2) + "px";
+		const dotSize = 16;
 
 		const maparea = document.querySelector('#maparea');
 		const mapareaBox = maparea.getBoundingClientRect();
 
-		this.style.left = (x - mapareaBox.left) + "px";
-		this.style.top = (y - mapareaBox.top) + "px";
+		// Position map-info to the right of the point
+		const x = this.point.x + (dotSize / 2) + gap - mapareaBox.left;
+		const y = this.point.y - (this.clientHeight / 2) - mapareaBox.top;
+
+		this.style.left = x + "px";
+		this.style.top = y + "px";
+
+		// Position arrow connecting dot to map-info
+		this.arrow.style['width'] = gap + "px";
+		this.arrow.style['height'] = lineWidth + "px";
+		this.arrow.style['left'] = -(gap - 5) + "px";
+		this.arrow.style['top'] = (this.clientHeight / 2 - lineWidth / 2) + "px";
+
+		// Position dot at the point
+		this.dot.style['left'] = -(gap + dotSize / 2) + "px";
+		this.dot.style['top'] = (this.clientHeight / 2 - dotSize / 2) + "px";
 	}
 
 	render() {
@@ -57,6 +63,7 @@ export default class mapinfo extends HTMLElement {
 
 		this.append(content);
 
+		this.dot = qs('.dot', this);
 		this.arrow = qs('.arrow', this);
 		this.main = qs('main', this);
 

@@ -9,6 +9,7 @@ import {
 } from './complicated.js';
 
 import {
+	get_admin_area_item,
 	get_admin_area_layer_data,
 } from './high-priority-areas.js';
 
@@ -554,7 +555,7 @@ export function show_admin_area_info(item, position, centerPointer = false) {
 		fields,
 		props,
 		"ll":             null,
-		"analysis_value": item.v,
+		"analysis_value": item.priority,
 		"analysis_name":  analysis_name,
 		"feature_name":   item.name,
 		"area_info":      info,
@@ -564,6 +565,16 @@ export function show_admin_area_info(item, position, centerPointer = false) {
 	current_map_info_drop = drop;
 
 	if (centerPointer) ensure_map_info_visible();
+}
+
+function get_clicked_admin_area_item(e) {
+	if (STATE.variant === 'raster') return null;
+
+	const layerId = `priority-layer-${STATE.variant}`;
+	const features = MAPBOX.queryRenderedFeatures(e.point, { "layers": [layerId] });
+	if (features.length === 0) return null;
+
+	return get_admin_area_item(STATE.variant, features[0].id);
 }
 
 function click(e) {
@@ -578,5 +589,11 @@ function click(e) {
 		"lngLat": e.lngLat,
 	};
 
-	show_location_info(ll, position);
+	const item = get_clicked_admin_area_item(e);
+
+	if (item) {
+		show_admin_area_info(item, position, true);
+	} else {
+		show_location_info(ll, position);
+	}
 };

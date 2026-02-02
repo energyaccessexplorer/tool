@@ -38,8 +38,8 @@ const paginationState = {
 };
 
 function pointto(p, centerPointer = false) {
-	const dict = [[ "v", EAE['indexes'][STATE.index]['name'] ]];
-	const props = { "v": lowmedhigh_scale(p.v) };
+	const dict = [[ "priority", EAE['indexes'][STATE.index]['name'] ]];
+	const props = { "priority": lowmedhigh_scale(p.priority) };
 
 	search_pointto(p.c, dict, props, centerPointer);
 };
@@ -60,7 +60,7 @@ function show_info_on_hover(p) {
 
 function raster_item(p) {
 	const pi3 = (p.c).map(c => +c.toFixed(3));
-	const score = (p.v ? Math.round((p.v).toFixed(2) * 100) : "");
+	const score = (p.priority ? Math.round((p.priority).toFixed(2) * 100) : "");
 
 	const template = tmpl('#location-item-template');
 	const el = template.firstElementChild;
@@ -143,13 +143,13 @@ function get_division_results(variant) {
 			const name = nameTable[id] || `Area ${id}`;
 
 			return {
-				"id":      +id,
-				"v":       priorityData[id].average,
-				"name":    name,
-				"feature": feature,
+				"id":       +id,
+				"priority": priorityData[id].average,
+				"name":     name,
+				"feature":  feature,
 			};
 		})
-		.sort((a, b) => a.v > b.v ? -1 : 1);
+		.sort((a, b) => a.priority > b.priority ? -1 : 1);
 };
 
 function render_pagination() {
@@ -241,7 +241,7 @@ function render_page(page) {
 	if (isRaster) {
 		const scoreCounts = {};
 		paginationState.allResults.forEach(item => {
-			const score = item.v ? Math.round((item.v).toFixed(2) * 100) : "";
+			const score = item.priority ? Math.round((item.priority).toFixed(2) * 100) : "";
 			scoreCounts[score] = (scoreCounts[score] || 0) + 1;
 		});
 
@@ -249,7 +249,7 @@ function render_page(page) {
 		let currentGroupList = null;
 
 		pageResults.forEach(item => {
-			const score = item.v ? Math.round((item.v).toFixed(2) * 100) : "";
+			const score = item.priority ? Math.round((item.priority).toFixed(2) * 100) : "";
 			const groupCount = scoreCounts[score];
 
 			if (score !== currentScore) {
@@ -290,7 +290,7 @@ async function trigger() {
 	const isRaster = STATE.variant === 'raster';
 	const results = isRaster ? await getallpoints() : get_division_results(STATE.variant);
 
-	paginationState.allResults = results.sort((a,b) => a.v > b.v ? -1 : 1);
+	paginationState.allResults = results.sort((a, b) => a.priority > b.priority ? -1 : 1);
 	paginationState.currentPage = 1;
 
 	const count = paginationState.allResults.length;

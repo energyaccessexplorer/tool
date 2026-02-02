@@ -18,6 +18,26 @@ import {
 	tmpl,
 } from '../lib/helpers.js';
 
+export function get_admin_area_item(variant, featureId) {
+	const division = GEOGRAPHY.divisions[variant];
+	if (!division || !division.priorityData || !division.vectors) return null;
+
+	const features = division.vectors.data.features;
+	const priorityData = division.priorityData;
+	const nameTable = maybe(division, 'csv', 'table') || {};
+
+	const id = featureId;
+	const feature = features.find(f => f.id === +id);
+	if (!feature || !priorityData[id]) return null;
+
+	return {
+		"id":       +id,
+		"priority": priorityData[id].average,
+		"name":     nameTable[id] || `Area ${id}`,
+		"feature":  feature,
+	};
+}
+
 export function get_admin_area_layer_data(variant, area_id) {
 	const fields = [];
 	const props = {};
@@ -169,7 +189,7 @@ function get_row(item, is_raster, analysis_name) {
 	}
 
 	const { feature, feature_type, detailedData } = area_info(
-		fields, props, ll, item.v, analysis_name, null, info, raw,
+		fields, props, ll, item.priority, analysis_name, null, info, raw,
 	);
 
 	const row = {};
@@ -193,7 +213,7 @@ function get_row(item, is_raster, analysis_name) {
 }
 
 function get_sort_value(item, column, is_raster, analysis_name) {
-	if (column === "Priority score" || column === analysis_name) return item.v;
+	if (column === "Priority score" || column === analysis_name) return item.priority;
 	if (column === "Longitude" && item.c) return item.c[0];
 	if (column === "Latitude" && item.c) return item.c[1];
 

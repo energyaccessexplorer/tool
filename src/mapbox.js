@@ -412,7 +412,20 @@ export async function sort() {
 export function show_location_info(ll, position, centerPointer = true) {
 	const rc = coordinates_to_raster_pixel(ll, OUTLINE.raster);
 
-	const p = MAPBOX.queryRenderedFeatures(MAPBOX.project(ll));
+	const pt = MAPBOX.project(ll);
+	const p = MAPBOX.queryRenderedFeatures([[pt.x - 10, pt.y - 10], [pt.x + 10, pt.y + 10]]);
+
+	const dotFeature = p.find(feat => feat && maybe(feat, 'geometry', 'type') === 'Point');
+	if (dotFeature) {
+		const [lng, lat] = dotFeature.geometry.coordinates;
+		ll = [lng, lat];
+		const snapped = MAPBOX.project([lng, lat]);
+		const mapRect = MAPBOX.getContainer().getBoundingClientRect();
+		position.x = mapRect.left + snapped.x;
+		position.y = mapRect.top + snapped.y;
+		position.lngLat = { lng, lat };
+	}
+
 	const [fields, props, _] = context(rc, p);
 
 	const ac = coordinates_to_raster_pixel(ll, {

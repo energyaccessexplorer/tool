@@ -12,7 +12,7 @@ export function intersection(...rasters) {
 	for (let i = 0; i < length; i++) {
 		let skip = false;
 
-		for (let k of rasters) {
+		for (const k of rasters) {
 			if (k.data[i] === k.nodata) {
 				skip = true;
 				break;

@@ -2,19 +2,20 @@ buttons {
   display: flex;
 }
 
-buttons > * {
+buttons button {
   display: block;
   cursor: pointer;
 
   border-radius: 2px;
 
-  line-height: 1.8em;
-  width: 1.8em;
-
-  text-align: center;
+  background-color: white;
+  color: var(--the-color);
 }
 
-buttons *:hover {
-  box-shadow: inset 0px 0px 5px rgb(0 0 0 / 5%);
+buttons button:hover {
   background-color: rgba(0, 0, 0, 0.07);
+}
+
+buttons button i:not(:only-child) {
+  margin-right: 0.5em;
 }

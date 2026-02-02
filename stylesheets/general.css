@@ -1,5 +1,9 @@
-h1, h2, h3 {
+h1, h2, h3, h4 {
   color: var(--the-green);
+  border: none;
+  margin: unset;
+  padding-left: 0;
+  padding-bottom: 0.5em;
 }
 
 a {
@@ -13,6 +17,16 @@ a {
 button {
   font-family: without-serif, sans-serif !important;
   padding: 7px 12px;
+}
+
+button,
+select {
+  border-radius: 3px;
+}
+
+a i ~ span,
+button i ~ span  {
+  margin-left: 0.75em;
 }
 
 .big-green-button {
@@ -133,12 +147,6 @@ bubble-message .bubble-message-close-button::before {
   white-space: pre-line;
 }
 
-#output-preview {
-  background-color: white;
-  text-align: center;
-  border-top: solid 1px lightgray;
-}
-
 #share-link-modal p {
   max-width: 32em;
 }
@@ -154,6 +162,10 @@ bubble-message .bubble-message-close-button::before {
 
 #share-link-copy-button {
   padding: 0 12px;
+}
+
+canvas#output {
+  display: none;
 }
 
 @keyframes pulse {

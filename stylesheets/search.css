@@ -35,7 +35,7 @@
   overflow-y: scroll;
 }
 
-.search-results > details,
+#geographies .search-results > details,
 .search-results > ul {
   margin-top: 2em;
 }

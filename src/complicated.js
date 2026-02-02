@@ -17,6 +17,13 @@ import {
 	analysis,
 } from './analysis.js';
 
+import {
+	and,
+	maybe,
+	qs,
+	until,
+} from '../lib/helpers.js';
+
 export function context(rc, f) {
 	const dict = [];
 	const props = {};
@@ -158,8 +165,6 @@ export async function analysis_to_dataset(t) {
 	d.metadata.inputs = STATE.datasets.map(d => d.id);
 
 	await d.active(true, true);
-
-	STATE.view = 'data';
 
 	await until(_ => d.card);
 

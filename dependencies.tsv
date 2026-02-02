@@ -18,5 +18,5 @@ bootstrap-icons.css	https://cdn.jsdelivr.net/npm/bootstrap-icons@latest/font/boo
 fonts/bootstrap-icons.woff2	https://cdn.jsdelivr.net/npm/bootstrap-icons@latest/font/fonts/bootstrap-icons.woff2
 fonts/bootstrap-icons.woff	https://cdn.jsdelivr.net/npm/bootstrap-icons@latest/font/fonts/bootstrap-icons.woff
 jwt-decode.js	https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js
-jszip.js	https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@3.12.0/libs/jszip.min.js
-pptxgen.js	https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@3.12.0/dist/pptxgen.min.js
+jszip.js	https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@4.0.1/libs/jszip.min.js
+pptxgen.js	https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@4.0.1/dist/pptxgen.min.js

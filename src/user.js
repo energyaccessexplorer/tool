@@ -1,5 +1,9 @@
 import modal from '../lib/modal.js';
 
+import {
+	maybe,
+} from '../lib/helpers.js';
+
 export function register_login() {
 	const d = document.createElement('div');
 	const p1 = document.createElement('p');

@@ -13,6 +13,12 @@ import {
 	zoom,
 } from './search.js';
 
+import {
+	ce,
+	maybe,
+	qs,
+} from '../lib/helpers.js';
+
 let ul, resultscontainer, resultsinfo;
 
 function pointto(p, a = false) {

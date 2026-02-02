@@ -1,0 +1,189 @@
+ds-card {
+  background-color: white;
+  display: flex;
+  flex-flow: column;
+
+  color: var(--the-gray);
+  fill: var(--the-gray);
+
+  border-bottom: solid 1px #d9d9d9;
+  border-radius: 5px;
+  position: relative;
+
+  margin: 1em;
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.3));
+}
+
+ds-card header {
+  display: flex;
+  flex-flow: row nowrap;
+  user-select: none;
+}
+
+ds-card header .svg-symbol {
+  margin-right: 1em;
+}
+
+ds-card header .names {
+  flex-grow: 1;
+  display: flex;
+  flex-flow: column;
+  align-items: start;
+}
+
+ds-card header buttons button {
+  height: 2em;
+  width: 2em;
+  text-align: center;
+  padding: unset;
+  margin-left: 0.25em;
+}
+
+ds-card main {
+  display: flex;
+  justify-content: space-between;
+
+  padding: 0.5em;
+  color: var(--the-color);
+}
+
+ds-card content {
+  flex: 1;
+  display: block;
+  padding: 0.5em;
+}
+
+ds-card aside {
+  background-color: #f6f6f6;
+  border-top: 1px solid lightgray;
+}
+
+ds-card aside .group {
+  border-top: solid 1px lightgray;
+  padding: 1em;
+}
+
+ds-card aside .group:first-child {
+  border-top: none;
+}
+
+ds-card .explain {
+  color: dimgray;
+}
+
+ds-card .index {
+  font-size: 0.9em;
+  color: #999;
+  text-transform: capitalize;
+  margin: 0.5em 0;
+}
+
+ds-card .range .svg-interval {
+  margin-top: 0.1em;
+}
+
+ds-card [name=title] {
+  flex: 1;
+  margin-right: 5px;
+}
+
+ds-card [name=info] svg {
+  width: 18px;
+  margin-top: -2px;
+}
+
+ds-card [name=unit] {
+  display: inline-block;
+  font-weight: bold;
+  font-size: small;
+  color: gray;
+}
+
+ds-card handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #ccc;
+  font-size: 1.8em;
+
+  cursor: grab;
+  cursor: -webkit-grab;
+}
+
+ds-card .collection {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+ds-card .collection div,
+ds-card .collection svg {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+ds-card .collection svg {
+  transform: scale(0.7);
+  margin-right: 0.7em;
+}
+
+ds-card .legends-list {
+  width: 100%;
+  margin-top: 1em;
+  line-height: 1em;
+}
+
+ds-card .legends-list td:nth-child(1) {
+  width: 2.5em;
+}
+
+ds-card .legends-list td:nth-child(3) {
+  text-align: right;
+}
+
+ds-card .mutant-options select {
+  background-color: white;
+  border: 1px solid lightgray;
+  padding: 5px 7px;
+  margin: 1em 0;
+}
+
+ds-card aside buttons {
+  justify-content: left;
+}
+
+ds-card aside buttons button {
+  border: 1px solid lightgray;
+  padding: 7px 12px;
+  margin-right: 1em;
+}
+
+ds-card [bind="colorscale"] {
+  margin: 0.75em 0;
+}
+
+ds-card select,
+ds-card [bind="manual-max"] input,
+ds-card [bind="manual-min"] input {
+  background-color: white;
+  border: 1px solid lightgray;
+  border-radius: 2px;
+  padding: 5px 7px;
+}
+
+ds-card .visibility-group {
+  margin: 0em;
+}
+
+ds-card .checkbox-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 0.5em 0;
+  height: 26px;
+}
+
+ds-card .checkbox-row span:nth-child(2) {
+  margin-left: 1em;
+  flex-grow: 1;
+}

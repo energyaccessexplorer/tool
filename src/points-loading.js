@@ -22,6 +22,14 @@ import {
 	zoom,
 } from './search.js';
 
+import {
+	ce,
+	fake_blob_download,
+	maybe,
+	qs,
+	tmpl,
+} from '../lib/helpers.js';
+
 let ul, resultscontainer, resultsinfo;
 
 function pointto(p, a = false) {

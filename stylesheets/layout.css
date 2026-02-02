@@ -3,6 +3,8 @@ body {
 }
 
 #playground {
+  position: relative;
+
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
@@ -14,14 +16,14 @@ body {
   font-size: 0.9em;
 }
 
-#left-pane {
+#left-panel {
   display: flex;
   flex-grow: 0;
   flex-flow: column wrap;
   margin-top: -1px;
 }
 
-#left-pane[open] {
+#left-panel[open] {
   min-width: 40em;
 }
 
@@ -31,13 +33,6 @@ body {
   flex-shrink: 0;
   flex-flow: column nowrap;
   position: relative;
-}
-
-#views {
-  display: flex;
-  flex: 1 100%;
-  justify-content: space-around;
-  z-index: 1;
 }
 
 #maparea {
@@ -50,20 +45,23 @@ body {
   margin: auto;
 }
 
-#right-pane {
+#right-panel {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+
   display: flex;
   flex-flow: column nowrap;
   width: 24em;
   overflow-y: auto;
 }
 
-#right-pane .graphs {
+#right-panel .graphs {
   padding: 0 0.5em;
 }
 
 #filtered-pane,
-#indexes-pane {
-  flex-grow: 1;
+#index-graphs {
   border-top: 1px solid lightgray;
 }
 
@@ -103,24 +101,6 @@ body {
   padding: 5px 7px;
 }
 
-#drawer-right-pane {
-  border-top: 1px solid lightgray;
-  width: inherit;
-  box-sizing: border-box;
-  display: flex;
-  justify-content: space-around;
-  background-color: #F8F8F8;
-}
-
-#drawer-right-pane > div {
-  display: block;
-  width: 100%;
-  text-align: center;
-  border-right: 1px solid lightgray;
-  cursor: pointer;
-  padding: 1em;
-}
-
 [bind=help-message] {
   display: none;
 }
@@ -139,7 +119,7 @@ body {
   white-space: pre;
 }
 
-#drawer-right-pane > div:hover #disclaimer-message {
+#drawer-right-panel > div:hover #disclaimer-message {
   display: block;
 }
 
@@ -156,31 +136,13 @@ body {
   z-index: 0;
 }
 
-#output-preview {
-  box-sizing: border-box;
-}
-
-#output-preview .header {
-  line-height: 3em;
-}
-
-#canvas-output-select {
-  display: block;
-  padding: 0.7em 1em;
-  width: 20em;
-  margin: auto;
-  margin-bottom: 1em;
+.spacer {
+  flex-grow: 1;
 }
 
 canvas#output {
   max-height: 300px;
   max-width: 100%;
-}
-
-#canvas-output-select {
-  border: none;
-  font-size: 1em;
-  background-color: white;
 }
 
 #timeline-graphs {

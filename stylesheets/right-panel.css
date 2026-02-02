@@ -1,0 +1,103 @@
+#right-panel > span,
+#right-panel > div {
+  background-color: white;
+  color: var(--the-color);
+  fill: var(--the-color);
+  padding: 1em;
+}
+
+#right-panel[closed] > div {
+  display: none;
+}
+
+#index-graphs {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-around;
+}
+
+#index-graphs-title {
+  padding: 0.7em 1em;
+  text-align: center;
+  width: 100%;
+}
+
+.index-graphs-container {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-around;
+  text-align: center;
+  width: 100%;
+}
+
+.index-graphs-group {
+  width: 150px;
+}
+
+.index-graphs-group div {
+  margin: 1em auto;
+}
+
+.indexes-pie-label {
+  font-size: small;
+  color: #919191;
+}
+
+.index-graphs-scale {
+  margin: 1em 2em;
+}
+
+#index-graphs-description {
+  font-size: 0.8em;
+  font-style: italic;
+  text-align: center;
+  max-width: 40%;
+  min-height: 3em;
+}
+
+#big-buttons {
+  display: flex;
+  padding: 1em;
+  flex-flow: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  background-color: var(--the-white);
+}
+
+#big-buttons button {
+  white-space: nowrap;
+}
+
+#save-snapshot-button, #share-snapshot-button {
+  width: calc(50% - 2em);
+  display: inline-block;
+  background-color: var(--the-white);
+  color: var(--the-color) !important;
+  border: 2px solid #a5aeb5 !important;
+  font-size: 0.85em;
+  margin-top: 1em;
+  width: calc(50% - 0.5em);
+}
+
+#save-snapshot-button i, #share-snapshot-button i {
+  margin-right: 1em;
+}
+
+#drawer-right-panel {
+  border-top: 1px solid lightgray;
+  width: inherit;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-around;
+  background-color: #F8F8F8;
+  padding: 0 !important;
+}
+
+#drawer-right-panel > div {
+  display: block;
+  width: 100%;
+  text-align: center;
+  border-right: 1px solid lightgray;
+  cursor: pointer;
+  padding: 1em;
+}

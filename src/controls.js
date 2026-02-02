@@ -1,6 +1,5 @@
 import {
 	elem_collapse,
-	bi_icon,
 } from './utils.js';
 
 import DS from './ds.js';
@@ -12,6 +11,16 @@ import {
 import {
 	enough_datasets,
 } from './analysis.js';
+
+import bind from '../lib/bind.js';
+
+import {
+	ce,
+	maybe,
+	qs,
+	qsa,
+	tmpl,
+} from '../lib/helpers.js';
 
 const contents_el = qs('#controls-contents');
 
@@ -65,7 +74,7 @@ export default class dscontrols extends HTMLElement {
 	render() {
 		this.checkbox = toggle_switch.call(this.ds, this.on);
 
-		attach.call(this, tmpl('#ds-controls-template'));
+		this.append(tmpl('#controls-template'));
 
 		this.main = qs('main', this);
 		this.header = qs('header', this);
@@ -73,12 +82,12 @@ export default class dscontrols extends HTMLElement {
 
 		this.header.onclick = header_click.call(this);
 
-		slot_populate.call(this, Object.assign({}, this.ds, {
+		bind(this, Object.assign({}, this.ds, {
 			"checkbox":    this.checkbox.svg,
 			"description": this.ds.description || this.ds.category.description,
-			"card":        this.card(),
-			"info":        this.info(),
-		}));
+			"card":        (_, e) => { e.stopPropagation(); this.ds.card.discover(); },
+			"info":        (_, e) => { e.stopPropagation(); this.ds.info_modal(); },
+		}), { "final": false });
 
 		this.inject();
 
@@ -102,7 +111,7 @@ export default class dscontrols extends HTMLElement {
 		const ds = this.ds;
 		const path = maybe(ds.category, 'controls', 'path');
 
-		if (!path.length) return;
+		if (!maybe(path, 'length')) return;
 
 		function create_tab(name) {
 			const t = ce('div', humanformat(name), { "id": 'controls-tab-' + name, "class": 'controls-branch-tab up-title' });
@@ -162,26 +171,6 @@ export default class dscontrols extends HTMLElement {
 
 		if (this.checkbox) this.checkbox.svg.remove();
 	};
-
-	info() {
-		const e = bi_icon('info-circle');
-		e.onclick = v => {
-			v.stopPropagation();
-			this.ds.info_modal();
-		};
-
-		return e;
-	};
-
-	card() {
-		const e = bi_icon('list-task');
-		e.onclick = v => {
-			v.stopPropagation();
-			this.ds.card.discover();
-		};
-
-		return e;
-	}
 };
 
 customElements.define('ds-controls', dscontrols);
@@ -267,7 +256,6 @@ function header_click() {
 
 		if (e.target.closest('svg') === svg)
 			this.ds.turn();
-
 		else
 			svg.dispatchEvent(new Event('click', { "bubbles": true }));
 	};

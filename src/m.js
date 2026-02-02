@@ -8,6 +8,15 @@ import modal from '../lib/modal.js';
 
 import tabs from './tabs.js';
 
+import {
+	debounce,
+	fake_blob_download,
+	or,
+	qs,
+	unique,
+	tmpl,
+} from '../lib/helpers.js';
+
 const user_id = user_extract('id');
 
 function loading(bool) {
@@ -167,7 +176,7 @@ function drop(snapshots) {
 function base(e) {
 	if (location.hostname.match('localhost')) return "";
 
-	const subdomain = e === "production" ? "www" : e;
+	const subdomain = e === "public" ? "www" : e;
 
 	return `https://${subdomain}.energyaccessexplorer.org`;
 };

@@ -1,6 +1,7 @@
 import {
 	uniform_split,
 	colorscale,
+	colorscale_svg,
 	raster_pixel_to_coordinates,
 } from './utils.js';
 
@@ -11,7 +12,14 @@ import {
 import {
 	graphs as indexes_graphs,
 	updated_plot as indexes_updated_plot,
-} from './indexes.js';
+} from './right-panel.js';
+
+import {
+	and,
+	json_clone,
+	maybe,
+	until,
+} from '../lib/helpers.js';
 
 const filter_types = ["key-delta", "exclusion-buffer", "inclusion-buffer"];
 
@@ -21,6 +29,8 @@ export const analysis_colorscale = colorscale({
 	"stops":  uniform_split(5).map(x => d3.interpolateMagma(x)),
 	"domain": { "min": 0, "max": 1 },
 });
+
+export const analysis_colorscale_svg = colorscale_svg(analysis_colorscale.stops);
 
 export const lowmedhigh_scale = d3.scaleQuantize()
 	.domain([0,1])
@@ -58,7 +68,7 @@ export default async function run(type) {
 	// analysis.
 	//
 	const singles = {};
-	for (let i in EAE['indexes']) {
+	for (const i in EAE['indexes']) {
 		const compound = EAE['indexes'][i].compound;
 		if (compound.length < 2) singles[i] = 0;
 	}
@@ -70,7 +80,7 @@ export default async function run(type) {
 		return a;
 	}, singles);
 
-	for (let s in singles) if (singles[s] === 0) delete singles[s];
+	for (const s in singles) if (singles[s] === 0) delete singles[s];
 
 	const weights = {};
 	list.forEach(d => {
@@ -130,7 +140,7 @@ export default async function run(type) {
 		if (subdiv && divraster.data[i] !== sd) a = -1;
 
 		for (let j = 0; j < list.length; j += 1) {
-			let c = list[j];
+			const c = list[j];
 
 			// For the rest of the datasets, we 'annihilate' points that are already
 			// as -1 (or nodata) since we wouldn't know what value to assign for the

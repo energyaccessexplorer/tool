@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    <meta name="HandheldFriendly" content="true">
+    <meta name="MobileOptimized" content="640">
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <link rel="icon" href="{{template "base" .}}/images/EAE Logo_Emblem.svg">
+
+    <link rel="stylesheet" href="../lib/bootstrap-icons.css">
+
+    <script type="module" src="./browser.js"></script>
+
+    <script src="./libs.js?v=--TIMESTAMP--"></script>
+    <script src="./main.js?v=--TIMESTAMP--"></script>
+
+    <link href="{{template "base" .}}/stylesheets/style.css" rel="stylesheet" />
+    <link href="{{template "base" .}}/stylesheets/nav.css" rel="stylesheet" />
+
+    <link href="{{template "base" .}}/tool/lib/mapbox-gl.css" rel="stylesheet" />
+    <link href="./main.css" rel="stylesheet" />
+
+    {{template "head" .}}
+  </head>
+
+  <body>
+    {{template "nav" .}}
+
+    <div id="mobile-switcher"></div>
+
+    <div id="playground">
+      <div id="drawer">
+        <a for="cards" description="Active Layers"><i class="bi bi-list-task"></i></a>
+        <a for="controls" description="Add Layers"><i class="bi bi-plus-lg"></i></a>
+        <a for="geographies" description="Change Geographies"><i class="bi bi-globe"></i></a>
+        <a for="vectors" description="Search Features"><i class="bi bi-search"></i></a>
+        <a for="analysis" description="Top Locations"><i class="bi bi-bar-chart"></i></a>
+        <a for="locations" description="Search POI's"><i class="bi bi-geo"></i></a>
+        <a for="points" description="Points Loading"><i class="bi bi-crosshair"></i></a>
+      </div>
+
+      <div id="left-panel" style="display: none;">
+        <div id="cards" class="search-panel">
+          <div id="output-widget">
+            <h4>
+              Generate Analysis
+              <button id="eae-info-button">
+                <i class="bi-info-circle"></i>
+                <span>About</span>
+              </button>
+            </h4>
+
+            <div id="selects">
+              <div>
+                Analysis Area
+                <select id="output-variant-select"></select>
+              </div>
+
+              <div>
+                Prioritization Index
+                <select id="index-select"></select>
+              </div>
+            </div>
+
+            <div id="output-ramp">
+              <strong>Priority Legend</strong>
+            </div>
+
+            <div class="visibility-group">
+              <div id="output-visibility">
+                <label>
+                  <input id="output-on-map"
+                         type="checkbox" checked>
+                  &nbsp;
+                  Show analysis on map
+                </label>
+              </div>
+
+              <div id="output-opacity"
+                   class="opacity-group">
+                <span>Opacity</span>
+              </div>
+            </div>
+          </div>
+
+          <h4>Active Data Layers</h4>
+
+          <div id="cards-buttons">
+            <button bind-listen="click"
+                    bind-func="visible_all">
+              <i class="bi-eye-slash-fill"></i>
+              <span>Hide all layers</span>
+            </button>
+
+            <button bind-listen="click"
+                    bind-func="reset_all">
+              <i class="bi bi-arrow-repeat"></i>
+              <span>Reset all settings</span>
+            </button>
+
+            <button bind-listen="click"
+                    bind-func="expand_all">
+              <i class="bi bi-arrows-angle-expand"></i>
+              <span>Expand all settings</span>
+            </button>
+
+            <button bind-listen="click"
+                    bind-func="remove_all">
+              <span style="color: #c30000;">
+                <i class="bi-x-lg"></i>
+                <span>Remove all layers</span>
+              </span>
+            </button>
+          </div>
+
+          <div id="cards-list" class="search-results"></div>
+        </div>
+
+        <div id="controls" class="search-panel">
+          <div class="search-results">
+            <div id="controls-tabs"></div>
+            <div id="controls-contents"></div>
+          </div>
+        </div>
+
+        <div id="geographies" class="search-panel">
+          <div class="search-results"></div>
+
+          <div id="timeline-graphs">
+            <div class="header up-title"
+                 style="margin: auto;
+                        width: 100%;
+                        text-align: center;
+                        padding: 10px;">
+              <strong id="lines-header"></strong>
+            </div>
+
+            <div id="lines-graph" class="graphs"></div>
+          </div>
+        </div>
+
+        <div id="vectors" class="search-panel">
+          <div class="search-results"></div>
+        </div>
+
+        <div id="analysis" class="search-panel">
+          <div class="search-results"></div>
+        </div>
+
+        <div id="locations" class="search-panel">
+          <div class="search-results"></div>
+        </div>
+
+        <div id="points" class="search-panel">
+          <div id="ponits-buttons" class="panel-buttons">
+            <a id="points-download"
+               title="Download CSV file of the currents points selection">
+              <i class="bi-box-arrow-in-down"></i>
+            </a>
+
+            <a id="points-upload">
+              <label for="points-input"
+                     title="Load a CSV file with points to find within the analysis">
+                <i class="bi-box-arrow-in-up"></i>
+              </label>
+            </a>
+
+            <a id="points-pick"
+               title="Pick points on the map to add to the list">
+              <i class="bi-geo-alt"></i>
+            </a>
+
+            <a id="points-input"
+               title="Input coordinates manually">
+              <i class="bi-cursor-text"></i>
+            </a>
+          </div>
+
+          <div class="search-results"></div>
+        </div>
+      </div>
+
+      <div id="visual">
+        <div id="maparea">
+          <div id="mapbox-container"></div>
+          <!-- timeline will go here -->
+        </div>
+      </div>
+
+      <div id="right-panel">
+        <span id="right-panel-collapse">
+          <span class="bi-caret-up-fill"></span>
+          Analysis
+        </span>
+
+        <div id="big-buttons">
+          <button id="summary-button"
+                  class="big-green-button">Report</button>
+
+          <button id="save-snapshot-button"
+                  class="big-green-button">
+            <i class="bi bi-floppy2-fill"></i><span>Save Analysis</span>
+          </button>
+
+          <button id="share-snapshot-button"
+                  class="big-green-button">
+            <i class="bi bi-share-fill"></i><span>Share Analysis</span>
+          </button>
+        </div>
+
+        <div id="index-graphs">
+          <div id="index-graphs-title" class="up-title"></div>
+          <div id="index-graphs-subtext"></div>
+        </div>
+
+        <div id="filtered-pane" style="display: none;">
+          <div class="up-title">Considered geographies</div>
+          <div id="filtered-subgeographies"></div>
+        </div>
+
+        <div class="spacer"></div>
+
+        <div id="drawer-right-panel">
+          <div id="tiff-download"
+               title="Download TIFF image of the current analysis">
+            Export
+          </div>
+
+          <div>
+            Disclaimer
+            <div id="disclaimer-message">
+              <p>
+                The maps are for illustrative purposes and do not imply the
+                expression of any opinion on the part of WRI, concerning the
+                legal status of any country or territory or concerning the
+                delimitation of frontiers or boundaries.
+              </p>
+
+              <p>
+                If you use this platform, partially or entirely, you must follow
+                the <a href="https://www.energyaccessexplorer.org/attribution/">attribution instructions</a>.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {{template "loading" .}}
+  </body>
+
+  <template id="controls-template">
+    <main>
+      <div class="loading">
+        <div class="spinner"></div>
+      </div>
+
+      <header ripple>
+        <span bind="checkbox"></span>
+        <span bind="name"></span>
+
+        <buttons>
+          <button bind-listen="click"
+                  bind-func="card">
+            <i class="bi-list-task"></i>
+          </button>
+
+          <button bind-listen="click"
+                  bind-func="info">
+            <i class="bi-info-circle"></i>
+          </button>
+        </buttons>
+      </header>
+
+      <content>
+        <span bind="description"></span>
+      </content>
+    </main>
+  </template>
+
+  <template id="card-template">
+    <main>
+      <handle>
+        <i class="bi bi-grip-vertical"></i>
+      </handle>
+
+      <content>
+        <header>
+          <span bind-if="symbol"
+                bind="symbol" bind-replace></span>
+
+          <div class="names">
+            <div bind="name"></div>
+
+            <div class="index"
+                 bind="index"></div>
+          </div>
+
+          <div bind-tmpl="#card-header-buttons"></div>
+        </header>
+
+        <span bind-if="hosts"
+              bind="mutant-options"
+              class="mutant-options"></span>
+
+        <div bind-if="colorscale">
+          <div bind="colorscale"></div>
+          <span bind="ramp"></span>
+        </div>
+
+        <span bind-if="pvna">
+          <div style="display: inline-block;
+                      width: 64px;
+                      height: 5px;
+                      background-color: rgba(155,155,155,1);
+                      margin: 15px 15px 0 0;">
+          </div>
+
+          <div style="display: inline-block;
+                      font-size: x-small;">
+            Not Available
+          </div>
+        </span>
+      </content>
+    </main>
+
+    <aside style="display: none;">
+      <div class="group"
+           bind-if="value-checkboxes.length"
+           bind-tmpl="#value-checkboxes-template">
+      </div>
+
+      <div class="group"
+           bind-if="specs.length"
+           bind-tmpl="#specs-list-template">
+      </div>
+
+      <div class="group"
+           bind-if="manual-inputs">
+        <strong bind="unit-label">Range</strong>
+
+        <p class="explain"
+           bind="category.unit-explain">
+          Analysis will restrict the dataset to the selected range.
+        </p>
+
+        <div style="display: flex;
+                    justify-content: space-between;">
+          <div bind-if="manual-min">
+            <span bind="manual-min"></span>
+          </div>
+
+          <span bind="range" class="range"></span>
+
+          <div>
+            <span bind="manual-max"></span>
+          </div>
+        </div>
+      </div>
+
+      <div bind-if="weight-group"
+           class="group">
+        <strong>Importance</strong>
+
+        <p class="explain">
+          Change importance to provide different weightings for data in the
+          analysis calculation.
+        </p>
+
+        <span bind="weight-group"></span>
+      </div>
+
+      <div class="group">
+        <div class="visibility-group">
+          <div>
+            <label>
+              <input type="checkbox"
+                     bind-listen="change"
+                     bind-func="visibility"
+                     checked />
+              &nbsp;
+              Show layer
+            </label>
+          </div>
+
+          <div class="opacity-group">
+            <span>Opacity</span>
+            <span bind="opacity" bind-replace></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="group">
+        <buttons>
+          <button bind-listen="click"
+                  bind-func="info">
+            <i class="bi-info-circle"></i> <span>About</span>
+          </button>
+
+          <button bind-if="vectors.data"
+                  bind-listen="click"
+                  bind-func="table">
+            <i class="bi-table"></i> <span>Table</span>
+          </button>
+        </buttons>
+      </div>
+    </aside>
+  </template>
+
+  <template id="ramp">
+    <div class="ramp">
+      <div bind="left"></div>
+      <div bind="middle" class="unit-ramp"></div>
+      <div bind="right"></div>
+    </div>
+  </template>
+
+  <template id="country-overview">
+    <div class="country-overview">
+      <section>
+        <strong>Population:</strong> <span bind="population"></span> million
+      </section>
+
+      <section>
+        <strong>&nbsp;&nbsp;&nbsp;&nbsp; Urban:</strong> <span bind="urban_population"></span>%
+      </section>
+
+      <section>
+        <strong>&nbsp;&nbsp;&nbsp;&nbsp; Rural:</strong> <span bind="rural_population"></span>%
+      </section>
+
+      <section>
+        <strong>Area:</strong> <span bind="area"></span> km<sup>2</sup>
+      </section>
+
+      <section>
+        <strong>GDP per capita:</strong> USD <span bind="gdp_percapita"></span>
+      </section>
+
+      <section>
+        <strong>Electrification Rate:</strong> <span bind="electrification"></span>%
+      </section>
+
+      <section>
+        <div style="display: flex; justify-content: space-around;
+                    text-align: center;
+                    text-transform: uppercase;
+                    color: var(--the-green);">
+          <strong style="margin: 0.5em;">Urban</strong>
+          <strong style="margin: 0.5em;">Rural</strong>
+        </div>
+
+        <div style="display: flex; justify-content: space-around;
+                    margin-bottom: 30px;">
+          <div style="display: flex; justify-content: space-around; width: 240px; padding: 0 1em;
+                      border-right: 1px solid lightgray;">
+            <span class="small">
+              Electrified:&nbsp; <strong><span bind="urban_electrification"></span>%</strong>
+            </span>
+
+            <span bind="urban_electrification_pie"></span>
+          </div>
+
+          <div style="display: flex; justify-content: space-around; width: 240px; padding: 0 1em;">
+            <span class="small">
+              Electrified:&nbsp; <strong><span bind="rural_electrification"></span>%</strong>
+            </span>
+
+            <span bind="rural_electrification_pie"></span>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <strong>Energy intensity level of primary energy (MJ/$2011 PPP GDP):</strong> <span bind="primary_intensity"></span>
+      </section>
+
+      <section>
+        <strong>Power outages in firms in a typical month:</strong> <span bind="outages_average"></span>
+      </section>
+    </div>
+  </template>
+
+  <template id="eae-info-modal-template">
+    <h3>About Energy Access Explorer prioritizaton</h3>
+    <p>
+      Energy Access Explorer enables you to identify high-priority areas for
+      energy access interventions. EAE uses multi-criteria analysis that uses
+      location-specific resource availability and infrastructure data to
+      represent energy supply, and incorporates demographic data and data on
+      social and productive uses to visualize demand for energy services.
+    </p>
+
+    <br><div style="border-bottom: 1px solid lightgray;"></div><br><br>
+
+    <h3>Analysis areas</h3>
+    <p>
+      Energy Access Explorer offers the option to generate an analysis across
+      various different administrative priorities.
+    </p>
+
+    <br>
+    <h4>Priority areas (1km²)</h4>
+    <p>
+      Selecting this analysis area provides a raster analysis in 1km2 tiles
+      across the entirity of the selected geography.
+    </p>
+
+    <br>
+    <h4>Other analysis areas</h4>
+    <p>
+      Depending on the currently selected geography, it is possible to change
+      the priotitization output to wider geographical areas such as districts,
+      regions or zones for more high level analysis.
+    </p>
+
+    <br><div style="border-bottom: 1px solid lightgray;"></div><br><br>
+
+    <h3>Prioritization indexes</h3>
+    <p>
+      There are 4 different methods to generate a prioritization, depending on
+      the aim of your analysis; these are known as the different
+      "indexes". Energy Access Potential is the standard recommended index as it
+      is an aggregation across demand and supply categories.
+    </p>
+
+    <br>
+    <h4 bind="eai.name"></h4>
+    <p bind="eai.explain"></p>
+
+    <br>
+    <h4 bind="demand.name"></h4>
+    <p bind="demand.explain"></p>
+
+    <br>
+    <h4 bind="supply.name"></h4>
+    <p bind="supply.explain"></p>
+
+    <br>
+    <h4 bind="ani.name"></h4>
+    <p bind="ani.explain"></p>
+
+    <br><div style="border-bottom: 1px solid lightgray;"></div><br><br>
+
+    <p>
+      <a href="https://www.wri.org/publication/energy-access-explorer-data-and-methods">
+        <i class="bi-box-arrow-up-right"></i>
+        <span>View technical note</span>
+      </a>
+    </p>
+  </template>
+
+  <template id="ds-info-modal">
+    <div style="display:flex; flex-flow: row nowrap;">
+      <div class="left" style="flex: 1;">
+        <section bind-cond="description">
+          <h3>Description</h3><pre class="description-text" bind="description"></pre>
+        </section>
+
+        <section bind-cond="category-description">
+          <h3>Why is this dataset used?</h3><pre class="description-text" bind="category-description"></pre>
+        </section>
+
+        <section bind-cond="suggested_citation">
+          <h3>Suggested Citation</h3><pre class="description-text" bind="suggested_citation"></pre>
+        </section>
+
+        <section bind-cond="cautions">
+          <h3>Cautions</h3><pre class="description-text" bind="cautions"></pre>
+        </section>
+      </div>
+
+      <div class="right" style="flex: 0 300px; padding-left: 3em;">
+        <section>
+          <a class="download-link"
+             bind-cond="download_original_url"
+             bind-attr="href"
+             bind-arg="download_original_url"
+             target="_blank">Download from Source</a>
+        </section>
+
+        <section>
+          <a class="download-link"
+             bind-cond="learn_more_url"
+             bind-attr="href"
+             bind-arg="learn_more_url"
+             target="_blank">Learn More</a>
+        </section>
+
+        <section bind-cond="sources">
+          <h3>Sources</h3>
+          <pre class="description-text" bind="sources"></pre>
+        </section>
+
+        <section bind-cond="spatial_resolution">
+          <h3>Spatial Resolution</h3>
+          <span bind="spatial_resolution"></span>
+        </section>
+
+        <section bind-cond="license">
+          <h3>License</h3>
+          <span bind="license"></span>
+        </section>
+
+        <section bind-cond="content_date">
+          <h3>Date of Content</h3>
+          <span bind="content_date"></span>
+        </section>
+      </div>
+    </div>
+  </template>
+
+  <template id="share-link-modal-content">
+    <p>
+      Sharing the following link will load the Energy Access Explorer platform in
+      the current state: layers and analysis.
+
+      Users might need the necessary permissions to view this snapshot fully.
+    </p>
+
+    <div style="display:flex; flex-flow: row nowrap;">
+      <input id="share-link-input"
+             type="text"
+             bind-value="url"
+             disabled
+             focus />
+
+      <button type="button"
+              id="share-link-copy-button">
+        <i class="bi bi-copy"
+           bind-listen="click"
+           bind-func="copy"></i>
+      </button>
+    </div>
+  </template>
+
+  <template id="ds-attributes-filter-modal">
+    <p>Filtered attributes only show on the data view. The analysis is not affected by this filtering.</p>
+
+    <p>TIP 1: (de)select multiple items by holding the CTRL key (CMD on mac) and clicking on the option.</p>
+    <p>TIP 2: (de)select a continuos range of options by selecting the start option, holding SHIFT key, and clicking on the last option.</p>
+    <p>TIP 3: use CTRL-A (CMD-A on mac) to select all the options in the <b>focused</b> select box.</p>
+  </template>
+
+  <template id="ds-attributes-filter">
+    <p bind="target"></p>
+
+    <select multiple
+            bind-attr="name"
+            bind-arg="dataset">
+      <option>-- none --</option>
+
+      <option bind-each="options"
+              bind-attr="value"
+              bind-arg="name"
+              bind="name">
+      </option>
+    </select>
+  </template>
+
+  <template id="index-graphs-container-template">
+    <div class="index-graphs-container">
+      <div class="index-graphs-group">
+        <div>Area share</div>
+        <div id="area-number" class="indexes-pie-label"></div>
+      </div>
+
+      <div class="index-graphs-group">
+        <div>Population share</div>
+        <div id="population-number" class="indexes-pie-label"></div>
+      </div>
+    </div>
+  </template>
+
+  <template id="geographies-search-item">
+    <div bind="name"></div>
+
+    <buttons>
+      <span class="bi-zoom-in"
+            zoom="true"></span>
+
+      <span class="bi-box-arrow-in-down"
+            bind-cond="url"
+            bind-attr="href"
+            bind-arg="url"></span>
+    </buttons>
+  </template>
+
+  <template id="points-input-form">
+    <form>
+      <input id="lng"
+             type="number"
+             step="any"
+             placeholder="Longitude"
+             style="padding: 5px 7px;">
+
+      <input id="lat"
+             type="number"
+             step="any"
+             placeholder="Latitude"
+             style="padding: 5px 7px;">
+
+      <br><br>
+
+      <button type="submit"
+              class="big-green-button"
+              style="font-size: 0.8em; margin: auto;">Add point</button>
+    </form>
+  </template>
+
+  <template id="value-checkboxes-template">
+    <label bind-each="value-checkboxes"
+           class="checkbox-row">
+      <span bind-init="color"
+            style="display:block;
+                   height: 20px;
+                   width: 20px;"></span>
+
+      <span bind="name"></span>
+
+      <input type="checkbox"
+             bind-attr-checked="checked"
+             bind-value="value"
+             bind-listen="change"
+             bind-func="change">
+    </label>
+  </template>
+
+  <template id="specs-list-template">
+    <label bind-each="specs"
+           class="checkbox-row">
+      <span bind="csymbol"></span>
+
+      <span bind="cname"></span>
+
+      <input type="checkbox"
+             bind-value="cname"
+             bind-attr-checked="checked"
+             bind-listen="change"
+             bind-func="change">
+    </label>
+  </template>
+
+  <template id="card-header-buttons">
+    <buttons>
+      <button bind-listen="click"
+              bind-func="settings"
+              title="Hide/Show settings">
+        <i class="bi-chevron-down"></i>
+      </button>
+
+      <button bind-listen="click"
+              bind-func="close"
+              title="Remove dataset">
+        <i class="bi-x-lg"></i>
+      </button>
+    </buttons>
+  </template>
+
+  {{template "env" .}}
+
+  <script type="module">
+    import flash from '../lib/flash.js';
+    import pgrest from '../lib/pgrest.js';
+
+    window.FLASH = new flash();
+    window.API = new pgrest(EAE['settings'].database, FLASH);
+
+    window.GEOGRAPHY = null;
+    window.SNAPSHOT = null;
+    window.OUTLINE = null;
+    window.MAPBOX = null;
+    window.INFOMODE = false;
+    window.COORDINATESMODE = false;
+    window.COORDINATES = [];
+    window.MOBILE = false;
+    window.DST = new Map();
+    window.SELF = null;
+    window.STATE = null;
+    window.DEBUG = true;
+    window.COMMIT = null;
+    window.SUMMARY = null;
+  </script>
+
+  <script type="module">
+    import {init} from './a.js';
+    init();
+  </script>
+</html>

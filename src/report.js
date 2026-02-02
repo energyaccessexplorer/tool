@@ -12,6 +12,7 @@ import {
 
 import {
 	analysis_colorscale,
+	analysis_colorscale_svg,
 	medhigh_point_count,
 	getpoints as toplocations_fetch,
 } from './analysis.js';
@@ -19,6 +20,13 @@ import {
 import {
 	coords_search_pois,
 } from './mapbox.js';
+
+import {
+	and,
+	coalesce,
+	maybe,
+	or,
+} from '../lib/helpers.js';
 
 const N_POINTS = 20;
 
@@ -312,10 +320,10 @@ function geography_indexes_left($) {
 		$.addText(
 			[
 				{
-					"text":    index.name + " ",
+					"text":    index['name'] + " ",
 					"options": { bold },
 				}, {
-					"text": index.info.replace(/\n/g, ' '),
+					"text": index['explain'].replace(/\n/g, ' '),
 				},
 			],
 			textopts({ x, y, "w": "45%", "fontSize": 11 }),
@@ -621,7 +629,7 @@ function analysis_left($, index) {
 		textopts({ x, "y": 1, bold, "w": "45%" }),
 	);
 
-	const s = btoa(new XMLSerializer().serializeToString(analysis_colorscale.svg));
+	const s = btoa(new XMLSerializer().serializeToString(analysis_colorscale_svg));
 
 	$.addImage({
 		x,
@@ -917,5 +925,5 @@ export async function pptx() {
 		toplocations_index.call(p, 'supply', points);
 	}
 
-	p.writeFile();
+	p.writeFile({ "filename": null });
 };

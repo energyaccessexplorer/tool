@@ -7,18 +7,14 @@
     display: none;
   }
 
-  #output-preview {
-    display: none;
-  }
-
-  #left-pane {
+  #left-panel {
     min-width: unset;
     width: 100%;
     z-index: 1;
     display: none;
   }
 
-  #left-pane[open] {
+  #left-panel[open] {
     max-width: 100%;
     min-width: unset;
   }
@@ -32,7 +28,7 @@
     display: none;
   }
 
-  #right-pane {
+  #right-panel {
     width: 100%;
     position: absolute;
     overflow-y: scroll;
@@ -58,14 +54,6 @@
 
   #mobile-switcher > div.active {
     background-color: #dedede;
-  }
-
-  #views {
-    width: 100%;
-    position: fixed;
-    top: unset;
-    bottom: 0;
-    margin: auto;
   }
 
   #mapbox-container {

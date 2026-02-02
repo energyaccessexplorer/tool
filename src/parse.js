@@ -7,6 +7,18 @@ import {
 	drawcanvas as plot_drawcanvas,
 } from './plot.js';
 
+import {
+	and,
+	ce,
+	has,
+	maybe,
+	nil,
+	or,
+	same,
+	until,
+	Whatever,
+} from '../lib/helpers.js';
+
 async function fetchcheck(endpoint, format) {
 	await until(_ => MAPBOX.isStyleLoaded()); // <-- magic line. If you remove it, no more unicorns!
 
@@ -88,7 +100,7 @@ function table_setup() {
 		return;
 
 	const arr = [];
-	for (let i in this.csv.table) arr[i] = this.csv.table[i];
+	for (const i in this.csv.table) arr[i] = this.csv.table[i];
 
 	const min = d3.min(arr);
 	const max = d3.max(arr);
@@ -103,7 +115,7 @@ function table_refresh() {
 	const k = this.csv.key;
 	const v = this.type.match(/-timeline/) ? STATE.timeline : this.csv.column;
 
-	for (let r of data) {
+	for (const r of data) {
 		const n = +r[v];
 		table[r[k]] = isNaN(n) ? r[v] : n;
 	}
@@ -162,7 +174,7 @@ export function raster() {
 
 			if (this.type.match(/raster(-timeline)?/) && !this.domain) {
 				let min, max; min = max = this.raster.nodata;
-				for (let v of this.raster.data) {
+				for (const v of this.raster.data) {
 					if (v === this.raster.nodata) continue;
 					if (min === this.raster.nodata) min = v;
 					if (max === this.raster.nodata) max = v;
@@ -213,7 +225,7 @@ export async function geojson_summary() {
 		"__IGNORED": [],
 	};
 
-	for (let p of properties) {
+	for (const p of properties) {
 		const values = Array.from(new Set(features.map(x => x.properties[p]).flat()));
 
 		if (values.length > 10) {
@@ -222,7 +234,7 @@ export async function geojson_summary() {
 		}
 
 		o[p] = {};
-		for (let v of values)
+		for (const v of values)
 			o[p][v] = features.filter(x => x.properties[p] === v).length;
 	}
 
@@ -284,7 +296,7 @@ function specs_set(fs, specs) {
 
 		const c = Object.assign({}, criteria[0]);
 
-		for (let s of specs) {
+		for (const s of specs) {
 			const v = fs[i].properties[s.key];
 
 			if (!v) continue;
@@ -316,7 +328,7 @@ function specs_set(fs, specs) {
 
 		fs[i].properties['__criteria'] = c;
 
-		fs[i].properties['__visible'] = this.selection ?
+		fs[i].properties['__visible'] = this.selection.length ?
 			this.selection.includes(c[c.params[0]]) :
 			true;
 	}
@@ -495,11 +507,11 @@ export function vectors_csv() {
 
 	const v = this.timeline ? STATE.timeline : this.csv.column;
 
-	for (let f of this.vectors.data.features) {
+	for (const f of this.vectors.data.features) {
 		f.id = f.properties[this.vectors.id];
 		f.properties['__visible'] = !nil(data.find(r => r[this.csv.key] === f.id));
 
-		let row = data.find(r => r[this.csv.key] === f.id);
+		const row = data.find(r => r[this.csv.key] === f.id);
 		f.properties['__fill'] = this.colorscale ? s(maybe(row, v)) : this.vectors.fill;
 	}
 

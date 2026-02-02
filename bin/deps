@@ -29,7 +29,8 @@ printline() {
 }
 
 fetch() {
-	if curl --location \
+	if curl --disable \
+			--location \
 			--silent \
 			--fail-with-body \
 			--output "$DEST/$1" \

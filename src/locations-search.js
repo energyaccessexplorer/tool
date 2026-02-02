@@ -11,6 +11,12 @@ import {
 	bi_icon,
 } from './utils.js';
 
+import {
+	ce,
+	maybe,
+	qs,
+} from '../lib/helpers.js';
+
 let ul, input, resultscontainer;
 
 let resultsinfo;

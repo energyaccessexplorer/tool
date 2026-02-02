@@ -1,3 +1,4 @@
+{{define "nav"}}
 <nav>
   <input id="toggle"
          class="no-desktop"
@@ -10,36 +11,37 @@
   </label>
 
   <a id="energy-access-link"
-     href="{{> views/base}}/">
-    <img src="{{> views/base}}/images/EAE Logo_Horizontal White.svg">
+     href="{{template "base" .}}/">
+    <img src="{{template "base" .}}/images/EAE Logo_Horizontal White.svg">
   </a>
 
   <div id="navigation-links">
-    <a href="{{> views/base}}/tool/s"
+    <a href="{{template "base" .}}/tool/s"
        class="toggleable">
       Tool
     </a>
 
-    <a href="{{> views/base}}/about"
+    <a href="{{template "base" .}}/about"
        class="toggleable">
       About
     </a>
 
-    <a href="{{> views/base}}/get-involved"
+    <a href="{{template "base" .}}/get-involved"
        class="toggleable">
       Get Involved
     </a>
 
-    <a href="{{> views/base}}/user-stories"
+    <a href="{{template "base" .}}/user-stories"
        class="toggleable">
       User Stories
     </a>
 
-    <a href="{{> views/base}}/partners"
+    <a href="{{template "base" .}}/partners"
        class="toggleable">
       Partners
     </a>
   </div>
 </nav>
 
-<script src="{{> views/base}}/javascripts/nav.js"></script>
+<script src="{{template "base" .}}/javascripts/nav.js"></script>
+{{end}}

@@ -22,6 +22,11 @@ import snapshot from './qa-snapshot.js';
 
 import indexes from './qa-indexes.js';
 
+import {
+	qs,
+	qsa,
+} from '../lib/helpers.js';
+
 const batches = {
 	"clear": [
 		{
@@ -29,13 +34,12 @@ const batches = {
 			"target": 'body',
 			"run":    function() {
 				STATE.index = 'eai';
-				STATE.view = 'data';
 
 				STATE.datasets.forEach(d => d.active(false, false));
 
 				COMMIT("datasets");
 
-				for (let e of qsa('.controls-subbranch'))
+				for (const e of qsa('.controls-subbranch'))
 					elem_collapse(qs('.controls-container', e), e);
 
 				left_panel('controls');

@@ -13,6 +13,16 @@ import {
 	lowmedhigh_scale,
 } from './analysis.js';
 
+import {
+	ce,
+	delay,
+	maybe,
+	qs,
+	qsa,
+	unique_by,
+	until,
+} from '../lib/helpers.js';
+
 import bubblemessage from '../lib/bubblemessage.js';
 
 const default_styles = [{
@@ -48,7 +58,7 @@ class MapboxThemeControl {
 		this._container.className = 'mapboxgl-ctrl';
 		this._container.classList.add('mapboxgl-ctrl-group');
 
-		let button = ce('button', ce('div', bi_icon('layers-fill'), { "style": "transform: scale(0.75)" }), { "type": 'button', "class": 'mapboxgl-ctrl-icon'});
+		const button = ce('button', ce('div', bi_icon('layers-fill'), { "style": "transform: scale(0.75)" }), { "type": 'button', "class": 'mapboxgl-ctrl-icon'});
 
 		this._container.append(button);
 
@@ -70,7 +80,7 @@ class MapboxProjectionControl {
 		this._container.className = 'mapboxgl-ctrl';
 		this._container.classList.add('mapboxgl-ctrl-group');
 
-		let button = ce('button', ce('div', bi_icon('dribbble'), { "style": "transform: scale(0.75)" }), { "type": 'button', "class": 'mapboxgl-ctrl-icon'});
+		const button = ce('button', ce('div', bi_icon('dribbble'), { "style": "transform: scale(0.75)" }), { "type": 'button', "class": 'mapboxgl-ctrl-icon'});
 
 		this._container.append(button);
 
@@ -92,7 +102,7 @@ class MapboxInfoControl {
 		this._container.className = 'mapboxgl-ctrl';
 		this._container.classList.add('mapboxgl-ctrl-group');
 
-		let button = ce('button', ce('div', bi_icon('info-circle'), { "style": "transform: scale(0.75)" }), { "type": 'button', "class": 'mapboxgl-ctrl-icon'});
+		const button = ce('button', ce('div', bi_icon('info-circle'), { "style": "transform: scale(0.75)" }), { "type": 'button', "class": 'mapboxgl-ctrl-icon'});
 
 		this._container.append(button);
 
@@ -119,7 +129,7 @@ export function init() {
 		"style":                 theme_pick(""),
 	});
 
-	MAPBOX.addControl(new mapboxgl.NavigationControl({ "showCompass": false }));
+	MAPBOX.addControl(new mapboxgl.NavigationControl({ "showCompass": false }), 'top-left');
 
 	MAPBOX.zoomTo(MAPBOX.getZoom() * 0.95, {"duration": 0});
 	MAPBOX.doubleClickZoom.disable();
@@ -128,20 +138,20 @@ export function init() {
 
 	MAPBOX.on('click', click);
 
-	MAPBOX.addControl((new MapboxThemeControl()), 'top-right');
-	MAPBOX.addControl((new MapboxProjectionControl()), 'top-right');
-	MAPBOX.addControl((new MapboxInfoControl()), 'top-right');
+	MAPBOX.addControl((new MapboxThemeControl()), 'top-left');
+	MAPBOX.addControl((new MapboxProjectionControl()), 'top-left');
+	MAPBOX.addControl((new MapboxInfoControl()), 'top-left');
 
 	MAPBOX.coords = fit(GEOGRAPHY.envelope);
 	MAPBOX.setStyle(theme_pick(EAE['settings'].mapbox_theme));
 };
 
 function projection_control_popup(_) {
-	let x = ce('div', null, { "class": 'mapbox-control-popup' });
-	let radios = ce('div');
+	const x = ce('div', null, { "class": 'mapbox-control-popup' });
+	const radios = ce('div');
 
-	for (let t of projections) {
-		let e = ce('div', null, { "class": 'radio-group' });
+	for (const t of projections) {
+		const e = ce('div', null, { "class": 'radio-group' });
 
 		e.append(
 			ce('input', null, {
@@ -156,7 +166,7 @@ function projection_control_popup(_) {
 		radios.append(e);
 	}
 
-	let current = qs(`input[value="${MAPBOX.getProjection()?.name}"]`, radios);
+	const current = qs(`input[value="${MAPBOX.getProjection()?.name}"]`, radios);
 	if (current) current.setAttribute('checked', true);
 
 	qsa('input[name="mapbox_projection"]', radios)
@@ -169,7 +179,7 @@ function projection_control_popup(_) {
 	x.style = `
 position: absolute;
 top: 120px;
-right: 10px;
+left: 10px;
 background-color: white;
 box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
 border-radius: 4px;
@@ -180,11 +190,11 @@ padding: 16px;
 };
 
 function theme_control_popup(_) {
-	let x = ce('div', null, { "class": 'mapbox-control-popup' });
-	let radios = ce('div');
+	const x = ce('div', null, { "class": 'mapbox-control-popup' });
+	const radios = ce('div');
 
-	for (let t of styles) {
-		let e = ce('div', null, { "class": 'radio-group' });
+	for (const t of styles) {
+		const e = ce('div', null, { "class": 'radio-group' });
 
 		e.append(
 			ce('input', null, {
@@ -199,7 +209,7 @@ function theme_control_popup(_) {
 		radios.append(e);
 	}
 
-	let current = qs(`input[value="${EAE['settings'].mapbox_theme}"]`, radios);
+	const current = qs(`input[value="${EAE['settings'].mapbox_theme}"]`, radios);
 	if (current) current.setAttribute('checked', true);
 
 	qsa('input[name="mapbox_theme"]', radios)
@@ -212,7 +222,7 @@ function theme_control_popup(_) {
 	x.style = `
 position: absolute;
 top: 120px;
-right: 10px;
+left: 10px;
 background-color: white;
 box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
 border-radius: 4px;
@@ -223,7 +233,7 @@ padding: 16px;
 };
 
 function theme_pick(theme) {
-	let t = (theme === "" ? null : theme);
+	const t = (theme === "" ? null : theme);
 
 	return (t ? `mapbox://styles/${t}` : {
 		"version": 8,
@@ -458,16 +468,14 @@ function click(e) {
 
 	qs('#points.search-panel').dispatchEvent(new Event('activate'));
 
-	if (STATE.view === "analysis") {
-		const ac = coordinates_to_raster_pixel(ll, {
-			"data":   MAPBOX.getSource('output-source').raster,
-			"nodata": -1,
-		});
+	const ac = coordinates_to_raster_pixel(ll, {
+		"data":   MAPBOX.getSource('output-source').raster,
+		"nodata": -1,
+	});
 
-		if (Number.isFinite(maybe(ac, 'value'))) {
-			dict.unshift(["_analysis_name", EAE['indexes'][STATE.index]['name']], null);
-			props["_analysis_name"] = lowmedhigh_scale(ac.value);
-		}
+	if (Number.isFinite(maybe(ac, 'value'))) {
+		dict.unshift(["_analysis_name", EAE['indexes'][STATE.index]['name']], null);
+		props["_analysis_name"] = lowmedhigh_scale(ac.value);
 	}
 
 	const td = table_data(dict, props, ll);

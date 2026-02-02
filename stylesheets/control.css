@@ -1,0 +1,132 @@
+ds-controls main {
+  background-color: var(--the-darker-white);
+  border-bottom: solid 1px #d9d9d9;
+  color: var(--the-color);
+  position: relative;
+}
+
+ds-controls main.active {
+  background-color: white;
+}
+
+ds-controls main.disabled {
+  color: #9ca9b5;
+}
+
+ds-controls header {
+  display: flex;
+  justify-content: space-between;
+
+  padding: 0.7em;
+
+  cursor: pointer;
+}
+
+ds-controls [bind=description] {
+  display: block;
+
+  padding-bottom: 0.9em;
+  margin: auto 1em auto 3.8em;
+
+  color: #a3a3a3;
+}
+
+ds-controls [bind=description]:empty {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+ds-controls [bind=name] {
+  flex: 1;
+  display: block;
+  margin: auto 0.5em;
+  line-height: 1.5em;
+}
+
+ds-controls [bind=checkbox] {
+  flex: 0;
+  display: block;
+  margin-bottom: -4px;
+  transform: scale(0.6);
+}
+
+ds-controls .svg-interval {
+  filter: drop-shadow(0px 1px 1px rgba(0, 0, 0, 0.3));
+}
+
+ds-controls .control-option {
+  margin-left: 1.5em;
+  margin-right: 2.5em;
+  margin-bottom: 0.9em;
+}
+
+ds-controls .collection {
+  font-size: 0.85em;
+  margin-bottom: 1em;
+  margin-top: 0;
+  color: #666;
+}
+
+ds-controls select {
+  border: none;
+  box-sizing: content-box;
+
+  padding: 0.65em;
+
+  width: 100%;
+
+  background-color: white;
+}
+
+ds-controls .loading {
+  position: absolute;
+  display: none;
+  background-color: rgba(0,0,0,0.15);
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  text-align: left;
+  z-index: 1;
+}
+
+ds-controls .loading .spinner {
+  display: block;
+  position: relative;
+  top: -2px;
+  left: 3px;
+  border: 1px solid #333;
+  border-radius: 50%;
+  border-top: 1px solid white;
+  background-color: #D0D0D0;
+  animation: spin 2s linear infinite;
+  width: 24px;
+  height: 24px;
+  margin: 0.5em;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+ds-controls buttons {
+  visibility: hidden;
+  justify-content: flex-end;
+}
+
+ds-controls buttons button {
+  height: 2em;
+  width: 2em;
+  text-align: center;
+  padding: unset;
+  margin-left: 0.25em;
+}
+
+ds-controls:hover buttons {
+  visibility: visible;
+}
+
+ds-controls:not(.active) buttons [bind=card] {
+  display: none;
+}

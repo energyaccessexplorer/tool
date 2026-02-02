@@ -19,6 +19,14 @@ import {
 	clean,
 } from './a.js';
 
+import {
+	ce,
+	delay,
+	maybe,
+	or,
+	qs,
+} from '../lib/helpers.js';
+
 import DS from './ds.js';
 
 const welcome = (_ => {
@@ -239,7 +247,6 @@ export function init() {
 
 	qs('#drawer-help').onclick = run;
 
-	if (STATE.view !== 'data') return;
 	if (STATE.datasets.length) return;
 
 	HELP.start();

@@ -12,6 +12,10 @@ import {
 	pointer as mapbox_pointer,
 } from './mapbox.js';
 
+import {
+	qs,
+} from '../lib/helpers.js';
+
 let pointer;
 
 export function pointto(coords, dict, props, a = false) {

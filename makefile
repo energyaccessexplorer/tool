@@ -1,6 +1,6 @@
 default: reconfig build lint
 
-.include ".env"
+include .env
 # in .env:
 #
 # TITLE = "Energy Access Explorer"
@@ -28,11 +28,15 @@ LIB = ${DIST}/lib
 
 TIMESTAMP != date -u +'%Y-%m-%d--%T'
 
-clean:
-	@ rm -rf ${LIB} ${DIST}
+templates:
+	@ echo "Building template compiler"
+	@ go build -o ${BIN}/templates ./templates
 
-build: deps build-a build-s build-m build-p
-	@ mustache /tmp/empty.json views/index.mustache > ${DIST}/index.html
+clean:
+	@ rm -rf ${LIB} ${DIST} ${BIN}/templates
+
+build: deps templates build-a build-s build-m build-p
+	@ ${BIN}/templates -template=index -output=${DIST}/index.html
 
 lint:
 	@ ${BIN}/lint ${SRC}
@@ -44,13 +48,11 @@ deps:
 	@ sed -i.orig 's/var PptxGenJS=/window.PptxGenJS=/' ${LIB}/pptxgen.js
 	@ rm ${LIB}/pptxgen.js.orig
 
-	@ echo '{}' >/tmp/empty.json
-
 build-m:
 	@ echo "Building my screen"
 	@ mkdir -p ${DIST}/m
 
-	@ mustache /tmp/empty.json ${VIEWS}/m.mustache > ${DIST}/m/index.html
+	@ ${BIN}/templates -template=m -output=${DIST}/m/index.html
 
 	@ sed -r -i.orig 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/m/index.html
 	@ rm ${DIST}/m/index.html.orig
@@ -58,13 +60,12 @@ build-m:
 	@ cp \
 		${SRC}/user.js \
 		${SRC}/utils.js \
-		${SRC}/m.js \
 		${SRC}/tabs.js \
+		${SRC}/m.js \
 		${DIST}/m/
 
 	@ cat \
 		${LIB}/jwt-decode.js \
-		${LIB}/helpers.js \
 		${LIB}/d3.js \
 		> ${DIST}/m/libs.js
 
@@ -83,7 +84,7 @@ build-p:
 	@ echo "Building snapshot screen"
 	@ mkdir -p ${DIST}/p
 
-	@ mustache /tmp/empty.json ${VIEWS}/p.mustache > ${DIST}/p/index.html
+	@ ${BIN}/templates -template=p -output=${DIST}/p/index.html
 
 	@ sed -r -i.orig 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/p/index.html
 	@ rm ${DIST}/p/index.html.orig
@@ -96,7 +97,6 @@ build-p:
 
 	@ cat \
 		${LIB}/jwt-decode.js \
-		${LIB}/helpers.js \
 		> ${DIST}/p/libs.js
 
 	@ echo "window.EAE = {};" | cat - \
@@ -114,13 +114,11 @@ build-a:
 	@ echo "Building analysis screen"
 	@ mkdir -p ${DIST}/a
 
-	@ mustache /tmp/empty.json ${VIEWS}/a.mustache > ${DIST}/a/index.html
+	@ ${BIN}/templates -template=a -output=${DIST}/a/index.html
 
 	@ sed -r -i.orig 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/a/index.html
 	@ rm ${DIST}/a/index.html.orig
 
-	@ cp ${CSS}/ripple.css ${DIST}/a/ripple.css
-	@ cp ${CSS}/buttons.css ${DIST}/a/buttons.css
 	@ cp \
 		${SRC}/utils.js \
 		${SRC}/admin-tiers.js \
@@ -140,7 +138,8 @@ build-a:
 		${SRC}/points-loading.js \
 		${SRC}/ds.js \
 		${SRC}/parse.js \
-		${SRC}/indexes.js \
+		${SRC}/output-widget.js \
+		${SRC}/right-panel.js \
 		${SRC}/filtered.js \
 		${SRC}/mapbox.js \
 		${SRC}/plot.js \
@@ -149,15 +148,14 @@ build-a:
 		${SRC}/summary.js \
 		${SRC}/timeline.js \
 		${SRC}/user.js \
-		${SRC}/views.js \
 		${SRC}/help.js \
-		${SRC}/a.js \
 		${SRC}/qa.js \
 		${SRC}/complicated.js \
 		${SRC}/qa-controls.js \
 		${SRC}/qa-outputs.js \
 		${SRC}/qa-snapshot.js \
 		${SRC}/qa-indexes.js \
+		${SRC}/a.js \
 		${DIST}/a/
 
 	@ cat \
@@ -168,7 +166,6 @@ build-a:
 		${LIB}/sphericalmercator.js \
 		${LIB}/html5sortable.js \
 		${LIB}/jwt-decode.js \
-		${LIB}/helpers.js \
 		> ${DIST}/a/libs.js
 
 	@ echo "window.EAE = {};" | cat - \
@@ -180,12 +177,11 @@ build-a:
 		${CSS}/general.css \
 		${CSS}/a.css \
 		${CSS}/layout.css \
-		${CSS}/left-pane.css \
+		${CSS}/left-panel.css \
 		${CSS}/search.css \
 		${CSS}/controls.css \
 		${CSS}/maparea.css \
-		${CSS}/indexes.css \
-		${CSS}/views.css \
+		${CSS}/right-panel.css \
 		${CSS}/filtered.css \
 		${CSS}/ripple.css \
 		${CSS}/buttons.css \
@@ -193,13 +189,15 @@ build-a:
 		${CSS}/mobile.css \
 		${CSS}/cards.css \
 		${CSS}/config.css \
+		${CSS}/card.css	\
+		${CSS}/control.css \
 		> ${DIST}/a/main.css
 
 build-s:
 	@ echo "Building select screen"
 	@ mkdir -p ${DIST}/s
 
-	@ mustache /tmp/empty.json ${VIEWS}/s.mustache > ${DIST}/s/index.html
+	@ ${BIN}/templates -template=s -output=${DIST}/s/index.html
 
 	@ sed -r -i.orig 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/s/index.html
 	@ rm ${DIST}/s/index.html.orig
@@ -214,7 +212,6 @@ build-s:
 	@ cat \
 		${LIB}/d3.js \
 		${LIB}/jwt-decode.js \
-		${LIB}/helpers.js \
 		> ${DIST}/s/libs.js
 
 	@ echo "window.EAE = {};" | cat - \
@@ -225,7 +222,6 @@ build-s:
 		${CSS}/general.css \
 		${CSS}/s.css \
 		${CSS}/maparea.css \
-		${CSS}/views.css \
 		${CSS}/ripple.css \
 		${CSS}/mobile.css \
 		> ${DIST}/s/main.css
@@ -248,11 +244,6 @@ synced:
 		--exclude=files \
 		--info=name1,progress0 \
 		${DIST}/ ${SSH_USER}@${SSH_HOST}:${TOOL_DEST}
-
-deploy-all:
-	bmake deploy env=production
-	bmake deploy env=staging
-	bmake deploy env=training
 
 deploy:
 	@ touch ${env}.diff development.diff
@@ -301,3 +292,5 @@ reconfig:
 
 	@ sed -i.orig -e '$$s/$$/;\n/' settings.tmp.json
 	@ rm settings.tmp.json.orig
+
+.PHONY: templates

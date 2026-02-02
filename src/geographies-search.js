@@ -2,6 +2,14 @@ import {
 	fit as mapbox_fit,
 } from './mapbox.js';
 
+import {
+	and,
+	ce,
+	maybe,
+	qs,
+	until,
+} from '../lib/helpers.js';
+
 let input, resultscontainer;
 let all = [];
 let details = [];

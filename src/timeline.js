@@ -1,5 +1,15 @@
 import bubblemessage from '../lib/bubblemessage.js';
 
+import {
+	and,
+	ce,
+	has,
+	maybe,
+	or,
+	qs,
+	until,
+} from '../lib/helpers.js';
+
 function slider(opts) {
 	const {steps, drag, width, init} = opts;
 
@@ -340,7 +350,7 @@ export function lines_draw() {
 		})));
 	}, []);
 
-	let lines = qs('#timeline-lines');
+	const lines = qs('#timeline-lines');
 	if (lines) lines.remove();
 
 	const average = datasets.map(i => ({
@@ -397,7 +407,7 @@ export async function lines_update() {
 	else {
 		qs('#lines-header').innerText = "";
 
-		let lines = qs('#timeline-lines');
+		const lines = qs('#timeline-lines');
 		if (lines) lines.remove();
 	}
 };

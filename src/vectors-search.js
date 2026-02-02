@@ -3,6 +3,13 @@ import {
 	zoom,
 } from './search.js';
 
+import {
+	ce,
+	maybe,
+	qs,
+	until,
+} from '../lib/helpers.js';
+
 let ul, input, resultscontainer;
 
 let ds, resultsinfo, attr, searchable, searchable_attrs;
@@ -52,7 +59,7 @@ async function reset() {
 	if (maybe(ds.config, 'properties_search', 'length')) {
 		const first = ds.vectors.data.features[0];
 
-		for (let a of ds.config.properties_search) {
+		for (const a of ds.config.properties_search) {
 			if (!first.properties.hasOwnProperty(a))
 				console.warn(`${ds.id}'s properties_search is misconfigured. Features' missing '${a}'`);
 		}
@@ -67,7 +74,7 @@ async function reset() {
 		return;
 	}
 
-	for (let f of ds.vectors.data.features) {
+	for (const f of ds.vectors.data.features) {
 		if (f['__li']) continue;
 
 		const li = ce('li', f.properties[attr]);
@@ -107,7 +114,7 @@ function trigger(value) {
 		const f = ds.vectors.data.features[i];
 		let matches = false;
 
-		for (let [k,v] of Object.entries(f.properties)) {
+		for (const [k,v] of Object.entries(f.properties)) {
 			if (!searchable_attrs.includes(k)) continue;
 
 			if (v && (v + "").match(new RegExp(value, 'i'))) {

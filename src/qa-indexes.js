@@ -15,7 +15,7 @@ export default [
 	},
 	{
 		"lazy":   true,
-		"target": '#indexes-modal',
+		"target": '#eae-info-modal',
 		"listen": {
 			"action": 'click',
 		},

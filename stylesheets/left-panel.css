@@ -1,0 +1,84 @@
+#drawer {
+  display: block;
+  flex: 0;
+  min-height: 100%;
+  min-width: 4em;
+  border-right: 1px solid lightgray;
+}
+
+#drawer a {
+  margin: 0;
+  height: 3em;
+  line-height: 3em;
+  font-size: 1.4em;
+  display: block;
+  text-align: center;
+  border-bottom: 1px solid lightgray;
+  color: var(--the-color);
+}
+
+#drawer a.active {
+  box-shadow: inset 0px 0px 12px rgba(0, 0, 0, 0.07);
+  background-color: rgba(0, 0, 0, 0.07);
+}
+
+#output-widget {
+  flex: 1 0 0;
+  padding: 0 0 1.5em;
+  background-color: white;
+  border-bottom: 1px solid lightgray;
+}
+
+#output-widget > * {
+  margin: 1em 1.5em;
+}
+
+#output-widget #selects {
+  display: flex;
+  justify-content: space-between;
+}
+
+#output-widget #selects > div {
+  width: calc(50% - 1em);
+}
+
+#output-widget #selects select {
+  background-color: white;
+  border: 1px solid lightgray;
+  padding: 5px 7px;
+  margin: 0.5em 0;
+  width: 100%;
+}
+
+#output-widget #output-ramp {
+  margin: 0em 1.5em 1.5em;
+}
+
+#output-widget #output-ramp svg {
+  margin: 0.5em 0;
+}
+
+#output-widget #output-ramp .unit-ramp {
+  font-weight: unset;
+  color: unset;
+}
+
+#output-widget #eae-info-button {
+  position: absolute;
+  right: 0;
+  top: -8px;
+  font-weight: bold;
+}
+
+#left-panel h1,
+#left-panel h2,
+#left-panel h3,
+#left-panel h4 {
+  color: var(--the-color);
+}
+
+#left-panel h4 {
+  position: relative;
+  font-size: 1.25em;
+  margin: 1em;
+}

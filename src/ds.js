@@ -1,5 +1,6 @@
 import {
 	colorscale,
+	colorscale_svg,
 	uniform_split,
 } from './utils.js';
 
@@ -26,12 +27,30 @@ import {
 	crop_to,
 } from './rasters.js';
 
+import {
+	and,
+	ce,
+	coalesce,
+	json_clone,
+	maybe,
+	nil,
+	or,
+	qs,
+	tmpl,
+	until,
+	Whatever,
+} from '../lib/helpers.js';
+
 export const default_colorscale = colorscale({
 	"stops":  d3.schemeRdBu[5].reverse(),
 	"domain": { "min": 0, "max": 1 },
 });
 
+export const default_colorscale_svg = colorscale_svg(default_colorscale.stops);
+
 export default class DS {
+	visible = true;
+
 	constructor(o) {
 		this.id = o.name || o.category.name;
 
@@ -49,7 +68,7 @@ export default class DS {
 
 		this.on = false;
 
-		this.selection = null;
+		this.selection = [];
 
 		this._layers = [];
 
@@ -90,7 +109,7 @@ export default class DS {
 		let go = true;
 
 		if (this.category.name.match(/^(timeline-)?indicator/)) {
-			let b = GEOGRAPHY.divisions[this.config.divisions_tier];
+			const b = GEOGRAPHY.divisions[this.config.divisions_tier];
 
 			if (!b) {
 				FLASH.push({
@@ -142,7 +161,7 @@ This is not fatal but the dataset is now disabled.`,
 		};
 
 		if (o.category.vectors) {
-			let f = this.processed_files.find(x => x.func === 'vectors');
+			const f = this.processed_files.find(x => x.func === 'vectors');
 
 			if (!f) go = ok.call(this, 'vectors');
 			else {
@@ -262,9 +281,23 @@ This is not fatal but the dataset is now disabled.`,
 	category_overrides(ovrr) {
 		if (!ovrr) return;
 
-		const configs = ['description', 'domain', 'domain_init', 'raster', 'vectors', 'csv', 'analysis', 'timeline', 'controls'];
+		const configs = [
+			'analysis',
+			'colorstops',
+			'controls',
+			'csv',
+			'description',
+			'domain',
+			'domain_init',
+			'name',
+			'name_long',
+			'raster',
+			'timeline',
+			'unit',
+			'vectors',
+		];
 
-		for (let c of configs) {
+		for (const c of configs) {
 			if (!ovrr.hasOwnProperty(c)) continue;
 
 			if (typeof ovrr[c] !== 'object') {
@@ -272,20 +305,19 @@ This is not fatal but the dataset is now disabled.`,
 				continue;
 			}
 
-			if (!maybe(this.category, c)) {
+			if (nil(this.category[c])) {
 				this.category[c] = json_clone(ovrr[c]);
 				continue;
 			}
 
-			for (let a in ovrr[c]) {
+			if (Array.isArray(ovrr[c])) {
+				this.category[c] = json_clone(ovrr[c]);
+				continue;
+			}
+
+			for (const a in ovrr[c]) {
 				this.category[c][a] = ovrr[c][a];
 			}
-		}
-
-		const attrs = ['unit', 'name', 'name_long'];
-		for (let a of attrs) {
-			if (!ovrr[a]) continue;
-			this.category[a] = ovrr[a];
 		}
 	};
 
@@ -328,7 +360,7 @@ This is not fatal but the dataset is now disabled.`,
 	add_layers(...arr) {
 		if (this.layers.length) return;
 
-		for (let a of arr) {
+		for (const a of arr) {
 			a['id'] = a['id'] || this.id;
 			a['source'] = this.id;
 
@@ -366,16 +398,7 @@ This is not fatal but the dataset is now disabled.`,
 			this.hosts[i] = ds;
 		}
 
-		const m = this.host = this.hosts.filter(Boolean)[0];
-
-		this.csv = m.csv;
-		this.raster = m.raster;
-		this.vectors = m.vectors;
-		this.colorscale = m.colorscale;
-
-		this.domain = m.domain;
-		this._domain = m._domain;
-		this._domain_select = m._domain_select;
+		this.host = this.hosts.filter(Boolean)[0];
 	};
 
 	async mutate(host) {
@@ -387,14 +410,13 @@ This is not fatal but the dataset is now disabled.`,
 		this.raster = host.raster;
 		this.vectors = host.vectors;
 		this.colorscale = host.colorscale;
-
 		this.domain = host.domain;
-		this._domain = host._domain;
-		this._domain_select = host._domain_select;
+		this._domain = json_clone(host.domain);
+		this._domain_select = this.host._domain_select;
+
+		this.fn = this.host.fn;
 
 		this.opacity(1);
-
-		if (this.card) this.card.refresh();
 
 		return this;
 	};
@@ -478,7 +500,12 @@ This is not fatal but the dataset is now disabled.`,
 	};
 
 	async visibility(t) {
+		this.visible = t;
+
 		this.layers.map(l => MAPBOX.setLayoutProperty(l.id, 'visibility', t ? 'visible' : 'none'));
+
+		const c = qs('[bind-func=visibility]', this.card);
+		if (c) c.checked = t;
 
 		if (this.host) {
 			this.hosts.forEach(d => MAPBOX.setLayoutProperty(d.id, 'visibility', 'none'));
@@ -694,9 +721,9 @@ This is not fatal but the dataset is now disabled.`,
 			if (this.disabled) return;
 		}
 
-		if (!this.card) this.card = new dscard(this);
+		if (this.hosts) await this.mutate(this.host);
 
-		if (this.hosts) this.mutate(this.host);
+		if (!this.card) this.card = new dscard(this);
 
 		if (this.controls) this.controls.turn(v);
 
@@ -770,14 +797,14 @@ This is not fatal but the dataset is now disabled.`,
 		}
 		}
 
-		for (let a of t)
+		for (const a of t)
 			MAPBOX.setPaintProperty(this.id, a, v);
 	};
 
 	turn(v) {
 		v = v ?? !this.on;
 
-		this.active(v, ['data', 'timeline'].includes(STATE.view));
+		this.active(v, true);
 
 		let copy = [...STATE.datasets];
 

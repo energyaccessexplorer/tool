@@ -2,6 +2,10 @@ import {
 	analysis_colorscale,
 } from './analysis.js';
 
+import {
+	qs,
+} from '../lib/helpers.js';
+
 export function drawcanvas(opts) {
 	const {canvas, data, width, height, nodata, colorscale} = opts;
 

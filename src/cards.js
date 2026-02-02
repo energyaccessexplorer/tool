@@ -4,20 +4,19 @@ import modal from '../lib/modal.js';
 
 import bind from '../lib/bind.js';
 
+import bubblemessage from '../lib/bubblemessage.js';
+
 import {
-	svg_interval,
-	opacity_control,
-	uniform_split,
 	bi_icon,
+	colorscale_svg,
+	svg_interval,
+	uniform_split,
 } from './utils.js';
 
 import {
-	points_symbol,
 	lines_symbol,
+	points_symbol,
 	polygons_symbol,
-	lines_legends_svg,
-	points_legends_svg,
-	polygons_legends_svg,
 } from './symbols.js';
 
 import {
@@ -25,157 +24,102 @@ import {
 	sort,
 } from './a.js';
 
+import {
+	and,
+	ce,
+	coalesce,
+	debounce,
+	maybe,
+	nil,
+	or,
+	qs,
+	qsa,
+	same,
+	tmpl,
+	unique,
+} from '../lib/helpers.js';
+
 const cards_list = qs('#cards-list');
 
-const slider_width = 472;
+const slider_width = 320;
 
 const filters = {};
 
-async function mutant_options() {
-	const d = this.ds;
+function mutant_options() {
+	if (!maybe(this.ds, 'hosts', 'length')) return "";
 
-	await until(_ => d.hosts.every(x => x instanceof DS));
+	const ds = this.ds;
 
 	const container = ce('div', null, { "class": 'control-option' });
 	const select = ce('select');
 
-	d.hosts.forEach(d => select.append(ce('option', d.name, { "value": d.id })));
+	ds.hosts.forEach(d => select.append(ce('option', d.name, { "value": d.id })));
 
-	select.value = d.host.id;
+	select.value = ds.host.id;
 
-	select.onchange = async e => {
+	select.onchange = e => {
 		const host = DST.get(e.target.value);
 
-		d.selection = [e.target.value];
+		ds.selection = [e.target.value];
 
-		await d.mutate(host);
-
-		COMMIT("layers");
+		ds.mutate(host)
+			.then(_ => this.bind())
+			.then(_ => COMMIT("layers"));
 	};
 
 	container.append(select);
 
-	this.mutant_options = container;
-
-	slot_populate.call(this, {
-		"mutant-options": container,
-	});
+	return container;
 };
 
-function ramp(...els) {
-	const r = tmpl('#ramp');
-
-	for (const e of els)
-		qs('.ramp', r).append(e);
-
-	const div = qs(':scope > div', r);
-
-	if (!div) return r;
-	div.style['width'] = `${slider_width + 2}px`;
-	div.style['margin'] = 'auto';
-
-	return r;
-};
-
-function value_multiselect() {
+function value_checkboxes() {
 	const ds = this.ds;
 
-	const inputs = ds.csv.data.map(x => {
-		const k = x['KEY'];
+	if (!ds._domain_select) return null;
 
-		const i = ce('input', null, { "type": 'checkbox', "name": "", "value": k });
-		i.checked = (!this.multiselection.length ? true : this.multiselection.indexOf(k) > -1);
-		i.id = ds.id + "_" + k;
+	switch (ds.type) {
+	case 'raster-valued-mutant':
+	case 'raster-valued':	{
+		break;
+	}
 
-		i.onchange = _ => {
-			this.multiselection = [...new Set(inputs.filter(e => e.checked).map(e => +e.value))];
-			ds._domain_select = this.multiselection;
-			ds._domain = Object.assign({}, ds.domain);
-		};
-
-		return i;
-	});
-
-	this.multiselection = this.multiselection.length ? this.multiselection : [...new Set(inputs.map(e => +e.value))];
-
-	ds._domain_select = this.multiselection;
-
-	const elements = inputs.map((e,i) => {
-		const c = ds.colorscale.fn(+e.value);
-		const s = ce('span', null, { "style": `width: 20px; height: 14px; display: inline-block; background-color: rgba(${c}); margin: auto 1em;` });
-
-		const l = ce('label', s, { "for": e.id });
-		l.append(ds.csv.data[i]['VALUE']);
-
-		return ce('div', [e,l]);
-	});
-
-	return {
-		elements,
+	default:
+		return null;
 	};
+
+	ds.domain_select = ds._domain_select = ds.csv.data.map(x => x['KEY']);
+
+	const pick = _ => {
+		this.checkboxes = qsa('.checkbox-row > input', this, true);
+		return ds._domain_select = [...new Set(this.checkboxes.filter(i => i.checked).map(i => +i.value))];
+	};
+
+	const change = _ => {
+		pick();
+		COMMIT("datasets");
+	};
+
+	const payload = ds.csv.data.map(x => ({
+		"name":    x['VALUE'],
+		"value":   x['KEY'],
+		"color":   d => d.style['background-color'] = `rgba(${ds.colorscale.fn(+x['KEY'])})`,
+		"checked": (!ds._domain_select.length ? true : ds._domain_select.indexOf(x['KEY']) > -1),
+		change,
+	}));
+
+	return payload;
 };
 
-function range() {
+function manual_inputs() {
 	const ds = this.ds;
 	const cat = this.ds.category;
 
-	const domain = {};
+	if (!ds.domain) return "";
 
-	let {min,max} = ds.domain;
+	const {min,max} = ds.domain;
 
-	const diff = Math.abs(max - min);
-	let d = 3 - Math.ceil(Math.log10(diff || 1));
-	if (d < 0) d = 0;
-
-	if (and(cat.unit === "%",
-	        or(and(min === 0, max === 100),
-	           and(min === 100, max === 0)))) d = 0;
-
-	const update = (v, i, el, cx) => {
-		el.value = (+v).toFixed(d);
-
-		const man = maybe(this, 'manual_' + i);
-		if (man) {
-			man.value = v;
-		}
-
-		const ctrl = maybe(this, 'cr_' + i);
-		if (ctrl?.style) {
-			ctrl.style.left = cx + "px";
-		}
-
-		domain[i] = parseFloat(v);
-	};
-
-	const step = maybe(ds, 'raster', 'intervals') ? undefined :
-		0.1 * Math.pow(10, Math.floor(Math.log10(Math.abs(ds.domain.max - ds.domain.min))));
-
-	this.cr_max = tmpl('#controls-manual-input').firstElementChild;
-	this.cr_min = tmpl('#controls-manual-input').firstElementChild;
-
-	this.manual_min = ce('input', null, {
-		"bind":  "min",
-		"type":  "number",
-		"min":   ds.domain.min,
-		"max":   ds.domain.max,
-		"step":  step,
-		"value": ds._domain.min,
-	});
-
-	this.manual_max = ce('input', null, {
-		"bind":  "max",
-		"type":  "number",
-		"min":   ds.domain.min,
-		"max":   ds.domain.max,
-		"step":  step,
-		"value": ds._domain.max,
-	});
-
-	const change = (e,i) => {
-		let v = +e.target.value;
-
-		const { min, max } = ds.domain;
-
+	const input_change = (e,i) => {
+		const v = +e.value;
 		const d = ds._domain;
 
 		if (or(
@@ -184,26 +128,42 @@ function range() {
 			and(i === 'min', v > d['max']),
 			and(i === 'max', v < d['min']),
 		)) {
-			e.target.reportValidity();
-			e.target.setCustomValidity("Value out of range");
+			e.reportValidity();
+			e.setCustomValidity("Value out of range");
 			return;
 		}
 
-		d[i] = +v;
+		d[i] = v;
 
-		ds._domain = d;
-		COMMIT("datasets");
+		this.values(d);
 	};
 
-	this.manual_min.oninput = debounce(e => change(e, 'min'), 600);
-	this.manual_max.oninput = debounce(e => change(e, 'max'), 600);
+	const step = maybe(ds, 'raster', 'intervals') ? undefined :
+		0.1 * Math.pow(10, Math.floor(Math.log10(Math.abs(max - min))));
 
-	this.cr_min.append(this.manual_min);
-	this.cr_max.append(this.manual_max);
+	this.manual_min = ce('input', null, {
+		"type":  "number",
+		"min":   min,
+		"max":   max,
+		"step":  step,
+		"value": ds._domain.min,
+	});
+
+	this.manual_min.oninput = debounce(input_change.bind(null, this.manual_min, 'min'), 600);
+
+	this.manual_max = ce('input', null, {
+		"type":  "number",
+		"min":   min,
+		"max":   max,
+		"step":  step,
+		"value": ds._domain.max,
+	});
+
+	this.manual_max.oninput = debounce(input_change.bind(null, this.manual_max, 'max'), 600);
 
 	switch (maybe(cat, 'controls', 'range')) {
 	case 'single':
-		this.cr_min = "";
+		this.manual_min = null;
 		break;
 
 	case 'double':
@@ -212,107 +172,168 @@ function range() {
 	case null:
 	case 'none':
 	default:
-		this.cr_min = "";
-		this.cr_max = "";
+		this.manual_min = null;
+		this.manual_max = null;
 		break;
 	}
+
+	return (this.manual_min || this.manual_max);
+};
+
+function range() {
+	const ds = this.ds;
+	const cat = this.ds.category;
+
+	switch (ds.type) {
+	case 'points':
+	case 'lines':
+	case 'polygons':
+	case 'polygons-valued':
+	case 'polygons-timeline':
+	case 'raster-mutant':
+	case 'raster-timeline':
+	case 'raster': {
+		break;
+	}
+
+	default:
+		return null;
+	}
+
+	const {min,max} = ds.domain;
+
+	const diff = Math.abs(max - min);
+	let f = 3 - Math.ceil(Math.log10(diff || 1));
+	if (f < 0) f = 0;
+
+	if (and(cat.unit === "%",
+	        or(and(min === 0, max === 100),
+	           and(min === 100, max === 0)))) f = 0;
 
 	let steps;
 	if (maybe(cat, 'controls', 'range_steps')) {
 		steps = [];
-		const s = (ds.domain.max - ds.domain.min) / (cat.controls.range_steps - 1);
+		const s = (max - min) / (cat.controls.range_steps - 1);
 
 		for (let i = 0; i < cat.controls.range_steps; i += 1)
-			steps[i] = ds.domain.min + (s * i);
+			steps[i] = min + (s * i);
 	}
 
-	const s = svg_interval({
-		"background":   ds.colorscale?.svg.querySelector('g').cloneNode(true),
+	const svg_change = (v, i) => {
+		const d = ds._domain;
+		d[i] = this.ds.fn.invert(parseFloat(v));
+	};
+
+	this.range_svg = svg_interval({
 		"sliders":      ds.category.controls.range,
 		"width":        slider_width,
+		"height":       8,
+		"radius":       10,
 		"init":         {
 			"min": this.ds.fn(ds._domain.min),
 			"max": this.ds.fn(ds._domain.max),
 		},
 		"steps":        steps,
-		"callback1":    (v, cx) => update(this.ds.fn.invert(v), 'min', this.manual_min, cx),
-		"callback2":    (v, cx) => update(this.ds.fn.invert(v), 'max', this.manual_max, cx),
+		"callback1":    v => svg_change(v, 'min'),
+		"callback2":    v => svg_change(v, 'max'),
 		"end_callback": _ => {
-			ds._domain = domain;
+			this.values();
 			COMMIT("datasets");
 		},
 	});
 
-	return {
-		"elements": [s.svg, this.cr_min, this.cr_max],
-		"svg":      s.svg,
-		"change":   s.change,
-	};
+	return this.range_svg;
 };
 
-function weight() {
-	const weights = [1,2,3,4,5];
-
-	const s = d3.scaleLinear()
-		.domain(weights)
-		.range(uniform_split(5));
-
-	const r = ramp(
-		ce('div', weights[0]),
-		ce('div', "importance", { "class": "unit-ramp" }),
-		ce('div', weights[weights.length - 1]),
-	);
-
-	const w = svg_interval({
-		"sliders":      "single",
-		"init":         { "min": 0, "max": weights[this.weight-1] },
-		"steps":        weights,
-		"width":        slider_width,
-		"end_callback": v => {
-			this.weight = s.invert(v);
-			COMMIT("datasets");
-		},
-	});
-
-	const el = ce('div', [w.svg, r], { "style": "text-align: center;" });
-
-	return {
-		el,
-		"svg":    w.svg,
-		"change": w.change,
-		"ramp":   r,
-	};
-};
-
-function range_el() {
+function weight_group() {
 	const ds = this.ds;
-	const cat = this.ds.category;
 
-	let d = ce('div', null, { "class": "range-el" });
-	let e = "";
-	let r = "";
-	let o = "";
-	let g = undefined;
+	if (!ds.category.controls.weight) return null;
 
-	function ramp_domain() {
-		let {min,max} = ds.domain;
+	const el = ce('select', null, { "bind": 'weight' });
 
-		const diff = Math.abs(max - min);
-		let i = 3 - Math.ceil(Math.log10(diff || 1));
-		if (i < 0) i = 0;
+	el.prepend(
+		...["Low", "Low-Medium", "Medium", "Medium-High", "High"]
+			.map((e,i) => ce('option', e, { "value": i + 1 }))
+			.reverse());
 
-		if (and(cat.unit === "%",
-		        or(and(min === 0, max === 100),
-		           and(min === 100, max === 0)))) i = 0;
+	el.value = ds.weight;
 
-		const u = coalesce(cat.controls.range_label, cat.unit, 'range');
-
-		return [
-			ce('div', min.toFixed(i)),
-			ce('div', u, { "class": "unit-ramp" }),
-			ce('div', max.toFixed(i)),
-		];
+	el.onchange = e => {
+		ds.weight = +e.target.value;
+		COMMIT("datasets");
 	};
+
+	this.weight = el;
+
+	return el;
+};
+
+function specs() {
+	if (!this.ds.criteria || this.ds.criteria.length < 2) return;
+
+	let f;
+	switch (this.ds.type) {
+	case "lines":
+		f = x => lines_symbol({
+			"size":             20,
+			"stroke":           x['stroke'] || 'black',
+		});
+		break;
+
+	case "points":
+		f = x => points_symbol({
+			"size":         20,
+			"fill":         this.ds.vectors.fill,
+			"stroke":       x['stroke'] || 'black',
+			"stroke-width": x['stroke-width'],
+		});
+		break;
+
+	case "polygons":
+		f = x => polygons_symbol({
+			"size":   20,
+			"fill":   this.ds.vectors.fill,
+			"stroke": x['stroke'],
+		});
+		break;
+
+	default:
+		break;
+	}
+
+	return this.ds.criteria.map(l => {
+		const id = l[l.params[0]] || 'default';
+
+		const change = (d,e) => {
+			this.checkboxes = qsa('.checkbox-row > input', this, true);
+
+			this.ds.selection = this.checkboxes
+				.filter(c => c.checked)
+				.map(c => c.value || 'default');
+
+			const fs = this.ds.vectors.data.features;
+			for (let i = 0; i < fs.length; i += 1)
+				if (same(fs[i].properties['__criteria'], l))
+					fs[i].properties['__visible'] = e.target.checked;
+
+			MAPBOX.getSource(this.ds.id).setData(this.ds.vectors.data);
+		};
+
+		this.ds.selection.push(id);
+
+		return {
+			"csymbol": f.call(this, l),
+			"cname":   l.params.map(p => l[p] ?? 'default').join(", "),
+			"checked": true,
+			change,
+		};
+	});
+};
+
+function symbol() {
+	let e;
+	const ds = this.ds;
 
 	switch (ds.type) {
 	case 'points-timeline': {
@@ -326,9 +347,6 @@ function range_el() {
 	}
 
 	case 'points': {
-		if (ds.raster)
-			g = range.call(this);
-
 		e = points_symbol({
 			"size":        24,
 			"fill":        ds.vectors.fill,
@@ -339,32 +357,24 @@ function range_el() {
 	}
 
 	case 'lines-timeline': {
-		e = points_symbol({
+		e = lines_symbol({
 			"size":        24,
-			"fill":        ds.vectors.fill,
 			"stroke":      ds.vectors.stroke,
-			"strokewidth": 2,
 		});
 		break;
 	}
 
 	case 'lines': {
-		if (ds.raster)
-			g = range.call(this);
-
 		e = lines_symbol({
-			"size":      28,
-			"dasharray": ds.vectors.dasharray,
+			"size":      24,
 			"stroke":    ds.vectors.stroke,
-			"width":     ds.vectors.width * 2,
-			"fill":      'none',
 		});
 		break;
 	}
 
 	case 'polygons-boundaries': {
 		e = polygons_symbol({
-			"size":        28,
+			"size":        24,
 			"fill":        ds.vectors.fill,
 			"opacity":     ds.vectors.opacity,
 			"stroke":      ds.vectors.stroke,
@@ -374,9 +384,6 @@ function range_el() {
 	}
 
 	case 'polygons': {
-		if (ds.raster)
-			g = range.call(this);
-
 		e = polygons_symbol({
 			"size":        28,
 			"fill":        ds.vectors.fill,
@@ -388,45 +395,21 @@ function range_el() {
 	}
 
 	case 'polygons-valued': {
-		g = range.call(this);
-
-		o = ce(
-			'span',
-			[
-				ce('div', null, {
-					"style": `
-	display: inline-block;
-	width: 64px;
-	height: 5px;
-	background-color: rgba(155,155,155,1);
-	margin: 15px 15px 0 0;
-	`,
-				}),
-				ce('div', "Not Available", { "style": "display: inline-block; font-size: x-small;" }),
-			]);
-
 		break;
 	}
 
 	case 'raster-valued-mutant':
 	case 'raster-valued':	{
-		if (this.ds._domain_select)
-			g = value_multiselect.call(this);
-
 		break;
 	}
 
 	case 'raster-mutant':
 	case 'raster-timeline':
 	case 'raster': {
-		g = range.call(this);
-
 		break;
 	}
 
 	case 'polygons-timeline': {
-		g = range.call(this);
-
 		e = polygons_symbol({
 			"size":        28,
 			"fill":        ds.vectors.fill,
@@ -438,29 +421,113 @@ function range_el() {
 	}
 
 	case 'table': {
-		qs('content', this).remove();
 		break;
 	}
 
 	default: {
-		console.warn("dscard.range_el could not decide type.", ds.id);
 		break;
 	}
 	}
 
-	if (ds.domain && !ds._domain_select) {
-		r = tmpl('#ramp');
-		qs('.ramp', r).append(...ramp_domain.call(this));
+	if (e instanceof Node)
+		e.classList.add('svg-symbol');
+
+	return e;
+};
+
+function colorscale() {
+	if (!this.ds.colorscale) return null;
+
+	let bubble;
+
+	function mouseenter(t, _i, message) {
+		if (!message) return;
+		bubble = new bubblemessage({ message, "position": "E", "close": false, "noevents": true }, t);
+	};
+
+	function mouseleave() {
+		if (bubble) bubble.remove();
+	};
+
+	switch (this.ds.type) {
+	case 'polygons-valued':
+	case 'polygons-timeline':
+	case 'raster-mutant':
+	case 'raster-timeline':
+	case 'raster': {
+		let x = i => i;
+
+		if (this.ds.raster.intervals) {
+			x = i => this.ds.colorscale.intervals[i] + " - " + this.ds.colorscale.intervals[i+1];
+		} else {
+			const s = uniform_split(this.ds.colorscale.stops.length + 1);
+			x = i => this.ds.fn.invert(s[i]).toFixed(2) + " - " + this.ds.fn.invert(s[i+1]).toFixed(2);
+		}
+
+		return colorscale_svg(
+			this.ds.colorscale.stops,
+			16,
+			(t,i) => mouseenter(t, i, x(i)),
+			mouseleave,
+		);
 	}
 
-	d.append(
-		...coalesce(maybe((this.range_el = g), 'elements'), []),
-		coalesce(r, ""),
-		coalesce(o, ""),
-		coalesce(e, ""),
-	);
+	case 'raster-valued':
+	case 'raster-valued-mutant': {
+		const ds = this.ds.hosts ? this.ds.host : this.ds;
+		return colorscale_svg(
+			ds.colorscale.stops,
+			16,
+			(t,i) => mouseenter(t, i, maybe(ds.csv.table, i)),
+			mouseleave,
+		);
+	}
 
-	return d;
+	default:
+		return null;
+	}
+};
+
+function ramp() {
+	const ds = this.ds.hosts ? this.ds.host : this.ds;
+	const cat = this.ds.category;
+
+	if (!ds.domain) return "";
+
+	if (ds._domain_select) return bind(tmpl('#ramp'), {
+		"middle": coalesce(cat.controls.range_label, cat.unit),
+	});
+
+	const {min,max} = ds.domain;
+
+	const diff = Math.abs(max - min);
+	let i = 3 - Math.ceil(Math.log10(diff || 1));
+	if (i < 0) i = 0;
+
+	if (and(cat.unit === "%",
+	        or(and(min === 0, max === 100),
+	           and(min === 100, max === 0)))) i = 0;
+
+	return bind(tmpl('#ramp'), {
+		"left":   min.toFixed(i),
+		"middle": coalesce(cat.controls.range_label, cat.unit, 'range'),
+		"right":  max.toFixed(i),
+	});
+};
+
+function opacity() {
+	this.opacity = svg_interval({
+		"init":      { "min": 0, "max": this.opacity_value },
+		"sliders":   'single',
+		"height":    8,
+		"radius":    10,
+		"callback2": x => {
+			this.opacity_value = x;
+			this.ds.opacity(x);
+		},
+	});
+
+	return this.opacity.svg;
 };
 
 function filter_modal() {
@@ -529,54 +596,99 @@ export function init() {
 	sortable(cards_list, {
 		'items':                'ds-card',
 		'forcePlaceholderSize': true,
-		'placeholder':          '<div style="margin: 1px; background-color: rgba(0,0,0,0.3);"></div>',
+		'placeholder':          '<div style="margin: 1em;"></div>',
 	})[0]
 		.addEventListener('sortupdate', _ => {
 			sort(maybe(sortable(cards_list, 'serialize'), 0, 'items').map(c => c.node.ds));
 			COMMIT();
 		});
 
-	const ca = ce('span', 'Clear all datasets', { "class": 'cards-clear' });
-	ca.onclick = _ => {
+	const remove_all = function() {
 		STATE.datasets.forEach(x => x.turn(false));
 		COMMIT("datasets");
 		update();
 	};
 
-	const cp = ce('span', 'Clear filters', { "class": 'cards-clear' });
-	cp.onclick = _ => {
+	let visible = true;
+	const visible_all = function() {
+		visible = !visible;
+
+		STATE.datasets.forEach(x => x.visibility(visible));
+
+		qs('span', this).innerText = visible ? "Hide all layers" : "Show all layers";
+		qs('i', this).className = visible ? 'bi-eye-slash-fill' : 'bi-eye-fill';
+	};
+
+	const reset_all = function() {
 		STATE.datasets.forEach(d => {
-			d._domain = Object.assign({}, d.domain);
-			d.card.refresh();
+			d._domain = Object.assign({}, d.domain, d.category.domain_init);
+			d._domain_select = d.domain_select ? [...d.domain_select] : undefined;
+			d.weight = 3;
+			d.opacity(1);
+
+			d.card.values();
+
+			if (d.vectors?.data) {
+				const fs = d.vectors.data.features;
+				for (let i = 0; i < fs.length; i += 1)
+					fs[i].properties['__visible'] = true;
+
+				MAPBOX.getSource(d.id).setData(d.vectors.data);
+			}
+
 			COMMIT("datasets");
 		});
 	};
 
-	qs('#cards #cards-clear-buttons').append(ca,cp);
+	let collapsed = true;
+	const expand_all = function() {
+		collapsed = !collapsed;
+
+		STATE.datasets.forEach(d => d.card.toggle_settings(!collapsed));
+
+		qs('span', this).innerText = collapsed ? "Expand all settings" : "Collapse all settings";
+		qs('i', this).className = collapsed ? 'bi-arrows-angle-expand' : 'bi-arrows-angle-contract';
+	};
+
+	bind(qs('#cards #cards-buttons'), {
+		remove_all,
+		visible_all,
+		reset_all,
+		expand_all,
+	});
 };
 
 export function update() {
 	const list = STATE.datasets
-		.map(d => d.card);
+		.map(d => d.card)
+		.filter(c => c);
 
 	if (list.length) sortable(cards_list, 'disable');
 
-	for (let i of list) {
-		cards_list.append(i);
-		i.refresh();
-	}
+	cards_list.append(...list);
 
 	if (list.length) sortable(cards_list, 'enable');
+};
+
+function settings(_, button, value) {
+	if (value === null || value === undefined) {
+		this.show_settings = !this.show_settings;
+	} else {
+		this.show_settings = value;
+	}
+
+	qs('aside', this).style.display = this.show_settings ? 'block' : 'none';
+	qs('i', button).className = this.show_settings ? 'bi-chevron-up' : 'bi-chevron-down';
 };
 
 export default class dscard extends HTMLElement {
 	manual_min;
 	manual_max;
-	multiselection = [];
 
-	connectedCallback() {
-		delay(1).then(_ => this.refresh());
-	};
+	checkboxes = [];
+
+	show_settings = false;
+	opacity_value = 1;
 
 	constructor(d) {
 		if (!(d instanceof DS)) throw new Error(`dscard: Expected a ds but got ${d}`);
@@ -586,134 +698,73 @@ export default class dscard extends HTMLElement {
 
 		this.ds = d;
 
-		this.opacity_value = 1;
-
-		this.show_advanced = false;
-
 		this.render();
 
 		return this;
 	};
 
 	render() {
-		this.setAttribute('bind', this.ds.id);
+		this.append(tmpl('#card-template'));
 
-		this.content = qs('content', this);
-
-		if (this.ds.category.controls.weight)
-			this.weight_group = weight.call(this.ds);
-
-		if (this.ds.hosts) mutant_options.call(this);
-
-		attach.call(this, tmpl('#ds-card-template'));
-
-		slot_populate.call(this, Object.assign({}, this.ds, {
-			'range':        range_el.call(this),
-			'info':         this.info(),
-			'opacity':      this.opacity(),
-			'close':        this.close(),
-			'weight':       maybe(this.weight_group, 'el'),
-			'ctrls':        maybe(this.weight_group, 'el') && this.ctrls(),
-			'list':         this.list_elements(),
-			'filter':       this.filter(),
-			'legends-list': this.legends(),
-		}));
+		this.bind();
 
 		return this;
+	};
+
+	bind() {
+		bind(this, Object.assign({}, this.ds, {
+			"unit-label":       coalesce(this.ds.category.controls.range_label, this.ds.category.unit, "Range"),
+			"range":            maybe(range.call(this), 'svg'),
+			"value-checkboxes": value_checkboxes.call(this),
+			"pvna":             (this.ds.type === 'polygons-valued'),
+			"info":             this.ds.info_modal.bind(this.ds),
+			"index":            coalesce(this.ds.index, "Filter").replace(/(ani|eai)/, "Filter"),
+			"specs":            specs.call(this),
+			"symbol":           symbol.call(this),
+			"colorscale":       colorscale.call(this),
+			"ramp":             ramp.call(this),
+			"visibility":       (_, e) => this.ds.visibility(e.target.checked),
+			"opacity":          opacity.call(this),
+			"close":            _ => { this.ds.turn(false); COMMIT("datasets"); },
+			"weight-group":     weight_group.call(this),
+			"settings":         (_, e) => settings.call(this, _, e.target.closest('button')),
+			"table":            this.ds.features_table_modal.bind(this.ds),
+			"filter":           this.filter(),
+			"manual-inputs":    manual_inputs.call(this),
+			"manual-min":       this.manual_min,
+			"manual-max":       this.manual_max,
+			"mutant-options":   mutant_options.call(this),
+		}), { "final": false });
 	};
 
 	disable() {
 		this.remove();
 	};
 
-	refresh() {
-		qs('[slot=range]', this)
-			.replaceChildren(this.range_el = range_el.call(this));
+	values(d) {
+		if (d === undefined) d = this.ds._domain;
 
-		this.opacity_value = 1;
-		qs('[slot=opacity]', this)
-			.replaceChildren(this.opacity());
-	};
+		if (this.manual_min) this.manual_min.value = d['min'];
+		if (this.manual_max) this.manual_max.value = d['max'];
 
-	legends() {
-		if (!this.ds.criteria || this.ds.criteria.length < 2) return;
+		if (this.weight) this.weight.value = this.ds.weight;
 
-		const ul = ce('div', null, { "style": "font-size: smaller;" });
+		this.opacity_value = this.ds.opacity;
+		this.opacity.change({
+			"min": 0,
+			"max": 1,
+		});
 
-		let f;
-		switch (this.ds.type) {
-		case "lines":
-			f = lines_legends_svg;
-			break;
-
-		case "points":
-			f = points_legends_svg;
-			break;
-
-		case "polygons":
-			f = polygons_legends_svg;
-			break;
-
-		default:
-			break;
+		if (this.range_svg) {
+			this.range_svg.change({
+				"min": this.ds.fn(d['min']),
+				"max": this.ds.fn(d['max']),
+			});
 		}
 
-		this.checkboxes = [];
+		for (const c of this.checkboxes) c.checked = true;
 
-		for (let l of this.ds.criteria) {
-			let cb;
-
-			const li = ce(
-				'div',
-				[
-					f.call(this, l),
-					ce('span', l.params.map(p => l[p] ?? 'default').join(", ")),
-					cb = ce('input', null, { "type": 'checkbox' }),
-				],
-				{
-					"style": `display: flex; justify-content: space-between;`,
-				},
-			);
-
-			cb.onchange = _ => {
-				const fs = this.ds.vectors.data.features;
-
-				for (let i = 0; i < fs.length; i += 1)
-					if (same(fs[i].properties['__criteria'], l))
-						fs[i].properties['__visible'] = cb.checked;
-
-				this.ds.selection = this.checkboxes
-					.filter(c => c[1].checked)
-					.map(c => c[0] || 'default');
-
-				MAPBOX.getSource(this.ds.id).setData(this.ds.vectors.data);
-			};
-
-			const id = l[l.params[0]] || 'default';
-			cb.checked = this.ds.selection ? this.ds.selection.includes(id) : true;
-
-			this.checkboxes.push([id, cb]);
-
-			ul.append(li);
-		}
-
-		return ul;
-	};
-
-	list_elements() {
-		if (!maybe(this.ds, 'vectors', 'data')) return "";
-
-		const e = bi_icon('table');
-		e.onclick = this.ds.features_table_modal.bind(this.ds);
-
-		return e;
-	};
-
-	info() {
-		const e = bi_icon('info-circle');
-		e.onclick = this.ds.info_modal.bind(this.ds);
-
-		return e;
+		COMMIT("datasets");
 	};
 
 	filter() {
@@ -729,37 +780,14 @@ export default class dscard extends HTMLElement {
 		return e;
 	};
 
-	ctrls() {
-		const e = bi_icon('gear');
-		e.onclick = _ => qs('.advanced-controls', this).style.display = ((this.show_advanced = !this.show_advanced)) ? 'block' : 'none';
-
-		return e;
-	}
-
-	close() {
-		const e = bi_icon('x-lg');
-		e.onclick = _ => {
-			this.ds.turn(false);
-			COMMIT("datasets");
-		};
-
-		return e;
-	};
-
-	opacity() {
-		return opacity_control({
-			"fn": x => {
-				this.opacity_value = x;
-				this.ds.opacity(x);
-			},
-			"init": maybe(this.ds, 'vectors', 'opacity'),
-		});
-	};
-
 	discover() {
 		left_panel('cards');
 		this.scrollIntoView();
-	}
+	};
+
+	toggle_settings(v) {
+		settings.call(this, null, qs('button[bind-func=settings]', this), v);
+	};
 };
 
 customElements.define('ds-card', dscard);

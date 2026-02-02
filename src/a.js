@@ -16,6 +16,13 @@ import {
 } from './complicated.js';
 
 import {
+	init as output_widget_init,
+	indexes as indexes_list,
+	shown as output_shown,
+	opacity as output_opacity,
+} from './output-widget.js';
+
+import {
 	recount as controls_recount,
 } from './controls.js';
 
@@ -59,12 +66,6 @@ import {
 } from './filtered.js';
 
 import {
-	buttons as views_buttons,
-	init as views_init,
-	right_pane as views_right_pane,
-} from './views.js';
-
-import {
 	init as mapbox_init,
 } from './mapbox.js';
 
@@ -72,11 +73,6 @@ import {
 	init as cards_init,
 	update as cards_update,
 } from './cards.js';
-
-import {
-	init as indexes_init,
-	list as indexes_list,
-} from './indexes.js';
 
 import {
 	init as timeline_init,
@@ -90,6 +86,24 @@ import {
 	sort as mapbox_sort,
 	fit as mapbox_fit,
 } from './mapbox.js';
+
+import {
+	init as right_panel_init,
+} from './right-panel.js';
+
+import {
+	and,
+	ce,
+	debounce,
+	delay,
+	json_clone,
+	maybe,
+	or,
+	qs,
+	qsa,
+	unique,
+	Whatever,
+} from '../lib/helpers.js';
 
 import DS from './ds.js';
 
@@ -262,8 +276,6 @@ async function init_1() {
 		"select": ['*', 'parent_sort_branches', 'parent_sort_subbranches', 'parent_sort_datasets'],
 	}, { "one": true });
 
-	views_init();
-
 	MOBILE = screen.width < 1152;
 
 	GEOGRAPHY.timeline = maybe(GEOGRAPHY, 'configuration', 'timeline');
@@ -287,11 +299,13 @@ On your OS, you can do this by pressing (${mac ? "⌘" : "ctrl"} −) a couple t
 
 	if (MOBILE) mobile();
 
+	document.body.append(ce('canvas', null, { "id": "output" }));
+
 	return conf;
 };
 
 async function init_2(conf) {
-	let select = ["*", "type", "category:categories(*)"];
+	const select = ["*", "type", "category:categories(*)"];
 
 	const divisions = maybe(GEOGRAPHY.configuration, 'divisions').filter(d => d.dataset_id !== null);
 
@@ -402,7 +416,7 @@ This is fatal. Thanks for all the fish.`;
 async function init_3() {
 	loading("Setting up UI elements...");
 
-	indexes_init();
+	right_panel_init();
 	controlssearch_init();
 	geographiessearch_init();
 	vectorssearch_init();
@@ -414,11 +428,14 @@ async function init_3() {
 };
 
 async function init_4() {
-	left_panel("controls");
-	qs('#left-pane').style.display = '';
-	qs('#left-pane input[id="controls-search"]').focus();
+	left_panel("cards");
 
-	qs('#right-pane').style.display = '';
+	output_widget_init();
+
+	qs('#left-panel').style.display = '';
+	qs('#left-panel input[id="controls-search"]').focus();
+
+	qs('#right-panel').style.display = '';
 
 	COMMIT("datasets");
 	delay(0.3).then(_ => mapbox_fit(GEOGRAPHY.envelope));
@@ -451,9 +468,8 @@ async function reload(k,v) {
 	}
 
 	const timeline = qs('#timeline');
-	const output_preview = qs('#output-preview');
 
-	const {view, index, variant} = STATE;
+	const {index, variant} = STATE;
 
 	(function special_layers() {
 		if (!MAPBOX.getSource('output-source')) {
@@ -536,103 +552,63 @@ async function reload(k,v) {
 		const a = STATE.datasets.map(d => maybe(d, 'config', 'divisions_tier'));
 
 		GEOGRAPHY.divisions.forEach((_,i) => {
-			let y = (a.indexOf(i) < 0) ? 'none' : v;
+			const y = (a.indexOf(i) < 0) ? 'none' : v;
 
 			if (MAPBOX.getLayer(`filtered-layer-${i}`))
 				MAPBOX.setLayoutProperty(`filtered-layer-${i}`, 'visibility', y);
 		});
 	};
 
-	function output_visibility(v) {
-		if (MAPBOX.getLayer('output-layer'))
-			MAPBOX.setLayoutProperty('output-layer', 'visibility', v);
+	function output_visibility() {
+		if (!MAPBOX.getLayer('output-layer')) return;
+
+		const v = STATE.variant === 'raster' && output_shown;
+
+		MAPBOX.setLayoutProperty('output-layer', 'visibility', v ? 'visible' : 'none');
+
+		MAPBOX.setPaintProperty('output-layer', 'raster-opacity', output_opacity);
+
+		MAPBOX.moveLayer('output-layer', MAPBOX.first_symbol);
 	};
 
 	function priority_visibility_pick() {
 		const x = variant !== "raster";
 
 		GEOGRAPHY.divisions.forEach((d,i) => {
-			if (MAPBOX.getLayer(`priority-layer-${i}`))
-				MAPBOX.setLayoutProperty(`priority-layer-${i}`, 'visibility', x && (variant === i) ? "visible" : "none");
+			if (MAPBOX.getLayer(`priority-layer-${i}`)) {
+				const t = and(x, STATE.variant === i, output_shown);
+
+				MAPBOX.setPaintProperty(`priority-layer-${i}`, 'fill-opacity', output_opacity);
+				MAPBOX.setLayoutProperty(`priority-layer-${i}`, 'visibility', t ? "visible" : "none");
+
+				if (t) MAPBOX.moveLayer(`priority-layer-${i}`, MAPBOX.first_symbol);
+			}
 		});
 	};
 
-	function datasets_visibility(v) {
-		return Promise.all(STATE.datasets.map(x => x.active(true, v)));
-	};
+	await (function datasets_visibility() {
+		return Promise.all(STATE.datasets.map(x => x.active(true, x.visible)));
+	})();
 
 	const a = await analysis_plot_active(index, true);
 
 	if (GEOGRAPHY.divisions[variant])
 		priority(GEOGRAPHY.divisions[variant], a, variant);
 
-	switch (view) {
-	case "analysis": {
-		indexes_list();
+	indexes_list();
 
-		await datasets_visibility(false);
+	if (timeline) timeline_lines_update();
 
-		if (timeline) timeline.style.display = 'none';
+	filtered_visibility('none');
+	filtered_valued_polygons();
 
-		filtered_visibility('none');
-
-		output_visibility(variant === 'raster' ? 'visible' : 'none');
-
-		priority_visibility_pick();
-
-		views_right_pane();
-
-		output_preview.style.display = 'none';
-
-		break;
-	}
-
-	case "data": {
-		filtered_visibility('none');
-
-		output_visibility('none');
-
-		priority_visibility_pick();
-
-		output_preview.style.display = '';
-
-		views_right_pane();
-
-		await datasets_visibility(true);
-
-		if (timeline) timeline_lines_update();
-
-		break;
-	}
-
-	case "filtered": {
-		if (timeline) timeline.style.display = 'none';
-
-		await datasets_visibility(false);
-
-		filtered_visibility('visible');
-
-		output_visibility('none');
-
-		priority_visibility_pick();
-
-		filtered_valued_polygons();
-
-		output_preview.style.display = '';
-
-		views_right_pane();
-
-		break;
-	}
-
-	default: {
-		throw new Error(`Invalid view '${view}'`);
-	}
+	if (k === "layers") {
+		await mapbox_sort();
 	}
 
 	if (k === "datasets") {
 		cards_update();
-		mapbox_sort();
+		await mapbox_sort();
 
 		STATE.datasets.forEach(async d => {
 			if (d.type.match(/raster-timeline/))
@@ -643,14 +619,15 @@ async function reload(k,v) {
 		});
 	}
 
-	views_buttons(view);
+	priority_visibility_pick();
+
+	output_visibility();
 
 	timeline_visibility();
 };
 
 export function clean() {
 	STATE.index = 'eai';
-	STATE.view = 'data';
 
 	STATE.datasets.forEach(d => d.active(false, false));
 
@@ -666,7 +643,7 @@ export function clean() {
 	qs('input#controls-search').value = "";
 	qs('input#controls-search').dispatchEvent(new Event('input'));
 
-	for (let e of qsa('.controls-subbranch'))
+	for (const e of qsa('.controls-subbranch'))
 		elem_collapse(qs('.controls-container', e), e);
 };
 
@@ -702,35 +679,31 @@ function mobile() {
 	function mobile_switch(v) {
 		switch (v) {
 		case 'controls':{
-			for (let e of ['#left-pane'])
+			for (const e of ['#left-panel'])
 				qs(e).style.display = '';
 
-			for (let e of ['#right-pane', '#views'])
+			for (const e of ['#right-panel'])
 				qs(e).style.display = 'none';
 
 			break;
 		}
 
 		case 'outputs': {
-			for (let e of ['#left-pane', '#views'])
+			for (const e of ['#left-panel'])
 				qs(e).style.display = 'none';
 
-			for (let e of ['#right-pane'])
+			for (const e of ['#right-panel'])
 				qs(e).style.display = '';
-
-			STATE.view = v;
-
-			views_right_pane();
 
 			break;
 		}
 
 		case 'map':
 		default: {
-			for (let e of ['#right-pane', '#views'])
+			for (const e of ['#right-panel'])
 				qs(e).style.display = 'none';
 
-			for (let e of ['#left-pane', '#views'])
+			for (const e of ['#left-panel'])
 				qs(e).style.display = '';
 
 			break;
@@ -738,9 +711,9 @@ function mobile() {
 		}
 	};
 
-	for (let e of tabs) {
+	for (const e of tabs) {
 		e.onclick = function() {
-			for (let t of tabs) t.classList.remove('active');
+			for (const t of tabs) t.classList.remove('active');
 
 			mobile_switch(this.getAttribute('bind'));
 			e.classList.add('active');
@@ -753,14 +726,14 @@ function mobile() {
 };
 
 export function left_panel(t) {
-	for (let m of qsa('bubble-message')) m.remove();
+	for (const m of qsa('bubble-message')) m.remove();
 
-	for (let e of qsa('#left-pane > div'))
+	for (const e of qsa('#left-panel > div'))
 		e.style.display = 'none';
 
 	const as = qsa('#drawer a');
 
-	for (let a of as) {
+	for (const a of as) {
 		if (a.getAttribute('for') === t) a.classList.add('active');
 		else a.classList.remove('active');
 	}
@@ -775,7 +748,7 @@ export function left_panel(t) {
 		p.dispatchEvent(new Event('activate'));
 	}
 
-	const l = qs('#left-pane');
+	const l = qs('#left-panel');
 	if (t) l.setAttribute('open', '');
 	else l.removeAttribute('open');
 
@@ -791,10 +764,9 @@ function drawer_init() {
 
 	let p;
 
-	for (let a of as) {
+	for (const a of as) {
 		a.onclick = function() {
-			if (!this.classList.contains('active'))
-				STATE.tab = this.getAttribute('for');
+			left_panel(this.classList.contains('active') ? null : (STATE.tab = this.getAttribute('for')));
 		};
 
 		a.onmouseenter = function() {
@@ -874,7 +846,7 @@ function load_datasets(array) {
 		} else
 			console.warn(`Could not initialise domain for '${ds.id}' - ${ds.type}.`);
 
-		ds.selection = d.selection;
+		ds.selection = d.selection || [];
 
 		if (and(maybe(d.selection, 0), ds.hosts))
 			ds.mutate(DST.get(d.selection[0]));

@@ -2,6 +2,10 @@ import {
 	info_mode_change,
 } from './mapbox.js';
 
+import {
+	qs,
+} from '../lib/helpers.js';
+
 const mark = Object.freeze({
 	"title":    null,
 	"position": 'C',

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    <meta name="HandheldFriendly" content="true">
+    <meta name="MobileOptimized" content="640">
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <link rel="icon" href="{{template "base" .}}/images/EAE Logo_Emblem.svg">
+
+    <script src="./libs.js?v=--TIMESTAMP--"></script>
+    <script src="./main.js?v=--TIMESTAMP--"></script>
+
+    <link rel="stylesheet" href="../lib/bootstrap-icons.css">
+
+    <link href="{{template "base" .}}/stylesheets/style.css" rel="stylesheet" />
+    <link href="{{template "base" .}}/stylesheets/nav.css" rel="stylesheet" />
+    <link href="{{template "base" .}}/stylesheets/thumbnails.css" rel="stylesheet" />
+
+    <link href="./main.css" rel="stylesheet" />
+
+    {{template "head" .}}
+  </head>
+
+  <body>
+    {{template "nav" .}}
+
+    <div id="banner">
+      <h1>My EAE</h1>
+
+      <div id="tabs">
+        <div tab="saved-analysis" active>
+          <i class="bi bi-folder-fill"></i>
+          Saved Analysis
+        </div>
+
+        <div tab="account">
+          <i class="bi bi-person-fill"></i>
+          Account
+        </div>
+      </div>
+    </div>
+
+    <div id="playground">
+      <main tab-content="saved-analysis" active>
+        <input id="search"
+               placeholder="Filter by title or geography name">
+
+        <select id="sort">
+          <option value="time">Sort by: Date</option>
+          <option value="title">Sort by: Title</option>
+        </select>
+
+        <div id="snapshots">
+          <div id="snapshots-controls">
+            <strong id="snapshots-count">0 Analyses</strong>
+          </div>
+        </div>
+      </main>
+
+      <main tab-content="account">
+        <div style="padding: 3em;">
+          <button id="change-password"
+                  style="padding: 5px 12px;">Change password</button>
+        </div>
+      </main>
+    </div>
+
+    {{template "loading" .}}
+  </body>
+
+  <template id="snapshot">
+    <div class="snapshot-square"
+         bind-attr="data"
+         bind-arg="time">
+      <header>
+        <strong class="title"
+                bind="title"></strong>
+
+        <p class="path"
+           bind="path"></p>
+
+        <div class="title-edit">
+          <span class="bi bi-pencil"></span>
+          <span class="bi bi-trash3"></span>
+        </div>
+      </header>
+
+      <content>
+        <p bind="date"
+           class="date"></p>
+
+        <div class="env"
+             bind-differs="env"
+             bind-arg="production">
+          <strong bind="env"></strong>
+        </div>
+      </content>
+
+      <footer>
+        <a bind-attr="href"
+           bind-arg="url"
+           target="_blank">
+          <i class="bi bi-box-arrow-up-right"></i>
+          Open
+        </a>
+
+        <span>
+          <button class="download">
+            <i class="bi bi-download"></i>
+            Download
+          </button>
+
+          &nbsp;
+
+          <button class="share">
+            <i class="bi bi-share"></i>
+            Share
+          </button>
+        </span>
+      </footer>
+    </div>
+  </template>
+
+  <template id="share-link-modal-content">
+    <p>
+      Sharing the following link will load the Energy Access Explorer platform in
+      the current state: layers and analysis.
+
+      Users might need the necessary permissions to view this snapshot fully.
+    </p>
+
+    <div style="display:flex; flex-flow: row nowrap;">
+      <input id="share-link-input"
+             type="text"
+             bind-value="url"
+             disabled
+             focus />
+
+      <button type="button"
+              id="share-link-copy-button">
+        <i class="bi bi-copy"
+           bind-listen="click"
+           bind-func="copy"></i>
+      </button>
+    </div>
+  </template>
+
+  {{template "env" .}}
+
+  <script type="module">
+    import flash from '../lib/flash.js';
+    import pgrest from '../lib/pgrest.js';
+
+    window.FLASH = new flash();
+    window.API = new pgrest(EAE['settings'].database, FLASH);
+    window.MOBILE = window.innerWidth < 1152;
+  </script>
+
+  <script type="module">
+    import {init} from './m.js';
+    init();
+  </script>
+</html>

@@ -1,13 +1,17 @@
-input[type=checkbox]:checked {
-  accent-color: var(--the-yellow);
+h1, h2, h3, h4 {
+  padding: unset;
 }
 
-#left-pane #drawer {
+input[type=checkbox]:checked {
+  accent-color: var(--the-green);
+}
+
+#left-panel #drawer {
   border-right: 1px solid lightgray;
   background-color: white;
 }
 
-#left-pane #drawer > div {
+#left-panel #drawer > div {
   text-align: center;
   border-bottom: 1px solid lightgray;
 }
@@ -34,8 +38,38 @@ input[type=checkbox]:checked {
 }
 
 .svg-interval,
+.svg-point,
+.svg-polygon,
 .svg-pie {
   filter: drop-shadow( 0px 1px 1px rgba(0, 0, 0, 0.3));
+}
+
+.opacity-group {
+  display: flex;
+  align-items: center;
+}
+
+.visibility-group {
+  display: flex;
+  justify-content: space-between;
+  margin: 0.5em 1.5em;
+  border: 1px solid lightgray;
+  background-color: white;
+  padding: 0.75em 1em;
+  border-radius: 3px;
+}
+
+.ramp {
+  display: flex;
+  font-size: 0.8em;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  margin: auto 0.5em;
+}
+
+.unit-ramp {
+  font-weight: bold;
+  color: darkgray;
 }
 
 bubble-message {
@@ -50,4 +84,19 @@ bubble-message {
 #ds-features-table main {
   overflow-y: scroll;
   max-height: calc(100% - 8em);
+}
+
+#eae-info-modal {
+  max-width: 40em;
+  margin: auto !important;
+  overflow-y: hidden !important;
+}
+
+#eae-info-modal main {
+  max-height: calc(100% - 8em);
+  overflow-y: scroll;
+}
+
+#eae-info-modal content {
+  max-height: calc(100% - 17em);
 }

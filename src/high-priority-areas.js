@@ -93,7 +93,11 @@ export function area_info(fields, props, ll, analysis_value, analysis_name, feat
 		if (feature_entry) {
 			const category_html = feature_entry[1];
 			const category = category_html.match(/<strong[^>]*>(.*?)<\/strong>/)?.[1] || '';
-			const name = feature_name || props['Facility Name'] || props['name'];
+			const nameFromProps = Object.entries(props).find(([k]) => {
+				const lk = k.toLowerCase();
+				return lk === 'facility name' || lk === 'name' || lk === 'facility_name';
+			})?.[1];
+			const name = feature_name || nameFromProps;
 
 			if (name) {
 				feature = name;
@@ -132,13 +136,6 @@ export function area_info(fields, props, ll, analysis_value, analysis_name, feat
 		basicData.push({ "label": "Location", "value": divisionValues.join(', ') });
 	}
 
-	for (const field of allDivisionFields) {
-		const value = props[field[0]];
-		if (value) {
-			detailedData.push({ "label": field[1], "value": value });
-		}
-	}
-
 	for (const field of fields) {
 		if (!field) continue;
 		if (field[0].startsWith('_')) continue;
@@ -155,6 +152,13 @@ export function area_info(fields, props, ll, analysis_value, analysis_name, feat
 		const rawValue = raw.values[key];
 		const unit = raw.units[key];
 		detailedData.push({ label, value, rawValue, unit });
+	}
+
+	for (const field of allDivisionFields) {
+		const value = props[field[0]];
+		if (value) {
+			detailedData.push({ "label": field[1], "value": value });
+		}
 	}
 
 	const hasLayerData = STATE.datasets.length > 0;

@@ -24,7 +24,7 @@ import {
 	until,
 } from '../lib/helpers.js';
 
-export function context(rc, f) {
+export function context(rc, features = []) {
 	const dict = [];
 	const props = {};
 	const values = {};
@@ -36,6 +36,8 @@ export function context(rc, f) {
 
 	const x = rc.index;
 	const in0 = STATE.datasets[0];
+
+	const dotState = { "used": false };
 
 	function rows(d) {
 		if (typeof d === "string") {
@@ -72,10 +74,11 @@ export function context(rc, f) {
 			units[k] = "km (proximity to)";
 		}
 
-		if (d.vectors) {
-			if ((f && f.source) === d.id) {
+		if (d.vectors && !dotState.used) {
+			const match = features.find(feat => feat && feat.source === d.id);
+			if (match) {
 				if (maybe(d.config, 'attributes_map', 'length')) {
-					Object.assign(props, f.properties);
+					Object.assign(props, match.properties);
 
 					const a = d.config.attributes_map.map(e => [e.dataset, e.target]);
 					if (a.length) {
@@ -84,6 +87,8 @@ export function context(rc, f) {
 							...a,
 						);
 					}
+
+					dotState.used = true;
 				}
 			}
 		}

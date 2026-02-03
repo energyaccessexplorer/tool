@@ -718,9 +718,13 @@
   <template id="index-graph-section-template">
     <panel-section class="index-graphs-section">
       <span slot="title"></span>
-      <span slot="description">Energy access potential across all selected geographic areas.</span>
+      <div slot="actions">
+        <button class="button-icon button-info button-about">
+          <span>About</span>
+          <i class="bi bi-info-circle"></i>
+        </button>
+      </div>
       <div class="share-graph">
-        <div class="section-description"></div>
         <div class="graph-and-scale">
           <div class="index-graphs-scale-container"></div>
           <div class="index-graphs-group"></div>
@@ -732,12 +736,8 @@
   <template id="analysis-locations-template">
     <panel-section id="analysis-locations-section" collapsible collapsed>
       <h2 slot="title">High priority areas</h2>
-      <div slot="description">
-        Showing areas (1km2) with the highest prioritization scores based on
-        your analysis criteria.
-      </div>
       <div slot="actions">
-        <button class="button-icon button-info">
+        <button class="button-icon button-info button-about">
           <span>About</span>
           <i class="bi bi-info-circle"></i>
         </button>

@@ -87,6 +87,7 @@ import {
 
 import {
 	init as right_panel_init,
+	show_loading_state as right_panel_show_loading,
 } from './right-panel.js';
 
 import {
@@ -458,6 +459,7 @@ async function reload(k,v) {
 	}
 
 	drop_map_info();
+	right_panel_show_loading();
 
 	if (k === "datasets") {
 		controls_recount();

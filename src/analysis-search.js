@@ -24,12 +24,15 @@ import {
 	ce,
 	maybe,
 	qs,
+	qsa,
 	tmpl,
 } from '../lib/helpers.js';
 
 import bind from '../lib/bind.js';
 
-let ul, resultscontainer, section, paginationContainer, descriptionEl;
+import bubblemessage from '../lib/bubblemessage.js';
+
+let ul, resultscontainer, section, paginationContainer;
 
 const paginationState = {
 	"allResults":   [],
@@ -302,10 +305,9 @@ async function trigger() {
 		return;
 	}
 
-	if (descriptionEl) {
-		const areaType = isRaster ? 'areas (1km²)' : (GEOGRAPHY.divisions[STATE.variant]?.name || 'areas');
-		descriptionEl.textContent = `Showing ${areaType} with the highest prioritization scores based on your analysis criteria.`;
-	}
+	const areaType = isRaster ? 'areas (1km²)' : (GEOGRAPHY.divisions[STATE.variant]?.name || 'areas');
+	const about = `Showing ${areaType} with the highest prioritization scores based on your analysis criteria.`;
+	setup_about_button(about);
 
 	render_page(paginationState.currentPage);
 	set_buttons_disabled(false);
@@ -332,9 +334,28 @@ function set_buttons_disabled(disabled) {
 	qs('#download-locations-data', section).disabled = disabled;
 }
 
+function setup_about_button(about) {
+	let bubble = null;
+	const aboutButton = qs('.button-about', section);
+
+	aboutButton.onmouseenter = () => {
+		bubble = new bubblemessage({
+			"message":  about,
+			"position": 'W',
+			"close":    false,
+		}, aboutButton);
+	};
+
+	aboutButton.onmouseleave = () => {
+		if (bubble) {
+			bubble.remove();
+			bubble = null;
+		}
+	};
+}
+
 export function init() {
 	section = qs('#right-panel #analysis-locations-section');
 	resultscontainer = qs('.locations-paginated-list', section);
-	descriptionEl = qs('[slot="description"]', section);
 	set_buttons_disabled(true);
 };

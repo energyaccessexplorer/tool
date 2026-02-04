@@ -333,14 +333,24 @@ async function export_all() {
 	const type = STATE.index;
 	const index_name = EAE['indexes'][type]['name'].toLowerCase().replace(/\s+/g, '-');
 
-	const [pptx_blob, tiff_blob, high_priority_csv, share_csv] = await Promise.all([
-		report_pptx_blob(),
-		analysis(type).then(a => a.tiff),
-		generate_high_priority_csv(get_locations_results()),
-		Promise.resolve(generate_share_csv_content()),
-	]);
+	let pptx_blob, tiff_blob, high_priority_csv, share_csv;
+	try {
+		[pptx_blob, tiff_blob, high_priority_csv, share_csv] = await Promise.all([
+			report_pptx_blob(),
+			analysis(type).then(a => a.tiff),
+			generate_high_priority_csv(get_locations_results(), {
+				"onProgress":  (p) => update(20 + (p * 50)),
+				"isCancelled": () => cancelled,
+			}),
+			Promise.resolve(generate_share_csv_content()),
+		]);
+	} catch (e) {
+		console.error('Export failed:', e);
+		loading(false);
+		return;
+	}
 
-	if (cancelled) { loading(false); return; }
+	if (cancelled || high_priority_csv === null) { loading(false); return; }
 	update(70);
 
 	zip.file(export_filename('summary', 'pptx', { "timestamp": false }), pptx_blob);

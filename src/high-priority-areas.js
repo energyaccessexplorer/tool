@@ -322,7 +322,10 @@ export async function download(results) {
 	}
 }
 
-export async function generate_csv_content(results) {
+export async function generate_csv_content(results, opts = {}) {
+	if (!results || results.length === 0) return '';
+
+	const { onProgress, isCancelled } = opts;
 	const data = prepare_data(results);
 	const { headers, is_raster, analysis_name } = data;
 
@@ -335,13 +338,20 @@ export async function generate_csv_content(results) {
 		return str;
 	};
 
+	const total = results.length;
 	const rows = [];
 	let i = 0;
 	for (const row_data of generate_rows(results, is_raster, analysis_name)) {
+		if (isCancelled && isCancelled()) return null;
+
 		rows.push(headers.map(h => escape_csv(row_data[h])).join(','));
-		if (++i % 100 === 0) await new Promise(resolve => setTimeout(resolve, 0));
+		if (++i % 100 === 0) {
+			if (onProgress) onProgress(i / total);
+			await new Promise(resolve => setTimeout(resolve, 0));
+		}
 	}
 
+	if (onProgress) onProgress(1);
 	return [headers.join(','), ...rows].join('\n');
 }
 

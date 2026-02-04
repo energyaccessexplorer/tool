@@ -388,7 +388,7 @@ export function aggregate_layer_values(division) {
 		if (dataset.category.name === 'boundaries') continue;
 		if (dataset.category.name === 'outline') continue;
 
-		const is_point_layer = !!dataset.vectors;
+		const is_point_layer = dataset.vectors?.shape_type === 'points';
 		const layer_id = dataset.id;
 
 		layer_data[layer_id] = {

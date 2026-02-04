@@ -28,19 +28,14 @@ LIB = ${DIST}/lib
 
 TIMESTAMP != date -u +'%Y-%m-%d--%T'
 
-# Build Go template compiler
-${BIN}/template-compiler: template-compiler/main.go go.mod
-	@ echo "Building Go template compiler"
-	@ go build -o ${BIN}/template-compiler ./template-compiler
+templates:
+	@ go build -o ${BIN}/templates ./templates
 
 clean:
-	@ rm -rf ${LIB} ${DIST} ${BIN}/template-compiler
+	@ rm -rf ${LIB} ${DIST} ${BIN}/templates
 
-build: deps build-go-templates build-a build-s build-m build-p
-	@ ${BIN}/template-compiler -template=index -output=${DIST}/index.html
-
-build-go-templates: ${BIN}/template-compiler
-	@ echo "Building Go templates"
+build: deps templates build-a build-s build-m build-p
+	@ ${BIN}/templates -template=index -output=${DIST}/index.html
 
 lint:
 	@ ${BIN}/lint ${SRC}
@@ -56,7 +51,7 @@ build-m:
 	@ echo "Building my screen"
 	@ mkdir -p ${DIST}/m
 
-	@ ${BIN}/template-compiler -template=m -output=${DIST}/m/index.html
+	@ ${BIN}/templates -template=m -output=${DIST}/m/index.html
 
 	@ sed -r -i.orig 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/m/index.html
 	@ rm ${DIST}/m/index.html.orig
@@ -88,7 +83,7 @@ build-p:
 	@ echo "Building snapshot screen"
 	@ mkdir -p ${DIST}/p
 
-	@ ${BIN}/template-compiler -template=p -output=${DIST}/p/index.html
+	@ ${BIN}/templates -template=p -output=${DIST}/p/index.html
 
 	@ sed -r -i.orig 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/p/index.html
 	@ rm ${DIST}/p/index.html.orig
@@ -118,7 +113,7 @@ build-a:
 	@ echo "Building analysis screen"
 	@ mkdir -p ${DIST}/a
 
-	@ ${BIN}/template-compiler -template=a -output=${DIST}/a/index.html
+	@ ${BIN}/templates -template=a -output=${DIST}/a/index.html
 
 	@ sed -r -i.orig 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/a/index.html
 	@ rm ${DIST}/a/index.html.orig
@@ -209,7 +204,7 @@ build-s:
 	@ echo "Building select screen"
 	@ mkdir -p ${DIST}/s
 
-	@ ${BIN}/template-compiler -template=s -output=${DIST}/s/index.html
+	@ ${BIN}/templates -template=s -output=${DIST}/s/index.html
 
 	@ sed -r -i.orig 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/s/index.html
 	@ rm ${DIST}/s/index.html.orig

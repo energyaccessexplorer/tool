@@ -190,8 +190,8 @@ function get_row(item, is_raster, analysis_name) {
 
 	if (is_raster) {
 		ll = item.c;
-		const rc = coordinates_to_raster_pixel(ll, OUTLINE.raster);
-		[fields, props, raw] = context(rc, null);
+		const raster_pixel = coordinates_to_raster_pixel(ll, OUTLINE.raster);
+		[fields, props, raw] = context(raster_pixel);
 	} else {
 		info = { "variant": STATE.variant, "name": item.name };
 		[fields, props, raw] = get_admin_area_layer_data(STATE.variant, item.id);

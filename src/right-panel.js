@@ -1,3 +1,5 @@
+/* global JSZip */
+
 import {
 	svg_pie,
 	copy_to_clipboard,

@@ -24,17 +24,17 @@ import {
 	until,
 } from '../lib/helpers.js';
 
-export function context(rc, features = []) {
+export function context(raster_pixel, features = []) {
 	const dict = [];
 	const props = {};
 	const values = {};
 	const units = {};
 
-	if (!rc) return [dict, props, { values, units }];
+	if (!raster_pixel) return [dict, props, { values, units }];
 
 	const controls = controls_list();
 
-	const x = rc.index;
+	const x = raster_pixel.index;
 	const in0 = STATE.datasets[0];
 
 	const dotState = { "used": false };

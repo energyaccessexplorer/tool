@@ -410,12 +410,13 @@ export async function sort() {
 };
 
 export function show_location_info(ll, position, centerPointer = true) {
-	const rc = coordinates_to_raster_pixel(ll, OUTLINE.raster);
+	const raster_pixel = coordinates_to_raster_pixel(ll, OUTLINE.raster);
 
 	const pt = MAPBOX.project(ll);
-	const p = MAPBOX.queryRenderedFeatures([[pt.x - 10, pt.y - 10], [pt.x + 10, pt.y + 10]]);
+	const features = MAPBOX.queryRenderedFeatures([[pt.x - 10, pt.y - 10],
+		[pt.x + 10, pt.y + 10]]);
 
-	const dotFeature = p.find(feat => feat && maybe(feat, 'geometry', 'type') === 'Point');
+	const dotFeature = features.find(feat => feat && maybe(feat, 'geometry', 'type') === 'Point');
 	if (dotFeature) {
 		const [lng, lat] = dotFeature.geometry.coordinates;
 		ll = [lng, lat];
@@ -426,7 +427,7 @@ export function show_location_info(ll, position, centerPointer = true) {
 		position.lngLat = { lng, lat };
 	}
 
-	const [fields, props, _] = context(rc, p);
+	const [fields, props, _] = context(raster_pixel, features);
 
 	const ac = coordinates_to_raster_pixel(ll, {
 		"data":   MAPBOX.getSource('output-source').raster,

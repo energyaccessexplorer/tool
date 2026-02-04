@@ -708,20 +708,20 @@ function analysis_right($, index, rows) {
 	}
 };
 
-async function toplocation_prepare(t) {
+async function toplocation_prepare(location) {
 	const r = {};
 
 	for (const k in SUMMARY)
-		r[k] = SUMMARY[k].raw_raster[t.i];
+		r[k] = SUMMARY[k].raw_raster[location.i];
 
-	const poi = await coords_search_pois({ "coords": t.c, "limit": 1 });
+	const poi = await coords_search_pois({ "coords": location.c, "limit": 1 });
 
 	return Object.assign(
 		r,
-		context(coordinates_to_raster_pixel(t.c))[1],
+		context(coordinates_to_raster_pixel(location.c))[1],
 		{
-			"long": t.c[0],
-			"lat":  t.c[1],
+			"long": location.c[0],
+			"lat":  location.c[1],
 			"poi":  maybe(poi, 0, 'name'),
 		},
 	);

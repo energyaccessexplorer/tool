@@ -24,7 +24,6 @@ import {
 	ce,
 	maybe,
 	qs,
-	qsa,
 	tmpl,
 } from '../lib/helpers.js';
 

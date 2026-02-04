@@ -31,8 +31,6 @@ import bind from '../lib/bind.js';
 
 import bubblemessage from '../lib/bubblemessage.js';
 
-let ul, resultscontainer, section, paginationContainer;
-
 const paginationState = {
 	"allResults":   [],
 	"currentPage":  1,
@@ -155,6 +153,10 @@ function get_division_results(variant) {
 };
 
 function render_pagination() {
+	const section = qs('#right-panel #analysis-locations-section');
+	const resultscontainer = qs('.locations-paginated-list', section);
+	let paginationContainer = qs('.pagination-container', resultscontainer);
+
 	if (!paginationContainer) {
 		const template = tmpl('#pagination-template');
 		resultscontainer.append(template);
@@ -226,6 +228,10 @@ function render_pagination() {
 }
 
 function render_page(page) {
+	const section = qs('#right-panel #analysis-locations-section');
+	const resultscontainer = qs('.locations-paginated-list', section);
+	let ul = qs('.locations-list', resultscontainer);
+
 	if (!ul) {
 		ul = ce('ul', null, { "class": 'locations-list' });
 		resultscontainer.append(ul);
@@ -283,13 +289,16 @@ function render_page(page) {
 }
 
 async function trigger() {
+	const section = qs('#right-panel #analysis-locations-section');
+	const resultscontainer = qs('.locations-paginated-list', section);
+
 	set_buttons_disabled(true);
 
+	const ul = qs('.locations-list', resultscontainer);
 	if (ul) ul.replaceChildren();
-	if (paginationContainer) {
-		paginationContainer.remove();
-		paginationContainer = null;
-	}
+
+	const paginationContainer = qs('.pagination-container', resultscontainer);
+	if (paginationContainer) paginationContainer.remove();
 
 	const isRaster = STATE.variant === 'raster';
 	const results = isRaster ? await getallpoints() : get_division_results(STATE.variant);
@@ -300,13 +309,9 @@ async function trigger() {
 	const count = paginationState.allResults.length;
 
 	if (count === 0) {
-		if (section) section.setAttribute('collapsed', '');
+		section.setAttribute('collapsed', '');
 		return;
 	}
-
-	const areaType = isRaster ? 'areas (1km²)' : (GEOGRAPHY.divisions[STATE.variant]?.name || 'areas');
-	const about = `Showing ${areaType} with the highest prioritization scores based on your analysis criteria.`;
-	setup_about_button(about);
 
 	render_page(paginationState.currentPage);
 	set_buttons_disabled(false);
@@ -329,17 +334,22 @@ export function get_locations_results() {
 }
 
 function set_buttons_disabled(disabled) {
+	const section = qs('#right-panel #analysis-locations-section');
 	qs('#view-all-locations', section).disabled = disabled;
 	qs('#download-locations-data', section).disabled = disabled;
 }
 
-function setup_about_button(about) {
-	let bubble = null;
+export function init() {
+	const section = qs('#right-panel #analysis-locations-section');
 	const aboutButton = qs('.button-about', section);
 
+	let bubble = null;
 	aboutButton.onmouseenter = () => {
+		const isRaster = STATE.variant === 'raster';
+		const areaType = isRaster ? 'areas (1km²)' : (GEOGRAPHY.divisions[STATE.variant]?.name || 'areas');
+
 		bubble = new bubblemessage({
-			"message":  about,
+			"message":  `Showing ${areaType} with the highest prioritization scores based on your analysis criteria.`,
 			"position": 'W',
 			"close":    false,
 		}, aboutButton);
@@ -351,10 +361,6 @@ function setup_about_button(about) {
 			bubble = null;
 		}
 	};
-}
 
-export function init() {
-	section = qs('#right-panel #analysis-locations-section');
-	resultscontainer = qs('.locations-paginated-list', section);
 	set_buttons_disabled(true);
 };

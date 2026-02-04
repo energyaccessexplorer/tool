@@ -61,7 +61,7 @@ const PIES = {};
 
 const bubble = (v,e) => new bubblemessage({ "message": v + "%", "position": "C", "close": false, "noevents": true }, e);
 
-function update_graph_section(section, distribution, total, unit) {
+function update_graph_section(section, distribution, total, unit, description) {
 	const labels = ['Low', 'Low - medium', 'Medium', 'Medium - high', 'High'];
 
 	const scale = ce('dl', null, { "class": 'discrete-scale' });
@@ -84,12 +84,17 @@ function update_graph_section(section, distribution, total, unit) {
 	const scale_container = qs('.index-graphs-scale-container', section);
 	scale_container.innerHTML = '';
 	scale_container.append(scale);
+
+	const descEl = qs('.section-description', section);
+	descEl.innerHTML = '';
+	descEl.append(description);
 }
 
-function create_graph_section(title, type, numberId) {
+function create_graph_section(title, type, numberId, descId) {
 	const section = tmpl('#index-graph-section-template');
 	qs('[slot="title"]', section).textContent = title;
 	qs('.index-graphs-group', section).id = numberId;
+	qs('.section-description', section).id = descId;
 	qs('.index-graphs-group', section).append(PIES[type].svg);
 	return section;
 }
@@ -123,9 +128,6 @@ export function show_loading_state() {
 }
 
 export async function graphs(raster) {
-	const blankState = qs('#analysis-blank-state');
-	const sectionsWrapper = qs('#analysis-sections-wrapper');
-
 	const t = await summary_analyse(raster);
 
 	const e = (1000/GEOGRAPHY.resolution)**2;
@@ -143,12 +145,19 @@ export async function graphs(raster) {
 
 		const totalPop = Math.round(g['total'] / e);
 		const highPop = Math.round(g['distribution'][4] * totalPop);
-		const about = `Showing energy access potential for areas affecting ${totalPop.toLocaleString()} people, of whom ${highPop.toLocaleString()} people are situated in areas of high energy access potential.`;
+
+		const description = document.createDocumentFragment();
+		description.append(
+			'Showing energy access potential for areas affecting ',
+			ce('strong', totalPop.toLocaleString() + ' people'),
+			', of whom ',
+			ce('strong', highPop.toLocaleString() + ' people'),
+			' are situated in areas of high energy access potential.',
+		);
 
 		const section = qs('#population-number').closest('.index-graphs-section');
 
-		update_graph_section(section, g['distribution'], totalPop, 'people');
-		setup_about_button(section, about);
+		update_graph_section(section, g['distribution'], totalPop, 'people', description);
 
 		g['distribution'].forEach((_,i) => PIES['population']['data'][i].shift());
 
@@ -165,12 +174,19 @@ export async function graphs(raster) {
 
 		const totalArea = Math.round(g['total'] * f);
 		const highArea = Math.round(g['distribution'][4] * totalArea);
-		const about = `Showing energy access potential for areas spanning ${totalArea.toLocaleString()} km², of which ${highArea.toLocaleString()} km² has high energy access potential.`;
+
+		const description = document.createDocumentFragment();
+		description.append(
+			'Showing energy access potential for areas spanning ',
+			ce('strong', totalArea.toLocaleString() + ' km²'),
+			', of which ',
+			ce('strong', highArea.toLocaleString() + ' km²'),
+			' has high energy access potential.',
+		);
 
 		const section = qs('#area-number').closest('.index-graphs-section');
 
-		update_graph_section(section, g['distribution'], totalArea, 'km²');
-		setup_about_button(section, about);
+		update_graph_section(section, g['distribution'], totalArea, 'km²', description);
 
 		g['distribution'].forEach((_,i) => PIES['area']['data'][i].shift());
 
@@ -182,6 +198,8 @@ export async function graphs(raster) {
 
 	analysis_locations_panel_update();
 
+	const blankState = qs('#analysis-blank-state');
+	const sectionsWrapper = qs('#analysis-sections-wrapper');
 	const saveButton = qs('#save-snapshot-button');
 	const shareButton = qs('#share-snapshot-button');
 	const downloadButton = qs('#tiff-download');
@@ -232,8 +250,11 @@ export function init() {
 		show_export_modal();
 	};
 
-	const areaSection = create_graph_section('Area share', 'area', 'area-number');
-	const populationSection = create_graph_section('Population share', 'population', 'population-number');
+	const areaSection = create_graph_section('Area share', 'area', 'area-number', 'area-description');
+	const populationSection = create_graph_section('Population share', 'population', 'population-number', 'population-description');
+
+	setup_about_button(areaSection, "Shows the 'Prioritization Index' results as area shares, based on your analysis criteria.");
+	setup_about_button(populationSection, "Shows the 'Prioritization Index' results as population shares, based on your analysis criteria.");
 
 	qs('#analysis-sections-wrapper').append(areaSection);
 	qs('#analysis-sections-wrapper').append(populationSection);

@@ -18,7 +18,7 @@ import {
 import {
 	download as high_priority_areas_download,
 	view_all as high_priority_areas_view_all,
-} from './high-priority-areas.js';
+} from './area-analysis.js';
 
 import {
 	ce,

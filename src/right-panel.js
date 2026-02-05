@@ -44,7 +44,7 @@ import {
 
 import {
 	generate_csv_content as generate_high_priority_csv,
-} from './high-priority-areas.js';
+} from './area-analysis.js';
 
 import {
 	ce,

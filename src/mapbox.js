@@ -11,7 +11,7 @@ import {
 import {
 	get_admin_area_item,
 	get_admin_area_layer_data,
-} from './high-priority-areas.js';
+} from './area-analysis.js';
 
 import {
 	ce,

@@ -134,7 +134,7 @@ build-a:
 		${SRC}/symbols.js \
 		${SRC}/geographies-search.js \
 		${SRC}/vectors-search.js \
-		${SRC}/high-priority-areas.js \
+		${SRC}/area-analysis.js \
 		${SRC}/analysis-search.js \
 		${SRC}/locations-search.js \
 		${SRC}/points-loading.js \

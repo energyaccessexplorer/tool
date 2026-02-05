@@ -1,6 +1,6 @@
 import {
 	area_info,
-} from './high-priority-areas.js';
+} from './area-analysis.js';
 
 import {
 	tmpl,

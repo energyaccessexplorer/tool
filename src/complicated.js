@@ -1,5 +1,3 @@
-import DS from './ds.js';
-
 import {
 	intersect,
 } from './rasters.js';
@@ -9,19 +7,12 @@ import {
 } from './controls.js';
 
 import {
-	colorscale,
 	extent_contained,
 } from './utils.js';
 
 import {
-	analysis,
-} from './analysis.js';
-
-import {
 	and,
 	maybe,
-	qs,
-	until,
 } from '../lib/helpers.js';
 
 export function context(raster_pixel, features = []) {
@@ -163,59 +154,6 @@ export function context(raster_pixel, features = []) {
 	});
 
 	return [dict, props, { values, units }];
-};
-
-let analysis_count = 0;
-export async function analysis_to_dataset(t) {
-	const category = await API.get("categories", { "select": "*", "name": "eq.analysis" }, { "one": true });
-
-	category.colorstops = colorscale.stops;
-
-	analysis_count++;
-
-	const a = await analysis(t);
-
-	const url = URL.createObjectURL(new Blob([a.tiff], { "type": "application/octet-stream;charset=utf-8" }));
-
-	const d = new DS({
-		"name":            `analysis-${t}-` + analysis_count,
-		"name_long":       `Analysis ${t.toUpperCase()} - ` + analysis_count,
-		"type":            "raster",
-		"category":        category,
-		"processed_files": [{
-			"func":     "raster",
-			"endpoint": url,
-		}],
-		"source_files": [],
-		"metadata":     {},
-	});
-
-	d.metadata.inputs = STATE.datasets.map(d => d.id);
-
-	await d.active(true, true);
-
-	await until(_ => d.card);
-
-	qs('#cards #cards-list').prepend(d.card);
-
-	await until(_ => maybe(d, 'raster', 'data'));
-
-	d['summary'] = {
-		'intersections': {},
-	};
-
-	for (const i of d.metadata.inputs) {
-		const ds = DST.get(i);
-		const x = analysis_dataset_intersect.call(ds, d.raster);
-
-		if (x) d['summary']['intersections'][ds.id] = x;
-	}
-
-	d['summary']['analysis'] = a.analysis;
-
-	d.opacity(1);
-
-	COMMIT("datasets");
 };
 
 export function analysis_dataset_intersect(raster) {

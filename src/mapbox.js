@@ -427,7 +427,7 @@ export function show_location_info(ll, position, centerPointer = true) {
 		position.lngLat = { lng, lat };
 	}
 
-	const [fields, props, _] = context(raster_pixel, features);
+	const [fields, props, raw] = context(raster_pixel, features);
 
 	const ac = coordinates_to_raster_pixel(ll, {
 		"data":   MAPBOX.getSource('output-source').raster,
@@ -444,7 +444,7 @@ export function show_location_info(ll, position, centerPointer = true) {
 	coords_search_pois({ "coords": ll, "limit": 1 })
 		.then(r => {
 			const feature_name = maybe(r, 0, 'name') || null;
-			const { drop } = pointer(position, { fields, props, ll, analysis_value, analysis_name, feature_name });
+			const { drop } = pointer(position, { fields, props, ll, analysis_value, analysis_name, feature_name, raw });
 			current_map_info_drop = drop;
 
 			if (centerPointer) ensure_map_info_visible();

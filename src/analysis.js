@@ -433,7 +433,7 @@ function aggregate_point_values(division_raster, dataset, layer_data, layer_id, 
 		const values = layer_data[layer_id].areas[area_id].values;
 		layer_data[layer_id].areas[area_id].result = {
 			"type":  'points',
-			"count": values.length,
+			"value": values.length,
 		};
 	}
 }
@@ -452,9 +452,11 @@ function aggregate_scalar_values(division_raster, dataset, layer_data, layer_id,
 		const values = layer_data[layer_id].areas[area_id].values;
 		if (values.length === 0) continue;
 
+		const sum = values.reduce((a, b) => a + b, 0);
+
 		layer_data[layer_id].areas[area_id].result = {
-			"type":    'scalar',
-			"average": values.reduce((a, b) => a + b, 0) / values.length,
+			"type":  'scalar',
+			"value": dataset.category.unit ? sum / values.length : sum,
 		};
 	}
 }

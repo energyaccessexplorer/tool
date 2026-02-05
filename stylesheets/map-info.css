@@ -24,7 +24,7 @@ map-info {
 	padding: 0;
 	gap: 10px;
 	isolation: isolate;
-	width: 320px;
+	width: 400px;
 	font-size: 14px;
 	line-height: 20px;
 	color: #5C5959;
@@ -36,7 +36,7 @@ map-info main {
 	display: flex;
 	flex-direction: column;
 	padding: 0;
-	width: 320px;
+	width: inherit;
 	max-height: 60vh;
 	background: #FFFFFF;
 	border: 1px solid #E7E6E6;
@@ -136,7 +136,7 @@ map-info content {
 	padding: 0;
 	gap: 12px;
 	isolation: isolate;
-	width: 320px;
+	width: inherit;
 	align-self: stretch;
 }
 

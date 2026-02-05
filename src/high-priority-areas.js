@@ -54,12 +54,10 @@ export function get_admin_area_layer_data(variant, area_id) {
 
 			let value, unit;
 			if (area_result.type === 'points') {
-				value = area_result.count;
+				value = area_result.value;
 				unit = 'count';
 			} else {
-				value = typeof area_result.average === 'number'
-					? parseFloat(area_result.average.toFixed(2))
-					: area_result.average;
+				value = parseFloat(area_result.value.toFixed(2));
 				unit = layer.unit || '';
 			}
 
@@ -136,22 +134,46 @@ export function area_info(fields, props, ll, analysis_value, analysis_name, feat
 		basicData.push({ "label": "Location", "value": divisionValues.join(', ') });
 	}
 
+	const datasetIds = new Set(STATE.datasets.map(d => d.id));
+	const clickedLayerId = fields.find(d => d?.[0]?.startsWith('_') && datasetIds.has(d[0].slice(1)))?.[0].slice(1);
+	const layerEntries = {};
+	const subordinateEntries = {};
+
 	for (const field of fields) {
 		if (!field) continue;
-		if (field[0].startsWith('_')) continue;
-		if (field[0].includes('analysis')) continue;
+		const [key, label] = field;
+		if (!key || key.startsWith('_') || key.includes('analysis')) continue;
+		if (['facility name', 'name', 'facility_name'].includes(key.toLowerCase())) continue;
+		if (props[key] == null) continue;
 
-		const field_name = field[0].toLowerCase();
-		if (field_name === 'facility name' || field_name === 'name' || field_name === 'facility_name') continue;
+		(datasetIds.has(key) ? layerEntries : subordinateEntries)[key] = [key, label];
+	}
 
-		if (props[field[0]] === undefined || props[field[0]] === null) continue;
-
-		const key = field[0];
-		const label = field.hasOwnProperty(1) ? field[1] : key;
-		const rawValue = raw.values[key];
+	function pushDetail(key, label, value) {
 		const unit = raw.units[key];
-		const value = `${props[key]} ${unit || ''}`.trim();
-		detailedData.push({ label, value, rawValue, unit });
+		const displayUnit = unit === 'count' ? '' : (unit || '');
+		const v = Number(value);
+		const formatted = Number.isFinite(v) ? v.toLocaleString() : value;
+		detailedData.push({
+			"label":    label || key,
+			"value":    `${formatted} ${displayUnit}`.trim(),
+			"rawValue": raw.values[key],
+			"unit":     unit,
+		});
+	}
+
+	for (const { "id": layerId } of STATE.datasets) {
+		if (!layerEntries[layerId]) continue;
+
+		const [key, label] = layerEntries[layerId];
+		pushDetail(key, label, raw.values[key]);
+
+		if (layerId === clickedLayerId) {
+			for (const subKey in subordinateEntries) {
+				const [, subLabel] = subordinateEntries[subKey];
+				pushDetail(subKey, '\u00A0\u00A0\u00A0\u00A0' + (subLabel || subKey), props[subKey]);
+			}
+		}
 	}
 
 	for (const field of allDivisionFields) {
@@ -256,9 +278,12 @@ function sort_results(results, column, desc, is_raster, analysis_name) {
 function prepare_data(results) {
 	const is_raster = STATE.variant === 'raster';
 	const analysis_name = EAE['indexes'][STATE.index]['name'];
-
-	const headers = ["Priority score", ...Object.keys(get_row(results[0], is_raster, analysis_name)).filter(h => h !== "Priority score")];
 	const area_type = is_raster ? '1km²' : (GEOGRAPHY.divisions[STATE.variant]?.name || 'areas');
+
+	const row = get_row(results[0], is_raster, analysis_name);
+	const fixedOrder = ["Priority score", analysis_name, "Latitude", "Longitude"];
+	const remaining = Object.keys(row).filter(h => !fixedOrder.includes(h));
+	const headers = fixedOrder.filter(h => row.hasOwnProperty(h)).concat(remaining);
 
 	return { headers, area_type, analysis_name, is_raster };
 }

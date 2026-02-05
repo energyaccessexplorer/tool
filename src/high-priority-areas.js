@@ -148,9 +148,9 @@ export function area_info(fields, props, ll, analysis_value, analysis_name, feat
 
 		const key = field[0];
 		const label = field.hasOwnProperty(1) ? field[1] : key;
-		const value = props[key].toString();
 		const rawValue = raw.values[key];
 		const unit = raw.units[key];
+		const value = `${props[key]} ${unit || ''}`.trim();
 		detailedData.push({ label, value, rawValue, unit });
 	}
 

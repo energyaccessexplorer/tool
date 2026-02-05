@@ -119,105 +119,92 @@ function setup_about_button(section, about) {
 	};
 }
 
-export function show_loading_state() {
-	const blankState = qs('#analysis-blank-state');
-	const sectionsWrapper = qs('#analysis-sections-wrapper');
-
-	blankState.style.display = 'flex';
-	sectionsWrapper.style.display = 'none';
-}
-
-export async function graphs(raster) {
-	const t = await summary_analyse(raster);
-
-	const e = (1000/GEOGRAPHY.resolution)**2;
-
-	const outline_raster = DST.get('outline').raster;
-	const outline_cover = outline_raster.data.filter(x => x != outline_raster.nodata).length;
-	const f = GEOGRAPHY.area ? (GEOGRAPHY.area / outline_cover) : (1/e);
-
-	let hasValidData = false;
-
-	let g = maybe(t, 'population-density'); if (g) {
-		g['distribution'].forEach((x,i) => PIES['population']['data'][i].push(x));
-
-		PIES['population'].change(1);
-
-		const totalPop = Math.round(g['total'] / e);
-		const highPop = Math.round(g['distribution'][4] * totalPop);
-
-		const description = document.createDocumentFragment();
-		description.append(
-			'Showing energy access potential for areas affecting ',
-			ce('strong', totalPop.toLocaleString() + ' people'),
-			', of whom ',
-			ce('strong', highPop.toLocaleString() + ' people'),
-			' are situated in areas of high energy access potential.',
-		);
-
-		const section = qs('#population-number').closest('.index-graphs-section');
-
-		update_graph_section(section, g['distribution'], totalPop, 'people', description);
-
-		g['distribution'].forEach((_,i) => PIES['population']['data'][i].shift());
-
-		if (!isNaN(totalPop) && totalPop > 0) hasValidData = true;
-	} else {
-		const pn = qs('#population-number');
-		if (pn) pn.closest('.index-graphs-group').remove();
-	}
-
-	g = maybe(t, 'area'); if (g) {
-		g['distribution'].forEach((x,i) => PIES['area']['data'][i].push(x));
-
-		PIES['area'].change(1);
-
-		const totalArea = Math.round(g['total'] * f);
-		const highArea = Math.round(g['distribution'][4] * totalArea);
-
-		const description = document.createDocumentFragment();
-		description.append(
-			'Showing energy access potential for areas spanning ',
-			ce('strong', totalArea.toLocaleString() + ' km²'),
-			', of which ',
-			ce('strong', highArea.toLocaleString() + ' km²'),
-			' has high energy access potential.',
-		);
-
-		const section = qs('#area-number').closest('.index-graphs-section');
-
-		update_graph_section(section, g['distribution'], totalArea, 'km²', description);
-
-		g['distribution'].forEach((_,i) => PIES['area']['data'][i].shift());
-
-		if (!isNaN(totalArea) && totalArea > 0) hasValidData = true;
-	} else {
-		const an = qs('#area-number');
-		if (an) an.closest('.index-graphs-group').remove();
-	}
-
-	analysis_locations_panel_update();
-
-	const blankState = qs('#analysis-blank-state');
-	const sectionsWrapper = qs('#analysis-sections-wrapper');
+export function update_analysis_buttons(hasData) {
 	const saveButton = qs('#save-snapshot-button');
 	const shareButton = qs('#share-snapshot-button');
 	const downloadButton = qs('#tiff-download');
 
-	if (hasValidData) {
-		blankState.style.display = 'none';
-		sectionsWrapper.style.display = 'flex';
-		if (saveButton) saveButton.disabled = false;
-		if (shareButton) shareButton.disabled = false;
-		if (downloadButton) downloadButton.disabled = false;
-	} else {
-		blankState.style.display = 'flex';
-		sectionsWrapper.style.display = 'none';
-		if (saveButton) saveButton.disabled = true;
-		if (shareButton) shareButton.disabled = true;
-		if (downloadButton) downloadButton.disabled = true;
-	}
+	if (saveButton) saveButton.disabled = !hasData;
+	if (shareButton) shareButton.disabled = !hasData;
+	if (downloadButton) downloadButton.disabled = !hasData;
+}
+
+export function update_analysis_state(hasValidGraphs) {
+	const blankState = qs('#analysis-blank-state');
+	const sectionsWrapper = qs('#analysis-sections-wrapper');
+
+	blankState.style.display = hasValidGraphs ? 'none' : 'flex';
+	sectionsWrapper.style.display = hasValidGraphs ? 'flex' : 'none';
+}
+
+
+export async function graphs(raster) {
+	const t = await summary_analyse(raster);
+	const e = (1000/GEOGRAPHY.resolution)**2;
+	const outline_raster = DST.get('outline').raster;
+	const outline_cover = outline_raster.data.filter(x => x != outline_raster.nodata).length;
+	const f = GEOGRAPHY.area ? (GEOGRAPHY.area / outline_cover) : (1/e);
+
+	process_graph(t, {
+		"dataKey":     'population-density',
+		"pieKey":      'population',
+		"selector":    '#population-number',
+		"unit":        'people',
+		"calcTotal":   (data) => Math.round(data['total'] / e),
+		"description": (total, high) => [
+			'Showing energy access potential for areas affecting ',
+			ce('strong', total.toLocaleString() + ' people'),
+			', of whom ',
+			ce('strong', high.toLocaleString() + ' people'),
+			' are situated in areas of high energy access potential.',
+		],
+	});
+
+	process_graph(t, {
+		"dataKey":     'area',
+		"pieKey":      'area',
+		"selector":    '#area-number',
+		"unit":        'km²',
+		"calcTotal":   (data) => Math.round(data['total'] * f),
+		"description": (total, high) => [
+			'Showing energy access potential for areas spanning ',
+			ce('strong', total.toLocaleString() + ' km²'),
+			', of which ',
+			ce('strong', high.toLocaleString() + ' km²'),
+			' has high energy access potential.',
+		],
+	});
+
+	analysis_locations_panel_update();
 };
+
+function process_graph(analysis_summary, config) {
+	const data = maybe(analysis_summary, config.dataKey);
+
+	if (!data) {
+		const el = qs(config.selector);
+		if (el) el.closest('.index-graphs-group').remove();
+		return false;
+	}
+
+	const total = config.calcTotal(data);
+	if (isNaN(total) || total <= 0) return false;
+
+	data['distribution'].forEach((x, i) => PIES[config.pieKey]['data'][i].push(x));
+	PIES[config.pieKey].change(1);
+
+	const high = Math.round(data['distribution'][4] * total);
+
+	const description = document.createDocumentFragment();
+	description.append(...config.description(total, high));
+
+	const section = qs(config.selector).closest('.index-graphs-section');
+	update_graph_section(section, data['distribution'], total, config.unit, description);
+
+	data['distribution'].forEach((_, i) => PIES[config.pieKey]['data'][i].shift());
+
+	return true;
+}
 
 export function init() {
 	PIES["population"] = svg_pie([[0], [0], [0], [0], [0]], 70, 0, analysis_colorscale.stops, null, null, bubble);

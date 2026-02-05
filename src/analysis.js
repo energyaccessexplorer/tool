@@ -12,6 +12,8 @@ import {
 
 import {
 	graphs as indexes_graphs,
+	update_analysis_buttons,
+	update_analysis_state,
 } from './right-panel.js';
 
 import {
@@ -291,7 +293,11 @@ export async function plot_active(type, doindexes) {
 		canvas_source.pause();
 	}
 
-	if (doindexes) indexes_graphs(a.raster);
+	if (doindexes) {
+		update_analysis_state(Boolean(a));
+		update_analysis_buttons(Boolean(a));
+		indexes_graphs(a.raster);
+	}
 
 	return a;
 };

@@ -37,7 +37,7 @@ export function context(raster_pixel, features = []) {
 		}
 
 		let v = d.raster.data[x];
-		let k = d.id;
+		const k = d.id;
 
 		if (v === d.raster.nodata) return;
 
@@ -45,7 +45,6 @@ export function context(raster_pixel, features = []) {
 			v = v.toFixed(2);
 
 		if (maybe(d, 'csv', 'key')) {
-			k = d.id + "_csv_" + d.csv.key;
 			v = d.csv.table[v];
 		}
 

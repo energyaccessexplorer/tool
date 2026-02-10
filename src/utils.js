@@ -585,6 +585,15 @@ export function copy_to_clipboard(url, button) {
 		});
 };
 
+export function area_type(variant) {
+	if (variant === 'raster') {
+		const r = GEOGRAPHY.resolution;
+		return (r % 1000) === 0 ? (r / 1000) + 'km²' : r + 'm²';
+	} else {
+		return GEOGRAPHY.divisions[variant]?.name || 'areas';
+	}
+}
+
 export function export_filename(name, extension, { timestamp = true } = {}) {
 	if (!timestamp) return `eae-${name}.${extension}`;
 

@@ -21,6 +21,10 @@ import {
 } from './area-analysis.js';
 
 import {
+	area_type,
+} from './utils.js';
+
+import {
 	ce,
 	maybe,
 	qs,
@@ -31,13 +35,12 @@ import bind from '../lib/bind.js';
 
 import bubblemessage from '../lib/bubblemessage.js';
 
-function area_type(variant) {
+function format_area_type(variant) {
+	const type = area_type(variant);
 	if (variant === 'raster') {
-		const r = GEOGRAPHY.resolution;
-		const unit = (r % 1000) === 0 ? (r / 1000) + 'km²' : r + 'm²';
-		return `areas (${unit})`;
+		return `areas (${type})`;
 	} else {
-		return (GEOGRAPHY.divisions[variant]?.name || 'areas').toLowerCase();
+		return type.toLowerCase();
 	}
 }
 
@@ -356,7 +359,7 @@ export function init() {
 	let bubble = null;
 	aboutButton.onmouseenter = () => {
 		bubble = new bubblemessage({
-			"message":  `Showing ${area_type(STATE.variant)} with the highest prioritization scores based on your analysis criteria.`,
+			"message":  `Showing ${format_area_type(STATE.variant)} with the highest prioritization scores based on your analysis criteria.`,
 			"position": 'W',
 			"close":    false,
 		}, aboutButton);

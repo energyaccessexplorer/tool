@@ -1,4 +1,5 @@
 import {
+	area_type,
 	coordinates_to_raster_pixel,
 	export_filename,
 	loading,
@@ -278,14 +279,14 @@ function sort_results(results, column, desc, is_raster, analysis_name) {
 function prepare_data(results) {
 	const is_raster = STATE.variant === 'raster';
 	const analysis_name = EAE['indexes'][STATE.index]['name'];
-	const area_type = is_raster ? '1km²' : (GEOGRAPHY.divisions[STATE.variant]?.name || 'areas');
+	const area_type_str = area_type(STATE.variant);
 
 	const row = get_row(results[0], is_raster, analysis_name);
 	const fixedOrder = ["Priority score", analysis_name, "Latitude", "Longitude"];
 	const remaining = Object.keys(row).filter(h => !fixedOrder.includes(h));
 	const headers = fixedOrder.filter(h => row.hasOwnProperty(h)).concat(remaining);
 
-	return { headers, area_type, analysis_name, is_raster };
+	return { headers, "area_type": area_type_str, analysis_name, is_raster };
 }
 
 function* generate_rows(results, is_raster, analysis_name, start = 0, count = results.length - start) {
@@ -384,7 +385,7 @@ export function view_all(results) {
 	const data = prepare_data(results);
 	if (!data) return;
 
-	const { headers, is_raster, area_type, analysis_name } = data;
+	const { headers, is_raster, "area_type": area_type_str, analysis_name } = data;
 
 	const selected_indices = new Set();
 
@@ -598,7 +599,7 @@ export function view_all(results) {
 
 	const header = tmpl('#modal-header-template');
 	bind(header, {
-		"title":    `High priority areas (${area_type})`,
+		"title":    `High priority areas (${area_type_str})`,
 		"subtitle": analysis_name,
 	});
 

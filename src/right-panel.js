@@ -147,7 +147,7 @@ export async function graphs(raster) {
 
 	const indexName = EAE['indexes'][STATE.index]['name'].toLowerCase();
 
-	process_graph(t, {
+	const hasPopulation = process_graph(t, {
 		"dataKey":     'population-density',
 		"pieKey":      'population',
 		"selector":    '#population-number',
@@ -162,7 +162,7 @@ export async function graphs(raster) {
 		],
 	});
 
-	process_graph(t, {
+	const hasArea = process_graph(t, {
 		"dataKey":     'area',
 		"pieKey":      'area',
 		"selector":    '#area-number',
@@ -176,6 +176,10 @@ export async function graphs(raster) {
 			` has high ${indexName}.`,
 		],
 	});
+
+	const hasValidData = hasPopulation || hasArea;
+	update_analysis_state(hasValidData);
+	update_analysis_buttons(hasValidData);
 
 	analysis_locations_panel_update();
 };

@@ -145,6 +145,8 @@ export async function graphs(raster) {
 	const outline_cover = outline_raster.data.filter(x => x != outline_raster.nodata).length;
 	const f = GEOGRAPHY.area ? (GEOGRAPHY.area / outline_cover) : (1/e);
 
+	const indexName = EAE['indexes'][STATE.index]['name'].toLowerCase();
+
 	process_graph(t, {
 		"dataKey":     'population-density',
 		"pieKey":      'population',
@@ -152,11 +154,11 @@ export async function graphs(raster) {
 		"unit":        'people',
 		"calcTotal":   (data) => Math.round(data['total'] / e),
 		"description": (total, high) => [
-			'Showing energy access potential for areas affecting ',
+			`Showing ${indexName} for areas affecting `,
 			ce('strong', total.toLocaleString() + ' people'),
 			', of whom ',
 			ce('strong', high.toLocaleString() + ' people'),
-			' are situated in areas of high energy access potential.',
+			` are situated in areas of high ${indexName}.`,
 		],
 	});
 
@@ -167,11 +169,11 @@ export async function graphs(raster) {
 		"unit":        'km²',
 		"calcTotal":   (data) => Math.round(data['total'] * f),
 		"description": (total, high) => [
-			'Showing energy access potential for areas spanning ',
+			`Showing ${indexName} for areas spanning `,
 			ce('strong', total.toLocaleString() + ' km²'),
 			', of which ',
 			ce('strong', high.toLocaleString() + ' km²'),
-			' has high energy access potential.',
+			` has high ${indexName}.`,
 		],
 	});
 

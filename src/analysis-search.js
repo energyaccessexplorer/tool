@@ -31,6 +31,16 @@ import bind from '../lib/bind.js';
 
 import bubblemessage from '../lib/bubblemessage.js';
 
+function area_type(variant) {
+	if (variant === 'raster') {
+		const r = GEOGRAPHY.resolution;
+		const unit = (r % 1000) === 0 ? (r / 1000) + 'km²' : r + 'm²';
+		return `areas (${unit})`;
+	} else {
+		return (GEOGRAPHY.divisions[variant]?.name || 'areas').toLowerCase();
+	}
+}
+
 const paginationState = {
 	"allResults":   [],
 	"currentPage":  1,
@@ -345,11 +355,8 @@ export function init() {
 
 	let bubble = null;
 	aboutButton.onmouseenter = () => {
-		const isRaster = STATE.variant === 'raster';
-		const areaType = isRaster ? 'areas (1km²)' : (GEOGRAPHY.divisions[STATE.variant]?.name || 'areas');
-
 		bubble = new bubblemessage({
-			"message":  `Showing ${areaType} with the highest prioritization scores based on your analysis criteria.`,
+			"message":  `Showing ${area_type(STATE.variant)} with the highest prioritization scores based on your analysis criteria.`,
 			"position": 'W',
 			"close":    false,
 		}, aboutButton);

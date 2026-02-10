@@ -11,6 +11,7 @@ import {
 
 import {
 	lowmedhigh_scale,
+	priority_scale,
 } from './analysis.js';
 
 import {
@@ -109,7 +110,10 @@ export function area_info(fields, props, ll, analysis_value, analysis_name, feat
 
 	if (Number.isFinite(analysis_value)) {
 		if (analysis_name) {
-			const analysisData = { "label": analysis_name, "value": lowmedhigh_scale(analysis_value) };
+			const scale = is_admin_area
+				? priority_scale(GEOGRAPHY.divisions[area_info.variant].priorityData, lowmedhigh_scale.range())
+				: lowmedhigh_scale;
+			const analysisData = { "label": analysis_name, "value": scale(analysis_value) };
 			basicData.push(analysisData);
 			detailedData.push(analysisData);
 		}

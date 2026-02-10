@@ -36,6 +36,16 @@ export const lowmedhigh_scale = d3.scaleQuantize()
 	.domain([0,1])
 	.range(["Low", "Low-Medium", "Medium", "Medium-High", "High"]);
 
+export function priority_scale(priorityData, range) {
+	const averages = Object.values(priorityData)
+		.map(d => d.average)
+		.filter(v => v !== -1 && Number.isFinite(v));
+	if (averages.length === 0) return null;
+	return d3.scaleQuantile()
+		.domain([Math.min(...averages), Math.max(...averages)])
+		.range(range);
+}
+
 /*
  * run
  *
@@ -359,10 +369,7 @@ export function priority(d, a, i) {
 		o[e]['average'] = o[e]['values'].reduce((a,b) => a+b, 0) / o[e]['values'].length;
 	}
 
-	const actives = Object.keys(o).filter(k => o[k]['average'] !== -1);
-	const averages = actives.map(k => o[k]['average']);
-
-	const s = d3.scaleQuantile().domain([Math.min(...averages),Math.max(...averages)]).range(analysis_colorscale.stops);
+	const s = priority_scale(o, analysis_colorscale.stops);
 
 	for (const e in o) {
 		if (o[e]['average'] === -1) {

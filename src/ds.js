@@ -414,7 +414,7 @@ This is not fatal but the dataset is now disabled.`,
 		this.colorscale = host.colorscale;
 		this.domain = host.domain;
 		this._domain = json_clone(host.domain);
-		this._domain_select = this.host._domain_select;
+		if (!this.card) this._domain_select = this.host._domain_select;
 
 		this.fn = this.host.fn;
 
@@ -510,8 +510,10 @@ This is not fatal but the dataset is now disabled.`,
 		if (c) c.checked = t;
 
 		if (this.host) {
-			this.hosts.forEach(d => MAPBOX.setLayoutProperty(d.id, 'visibility', 'none'));
-			MAPBOX.setLayoutProperty(this.host.id, 'visibility', t ? 'visible' : 'none');
+			this.hosts.forEach(d => {
+				if (MAPBOX.getLayer(d.id)) MAPBOX.setLayoutProperty(d.id, 'visibility', 'none');
+			});
+			if (MAPBOX.getLayer(this.host.id)) MAPBOX.setLayoutProperty(this.host.id, 'visibility', t ? 'visible' : 'none');
 		}
 	};
 

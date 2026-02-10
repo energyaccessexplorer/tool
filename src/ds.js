@@ -398,25 +398,12 @@ This is not fatal but the dataset is now disabled.`,
 			this.hosts[i] = ds;
 		}
 
-		const m = this.host = this.hosts.filter(Boolean)[0];
-
-		this.csv = m.csv;
-		this.raster = m.raster;
-		this.vectors = m.vectors;
-		this.colorscale = m.colorscale;
-
-		const min = Math.min(...this.hosts.map(h => h.domain.min));
-		const max = Math.max(...this.hosts.map(h => h.domain.max));
-
-		this.domain = { min, max };
-		this._domain = { min, max };
-
-		this.fn = this.host.fn;
-
-		this._domain_select = m._domain_select;
+		this.host = this.hosts.filter(Boolean)[0];
 	};
 
 	async mutate(host) {
+		await host.loadall();
+
 		await host.raster.parse();
 
 		this.host = host;
@@ -425,6 +412,11 @@ This is not fatal but the dataset is now disabled.`,
 		this.raster = host.raster;
 		this.vectors = host.vectors;
 		this.colorscale = host.colorscale;
+		this.domain = host.domain;
+		this._domain = json_clone(host.domain);
+		this._domain_select = this.host._domain_select;
+
+		this.fn = this.host.fn;
 
 		this.opacity(1);
 

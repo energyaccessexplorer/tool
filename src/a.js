@@ -853,8 +853,8 @@ function load_datasets(array) {
 
 		ds.selection = d.selection || [];
 
-		if (and(maybe(d.selection, 0), ds.hosts))
-			ds.mutate(DST.get(d.selection[0]));
+		const h = ds.selection[0] || maybe(ds.hosts, 0);
+		if (h) ds.mutate((ds.host = DST.get(h)));
 
 		if (typeof d.weight === 'number') ds.weight = d.weight;
 

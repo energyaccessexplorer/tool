@@ -1,6 +1,6 @@
 default: reconfig build lint
 
-.include ".env"
+include .env
 # in .env:
 #
 # TITLE = "Energy Access Explorer"

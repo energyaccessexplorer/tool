@@ -167,10 +167,16 @@ async function presets_init() {
 				if (!preset) return;
 				if (!preset.datasets) preset.datasets = [];
 
+				let name = r['ds_name'];
+				const m = name.match(/(.*):(.*)/);
+
+				if (m) name = m[1];
+
 				const ds = {
-					"name":   r['ds_name'],
-					"weight": intornot(r['weight']),
-					"domain": {
+					"name":      name,
+					"weight":    intornot(r['weight']),
+					"selection": maybe(m, 2) ? [maybe(m, 2)] : undefined,
+					"domain":    {
 						"min": intornot(r['min']),
 						"max": intornot(r['max']),
 					},
@@ -233,7 +239,7 @@ export async function init() {
 					if (!data) return;
 
 					d.append(ce('img', null, {
-						"src":   URL.createObjectURL((new Blob([hextostring(data['flag'])], {"type": 'image/svg+xml'}))),
+						"src":   URL.createObjectURL((new Blob([hextostring(data['flag'])], {"type": "image/svg+xml"}))),
 						"class": "flag",
 					}));
 				});

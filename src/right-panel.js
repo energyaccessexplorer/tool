@@ -143,7 +143,8 @@ export async function graphs(raster) {
 	const e = (1000/GEOGRAPHY.resolution)**2;
 	const outline_raster = DST.get('outline').raster;
 	const outline_cover = outline_raster.data.filter(x => x != outline_raster.nodata).length;
-	const f = GEOGRAPHY.area ? (GEOGRAPHY.area / outline_cover) : (1/e);
+
+	const all_area = GEOGRAPHY.area ?? (outline_cover * e);
 
 	const indexName = EAE['indexes'][STATE.index]['name'].toLowerCase();
 
@@ -167,7 +168,7 @@ export async function graphs(raster) {
 		"pieKey":      'area',
 		"selector":    '#area-number',
 		"unit":        'km²',
-		"calcTotal":   (data) => Math.round(data['total'] * f),
+		"calcTotal":   (data) => Math.round(data['total'] * e),
 		"description": (total, high) => [
 			`Showing ${indexName} for areas spanning `,
 			ce('strong', total.toLocaleString() + ' km²'),

@@ -482,16 +482,14 @@ function colorscale() {
 };
 
 function ramp() {
-	const ds = this.ds;
+	const ds = this.ds.hosts ? this.ds.host : this.ds;
 	const cat = this.ds.category;
 
 	if (!ds.domain) return "";
 
-	if (ds._domain_select) {
-		return bind(tmpl('#ramp'), {
-			"middle": coalesce(cat.controls.range_label, cat.unit),
-		});
-	}
+	if (ds._domain_select) return bind(tmpl('#ramp'), {
+		"middle": coalesce(cat.controls.range_label, cat.unit),
+	});
 
 	const {min,max} = ds.domain;
 
@@ -686,8 +684,6 @@ export default class dscard extends HTMLElement {
 			"min": 0,
 			"max": 1,
 		});
-
-		this.ds.visibility(true);
 
 		if (this.range_svg) {
 			this.range_svg.change({

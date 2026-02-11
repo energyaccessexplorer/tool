@@ -141,11 +141,6 @@ export function update_analysis_state(hasValidGraphs) {
 export async function graphs(raster) {
 	const t = await summary_analyse(raster);
 	const e = (1000/GEOGRAPHY.resolution)**2;
-	const outline_raster = DST.get('outline').raster;
-	const outline_cover = outline_raster.data.filter(x => x != outline_raster.nodata).length;
-
-	const all_area = GEOGRAPHY.area ?? (outline_cover * e);
-
 	const indexName = EAE['indexes'][STATE.index]['name'].toLowerCase();
 
 	const hasPopulation = process_graph(t, {

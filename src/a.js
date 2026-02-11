@@ -48,7 +48,6 @@ import {
 } from './points-loading.js';
 
 import {
-	aggregate_layer_values,
 	priority,
 	plot_active as analysis_plot_active,
 } from './analysis.js';
@@ -83,8 +82,7 @@ import {
 
 import {
 	init as right_panel_init,
-	update_analysis_state as right_panel_update_state,
-	update_analysis_buttons,
+	update_analysis as right_panel_update_analysis,
 } from './right-panel.js';
 
 import {
@@ -455,8 +453,7 @@ async function reload(k,v) {
 	}
 
 	drop_map_info();
-	right_panel_update_state(false);
-	update_analysis_buttons(false);
+	right_panel_update_analysis(false);
 
 	if (k === "datasets") {
 		controls_recount();
@@ -592,8 +589,7 @@ async function reload(k,v) {
 	const a = await analysis_plot_active(index, true);
 
 	if (GEOGRAPHY.divisions[variant]) {
-		GEOGRAPHY.divisions[variant].priorityData = priority(GEOGRAPHY.divisions[variant], a, variant);
-		GEOGRAPHY.divisions[variant].layerData = aggregate_layer_values(GEOGRAPHY.divisions[variant]);
+		priority(GEOGRAPHY.divisions[variant], a, variant);
 	}
 
 	indexes_list();

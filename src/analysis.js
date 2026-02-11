@@ -382,10 +382,11 @@ export function priority(d, a, i) {
 
 	source.setData(json_clone(source._data));
 
-	return o;
+	d.priorityData = o;
+	d.layerData = aggregate_layer_values(d);
 };
 
-export function aggregate_layer_values(division) {
+function aggregate_layer_values(division) {
 	const divisions = division.raster.data;
 	const layer_data = {};
 	const area_ids = [];

@@ -142,6 +142,7 @@ build-a:
 		${SRC}/ds.js \
 		${SRC}/parse.js \
 		${SRC}/output-widget.js \
+		${SRC}/right-panel-graphs.js \
 		${SRC}/right-panel.js \
 		${SRC}/filtered.js \
 		${SRC}/mapbox.js \

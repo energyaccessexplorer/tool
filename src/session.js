@@ -20,15 +20,7 @@ const url = new URL(location);
 
 function show_save_toast(label, caption) {
 	const toast = new Toast({ label, caption });
-
-	const action = document.createElement('a');
-	action.href = '/tool/m/';
-	action.target = '_blank';
-	action.className = 'button-small';
-	action.textContent = 'View in My EAE';
-	action.slot = 'action';
-
-	toast.append(action);
+	toast.append(tmpl('#toast-save-action-template'));
 	toast.show();
 }
 

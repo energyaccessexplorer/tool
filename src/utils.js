@@ -594,18 +594,3 @@ export function area_type(variant) {
 	}
 }
 
-export function export_filename(name, extension, { timestamp = true } = {}) {
-	if (!timestamp) return `eae-${name}.${extension}`;
-
-	const now = new Date();
-	const date_str = [
-		now.getFullYear(),
-		String(now.getMonth() + 1).padStart(2, '0'),
-		String(now.getDate()).padStart(2, '0'),
-	].join('');
-	const time_str = [
-		String(now.getHours()).padStart(2, '0'),
-		String(now.getMinutes()).padStart(2, '0'),
-	].join('');
-	return `${date_str}${time_str}-eae-${name}.${extension}`;
-}

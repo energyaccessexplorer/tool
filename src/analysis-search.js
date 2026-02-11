@@ -301,11 +301,9 @@ function render_page(page) {
 	render_pagination();
 }
 
-async function trigger() {
+export async function update() {
 	const section = qs('#right-panel #analysis-locations-section');
 	const resultscontainer = qs('.locations-paginated-list', section);
-
-	set_buttons_disabled(true);
 
 	const ul = qs('.locations-list', resultscontainer);
 	if (ul) ul.replaceChildren();
@@ -327,11 +325,6 @@ async function trigger() {
 	}
 
 	render_page(paginationState.currentPage);
-	set_buttons_disabled(false);
-};
-
-export function update() {
-	trigger();
 };
 
 export function download_locations_data() {
@@ -344,12 +337,6 @@ export function view_all_locations() {
 
 export function get_locations_results() {
 	return paginationState.allResults;
-}
-
-function set_buttons_disabled(disabled) {
-	const section = qs('#right-panel #analysis-locations-section');
-	qs('#view-all-locations', section).disabled = disabled;
-	qs('#download-locations-data', section).disabled = disabled;
 }
 
 export function init() {
@@ -372,5 +359,4 @@ export function init() {
 		}
 	};
 
-	set_buttons_disabled(true);
 };

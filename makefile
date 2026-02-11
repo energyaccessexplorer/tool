@@ -159,6 +159,7 @@ build-a:
 		${SRC}/qa-indexes.js \
 		${SRC}/map-info.js \
 		${SRC}/panel-section.js \
+		${SRC}/export.js \
 		${SRC}/toast.js \
 		${SRC}/a.js \
 		${DIST}/a/

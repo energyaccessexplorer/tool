@@ -1,7 +1,10 @@
 import {
 	coordinates_to_raster_pixel,
-	export_filename,
 } from './utils.js';
+
+import {
+	export_filename,
+} from './export.js';
 
 import '../lib/jszip.js';
 

@@ -1,9 +1,12 @@
 import {
 	area_type,
 	coordinates_to_raster_pixel,
-	export_filename,
 	loading,
 } from './utils.js';
+
+import {
+	export_filename,
+} from './export.js';
 
 import {
 	context,
@@ -299,9 +302,8 @@ function prepare_data(results) {
 }
 
 function* generate_rows(results, is_raster, analysis_name, start = 0, count = results.length - start) {
-	const end = Math.min(start + count, results.length);
-	for (let i = start; i < end; i++) {
-		yield get_row(results[i], is_raster, analysis_name);
+	for (const item of results.slice(start, start + count)) {
+		yield get_row(item, is_raster, analysis_name);
 	}
 }
 
@@ -406,10 +408,6 @@ export function view_all(results) {
 		"per_page":    10,
 	};
 
-	function total_pages() {
-		return Math.ceil(state.results.length / state.per_page);
-	}
-
 	function get_icon_class(header) {
 		if (state.sort_column !== header) return "bi bi-chevron-expand";
 		return state.sort_desc ? "bi bi-caret-down-fill" : "bi bi-caret-up-fill";
@@ -493,15 +491,14 @@ export function view_all(results) {
 	}
 
 	function get_page_numbers() {
-		const total = total_pages();
+		const total = Math.ceil(state.results.length / state.per_page);
 		const current = state.page;
 		const delta = 1;
 		const pages = [];
 		const middle = Math.ceil(total / 2);
 
 		if (total <= 7) {
-			for (let i = 1; i <= total; i++) pages.push(i);
-			return pages;
+			return Array.from({ "length": total }, (_, i) => i + 1);
 		}
 
 		pages.push(1);
@@ -597,7 +594,7 @@ export function view_all(results) {
 	}
 
 	function go_to_page(page) {
-		const total = total_pages();
+		const total = Math.ceil(state.results.length / state.per_page);
 		if (page < 1 || page > total) return;
 		state.page = page;
 		render_page();

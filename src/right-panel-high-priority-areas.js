@@ -40,6 +40,14 @@ import bind from '../lib/bind.js';
 
 import bubblemessage from '../lib/bubblemessage.js';
 
+function view_all_locations() {
+	show_modal_table(paginationState.allResults);
+}
+
+function download_locations_data() {
+	download_high_priority_areas(paginationState.allResults);
+}
+
 function format_area_type(variant) {
 	const type = area_type(variant);
 	if (variant === 'raster') {
@@ -332,19 +340,15 @@ export async function update() {
 	render_page(paginationState.currentPage);
 };
 
-export function download_locations_data() {
-	download_high_priority_areas(paginationState.allResults);
-}
-
-export function view_all_locations() {
-	show_modal_table(paginationState.allResults);
-}
-
 export function get_locations_results() {
 	return paginationState.allResults;
 }
 
 export function init() {
+	const analysis_locations = tmpl('#analysis-locations-template');
+	bind(analysis_locations, { download_locations_data, view_all_locations });
+	qs('#analysis-locations').replaceWith(analysis_locations);
+
 	const section = qs('#right-panel #analysis-locations-section');
 	const aboutButton = qs('.button-about', section);
 

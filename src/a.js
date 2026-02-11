@@ -40,10 +40,6 @@ import {
 } from './vectors-search.js';
 
 import {
-	init as right_panel_high_priority_areas_init,
-} from './right-panel-high-priority-areas.js';
-
-import {
 	init as locationssearch_init,
 } from './locations-search.js';
 
@@ -420,7 +416,6 @@ async function init_3() {
 	controlssearch_init();
 	geographiessearch_init();
 	vectorssearch_init();
-	right_panel_high_priority_areas_init();
 	locationssearch_init();
 	points_init();
 	timeline_init();

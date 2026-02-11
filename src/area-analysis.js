@@ -154,16 +154,17 @@ export function area_info(fields, props, ll, analysis_value, analysis_name, feat
 		(datasetIds.has(key) ? layerEntries : subordinateEntries)[key] = [key, label];
 	}
 
-	function pushDetail(key, label, value) {
+	function pushDetail(key, label, value, subordinate) {
 		const unit = raw.units[key];
 		const displayUnit = unit === 'count' ? '' : (unit || '');
 		const v = Number(value);
 		const formatted = Number.isFinite(v) ? v.toLocaleString() : value;
 		detailedData.push({
-			"label":    label || key,
-			"value":    `${formatted} ${displayUnit}`.trim(),
-			"rawValue": raw.values[key],
-			"unit":     unit,
+			"label":       label || key,
+			"value":       `${formatted} ${displayUnit}`.trim(),
+			"rawValue":    raw.values[key],
+			"unit":        unit,
+			"subordinate": subordinate,
 		});
 	}
 
@@ -171,12 +172,16 @@ export function area_info(fields, props, ll, analysis_value, analysis_name, feat
 		if (!layerEntries[layerId]) continue;
 
 		const [key, label] = layerEntries[layerId];
+		const parentIndex = detailedData.length;
 		pushDetail(key, label, raw.values[key]);
 
 		if (layerId === clickedLayerId) {
 			for (const subKey in subordinateEntries) {
 				const [, subLabel] = subordinateEntries[subKey];
-				pushDetail(subKey, '\u00A0\u00A0\u00A0\u00A0' + (subLabel || subKey), props[subKey]);
+				pushDetail(subKey, subLabel || subKey, props[subKey], true);
+			}
+			if (detailedData.length > parentIndex + 1) {
+				detailedData[parentIndex].has_subordinates = true;
 			}
 		}
 	}

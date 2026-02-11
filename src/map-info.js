@@ -63,6 +63,27 @@ export default class mapinfo extends HTMLElement {
 
 		this.append(content);
 
+		const detailedRows = this.querySelectorAll('.detailed-data tr');
+		if (data.detailedData) {
+			data.detailedData.forEach((item, i) => {
+				if (item.subordinate && detailedRows[i]) {
+					detailedRows[i].classList.add('subordinate');
+				}
+			});
+		}
+
+		for (const toggle of this.querySelectorAll('.subordinate-toggle')) {
+			toggle.onclick = () => {
+				toggle.classList.toggle('expanded');
+				let row = toggle.closest('tr').nextElementSibling;
+				while (row && row.classList.contains('subordinate')) {
+					row.classList.toggle('visible');
+					row = row.nextElementSibling;
+				}
+				this.align();
+			};
+		}
+
 		this.dot = qs('.dot', this);
 		this.arrow = qs('.arrow', this);
 		this.main = qs('main', this);

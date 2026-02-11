@@ -258,3 +258,26 @@ map-info .analyse-button:hover {
 map-info .analyse-button:active {
 	background: #005533;
 }
+
+map-info tr.subordinate {
+	display: none;
+}
+
+map-info tr.subordinate.visible {
+	display: table-row;
+}
+
+map-info tr.subordinate td:first-child {
+	padding-left: 32px;
+}
+
+map-info .subordinate-toggle {
+	display: inline-block;
+	cursor: pointer;
+	margin-right: 4px;
+	transition: transform 0.2s ease;
+}
+
+map-info .subordinate-toggle.expanded {
+	transform: rotate(90deg);
+}

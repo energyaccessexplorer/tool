@@ -75,13 +75,9 @@ panel-section .card-body {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding: 0;
-  gap: 0;
   width: 100%;
   box-sizing: border-box;
   background: #F6F6F6;
-  overflow: visible;
-  max-height: none;
   transition: opacity 0.3s ease;
 }
 

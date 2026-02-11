@@ -233,7 +233,6 @@ toast-notification {
   left: 25px;
   bottom: 25px;
   display: flex;
-  flex-direction: row;
   align-items: center;
   padding: 12px;
   gap: 12px;
@@ -269,14 +268,12 @@ toast-notification .toast-icon i {
 toast-notification .toast-content {
   display: flex;
   align-items: center;
-  padding: 0;
   gap: 16px;
   flex: 1;
 }
 
 toast-notification .toast-header {
   align-items: flex-start;
-  padding: 0;
   flex: 1;
 }
 
@@ -301,9 +298,7 @@ toast-notification .toast-caption {
 
 toast-notification .toast-footer {
   display: flex;
-  flex-direction: row;
   align-items: center;
-  padding: 0;
   gap: 8px;
 }
 

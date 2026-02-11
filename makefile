@@ -137,6 +137,7 @@ build-a:
 		${SRC}/area-analysis.js \
 		${SRC}/analysis-search.js \
 		${SRC}/right-panel-high-priority-areas.js \
+		${SRC}/modal-table-high-priority-areas.js \
 		${SRC}/locations-search.js \
 		${SRC}/points-loading.js \
 		${SRC}/ds.js \

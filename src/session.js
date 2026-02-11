@@ -18,6 +18,20 @@ import bind from '../lib/bind.js';
 
 const url = new URL(location);
 
+function show_save_toast(label, caption) {
+	const toast = new Toast({ label, caption });
+
+	const action = document.createElement('a');
+	action.href = '/tool/m/';
+	action.target = '_blank';
+	action.className = 'button-small';
+	action.textContent = 'View in My EAE';
+	action.slot = 'action';
+
+	toast.append(action);
+	toast.show();
+}
+
 function request_authentication() {
 	const template = tmpl('#request-authentication-modal-template');
 	const children = Array.from(template.children);
@@ -123,22 +137,7 @@ export function snapshot(callback) {
 
 	function patch() {
 		API.patch('snapshots', { "time": `eq.${snapshot_id}` }, { "payload": { config } })
-			.then(_ => {
-				const toast = new Toast({
-					"label":   'Analysis updated successfully',
-					"caption": 'Your analysis was updated in your My EAE account.',
-				});
-
-				const action = document.createElement('a');
-				action.href = '/tool/m/';
-				action.target = '_blank';
-				action.className = 'button-small';
-				action.textContent = 'View in My EAE';
-				action.slot = 'action';
-
-				toast.append(action);
-				toast.show();
-			});
+			.then(_ => show_save_toast('Analysis updated successfully', 'Your analysis was updated in your My EAE account.'));
 
 		return snapshot_id;
 	};
@@ -157,22 +156,7 @@ export function snapshot(callback) {
 			SNAPSHOT = s;
 
 			API.post('snapshots', null, { "payload": s })
-				.then(_ => {
-					const toast = new Toast({
-						"label":   'Analysis saved successfully',
-						"caption": 'Your analysis was saved to your My EAE account.',
-					});
-
-					const action = document.createElement('a');
-					action.href = '/tool/m/';
-					action.target = '_blank';
-					action.className = 'button-small';
-					action.textContent = 'View in My EAE';
-					action.slot = 'action';
-
-					toast.append(action);
-					toast.show();
-				})
+				.then(_ => show_save_toast('Analysis saved successfully', 'Your analysis was saved to your My EAE account.'))
 				.then(_ => url.searchParams.set('snapshot', s['time']))
 				.then(_ => history.replaceState(null, null, url))
 				.then(_ => typeof callback === 'function' ? callback() : _);

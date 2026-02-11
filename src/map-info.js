@@ -31,7 +31,7 @@ export default class mapinfo extends HTMLElement {
 		const gap = 50;
 		const dotSize = 16;
 
-		const maparea = document.querySelector('#maparea');
+		const maparea = qs('#maparea');
 		const mapareaBox = maparea.getBoundingClientRect();
 
 		// Position map-info to the right of the point
@@ -111,7 +111,7 @@ export default class mapinfo extends HTMLElement {
 
 		this.style['visibility'] = 'hidden';
 
-		const maparea = document.querySelector('#maparea');
+		const maparea = qs('#maparea');
 		maparea.append(this);
 
 		this.align();

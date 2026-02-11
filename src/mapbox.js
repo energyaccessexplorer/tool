@@ -24,7 +24,7 @@ import {
 
 import mapinfo from './map-info.js';
 
-function get_admin_area_item(variant, featureId) {
+export function get_admin_area_item(variant, id) {
 	const division = GEOGRAPHY.divisions[variant];
 	if (!division || !division.priorityData || !division.vectors) return null;
 
@@ -32,7 +32,6 @@ function get_admin_area_item(variant, featureId) {
 	const priorityData = division.priorityData;
 	const nameTable = maybe(division, 'csv', 'table') || {};
 
-	const id = featureId;
 	const feature = features.find(f => f.id === +id);
 	if (!feature || !priorityData[id]) return null;
 
@@ -344,15 +343,13 @@ export function pointer({x = 0, y = 0, lngLat = null}, data) {
 
 	function drop() {
 		if (mark._preventDrop) return;
-		if (onMove) MAPBOX.off('move', onMove);
+		if (lngLat) MAPBOX.off('move', updatePosition);
 		mark.remove();
 	};
 
 	const mark = new mapinfo({ "position": pos, "data": data, "close": cls, "onClose": drop, "point": { x, y } });
 
 	function updatePosition() {
-		if (!lngLat) return;
-
 		const point = MAPBOX.project(lngLat);
 		const mapContainer = MAPBOX.getContainer().getBoundingClientRect();
 
@@ -362,10 +359,8 @@ export function pointer({x = 0, y = 0, lngLat = null}, data) {
 		mark.updatePoint(newX, newY);
 	}
 
-	let onMove;
 	if (lngLat) {
-		onMove = () => updatePosition();
-		MAPBOX.on('move', onMove);
+		MAPBOX.on('move', updatePosition);
 	}
 
 	return {

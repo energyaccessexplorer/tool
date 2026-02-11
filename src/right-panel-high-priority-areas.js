@@ -1,18 +1,16 @@
 import {
 	coords_search_pois as mapbox_coords_search_pois,
 	fit as mapbox_fit,
+	get_admin_area_item,
 	show_admin_area_info,
 	show_location_info,
 } from './mapbox.js';
 
 import {
-	lowmedhigh_scale,
 	plot_active,
 } from './analysis.js';
 
-
 import {
-	pointto as search_pointto,
 	zoom,
 } from './search.js';
 
@@ -23,6 +21,10 @@ import {
 import {
 	show as show_modal_table,
 } from './modal-table-high-priority-areas.js';
+
+import {
+	setup_about_button,
+} from './right-panel-graphs.js';
 
 import {
 	area_type,
@@ -37,8 +39,6 @@ import {
 } from '../lib/helpers.js';
 
 import bind from '../lib/bind.js';
-
-import bubblemessage from '../lib/bubblemessage.js';
 
 function view_all_locations() {
 	show_modal_table(paginationState.allResults);
@@ -63,25 +63,20 @@ const paginationState = {
 	"itemsPerPage": 10,
 };
 
-function pointto(p, centerPointer = false) {
-	const dict = [[ "priority", EAE['indexes'][STATE.index]['name'] ]];
-	const props = { "priority": lowmedhigh_scale(p.priority) };
-
-	search_pointto(p.c, dict, props, centerPointer);
-};
-
-function show_info_on_hover(p) {
+function get_map_position(coords) {
 	const maparea = qs('#maparea');
-	const {x, y} = MAPBOX.project(p.c);
+	const {x, y} = MAPBOX.project(coords);
 	const box = maparea.getBoundingClientRect();
 
-	const position = {
+	return {
 		"x":      box.x + x,
 		"y":      box.y + y,
-		"lngLat": {"lng": p.c[0], "lat": p.c[1]},
+		"lngLat": {"lng": coords[0], "lat": coords[1]},
 	};
+}
 
-	show_location_info(p.c, position, false);
+function show_info_on_hover(p) {
+	show_location_info(p.c, get_map_position(p.c), false);
 };
 
 function raster_item(p) {
@@ -98,7 +93,7 @@ function raster_item(p) {
 
 	el.setAttribute('data-score', score);
 	el.onmouseenter = show_info_on_hover.bind(null, p);
-	el.onclick = zoom.bind(null, p, pointto.bind(null, p, true));
+	el.onclick = zoom.bind(null, p, () => show_location_info(p.c, get_map_position(p.c), true));
 
 	const locationName = qs('.location-name', el);
 	mapbox_coords_search_pois({ "coords": p.c, "limit": 1 })
@@ -110,16 +105,7 @@ function raster_item(p) {
 function get_admin_area_position(item) {
 	const bounds = geojsonExtent(item.feature);
 	const center = [(bounds[0] + bounds[2]) / 2, (bounds[1] + bounds[3]) / 2];
-
-	const maparea = qs('#maparea');
-	const { x, y } = MAPBOX.project(center);
-	const box = maparea.getBoundingClientRect();
-
-	return {
-		"x":      box.x + x,
-		"y":      box.y + y,
-		"lngLat": { "lng": center[0], "lat": center[1] },
-	};
+	return get_map_position(center);
 }
 
 function show_admin_info_on_hover(item) {
@@ -156,25 +142,12 @@ function admin_area_item(item, rank) {
 
 function get_division_results(variant) {
 	const division = GEOGRAPHY.divisions[variant];
-	if (!division || !division.priorityData || !division.vectors) return [];
+	if (!division || !division.priorityData) return [];
 
-	const features = division.vectors.data.features;
-	const priorityData = division.priorityData;
-	const nameTable = maybe(division, 'csv', 'table') || {};
-
-	return Object.keys(priorityData)
-		.filter(id => priorityData[id].average > 0)
-		.map(id => {
-			const feature = features.find(f => f.id === +id);
-			const name = nameTable[id] || `Area ${id}`;
-
-			return {
-				"id":       +id,
-				"priority": priorityData[id].average,
-				"name":     name,
-				"feature":  feature,
-			};
-		})
+	return Object.keys(division.priorityData)
+		.filter(id => division.priorityData[id].average > 0)
+		.map(id => get_admin_area_item(variant, id))
+		.filter(item => item !== null)
 		.sort((a, b) => a.priority > b.priority ? -1 : 1);
 };
 
@@ -350,23 +323,7 @@ export function init() {
 	qs('#analysis-locations').replaceWith(analysis_locations);
 
 	const section = qs('#right-panel #analysis-locations-section');
-	const aboutButton = qs('.button-about', section);
-
-	let bubble = null;
-	aboutButton.onmouseenter = () => {
-		bubble = new bubblemessage({
-			"message":  `Showing ${format_area_type(STATE.variant)} with the highest prioritization scores based on your analysis criteria.`,
-			"position": 'W',
-			"close":    false,
-		}, aboutButton);
-	};
-
-	aboutButton.onmouseleave = () => {
-		if (bubble) {
-			bubble.remove();
-			bubble = null;
-		}
-	};
+	setup_about_button(section, `Showing ${format_area_type(STATE.variant)} with the highest prioritization scores based on your analysis criteria.`);
 
 };
 

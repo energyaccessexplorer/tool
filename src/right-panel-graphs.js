@@ -52,7 +52,7 @@ function create_graph_section(title, type, numberId, descId) {
 	return section;
 }
 
-function setup_about_button(section, about) {
+export function setup_about_button(section, about) {
 	let bubble = null;
 	const aboutButton = qs('.button-about', section);
 

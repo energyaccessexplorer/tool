@@ -1,12 +1,7 @@
 import {
 	area_type,
 	coordinates_to_raster_pixel,
-	loading,
 } from './utils.js';
-
-import {
-	export_filename,
-} from './export.js';
 
 import {
 	context,
@@ -18,31 +13,8 @@ import {
 } from './analysis.js';
 
 import {
-	fake_blob_download,
 	maybe,
-	qs,
-	tmpl,
 } from '../lib/helpers.js';
-
-export function get_admin_area_item(variant, featureId) {
-	const division = GEOGRAPHY.divisions[variant];
-	if (!division || !division.priorityData || !division.vectors) return null;
-
-	const features = division.vectors.data.features;
-	const priorityData = division.priorityData;
-	const nameTable = maybe(division, 'csv', 'table') || {};
-
-	const id = featureId;
-	const feature = features.find(f => f.id === +id);
-	if (!feature || !priorityData[id]) return null;
-
-	return {
-		"id":       +id,
-		"priority": priorityData[id].average,
-		"name":     nameTable[id] || `Area ${id}`,
-		"feature":  feature,
-	};
-}
 
 export function get_admin_area_layer_data(variant, area_id) {
 	const fields = [];
@@ -212,10 +184,6 @@ export function area_info(fields, props, ll, analysis_value, analysis_name, feat
 	};
 }
 
-import bind from '../lib/bind.js';
-
-import modal from '../lib/modal.js';
-
 function get_row(item, is_raster, analysis_name) {
 	let fields = [];
 	let props = {};
@@ -266,7 +234,7 @@ function get_sort_value(item, column, is_raster, analysis_name) {
 	return value && parseFloat(value) || value;
 }
 
-function sort_results(results, column, desc, is_raster, analysis_name) {
+export function sort_results(results, column, desc, is_raster, analysis_name) {
 	const sorted = [...results];
 	const mult = desc ? -1 : 1;
 
@@ -288,7 +256,7 @@ function sort_results(results, column, desc, is_raster, analysis_name) {
 	return sorted;
 }
 
-function prepare_data(results) {
+export function prepare_data(results) {
 	const is_raster = STATE.variant === 'raster';
 	const analysis_name = EAE['indexes'][STATE.index]['name'];
 	const area_type_str = area_type(STATE.variant);
@@ -301,321 +269,9 @@ function prepare_data(results) {
 	return { headers, "area_type": area_type_str, analysis_name, is_raster };
 }
 
-function* generate_rows(results, is_raster, analysis_name, start = 0, count = results.length - start) {
+export function* generate_rows(results, is_raster, analysis_name, start = 0, count = results.length - start) {
 	for (const item of results.slice(start, start + count)) {
 		yield get_row(item, is_raster, analysis_name);
 	}
 }
 
-export async function download(results) {
-	const data = prepare_data(results);
-	const { headers, is_raster, analysis_name } = data;
-
-	let cancelled = false;
-
-	loading("Generating...", {
-		"progress": 0,
-		"cancel":   () => { cancelled = true; },
-	});
-
-	const warn_before_unload = (e) => {
-		e.preventDefault();
-		e.returnValue = '';
-	};
-	window.addEventListener('beforeunload', warn_before_unload);
-
-	const escape_csv = (val) => {
-		if (val === null || val === undefined) return '';
-		const str = String(val);
-		if (str.includes(',') || str.includes('"') || str.includes('\n')) {
-			return `"${str.replace(/"/g, '""')}"`;
-		}
-		return str;
-	};
-
-	const total = results.length;
-	const rows = [];
-	let i = 0;
-	for (const row_data of generate_rows(results, is_raster, analysis_name)) {
-		if (cancelled) break;
-
-		rows.push(headers.map(h => escape_csv(row_data[h])).join(','));
-		if (++i % 100 === 0) {
-			loading("Generating...", {
-				"progress": (i / total) * 100,
-				"cancel":   () => { cancelled = true; },
-			});
-			await new Promise(resolve => setTimeout(resolve, 0));
-		}
-	}
-
-	window.removeEventListener('beforeunload', warn_before_unload);
-	loading(false);
-
-	if (!cancelled) {
-		const csv_content = [headers.join(','), ...rows].join('\n');
-		const filename = export_filename(`${analysis_name.toLowerCase().replace(/\s+/g, '-')}-high-priority-areas`, 'csv');
-		fake_blob_download(csv_content, filename, 'text/csv;charset=utf-8');
-	}
-}
-
-export async function generate_csv_content(results, opts = {}) {
-	if (!results || results.length === 0) return '';
-
-	const { onProgress, isCancelled } = opts;
-	const data = prepare_data(results);
-	const { headers, is_raster, analysis_name } = data;
-
-	const escape_csv = (val) => {
-		if (!val) return '';
-		const str = String(val);
-		if (str.includes(',') || str.includes('"') || str.includes('\n')) {
-			return `"${str.replace(/"/g, '""')}"`;
-		}
-		return str;
-	};
-
-	const total = results.length;
-	const rows = [];
-	let i = 0;
-	for (const row_data of generate_rows(results, is_raster, analysis_name)) {
-		if (isCancelled && isCancelled()) return null;
-
-		rows.push(headers.map(h => escape_csv(row_data[h])).join(','));
-		if (++i % 100 === 0) {
-			if (onProgress) onProgress(i / total);
-			await new Promise(resolve => setTimeout(resolve, 0));
-		}
-	}
-
-	if (onProgress) onProgress(1);
-	return [headers.join(','), ...rows].join('\n');
-}
-
-export function view_all(results) {
-	const data = prepare_data(results);
-	if (!data) return;
-
-	const { headers, is_raster, "area_type": area_type_str, analysis_name } = data;
-
-	const selected_indices = new Set();
-
-	const state = {
-		"sort_column": headers[0],
-		"sort_desc":   true,
-		"results":     results,
-		"page":        1,
-		"per_page":    10,
-	};
-
-	function get_icon_class(header) {
-		if (state.sort_column !== header) return "bi bi-chevron-expand";
-		return state.sort_desc ? "bi bi-caret-down-fill" : "bi bi-caret-up-fill";
-	}
-
-	function handle_sort(header) {
-		const is_priority = header === headers[0] || header === analysis_name;
-
-		if (state.sort_column === header) {
-			state.sort_desc = !state.sort_desc;
-		} else {
-			state.sort_column = header;
-			state.sort_desc = is_priority;
-		}
-
-		state.results = sort_results(results, state.sort_column, state.sort_desc, is_raster, analysis_name);
-		state.page = 1;
-		render_page();
-		update_sort_icons();
-	}
-
-	const content = tmpl('#high-priority-areas-list-all-template');
-
-	const tbody = qs('tbody', content);
-	const selection_overlay = qs('.selection-overlay', content);
-	const selection_count = qs('.selection-count', content);
-	const select_all_checkbox = qs('.select-all-checkbox', content);
-	const page_numbers_container = qs('.page-numbers', content);
-
-	bind(content, {
-		"analysis-name": analysis_name,
-		"headers":       headers.map(name => ({
-			name,
-			"on_sort": () => handle_sort(name),
-		})),
-		"on_prev":           () => go_to_page(state.page - 1),
-		"on_next":           () => go_to_page(state.page + 1),
-		"download_selected": () => {
-			const selected = Array.from(selected_indices).sort((a, b) => a - b).map(i => state.results[i]);
-			download(selected);
-		},
-		"on_uncheck_all":     () => uncheck_all(),
-		"on_per_page_change": function() {
-			state.per_page = parseInt(this.value, 10);
-			state.page = 1;
-			selected_indices.clear();
-			update_selection_overlay();
-			render_page();
-		},
-	});
-
-	const footer = tmpl('#high-priority-areas-list-all-footer-template');
-	bind(footer, {
-		"download": () => download(results),
-	});
-
-	function update_selection_overlay() {
-		const count = selected_indices.size;
-		if (count > 0) {
-			selection_overlay.classList.remove('hidden');
-			select_all_checkbox.classList.remove('hidden');
-			selection_count.textContent = `${count} row${count > 1 ? 's' : ''} currently selected.`;
-		} else {
-			selection_overlay.classList.add('hidden');
-			select_all_checkbox.classList.add('hidden');
-		}
-	}
-
-	function uncheck_all() {
-		selected_indices.clear();
-		tbody.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
-		select_all_checkbox.checked = false;
-		update_selection_overlay();
-	}
-
-	function update_sort_icons() {
-		document.querySelectorAll('.high-priority-areas-list-all-table th:not(.checkbox-column)').forEach((th, i) => {
-			const icon = th.querySelector('.sort-icon i');
-			if (icon) icon.className = get_icon_class(headers[i]);
-		});
-	}
-
-	function get_page_numbers() {
-		const total = Math.ceil(state.results.length / state.per_page);
-		const current = state.page;
-		const delta = 1;
-		const pages = [];
-		const middle = Math.ceil(total / 2);
-
-		if (total <= 7) {
-			return Array.from({ "length": total }, (_, i) => i + 1);
-		}
-
-		pages.push(1);
-
-		const range_start = Math.max(2, current - delta);
-		const range_end = Math.min(total - 1, current + delta);
-		const near_start = current <= delta + 2;
-		const near_end = current >= total - delta - 1;
-
-		if (near_start) {
-			for (let i = 2; i <= delta + 2; i++) pages.push(i);
-			pages.push('...');
-			pages.push(middle);
-			pages.push('...');
-		} else if (near_end) {
-			pages.push('...');
-			pages.push(middle);
-			pages.push('...');
-			for (let i = total - delta - 1; i <= total - 1; i++) pages.push(i);
-		} else {
-			if (range_start > 2) {
-				pages.push('...');
-			} else if (range_start === 2) {
-				pages.push(2);
-			}
-
-			for (let i = range_start; i <= range_end; i++) {
-				if (i > 1 && i < total && !pages.includes(i)) {
-					pages.push(i);
-				}
-			}
-
-			if (range_end < total - 1) {
-				pages.push('...');
-			} else if (range_end === total - 1 && !pages.includes(total - 1)) {
-				pages.push(total - 1);
-			}
-		}
-
-		pages.push(total);
-
-		return pages;
-	}
-
-	function render_pagination() {
-		const pages = get_page_numbers();
-
-		page_numbers_container.innerHTML = '';
-		for (const p of pages) {
-			if (p === '...') {
-				page_numbers_container.append(tmpl('#page-ellipsis-template'));
-			} else {
-				const item = tmpl('#page-number-template');
-				bind(item, {
-					"value":    p,
-					"on_click": () => go_to_page(p),
-				});
-				if (p === state.page) item.firstElementChild.classList.add('active');
-				page_numbers_container.append(item);
-			}
-		}
-	}
-
-	function render_page() {
-		tbody.innerHTML = '';
-		const start = (state.page - 1) * state.per_page;
-
-		for (const row_data of generate_rows(state.results, is_raster, analysis_name, start, state.per_page)) {
-			const row_index = start + tbody.children.length;
-			const row = tmpl('#high-priority-areas-row-template');
-			const is_selected = selected_indices.has(row_index);
-
-			bind(row, {
-				"cells":     headers.map(header => ({ "value": row_data[header] || '' })),
-				"on_select": function() {
-					if (this.checked) {
-						selected_indices.add(row_index);
-					} else {
-						selected_indices.delete(row_index);
-					}
-					update_selection_overlay();
-				},
-			});
-
-			if (is_selected) {
-				row.querySelector('input[type="checkbox"]').checked = true;
-			}
-
-			tbody.append(row);
-		}
-
-		render_pagination();
-	}
-
-	function go_to_page(page) {
-		const total = Math.ceil(state.results.length / state.per_page);
-		if (page < 1 || page > total) return;
-		state.page = page;
-		render_page();
-	}
-
-	update_sort_icons();
-	render_page();
-
-	const header = tmpl('#modal-header-template');
-	bind(header, {
-		"title":    `High priority areas (${area_type_str})`,
-		"subtitle": analysis_name,
-	});
-
-	const m = new modal({
-		"id":      'high-priority-areas-list-all',
-		"header":  header,
-		"content": content,
-		"footer":  footer,
-		"destroy": true,
-	});
-
-	m.show();
-}

@@ -26,12 +26,12 @@ import {
 } from './analysis.js';
 
 import {
-	download_locations_data,
 	get_locations_results,
 } from './right-panel-high-priority-areas.js';
 
 import {
-	generate_csv_content as generate_high_priority_csv,
+	prepare_data,
+	generate_rows,
 } from './area-analysis.js';
 
 export function export_filename(name, extension, { timestamp = true } = {}) {
@@ -109,7 +109,7 @@ export async function export_all() {
 		[pptx_blob, tiff_blob, high_priority_csv, share_csv] = await Promise.all([
 			pptx().then(p => p.write('blob')),
 			analysis(type).then(a => a.tiff),
-			generate_high_priority_csv(get_locations_results(), {
+			generate_high_priority_areas_csv(get_locations_results(), {
 				"onProgress":  (p) => update(20 + (p * 50)),
 				"isCancelled": () => cancelled,
 			}),
@@ -164,7 +164,7 @@ export function show_export_modal() {
 			fake_blob_download((await analysis(type)).tiff, export_filename(`${index_name}-map`, 'tif'));
 			loading(false);
 		},
-		"export_csv":       () => download_locations_data(),
+		"export_csv":       () => download_high_priority_areas(get_locations_results()),
 		"export_share_csv": async () => {
 			loading("Generating...");
 			await generate_summary_data();
@@ -187,4 +187,89 @@ export function show_export_modal() {
 		"footer":  footer,
 		"destroy": true,
 	}).show();
+}
+
+export async function download_high_priority_areas(results) {
+	const data = prepare_data(results);
+	const { headers, is_raster, analysis_name } = data;
+
+	let cancelled = false;
+
+	loading("Generating...", {
+		"progress": 0,
+		"cancel":   () => { cancelled = true; },
+	});
+
+	const warn_before_unload = (e) => {
+		e.preventDefault();
+		e.returnValue = '';
+	};
+	window.addEventListener('beforeunload', warn_before_unload);
+
+	const escape_csv = (val) => {
+		if (val === null || val === undefined) return '';
+		const str = String(val);
+		if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+			return `"${str.replace(/"/g, '""')}"`;
+		}
+		return str;
+	};
+
+	const total = results.length;
+	const rows = [];
+	let i = 0;
+	for (const row_data of generate_rows(results, is_raster, analysis_name)) {
+		if (cancelled) break;
+
+		rows.push(headers.map(h => escape_csv(row_data[h])).join(','));
+		if (++i % 100 === 0) {
+			loading("Generating...", {
+				"progress": (i / total) * 100,
+				"cancel":   () => { cancelled = true; },
+			});
+			await new Promise(resolve => setTimeout(resolve, 0));
+		}
+	}
+
+	window.removeEventListener('beforeunload', warn_before_unload);
+	loading(false);
+
+	if (!cancelled) {
+		const csv_content = [headers.join(','), ...rows].join('\n');
+		const filename = export_filename(`${analysis_name.toLowerCase().replace(/\s+/g, '-')}-high-priority-areas`, 'csv');
+		fake_blob_download(csv_content, filename, 'text/csv;charset=utf-8');
+	}
+}
+
+async function generate_high_priority_areas_csv(results, opts = {}) {
+	if (!results || results.length === 0) return '';
+
+	const { onProgress, isCancelled } = opts;
+	const data = prepare_data(results);
+	const { headers, is_raster, analysis_name } = data;
+
+	const escape_csv = (val) => {
+		if (!val) return '';
+		const str = String(val);
+		if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+			return `"${str.replace(/"/g, '""')}"`;
+		}
+		return str;
+	};
+
+	const total = results.length;
+	const rows = [];
+	let i = 0;
+	for (const row_data of generate_rows(results, is_raster, analysis_name)) {
+		if (isCancelled && isCancelled()) return null;
+
+		rows.push(headers.map(h => escape_csv(row_data[h])).join(','));
+		if (++i % 100 === 0) {
+			if (onProgress) onProgress(i / total);
+			await new Promise(resolve => setTimeout(resolve, 0));
+		}
+	}
+
+	if (onProgress) onProgress(1);
+	return [headers.join(','), ...rows].join('\n');
 }

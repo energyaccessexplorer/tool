@@ -9,7 +9,6 @@ import {
 } from './complicated.js';
 
 import {
-	get_admin_area_item,
 	get_admin_area_layer_data,
 } from './area-analysis.js';
 
@@ -24,6 +23,26 @@ import {
 } from '../lib/helpers.js';
 
 import mapinfo from './map-info.js';
+
+function get_admin_area_item(variant, featureId) {
+	const division = GEOGRAPHY.divisions[variant];
+	if (!division || !division.priorityData || !division.vectors) return null;
+
+	const features = division.vectors.data.features;
+	const priorityData = division.priorityData;
+	const nameTable = maybe(division, 'csv', 'table') || {};
+
+	const id = featureId;
+	const feature = features.find(f => f.id === +id);
+	if (!feature || !priorityData[id]) return null;
+
+	return {
+		"id":       +id,
+		"priority": priorityData[id].average,
+		"name":     nameTable[id] || `Area ${id}`,
+		"feature":  feature,
+	};
+}
 
 let current_map_info_drop = null;
 

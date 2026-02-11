@@ -2,10 +2,6 @@ import {
 	coordinates_to_raster_pixel,
 } from './utils.js';
 
-import {
-	export_filename,
-} from './export.js';
-
 import '../lib/jszip.js';
 
 import '../lib/pptxgen.js';
@@ -932,12 +928,3 @@ export async function pptx() {
 	return p;
 };
 
-export async function pptx_blob() {
-	const p = await pptx();
-	return p.write('blob');
-};
-
-export async function pptx_download() {
-	const p = await pptx();
-	p.writeFile({ "filename": export_filename('summary', 'pptx') });
-};

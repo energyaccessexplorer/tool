@@ -18,8 +18,7 @@ import modal from '../lib/modal.js';
 import { generate_summary_data } from './summary.js';
 
 import {
-	pptx_blob as report_pptx_blob,
-	pptx_download as report_pptx_download,
+	pptx,
 } from './report.js';
 
 import {
@@ -108,7 +107,7 @@ export async function export_all() {
 	let pptx_blob, tiff_blob, high_priority_csv, share_csv;
 	try {
 		[pptx_blob, tiff_blob, high_priority_csv, share_csv] = await Promise.all([
-			report_pptx_blob(),
+			pptx().then(p => p.write('blob')),
 			analysis(type).then(a => a.tiff),
 			generate_high_priority_csv(get_locations_results(), {
 				"onProgress":  (p) => update(20 + (p * 50)),
@@ -153,7 +152,8 @@ export function show_export_modal() {
 
 			await delay(0.1);
 			await generate_summary_data();
-			await report_pptx_download();
+			const p = await pptx();
+			p.writeFile({ "filename": export_filename('summary', 'pptx') });
 
 			loading(false);
 		},

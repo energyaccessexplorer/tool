@@ -6,9 +6,10 @@ import {
 } from './mapbox.js';
 
 import {
-	getallpoints,
 	lowmedhigh_scale,
+	plot_active,
 } from './analysis.js';
+
 
 import {
 	pointto as search_pointto,
@@ -22,6 +23,7 @@ import {
 
 import {
 	area_type,
+	raster_pixel_to_coordinates,
 } from './utils.js';
 
 import {
@@ -312,7 +314,7 @@ export async function update() {
 	if (paginationContainer) paginationContainer.remove();
 
 	const isRaster = STATE.variant === 'raster';
-	const results = isRaster ? await getallpoints() : get_division_results(STATE.variant);
+	const results = isRaster ? await all_points() : get_division_results(STATE.variant);
 
 	paginationState.allResults = results.sort((a, b) => a.priority > b.priority ? -1 : 1);
 	paginationState.currentPage = 1;
@@ -359,4 +361,20 @@ export function init() {
 		}
 	};
 
+};
+
+async function all_points() {
+	const a = await plot_active(STATE.index, false);
+
+	const points = a.raster.reduce((t,v,i) => {
+		if (v > 0) {
+			t.push({i,v});
+		}
+
+		return t;
+	}, []);
+
+	return points
+		.sort((a,b) => a.v > b.v ? -1 : 1)
+		.map(t => ({ "priority": t.v, "i": t.i, "c": raster_pixel_to_coordinates(t.i) }));
 };

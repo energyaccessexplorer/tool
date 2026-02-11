@@ -20,7 +20,7 @@ import {
 	update as analysis_locations_panel_update,
 	download_locations_data,
 	view_all_locations,
-} from './analysis-search.js';
+} from './right-panel-high-priority-areas.js';
 
 import {
 	extract as user_extract,

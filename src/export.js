@@ -29,7 +29,7 @@ import {
 import {
 	download_locations_data,
 	get_locations_results,
-} from './analysis-search.js';
+} from './right-panel-high-priority-areas.js';
 
 import {
 	generate_csv_content as generate_high_priority_csv,

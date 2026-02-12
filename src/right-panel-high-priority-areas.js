@@ -23,6 +23,11 @@ import {
 } from './modal-table-high-priority-areas.js';
 
 import {
+	precompute_rows,
+	clear_row_cache,
+} from './area-analysis.js';
+
+import {
 	setup_about_button,
 } from './right-panel-graphs.js';
 
@@ -56,6 +61,8 @@ function format_area_type(variant) {
 		return type.toLowerCase();
 	}
 }
+
+let _precompute_controller = null;  
 
 const paginationState = {
 	"allResults":   [],
@@ -288,6 +295,9 @@ function render_page(page) {
 }
 
 export async function update() {
+	if (_precompute_controller) _precompute_controller.abort();
+	clear_row_cache();
+
 	const section = qs('#right-panel #analysis-locations-section');
 	const resultscontainer = qs('.locations-paginated-list', section);
 
@@ -311,6 +321,10 @@ export async function update() {
 	}
 
 	render_page(paginationState.currentPage);
+
+	_precompute_controller = new AbortController();
+	const analysis_name = EAE['indexes'][STATE.index]['name'];
+	precompute_rows(paginationState.allResults, isRaster, analysis_name, _precompute_controller.signal);
 };
 
 export function get_locations_results() {

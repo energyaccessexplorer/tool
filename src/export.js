@@ -48,14 +48,17 @@ function escape_csv(val) {
 async function build_csv_rows(results, { headers, is_raster, analysis_name, onProgress, isCancelled }) {
 	const total = results.length;
 	const rows = [];
+	let last_yield = performance.now();
 	let i = 0;
 	for (const row_data of generate_rows(results, is_raster, analysis_name)) {
 		if (isCancelled && isCancelled()) return null;
 
 		rows.push(headers.map(h => escape_csv(row_data[h])).join(','));
-		if (++i % 100 === 0) {
+		i++;
+		if (performance.now() - last_yield > 16) {
 			if (onProgress) onProgress(i / total);
 			await new Promise(resolve => setTimeout(resolve, 0));
+			last_yield = performance.now();
 		}
 	}
 	if (onProgress) onProgress(1);

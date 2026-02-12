@@ -31,6 +31,7 @@ export function show(results) {
 		"results":     results,
 		"page":        1,
 		"per_page":    10,
+		"sorting":     false,
 	};
 
 	function get_icon_class(header) {
@@ -38,7 +39,10 @@ export function show(results) {
 		return state.sort_desc ? "bi bi-caret-down-fill" : "bi bi-caret-up-fill";
 	}
 
-	function handle_sort(header) {
+	async function handle_sort(header) {
+		if (state.sorting) return;
+		state.sorting = true;
+
 		const is_priority = header === headers[0] || header === analysis_name;
 
 		if (state.sort_column === header) {
@@ -48,10 +52,17 @@ export function show(results) {
 			state.sort_desc = is_priority;
 		}
 
-		state.results = sort_results(results, state.sort_column, state.sort_desc, is_raster, analysis_name);
-		state.page = 1;
-		render_page();
 		update_sort_icons();
+		tbody.style.opacity = '0.5';
+		tbody.style.pointerEvents = 'none';
+
+		state.results = await sort_results(results, state.sort_column, state.sort_desc, is_raster, analysis_name);
+		state.page = 1;
+
+		tbody.style.opacity = '';
+		tbody.style.pointerEvents = '';
+		state.sorting = false;
+		render_page();
 	}
 
 	const content = tmpl('#high-priority-areas-list-all-template');

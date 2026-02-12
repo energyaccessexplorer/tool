@@ -1,6 +1,7 @@
 /* global JSZip */
 
 import {
+	area_type,
 	loading,
 } from './utils.js';
 
@@ -87,7 +88,7 @@ export function generate_share_csv_content() {
 	const data = [];
 
 	for (const type of ['area', 'population-density']) {
-		const label = type === 'area' ? 'km2' : 'people';
+		const label = type === 'area' ? area_type('raster') : 'people';
 		for (const k of Object.keys(SUMMARY)) {
 			const name = `${EAE['indexes'][k]['name']} (${label})`;
 			columns.push(name);
@@ -178,6 +179,7 @@ export function show_export_modal() {
 	const content = tmpl('#export-options-modal-content');
 
 	bind(content, {
+		"area_type":  area_type(STATE.variant).toLowerCase(),
 		"export_ppt": async function() {
 			loading("Generating...");
 

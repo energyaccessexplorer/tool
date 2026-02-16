@@ -31,7 +31,7 @@ import {
 } from './right-panel-high-priority-areas.js';
 
 import {
-	prepare_data,
+	prepare_tabular_data,
 	generate_rows,
 } from './area-analysis.js';
 
@@ -222,8 +222,9 @@ export function show_export_modal() {
 	}).show();
 }
 
-export async function download_high_priority_areas(results) {
-	const { headers, is_raster, analysis_name } = prepare_data(results);
+export async function download_high_priority_areas(results, opts = {}) {
+	const { headers, is_raster, analysis_name } = prepare_tabular_data(results);
+	const csv_headers = opts.visible_headers || headers;
 
 	let cancelled = false;
 
@@ -239,7 +240,7 @@ export async function download_high_priority_areas(results) {
 	window.addEventListener('beforeunload', warn_before_unload);
 
 	const rows = await build_csv_rows(results, {
-		headers, is_raster, analysis_name,
+		"headers":    csv_headers, is_raster, analysis_name,
 		"onProgress":  (p) => loading("Generating...", {
 			"progress": p * 100,
 			"cancel":   () => { cancelled = true; },
@@ -251,7 +252,7 @@ export async function download_high_priority_areas(results) {
 	loading(false);
 
 	if (rows) {
-		const csv_content = [headers.join(','), ...rows].join('\n');
+		const csv_content = [csv_headers.join(','), ...rows].join('\n');
 		const filename = export_filename(`${slugify(analysis_name)}-high-priority-areas`, 'csv');
 		fake_blob_download(csv_content, filename, 'text/csv;charset=utf-8');
 	}
@@ -261,7 +262,7 @@ async function generate_high_priority_areas_csv(results, opts = {}) {
 	if (!results || results.length === 0) return '';
 
 	const { onProgress, isCancelled } = opts;
-	const { headers, is_raster, analysis_name } = prepare_data(results);
+	const { headers, is_raster, analysis_name } = prepare_tabular_data(results);
 
 	const rows = await build_csv_rows(results, {
 		headers, is_raster, analysis_name, onProgress, isCancelled,

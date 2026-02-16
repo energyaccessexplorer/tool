@@ -3,7 +3,7 @@ import {
 } from './export.js';
 
 import {
-	prepare_data,
+	prepare_tabular_data,
 	generate_rows,
 	sort_results,
 } from './area-analysis.js';
@@ -18,12 +18,16 @@ import {
 import bind from '../lib/bind.js';
 
 export function show(results) {
-	const data = prepare_data(results);
+	const data = prepare_tabular_data(results);
 	if (!data) return;
 
-	const { headers, is_raster, "area_type": area_type_str, analysis_name } = data;
+	const { headers, is_raster, "area_type": area_type_str, analysis_name, column_meta, selector_groups } = data;
 
 	const selected_indices = new Set();
+
+	function get_visible_headers() {
+		return headers.filter(h => column_meta.get(h).visible);
+	}
 
 	const state = {
 		"sort_column": headers[0],
@@ -73,17 +77,64 @@ export function show(results) {
 	const select_all_checkbox = qs('.select-all-checkbox', content);
 	const page_numbers_container = qs('.page-numbers', content);
 
+	function render_headers() {
+		const tr = tbody.closest('table').querySelector('thead tr');
+		tr.querySelectorAll('th:not(.checkbox-column)').forEach(th => th.remove());
+
+		for (const name of get_visible_headers()) {
+			const th = tmpl('#column-header-template');
+			bind(th, {
+				name,
+				"icon_class": get_icon_class(name),
+				"on_sort":    () => handle_sort(name),
+			});
+			tr.append(th);
+		}
+	}
+
+	function column_selector_grid() {
+		const grid = document.createElement('div');
+		grid.className = 'column-selector-columns';
+
+		function make_item(header) {
+			const meta = column_meta.get(header);
+			const item = tmpl('#column-selector-item-template');
+			bind(item, {
+				"label":     header,
+				"checked":   meta.visible ? '' : false,
+				"css_class": meta.subordinate ? 'column-selector-item subordinate' : 'column-selector-item',
+				"on_toggle": function() {
+					meta.visible = this.checked;
+					render_headers();
+					render_page();
+				},
+			});
+			return item;
+		}
+
+		for (const group of selector_groups) {
+			const wrapper = document.createElement('div');
+			wrapper.className = group.children.length ? 'column-group has-children' : 'column-group';
+			wrapper.append(make_item(group.header));
+			for (const child of group.children) {
+				wrapper.append(make_item(child));
+			}
+			grid.append(wrapper);
+		}
+
+		return grid;
+	}
+
 	bind(content, {
-		"analysis-name": analysis_name,
-		"headers":       headers.map(name => ({
-			name,
-			"on_sort": () => handle_sort(name),
-		})),
-		"on_prev":           () => go_to_page(state.page - 1),
-		"on_next":           () => go_to_page(state.page + 1),
-		"download_selected": () => {
+		"analysis-name":          analysis_name,
+		"toggle_column_selector": function() {
+			this.closest('.high-priority-areas-list-all-content').querySelector('.column-selector-panel').classList.toggle('hidden');
+		},
+		"on_prev":                () => go_to_page(state.page - 1),
+		"on_next":                () => go_to_page(state.page + 1),
+		"download_selected":      () => {
 			const selected = Array.from(selected_indices).sort((a, b) => a - b).map(i => state.results[i]);
-			download_high_priority_areas(selected);
+			download_high_priority_areas(selected, { "visible_headers": get_visible_headers() });
 		},
 		"on_uncheck_all":     () => uncheck_all(),
 		"on_per_page_change": function() {
@@ -95,9 +146,12 @@ export function show(results) {
 		},
 	});
 
+	qs('.column-selector-panel', content).append(column_selector_grid());
+	render_headers();
+
 	const footer = tmpl('#high-priority-areas-list-all-footer-template');
 	bind(footer, {
-		"download": () => download_high_priority_areas(results),
+		"download": () => download_high_priority_areas(results, { "visible_headers": get_visible_headers() }),
 	});
 
 	function update_selection_overlay() {
@@ -120,9 +174,10 @@ export function show(results) {
 	}
 
 	function update_sort_icons() {
+		const visible = get_visible_headers();
 		document.querySelectorAll('.high-priority-areas-list-all-table th:not(.checkbox-column)').forEach((th, i) => {
 			const icon = th.querySelector('.sort-icon i');
-			if (icon) icon.className = get_icon_class(headers[i]);
+			if (icon) icon.className = get_icon_class(visible[i]);
 		});
 	}
 
@@ -208,7 +263,11 @@ export function show(results) {
 			const is_selected = selected_indices.has(row_index);
 
 			bind(row, {
-				"cells":     headers.map(header => ({ "value": row_data[header] || '' })),
+				"cells":     get_visible_headers().map(header => {
+					const raw = row_data[header];
+					const value = typeof raw === 'number' ? raw.toLocaleString() : (raw || '');
+					return { value };
+				}),
 				"on_select": function() {
 					if (this.checked) {
 						selected_indices.add(row_index);
@@ -236,7 +295,6 @@ export function show(results) {
 		render_page();
 	}
 
-	update_sort_icons();
 	render_page();
 
 	const header = tmpl('#modal-header-template');

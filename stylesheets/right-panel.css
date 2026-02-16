@@ -598,11 +598,62 @@ dialog .saved-analysis-last-viewed {
   width: 100%;
 }
 
+.high-priority-areas-list-all-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .high-priority-areas-list-all-subtitle {
   margin: 0;
   font-size: 16px;
   line-height: 24px;
   color: #575656;
+}
+
+.column-selector-panel {
+  background: #F6F6F6;
+  border: 1px solid #E7E6E6;
+  border-radius: 4px;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+}
+
+.column-selector-panel.hidden {
+  display: none;
+}
+
+.column-selector-columns {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px 16px;
+}
+
+.column-selector-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  line-height: 16px;
+  color: #3D3B3B;
+  cursor: pointer;
+}
+
+.column-selector-item input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.column-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.column-selector-item.subordinate {
+  padding-left: 20px;
 }
 
 .high-priority-areas-list-all-table-container {

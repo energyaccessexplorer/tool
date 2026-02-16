@@ -12,6 +12,8 @@ import {
 } from '../lib/helpers.js';
 
 const _row_cache = new Map();
+let _feature_index = null;
+let _feature_dataset = null;
 
 function _item_key(item) {
 	return item.i !== undefined ? item.i : item.id;
@@ -19,6 +21,43 @@ function _item_key(item) {
 
 export function clear_row_cache() {
 	_row_cache.clear();
+	_feature_index = null;
+	_feature_dataset = null;
+}
+
+function _get_feature_index() {
+	if (_feature_index) return { "index": _feature_index, "dataset": _feature_dataset };
+
+	for (const d of STATE.datasets) {
+		if (!d.vectors || !maybe(d, 'config', 'attributes_map', 'length')) continue;
+
+		const map = new Map();
+		for (const f of d.vectors.data.features) {
+			const ri = f.properties['__rasterindex'];
+			if (ri !== undefined && ri !== null) {
+				map.set(ri, f.properties);
+			}
+		}
+
+		_feature_index = map;
+		_feature_dataset = d;
+		return { "index": map, "dataset": d };
+	}
+
+	return null;
+}
+
+function _subordinate_entries(x) {
+	const fi = _get_feature_index();
+	if (!fi) return {};
+
+	const { index, dataset } = fi;
+	const attrs = dataset.config.attributes_map;
+	const props = index.get(x);
+
+	return Object.fromEntries(
+		attrs.map(attr => [attr.target, props ? (props[attr.dataset] ?? '') : '']),
+	);
 }
 
 
@@ -120,8 +159,10 @@ export function area_info(fields, props, ll, analysis_value, analysis_name, feat
 		basicData.push({ "label": "Location", "value": divisionValues.join(', ') });
 	}
 
-	const datasetIds = new Set(STATE.datasets.map(d => d.id));
-	const clickedLayerId = fields.find(d => d?.[0]?.startsWith('_') && datasetIds.has(d[0].slice(1)))?.[0].slice(1);
+	const tree = get_property_tree();
+	const tree_ids = new Set(tree.map(n => n.id));
+	const subordinate_keys = new Set(tree.flatMap(n => n.children.map(c => c.key)));
+	const clickedLayerId = fields.find(d => d?.[0]?.startsWith('_') && tree_ids.has(d[0].slice(1)))?.[0].slice(1);
 	const layerEntries = {};
 	const subordinateEntries = {};
 
@@ -132,7 +173,7 @@ export function area_info(fields, props, ll, analysis_value, analysis_name, feat
 		if (['facility name', 'name', 'facility_name'].includes(key.toLowerCase())) continue;
 		if (props[key] == null) continue;
 
-		(datasetIds.has(key) ? layerEntries : subordinateEntries)[key] = [key, label];
+		(subordinate_keys.has(key) ? subordinateEntries : layerEntries)[key] = [key, label];
 	}
 
 	function pushDetail(key, label, value, subordinate) {
@@ -277,6 +318,7 @@ function _build_raster_row(item, analysis_name) {
 		"Latitude":  item.c[1].toFixed(5),
 		..._priority_entries(item, analysis_name),
 		..._raster_dataset_entries(item.i),
+		..._subordinate_entries(item.i),
 		..._division_names(item.i),
 	};
 }
@@ -340,17 +382,64 @@ export async function sort_results(results, column, desc, is_raster, analysis_na
 	return decorated.map(([, i]) => results[i]);
 }
 
-export function prepare_data(results) {
+export function get_property_tree() {
+	return STATE.datasets
+		.filter(d => d.category.name !== 'boundaries'
+			&& d.category.name !== 'outline')
+		.map(d => {
+			const unit = _dataset_unit(d, 1);
+			const header = unit ? `${d.name} - ${unit}` : d.name;
+			const children = maybe(d, 'config', 'attributes_map', 'length')
+				? d.config.attributes_map.map(a => ({ "key": a.dataset, "header": a.target }))
+				: [];
+			return { "id": d.id, header, children };
+		});
+}
+
+export function prepare_tabular_data(results) {
 	const is_raster = STATE.variant === 'raster';
 	const analysis_name = EAE['indexes'][STATE.index]['name'];
-	const area_type_str = area_type(STATE.variant);
 
 	const row = get_row(results[0], is_raster, analysis_name);
 	const fixedOrder = ["Priority score", analysis_name, "Latitude", "Longitude"];
-	const remaining = Object.keys(row).filter(h => !fixedOrder.includes(h));
-	const headers = fixedOrder.filter(h => row.hasOwnProperty(h)).concat(remaining);
+	const headers = fixedOrder.filter(h => row.hasOwnProperty(h)).concat(Object.keys(row).filter(h => !fixedOrder.includes(h)));
 
-	return { headers, "area_type": area_type_str, analysis_name, is_raster };
+	const tree = is_raster ? get_property_tree() : [];
+	const sub_targets = new Set(tree.flatMap(n => n.children.map(c => c.header)));
+	const parent_by_target = new Map(tree.flatMap(n => n.children.map(c => [c.header, n.header])));
+
+	const locked = new Set(fixedOrder);
+	for (const d of GEOGRAPHY.divisions.slice(is_raster ? 1 : 0)) {
+		if (row.hasOwnProperty(d.name)) locked.add(d.name);
+	}
+
+	const column_meta = new Map();
+	for (const h of headers) {
+		const is_sub = sub_targets.has(h);
+		column_meta.set(h, {
+			"visible":     !is_sub,
+			"subordinate": is_sub,
+			"parent":      is_sub ? parent_by_target.get(h) : null,
+			"locked":      locked.has(h),
+		});
+	}
+
+	const children_by_parent = new Map();
+	for (const h of headers) {
+		const m = column_meta.get(h);
+		if (!m.subordinate) continue;
+		if (!children_by_parent.has(m.parent)) children_by_parent.set(m.parent, []);
+		children_by_parent.get(m.parent).push(h);
+	}
+
+	const selector_groups = [];
+	for (const h of headers) {
+		const m = column_meta.get(h);
+		if (m.locked || m.subordinate) continue;
+		selector_groups.push({ "header": h, "children": children_by_parent.get(h) || [] });
+	}
+
+	return { headers, "area_type": area_type(STATE.variant), analysis_name, is_raster, column_meta, selector_groups };
 }
 
 export function* generate_rows(results, is_raster, analysis_name, start = 0, count = results.length - start) {

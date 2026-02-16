@@ -1019,7 +1019,14 @@
 
   <template id="high-priority-areas-list-all-template">
     <div class="high-priority-areas-list-all-content">
-      <p class="high-priority-areas-list-all-subtitle" bind="analysis-name"></p>
+      <div class="high-priority-areas-list-all-toolbar">
+        <p class="high-priority-areas-list-all-subtitle" bind="analysis-name"></p>
+        <button class="button-icon button-icon-sm column-selector-toggle"
+                bind-listen="click" bind-func="toggle_column_selector">
+          <i class="bi bi-gear"></i>
+        </button>
+      </div>
+      <div class="column-selector-panel hidden"></div>
       <div class="high-priority-areas-list-all-table-container">
         <table class="high-priority-areas-list-all-table">
           <thead>
@@ -1087,6 +1094,25 @@
       </td>
       <td bind-each="cells" bind="value"></td>
     </tr>
+  </template>
+
+  <template id="column-header-template">
+    <th bind-listen="click" bind-func="on_sort">
+      <div class="th-content">
+        <span bind="name"></span>
+        <span class="sort-icon"><i bind-attr-class="icon_class"></i></span>
+      </div>
+    </th>
+  </template>
+
+  <template id="column-selector-item-template">
+    <label bind-attr-class="css_class">
+      <input type="checkbox"
+             bind-attr-checked="checked"
+             bind-listen="change"
+             bind-func="on_toggle">
+      <span bind="label"></span>
+    </label>
   </template>
 
   <template id="page-number-template">

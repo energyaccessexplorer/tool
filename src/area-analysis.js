@@ -52,11 +52,10 @@ function _subordinate_entries(x) {
 	if (!fi) return {};
 
 	const { index, dataset } = fi;
-	const attrs = dataset.config.attributes_map;
 	const props = index.get(x);
 
 	return Object.fromEntries(
-		attrs.map(attr => [attr.target, props ? (props[attr.dataset] ?? '') : '']),
+		dataset.config.attributes_map.map(attr => [attr.target, props ? (props[attr.dataset] ?? '') : '']),
 	);
 }
 
@@ -160,11 +159,10 @@ export function area_info(fields, props, ll, analysis_value, analysis_name, feat
 	}
 
 	const tree = get_property_tree();
-	const tree_ids = new Set(tree.map(n => n.id));
 	const subordinate_keys = new Set(tree.flatMap(n => n.children.map(c => c.key)));
-	const clickedLayerId = fields.find(d => d?.[0]?.startsWith('_') && tree_ids.has(d[0].slice(1)))?.[0].slice(1);
-	const layerEntries = {};
-	const subordinateEntries = {};
+	const clicked_layer_id = fields.find(d => d?.[0]?.startsWith('_') && tree.some(n => n.id === d[0].slice(1)))?.[0].slice(1);
+	const layer_entries = {};
+	const subordinate_entries = {};
 
 	for (const field of fields) {
 		if (!field) continue;
@@ -173,7 +171,7 @@ export function area_info(fields, props, ll, analysis_value, analysis_name, feat
 		if (['facility name', 'name', 'facility_name'].includes(key.toLowerCase())) continue;
 		if (props[key] == null) continue;
 
-		(subordinate_keys.has(key) ? subordinateEntries : layerEntries)[key] = [key, label];
+		(subordinate_keys.has(key) ? subordinate_entries : layer_entries)[key] = [key, label];
 	}
 
 	function pushDetail(key, label, value, subordinate) {
@@ -191,15 +189,15 @@ export function area_info(fields, props, ll, analysis_value, analysis_name, feat
 	}
 
 	for (const { "id": layerId } of STATE.datasets) {
-		if (!layerEntries[layerId]) continue;
+		if (!layer_entries[layerId]) continue;
 
-		const [key, label] = layerEntries[layerId];
+		const [key, label] = layer_entries[layerId];
 		const parentIndex = detailedData.length;
 		pushDetail(key, label, raw.values[key]);
 
-		if (layerId === clickedLayerId) {
-			for (const subKey in subordinateEntries) {
-				const [, subLabel] = subordinateEntries[subKey];
+		if (layerId === clicked_layer_id) {
+			for (const subKey in subordinate_entries) {
+				const [, subLabel] = subordinate_entries[subKey];
 				pushDetail(subKey, subLabel || subKey, props[subKey], true);
 			}
 			if (detailedData.length > parentIndex + 1) {
@@ -388,11 +386,13 @@ export function get_property_tree() {
 			&& d.category.name !== 'outline')
 		.map(d => {
 			const unit = _dataset_unit(d, 1);
-			const header = unit ? `${d.name} - ${unit}` : d.name;
-			const children = maybe(d, 'config', 'attributes_map', 'length')
-				? d.config.attributes_map.map(a => ({ "key": a.dataset, "header": a.target }))
-				: [];
-			return { "id": d.id, header, children };
+			return {
+				"id":       d.id,
+				"header":   unit ? `${d.name} - ${unit}` : d.name,
+				"children": maybe(d, 'config', 'attributes_map', 'length')
+					? d.config.attributes_map.map(a => ({ "key": a.dataset, "header": a.target }))
+					: [],
+			};
 		});
 }
 
@@ -401,28 +401,27 @@ export function prepare_tabular_data(results) {
 	const analysis_name = EAE['indexes'][STATE.index]['name'];
 
 	const row = get_row(results[0], is_raster, analysis_name);
-	const fixedOrder = ["Priority score", analysis_name, "Latitude", "Longitude"];
-	const headers = fixedOrder.filter(h => row.hasOwnProperty(h)).concat(Object.keys(row).filter(h => !fixedOrder.includes(h)));
+	const fixed_order = ["Priority score", analysis_name, "Latitude", "Longitude"];
+	const headers = fixed_order.filter(h => row.hasOwnProperty(h)).concat(Object.keys(row).filter(h => !fixed_order.includes(h)));
 
 	const tree = is_raster ? get_property_tree() : [];
 	const sub_targets = new Set(tree.flatMap(n => n.children.map(c => c.header)));
 	const parent_by_target = new Map(tree.flatMap(n => n.children.map(c => [c.header, n.header])));
 
-	const locked = new Set(fixedOrder);
-	for (const d of GEOGRAPHY.divisions.slice(is_raster ? 1 : 0)) {
-		if (row.hasOwnProperty(d.name)) locked.add(d.name);
-	}
+	const locked = new Set([
+		...fixed_order,
+		...GEOGRAPHY.divisions.slice(is_raster ? 1 : 0).filter(d => row.hasOwnProperty(d.name)).map(d => d.name),
+	]);
 
-	const column_meta = new Map();
-	for (const h of headers) {
+	const column_meta = new Map(headers.map(h => {
 		const is_sub = sub_targets.has(h);
-		column_meta.set(h, {
+		return [h, {
 			"visible":     !is_sub,
 			"subordinate": is_sub,
 			"parent":      is_sub ? parent_by_target.get(h) : null,
 			"locked":      locked.has(h),
-		});
-	}
+		}];
+	}));
 
 	const children_by_parent = new Map();
 	for (const h of headers) {
@@ -432,12 +431,9 @@ export function prepare_tabular_data(results) {
 		children_by_parent.get(m.parent).push(h);
 	}
 
-	const selector_groups = [];
-	for (const h of headers) {
-		const m = column_meta.get(h);
-		if (m.locked || m.subordinate) continue;
-		selector_groups.push({ "header": h, "children": children_by_parent.get(h) || [] });
-	}
+	const selector_groups = headers
+		.filter(h => { const m = column_meta.get(h); return !m.locked && !m.subordinate; })
+		.map(h => ({ "header": h, "children": children_by_parent.get(h) || [] }));
 
 	return { headers, "area_type": area_type(STATE.variant), analysis_name, is_raster, column_meta, selector_groups };
 }

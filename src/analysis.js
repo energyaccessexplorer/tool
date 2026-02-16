@@ -477,7 +477,7 @@ function aggregate_scalar_values(division_raster, dataset, layer_data, layer_id,
 
 		layer_data[layer_id].areas[area_id].result = {
 			"type":  'scalar',
-			"value": aggregate(values, dataset.category.analysis?.aggregation),
+			"value": aggregate(values, dataset.category.analysis?.aggregation || (dataset.category.unit ? "AVG" : "SUM")),
 		};
 	}
 }

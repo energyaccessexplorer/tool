@@ -448,6 +448,19 @@ function aggregate_point_values(division_raster, dataset, layer_data, layer_id, 
 	}
 }
 
+function aggregate(values, fn) {
+	const sum = values.reduce((a, b) => a + b, 0);
+
+	switch (fn) {
+	case "SUM":
+		return sum;
+
+	case "AVG":
+	default:
+		return sum / values.length;
+	}
+}
+
 function aggregate_scalar_values(division_raster, dataset, layer_data, layer_id, area_ids) {
 	division_raster.forEach((area_id, i) => {
 		if (area_id === -1) return;
@@ -462,11 +475,9 @@ function aggregate_scalar_values(division_raster, dataset, layer_data, layer_id,
 		const values = layer_data[layer_id].areas[area_id].values;
 		if (values.length === 0) continue;
 
-		const sum = values.reduce((a, b) => a + b, 0);
-
 		layer_data[layer_id].areas[area_id].result = {
 			"type":  'scalar',
-			"value": dataset.category.unit ? sum / values.length : sum,
+			"value": aggregate(values, dataset.category.analysis?.aggregation),
 		};
 	}
 }

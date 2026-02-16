@@ -394,15 +394,14 @@ This is fatal. Thanks for all the fish.`;
 			return true;
 		});
 
-	ALL
-		.filter(d => !divisions.map(i => i.dataset_id).includes(d.id))
-		.filter(d => d.category.name !== 'admin-tiers')
-		.forEach(e => new DS(e));
-
-	// We need all the datasets to be initialised _before_ setting
-	// mutant attributes (order is never guaranteed)
+	// We need all the datasets to be initialised _before_ running mutant_init
 	//
-	DS.array.filter(d => d.hosts).forEach(d => d.mutant_init());
+	await Promise.all(
+		ALL.filter(d => !divisions.map(i => i.dataset_id).includes(d.id))
+			.filter(d => d.category.name !== 'admin-tiers')
+			.map(e => new DS(e))
+			.filter(d => d.config.hosts)
+			.map(d => d.mutant_init()));
 
 	await load_datasets(conf.datasets);
 };
@@ -828,7 +827,7 @@ function timeline_visibility() {
 };
 
 function load_datasets(array) {
-	return Promise.all(array.map(d => {
+	return Promise.all(array.map(async d => {
 		const ds = DS.array.find(t => t.id === d.name || t.name === d.id || t.id === d.id);
 
 		if (!ds) {
@@ -844,11 +843,15 @@ function load_datasets(array) {
 
 		ds.selection = d.selection || [];
 
-		const host = ds.selection[0] ? DST.get(ds.selection[0]) : maybe(ds.hosts, 0);
-		if (host) ds.mutate((ds.host = host));
+		if (ds.config.hosts) {
+			await Promise.all(ds.hosts.map(h => h.loadall()));
+
+			const h = ds.selection[0] || maybe(ds.config.hosts, 0);
+			if (h) ds.mutate((ds.host = DST.get(h)));
+		}
 
 		if (typeof d.weight === 'number') ds.weight = d.weight;
 
-		return ds.turn(true);
+		ds.turn(true);
 	}));
 };

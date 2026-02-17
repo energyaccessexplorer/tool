@@ -1,27 +1,15 @@
 import {
 	fit as mapbox_fit,
+	get_map_position,
 	show_location_info,
 } from './mapbox.js';
 
 import {
-	qs,
 	qsa,
 } from '../lib/helpers.js';
 
 export function pointto(coords, dict, props, centerPointer = false) {
-	const maparea = qs('#maparea');
-
-	const {x,y} = MAPBOX.project(coords);
-
-	const box = maparea.getBoundingClientRect();
-
-	const position = {
-		"x":      box.x + x,
-		"y":      box.y + y,
-		"lngLat": {"lng": coords[0], "lat": coords[1]},
-	};
-
-	show_location_info(coords, position, centerPointer);
+	show_location_info(coords, get_map_position(coords), centerPointer);
 };
 
 export function zoom(p, fn) {

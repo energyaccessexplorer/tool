@@ -2,6 +2,7 @@ import {
 	coords_search_pois as mapbox_coords_search_pois,
 	fit as mapbox_fit,
 	get_admin_area_item,
+	get_map_position,
 	show_admin_area_info,
 	show_location_info,
 } from './mapbox.js';
@@ -69,18 +70,6 @@ const paginationState = {
 	"currentPage":  1,
 	"itemsPerPage": 10,
 };
-
-function get_map_position(coords) {
-	const maparea = qs('#maparea');
-	const {x, y} = MAPBOX.project(coords);
-	const box = maparea.getBoundingClientRect();
-
-	return {
-		"x":      box.x + x,
-		"y":      box.y + y,
-		"lngLat": {"lng": coords[0], "lat": coords[1]},
-	};
-}
 
 function show_info_on_hover(p) {
 	show_location_info(p.c, get_map_position(p.c), false);

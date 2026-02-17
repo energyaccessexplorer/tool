@@ -45,6 +45,17 @@ export function get_admin_area_item(variant, id) {
 
 let current_map_info_drop = null;
 
+export function get_map_position(coords) {
+	const {x, y} = MAPBOX.project(coords);
+	const box = qs('#maparea').getBoundingClientRect();
+
+	return {
+		"x":      box.x + x,
+		"y":      box.y + y,
+		"lngLat": {"lng": coords[0], "lat": coords[1]},
+	};
+}
+
 const default_styles = [{
 	"name":  "Basic (default)",
 	"value": "mapbox/basic-v9",
@@ -350,13 +361,8 @@ export function pointer({x = 0, y = 0, lngLat = null}, data) {
 	const mark = new mapinfo({ "position": pos, "data": data, "close": cls, "onClose": drop, "point": { x, y } });
 
 	function updatePosition() {
-		const point = MAPBOX.project(lngLat);
-		const mapContainer = MAPBOX.getContainer().getBoundingClientRect();
-
-		const newX = mapContainer.left + point.x;
-		const newY = mapContainer.top + point.y;
-
-		mark.updatePoint(newX, newY);
+		const { x, y } = get_map_position([lngLat.lng, lngLat.lat]);
+		mark.updatePoint(x, y);
 	}
 
 	if (lngLat) {
@@ -432,13 +438,8 @@ export function show_location_info(ll, position, centerPointer = true) {
 
 	const dotFeature = features.find(feat => feat && maybe(feat, 'geometry', 'type') === 'Point');
 	if (dotFeature) {
-		const [lng, lat] = dotFeature.geometry.coordinates;
-		ll = [lng, lat];
-		const snapped = MAPBOX.project([lng, lat]);
-		const mapRect = MAPBOX.getContainer().getBoundingClientRect();
-		position.x = mapRect.left + snapped.x;
-		position.y = mapRect.top + snapped.y;
-		position.lngLat = { lng, lat };
+		ll = dotFeature.geometry.coordinates;
+		Object.assign(position, get_map_position(ll));
 	}
 
 	const [fields, props, raw] = context(raster_pixel, features);

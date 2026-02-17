@@ -242,39 +242,35 @@ function render_page(page) {
 	const pageResults = paginationState.allResults.slice(startIdx, endIdx);
 
 	if (isRaster) {
+		const score_of = item => item.priority ? Math.round((item.priority).toFixed(2) * 100) : "";
+
 		const scoreCounts = {};
 		paginationState.allResults.forEach(item => {
-			const score = item.priority ? Math.round((item.priority).toFixed(2) * 100) : "";
+			const score = score_of(item);
 			scoreCounts[score] = (scoreCounts[score] || 0) + 1;
 		});
 
-		let currentScore = null;
-		let currentGroupList = null;
+		const groups = pageResults.reduce((acc, item) => {
+			const score = score_of(item);
+			(acc[score] ??= []).push(item);
+			return acc;
+		}, {});
 
-		pageResults.forEach(item => {
-			const score = item.priority ? Math.round((item.priority).toFixed(2) * 100) : "";
-			const groupCount = scoreCounts[score];
+		Object.entries(groups).forEach(([score, items]) => {
+			const template = tmpl('#location-group-template');
+			const group = template.firstElementChild;
+			group.setAttribute('data-score', score);
 
-			if (score !== currentScore) {
-				currentScore = score;
-				const template = tmpl('#location-group-template');
-				const currentGroup = template.firstElementChild;
+			const areaCount = scoreCounts[score] === 1 ? '1 area' : `${scoreCounts[score]} areas`;
+			bind(template, {
+				"score-text": `${score}% priority score`,
+				"area-count": areaCount,
+			});
 
-				currentGroup.setAttribute('data-score', score);
+			const groupList = qs('.location-group-list', group);
+			items.forEach(item => groupList.append(raster_item(item)));
 
-				const areaCount = groupCount === 1 ? '1 area' : `${groupCount} areas`;
-
-				bind(template, {
-					"score-text": `${score}% priority score`,
-					"area-count": areaCount,
-				});
-
-				currentGroupList = qs('.location-group-list', currentGroup);
-
-				ul.append(template);
-			}
-
-			currentGroupList.append(raster_item(item));
+			ul.append(template);
 		});
 	} else {
 		pageResults.forEach((item, i) => ul.append(admin_area_item(item, startIdx + i + 1)));

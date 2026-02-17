@@ -77,6 +77,9 @@ export function get_admin_area_layer_data(variant, area_id) {
 			if (area_result.type === 'points') {
 				value = area_result.value;
 				unit = 'count';
+			} else if (area_result.value === null) {
+				value = 'Not aggregated';
+				unit = '';
 			} else {
 				value = parseFloat(area_result.value.toFixed(2));
 				unit = layer.unit || '';

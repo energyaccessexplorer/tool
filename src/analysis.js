@@ -388,41 +388,36 @@ export function priority(d, a, i) {
 
 function aggregate_layer_values(division) {
 	const divisions = division.raster.data;
-	const layer_data = {};
-	const area_ids = [];
+	const area_ids = [...new Set(divisions.filter(e => e !== -1))];
 
-	for (const e of divisions) if (e !== -1 && area_ids.indexOf(e) === -1) area_ids.push(e);
+	const valid_datasets = STATE.datasets
+		.filter(d => and(d.raster, d.raster.data))
+		.filter(d => d.category.name !== 'boundaries' && d.category.name !== 'outline');
 
-	for (const dataset of STATE.datasets) {
-		if (!and(dataset.raster, dataset.raster.data)) continue;
-		if (dataset.category.name === 'boundaries') continue;
-		if (dataset.category.name === 'outline') continue;
+	return Object.fromEntries(
+		valid_datasets.map(dataset => {
+			const is_point_layer = dataset.vectors?.shape_type === 'points';
+			const areas = Object.fromEntries(
+				area_ids.map(id => [id, { "values": [], "result": null }]),
+			);
 
-		const is_point_layer = dataset.vectors?.shape_type === 'points';
-		const layer_id = dataset.id;
+			if (is_point_layer) {
+				aggregate_point_values(divisions, dataset, areas, area_ids);
+			} else {
+				aggregate_scalar_values(divisions, dataset, areas, area_ids);
+			}
 
-		layer_data[layer_id] = {
-			"name":           dataset.name,
-			"unit":           dataset.category.unit,
-			"is_point_layer": is_point_layer,
-			"areas":          {},
-		};
+			return [dataset.id, {
+				"name":           dataset.name,
+				"unit":           dataset.category.unit,
+				"is_point_layer": is_point_layer,
+				areas,
+			}];
+		}),
+	);
+}
 
-		for (const area_id of area_ids) {
-			layer_data[layer_id].areas[area_id] = { "values": [], "result": null };
-		}
-
-		if (is_point_layer) {
-			aggregate_point_values(divisions, dataset, layer_data, layer_id, area_ids);
-		} else {
-			aggregate_scalar_values(divisions, dataset, layer_data, layer_id, area_ids);
-		}
-	}
-
-	return layer_data;
-};
-
-function aggregate_point_values(division_raster, dataset, layer_data, layer_id, area_ids) {
+function aggregate_point_values(division_raster, dataset, areas, area_ids) {
 	const features = maybe(dataset, 'vectors', 'data', 'features') || [];
 
 	for (const feature of features) {
@@ -434,16 +429,15 @@ function aggregate_point_values(division_raster, dataset, layer_data, layer_id, 
 
 		const area_id = division_raster[pixel.index];
 		if (area_id === -1) continue;
-		if (!layer_data[layer_id].areas[area_id]) continue;
+		if (!areas[area_id]) continue;
 
-		layer_data[layer_id].areas[area_id].values.push(1);
+		areas[area_id].values.push(1);
 	}
 
 	for (const area_id of area_ids) {
-		const values = layer_data[layer_id].areas[area_id].values;
-		layer_data[layer_id].areas[area_id].result = {
+		areas[area_id].result = {
 			"type":  'points',
-			"value": values.length,
+			"value": areas[area_id].values.length,
 		};
 	}
 }
@@ -461,23 +455,25 @@ function aggregate(values, fn) {
 	}
 }
 
-function aggregate_scalar_values(division_raster, dataset, layer_data, layer_id, area_ids) {
+function aggregate_scalar_values(division_raster, dataset, areas, area_ids) {
 	division_raster.forEach((area_id, i) => {
 		if (area_id === -1) return;
 
 		const v = dataset.raster.data[i];
 		if (v === dataset.raster.nodata) return;
 
-		layer_data[layer_id].areas[area_id].values.push(v);
+		areas[area_id].values.push(v);
 	});
 
+	const agg_fn = dataset.category.analysis?.aggregation;
+
 	for (const area_id of area_ids) {
-		const values = layer_data[layer_id].areas[area_id].values;
+		const values = areas[area_id].values;
 		if (values.length === 0) continue;
 
-		layer_data[layer_id].areas[area_id].result = {
+		areas[area_id].result = {
 			"type":  'scalar',
-			"value": aggregate(values, dataset.category.analysis?.aggregation || (dataset.category.unit ? "AVG" : "SUM")),
+			"value": agg_fn ? aggregate(values, agg_fn) : null,
 		};
 	}
 }

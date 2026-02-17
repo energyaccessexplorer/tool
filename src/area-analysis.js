@@ -110,8 +110,8 @@ export function area_info(fields, props, ll, analysis_value, analysis_name, feat
 		const feature_entry = fields.find(d => d && d[0] && d[0].startsWith('_') && !d[0].includes('analysis'));
 
 		if (feature_entry) {
-			const category_html = feature_entry[1];
-			const category = category_html.match(/<strong[^>]*>(.*?)<\/strong>/)?.[1] || '';
+			const dataset = STATE.datasets.find(d => d.id === feature_entry[0].slice(1));
+			const category = dataset?.name?.toUpperCase() || '';
 			const name_field = fields.find(d => d?.[1] && !d[0]?.startsWith('_') &&
 				['name', 'facility name', 'facility_name'].includes(d[1].toLowerCase()));
 			const name = props[name_field?.[0]] || feature_name;

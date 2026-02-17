@@ -491,6 +491,9 @@ async function reload(k,v) {
 		}
 
 		GEOGRAPHY.divisions.forEach((d,i) => {
+			// Workaround a crash for Uganda
+			if (!d.vectors.data) return;
+
 			if (!MAPBOX.getSource(`filtered-source-${i}`)) {
 				MAPBOX.addSource(`filtered-source-${i}`, {
 					"type": 'geojson',

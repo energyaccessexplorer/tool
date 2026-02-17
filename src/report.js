@@ -13,6 +13,7 @@ import {
 import {
 	analysis_colorscale,
 	analysis_colorscale_svg,
+	lowmedhigh_scale,
 	medhigh_point_count,
 	getpoints as toplocations_fetch,
 } from './analysis.js';

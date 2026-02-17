@@ -7,6 +7,7 @@ import bubblemessage from '../lib/bubblemessage.js';
 import analysis_run, {
 	analysis_colorscale,
 	analysis_colorscale_svg,
+	lowmedhigh_scale,
 } from './analysis.js';
 
 import {

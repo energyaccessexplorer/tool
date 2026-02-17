@@ -1,5 +1,5 @@
 import { svg_pie } from './utils.js';
-import { analysis_colorscale } from './analysis.js';
+import { analysis_colorscale, lowmedhigh_scale } from './analysis.js';
 import bubblemessage from '../lib/bubblemessage.js';
 import bind from '../lib/bind.js';
 
@@ -15,7 +15,7 @@ const PIES = {};
 const bubble = (v,e) => new bubblemessage({ "message": v + "%", "position": "C", "close": false, "noevents": true }, e);
 
 function update_graph_section(section, distribution, total, unit, description) {
-	const labels = ['Low', 'Low - medium', 'Medium', 'Medium - high', 'High'];
+	const labels = lowmedhigh_scale.range();
 
 	const scale = ce('dl', null, { "class": 'discrete-scale' });
 

@@ -24,6 +24,7 @@ import {
 
 import {
 	analysis,
+	lowmedhigh_scale,
 } from './analysis.js';
 
 import {
@@ -83,7 +84,7 @@ export function export_filename(name, extension, { timestamp = true } = {}) {
 }
 
 export function generate_share_csv_content() {
-	const levels = ['low', 'low-med', 'medium', 'med-high', 'high'];
+	const levels = lowmedhigh_scale.range().map(l => l.toLowerCase());
 	const columns = [];
 	const data = [];
 

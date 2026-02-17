@@ -569,7 +569,7 @@ export function show_admin_area_info(item, position, centerPointer = false) {
 		"analysis_value": item.priority,
 		"analysis_name":  analysis_name,
 		"feature_name":   item.name,
-		"area_info":      info,
+		"admin_info":     info,
 		raw,
 	});
 

@@ -55,7 +55,7 @@ export default class mapinfo extends HTMLElement {
 	render() {
 		const { "data": rawData, onClose } = this.opts;
 
-		const { fields, props, ll, analysis_value, analysis_name, feature_name, "area_info": info, raw } = rawData;
+		const { fields, props, ll, analysis_value, analysis_name, feature_name, "admin_info": info, raw } = rawData;
 		const data = area_info(fields, props, ll, analysis_value, analysis_name, feature_name, info, raw);
 
 		const content = tmpl('#map-info-template');

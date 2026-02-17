@@ -84,7 +84,7 @@ export function show(results) {
 		for (const name of get_visible_headers()) {
 			const th = tmpl('#column-header-template');
 			bind(th, {
-				name,
+				"name":       name,
 				"icon_class": get_icon_class(name),
 				"on_sort":    () => handle_sort(name),
 			});
@@ -100,7 +100,7 @@ export function show(results) {
 			const meta = column_meta.get(header);
 			const item = tmpl('#column-selector-item-template');
 			bind(item, {
-				"label":     header,
+				"label":     meta.display || header,
 				"checked":   meta.visible ? '' : false,
 				"css_class": meta.subordinate ? 'column-selector-item subordinate' : 'column-selector-item',
 				"on_toggle": function() {

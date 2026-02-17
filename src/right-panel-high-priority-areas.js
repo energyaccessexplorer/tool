@@ -322,7 +322,7 @@ export function init() {
 	qs('#analysis-locations').replaceWith(analysis_locations);
 
 	const section = qs('#right-panel #analysis-locations-section');
-	setup_about_button(section, `Showing ${format_area_type(STATE.variant)} with the highest prioritization scores based on your analysis criteria.`);
+	setup_about_button(section, () => `Showing ${format_area_type(STATE.variant)} with the highest prioritization scores based on your analysis criteria.`);
 
 };
 

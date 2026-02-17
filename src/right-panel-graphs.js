@@ -58,7 +58,7 @@ export function setup_about_button(section, about) {
 
 	aboutButton.onmouseenter = () => {
 		bubble = new bubblemessage({
-			"message":  about,
+			"message":  typeof about === 'function' ? about() : about,
 			"position": 'W',
 			"close":    false,
 		}, aboutButton);

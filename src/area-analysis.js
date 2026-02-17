@@ -280,7 +280,7 @@ function _find_tier_row(csv, divisions, x) {
 	return null;
 }
 
-function _division_names(x) {
+export function division_names(x) {
 	const divisions = GEOGRAPHY.divisions.slice(1);
 	const tier_row = _find_tier_row(
 		maybe(DST.get('admin-tiers'), 'csv', 'data'),
@@ -315,7 +315,7 @@ function _build_raster_row(item, analysis_name) {
 		..._priority_entries(item, analysis_name),
 		..._raster_dataset_entries(item.i),
 		..._subordinate_entries(item.i),
-		..._division_names(item.i),
+		...division_names(item.i),
 	};
 }
 

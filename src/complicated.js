@@ -11,6 +11,10 @@ import {
 } from './utils.js';
 
 import {
+	division_names,
+} from './area-analysis.js';
+
+import {
 	and,
 	maybe,
 } from '../lib/helpers.js';
@@ -110,38 +114,14 @@ export function context(raster_pixel, features = []) {
 		.filter(d => maybe(d, 'raster', 'data'))
 		.forEach(d => rows(d));
 
-	(function tier_rows() {
-		const g = GEOGRAPHY.divisions.slice(1);
-		const adminTiers = maybe(DST.get('admin-tiers'), 'csv', 'data');
+	const names = division_names(x);
+	const tier_entries = Object.entries(names).map(([divName, name]) => {
+		props["_" + divName] = name;
+		return ["_" + divName, divName];
+	});
 
-		// Find a known tier value to lookup the admin-tiers row
-		let tierRow = null;
-		for (const [i, d] of g.entries()) {
-			const tierIndex = i + 1;
-			const rasterId = maybe(d, 'raster', 'data', x);
-			if (rasterId !== undefined && adminTiers) {
-				tierRow = adminTiers.find(row => row[`TIER${tierIndex}`] === rasterId);
-				if (tierRow) break;
-			}
-		}
-
-		const a = g.map((d, i) => {
-			const tierIndex = i + 1;
-			const rasterId = maybe(d, 'raster', 'data', x);
-			const tierId = rasterId ?? maybe(tierRow, `TIER${tierIndex}`);
-			const name = maybe(d, 'csv', 'table', tierId);
-
-			if (name) {
-				props["_" + d.name] = name;
-				return ["_" + d.name, d.name];
-			}
-			return null;
-		}).filter(Boolean);
-
-		if (dict.length) a.unshift(null);
-
-		dict.push(...a);
-	})();
+	if (dict.length && tier_entries.length) tier_entries.unshift(null);
+	dict.push(...tier_entries);
 
 	dict.forEach((d,i) => {
 		if (!d) return;

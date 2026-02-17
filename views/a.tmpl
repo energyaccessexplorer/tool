@@ -848,7 +848,11 @@
     <main>
       <header>
         <div class="header-content">
-          <div class="title" bind-cond="feature" bind="feature"></div>
+          <div class="title" bind-cond="feature">
+            <i class="bi-geo" bind-cond="feature_type"></i>
+            <i class="bi-crosshair" bind-unless="feature_type"></i>
+            <span bind="feature"></span>
+          </div>
           <div class="title coordinate-title" bind-cond="coordinate-title">
             <i class="bi-crosshair"></i>
             <span bind="coordinates"></span>

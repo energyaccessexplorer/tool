@@ -112,11 +112,9 @@ export function area_info(fields, props, ll, analysis_value, analysis_name, feat
 		if (feature_entry) {
 			const category_html = feature_entry[1];
 			const category = category_html.match(/<strong[^>]*>(.*?)<\/strong>/)?.[1] || '';
-			const nameFromProps = Object.entries(props).find(([k]) => {
-				const lk = k.toLowerCase();
-				return lk === 'facility name' || lk === 'name' || lk === 'facility_name';
-			})?.[1];
-			const name = feature_name || nameFromProps;
+			const name_field = fields.find(d => d?.[1] && !d[0]?.startsWith('_') &&
+				['name', 'facility name', 'facility_name'].includes(d[1].toLowerCase()));
+			const name = props[name_field?.[0]] || feature_name;
 
 			if (name) {
 				feature = name;

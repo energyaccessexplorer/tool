@@ -397,15 +397,9 @@ function aggregate_layer_values(division) {
 	return Object.fromEntries(
 		valid_datasets.map(dataset => {
 			const is_point_layer = dataset.vectors?.shape_type === 'points';
-			const areas = Object.fromEntries(
-				area_ids.map(id => [id, { "values": [], "result": null }]),
-			);
-
-			if (is_point_layer) {
-				aggregate_point_values(divisions, dataset, areas, area_ids);
-			} else {
-				aggregate_scalar_values(divisions, dataset, areas, area_ids);
-			}
+			const areas = is_point_layer
+				? aggregate_point_values(divisions, dataset, area_ids)
+				: aggregate_scalar_values(divisions, dataset, area_ids);
 
 			return [dataset.id, {
 				"name":           dataset.name,
@@ -417,8 +411,9 @@ function aggregate_layer_values(division) {
 	);
 }
 
-function aggregate_point_values(division_raster, dataset, areas, area_ids) {
+function aggregate_point_values(division_raster, dataset, area_ids) {
 	const features = maybe(dataset, 'vectors', 'data', 'features') || [];
+	const counts = Object.fromEntries(area_ids.map(id => [id, 0]));
 
 	for (const feature of features) {
 		const coords = maybe(feature, 'geometry', 'coordinates');
@@ -429,17 +424,16 @@ function aggregate_point_values(division_raster, dataset, areas, area_ids) {
 
 		const area_id = division_raster[pixel.index];
 		if (area_id === -1) continue;
-		if (!areas[area_id]) continue;
+		if (!(area_id in counts)) continue;
 
-		areas[area_id].values.push(1);
+		counts[area_id]++;
 	}
 
-	for (const area_id of area_ids) {
-		areas[area_id].result = {
-			"type":  'points',
-			"value": areas[area_id].values.length,
-		};
-	}
+	return Object.fromEntries(
+		area_ids.map(id => [id, {
+			"result": { "type": 'points', "value": counts[id] },
+		}]),
+	);
 }
 
 function aggregate(values, fn) {
@@ -455,27 +449,31 @@ function aggregate(values, fn) {
 	}
 }
 
-function aggregate_scalar_values(division_raster, dataset, areas, area_ids) {
+function aggregate_scalar_values(division_raster, dataset, area_ids) {
+	const values_by_area = Object.fromEntries(area_ids.map(id => [id, []]));
+
 	division_raster.forEach((area_id, i) => {
 		if (area_id === -1) return;
 
 		const v = dataset.raster.data[i];
 		if (v === dataset.raster.nodata) return;
 
-		areas[area_id].values.push(v);
+		if (area_id in values_by_area) values_by_area[area_id].push(v);
 	});
 
 	const agg_fn = dataset.category.analysis?.aggregation;
 
-	for (const area_id of area_ids) {
-		const values = areas[area_id].values;
-		if (values.length === 0) continue;
+	return Object.fromEntries(
+		area_ids.map(id => {
+			const values = values_by_area[id];
 
-		areas[area_id].result = {
-			"type":  'scalar',
-			"value": agg_fn ? aggregate(values, agg_fn) : null,
-		};
-	}
+			return [id, {
+				"result": values.length
+					? { "type": 'scalar', "value": agg_fn ? aggregate(values, agg_fn) : null }
+					: null,
+			}];
+		}),
+	);
 }
 
 export function enough_datasets(t) {

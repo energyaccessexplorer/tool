@@ -145,7 +145,6 @@ build-a:
 		${SRC}/output-widget.js \
 		${SRC}/right-panel-graphs.js \
 		${SRC}/right-panel.js \
-		${SRC}/filtered.js \
 		${SRC}/mapbox.js \
 		${SRC}/plot.js \
 		${SRC}/rasters.js \

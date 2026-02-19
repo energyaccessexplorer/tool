@@ -360,7 +360,7 @@ function build_admin_row(item, analysis_name) {
 		...Object.fromEntries(
 			detailedData.map(data => {
 				const header = data.unit ? `${data.label} - ${data.unit}` : data.label;
-				return [header, data.raw_value];
+				return [header, data.label === "Priority score" ? data.value : data.raw_value];
 			}),
 		),
 	};

@@ -340,50 +340,55 @@ export async function analysis(type) {
 	};
 };
 
-export function priority(d, a, i) {
-	const source = MAPBOX.getSource(`priority-source-${i}`);
+export function priority(division, analysis, tier) {
+	const source = MAPBOX.getSource(`priority-source-${tier}`);
 	if (!source) {
-		console.debug(`priority-source-${i}: not yet...`);
+		console.debug(`priority-source-${tier}: not yet...`);
 		return;
 	}
 
-	const g = d.raster.data;
+	const division_raster = division.raster.data;
+	const area_ids = [...new Set(division_raster)].sort().filter(id => id !== -1);
 
-	const o = {};
-
-	const u = [];
-	for (const e of g) if (u.indexOf(e) === -1) u.push(e);
-	for (const e of u.sort()) {
-		if (e === -1) continue;
-
-		o[e] = {
+	const areas = {};
+	for (const area_id of area_ids) {
+		areas[area_id] = {
 			"values":  [],
 			"average": 0,
 		};
 	}
 
-	for (let i = 0; i < a.raster.length; i += 1)
-		if (g[i] > -1) o[g[i]]['values'].push(a.raster[i]);
+	for (let i = 0; i < analysis.raster.length; i += 1) {
+		const area_id = division_raster[i];
+		const analysis_value = analysis.raster[i];
+		const belongs_to_area = area_id > -1;
+		const has_data = analysis_value !== -1;
 
-	for (const e in o) {
-		o[e]['average'] = o[e]['values'].reduce((a,b) => a+b, 0) / o[e]['values'].length;
+		if (belongs_to_area && has_data) areas[area_id]['values'].push(analysis_value);
 	}
 
-	const s = priority_scale(o, analysis_colorscale.stops);
+	for (const area_id in areas) {
+		const values = areas[area_id]['values'];
+		areas[area_id]['average'] = values.reduce((sum, v) => sum + v, 0) / values.length;
+	}
 
-	for (const e in o) {
-		if (o[e]['average'] === -1) {
-			source._data.features.find(f => f.id === +e).properties['__fill'] = "transparent";
+	const scale = priority_scale(areas, analysis_colorscale.stops);
+
+	for (const area_id in areas) {
+		const feature = source._data.features.find(f => f.id === +area_id);
+
+		if (areas[area_id]['average'] === -1) {
+			feature.properties['__fill'] = "transparent";
 			continue;
 		}
 
-		source._data.features.find(f => f.id === +e).properties['__fill'] = s(o[e]['average']);
+		feature.properties['__fill'] = scale(areas[area_id]['average']);
 	}
 
 	source.setData(json_clone(source._data));
 
-	d.priorityData = o;
-	d.layerData = aggregate_layer_values(d);
+	division.priorityData = areas;
+	division.layerData = aggregate_layer_values(division);
 };
 
 function aggregate_layer_values(division) {

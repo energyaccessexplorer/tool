@@ -60,11 +60,9 @@ export function context(raster_pixel, features = []) {
 		}
 
 		else if (and(Number.isFinite(v), d.vectors)) {
-			const l = v === 0 ? "< 1" : v;
-
 			dict.push([k, d.name]);
-			props[k] = `<code>${l} km (proximity to)</code>`;
-			values[k] = l;
+			props[k] = `<code>${v === 0 ? "< 1" : v} km (proximity to)</code>`;
+			values[k] = v;
 			units[k] = "km (proximity to)";
 		}
 

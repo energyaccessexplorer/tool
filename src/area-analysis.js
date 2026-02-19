@@ -57,7 +57,6 @@ export function value_tree(raster_index) {
 			const unit = dataset_unit(dataset, raw);
 			if (!unit) return null;
 
-			const value = (raw === 0 && unit === "km (proximity to)") ? 1 : raw;
 			const fi = indexes_by_id.get(dataset.id);
 			const props = fi?.get(raster_index);
 
@@ -65,7 +64,7 @@ export function value_tree(raster_index) {
 				"id":       dataset.id,
 				"name":     dataset.name,
 				"header":   `${dataset.name} - ${unit}`,
-				"value":    value,
+				"value":    raw,
 				"children": maybe(dataset, 'config', 'attributes_map', 'length')
 					? Object.fromEntries(
 						dataset.config.attributes_map.map(attr =>
@@ -145,8 +144,8 @@ function analysis_entries(analysis_value, analysis_name, admin_info) {
 		: lowmedhigh_scale;
 
 	return [
-		...(analysis_name ? [{ "label": analysis_name, "value": scale(analysis_value) }] : []),
-		{ "label": "Priority score", "value": `${(analysis_value * 100).toFixed(1)}%` },
+		...(analysis_name ? [{ "label": analysis_name, "value": scale(analysis_value), "raw_value": scale(analysis_value) }] : []),
+		{ "label": "Priority score", "value": `${(analysis_value * 100).toFixed(1)}%`, "raw_value": analysis_value },
 	];
 }
 
@@ -176,7 +175,7 @@ function format_detail(key, label, value, raw, subordinate) {
 	return {
 		"label":       label || key,
 		"value":       `${formatted} ${display_unit}`.trim(),
-		"rawValue":    raw.values[key],
+		"raw_value":    raw.values[key],
 		"unit":        unit,
 		"subordinate": subordinate,
 	};
@@ -231,7 +230,7 @@ function layer_detail_entries(fields, props, raw) {
 function division_detail_entries(fields, props) {
 	return fields
 		.filter(field => field?.[0]?.startsWith('_') && !field[0].includes('analysis'))
-		.map(field => ({ "label": field[1], "value": props[field[0]] }))
+		.map(field => ({ "label": field[1], "value": props[field[0]], "raw_value": props[field[0]] }))
 		.filter(entry => entry.value);
 }
 
@@ -241,7 +240,7 @@ export function area_info(fields, props, ll, analysis_value, analysis_name, feat
 
 	const analysis = analysis_entries(analysis_value, analysis_name, admin_info);
 	const coord = (!admin_info && coordinates && feature)
-		? [{ "label": "Coordinates", "value": coordinates }]
+		? [{ "label": "Coordinates", "value": coordinates, "raw_value": coordinates }]
 		: [];
 	const location = location_entry(fields, props);
 
@@ -348,11 +347,6 @@ function build_raster_row(item, analysis_name) {
 	};
 }
 
-function admin_detail_value(data) {
-	const raw = data.rawValue !== undefined ? data.rawValue : data.value;
-	return raw === "< 1" ? 1 : raw;
-}
-
 function build_admin_row(item, analysis_name) {
 	const info = { "variant": STATE.variant, "name": item.name };
 	const [fields, props, raw] = get_admin_area_layer_data(STATE.variant, item.id);
@@ -366,7 +360,7 @@ function build_admin_row(item, analysis_name) {
 		...Object.fromEntries(
 			detailedData.map(data => {
 				const header = data.unit ? `${data.label} - ${data.unit}` : data.label;
-				return [header, admin_detail_value(data)];
+				return [header, data.raw_value];
 			}),
 		),
 	};

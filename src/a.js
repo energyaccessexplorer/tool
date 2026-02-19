@@ -758,15 +758,15 @@ export function left_panel(t) {
 };
 
 function drawer_init() {
-	const as = qsa('#drawer a');
-
 	let p;
 
-	for (const a of as) {
+	for (const a of qsa('#drawer a[for]')) {
 		a.onclick = function() {
 			left_panel(this.classList.contains('active') ? null : (STATE.tab = this.getAttribute('for')));
 		};
+	}
 
+	for (const a of qsa('#drawer a')) {
 		a.onmouseenter = function() {
 			if (p) p.remove();
 

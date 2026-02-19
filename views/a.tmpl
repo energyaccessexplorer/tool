@@ -39,6 +39,7 @@
         <a for="vectors" description="Search Features"><i class="bi bi-search"></i></a>
         <a for="locations" description="Search POI's"><i class="bi bi-geo"></i></a>
         <a for="points" description="Points Loading"><i class="bi bi-crosshair"></i></a>
+        <a id="drawer-info" description="About" bind-listen="click" bind-func="show_info"><i class="bi bi-question-circle"></i></a>
       </div>
 
       <div id="left-panel" style="display: none;">
@@ -560,12 +561,30 @@
 
     <br><div style="border-bottom: 1px solid lightgray;"></div><br><br>
 
+    <h3>Disclaimer</h3>
+    <p>
+      The maps are for illustrative purposes and do not imply the
+      expression of any opinion on the part of WRI, concerning the
+      legal status of any country or territory or concerning the
+      delimitation of frontiers or boundaries.
+    </p>
+
+    <br>
+    <p>
+      If you use this platform, partially or entirely, you must follow
+      the <a href="https://www.energyaccessexplorer.org/attribution/">attribution instructions</a>.
+    </p>
+
+    <br><div style="border-bottom: 1px solid lightgray;"></div><br><br>
+
     <p>
       <a href="https://www.wri.org/publication/energy-access-explorer-data-and-methods">
         <i class="bi-box-arrow-up-right"></i>
         <span>View technical note</span>
       </a>
     </p>
+
+    <br>
   </template>
 
   <template id="ds-info-modal">

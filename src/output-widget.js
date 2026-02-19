@@ -79,17 +79,18 @@ function ramp() {
 	);
 };
 
-function eae_info_modal() {
-	const b = qs('#eae-info-button');
+export function show_eae_info_modal() {
+	new modal({
+		"id":      'eae-info-modal',
+		"header":  "Generate prioritization",
+		"content": bind(tmpl('#eae-info-modal-template'), EAE['indexes']),
+		"destroy": true,
+	}).show();
+}
 
-	b.onclick = function() {
-		new modal({
-			"id":      'eae-info-modal',
-			"header":  "Generate prioritization",
-			"content": bind(tmpl('#eae-info-modal-template'), EAE['indexes']),
-			"destroy": true,
-		}).show();
-	};
+function eae_info_modal() {
+	qs('#eae-info-button').onclick = show_eae_info_modal;
+	bind(qs('#drawer-info'), { "show_info": show_eae_info_modal });
 };
 
 export function indexes() {

@@ -87,16 +87,19 @@ bubble-message {
 }
 
 #eae-info-modal {
-  max-width: 40em;
   margin: auto !important;
   overflow-y: hidden !important;
 }
 
 #eae-info-modal main {
   max-height: calc(100% - 8em);
-  overflow-y: scroll;
+  overflow-y: hidden;
+  width: 70vw !important;
 }
 
 #eae-info-modal content {
-  max-height: calc(100% - 17em);
+  overflow-y: auto;
+  max-height: calc(100vh - 16em);
+  width: 100%;
+  box-sizing: border-box;
 }

@@ -415,6 +415,7 @@ This is not fatal but the dataset is now disabled.`,
 		this.colorscale = host.colorscale;
 		this.domain = host.domain;
 		this._domain = json_clone(host.domain);
+
 		this.domain_select = this.host.domain_select;
 		this._domain_select = this.host._domain_select;
 

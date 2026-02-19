@@ -34,20 +34,20 @@ import {
 
 const user_id = user_extract('id');
 
-export function update_analysis(hasData) {
-	const saveButton = qs('#save-snapshot-button');
-	const shareButton = qs('#share-snapshot-button');
-	const downloadButton = qs('#tiff-download');
+export function update_analysis(has_data) {
+	const save_button = qs('#save-snapshot-button');
+	const share_button = qs('#share-snapshot-button');
+	const download_button = qs('#tiff-download');
 
-	if (saveButton) saveButton.disabled = !hasData;
-	if (shareButton) shareButton.disabled = !hasData;
-	if (downloadButton) downloadButton.disabled = !hasData;
+	if (save_button) save_button.disabled = !has_data;
+	if (share_button) share_button.disabled = !has_data;
+	if (download_button) download_button.disabled = !has_data;
 
-	const blankState = qs('#analysis-blank-state');
-	const sectionsWrapper = qs('#analysis-sections-wrapper');
+	const blank_state = qs('#analysis-blank-state');
+	const sections_wrapper = qs('#analysis-sections-wrapper');
 
-	blankState.style.display = hasData ? 'none' : 'flex';
-	sectionsWrapper.style.display = hasData ? 'flex' : 'none';
+	blank_state.style.display = has_data ? 'none' : 'flex';
+	sections_wrapper.style.display = has_data ? 'flex' : 'none';
 }
 
 export async function graphs(raster) {
@@ -91,19 +91,19 @@ export function init() {
 
 	const panel = qs('#right-panel');
 	const header = qs('#right-panel-header');
-	const hideButton = qs('#right-panel-hide');
-	const showButton = qs('#right-panel-show');
+	const hide_button = qs('#right-panel-hide');
+	const show_button = qs('#right-panel-show');
 
-	hideButton.onclick = () => {
+	hide_button.onclick = () => {
 		panel.setAttribute('closed', '');
 		header.style.display = 'none';
-		showButton.style.display = 'flex';
+		show_button.style.display = 'flex';
 	};
 
-	showButton.onclick = () => {
+	show_button.onclick = () => {
 		panel.removeAttribute('closed');
 		header.style.display = 'block';
-		showButton.style.display = 'none';
+		show_button.style.display = 'none';
 	};
 
 	analysis_locations_panel_init();

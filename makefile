@@ -126,6 +126,7 @@ build-a:
 		${SRC}/browser.js \
 		${SRC}/session.js \
 		${SRC}/analysis.js \
+		${SRC}/analysis-model-pixel-scale-estimation.js \
 		${SRC}/cards.js \
 		${SRC}/config.js \
 		${SRC}/controls.js \

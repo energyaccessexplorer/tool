@@ -21,6 +21,10 @@ import {
 	until,
 } from '../lib/helpers.js';
 
+import {
+	estimate_model_pixel_scale,
+} from './analysis-model-pixel-scale-estimation.js';
+
 const filter_types = ["key-delta", "exclusion-buffer", "inclusion-buffer"];
 
 const inclusion_filters = ["key-delta", "inclusion-buffer"];
@@ -455,6 +459,21 @@ function aggregate(values, fn) {
 }
 
 function aggregate_scalar_values(division_raster, dataset, area_ids) {
+	const agg_fn = dataset.category.analysis?.aggregation;
+
+	if (agg_fn === "SUM") {
+		dataset._model_pixel_scale = dataset._model_pixel_scale
+			|| estimate_model_pixel_scale(
+				dataset.raster.data,
+				dataset.raster.width,
+				dataset.raster.height,
+				dataset.raster.nodata,
+			);
+	}
+
+	const oversampling = dataset._model_pixel_scale
+		? dataset._model_pixel_scale[0] * dataset._model_pixel_scale[1]
+		: null;
 	const values_by_area = Object.fromEntries(area_ids.map(id => [id, []]));
 
 	division_raster.forEach((area_id, i) => {
@@ -463,10 +482,8 @@ function aggregate_scalar_values(division_raster, dataset, area_ids) {
 		const v = dataset.raster.data[i];
 		if (v === dataset.raster.nodata) return;
 
-		if (area_id in values_by_area) values_by_area[area_id].push(v);
+		if (area_id in values_by_area) values_by_area[area_id].push(oversampling ? v / oversampling : v);
 	});
-
-	const agg_fn = dataset.category.analysis?.aggregation;
 
 	return Object.fromEntries(
 		area_ids.map(id => {

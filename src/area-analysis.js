@@ -35,6 +35,15 @@ function get_feature_indexes() {
 				if (ri !== undefined && ri !== null) {
 					map.set(ri, feature.properties);
 				}
+
+				const ris = feature.properties['__rasterindexes'];
+				if (ris) {
+					for (const idx of ris) {
+						if (idx !== undefined && idx !== null && !map.has(idx)) {
+							map.set(idx, feature.properties);
+						}
+					}
+				}
 			}
 			return { "index": map, dataset };
 		});
@@ -218,7 +227,11 @@ function layer_detail_entries(fields, props, raw) {
 			? Object.entries(node.children).map(([target, value]) =>
 				format_detail(target, target, value, raw, true),
 			)
-			: [];
+			: (maybe(STATE.datasets.find(d => d.id === layer_id), 'config', 'attributes_map') || [])
+				.map(attr => props[attr.dataset] != null && props[attr.dataset] !== ''
+					? format_detail(attr.target, attr.target, props[attr.dataset], raw, true)
+					: null)
+				.filter(Boolean);
 
 		return [
 			{ ...format_detail(key, label, raw.values[key], raw), ...(children.length ? { "has_subordinates": true } : {}) },

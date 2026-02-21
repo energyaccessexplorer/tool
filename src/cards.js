@@ -1,10 +1,13 @@
 import DS from './ds.js';
 
+import modal from '../lib/modal.js';
+
 import bind from '../lib/bind.js';
 
 import bubblemessage from '../lib/bubblemessage.js';
 
 import {
+	bi_icon,
 	colorscale_svg,
 	svg_interval,
 	uniform_split,
@@ -27,16 +30,20 @@ import {
 	coalesce,
 	debounce,
 	maybe,
+	nil,
 	or,
 	qs,
 	qsa,
 	same,
 	tmpl,
+	unique,
 } from '../lib/helpers.js';
 
 const cards_list = qs('#cards-list');
 
 const slider_width = 320;
+
+const filters = {};
 
 function mutant_options() {
 	if (!maybe(this.ds, 'hosts', 'length')) return "";
@@ -523,6 +530,68 @@ function opacity() {
 	return this.opacity.svg;
 };
 
+function filter_modal() {
+	const content = tmpl('#ds-attributes-filter-modal');
+	bind(content, this);
+
+	if (nil(filters[this.id])) filters[this.id] = {};
+
+	const filterout = debounce(_ => {
+		const fs = this.vectors.geojson.features;
+
+		for (let i = 0; i < fs.length; i += 1) {
+			let v = false;
+
+			for (const k in filters[this.id]) {
+				const f = filters[this.id][k];
+				if (f.includes(fs[i].properties[k])) v = true;
+			}
+
+			fs[i].properties['__visible'] = v;
+		}
+
+		this.update_source(this.vectors.geojson);
+	}, 300);
+
+	for (const a of this.config.attributes_map) {
+		if (this.config.properties_search?.includes(a.dataset)) continue;
+
+		const o = unique(this.vectors.geojson.features.map(f => f.properties[a.dataset]));
+
+		const e = tmpl('#ds-attributes-filter');
+		bind(e, {
+			"dataset": a.dataset,
+			"target":  a.target,
+			"options": o.map(t => ({ "name": t })),
+		});
+
+		const s = qs('select', e);
+
+		s.onchange = ev => {
+			const f = filters[this.id][a.dataset] = [];
+
+			for (const t of ev.target.options)
+				if (t.selected) f.push(t.value);
+
+			filterout();
+		};
+
+		for (const o of qsa('option', s)) {
+			if (maybe(filters, this.id, s.getAttribute('name'))?.includes(o.value))
+				o.setAttribute('selected', '');
+		}
+
+		content.append(e);
+	}
+
+	new modal({
+		"id":      'ds-filter',
+		"header":  this.name,
+		content,
+		"destroy": true,
+	}).show();
+};
+
 export function init() {
 	sortable(cards_list, {
 		'items':                'ds-card',
@@ -660,6 +729,7 @@ export default class dscard extends HTMLElement {
 			"weight-group":     weight_group.call(this),
 			"settings":         (_, e) => settings.call(this, _, e.target.closest('button')),
 			"table":            this.ds.features_table_modal.bind(this.ds),
+			"filter":           this.filter(),
 			"manual-inputs":    manual_inputs.call(this),
 			"manual-min":       this.manual_min,
 			"manual-max":       this.manual_max,
@@ -695,6 +765,19 @@ export default class dscard extends HTMLElement {
 		for (const c of this.checkboxes) c.checked = true;
 
 		COMMIT("datasets");
+	};
+
+	filter() {
+		if (!maybe(this.ds, 'config', 'attributes_map', 'length'))
+			return "";
+
+		if (this.ds.config.attributes_map.every(a => this.ds.config.properties_search.includes(a.dataset)))
+			return "";
+
+		const e = bi_icon('filter');
+		e.onclick = filter_modal.bind(this.ds);
+
+		return e;
 	};
 
 	discover() {

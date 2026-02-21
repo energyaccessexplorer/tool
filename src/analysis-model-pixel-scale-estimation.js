@@ -1,24 +1,19 @@
 // Attemt to estimate real-world pixel sixe otherwise provided by GeoTIFF ModelPixelScale.
 export function estimate_model_pixel_scale(data, width, height, nodata) {
-	// Count value-changes per column (horizontal boundaries).
-	const col_edges = new Uint32Array(width);
-	for (let row = 0; row < height; row++) {
-		for (let col = 0; col < width - 1; col++) {
-			const i = row * width + col;
-			const a = data[i], b = data[i + 1];
-			if (a !== nodata && b !== nodata && a !== b) col_edges[col]++;
+	function count_edges(rows, cols, step, size, idx) {
+		const edges = new Uint32Array(size);
+		for (let r = 0; r < rows; r++) {
+			for (let c = 0; c < cols; c++) {
+				const i = r * width + c;
+				if (data[i] !== nodata && data[i + step] !== nodata && data[i] !== data[i + step])
+					edges[idx(r, c)]++;
+			}
 		}
+		return edges;
 	}
 
-	// Count value-changes per row (vertical boundaries).
-	const row_edges = new Uint32Array(height);
-	for (let row = 0; row < height - 1; row++) {
-		for (let col = 0; col < width; col++) {
-			const i = row * width + col;
-			const a = data[i], b = data[i + width];
-			if (a !== nodata && b !== nodata && a !== b) row_edges[row]++;
-		}
-	}
+	const col_edges = count_edges(height, width - 1, 1,     width,  (_, c) => c);
+	const row_edges = count_edges(height - 1, width, width, height, (r) => r);
 
 	return [mode_spacing(col_edges), mode_spacing(row_edges)];
 }

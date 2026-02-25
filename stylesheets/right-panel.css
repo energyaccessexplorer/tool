@@ -115,34 +115,6 @@
   line-height: 20px;
 }
 
-.top-action-button #disclaimer-message {
-  display: none;
-  position: absolute;
-  background-color: #141414;
-  right: 0;
-  bottom: 100%;
-  padding: 1em 2em;
-  margin-bottom: 8px;
-  border-radius: 4px;
-  width: 300px;
-  z-index: 1000;
-}
-
-.top-action-button:hover #disclaimer-message {
-  display: block;
-}
-
-.top-action-button #disclaimer-message p {
-  color: #f1f1f1;
-  white-space: normal;
-  margin: 0.5em 0;
-  font-size: 12px;
-  line-height: 1.4;
-}
-
-.top-action-button #disclaimer-message a {
-  color: #4a9eff;
-}
 
 
 .index-graphs-section {

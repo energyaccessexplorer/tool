@@ -594,6 +594,10 @@ export function update() {
 		.map(d => d.card)
 		.filter(c => c);
 
+	const children = [...cards_list.children];
+	if (list.length === children.length && list.every((c, i) => c === children[i]))
+		return;
+
 	if (list.length) sortable(cards_list, 'disable');
 
 	cards_list.append(...list);

@@ -634,6 +634,21 @@ dialog .saved-analysis-last-viewed {
   background: #FFFFFF;
   border: 2px solid #E7E6E6;
   border-radius: 4px;
+  scrollbar-width: auto;
+}
+
+.high-priority-areas-list-all-table-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.high-priority-areas-list-all-table-container::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 6px;
+}
+
+.high-priority-areas-list-all-table-container::-webkit-scrollbar-track {
+  background: #E7E6E6;
 }
 
 .high-priority-areas-list-all-table {

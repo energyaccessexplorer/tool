@@ -28,6 +28,10 @@ import {
 } from './rasters.js';
 
 import {
+	loading_analysis,
+} from './right-panel.js';
+
+import {
 	and,
 	ce,
 	coalesce,
@@ -705,6 +709,7 @@ This is not fatal but the dataset is now disabled.`,
 
 		if (v) {
 			if (this.controls) this.controls.loading(true);
+			loading_analysis(true);
 
 			await this.loadall();
 

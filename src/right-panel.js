@@ -34,6 +34,11 @@ import {
 
 const user_id = user_extract('id');
 
+export function loading_analysis(loading) {
+	qs('#analysis-loading-state').style.display = loading ? 'flex' : 'none';
+	qs('#analysis-blank-state').style.display = 'none';
+}
+
 export function update_analysis(has_data) {
 	const save_button = qs('#save-snapshot-button');
 	const share_button = qs('#share-snapshot-button');
@@ -42,6 +47,8 @@ export function update_analysis(has_data) {
 	if (save_button) save_button.disabled = !has_data;
 	if (share_button) share_button.disabled = !has_data;
 	if (download_button) download_button.disabled = !has_data;
+
+	qs('#analysis-loading-state').style.display = 'none';
 
 	const blank_state = qs('#analysis-blank-state');
 	const sections_wrapper = qs('#analysis-sections-wrapper');

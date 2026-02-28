@@ -256,7 +256,7 @@ function render_page(page) {
 			return acc;
 		}, {});
 
-		Object.entries(groups).forEach(([score, items]) => {
+		Object.entries(groups).sort(([a], [b]) => Number(b) - Number(a)).forEach(([score, items]) => {
 			const template = tmpl('#location-group-template');
 			const group = template.firstElementChild;
 			group.setAttribute('data-score', score);

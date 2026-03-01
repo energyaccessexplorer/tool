@@ -22,7 +22,8 @@ import {
 } from '../lib/helpers.js';
 
 import {
-	estimate_model_pixel_scale,
+	estimate_oversampling_block_size,
+	fetch_unscaled_raster,
 } from './analysis-model-pixel-scale-estimation.js';
 
 const filter_types = ["key-delta", "exclusion-buffer", "inclusion-buffer"];
@@ -344,7 +345,7 @@ export async function analysis(type) {
 	};
 };
 
-export function priority(division, analysis, tier) {
+export async function priority(division, analysis, tier) {
 	const source = MAPBOX.getSource(`priority-source-${tier}`);
 	if (!source) {
 		console.debug(`priority-source-${tier}: not yet...`);
@@ -392,10 +393,10 @@ export function priority(division, analysis, tier) {
 	source.setData(json_clone(source._data));
 
 	division.priorityData = areas;
-	division.layerData = aggregate_layer_values(division);
+	division.layerData = await aggregate_layer_values(division);
 };
 
-function aggregate_layer_values(division) {
+async function aggregate_layer_values(division) {
 	const divisions = division.raster.data;
 	const area_ids = [...new Set(divisions.filter(e => e !== -1))];
 
@@ -403,12 +404,12 @@ function aggregate_layer_values(division) {
 		.filter(d => and(d.raster, d.raster.data))
 		.filter(d => d.category.name !== 'boundaries' && d.category.name !== 'outline');
 
-	return Object.fromEntries(
-		valid_datasets.map(dataset => {
+	const entries = await Promise.all(
+		valid_datasets.map(async dataset => {
 			const is_point_layer = dataset.vectors?.shape_type === 'points';
 			const areas = is_point_layer
 				? aggregate_point_values(divisions, dataset, area_ids)
-				: aggregate_scalar_values(divisions, dataset, area_ids);
+				: await aggregate_scalar_values(divisions, dataset, area_ids);
 
 			return [dataset.id, {
 				"name":           dataset.name,
@@ -418,6 +419,8 @@ function aggregate_layer_values(division) {
 			}];
 		}),
 	);
+
+	return Object.fromEntries(entries);
 }
 
 function aggregate_point_values(division_raster, dataset, area_ids) {
@@ -458,32 +461,18 @@ function aggregate(values, fn) {
 	}
 }
 
-function aggregate_scalar_values(division_raster, dataset, area_ids) {
+async function aggregate_scalar_values(division_raster, dataset, area_ids) {
 	const agg_fn = dataset.category.analysis?.aggregation;
-
-	if (agg_fn === "SUM") {
-		dataset._model_pixel_scale = dataset._model_pixel_scale
-			|| estimate_model_pixel_scale(
-				dataset.raster.data,
-				dataset.raster.width,
-				dataset.raster.height,
-				dataset.raster.nodata,
-			);
-	}
-
-	const oversampling = dataset._model_pixel_scale
-		? dataset._model_pixel_scale[0] * dataset._model_pixel_scale[1]
+	const src = agg_fn === "SUM"
+		? await (dataset._oversampling_source ??= fetch_unscaled_raster(dataset).catch(e => {
+			console.warn(`oversampling '${dataset.id}': could not fetch original (${e.message}), falling back to estimation`);
+			return null;
+		}))
 		: null;
-	const values_by_area = Object.fromEntries(area_ids.map(id => [id, []]));
 
-	division_raster.forEach((area_id, i) => {
-		if (area_id === -1) return;
-
-		const v = dataset.raster.data[i];
-		if (v === dataset.raster.nodata) return;
-
-		if (area_id in values_by_area) values_by_area[area_id].push(oversampling ? v / oversampling : v);
-	});
+	const values_by_area = src?.data
+		? collect_values_from_unscaled(src, division_raster, dataset, area_ids)
+		: collect_values_from_upscaled(division_raster, dataset, area_ids, src && !src.data);
 
 	return Object.fromEntries(
 		area_ids.map(id => {
@@ -496,6 +485,46 @@ function aggregate_scalar_values(division_raster, dataset, area_ids) {
 			}];
 		}),
 	);
+}
+
+// The upscaled raster repeats each pixel many times, so summing it directly
+// overcounts. Instead, iterate the unscaled raster (when available) mapping
+// each pixel to its area. Each pixel is counted once.
+function collect_values_from_unscaled(src, division_raster, dataset, area_ids) {
+	const { "width": raster_w, "height": raster_h, nodata } = dataset.raster;
+	const result = Object.fromEntries(area_ids.map(id => [id, []]));
+
+	for (let row = 0; row < src.h; row++) {
+		for (let col = 0; col < src.w; col++) {
+			const value = src.data[row * src.w + col];
+
+			if (value !== nodata && value === value) {
+				const raster_row = Math.floor((row + 0.5) * raster_h / src.h);
+				const raster_col = Math.floor((col + 0.5) * raster_w / src.w);
+				const area_id = division_raster[raster_row * raster_w + raster_col];
+
+				if (area_id !== -1 && area_id in result) result[area_id].push(value);
+			}
+		}
+	}
+
+	return result;
+}
+
+function collect_values_from_upscaled(division_raster, dataset, area_ids, correct_oversampling) {
+	const { data, width, height, nodata } = dataset.raster;
+	const result = Object.fromEntries(area_ids.map(id => [id, []]));
+
+	const estimated_block_factor = correct_oversampling
+		? estimate_oversampling_block_size(data, width, height, nodata).reduce((a, b) => a * b)
+		: null;
+
+	division_raster.forEach((area_id, i) => {
+		if (area_id !== -1 && data[i] !== nodata && area_id in result)
+			result[area_id].push(estimated_block_factor ? data[i] / estimated_block_factor : data[i]);
+	});
+
+	return result;
 }
 
 export function enough_datasets(t) {

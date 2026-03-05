@@ -82,7 +82,7 @@ function ramp() {
 export function show_eae_info_modal() {
 	new modal({
 		"id":      'eae-info-modal',
-		"header":  "Generate prioritization",
+		"header":  "About Energy Access Explorer prioritization",
 		"content": bind(tmpl('#eae-info-modal-template'), EAE['indexes']),
 		"destroy": true,
 	}).show();

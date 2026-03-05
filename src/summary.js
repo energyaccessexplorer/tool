@@ -7,6 +7,8 @@ import bubblemessage from '../lib/bubblemessage.js';
 import analysis_run, {
 	analysis_colorscale,
 	analysis_colorscale_svg,
+	division_averages,
+	priority_scale,
 } from './analysis.js';
 
 import {
@@ -38,11 +40,27 @@ import {
 	tmpl,
 } from '../lib/helpers.js';
 
-export async function generate_summary_data() {
-	if (typeof SUMMARY !== 'undefined' && SUMMARY && Object.keys(SUMMARY).length > 0) {
-		return SUMMARY;
-	}
+function variant_raster(raster) {
+	const division = (STATE.variant !== "raster") ? GEOGRAPHY.divisions[STATE.variant] : null;
+	const areas = division?.raster?.data ? division_averages(raster, division.raster.data) : null;
+	const n = analysis_colorscale.stops.length;
+	const scale = areas ? priority_scale(areas, analysis_colorscale.stops.map((_, i) => i / (n - 1))) : null;
 
+	if (scale) {
+		return Float32Array.from(raster, (_, i) => {
+			const id = division.raster.data[i];
+			if (id !== -1 && id in areas) {
+				return scale(areas[id].average);
+			} else {
+				return -1;
+			}
+		});
+	} else {
+		return raster;
+	}
+}
+
+export async function generate_summary_data() {
 	const pop = DST.get('population-density');
 	await pop.load('raster');
 
@@ -66,7 +84,7 @@ export async function generate_summary_data() {
 		c.style.display = 'none';
 		document.body.append(c);
 
-		plot_outputcanvas(raster, c);
+		plot_outputcanvas(variant_raster(raster), c);
 
 		SUMMARY[idxn]['canvas'] = c;
 		SUMMARY[idxn]['population-density']['pie'] = ppie;

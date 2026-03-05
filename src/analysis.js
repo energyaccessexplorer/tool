@@ -345,55 +345,54 @@ export async function analysis(type) {
 	};
 };
 
+// Compute average analysis value per division area.
+// Returns { [area_id]: { average } }
+export function division_averages(analysis_raster, division_data) {
+	return Object.fromEntries(
+		Object.entries(
+			Array.from(analysis_raster).reduce((acc, value, i) => {
+				const id = division_data[i];
+				// skip nodata pixels
+				if (id === -1 || value === -1) {
+					return acc;
+				} else {
+					return Object.assign(acc, {
+						[id]: {
+							"sum":   (acc[id]?.sum || 0) + value,
+							"count": (acc[id]?.count || 0) + 1,
+						},
+					});
+				}
+			}, {}),
+		).map(([id, { sum, count }]) => [id, { "average": sum / count }]),
+	);
+}
+
 export async function priority(division, analysis, tier) {
 	const source = MAPBOX.getSource(`priority-source-${tier}`);
-	if (!source) {
-		console.debug(`priority-source-${tier}: not yet...`);
-		return;
-	}
 
-	const division_raster = division.raster.data;
-	const area_ids = [...new Set(division_raster)].sort().filter(id => id !== -1);
+	if (source) {
+		const areas = division_averages(analysis.raster, division.raster.data);
 
-	const areas = {};
-	for (const area_id of area_ids) {
-		areas[area_id] = {
-			"values":  [],
-			"average": 0,
-		};
-	}
+		const scale = priority_scale(areas, analysis_colorscale.stops);
 
-	for (let i = 0; i < analysis.raster.length; i += 1) {
-		const area_id = division_raster[i];
-		const analysis_value = analysis.raster[i];
-		const belongs_to_area = area_id > -1;
-		const has_data = analysis_value !== -1;
+		for (const area_id in areas) {
+			const feature = source._data.features.find(f => f.id === +area_id);
 
-		if (belongs_to_area && has_data) areas[area_id]['values'].push(analysis_value);
-	}
-
-	for (const area_id in areas) {
-		const values = areas[area_id]['values'];
-		areas[area_id]['average'] = values.reduce((sum, v) => sum + v, 0) / values.length;
-	}
-
-	const scale = priority_scale(areas, analysis_colorscale.stops);
-
-	for (const area_id in areas) {
-		const feature = source._data.features.find(f => f.id === +area_id);
-
-		if (areas[area_id]['average'] === -1) {
-			feature.properties['__fill'] = "transparent";
-			continue;
+			if (areas[area_id]['average'] === -1) {
+				feature.properties['__fill'] = "transparent";
+			} else {
+				feature.properties['__fill'] = scale(areas[area_id]['average']);
+			}
 		}
 
-		feature.properties['__fill'] = scale(areas[area_id]['average']);
+		source.setData(json_clone(source._data));
+
+		division.priorityData = areas;
+		division.layerData = await aggregate_layer_values(division);
+	} else {
+		console.debug(`priority-source-${tier}: not yet...`);
 	}
-
-	source.setData(json_clone(source._data));
-
-	division.priorityData = areas;
-	division.layerData = await aggregate_layer_values(division);
 };
 
 async function aggregate_layer_values(division) {

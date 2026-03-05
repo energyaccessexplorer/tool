@@ -263,3 +263,18 @@ map-info .subordinate-toggle {
 map-info .subordinate-toggle.expanded {
 	transform: rotate(90deg);
 }
+
+map-info .map-info-info-button {
+	background: none;
+	border: none;
+	padding: 0;
+	margin-left: 4px;
+	cursor: pointer;
+	color: #5C5959;
+	font-size: 14px;
+	vertical-align: middle;
+}
+
+map-info .map-info-info-button:hover {
+	color: #00794C;
+}

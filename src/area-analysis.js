@@ -153,7 +153,7 @@ function analysis_entries(analysis_value, analysis_name, admin_info) {
 		: lowmedhigh_scale;
 
 	return [
-		...(analysis_name ? [{ "label": analysis_name, "value": scale(analysis_value), "raw_value": scale(analysis_value) }] : []),
+		...(analysis_name ? [{ "label": analysis_name, "value": scale(analysis_value), "raw_value": scale(analysis_value), "has_info_button": true }] : []),
 		{ "label": "Priority score", "value": `${(analysis_value * 100).toFixed(1)}%`, "raw_value": analysis_value },
 	];
 }

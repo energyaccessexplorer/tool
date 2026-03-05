@@ -3,6 +3,10 @@ import {
 } from './area-analysis.js';
 
 import {
+	show_eae_info_modal,
+} from './output-widget.js';
+
+import {
 	tmpl,
 	qs,
 } from '../lib/helpers.js';
@@ -93,6 +97,17 @@ export default class mapinfo extends HTMLElement {
 			if (onClose) onClose();
 			else this.remove();
 		};
+
+		const infoButton = qs('.map-info-info-button', this);
+		if (infoButton) {
+			infoButton.onclick = () => {
+				show_eae_info_modal();
+				requestAnimationFrame(() => {
+					const target = document.getElementById('prioritization-indexes');
+					if (target) target.scrollIntoView();
+				});
+			};
+		}
 
 		const analyseButton = qs('.analyse-button', this);
 		if (analyseButton) {

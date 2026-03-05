@@ -525,7 +525,7 @@
 
     <br><div style="border-bottom: 1px solid lightgray;"></div><br><br>
 
-    <h3>Prioritization indexes</h3>
+    <h3 id="prioritization-indexes">Prioritization indexes</h3>
     <p>
       There are 4 different methods to generate a prioritization, depending on
       the aim of your analysis; these are known as the different
@@ -867,7 +867,10 @@
       <content bind-cond="has-basic">
         <table>
           <tr bind-each="basicData">
-            <td bind="label"></td>
+            <td>
+              <span bind="label"></span>
+              <button class="map-info-info-button" bind-cond="has_info_button"><i class="bi-info-circle"></i></button>
+            </td>
             <td bind="value"></td>
           </tr>
         </table>

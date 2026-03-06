@@ -82,6 +82,7 @@ import {
 
 import {
 	init as right_panel_init,
+	graphs as right_panel_graphs,
 	update_analysis as right_panel_update_analysis,
 } from './right-panel.js';
 
@@ -588,11 +589,13 @@ async function reload(k,v) {
 		return Promise.all(STATE.datasets.map(x => x.active(true, x.visible)));
 	})();
 
-	const a = await analysis_plot_active(index, true);
+	const a = await analysis_plot_active(index);
 
 	if (GEOGRAPHY.divisions[variant]) {
-		priority(GEOGRAPHY.divisions[variant], a, variant);
+		await priority(GEOGRAPHY.divisions[variant], a, variant);
 	}
+
+	right_panel_graphs(a.raster);
 
 	indexes_list();
 

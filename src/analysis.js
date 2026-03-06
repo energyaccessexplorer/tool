@@ -11,10 +11,6 @@ import {
 } from './plot.js';
 
 import {
-	graphs as indexes_graphs,
-} from './right-panel.js';
-
-import {
 	and,
 	json_clone,
 	maybe,
@@ -281,7 +277,7 @@ function datasets(type) {
  *   - an index name
  */
 
-export async function plot_active(type, doindexes) {
+export async function plot_active(type) {
 	const a = await run(type);
 	plot_outputcanvas(a.raster);
 
@@ -304,10 +300,6 @@ export async function plot_active(type, doindexes) {
 
 		canvas_source.play();
 		canvas_source.pause();
-	}
-
-	if (doindexes) {
-		indexes_graphs(a.raster);
 	}
 
 	return a;
@@ -552,7 +544,7 @@ export function medhigh_point_count(d, a) {
 };
 
 export async function getpoints(n = 0) {
-	const a = await plot_active(STATE.index, false);
+	const a = await plot_active(STATE.index);
 
 	const threshold = a.raster.slice(0)
 		.sort((a,b) => a > b ? -1 : 1)

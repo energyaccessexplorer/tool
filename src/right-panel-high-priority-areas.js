@@ -327,7 +327,7 @@ export function init() {
 };
 
 async function all_points() {
-	const a = await plot_active(STATE.index, false);
+	const a = await plot_active(STATE.index);
 
 	const points = a.raster.reduce((t,v,i) => {
 		if (v > 0) {

@@ -482,7 +482,8 @@ async function aggregate_scalar_values(division_raster, dataset, area_ids) {
 // overcounts. Instead, iterate the unscaled raster (when available) mapping
 // each pixel to its area. Each pixel is counted once.
 function collect_values_from_unscaled(src, division_raster, dataset, area_ids) {
-	const { "width": raster_w, "height": raster_h, nodata } = dataset.raster;
+	const { "width": raster_w, "height": raster_h } = dataset.raster;
+	const nodata = src.nodata;
 	const result = Object.fromEntries(area_ids.map(id => [id, []]));
 
 	for (let row = 0; row < src.h; row++) {

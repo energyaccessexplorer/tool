@@ -38,7 +38,12 @@ export async function fetch_unscaled_raster(dataset) {
 	const image = await fetch(url).then(r => { if (!r.ok) throw new Error(r.status); return r.blob(); })
 		.then(b => GeoTIFF.fromBlob(b)).then(t => t.getImage());
 
+	const data = (await image.readRasters())[0];
+
+	// Source nodata cast to match data's typed array precision. Fixes [EAE-424]
+	const nodata = new data.constructor([parseFloat(image.fileDirectory.GDAL_NODATA)])[0];
+
 	console.info(`oversampling '${dataset.id}': fetched original ${image.getWidth()}×${image.getHeight()}`);
-	return { "w": image.getWidth(), "h": image.getHeight(), "data": (await image.readRasters())[0] };
+	return { "w": image.getWidth(), "h": image.getHeight(), data, nodata };
 }
 

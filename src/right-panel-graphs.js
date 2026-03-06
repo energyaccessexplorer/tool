@@ -1,5 +1,6 @@
 import { svg_pie } from './utils.js';
 import { analysis_colorscale, lowmedhigh_scale } from './analysis.js';
+import { compute_share_amounts } from './summary.js';
 import bubblemessage from '../lib/bubblemessage.js';
 import bind from '../lib/bind.js';
 
@@ -14,15 +15,14 @@ const PIES = {};
 
 const bubble = (v,e) => new bubblemessage({ "message": v + "%", "position": "C", "close": false, "noevents": true }, e);
 
-function update_graph_section(section, distribution, total, unit, description) {
+function update_graph_section(section, amounts, unit, description) {
 	const labels = lowmedhigh_scale.range();
 
 	const scale = ce('dl', null, { "class": 'discrete-scale' });
 
 	analysis_colorscale.stops.slice().reverse().map((color, i) => {
 		const idx = analysis_colorscale.stops.length - 1 - i;
-		const count = Math.round(distribution[idx] * total);
-		const value = `${count.toLocaleString()} ${unit}`;
+		const value = `${amounts[idx].toLocaleString()} ${unit}`;
 
 		const item = tmpl('#discrete-scale-item-template');
 		bind(item, {
@@ -73,7 +73,6 @@ export function setup_about_button(section, about) {
 }
 
 export function graphs(summary) {
-	const e = (1000/GEOGRAPHY.resolution)**2;
 	const indexName = EAE['indexes'][STATE.index]['name'].toLowerCase();
 
 	process_graph(summary, {
@@ -81,7 +80,6 @@ export function graphs(summary) {
 		"pieKey":      'population',
 		"selector":    '#population-number',
 		"unit":        'people',
-		"calcTotal":   (data) => Math.round(data['total'] / e),
 		"description": (total, high) => [
 			`Showing ${indexName} for areas affecting `,
 			ce('strong', total.toLocaleString() + ' people'),
@@ -96,7 +94,6 @@ export function graphs(summary) {
 		"pieKey":      'area',
 		"selector":    '#area-number',
 		"unit":        'km²',
-		"calcTotal":   (data) => Math.round(data['total'] * e),
 		"description": (total, high) => [
 			`Showing ${indexName} for areas spanning `,
 			ce('strong', total.toLocaleString() + ' km²'),
@@ -116,19 +113,19 @@ function process_graph(analysis_summary, config) {
 		return false;
 	}
 
-	const total = config.calcTotal(data);
+	const { total, amounts } = compute_share_amounts(data, config.dataKey);
 	if (isNaN(total) || total <= 0) return false;
 
 	data['distribution'].forEach((x, i) => PIES[config.pieKey]['data'][i].push(x));
 	PIES[config.pieKey].change(1);
 
-	const high = Math.round(data['distribution'][4] * total);
+	const high = amounts[4];
 
 	const description = document.createDocumentFragment();
 	description.append(...config.description(total, high));
 
 	const section = qs(config.selector).closest('.index-graphs-section');
-	update_graph_section(section, data['distribution'], total, config.unit, description);
+	update_graph_section(section, amounts, config.unit, description);
 
 	data['distribution'].forEach((_, i) => PIES[config.pieKey]['data'][i].shift());
 

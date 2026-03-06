@@ -2,6 +2,8 @@ import {
 	coordinates_to_raster_pixel,
 } from './utils.js';
 
+import { compute_share_amounts } from './summary.js';
+
 import '../lib/jszip.js';
 
 import '../lib/pptxgen.js';
@@ -359,7 +361,7 @@ function geography_indexes_right($) {
 
 			r.push({ "text": EAE['indexes'][k]['name'], "options": { bold } });
 
-			r.push(...SUMMARY[k][c]['amounts'].map(i => ({ "text": Math.round(i).toLocaleString() })));
+			r.push(...compute_share_amounts(SUMMARY[k][c], c).amounts.map(i => ({ "text": i.toLocaleString() })));
 
 			rows.push(r);
 		}

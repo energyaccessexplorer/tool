@@ -151,7 +151,8 @@ async function summary() {
 
 		for (const k in SUMMARY) {
 			const tr = ce('tr', ce('td', EAE['indexes'][k]['name'], { "class": 'index-name' }));
-			s.forEach((x,i) => tr.append(ce('td', Math.round(SUMMARY[k][j]['amounts'][i]).toLocaleString())));
+			const { amounts } = compute_share_amounts(SUMMARY[k][j], j);
+			s.forEach((x,i) => tr.append(ce('td', amounts[i].toLocaleString())));
 
 			tbody.append(tr);
 		}
@@ -203,6 +204,17 @@ async function summary() {
 
 	return content;
 };
+
+export function compute_share_amounts(data, type) {
+	const e = (1000/GEOGRAPHY.resolution)**2;
+	const total = type === 'area'
+		? Math.round(data['total'] * e)
+		: Math.round(data['total'] / e);
+	return {
+		total,
+		"amounts": data['distribution'].map(x => Math.round(x * total)),
+	};
+}
 
 export default async function analyse(raster) {
 	let ds = DST.get('population-density');

@@ -16,7 +16,7 @@ import bind from '../lib/bind.js';
 
 import modal from '../lib/modal.js';
 
-import { generate_summary_data } from './summary.js';
+import { generate_summary_data, compute_share_amounts } from './summary.js';
 
 import {
 	pptx,
@@ -93,7 +93,7 @@ export function generate_share_csv_content() {
 		for (const k of Object.keys(SUMMARY)) {
 			const name = `${EAE['indexes'][k]['name']} (${label})`;
 			columns.push(name);
-			data.push(SUMMARY[k][type]['amounts'].map(x => Math.round(x)));
+			data.push(compute_share_amounts(SUMMARY[k][type], type).amounts);
 		}
 	}
 

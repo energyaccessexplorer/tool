@@ -113,7 +113,7 @@ function process_graph(analysis_summary, config) {
 		return false;
 	}
 
-	const { total, amounts } = compute_share_amounts(data, config.dataKey);
+	const { total, amounts } = compute_share_amounts(data);
 	if (isNaN(total) || total <= 0) return false;
 
 	data['distribution'].forEach((x, i) => PIES[config.pieKey]['data'][i].push(x));

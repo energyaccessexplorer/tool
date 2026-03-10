@@ -93,7 +93,7 @@ export function generate_share_csv_content() {
 		for (const k of Object.keys(SUMMARY)) {
 			const name = `${EAE['indexes'][k]['name']} (${label})`;
 			columns.push(name);
-			data.push(compute_share_amounts(SUMMARY[k][type], type).amounts);
+			data.push(compute_share_amounts(SUMMARY[k][type]).amounts);
 		}
 	}
 

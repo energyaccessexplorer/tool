@@ -151,7 +151,7 @@ async function summary() {
 
 		for (const k in SUMMARY) {
 			const tr = ce('tr', ce('td', EAE['indexes'][k]['name'], { "class": 'index-name' }));
-			const { amounts } = compute_share_amounts(SUMMARY[k][j], j);
+			const { amounts } = compute_share_amounts(SUMMARY[k][j]);
 			s.forEach((x,i) => tr.append(ce('td', amounts[i].toLocaleString())));
 
 			tbody.append(tr);
@@ -205,11 +205,8 @@ async function summary() {
 	return content;
 };
 
-export function compute_share_amounts(data, type) {
-	const e = (1000/GEOGRAPHY.resolution)**2;
-	const total = type === 'area'
-		? Math.round(data['total'] * e)
-		: Math.round(data['total'] / e);
+export function compute_share_amounts(data) {
+	const total = Math.round(data['total']);
 	return {
 		total,
 		"amounts": data['distribution'].map(x => Math.round(x * total)),
@@ -217,6 +214,8 @@ export function compute_share_amounts(data, type) {
 }
 
 export default async function analyse(raster) {
+	const pixels_per_km2 = (1000/GEOGRAPHY.resolution)**2;
+
 	let ds = DST.get('population-density');
 
 	if (!ds) {
@@ -263,24 +262,23 @@ export default async function analyse(raster) {
 		}
 	}
 
-	const e = (1000/GEOGRAPHY.resolution)**2;
 	const c = OUTLINE.raster.data.filter(x => x !== OUTLINE.raster.nodata).length;
 
 	const ptotal = population_groups.reduce((a,b) => a + b, 0);
 	const atotal = area_groups.reduce((a,b) => a + b, 0);
 
 	const s = STATE.divtier ?
-		x => x / e :
+		x => x / pixels_per_km2 :
 		d3.scaleLinear()
 			.domain([0, c])
-			.range([0, (GEOGRAPHY.area || c/e)])
+			.range([0, (GEOGRAPHY.area || c/pixels_per_km2)])
 			.clamp(true);
 
 	const o = {};
 	if (ds.id === 'population-density')
 		o['population-density'] = {
-			"total":        ptotal / e,
-			"amounts":      population_groups.map(x => x / e),
+			"total":        ptotal,
+			"amounts":      population_groups,
 			"distribution": population_groups.reduce((a,b) => { a.push(b/ptotal); return a; }, []),
 		};
 

@@ -122,7 +122,7 @@ export function download_share_csv() {
 	fake_blob_download(blob, export_filename('population-area-share', 'csv'));
 }
 
-export async function export_all() {
+async function export_all(results, visible_headers) {
 	let cancelled = false;
 
 	const update = (progress) => loading("Generating...", {
@@ -144,9 +144,10 @@ export async function export_all() {
 	let pptx_blob, tiff_blob, high_priority_csv, share_csv;
 	try {
 		[pptx_blob, tiff_blob, high_priority_csv, share_csv] = await Promise.all([
-			pptx().then(p => p.write('blob')),
+			pptx({ results, visible_headers }).then(p => p.write('blob')),
 			analysis(type).then(a => a.tiff),
-			generate_high_priority_areas_csv(get_locations_results(), {
+			generate_high_priority_areas_csv(results, {
+				visible_headers,
 				"onProgress":  (p) => update(20 + (p * 50)),
 				"isCancelled": () => cancelled,
 			}),
@@ -233,7 +234,17 @@ export function show_export_modal() {
 
 	const footer = tmpl('#export-options-modal-footer');
 	bind(footer, {
-		"export_all": () => export_all(),
+		"export_all": () => {
+			document.querySelector('#export-options-modal')?.remove();
+			show_modal_table(get_locations_results(), {
+				"title":        "Download all",
+				"subtitle":     "Select priority areas columns and rows",
+				"action_label": "Download all (.zip)",
+				on_download(results, visible_headers) {
+					export_all(results, visible_headers);
+				},
+			});
+		},
 	});
 
 	const header = ce('span', 'Export options', { "class": 'modal-title' });
@@ -286,13 +297,14 @@ export async function download_high_priority_areas(results, opts = {}) {
 async function generate_high_priority_areas_csv(results, opts = {}) {
 	if (!results || results.length === 0) return '';
 
-	const { onProgress, isCancelled } = opts;
+	const { visible_headers, onProgress, isCancelled } = opts;
 	const { headers, is_raster, analysis_name } = prepare_tabular_data(results);
+	const csv_headers = visible_headers || headers;
 
 	const rows = await build_csv_rows(results, {
-		headers, is_raster, analysis_name, onProgress, isCancelled,
+		"headers": csv_headers, is_raster, analysis_name, onProgress, isCancelled,
 	});
 
 	if (rows === null) return null;
-	return [headers.join(','), ...rows].join('\n');
+	return [csv_headers.join(','), ...rows].join('\n');
 }

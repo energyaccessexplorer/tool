@@ -735,7 +735,7 @@ function toplocations_table(slide_title, columns, rows_data) {
 	footer($);
 };
 
-export async function pptx() {
+export async function pptx(opts = {}) {
 	const p = new PptxGenJS();
 
 	p.defineLayout({ "name": "A4", "width": a4(100, 'x'), "height": a4(100, 'y') });
@@ -766,11 +766,11 @@ export async function pptx() {
 	{
 		chapter.call(p, "" + (c++), "Top Locations");
 
-		const results = get_locations_results().slice(0, N_POINTS);
+		const results = opts.results || get_locations_results().slice(0, N_POINTS);
 
 		if (results.length) {
 			const { headers, is_raster, analysis_name, column_meta } = prepare_tabular_data(results);
-			const visible = headers.filter(h => column_meta.get(h).visible);
+			const visible = opts.visible_headers || headers.filter(h => column_meta.get(h).visible);
 			const rows = [...generate_rows(results, is_raster, analysis_name, 0, results.length)];
 
 			toplocations_table.call(p, `Locations with highest ${STATE.index.toUpperCase()} Index`, visible, rows);

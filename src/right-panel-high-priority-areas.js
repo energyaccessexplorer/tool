@@ -16,6 +16,10 @@ import {
 } from './search.js';
 
 import {
+	download_high_priority_areas,
+} from './export.js';
+
+import {
 	show as show_modal_table,
 } from './modal-table-high-priority-areas.js';
 
@@ -43,7 +47,18 @@ import {
 import bind from '../lib/bind.js';
 
 function view_all_locations() {
-	show_modal_table(paginationState.allResults);
+	const area_type_str = area_type(STATE.variant);
+	const analysis_name = EAE['indexes'][STATE.index]['name'];
+	const results = paginationState.allResults;
+
+	show_modal_table(results, {
+		"title":        `High priority areas (${area_type_str})`,
+		"subtitle":     analysis_name,
+		"action_label": "Download all (.csv)",
+		on_download(results, visible_headers) {
+			download_high_priority_areas(results, { visible_headers });
+		},
+	});
 }
 
 

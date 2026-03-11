@@ -185,15 +185,21 @@ export function show_export_modal() {
 
 	bind(content, {
 		"area_type":  area_type(STATE.variant).toLowerCase(),
-		"export_ppt": async function() {
-			loading("Generating...");
-
-			await delay(0.1);
-			await generate_summary_data();
-			const p = await pptx();
-			p.writeFile({ "filename": export_filename('summary', 'pptx') });
-
-			loading(false);
+		"export_ppt": () => {
+			document.querySelector('#export-options-modal')?.remove();
+			show_modal_table(get_locations_results(), {
+				"title":        "Export PowerPoint presentation",
+				"subtitle":     "Select priority areas columns and rows",
+				"action_label": "Download .ppt",
+				async on_download(results, visible_headers) {
+					loading("Generating...");
+					await delay(0.1);
+					await generate_summary_data();
+					const p = await pptx({ results, visible_headers });
+					p.writeFile({ "filename": export_filename('summary', 'pptx') });
+					loading(false);
+				},
+			});
 		},
 		"export_tiff": async () => {
 			loading("Generating...");
@@ -203,8 +209,19 @@ export function show_export_modal() {
 			loading(false);
 		},
 		"export_csv":       () => {
+			const area_type_str = area_type(STATE.variant);
+			const analysis_name = EAE['indexes'][STATE.index]['name'];
+			const results = get_locations_results();
+
 			document.querySelector('#export-options-modal')?.remove();
-			show_modal_table(get_locations_results());
+			show_modal_table(results, {
+				"title":        `High priority areas (${area_type_str})`,
+				"subtitle":     analysis_name,
+				"action_label": "Download all (.csv)",
+				on_download(results, visible_headers) {
+					download_high_priority_areas(results, { visible_headers });
+				},
+			});
 		},
 		"export_share_csv": async () => {
 			loading("Generating...");

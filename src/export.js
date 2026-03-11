@@ -32,6 +32,10 @@ import {
 } from './right-panel-high-priority-areas.js';
 
 import {
+	show as show_modal_table,
+} from './modal-table-high-priority-areas.js';
+
+import {
 	prepare_tabular_data,
 	generate_rows,
 } from './area-analysis.js';
@@ -198,7 +202,10 @@ export function show_export_modal() {
 			fake_blob_download((await analysis(type)).tiff, export_filename(`${index_slug}-map`, 'tif'));
 			loading(false);
 		},
-		"export_csv":       () => download_high_priority_areas(get_locations_results()),
+		"export_csv":       () => {
+			document.querySelector('#export-options-modal')?.remove();
+			show_modal_table(get_locations_results());
+		},
 		"export_share_csv": async () => {
 			loading("Generating...");
 			await generate_summary_data();

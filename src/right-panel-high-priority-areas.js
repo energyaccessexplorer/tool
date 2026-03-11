@@ -16,10 +16,6 @@ import {
 } from './search.js';
 
 import {
-	download_high_priority_areas,
-} from './export.js';
-
-import {
 	show as show_modal_table,
 } from './modal-table-high-priority-areas.js';
 
@@ -50,9 +46,6 @@ function view_all_locations() {
 	show_modal_table(paginationState.allResults);
 }
 
-function download_locations_data() {
-	download_high_priority_areas(paginationState.allResults);
-}
 
 function format_area_type(variant) {
 	const type = area_type(variant);
@@ -318,7 +311,7 @@ export function get_locations_results() {
 
 export function init() {
 	const analysis_locations = tmpl('#analysis-locations-template');
-	bind(analysis_locations, { download_locations_data, view_all_locations });
+	bind(analysis_locations, { view_all_locations });
 	qs('#analysis-locations').replaceWith(analysis_locations);
 
 	const section = qs('#right-panel #analysis-locations-section');

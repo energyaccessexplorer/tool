@@ -529,6 +529,8 @@ async function reload(k,v) {
 			if (!MAPBOX.getLayer(`priority-layer-${i}`)) {
 				if (i === 0) return;
 
+				// analysis_colorscale.stops[0] == "#000004"
+				//
 				MAPBOX.addLayer({
 					"id":     `priority-layer-${i}`,
 					"source": `priority-source-${i}`,
@@ -538,7 +540,7 @@ async function reload(k,v) {
 					},
 					"paint": {
 						"fill-color":         [ "get", "__fill" ],
-						"fill-outline-color": "black",
+						"fill-outline-color": [ "case", [ "==", [ "get", "__fill" ], "#000004" ], "#424242", "black" ],
 						"fill-opacity":       1,
 					},
 				}, MAPBOX.first_symbol);

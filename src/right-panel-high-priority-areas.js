@@ -52,9 +52,10 @@ function view_all_locations() {
 	const results = paginationState.allResults;
 
 	show_modal_table(results, {
-		"title":        `High priority areas (${area_type_str})`,
-		"subtitle":     analysis_name,
-		"action_label": "Download all (.csv)",
+		"title":              `High priority areas (${area_type_str})`,
+		"subtitle":           analysis_name,
+		"action_label":       "Download all (.csv)",
+		"column_toggle_hint": "Selected columns will be included in the CSV download",
 		on_download(results, visible_headers) {
 			download_high_priority_areas(results, { visible_headers });
 		},

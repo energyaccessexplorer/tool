@@ -17,6 +17,8 @@ import {
 
 import bind from '../lib/bind.js';
 
+import bubblemessage from '../lib/bubblemessage.js';
+
 export function show(results, opts = {}) {
 	const data = prepare_tabular_data(results);
 	if (!data) return;
@@ -129,6 +131,22 @@ export function show(results, opts = {}) {
 
 		return grid;
 	}
+
+	const toggle_btn = qs('.column-selector-toggle', content);
+	let bubble;
+
+	toggle_btn.onmouseenter = function() {
+		if (bubble) bubble.remove();
+		bubble = new bubblemessage({
+			"position": "W",
+			"message":  opts.column_toggle_hint,
+			"close":    false,
+		}, this);
+	};
+
+	toggle_btn.onmouseleave = function() {
+		if (bubble) bubble.remove();
+	};
 
 	bind(content, {
 		"analysis-name":          analysis_name,

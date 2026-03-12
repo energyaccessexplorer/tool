@@ -189,9 +189,10 @@ export function show_export_modal() {
 		"export_ppt": () => {
 			document.querySelector('#export-options-modal')?.remove();
 			show_modal_table(get_locations_results(), {
-				"title":        "Export PowerPoint presentation",
-				"subtitle":     "Select priority areas columns and rows",
-				"action_label": "Download .ppt",
+				"title":              "Export PowerPoint presentation",
+				"subtitle":           "Select priority areas columns and rows",
+				"action_label":       "Download .ppt",
+				"column_toggle_hint": "Selected columns will be included in the PowerPoint tables",
 				async on_download(results, visible_headers) {
 					loading("Generating...");
 					await delay(0.1);
@@ -216,9 +217,10 @@ export function show_export_modal() {
 
 			document.querySelector('#export-options-modal')?.remove();
 			show_modal_table(results, {
-				"title":        `High priority areas (${area_type_str})`,
-				"subtitle":     analysis_name,
-				"action_label": "Download all (.csv)",
+				"title":              `High priority areas (${area_type_str})`,
+				"subtitle":           analysis_name,
+				"action_label":       "Download all (.csv)",
+				"column_toggle_hint": "Selected columns will be included in the CSV download",
 				on_download(results, visible_headers) {
 					download_high_priority_areas(results, { visible_headers });
 				},
@@ -237,9 +239,10 @@ export function show_export_modal() {
 		"export_all": () => {
 			document.querySelector('#export-options-modal')?.remove();
 			show_modal_table(get_locations_results(), {
-				"title":        "Download all",
-				"subtitle":     "Select priority areas columns and rows",
-				"action_label": "Download all (.zip)",
+				"title":              "Download all",
+				"subtitle":           "Select priority areas columns and rows",
+				"action_label":       "Download all (.zip)",
+				"column_toggle_hint": "Selected columns will be included in the CSV and PowerPoint downloads",
 				on_download(results, visible_headers) {
 					export_all(results, visible_headers);
 				},

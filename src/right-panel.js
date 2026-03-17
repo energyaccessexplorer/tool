@@ -36,6 +36,7 @@ const user_id = user_extract('id');
 
 export function loading_analysis(loading) {
 	qs('#analysis-loading-state').style.display = loading ? 'flex' : 'none';
+	qs('#analysis-sections-wrapper').style.display = 'none';
 	qs('#analysis-blank-state').style.display = 'none';
 }
 

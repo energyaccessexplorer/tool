@@ -129,7 +129,7 @@ export function snapshot(callback) {
 
 	function patch() {
 		API.patch('snapshots', { "time": `eq.${snapshot_id}` }, { "payload": { config } })
-			.then(_ => show_save_toast('Analysis updated successfully', 'Your analysis was updated in your My EAE account.'));
+			.then(r => r && show_save_toast('Analysis updated successfully', 'Your analysis was updated in your My EAE account.'));
 
 		return snapshot_id;
 	};
@@ -148,10 +148,13 @@ export function snapshot(callback) {
 			SNAPSHOT = s;
 
 			API.post('snapshots', null, { "payload": s })
-				.then(_ => show_save_toast('Analysis saved successfully', 'Your analysis was saved to your My EAE account.'))
-				.then(_ => url.searchParams.set('snapshot', s['time']))
-				.then(_ => history.replaceState(null, null, url))
-				.then(_ => typeof callback === 'function' ? callback() : _);
+				.then(r => {
+					if (!r) return;
+					show_save_toast('Analysis saved successfully', 'Your analysis was saved to your My EAE account.');
+					url.searchParams.set('snapshot', s['time']);
+					history.replaceState(null, null, url);
+					if (typeof callback === 'function') callback();
+				});
 		});
 
 		return s['time'];

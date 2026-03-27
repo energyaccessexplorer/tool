@@ -40,10 +40,6 @@ import {
 } from './vectors-search.js';
 
 import {
-	init as analysissearch_init,
-} from './analysis-search.js';
-
-import {
 	init as locationssearch_init,
 } from './locations-search.js';
 
@@ -61,12 +57,14 @@ import {
 } from './timeline.js';
 
 import {
-	valued_polygons as filtered_valued_polygons,
 	colors_array as filtered_colors_array,
 } from './filtered.js';
 
 import {
 	init as mapbox_init,
+	sort as mapbox_sort,
+	fit as mapbox_fit,
+	drop_map_info,
 } from './mapbox.js';
 
 import {
@@ -83,12 +81,9 @@ import {
 } from './qa.js';
 
 import {
-	sort as mapbox_sort,
-	fit as mapbox_fit,
-} from './mapbox.js';
-
-import {
 	init as right_panel_init,
+	graphs as right_panel_graphs,
+	update_analysis as right_panel_update_analysis,
 } from './right-panel.js';
 
 import {
@@ -400,15 +395,14 @@ This is fatal. Thanks for all the fish.`;
 			return true;
 		});
 
-	ALL
-		.filter(d => !divisions.map(i => i.dataset_id).includes(d.id))
-		.filter(d => d.category.name !== 'admin-tiers')
-		.forEach(e => new DS(e));
-
-	// We need all the datasets to be initialised _before_ setting
-	// mutant attributes (order is never guaranteed)
+	// We need all the datasets to be initialised _before_ running mutant_init
 	//
-	DS.array.filter(d => d.hosts).forEach(d => d.mutant_init());
+	await Promise.all(
+		ALL.filter(d => !divisions.map(i => i.dataset_id).includes(d.id))
+			.filter(d => d.category.name !== 'admin-tiers')
+			.map(e => new DS(e))
+			.filter(d => d.config.hosts)
+			.map(d => d.mutant_init()));
 
 	await load_datasets(conf.datasets);
 };
@@ -420,7 +414,6 @@ async function init_3() {
 	controlssearch_init();
 	geographiessearch_init();
 	vectorssearch_init();
-	analysissearch_init();
 	locationssearch_init();
 	points_init();
 	timeline_init();
@@ -459,6 +452,9 @@ async function reload(k,v) {
 		return;
 	}
 
+	drop_map_info();
+	right_panel_update_analysis(false);
+
 	if (k === "datasets") {
 		controls_recount();
 	}
@@ -496,6 +492,9 @@ async function reload(k,v) {
 		}
 
 		GEOGRAPHY.divisions.forEach((d,i) => {
+			// Workaround a crash for Uganda
+			if (!d.vectors.data) return;
+
 			if (!MAPBOX.getSource(`filtered-source-${i}`)) {
 				MAPBOX.addSource(`filtered-source-${i}`, {
 					"type": 'geojson',
@@ -590,17 +589,19 @@ async function reload(k,v) {
 		return Promise.all(STATE.datasets.map(x => x.active(true, x.visible)));
 	})();
 
-	const a = await analysis_plot_active(index, true);
+	const a = await analysis_plot_active(index);
 
-	if (GEOGRAPHY.divisions[variant])
-		priority(GEOGRAPHY.divisions[variant], a, variant);
+	if (GEOGRAPHY.divisions[variant]) {
+		await priority(GEOGRAPHY.divisions[variant], a, variant);
+	}
+
+	right_panel_graphs(a.raster);
 
 	indexes_list();
 
 	if (timeline) timeline_lines_update();
 
 	filtered_visibility('none');
-	filtered_valued_polygons();
 
 	if (k === "layers") {
 		await mapbox_sort();
@@ -760,15 +761,15 @@ export function left_panel(t) {
 };
 
 function drawer_init() {
-	const as = qsa('#drawer a');
-
 	let p;
 
-	for (const a of as) {
+	for (const a of qsa('#drawer a[for]')) {
 		a.onclick = function() {
 			left_panel(this.classList.contains('active') ? null : (STATE.tab = this.getAttribute('for')));
 		};
+	}
 
+	for (const a of qsa('#drawer a')) {
 		a.onmouseenter = function() {
 			if (p) p.remove();
 
@@ -832,7 +833,7 @@ function timeline_visibility() {
 };
 
 function load_datasets(array) {
-	return Promise.all(array.map(d => {
+	return Promise.all(array.map(async d => {
 		const ds = DS.array.find(t => t.id === d.name || t.name === d.id || t.id === d.id);
 
 		if (!ds) {
@@ -848,11 +849,15 @@ function load_datasets(array) {
 
 		ds.selection = d.selection || [];
 
-		if (and(maybe(d.selection, 0), ds.hosts))
-			ds.mutate(DST.get(d.selection[0]));
+		if (ds.config.hosts) {
+			await Promise.all(ds.hosts.map(h => h.loadall()));
+
+			const h = ds.selection[0] || maybe(ds.config.hosts, 0);
+			if (h) ds.mutate((ds.host = DST.get(h)));
+		}
 
 		if (typeof d.weight === 'number') ds.weight = d.weight;
 
-		return ds.turn(true);
+		ds.turn(true);
 	}));
 };

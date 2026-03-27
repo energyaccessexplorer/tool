@@ -1,6 +1,6 @@
 default: reconfig build lint
 
-.include ".env"
+include .env
 # in .env:
 #
 # TITLE = "Energy Access Explorer"
@@ -29,7 +29,6 @@ LIB = ${DIST}/lib
 TIMESTAMP != date -u +'%Y-%m-%d--%T'
 
 templates:
-	@ echo "Building template compiler"
 	@ go build -o ${BIN}/templates ./templates
 
 clean:
@@ -119,12 +118,15 @@ build-a:
 	@ sed -r -i.orig 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/a/index.html
 	@ rm ${DIST}/a/index.html.orig
 
+	@ mkdir -p ${DIST}/a/components
+
 	@ cp \
 		${SRC}/utils.js \
 		${SRC}/admin-tiers.js \
 		${SRC}/browser.js \
 		${SRC}/session.js \
 		${SRC}/analysis.js \
+		${SRC}/analysis-model-pixel-scale-estimation.js \
 		${SRC}/cards.js \
 		${SRC}/config.js \
 		${SRC}/controls.js \
@@ -133,14 +135,17 @@ build-a:
 		${SRC}/symbols.js \
 		${SRC}/geographies-search.js \
 		${SRC}/vectors-search.js \
+		${SRC}/area-analysis.js \
 		${SRC}/analysis-search.js \
+		${SRC}/right-panel-high-priority-areas.js \
+		${SRC}/modal-table-high-priority-areas.js \
 		${SRC}/locations-search.js \
 		${SRC}/points-loading.js \
 		${SRC}/ds.js \
 		${SRC}/parse.js \
 		${SRC}/output-widget.js \
+		${SRC}/right-panel-graphs.js \
 		${SRC}/right-panel.js \
-		${SRC}/filtered.js \
 		${SRC}/mapbox.js \
 		${SRC}/plot.js \
 		${SRC}/rasters.js \
@@ -155,6 +160,10 @@ build-a:
 		${SRC}/qa-outputs.js \
 		${SRC}/qa-snapshot.js \
 		${SRC}/qa-indexes.js \
+		${SRC}/map-info.js \
+		${SRC}/panel-section.js \
+		${SRC}/export.js \
+		${SRC}/toast.js \
 		${SRC}/a.js \
 		${DIST}/a/
 
@@ -191,6 +200,8 @@ build-a:
 		${CSS}/config.css \
 		${CSS}/card.css	\
 		${CSS}/control.css \
+		${CSS}/map-info.css \
+		${CSS}/panel-section.css \
 		> ${DIST}/a/main.css
 
 build-s:
@@ -224,6 +235,7 @@ build-s:
 		${CSS}/maparea.css \
 		${CSS}/ripple.css \
 		${CSS}/mobile.css \
+		${CSS}/map-info.css \
 		> ${DIST}/s/main.css
 
 sync:

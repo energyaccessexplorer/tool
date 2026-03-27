@@ -1,8 +1,4 @@
 import {
-	info_mode_change,
-} from './mapbox.js';
-
-import {
 	qs,
 } from '../lib/helpers.js';
 
@@ -25,7 +21,6 @@ export default [
 		mark,
 		"target": '#mapbox-container',
 		"run":    function() {
-			if (!INFOMODE) info_mode_change();
 			MAPBOX.fire('click', { "lngLat": MAPBOX.getCenter() });
 		},
 		"listen": {

@@ -1,5 +1,3 @@
-import DS from './ds.js';
-
 import {
 	intersect,
 } from './rasters.js';
@@ -9,31 +7,32 @@ import {
 } from './controls.js';
 
 import {
-	colorscale,
 	extent_contained,
 } from './utils.js';
 
 import {
-	analysis,
-} from './analysis.js';
+	division_names,
+} from './area-analysis.js';
 
 import {
 	and,
 	maybe,
-	qs,
-	until,
 } from '../lib/helpers.js';
 
-export function context(rc, f) {
+export function context(raster_pixel, features = []) {
 	const dict = [];
 	const props = {};
+	const values = {};
+	const units = {};
 
-	if (!rc) return [dict, props];
+	if (!raster_pixel) return [dict, props, { values, units }];
 
 	const controls = controls_list();
 
-	const x = rc.index;
+	const x = raster_pixel.index;
 	const in0 = STATE.datasets[0];
+
+	const dotState = { "used": false };
 
 	function rows(d) {
 		if (typeof d === "string") {
@@ -42,7 +41,7 @@ export function context(rc, f) {
 		}
 
 		let v = d.raster.data[x];
-		let k = d.id;
+		const k = d.id;
 
 		if (v === d.raster.nodata) return;
 
@@ -50,26 +49,28 @@ export function context(rc, f) {
 			v = v.toFixed(2);
 
 		if (maybe(d, 'csv', 'key')) {
-			k = d.id + "_csv_" + d.csv.key;
 			v = d.csv.table[v];
 		}
 
 		if (d.category.unit) {
 			dict.push([k, d.name]);
 			props[k] = `<code>${v} ${d.category.unit}</code>`;
+			values[k] = v;
+			units[k] = d.category.unit;
 		}
 
 		else if (and(Number.isFinite(v), d.vectors)) {
-			const l = v === 0 ? "< 1" : v;
-
 			dict.push([k, d.name]);
-			props[k] = `<code>${l} km (proximity to)</code>`;
+			props[k] = `<code>${v === 0 ? "< 1" : v} km (proximity to)</code>`;
+			values[k] = v;
+			units[k] = "km (proximity to)";
 		}
 
-		if (d.vectors) {
-			if ((f && f.source) === d.id) {
+		if (d.vectors && !dotState.used) {
+			const match = features.find(feat => feat && feat.source === d.id);
+			if (match) {
 				if (maybe(d.config, 'attributes_map', 'length')) {
-					Object.assign(props, f.properties);
+					Object.assign(props, match.properties);
 
 					const a = d.config.attributes_map.map(e => [e.dataset, e.target]);
 					if (a.length) {
@@ -78,6 +79,8 @@ export function context(rc, f) {
 							...a,
 						);
 					}
+
+					dotState.used = true;
 				}
 			}
 		}
@@ -109,21 +112,14 @@ export function context(rc, f) {
 		.filter(d => maybe(d, 'raster', 'data'))
 		.forEach(d => rows(d));
 
-	(function tier_rows() {
-		const g = GEOGRAPHY.divisions.slice(0);
+	const names = division_names(x);
+	const tier_entries = Object.entries(names).map(([divName, name]) => {
+		props["_" + divName] = name;
+		return ["_" + divName, divName];
+	});
 
-		const a = g
-			.filter(d => maybe(d, 'raster', 'data'))
-			.filter(d => maybe(d, 'csv', 'table', d.raster.data[x]))
-			.map(d => {
-				props["_" + d.name] = d.csv.table[d.raster.data[x]];
-				return ["_" + d.name, d.name];
-			});
-
-		if (dict.length) a.unshift(null);
-
-		dict.push(...a);
-	})();
+	if (dict.length && tier_entries.length) tier_entries.unshift(null);
+	dict.push(...tier_entries);
 
 	dict.forEach((d,i) => {
 		if (!d) return;
@@ -134,60 +130,7 @@ export function context(rc, f) {
 		}
 	});
 
-	return [dict,props];
-};
-
-let analysis_count = 0;
-export async function analysis_to_dataset(t) {
-	const category = await API.get("categories", { "select": "*", "name": "eq.analysis" }, { "one": true });
-
-	category.colorstops = colorscale.stops;
-
-	analysis_count++;
-
-	const a = await analysis(t);
-
-	const url = URL.createObjectURL(new Blob([a.tiff], { "type": "application/octet-stream;charset=utf-8" }));
-
-	const d = new DS({
-		"name":            `analysis-${t}-` + analysis_count,
-		"name_long":       `Analysis ${t.toUpperCase()} - ` + analysis_count,
-		"type":            "raster",
-		"category":        category,
-		"processed_files": [{
-			"func":     "raster",
-			"endpoint": url,
-		}],
-		"source_files": [],
-		"metadata":     {},
-	});
-
-	d.metadata.inputs = STATE.datasets.map(d => d.id);
-
-	await d.active(true, true);
-
-	await until(_ => d.card);
-
-	qs('#cards #cards-list').prepend(d.card);
-
-	await until(_ => maybe(d, 'raster', 'data'));
-
-	d['summary'] = {
-		'intersections': {},
-	};
-
-	for (const i of d.metadata.inputs) {
-		const ds = DST.get(i);
-		const x = analysis_dataset_intersect.call(ds, d.raster);
-
-		if (x) d['summary']['intersections'][ds.id] = x;
-	}
-
-	d['summary']['analysis'] = a.analysis;
-
-	d.opacity(1);
-
-	COMMIT("datasets");
+	return [dict, props, { values, units }];
 };
 
 export function analysis_dataset_intersect(raster) {

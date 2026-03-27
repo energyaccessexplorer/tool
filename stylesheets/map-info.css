@@ -1,0 +1,280 @@
+map-info .dot, map-info, map-info .arrow {
+	box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+}
+
+map-info .dot {
+	display: block;
+	position: absolute;
+	left: 0;
+	top: 0;
+	box-sizing: border-box;
+	width: 16px;
+	height: 16px;
+	background: #00794C;
+	border: 4px solid #FFFFFF;
+	border-radius: 50%;
+	pointer-events: none;
+}
+
+map-info {
+	position: absolute;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	isolation: isolate;
+	width: 400px;
+	font-size: 14px;
+	line-height: 20px;
+	color: #5C5959;
+}
+
+
+map-info main {
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	width: inherit;
+	max-height: 60vh;
+	background: #FFFFFF;
+	border: 1px solid #E7E6E6;
+	border-radius: 4px;
+}
+
+map-info main > content {
+	overflow-y: auto;
+}
+
+map-info header {
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	padding: 0 12px 0 16px;
+	gap: 12px;
+	border-bottom: 1px solid #E7E6E6;
+}
+
+map-info header .header-content {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	padding: 12px 0;
+	gap: 2px;
+	flex: 1;
+}
+
+map-info header .close-button-container {
+	display: flex;
+	align-items: flex-start;
+	padding: 12px 0;
+	gap: 10px;
+	width: 20px;
+	align-self: stretch;
+}
+
+map-info header .close-button {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 20px;
+	height: 20px;
+	background: #E7E6E6;
+	border-radius: 2px;
+	cursor: pointer;
+}
+
+map-info header .close-button:hover {
+	background: #D0CFCF;
+}
+
+map-info header .close-button::before {
+	content: '×';
+	font-size: 18px;
+	line-height: 1;
+	color: #3D3B3B;
+	position: relative;
+	top: -1px;
+}
+
+map-info header .title {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	width: 100%;
+	font-weight: 700;
+	font-size: 16px;
+	line-height: 24px;
+	color: #1A1919;
+}
+
+map-info header .title.coordinate-title i {
+	font-size: 16px;
+	color: #3D3B3B;
+}
+
+map-info header .caption {
+	width: 100%;
+	font-weight: 400;
+}
+
+map-info content {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 12px;
+	isolation: isolate;
+	width: inherit;
+	align-self: stretch;
+}
+
+map-info table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+map-info tr,
+map-info .list-item {
+	border-bottom: 1px solid #E7E6E6;
+}
+
+map-info tr:last-child,
+map-info .list-item:last-child {
+	border-bottom: none;
+}
+
+map-info td {
+	padding: 12px 16px;
+}
+
+map-info td:first-child {
+	font-weight: 400;
+	max-width: 200px;
+}
+
+map-info td:last-child {
+	font-weight: 700;
+	text-align: right;
+}
+
+map-info strong {
+	font-weight: 400;
+}
+
+map-info code {
+	font-weight: 700;
+	background: none;
+}
+
+map-info .list {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	isolation: isolate;
+	align-self: stretch;
+}
+
+map-info .list-item {
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	padding: 12px 16px;
+	gap: 8px;
+	align-self: stretch;
+}
+
+map-info .list-item .label {
+	max-width: 200px;
+	font-weight: 400;
+}
+
+map-info .list-item .data {
+	font-weight: 700;
+	text-align: right;
+	flex-grow: 1;
+}
+
+map-info .arrow {
+	display: block;
+	position: absolute;
+	left: 0;
+	top: 0;
+	background: #FFFFFF;
+	pointer-events: none;
+	z-index: 1;
+}
+
+map-info .detailed-data.hidden,
+map-info content.hidden {
+	display: none;
+}
+
+map-info .analyse-button-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 12px 16px;
+	border-top: 1px solid #E7E6E6;
+}
+
+map-info .analyse-button {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 8px 16px;
+	gap: 8px;
+	background: #00794C;
+	border: 1px solid #006640;
+	border-radius: 4px;
+	font-weight: 600;
+	font-size: 14px;
+	line-height: 20px;
+	color: #F2FDF9;
+	cursor: pointer;
+	width: 100%;
+	transition: background-color 0.2s ease;
+}
+
+map-info .analyse-button:hover {
+	background: #006640;
+}
+
+map-info .analyse-button:active {
+	background: #005533;
+}
+
+map-info tr.subordinate {
+	display: none;
+}
+
+map-info tr.subordinate.visible {
+	display: table-row;
+}
+
+map-info tr.subordinate td:first-child {
+	padding-left: 32px;
+}
+
+map-info .subordinate-toggle {
+	display: inline-block;
+	cursor: pointer;
+	margin-right: 4px;
+	transition: transform 0.2s ease;
+}
+
+map-info .subordinate-toggle.expanded {
+	transform: rotate(90deg);
+}
+
+map-info .map-info-info-button {
+	background: none;
+	border: none;
+	padding: 0;
+	margin-left: 4px;
+	cursor: pointer;
+	color: #5C5959;
+	font-size: 14px;
+	vertical-align: middle;
+}
+
+map-info .map-info-info-button:hover {
+	color: #00794C;
+}

@@ -9,24 +9,3 @@
   text-align: center;
 }
 
-#filtered-subgeographies {
-  flex-grow: 1;
-  flex-basis: 0;
-  overflow-y: scroll;
-}
-
-#filtered-subgeographies details {
-  padding: 10px 20px;
-}
-
-#filtered-subgeographies ul {
-  list-style-type: none;
-}
-
-#filtered-subgeographies .colored-disc {
-  font-weight: bold;
-  display: inline-block;
-  width: 1.2em;
-  margin-left: -2.5em;
-  opacity: 0.5;
-}

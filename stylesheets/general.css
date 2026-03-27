@@ -1,3 +1,7 @@
+body {
+  font-family: 'Acumin Pro', sans-serif;
+}
+
 h1, h2, h3, h4 {
   color: var(--the-green);
   border: none;
@@ -24,11 +28,6 @@ select {
   border-radius: 3px;
 }
 
-a i ~ span,
-button i ~ span  {
-  margin-left: 0.75em;
-}
-
 .big-green-button {
   text-align: center;
   background-color: var(--the-green);
@@ -51,50 +50,6 @@ button i ~ span  {
   background-color: var(--the-green) !important;
   color: var(--the-white) !important;
   fill: var(--the-white) !important;
-}
-
-dialog main {
-  background-color: white;
-  margin: auto;
-  max-width: 1200px;
-  width: fit-content;
-  width: -moz-fit-content;
-  margin-top: 80px !important;
-}
-
-dialog header {
-  padding: 1em;
-  padding-left: 1.3em;
-  font-size: 1.2em;
-  background-color: var(--the-green);
-  color: var(--the-white);
-  position: relative;
-}
-
-dialog .close {
-  position: absolute;
-  top: 0.1em;
-  right: 0.2em;
-  text-decoration: none;
-  font-size: 2.5em;
-  width: 1em;
-  height: 1em;
-  text-align: center;
-  cursor: pointer;
-  color: var(--the-white);
-}
-
-dialog content {
-  padding: 1.5em 1.5em 0.75em !important;
-}
-
-dialog footer {
-  padding: 0.75em 1.5em 1.5em !important;
-}
-
-dialog pre {
-  max-width: 850px;
-  white-space: pre-line;
 }
 
 bubble-message {
@@ -151,17 +106,20 @@ bubble-message .bubble-message-close-button::before {
   max-width: 32em;
 }
 
+#share-link-input-wrapper {
+  display: flex;
+  gap: 16px;
+}
+
 #share-link-input {
-  font-family: monospace;
-  font-size: 1.2em;
-  padding: 7px 5px;
-  color: #414141;
-  width: 32em;
-  text-align: center;
+  flex: 1;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 #share-link-copy-button {
-  padding: 0 12px;
+  width: 130px;
+  flex-shrink: 0;
 }
 
 canvas#output {
@@ -173,3 +131,183 @@ canvas#output {
   50%  { opacity: 1.0; }
   100% { opacity: 0.7; }
 }
+
+dialog main {
+  background-color: white;
+  margin: auto;
+  max-width: 1200px;
+  width: fit-content;
+  width: -moz-fit-content;
+  margin-top: 80px !important;
+}
+
+dialog header {
+  padding: 1em;
+  padding-left: 1.3em;
+  background-color: var(--the-green);
+  color: var(--the-white);
+  position: relative;
+}
+
+dialog header .modal-title {
+  font-size: 24px;
+  line-height: 32px;
+}
+
+dialog header .modal-subtitle {
+  font-size: 16px;
+  line-height: 24px;
+  color: #F2FDF9;
+}
+
+dialog .close {
+  position: absolute;
+  top: 0.1em;
+  right: 0.2em;
+  text-decoration: none;
+  font-size: 2.5em;
+  width: 1em;
+  height: 1em;
+  text-align: center;
+  cursor: pointer;
+  color: var(--the-white);
+}
+
+dialog content,
+dialog.modal content {
+  display: flex !important;
+  flex-direction: column;
+  gap: 16px;
+  padding: 1.5em 1.5em 0.75em !important;
+  width: 590px;
+  background-color: #F9F9F9;
+}
+
+dialog content form,
+dialog.modal content form {
+  display: flex;
+  flex-direction: column;
+}
+
+dialog content p {
+  font-size: 16px;
+  line-height: 24px;
+  color: #575656;
+  margin: 0;
+}
+
+dialog footer,
+dialog.modal footer {
+  display: flex !important;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 0.75em 1.5em 1.5em !important;
+  border-top: 1px solid #E7E6E6;
+}
+
+.modal-footer-bar {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.modal-footer-bar .info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #5C5959;
+  font-size: 14px;
+}
+
+.modal-footer-bar .info i {
+  color: #9E9E9E;
+}
+
+dialog pre {
+  max-width: 850px;
+  white-space: pre-line;
+}
+
+toast-notification {
+  position: fixed;
+  left: 25px;
+  bottom: 25px;
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  gap: 12px;
+  width: 384px;
+  background: #EBF5F2;
+  border: 1px solid #009E77;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  z-index: 9999;
+}
+
+toast-notification .toast-icon,
+toast-notification .toast-header {
+  display: flex;
+  flex-direction: column;
+}
+
+toast-notification .toast-icon {
+  align-items: center;
+  align-self: flex-start;
+  padding: 2px 0 0;
+  width: 20px;
+  height: 22px;
+}
+
+toast-notification .toast-icon i {
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
+  color: #009E77;
+}
+
+toast-notification .toast-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+}
+
+toast-notification .toast-header {
+  align-items: flex-start;
+  flex: 1;
+}
+
+toast-notification .toast-label {
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: #00664D;
+  align-self: stretch;
+  margin: 0;
+}
+
+toast-notification .toast-caption {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: #00664D;
+  opacity: 0.8;
+  align-self: stretch;
+  margin: 0;
+}
+
+toast-notification .toast-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+toast-notification .toast-footer div {
+  display: flex;
+  align-items: center;
+}
+
+.loading p button {
+    margin: auto;
+}
+

@@ -377,10 +377,35 @@ export function elem_collapse(el, t, open) {
 	}
 };
 
-export function loading(msg, _perc) {
+export function loading(msg, opts) {
 	const el = qs('#app-loading');
 	el.style['display'] = msg ? 'block' : 'none';
 	qs('#loading-message', el).innerText = (typeof msg === 'string') ? msg : "Loading...";
+
+	const progress_el = qs('#loading-progress', el);
+	const cancel_el = qs('#loading-cancel', el);
+
+	if (!msg || !opts) {
+		progress_el.style.display = 'none';
+		cancel_el.style.display = 'none';
+		cancel_el.onclick = null;
+		return;
+	}
+
+	if (typeof opts.progress === 'number') {
+		progress_el.style.display = '';
+		progress_el.innerText = `${Math.round(opts.progress)}%`;
+	} else {
+		progress_el.style.display = 'none';
+	}
+
+	if (typeof opts.cancel === 'function') {
+		cancel_el.style.display = '';
+		cancel_el.onclick = opts.cancel;
+	} else {
+		cancel_el.style.display = 'none';
+		cancel_el.onclick = null;
+	}
 };
 
 export function super_error(t, m, e = "error") {
@@ -530,3 +555,42 @@ export function extent_contained(extent, raster) {
 export function bi_icon(v) {
 	return ce('i', null, { "class": "bi-" + v });
 };
+
+export function copy_to_clipboard(url, button) {
+	if (!navigator.clipboard) {
+		FLASH.push({
+			"type":    'error',
+			"timeout": 2000,
+			"title":   "Clipboard functionality not available",
+		});
+
+		button.remove();
+		return;
+	}
+
+	navigator.clipboard.writeText(url)
+		.then(_ => {
+			const icon = button.querySelector('i');
+			const text = button.querySelector('span');
+
+			icon.className = 'bi bi-check-lg';
+			text.textContent = 'Copied';
+			button.classList.add('copied');
+
+			setTimeout(() => {
+				icon.className = 'bi bi-copy';
+				text.textContent = 'Copy link';
+				button.classList.remove('copied');
+			}, 5000);
+		});
+};
+
+export function area_type(variant) {
+	if (variant === 'raster') {
+		const r = GEOGRAPHY.resolution;
+		return (r % 1000) === 0 ? (r / 1000) + 'km²' : r + 'm²';
+	} else {
+		return GEOGRAPHY.divisions[variant]?.name || 'areas';
+	}
+}
+

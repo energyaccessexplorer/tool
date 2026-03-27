@@ -28,6 +28,10 @@ import {
 } from './rasters.js';
 
 import {
+	loading_analysis,
+} from './right-panel.js';
+
+import {
 	and,
 	ce,
 	coalesce,
@@ -91,13 +95,12 @@ export default class DS {
 
 		this.hosts = null;
 
-		if (o.mutant_configuration) {
+		this.config = {};
+
+		if (o.mutant_configuration)
 			this.config = o.mutant_configuration;
-			this.hosts = Object.assign([], o.mutant_configuration.hosts);
-		}
-		else if (o.vectors_configuration) {
+		else if (o.vectors_configuration)
 			this.config = o.vectors_configuration;
-		}
 
 		DST.set(this.id, this);
 
@@ -375,7 +378,9 @@ This is not fatal but the dataset is now disabled.`,
 	};
 
 	mutant_init() {
-		for (const [i,h] of this.hosts.entries()) {
+		this.hosts = [];
+
+		for (const h of this.config.hosts) {
 			const ds = DST.get(h);
 
 			if (!ds) {
@@ -395,28 +400,15 @@ This is not fatal but the dataset is now disabled.`,
 				return;
 			}
 
-			this.hosts[i] = ds;
+			this.hosts.push(ds);
 		}
 
-		const m = this.host = this.hosts.filter(Boolean)[0];
-
-		this.csv = m.csv;
-		this.raster = m.raster;
-		this.vectors = m.vectors;
-		this.colorscale = m.colorscale;
-
-		const min = Math.min(...this.hosts.map(h => h.domain.min));
-		const max = Math.max(...this.hosts.map(h => h.domain.max));
-
-		this.domain = { min, max };
-		this._domain = { min, max };
-
-		this.fn = this.host.fn;
-
-		this._domain_select = m._domain_select;
+		this.host = this.hosts.filter(Boolean)[0];
 	};
 
 	async mutate(host) {
+		await host.loadall();
+
 		await host.raster.parse();
 
 		this.host = host;
@@ -425,6 +417,13 @@ This is not fatal but the dataset is now disabled.`,
 		this.raster = host.raster;
 		this.vectors = host.vectors;
 		this.colorscale = host.colorscale;
+		this.domain = host.domain;
+		this._domain = json_clone(host.domain);
+
+		this.domain_select = this.host.domain_select;
+		this._domain_select = this.host._domain_select;
+
+		this.fn = this.host.fn;
 
 		this.opacity(1);
 
@@ -518,7 +517,7 @@ This is not fatal but the dataset is now disabled.`,
 		if (c) c.checked = t;
 
 		if (this.host) {
-			this.hosts.forEach(d => MAPBOX.setLayoutProperty(d.id, 'visibility', 'none'));
+			this.hosts.forEach(d => d.layers && MAPBOX.setLayoutProperty(d.id, 'visibility', 'none'));
 			MAPBOX.setLayoutProperty(this.host.id, 'visibility', t ? 'visible' : 'none');
 		}
 	};
@@ -710,6 +709,7 @@ This is not fatal but the dataset is now disabled.`,
 
 		if (v) {
 			if (this.controls) this.controls.loading(true);
+			loading_analysis(true);
 
 			await this.loadall();
 

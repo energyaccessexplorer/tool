@@ -559,7 +559,7 @@ export function show_admin_area_info(item, position, centerPointer = false) {
 	const variant = STATE.variant;
 	const [fields, props, raw] = get_admin_area_layer_data(variant, item.id);
 
-	const info = { "variant": variant, "name": item.name };
+	const info = { "variant": variant, "name": item.name, "id": item.id };
 	const analysis_name = EAE['indexes'][STATE.index]['name'];
 
 	const { drop } = pointer(position, {

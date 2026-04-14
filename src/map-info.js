@@ -3,6 +3,11 @@ import {
 } from './area-analysis.js';
 
 import {
+	update as data_tab_update,
+	clear as data_tab_clear,
+} from './right-panel-data-tab.js';
+
+import {
 	show_eae_info_modal,
 } from './output-widget.js';
 
@@ -62,6 +67,8 @@ export default class mapinfo extends HTMLElement {
 		const { fields, props, ll, analysis_value, analysis_name, feature_name, "admin_info": info, raw } = rawData;
 		const data = area_info(fields, props, ll, analysis_value, analysis_name, feature_name, info, raw);
 
+		data_tab_update(data.detailedData, info);
+
 		const content = tmpl('#map-info-template');
 		bind(content, data);
 
@@ -94,6 +101,7 @@ export default class mapinfo extends HTMLElement {
 
 		const closeButton = qs('.close-button', this);
 		closeButton.onclick = () => {
+			data_tab_clear();
 			if (onClose) onClose();
 			else this.remove();
 		};

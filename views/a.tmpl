@@ -210,18 +210,25 @@
           </div>
         </header>
 
-        <div id="right-panel-content">
-          <div id="analysis-blank-state">
-            <div class="blank-state-content">
-              <svg class="blank-state-icon" width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M64 60.25H60.25V22.5H48.875V60.25H45.125V37.5H33.875V60.25H30.125V30H18.875V60.25H15.125V41.25H3.75V60.25H0V64H64V60.25Z" fill="#A0D4C1"/>
-                <path d="M63.999 15V0H48.874V3.75H57.598L39.499 21.7236L24.499 6.72361L0.549023 30.5494L3.20002 33.2006L24.499 12.0264L39.499 27.0264L60.249 6.40137V15H63.999Z" fill="#A0D4C1"/>
-              </svg>
-              <p class="blank-state-title">Add data to prioritize analysis</p>
-              <p class="blank-state-subtitle">Select a dataset from the left panel to add it to the map and start your prioritization analysis.</p>
-            </div>
-          </div>
+        <div id="right-panel-tabs" role="tablist">
+          <button class="right-panel-tab active" role="tab" data-tab="prioritization" aria-selected="true">
+            <i class="bi bi-lightning-fill"></i>
+            <span>Prioritization</span>
+          </button>
+          <button class="right-panel-tab" role="tab" data-tab="data" aria-selected="false">
+            <i class="bi bi-bar-chart-line-fill"></i>
+            <span>Data</span>
+          </button>
+        </div>
 
+        <svg style="display: none" xmlns="http://www.w3.org/2000/svg">
+          <symbol id="blank-state-icon" viewBox="0 0 64 64" fill="none">
+            <path d="M64 60.25H60.25V22.5H48.875V60.25H45.125V37.5H33.875V60.25H30.125V30H18.875V60.25H15.125V41.25H3.75V60.25H0V64H64V60.25Z" fill="#A0D4C1"/>
+            <path d="M63.999 15V0H48.874V3.75H57.598L39.499 21.7236L24.499 6.72361L0.549023 30.5494L3.20002 33.2006L24.499 12.0264L39.499 27.0264L60.249 6.40137V15H63.999Z" fill="#A0D4C1"/>
+          </symbol>
+        </svg>
+
+        <div id="right-panel-content">
           <div id="analysis-loading-state">
             <div class="blank-state-content">
               <div class="spinner"></div>
@@ -230,10 +237,29 @@
             </div>
           </div>
 
-          <div id="analysis-sections-wrapper">
-            <div id="analysis-locations"></div>
+          <div id="right-panel-tab-prioritization" class="right-panel-tab-panel" role="tabpanel">
+            <div id="analysis-blank-state">
+              <div class="blank-state-content">
+                <svg class="blank-state-icon" width="64" height="64"><use href="#blank-state-icon"/></svg>
+                <p class="blank-state-title">Add data to prioritize analysis</p>
+                <p class="blank-state-subtitle">Select a dataset from the left panel to add it to the map and start your prioritization analysis.</p>
+              </div>
+            </div>
+            <div id="analysis-sections-wrapper">
+              <div id="analysis-locations"></div>
+            </div>
           </div>
 
+          <div id="right-panel-tab-data" class="right-panel-tab-panel" role="tabpanel" hidden>
+            <div id="data-blank-state" style="display: flex">
+              <div class="blank-state-content">
+                <svg class="blank-state-icon" width="64" height="64"><use href="#blank-state-icon"/></svg>
+                <p class="blank-state-title" bind="title"></p>
+                <p class="blank-state-subtitle" bind="subtitle"></p>
+              </div>
+            </div>
+            <div id="data-cards-container"></div>
+          </div>
         </div>
 
         <footer id="right-panel-footer">

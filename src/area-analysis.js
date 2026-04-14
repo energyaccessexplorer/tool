@@ -164,16 +164,34 @@ function format_coordinates(ll) {
 		: null;
 }
 
+export function admin_location_name(variant, id) {
+	const csv_data = maybe(DST.get('admin-tiers'), 'csv', 'data');
+	if (csv_data) {
+		const tier_col = `TIER${variant}`;
+		 
+		const row = csv_data.find(r => r[tier_col] == id);
+		if (row) {
+			const names = [];
+			for (let i = variant; i >= 1; i--) {
+				const name = maybe(GEOGRAPHY, 'divisions', i, 'csv', 'table', row[`TIER${i}`]);
+				if (name) names.push(name);
+			}
+			names.push(GEOGRAPHY.name);
+			return names.join(', ');
+		}
+	}
+	return [maybe(GEOGRAPHY, 'divisions', variant, 'name'), GEOGRAPHY.name].filter(Boolean).join(', ');
+}
+
 function location_entry(fields, props) {
 	const division_fields = fields.filter(field => field?.[0]?.startsWith('_') && !field[0].includes('analysis'));
 	const values = division_fields
-		.slice(1)
 		.map(field => props[field[0]])
 		.filter(Boolean);
 
-	return values.length
-		? { "label": "Location", "value": values.join(', ') }
-		: null;
+	if (!values.length) return null;
+	values.push(GEOGRAPHY.name);
+	return { "label": "Location", "value": values.join(', ') };
 }
 
 function format_detail(key, label, value, raw, subordinate) {
@@ -255,7 +273,9 @@ export function area_info(fields, props, ll, analysis_value, analysis_name, feat
 	const coord = (!admin_info && coordinates && feature)
 		? [{ "label": "Coordinates", "value": coordinates, "raw_value": coordinates }]
 		: [];
-	const location = location_entry(fields, props);
+	const location = admin_info
+		? { "label": "Location", "value": admin_location_name(admin_info.variant, admin_info.id) }
+		: location_entry(fields, props);
 
 	const basicData = [...analysis, ...coord, ...(location ? [location] : [])];
 	const detailedData = [

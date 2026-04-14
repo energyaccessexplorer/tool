@@ -96,7 +96,7 @@
   font-size: 16px;
   line-height: 24px;
   color: #3D3B3B;
-  margin: 0;
+  margin: 12px;
 }
 
 .data-tab-title strong {
@@ -135,6 +135,9 @@
 }
 
 .data-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
   padding: 12px 16px 20px;
   background: #F6F6F6;
 }
@@ -148,6 +151,144 @@
 
 .data-card-description strong {
   font-weight: 700;
+}
+
+/* Categorical layer — donut chart */
+.data-card-donut {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
+.data-card-donut svg {
+  flex-shrink: 0;
+  width: 132px;
+  height: 132px;
+}
+
+.data-card-donut-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.data-card-legend-item {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 8px;
+  height: 24px;
+}
+
+.data-card-legend-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  border: 1px solid #C9C9C9;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.data-card-legend-name {
+  font-size: 16px;
+  line-height: 24px;
+  color: #1A1919;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.data-card-legend-item.active .data-card-legend-name {
+  font-weight: 700;
+}
+
+.data-card-legend-item.active {
+  background: #F0F0F0;
+  border-radius: 4px;
+  padding: 2px 4px;
+  margin: 0 -4px;
+}
+
+/* Categorical layer — bar chart */
+.data-card-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.data-card-bar-row {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #E7E6E6;
+}
+
+.data-card-bar-row:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.data-card-bar-content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.data-card-bar-copy {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.data-card-bar-label {
+  font-size: 14px;
+  color: #3D3B3B;
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.data-card-bar-value {
+  font-size: 14px;
+  color: #5C5959;
+  flex-shrink: 0;
+}
+
+.data-card-bar-track {
+  width: 96px;
+  flex-shrink: 0;
+}
+
+.data-card-bar-fill {
+  height: 20px;
+  background: #078456;
+}
+
+.data-card-bar-row.active .data-card-bar-label {
+  font-weight: 700;
+  color: #1A1919;
+}
+
+.data-card-bar-row.active .data-card-bar-value {
+  font-weight: 700;
+  color: #006640;
+}
+
+.data-card-bar-row.active .data-card-bar-fill {
+  background: #006640;
 }
 
 #right-panel-top-actions {

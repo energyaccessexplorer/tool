@@ -64,10 +64,10 @@ export default class mapinfo extends HTMLElement {
 	render() {
 		const { "data": rawData, onClose } = this.opts;
 
-		const { fields, props, ll, analysis_value, analysis_name, feature_name, "admin_info": info, raw } = rawData;
+		const { fields, props, ll, analysis_value, analysis_name, feature_name, "admin_info": info, raw, raster_index } = rawData;
 		const data = area_info(fields, props, ll, analysis_value, analysis_name, feature_name, info, raw);
 
-		data_tab_update(data.detailedData, info);
+		data_tab_update(data.detailedData, info, raster_index);
 
 		const content = tmpl('#map-info-template');
 		bind(content, data);

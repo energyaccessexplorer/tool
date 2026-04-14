@@ -459,7 +459,7 @@ export function show_location_info(ll, position, centerPointer = true) {
 	coords_search_pois({ "coords": ll, "limit": 1 })
 		.then(r => {
 			const feature_name = maybe(r, 0, 'name');
-			const { drop } = pointer(position, { fields, props, ll, analysis_value, analysis_name, feature_name, raw });
+			const { drop } = pointer(position, { fields, props, ll, analysis_value, analysis_name, feature_name, raw, "raster_index": raster_pixel?.index });
 			current_map_info_drop = drop;
 
 			if (centerPointer) ensure_map_info_visible();

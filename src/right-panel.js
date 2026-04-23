@@ -63,7 +63,7 @@ export function update_analysis(has_data) {
 	const blank_state = qs('#analysis-blank-state');
 	const sections_wrapper = qs('#analysis-sections-wrapper');
 
-	if (!has_data) data_tab_clear();
+	data_tab_clear();
 	blank_state.style.display = has_data ? 'none' : 'flex';
 	sections_wrapper.style.display = has_data ? 'flex' : 'none';
 

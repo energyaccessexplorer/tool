@@ -406,6 +406,7 @@ async function aggregate_layer_values(division) {
 				"name":           dataset.name,
 				"unit":           dataset.category.unit,
 				"is_point_layer": is_point_layer,
+				"aggregation":    is_point_layer ? 'SUM' : (dataset.category.analysis?.aggregation ?? 'AVG'),
 				areas,
 			}];
 		}),
@@ -453,7 +454,7 @@ function aggregate(values, fn) {
 }
 
 async function aggregate_scalar_values(division_raster, dataset, area_ids) {
-	const agg_fn = dataset.category.analysis?.aggregation;
+	const agg_fn = dataset.category.analysis?.aggregation ?? 'AVG';
 	const src = agg_fn === "SUM"
 		? await (dataset._oversampling_source ??= fetch_unscaled_raster(dataset).catch(e => {
 			console.warn(`oversampling '${dataset.id}': could not fetch original (${e.message}), falling back to estimation`);
@@ -471,7 +472,7 @@ async function aggregate_scalar_values(division_raster, dataset, area_ids) {
 
 			return [id, {
 				"result": values.length
-					? { "type": 'scalar', "value": agg_fn ? aggregate(values, agg_fn) : null }
+					? { "type": 'scalar', "value": aggregate(values, agg_fn) }
 					: null,
 			}];
 		}),

@@ -2,6 +2,10 @@ import {
 	admin_location_name,
 } from './area-analysis.js';
 
+import {
+	STANDARD_TABS,
+} from './a.js';
+
 import bind from '../lib/bind.js';
 
 import {
@@ -22,7 +26,21 @@ const POINTS_DESCRIPTIONS = {
 	'km':               'The total distance covered by {name} in this area is <strong>{value}</strong>.',
 };
 
+const RASTER_DESCRIPTIONS_SUM = {
+	'count':         'The total {name} count in this area is <strong>{value}</strong>.',
+	'people':        'The total population in this area is <strong>{value}</strong>.',
+	'households':    'There are <strong>{value}</strong> households in this area.',
+	'MW':            'The total energy demand in this area is <strong>{value}</strong>.',
+	'GWh':           'The total energy in this area is <strong>{value}</strong>.',
+	'Metric Tonnes': 'The total crop production in this area is <strong>{value}</strong>.',
+	'tCO2eq':        'The total emissions in this area are <strong>{value}</strong>.',
+	'USD':           'The total cost for {name} in this area is <strong>{value}</strong>.',
+	'm³/yr':         'The total water availability in this area is <strong>{value}</strong>.',
+};
+
 const RASTER_DESCRIPTIONS = {
+	'count':                      'The average {name} count in this area is <strong>{value}</strong>.',
+	'km (proximity to)':          'The average distance to {name} in this area is <strong>{value}</strong>.',
 	'kWh/m²':                     'The average {name} is <strong>{value}</strong> in this area.',
 	'ppl/km²':                    'The population density in this area is <strong>{value}</strong>.',
 	'people':                     'The estimated population in this area is <strong>{value}</strong>.',
@@ -76,10 +94,10 @@ function make_title(admin_info) {
 }
 
 function fill(template, name, value) {
-	return template.replaceAll('{name}', name).replaceAll('{value}', value);
+	return template.replaceAll('{name}', name.toLowerCase()).replaceAll('{value}', value);
 }
 
-function describe(datatype, unit, name, value) {
+function describe(datatype, unit, name, value, aggregation) {
 	if (datatype === 'points') {
 		const key = unit || 'count';
 		const tmpl = POINTS_DESCRIPTIONS[key] ?? POINTS_DESCRIPTIONS['count'];
@@ -90,7 +108,9 @@ function describe(datatype, unit, name, value) {
 		return fill('The total length of {name} in this region is <strong>{value}</strong>.', name, value);
 
 	if (datatype?.startsWith('raster')) {
-		const tmpl = RASTER_DESCRIPTIONS[unit] ?? 'The average {name} in this area is <strong>{value}</strong>.';
+		const tmpl = (aggregation === 'SUM' ? RASTER_DESCRIPTIONS_SUM[unit] : null)
+			?? RASTER_DESCRIPTIONS[unit]
+			?? (aggregation === 'SUM' ? 'The total {name} in this area is <strong>{value}</strong>.' : 'The average {name} in this area is <strong>{value}</strong>.');
 		return fill(tmpl, name, value);
 	}
 
@@ -101,7 +121,10 @@ function describe(datatype, unit, name, value) {
 		return fill(tmpl, name, value);
 	}
 
-	return fill('The average {name} in this area is <strong>{value}</strong>.', name, value);
+	const tmpl = (aggregation === 'SUM' ? RASTER_DESCRIPTIONS_SUM[unit] : null)
+		?? RASTER_DESCRIPTIONS[unit]
+		?? (aggregation === 'SUM' ? 'The total {name} in this area is <strong>{value}</strong>.' : 'The average {name} in this area is <strong>{value}</strong>.');
+	return fill(tmpl, name, value);
 }
 
 const _geo_dist_cache = new Map();
@@ -212,7 +235,10 @@ function make_card(ds, entry, admin_info) {
 	const card = ce('div', null, { "class": 'data-card' });
 
 	const header = ce('div', null, { "class": 'data-card-header' });
-	const title  = ce('span', ds.name, { "class": 'data-card-title' });
+	const path0  = ds.category?.controls?.path?.[0];
+	const tab_el = path0 && !STANDARD_TABS.has(path0) ? qs('#controls-tab-' + path0) : null;
+	const tab_label = tab_el?.textContent?.trim();
+	const title     = ce('span', tab_label ? `${tab_label} - ${ds.name}` : ds.name, { "class": 'data-card-title' });
 	const about  = ce('button', null, { "class": 'button-icon button-info button-about' });
 	about.innerHTML = '<span>About</span><i class="bi bi-info-circle"></i>';
 	header.append(title, about);
@@ -238,8 +264,12 @@ function make_card(ds, entry, admin_info) {
 	}
 
 	const desc = ce('p', null, { "class": 'data-card-description' });
-	if (entry.value != null)
-		desc.innerHTML = describe(ds.category.datatype, ds.category.unit, ds.name, entry.value);
+	if (entry.value != null) {
+		desc.innerHTML = describe(ds.category.datatype, entry.unit || ds.category.unit, ds.name, entry.value, entry.aggregation ?? ds.category.analysis?.aggregation);
+	} else {
+		desc.append('Data about ', ce('strong', null, { "bind": "name" }), ' in this area.');
+		bind(desc, { "name": ds.name });
+	}
 	body.append(desc);
 
 	about.onclick = () => ds.info_modal();

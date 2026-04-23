@@ -90,7 +90,7 @@ export function value_tree(raster_index) {
 export function get_admin_area_layer_data(variant, area_id) {
 	const fields = [];
 	const props = {};
-	const raw = { "values": {}, "units": {} };
+	const raw = { "values": {}, "units": {}, "aggregations": {} };
 
 	const layer_data = maybe(GEOGRAPHY, 'divisions', variant, 'layerData');
 	if (layer_data) {
@@ -104,9 +104,6 @@ export function get_admin_area_layer_data(variant, area_id) {
 			if (area_result.type === 'points') {
 				value = area_result.value;
 				unit = 'count';
-			} else if (area_result.value === null) {
-				value = 'Not aggregated';
-				unit = '';
 			} else {
 				value = parseFloat(area_result.value.toFixed(2));
 				unit = layer.unit || '';
@@ -116,6 +113,7 @@ export function get_admin_area_layer_data(variant, area_id) {
 			props[layer_id] = value;
 			raw.values[layer_id] = value;
 			raw.units[layer_id] = unit;
+			raw.aggregations[layer_id] = layer.aggregation;
 		}
 	}
 
@@ -204,6 +202,7 @@ function format_detail(key, label, value, raw, subordinate) {
 		"value":       `${formatted} ${display_unit}`.trim(),
 		"raw_value":    raw.values[key],
 		"unit":        unit,
+		"aggregation": raw.aggregations?.[key],
 		"subordinate": subordinate,
 	};
 }

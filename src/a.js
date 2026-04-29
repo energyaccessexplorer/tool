@@ -106,6 +106,8 @@ import admintiers from './admin-tiers.js';
 
 import bubblemessage from '../lib/bubblemessage.js';
 
+export const STANDARD_TABS = new Set(['census', 'demand', 'supply', 'other']);
+
 COMMIT = debounce(function() {
 	if (DEBUG || ENV.includes("test")) console.trace("commit!", ...arguments);
 

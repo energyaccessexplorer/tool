@@ -327,13 +327,13 @@ async function update_top_level_geography() {
 	}
 
 	const detailedData = [];
-	for (const [, layer] of Object.entries(_national_layer_data)) {
+	for (const [id, layer] of Object.entries(_national_layer_data)) {
 		const area_result = layer.areas?.[0]?.result;
 		if (!area_result) continue;
 
 		let value, unit;
 		if (area_result.type === 'points') {
-			value = area_result.value;
+			value = DST.get(id)?.vectors?.data?.features?.length ?? area_result.value;
 			unit = 'count';
 		} else {
 			value = parseFloat(area_result.value.toFixed(2));

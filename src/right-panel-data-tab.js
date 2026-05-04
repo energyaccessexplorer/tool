@@ -3,6 +3,10 @@ import {
 } from './area-analysis.js';
 
 import {
+	aggregate_layer_values,
+} from './analysis.js';
+
+import {
 	STANDARD_TABS,
 } from './a.js';
 
@@ -75,11 +79,13 @@ const RASTER_DESCRIPTIONS = {
 	'People per 100k population': 'There are <strong>{value}</strong> per 100k population affected by {name} in this area.',
 };
 
-function make_title(admin_info) {
+function make_title(admin_info, raster_index) {
 	const variant = qs('select#output-variant-select')?.value;
 	let area;
 
-	if (!variant || variant === 'raster') {
+	if (!admin_info && raster_index == null) {
+		area = GEOGRAPHY.name;
+	} else if (!admin_info || !variant || variant === 'raster') {
 		let u = 'm²';
 		let r = GEOGRAPHY.resolution;
 		if ((r % 1000) === 0) { u = 'km²'; r = r / 1000; }
@@ -128,6 +134,7 @@ function describe(datatype, unit, name, value, aggregation) {
 }
 
 const _geo_dist_cache = new Map();
+let _national_layer_data = null;
 
 function count_pixels(raster_data, nodata, mask_data, mask_nodata, mask_id, counts) {
 	let total = 0;
@@ -284,21 +291,11 @@ const BLANK_NO_LAYERS = {
 	"subtitle": 'Select a dataset from the left panel to add it to the map and start your prioritization analysis.',
 };
 
-const BLANK_NO_CLICK = {
-	"title":    'Click on the map to explore layer data',
-	"subtitle": 'Click anywhere on the map to see data for that location.',
-};
-
 function set_blank_state(visible) {
 	const blank = qs('#data-blank-state');
 	if (!blank) return;
 
-	if (visible) {
-		const has_layers = Array.from(DST.values()).some(
-			ds => ds.on && ds.category.name !== 'boundaries' && ds.category.name !== 'outline',
-		);
-		bind(blank, has_layers ? BLANK_NO_CLICK : BLANK_NO_LAYERS, { "final": false });
-	}
+	if (visible) bind(blank, BLANK_NO_LAYERS, { "final": false });
 
 	blank.style.display = visible ? 'flex' : 'none';
 }
@@ -311,6 +308,52 @@ function resolve_admin_info(admin_info, raster_index) {
 	const area_id = div.raster.data[raster_index];
 	if (area_id == null || area_id === div.raster.nodata) return null;
 	return { "variant": STATE.variant, "id": area_id };
+}
+
+async function update_top_level_geography() {
+	const active = STATE.datasets.filter(
+		ds => ds.on && ds.category.name !== 'boundaries' && ds.category.name !== 'outline',
+	);
+
+	if (!active.length) {
+		set_blank_state(true);
+		return;
+	}
+
+	if (!_national_layer_data) {
+		if (!OUTLINE?.raster?.data) { set_blank_state(true); return; }
+		const national_raster = OUTLINE.raster.data.map(v => v === OUTLINE.raster.nodata ? -1 : 0);
+		_national_layer_data = await aggregate_layer_values({ "raster": { "data": national_raster } });
+	}
+
+	const detailedData = [];
+	for (const [, layer] of Object.entries(_national_layer_data)) {
+		const area_result = layer.areas?.[0]?.result;
+		if (!area_result) continue;
+
+		let value, unit;
+		if (area_result.type === 'points') {
+			value = area_result.value;
+			unit = 'count';
+		} else {
+			value = parseFloat(area_result.value.toFixed(2));
+			unit = layer.unit || '';
+		}
+
+		const num = Number(value);
+		const formatted = Number.isFinite(num) ? num.toLocaleString() : String(value);
+		const display_unit = unit === 'count' ? '' : unit;
+
+		detailedData.push({
+			"label":       layer.name,
+			"value":       display_unit ? `${formatted} ${display_unit}` : formatted,
+			"raw_value":   value,
+			"unit":        unit,
+			"aggregation": layer.aggregation,
+		});
+	}
+
+	update(detailedData);
 }
 
 export function update(detailedData, admin_info = null, raster_index = null) {
@@ -332,7 +375,7 @@ export function update(detailedData, admin_info = null, raster_index = null) {
 
 	if (cards.length) {
 		set_blank_state(false);
-		container.append(make_title(effective_admin_info));
+		container.append(make_title(effective_admin_info, raster_index));
 		cards.forEach(ds => {
 			const entry = by_label.get(ds.name) ?? { "raw_value": null, "value": null, "label": ds.name };
 			container.append(make_card(ds, entry, effective_admin_info));
@@ -350,5 +393,6 @@ export function clear() {
 	const container = qs('#data-cards-container');
 	if (container) container.innerHTML = '';
 	_geo_dist_cache.clear();
-	set_blank_state(true);
+	_national_layer_data = null;
+	update_top_level_geography();
 }

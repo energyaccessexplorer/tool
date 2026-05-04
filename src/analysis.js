@@ -387,7 +387,7 @@ export async function priority(division, analysis, tier) {
 	}
 };
 
-async function aggregate_layer_values(division) {
+export async function aggregate_layer_values(division) {
 	const divisions = division.raster.data;
 	const area_ids = [...new Set(divisions.filter(e => e !== -1))];
 

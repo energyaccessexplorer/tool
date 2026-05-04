@@ -133,8 +133,10 @@ function describe(datatype, unit, name, value, aggregation) {
 	return fill(tmpl, name, value);
 }
 
-const _geo_dist_cache = new Map();
-let _national_layer_data = null;
+const cache = {
+	"geo_dist":            new Map(),
+	"national_layer_data": null,
+};
 
 function count_pixels(raster_data, nodata, mask_data, mask_nodata, mask_id, counts) {
 	let total = 0;
@@ -160,7 +162,7 @@ function compute_distribution(ds, admin_info) {
 
 	if (admin_info) {
 		cache_key   = `${ds.id}:${+admin_info.id}`;
-		if (_geo_dist_cache.has(cache_key)) return _geo_dist_cache.get(cache_key);
+		if (cache.geo_dist.has(cache_key)) return cache.geo_dist.get(cache_key);
 		const div = GEOGRAPHY.divisions?.[admin_info.variant];
 		if (!div?.raster?.data) return null;
 		mask_data   = div.raster.data;
@@ -168,7 +170,7 @@ function compute_distribution(ds, admin_info) {
 		mask_id     = +admin_info.id;
 	} else {
 		cache_key = ds.id;
-		if (_geo_dist_cache.has(cache_key)) return _geo_dist_cache.get(cache_key);
+		if (cache.geo_dist.has(cache_key)) return cache.geo_dist.get(cache_key);
 		const outline = OUTLINE?.raster;
 		if (!outline?.data) return null;
 		mask_data   = outline.data;
@@ -183,7 +185,7 @@ function compute_distribution(ds, admin_info) {
 		.map(c => ({ ...c, "percentage": (counts.get(c.value) || 0) / total * 100 }))
 		.filter(c => c.percentage > 0);
 
-	_geo_dist_cache.set(cache_key, result);
+	cache.geo_dist.set(cache_key, result);
 	return result;
 }
 
@@ -320,14 +322,14 @@ async function update_top_level_geography() {
 		return;
 	}
 
-	if (!_national_layer_data) {
+	if (!cache.national_layer_data) {
 		if (!OUTLINE?.raster?.data) { set_blank_state(true); return; }
 		const national_raster = OUTLINE.raster.data.map(v => v === OUTLINE.raster.nodata ? -1 : 0);
-		_national_layer_data = await aggregate_layer_values({ "raster": { "data": national_raster } });
+		cache.national_layer_data = await aggregate_layer_values({ "raster": { "data": national_raster } });
 	}
 
 	const detailedData = [];
-	for (const [id, layer] of Object.entries(_national_layer_data)) {
+	for (const [id, layer] of Object.entries(cache.national_layer_data)) {
 		const area_result = layer.areas?.[0]?.result;
 		if (!area_result) continue;
 
@@ -392,7 +394,7 @@ export function init() {
 export function clear() {
 	const container = qs('#data-cards-container');
 	if (container) container.innerHTML = '';
-	_geo_dist_cache.clear();
-	_national_layer_data = null;
+	cache.geo_dist.clear();
+	cache.national_layer_data = null;
 	update_top_level_geography();
 }

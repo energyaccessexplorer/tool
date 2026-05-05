@@ -1,3 +1,5 @@
+import Toast from './toast.js';
+
 import {
 	and,
 	ce,
@@ -408,13 +410,8 @@ export function loading(msg, opts) {
 	}
 };
 
-export function super_error(t, m, e = "error") {
-	FLASH.push({
-		"type":    e,
-		"timeout": 0,
-		"title":   t,
-		"message": m,
-	});
+export function super_error(t, m) {
+	new Toast({ "label": t, "caption": m ?? '', "variant": 'error' }).show();
 
 	const l = qs('#app-loading');
 	qs('.spinner', l).style.animation = 'none';
@@ -558,11 +555,7 @@ export function bi_icon(v) {
 
 export function copy_to_clipboard(url, button) {
 	if (!navigator.clipboard) {
-		FLASH.push({
-			"type":    'error',
-			"timeout": 2000,
-			"title":   "Clipboard functionality not available",
-		});
+		new Toast({ "label": "Clipboard functionality not available", "variant": 'error' }).show();
 
 		button.remove();
 		return;

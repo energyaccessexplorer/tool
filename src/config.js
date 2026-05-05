@@ -1,3 +1,5 @@
+import Toast from './toast.js';
+
 export function validate(conf) {
 	const base = [
 		'datasets',
@@ -15,12 +17,7 @@ export function validate(conf) {
 
 	for (const b of base)
 		if (!conf.hasOwnProperty(b)) {
-			FLASH.push({
-				"type":    'error',
-				"timeout": 5000,
-				"title":   "Configuration File Error",
-				"message": "The provided configuration does not comply with the necessary format.",
-			});
+			new Toast({ "label": "Configuration File Error", "caption": "The provided configuration does not comply with the necessary format.", "variant": 'error' }).show();
 
 			return false;
 		}

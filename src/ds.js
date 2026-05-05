@@ -1,3 +1,5 @@
+import Toast from './toast.js';
+
 import {
 	colorscale,
 	colorscale_svg,
@@ -115,15 +117,7 @@ export default class DS {
 			const b = GEOGRAPHY.divisions[this.config.divisions_tier];
 
 			if (!b) {
-				FLASH.push({
-					"type":    'error',
-					"timeout": 5000,
-					"title":   "Dataset/File error",
-					"message": `
-'${this.name}' requires a geography->divisions->${this.config.divisions_tier}.
-
-This is not fatal but the dataset is now disabled.`,
-				});
+				new Toast({ "label": "Dataset/File error", "caption": `'${this.name}' requires a geography->divisions->${this.config.divisions_tier}. This is not fatal but the dataset is now disabled.`, "variant": 'error' }).show();
 
 				this.disable(`Missing geography->divisions->${this.config.divisions_tier}.`);
 
@@ -148,15 +142,7 @@ This is not fatal but the dataset is now disabled.`,
 
 			if (this.category.name === 'outline') return true;
 
-			FLASH.push({
-				"type":    'error',
-				"timeout": 5000,
-				"title":   "Dataset/File error",
-				"message": `
-'${this.name}' has category '${this.category.name}' which requires a ${t} file.
-
-This is not fatal but the dataset is now disabled.`,
-			});
+			new Toast({ "label": "Dataset/File error", "caption": `'${this.name}' has category '${this.category.name}' which requires a ${t} file. This is not fatal but the dataset is now disabled.`, "variant": 'error' }).show();
 
 			this.disable(`Missing ${t}`);
 
@@ -385,15 +371,7 @@ This is not fatal but the dataset is now disabled.`,
 
 			if (!ds) {
 				const msg = `'${this.id}' claims to have host '${h}'. No such DS.`;
-				FLASH.push({
-					"type":    'error',
-					"timeout": 10000,
-					"title":   "Dataset/File error",
-					"message": `
-${msg}
-
-This is not fatal but the dataset is now disabled.`,
-				});
+				new Toast({ "label": "Dataset/File error", "caption": `${msg} This is not fatal but the dataset is now disabled.`, "variant": 'error' }).show();
 
 				this.disable(msg);
 

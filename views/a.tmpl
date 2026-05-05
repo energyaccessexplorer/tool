@@ -919,6 +919,8 @@
     </main>
   </template>
 
+  {{template "toast" .}}
+
   <template id="toast-notification-template">
     <div class="toast-icon">
       <i class="bi bi-check-circle-fill"></i>
@@ -1168,11 +1170,13 @@
   {{template "env" .}}
 
   <script type="module">
-    import flash from '../lib/flash.js';
     import pgrest from '../lib/pgrest.js';
+    import { show_error } from './toast.js';
 
-    window.FLASH = new flash();
-    window.API = new pgrest(EAE['settings'].database, FLASH);
+    window.API = new pgrest(EAE['settings'].database, {
+      push(e) { show_error(e.title, e.message); return this; },
+      clear() { return this; },
+    });
 
     window.GEOGRAPHY = null;
     window.SNAPSHOT = null;

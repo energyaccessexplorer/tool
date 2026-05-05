@@ -14,6 +14,10 @@ import {
 	tmpl,
 } from '../lib/helpers.js';
 
+import {
+	loading,
+} from './utils.js';
+
 import bind from '../lib/bind.js';
 
 const url = new URL(location);
@@ -127,9 +131,24 @@ export function snapshot(callback) {
 
 	delete config.geography;
 
+	function with_timeout(promise, ms = 10000) {
+		const timeout = new Promise((_, reject) =>
+			setTimeout(() => reject(new Error('Request timed out')), ms),
+		);
+		return Promise.race([promise, timeout]);
+	}
+
 	function patch() {
-		API.patch('snapshots', { "time": `eq.${snapshot_id}` }, { "payload": { config } })
-			.then(r => r && show_save_toast('Analysis updated successfully', 'Your analysis was updated in your My EAE account.'));
+		loading('Saving analysis...');
+		with_timeout(API.patch('snapshots', { "time": `eq.${snapshot_id}` }, { "payload": { config } }))
+			.then(r => {
+				if (r) show_save_toast('Analysis updated successfully', 'Your analysis was updated in your My EAE account.');
+			})
+			.catch(err => {
+				const toast = new Toast({ "label": 'Save failed', "caption": err.message, "variant": 'error' });
+				toast.show();
+			})
+			.finally(() => loading(false));
 
 		return snapshot_id;
 	};
@@ -147,14 +166,20 @@ export function snapshot(callback) {
 		edit_title(s, _ => {
 			SNAPSHOT = s;
 
-			API.post('snapshots', null, { "payload": s })
+			loading('Saving analysis...');
+			with_timeout(API.post('snapshots', null, { "payload": s }))
 				.then(r => {
 					if (!r) return;
 					show_save_toast('Analysis saved successfully', 'Your analysis was saved to your My EAE account.');
 					url.searchParams.set('snapshot', s['time']);
 					history.replaceState(null, null, url);
 					if (typeof callback === 'function') callback();
-				});
+				})
+				.catch(err => {
+					const toast = new Toast({ "label": 'Save failed', "caption": err.message, "variant": 'error' });
+					toast.show();
+				})
+				.finally(() => loading(false));
 		});
 
 		return s['time'];

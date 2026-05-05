@@ -307,6 +307,20 @@ toast-notification .toast-footer div {
   align-items: center;
 }
 
+toast-notification.error {
+  background: #FEF2F2;
+  border-color: #EF4444;
+}
+
+toast-notification.error .toast-icon i {
+  color: #EF4444;
+}
+
+toast-notification.error .toast-label,
+toast-notification.error .toast-caption {
+  color: #B91C1C;
+}
+
 .loading p button {
     margin: auto;
 }

@@ -60,6 +60,7 @@ build-m:
 		${SRC}/user.js \
 		${SRC}/utils.js \
 		${SRC}/tabs.js \
+		${SRC}/toast.js \
 		${SRC}/m.js \
 		${DIST}/m/
 
@@ -218,6 +219,7 @@ build-s:
 		${SRC}/utils.js \
 		${SRC}/browser.js \
 		${SRC}/user.js \
+		${SRC}/toast.js \
 		${SRC}/s.js \
 		${DIST}/s/
 

@@ -25,6 +25,7 @@ import {
 } from '../lib/helpers.js';
 
 const N_POINTS = 20;
+const MAX_COLS_PER_SLIDE = 12;
 
 const green = "#00794C";
 const white = "#ffffff";
@@ -701,38 +702,48 @@ function analysis_right($, index, rows) {
 	}
 };
 
-function toplocations_table(slide_title, columns, rows_data) {
-	const $ = this.addSlide();
+function toplocations_table(slide_title, anchor_cols, columns, rows_data) {
+	const chunk_size = Math.max(1, MAX_COLS_PER_SLIDE - anchor_cols.length);
+	const chunks = [];
+	for (let i = 0; i < columns.length; i += chunk_size)
+		chunks.push(columns.slice(i, i + chunk_size));
+	if (chunks.length === 0) chunks.push([]);
 
-	const border = tableborder;
+	chunks.forEach((chunk, ci) => {
+		const $ = this.addSlide();
 
-	title($, slide_title);
+		const border = tableborder;
+		const page_label = chunks.length > 1 ? ` (${ci + 1}/${chunks.length})` : '';
+		const slide_cols = [...anchor_cols, ...chunk];
 
-	const header = [
-		{
-			"text":    "#",
-			"options": textopts({ "align": "right", bold, "fontSize": 8 }),
-		},
-		...columns.map(name => ({
-			"text":    name,
-			"options": textopts({ "align": "center", bold, "fontSize": 8 }),
-		})),
-	];
+		title($, slide_title + page_label);
 
-	const rows = [header, ...rows_data.map((row, i) => [
-		{
-			"text":    i + 1,
-			"options": { "align": "right", "fontSize": 8, "fontFace": "monospace" },
-		},
-		...columns.map(col => ({
-			"text":    row[col] != null ? String(row[col]) : "",
-			"options": { "align": "center", "fontSize": 7 },
-		})),
-	])];
+		const header = [
+			{
+				"text":    "#",
+				"options": textopts({ "align": "right", bold, "fontSize": 8 }),
+			},
+			...slide_cols.map(name => ({
+				"text":    name,
+				"options": textopts({ "align": "center", bold, "fontSize": 8 }),
+			})),
+		];
 
-	$.addTable(rows, textopts({ x, "y": 1, "w": "96%", "colW": [0.5, ...Array(columns.length).fill(null)], border }));
+		const rows = [header, ...rows_data.map((row, i) => [
+			{
+				"text":    i + 1,
+				"options": { "align": "right", "fontSize": 8, "fontFace": "monospace" },
+			},
+			...slide_cols.map(col => ({
+				"text":    row[col] != null ? String(row[col]) : "",
+				"options": { "align": "center", "fontSize": 7 },
+			})),
+		])];
 
-	footer($);
+		$.addTable(rows, textopts({ x, "y": 1, "w": "96%", "colW": [0.5, ...Array(slide_cols.length).fill(null)], border }));
+
+		footer($);
+	});
 };
 
 export async function pptx(opts = {}) {
@@ -773,21 +784,39 @@ export async function pptx(opts = {}) {
 			const visible = opts.visible_headers || headers.filter(h => column_meta.get(h).visible);
 			const rows = [...generate_rows(results, is_raster, analysis_name, 0, results.length)];
 
-			toplocations_table.call(p, `Locations with highest ${STATE.index.toUpperCase()} Index`, visible, rows);
-
 			const dataset_for_header = h => STATE.datasets.find(d =>
 				h === d.name || h.startsWith(d.name + ' - '),
 			);
 
-			const location_cols = visible.filter(h => !dataset_for_header(h));
+			const raw_location_cols = visible.filter(h => !dataset_for_header(h));
+			const all_ds_cols = visible.filter(h => dataset_for_header(h));
+
+			// Merge Latitude and Longitude into a single column to save space
+			const LAT_LNG = 'Coordinates';
+			const location_cols = raw_location_cols
+				.filter(h => h !== 'Longitude')
+				.map(h => h === 'Latitude' ? LAT_LNG : h);
+			const merged_rows = rows.map(row => ({
+				...row,
+				[LAT_LNG]: `${row['Latitude']}, ${row['Longitude']}`,
+			}));
+
+			// Fixed computed cols always shown; first + last admin level always shown; middle admin levels dropped
+			const fixed_cols = ['Priority score', analysis_name, LAT_LNG].filter(h => location_cols.includes(h));
+			const admin_cols = location_cols.filter(h => !fixed_cols.includes(h));
+			const admin_anchors = admin_cols.length <= 1 ? admin_cols : [admin_cols[0], admin_cols[admin_cols.length - 1]];
+			const anchor_cols = [...fixed_cols, ...admin_anchors];
+
+			toplocations_table.call(p, `Locations with highest ${STATE.index.toUpperCase()} Index`, anchor_cols, all_ds_cols, merged_rows);
 
 			for (const index of ['demand', 'supply']) {
 				const ds_cols = visible.filter(h => dataset_for_header(h)?.index === index);
 				if (ds_cols.length) {
 					toplocations_table.call(p,
 						`High Priority Locations for Energy Interventions (${EAE['indexes'][index]['name']} Info)`,
-						[...location_cols, ...ds_cols],
-						rows);
+						anchor_cols,
+						ds_cols,
+						merged_rows);
 				}
 			}
 		}

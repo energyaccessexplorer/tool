@@ -79,24 +79,29 @@ const RASTER_DESCRIPTIONS = {
 	'People per 100k population': 'There are <strong>{value}</strong> per 100k population affected by {name} in this area.',
 };
 
-function make_title(admin_info, raster_index) {
-	const variant = qs('select#output-variant-select')?.value;
-	let area;
-
-	if (!admin_info && raster_index == null) {
-		area = GEOGRAPHY.name;
-	} else if (!admin_info || !variant || variant === 'raster') {
-		let u = 'm²';
-		let r = GEOGRAPHY.resolution;
-		if ((r % 1000) === 0) { u = 'km²'; r = r / 1000; }
-		area = `${GEOGRAPHY.name} at ${r}${u}`;
-	} else {
-		area = admin_location_name(admin_info.variant, admin_info.id);
-	}
-
+function title_p(area) {
 	const p = ce('p', null, { "class": 'data-tab-title' });
 	p.innerHTML = `Analysing selected datasets in <strong>${area}</strong>.`;
 	return p;
+}
+
+function make_title(admin_info, raster_index) {
+	const variant = qs('select#output-variant-select')?.value;
+	const location_selected = admin_info || raster_index != null;
+
+	if (!location_selected) {
+		const subtitle = ce('p', null, { "class": 'data-tab-subtitle' });
+		subtitle.textContent = 'Click anywhere on the map to see data for that location.';
+		const fragment = document.createDocumentFragment();
+		fragment.append(title_p(GEOGRAPHY.name), subtitle);
+		return fragment;
+	} else if (admin_info && variant && variant !== 'raster') {
+		return title_p(admin_location_name(admin_info.variant, admin_info.id));
+	} else if ((GEOGRAPHY.resolution % 1000) === 0) {
+		return title_p(`${GEOGRAPHY.name} at ${GEOGRAPHY.resolution / 1000}km²`);
+	} else {
+		return title_p(`${GEOGRAPHY.name} at ${GEOGRAPHY.resolution}m²`);
+	}
 }
 
 function fill(template, name, value) {

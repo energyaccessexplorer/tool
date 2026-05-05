@@ -104,6 +104,12 @@
   color: #1A1919;
 }
 
+.data-tab-subtitle {
+  font-size: 13px;
+  color: #7A7878;
+  margin: -6px 12px 12px;
+}
+
 .data-card {
   background: #FFFFFF;
   border: 1px solid #E7E6E6;

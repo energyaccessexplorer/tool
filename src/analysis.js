@@ -491,7 +491,7 @@ function collect_values_from_unscaled(src, division_raster, dataset, area_ids) {
 		for (let col = 0; col < src.w; col++) {
 			const value = src.data[row * src.w + col];
 
-			if (value !== nodata && !Number.isNaN(value)) {
+			if (value !== nodata) {
 				const raster_row = Math.floor((row + 0.5) * raster_h / src.h);
 				const raster_col = Math.floor((col + 0.5) * raster_w / src.w);
 				const area_id = division_raster[raster_row * raster_w + raster_col];
@@ -513,7 +513,7 @@ function collect_values_from_upscaled(division_raster, dataset, area_ids, correc
 		: null;
 
 	division_raster.forEach((area_id, i) => {
-		if (area_id !== -1 && data[i] !== nodata && !Number.isNaN(data[i]) && area_id in result)
+		if (area_id !== -1 && data[i] !== nodata && area_id in result)
 			result[area_id].push(estimated_block_factor ? data[i] / estimated_block_factor : data[i]);
 	});
 

@@ -169,6 +169,12 @@ export function raster() {
 			this.raster.nodata = parseFloat(image.fileDirectory.GDAL_NODATA);
 			this.raster.tiff = tiff;
 
+			if (Number.isNaN(this.raster.nodata)) this.raster.nodata = -Infinity;
+			const { "data": rdata, "nodata": rnodata } = this.raster;
+			for (let i = 0; i < rdata.length; i++) {
+				if (Number.isNaN(rdata[i])) rdata[i] = rnodata;
+			}
+
 			if (this.timeline)
 				this.timeline.rasters = rasters;
 

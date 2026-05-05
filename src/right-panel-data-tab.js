@@ -11,6 +11,7 @@ import {
 } from './a.js';
 
 import bind from '../lib/bind.js';
+import bubblemessage from '../lib/bubblemessage.js';
 
 import {
 	ce,
@@ -208,11 +209,15 @@ function make_donut_chart(distribution, active_name) {
 		legend.append(item);
 	}
 
+	const bubble = (v, e) => new bubblemessage({ "message": v + "%", "position": "C", "close": false, "noevents": true }, e);
+
 	const chart = svg_pie(
 		distribution.map(c => [c.percentage]),
 		66,
 		33,
 		distribution.map(c => c.color),
+		x => x.toFixed(2),
+		bubble,
 	);
 
 	wrap.append(legend, chart.svg);

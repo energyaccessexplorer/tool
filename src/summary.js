@@ -74,8 +74,8 @@ export async function generate_summary_data() {
 		SUMMARY[idxn] = await analyse(raster);
 		SUMMARY[idxn]['raw_raster'] = raster;
 
-		const ppie = svg_pie(SUMMARY[idxn]['population-density']['distribution'].map(x => [x]), 75, 0, analysis_colorscale.stops, null, null, bubble);
-		const apie = svg_pie(SUMMARY[idxn]['area']['distribution'].map(x => [x]), 75, 0, analysis_colorscale.stops, null, null, bubble);
+		const ppie = svg_pie(SUMMARY[idxn]['population-density']['distribution'].map(x => [x]), 75, 0, analysis_colorscale.stops, null, bubble);
+		const apie = svg_pie(SUMMARY[idxn]['area']['distribution'].map(x => [x]), 75, 0, analysis_colorscale.stops, null, bubble);
 
 		ppie.change(0);
 		apie.change(0);

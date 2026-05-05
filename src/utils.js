@@ -97,7 +97,7 @@ export function colorscale_svg(stops, height = 16, mouseenter = noop, mouseleave
 	return svg.node();
 };
 
-export function svg_pie(data, outer, inner, colors, inner_text, parse, bubble) {
+export function svg_pie(data, outer, inner, colors, parse, bubble) {
 	if (typeof parse !== 'function')
 		parse = x => (x * 100).toFixed(2);
 

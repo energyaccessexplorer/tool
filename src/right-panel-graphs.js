@@ -133,8 +133,8 @@ function process_graph(analysis_summary, config) {
 }
 
 export function init() {
-	PIES["population"] = svg_pie([[0], [0], [0], [0], [0]], 70, 0, analysis_colorscale.stops, null, null, bubble);
-	PIES["area"]       = svg_pie([[0], [0], [0], [0], [0]], 70, 0, analysis_colorscale.stops, null, null, bubble);
+	PIES["population"] = svg_pie([[0], [0], [0], [0], [0]], 70, 0, analysis_colorscale.stops, null, bubble);
+	PIES["area"]       = svg_pie([[0], [0], [0], [0], [0]], 70, 0, analysis_colorscale.stops, null, bubble);
 
 	const area_section = create_graph_section('Area share', 'area', 'area-number', 'area-description');
 	const population_section = create_graph_section('Population share', 'population', 'population-number', 'population-description');

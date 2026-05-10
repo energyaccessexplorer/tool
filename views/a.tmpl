@@ -236,6 +236,7 @@
           </div>
 
           <div id="right-panel-tab-prioritization" class="right-panel-tab-panel" role="tabpanel">
+            <div id="index-priority-container"></div>
             <div id="analysis-blank-state">
               <div class="blank-state-content">
                 <svg class="blank-state-icon" width="64" height="64"><use href="#blank-state-icon"/></svg>
@@ -761,6 +762,19 @@
           <div class="index-graphs-group"></div>
         </div>
       </div>
+    </panel-section>
+  </template>
+
+  <template id="index-priority-card-template">
+    <panel-section class="index-priority-section">
+      <h2 slot="title">Index Priority</h2>
+      <div slot="actions">
+        <button class="button-icon button-info button-about">
+          <span>About</span>
+          <i class="bi bi-info-circle"></i>
+        </button>
+      </div>
+      <div class="index-priority-values"></div>
     </panel-section>
   </template>
 

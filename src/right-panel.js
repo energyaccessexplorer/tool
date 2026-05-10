@@ -27,6 +27,10 @@ import {
 	clear as data_tab_clear,
 } from './right-panel-data-tab.js';
 
+import {
+	clear as prioritization_tab_clear,
+} from './right-panel-prioritization-tab.js';
+
 import bind from '../lib/bind.js';
 
 import modal from '../lib/modal.js';
@@ -45,6 +49,7 @@ export function loading_analysis(loading) {
 	qs('#analysis-blank-state').style.display = 'none';
 	if (loading) {
 		data_tab_clear();
+		prioritization_tab_clear();
 		document.querySelectorAll('.right-panel-tab-panel').forEach(p => { p.hidden = true; });
 	}
 }
@@ -64,6 +69,7 @@ export function update_analysis(has_data) {
 	const sections_wrapper = qs('#analysis-sections-wrapper');
 
 	data_tab_clear();
+	prioritization_tab_clear();
 	blank_state.style.display = has_data ? 'none' : 'flex';
 	sections_wrapper.style.display = has_data ? 'flex' : 'none';
 

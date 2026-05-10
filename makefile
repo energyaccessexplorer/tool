@@ -147,6 +147,7 @@ build-a:
 		${SRC}/output-widget.js \
 		${SRC}/right-panel-graphs.js \
 		${SRC}/right-panel-data-tab.js \
+		${SRC}/right-panel-prioritization-tab.js \
 		${SRC}/right-panel.js \
 		${SRC}/mapbox.js \
 		${SRC}/plot.js \

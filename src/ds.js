@@ -325,6 +325,10 @@ export default class DS {
 		DST.delete(this.id);
 	};
 
+	cannot_deactivate(visible) {
+		return !visible && this.category.name === 'outline';
+	};
+
 	get source() {
 		return MAPBOX.getSource(this.id);
 	};
@@ -682,10 +686,12 @@ export default class DS {
 		}).show();
 	};
 
-	async active(v, draw) {
-		this.on = v;
+	async active(visible, draw) {
+		if (this.cannot_deactivate(visible)) return;
 
-		if (v) {
+		this.on = visible;
+
+		if (visible) {
 			if (this.controls) this.controls.loading(true);
 			loading_analysis(true);
 
@@ -713,11 +719,11 @@ export default class DS {
 
 		if (!this.card) this.card = new dscard(this);
 
-		if (this.controls) this.controls.turn(v);
+		if (this.controls) this.controls.turn(visible);
 
-		this.visibility(v && draw);
+		this.visibility(visible && draw);
 
-		if (!v && this.card) this.card.remove();
+		if (!visible && this.card) this.card.remove();
 	};
 
 	loadall() {
@@ -789,10 +795,12 @@ export default class DS {
 			MAPBOX.setPaintProperty(this.id, a, v);
 	};
 
-	turn(v) {
-		v = v ?? !this.on;
+	turn(visible) {
+		visible = visible ?? !this.on;
 
-		this.active(v, true);
+		if (this.cannot_deactivate(visible)) return;
+
+		this.active(visible, true);
 
 		let copy = [...STATE.datasets];
 

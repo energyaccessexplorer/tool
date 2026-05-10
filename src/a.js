@@ -331,6 +331,9 @@ This is fatal. Thanks for all the fish.`;
 
 		OUTLINE = new DS(json);
 
+		OUTLINE.vectors.fill = 'transparent';
+		OUTLINE.vectors.opacity = 1;
+
 		await OUTLINE.load('vectors');
 		await OUTLINE.load('raster');
 
@@ -426,6 +429,8 @@ async function init_4() {
 	left_panel("cards");
 
 	output_widget_init();
+
+	await OUTLINE.active(true, true);
 
 	qs('#left-panel').style.display = '';
 	qs('#left-panel input[id="controls-search"]').focus();

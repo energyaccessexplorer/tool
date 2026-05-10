@@ -1,5 +1,6 @@
 import {
 	admin_location_name,
+	resolve_unit,
 } from './area-analysis.js';
 
 import {
@@ -349,7 +350,7 @@ async function update_top_level_geography() {
 			unit = 'count';
 		} else {
 			value = parseFloat(area_result.value.toFixed(2));
-			unit = layer.unit || '';
+			unit = resolve_unit(layer, DST.get(id), value);
 		}
 
 		const num = Number(value);

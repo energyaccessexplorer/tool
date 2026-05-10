@@ -273,22 +273,22 @@ async function init_1() {
 		"select": ['*', 'parent_sort_branches', 'parent_sort_subbranches', 'parent_sort_datasets'],
 	}, { "one": true });
 
-	MOBILE = screen.width < 1152;
+	// MOBILE= screen.width < 1152;
 
 	GEOGRAPHY.timeline = maybe(GEOGRAPHY, 'configuration', 'timeline');
 	GEOGRAPHY.timeline_dates = maybe(GEOGRAPHY, 'configuration', 'timeline_dates');
 
 	layout();
 
-	const mac = navigator.userAgent.indexOf('Mac') > -1;
+	// const mac = navigator.userAgent.indexOf('Mac') > -1;
 
-	if (!MOBILE && window.devicePixelRatio !== 1) alert(`
-	Energy Access Explorer is optimised for display settings that differ from yours.
+	// if (!MOBILE && window.devicePixelRatio !== 1) alert(`
+	// Energy Access Explorer is optimised for display settings that differ from yours.
 
-	If the layout feels cramped, try zooming out to ${Math.round(1/window.devicePixelRatio * 100)}%.
+	// If the layout feels cramped, try zooming out to ${Math.round(1/window.devicePixelRatio * 100)}%.
 
-	On your OS, you can do this by pressing (${mac ? "⌘" : "ctrl"} −) a couple times.
-	`);
+	// On your OS, you can do this by pressing (${mac ? "⌘" : "ctrl"} −) a couple times.
+	// `);
 
 	loading("Initialising mapbox...");
 
@@ -575,7 +575,7 @@ async function reload(k,v) {
 	function priority_visibility_pick() {
 		const x = variant !== "raster";
 
-		GEOGRAPHY.divisions.forEach((d,i) => {
+		GEOGRAPHY.divisions.forEach((_,i) => {
 			if (MAPBOX.getLayer(`priority-layer-${i}`)) {
 				const t = and(x, STATE.variant === i, output_shown);
 

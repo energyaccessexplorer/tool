@@ -714,7 +714,7 @@ function toplocations_table(slide_title, columns, rows_data) {
 			"options": textopts({ "align": "right", bold, "fontSize": 8 }),
 		},
 		...columns.map(name => ({
-			"text":    name,
+			"text":    name.replace(/\b\w/g, c => c.toUpperCase()),
 			"options": textopts({ "align": "center", bold, "fontSize": 8 }),
 		})),
 	];

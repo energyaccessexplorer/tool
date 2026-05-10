@@ -106,7 +106,7 @@ export function get_admin_area_layer_data(variant, area_id) {
 				unit = 'count';
 			} else {
 				value = parseFloat(area_result.value.toFixed(2));
-				unit = layer.unit || '';
+				unit = resolve_unit(layer, DST.get(layer_id), value);
 			}
 
 			fields.push([layer_id, layer.name]);
@@ -314,9 +314,13 @@ function resolve_raster_value(dataset, raw) {
 	return maybe(dataset, 'csv', 'key') ? dataset.csv.table[rounded] : rounded;
 }
 
-function dataset_unit(dataset, value) {
+export function dataset_unit(dataset, value) {
 	return dataset.category.unit
 		|| (Number.isFinite(value) && dataset.vectors ? "km (proximity to)" : null);
+}
+
+export function resolve_unit(layer, dataset, value) {
+	return layer.unit || dataset_unit(dataset, value) || '';
 }
 
 function flatten_value_tree(tree) {

@@ -431,6 +431,7 @@ async function init_4() {
 	output_widget_init();
 
 	await OUTLINE.active(true, true);
+	STATE.datasets = [...STATE.datasets, OUTLINE];
 
 	qs('#left-panel').style.display = '';
 	qs('#left-panel input[id="controls-search"]').focus();

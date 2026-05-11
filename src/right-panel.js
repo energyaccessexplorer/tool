@@ -29,6 +29,7 @@ import {
 
 import {
 	clear as prioritization_tab_clear,
+	clear_location_summary,
 } from './right-panel-prioritization-tab.js';
 
 import bind from '../lib/bind.js';
@@ -50,6 +51,7 @@ export function loading_analysis(loading) {
 	if (loading) {
 		data_tab_clear();
 		prioritization_tab_clear();
+		clear_location_summary();
 		document.querySelectorAll('.right-panel-tab-panel').forEach(p => { p.hidden = true; });
 	}
 }
@@ -70,6 +72,7 @@ export function update_analysis(has_data) {
 
 	data_tab_clear();
 	prioritization_tab_clear();
+	clear_location_summary();
 	blank_state.style.display = has_data ? 'none' : 'flex';
 	sections_wrapper.style.display = has_data ? 'flex' : 'none';
 

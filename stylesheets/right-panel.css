@@ -1179,3 +1179,43 @@ dialog .saved-analysis-last-viewed {
 .export-option-buttons .button-small {
   margin-top: 0;
 }
+
+#location-summary {
+  padding: 16px 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.location-summary-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.location-coordinates {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1A1919;
+}
+
+.location-priority-badge {
+  font-size: 12px;
+  font-weight: 600;
+  color: #006640;
+  background: #EBF5F2;
+  border: 1px solid #A0D4C1;
+  border-radius: 100px;
+  padding: 2px 10px;
+  white-space: nowrap;
+}
+
+.location-area-type,
+.location-name {
+  font-size: 14px;
+  color: #5C5959;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}

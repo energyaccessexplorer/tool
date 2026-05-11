@@ -10,6 +10,8 @@ import {
 import {
 	update as prioritization_tab_update,
 	clear as prioritization_tab_clear,
+	update_location_summary,
+	clear_location_summary,
 } from './right-panel-prioritization-tab.js';
 
 import {
@@ -74,6 +76,7 @@ export default class mapinfo extends HTMLElement {
 
 		data_tab_update(data.detailedData, info, raster_index);
 		prioritization_tab_update(raster_index, info, analysis_value);
+		update_location_summary(data, info);
 
 		const content = tmpl('#map-info-template');
 		bind(content, data);
@@ -109,6 +112,7 @@ export default class mapinfo extends HTMLElement {
 		closeButton.onclick = () => {
 			data_tab_clear();
 			prioritization_tab_clear();
+			clear_location_summary();
 			if (onClose) onClose();
 			else this.remove();
 		};

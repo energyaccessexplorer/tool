@@ -9,6 +9,10 @@ import {
 } from './right-panel-graphs.js';
 
 import {
+	area_type,
+} from './utils.js';
+
+import {
 	ce,
 	tmpl,
 	qs,
@@ -91,4 +95,37 @@ function make_row(key, entry, subordinate = false) {
 export function clear() {
 	const container = qs('#index-priority-container');
 	if (container) container.innerHTML = '';
+}
+
+export function update_location_summary(data, admin_info) {
+	const container = qs('#location-summary');
+	if (!container) return;
+
+	const score_entry = data?.basicData?.find(e => e.label === 'Priority score');
+	if (!score_entry) return;
+
+	const area_label = admin_info
+		? area_type(admin_info.variant)
+		: 'Priority areas (' + area_type('raster') + ')';
+
+	const location_entry = data.basicData.find(e => e.label === 'Location');
+
+	const coords_el = qs('.location-coordinates', container);
+	coords_el.textContent = data.coordinates ?? '';
+	coords_el.style.display = data.coordinates ? '' : 'none';
+
+	qs('.location-priority-badge', container).textContent = score_entry.value + ' priority score';
+
+	qs('.location-area-type span', container).textContent = area_label;
+
+	const loc_row = qs('.location-name', container);
+	qs('span', loc_row).textContent = location_entry?.value ?? '';
+	loc_row.style.display = location_entry ? '' : 'none';
+
+	container.style.display = '';
+}
+
+export function clear_location_summary() {
+	const container = qs('#location-summary');
+	if (container) container.style.display = 'none';
 }

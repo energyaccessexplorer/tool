@@ -252,6 +252,7 @@
 
           <div id="right-panel-tab-prioritization" class="right-panel-tab-panel" role="tabpanel">
             <div id="index-priority-container"></div>
+            <div id="poi-card-container"></div>
             <div id="analysis-blank-state">
               <div class="blank-state-content">
                 <svg class="blank-state-icon" width="64" height="64"><use href="#blank-state-icon"/></svg>
@@ -775,6 +776,25 @@
         <div class="graph-and-scale">
           <div class="index-graphs-scale-container"></div>
           <div class="index-graphs-group"></div>
+        </div>
+      </div>
+    </panel-section>
+  </template>
+
+  <template id="poi-card-template">
+    <panel-section class="poi-section">
+      <h2 slot="title">Intersecting points of interest</h2>
+      <div slot="actions">
+        <button class="button-icon button-info button-about">
+          <span>About</span>
+          <i class="bi bi-info-circle"></i>
+        </button>
+      </div>
+      <div class="poi-body">
+        <p class="poi-description" bind="description"></p>
+        <div bind-each="points" class="poi-row">
+          <span class="poi-name" bind="name"></span>
+          <span class="poi-kind" bind="kind"></span>
         </div>
       </div>
     </panel-section>

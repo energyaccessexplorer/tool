@@ -1180,6 +1180,52 @@ dialog .saved-analysis-last-viewed {
   margin-top: 0;
 }
 
+#poi-card-container {
+  padding: 12px 12px 0;
+}
+
+.poi-section .poi-body {
+  display: flex;
+  flex-direction: column;
+  padding: 0 16px 4px;
+  background: #F6F6F6;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.poi-description {
+  font-size: 14px;
+  color: #3D3B3B;
+  margin: 0;
+  padding: 10px 0;
+  border-bottom: 1px solid #E7E6E6;
+}
+
+.poi-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 0;
+  border-bottom: 1px solid #E7E6E6;
+}
+
+.poi-row:last-child {
+  border-bottom: none;
+}
+
+.poi-name {
+  font-size: 14px;
+  color: #3D3B3B;
+}
+
+.poi-kind {
+  font-size: 14px;
+  color: #1A1919;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
 #location-summary {
   padding: 16px 16px 20px;
   display: flex;

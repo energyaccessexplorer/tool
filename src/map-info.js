@@ -15,6 +15,11 @@ import {
 } from './right-panel-prioritization-tab.js';
 
 import {
+	update as poi_update,
+	clear as poi_clear,
+} from './right-panel-poi-card.js';
+
+import {
 	show_eae_info_modal,
 } from './output-widget.js';
 
@@ -77,6 +82,7 @@ export default class mapinfo extends HTMLElement {
 		data_tab_update(data.detailedData, info, raster_index);
 		prioritization_tab_update(raster_index, info, analysis_value);
 		update_location_summary(data, info);
+		if (!info) poi_update(ll);
 
 		const content = tmpl('#map-info-template');
 		bind(content, data);
@@ -113,6 +119,7 @@ export default class mapinfo extends HTMLElement {
 			data_tab_clear();
 			prioritization_tab_clear();
 			clear_location_summary();
+			poi_clear();
 			if (onClose) onClose();
 			else this.remove();
 		};

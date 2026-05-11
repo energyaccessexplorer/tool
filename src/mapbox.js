@@ -409,7 +409,10 @@ export function coords_search_pois({
 				t => maybe(t, 'properties', 'name'),
 			).map(f => ({
 				"name":        f.properties.name,
+				"kind":        f.properties.type || null,
 				"coordinates": f.geometry.coordinates,
+				"dist_m":      f.properties.tilequery?.distance ?? null,
+				"layer":       f.properties.tilequery?.layer ?? null,
 			}));
 		});
 };

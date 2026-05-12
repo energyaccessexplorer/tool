@@ -366,6 +366,8 @@ export async function priority(division, analysis, tier) {
 	if (source) {
 		const areas = division_averages(analysis.raster, division.raster.data);
 
+		source._data.features.forEach(f => f.properties['__fill'] = "transparent");
+
 		const scale = priority_scale(areas, analysis_colorscale.stops);
 
 		for (const area_id in areas) {

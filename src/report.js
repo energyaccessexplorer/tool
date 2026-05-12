@@ -20,6 +20,10 @@ import {
 } from './area-analysis.js';
 
 import {
+	area_type,
+} from './utils.js';
+
+import {
 	and,
 	or,
 } from '../lib/helpers.js';
@@ -369,7 +373,7 @@ function geography_indexes_right($) {
 	);
 
 	$.addText(
-		"Share of area for each Index in km²",
+		`Share of area for each Index (${area_type(STATE.variant)})`,
 		textopts({ "x": "55%", "y": 1.5, bold, "color": green }),
 	);
 
@@ -764,7 +768,9 @@ export async function pptx(opts = {}) {
 	}
 
 	{
-		chapter.call(p, "" + (c++), "Top Locations");
+		const area_label = area_type(STATE.variant);
+		const is_admin = STATE.variant !== 'raster';
+		chapter.call(p, "" + (c++), is_admin ? `Top ${area_label}` : "Top Locations");
 
 		const results = (opts.results || get_locations_results()).slice(0, N_POINTS);
 
@@ -777,7 +783,10 @@ export async function pptx(opts = {}) {
 			const fixed_cols = FIXED.filter(h => headers.includes(h));
 			const columns = [...fixed_cols, ...admin_cols];
 
-			toplocations_table.call(p, `Locations with highest ${STATE.index.toUpperCase()} Index`, columns, rows);
+			const slide_title = is_admin
+				? `${area_label} with highest ${STATE.index.toUpperCase()} Index`
+				: `Locations with highest ${STATE.index.toUpperCase()} Index`;
+			toplocations_table.call(p, slide_title, columns, rows);
 		}
 	}
 

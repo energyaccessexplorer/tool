@@ -230,8 +230,8 @@ dialog pre {
 
 toast-notification {
   position: fixed;
-  left: 25px;
-  bottom: 25px;
+  right: 25px;
+  top: 25px;
   display: flex;
   align-items: center;
   padding: 12px;
@@ -305,6 +305,20 @@ toast-notification .toast-footer {
 toast-notification .toast-footer div {
   display: flex;
   align-items: center;
+}
+
+toast-notification.error {
+  background: #FEF2F2;
+  border-color: #EF4444;
+}
+
+toast-notification.error .toast-icon i {
+  color: #EF4444;
+}
+
+toast-notification.error .toast-label,
+toast-notification.error .toast-caption {
+  color: #B91C1C;
 }
 
 .loading p button {

@@ -17,16 +17,23 @@ import {
 
 import bind from '../lib/bind.js';
 
-export function show(results) {
+import bubblemessage from '../lib/bubblemessage.js';
+
+export function show(results, opts = {}) {
 	const data = prepare_tabular_data(results);
 	if (!data) return;
 
-	const { headers, is_raster, "area_type": area_type_str, analysis_name, column_meta, selector_groups } = data;
+	const { headers, is_raster, analysis_name, column_meta, selector_groups } = data;
 
 	const selected_indices = new Set();
 
 	function get_visible_headers() {
 		return headers.filter(h => column_meta.get(h).visible);
+	}
+
+	function get_selected() {
+		return selected_indices.size
+			&& Array.from(selected_indices).map(i => state.results[i]);
 	}
 
 	const state = {
@@ -125,6 +132,22 @@ export function show(results) {
 		return grid;
 	}
 
+	const toggle_btn = qs('.column-selector-toggle', content);
+	let bubble;
+
+	toggle_btn.onmouseenter = function() {
+		if (bubble) bubble.remove();
+		bubble = new bubblemessage({
+			"position": "W",
+			"message":  opts.column_toggle_hint,
+			"close":    false,
+		}, this);
+	};
+
+	toggle_btn.onmouseleave = function() {
+		if (bubble) bubble.remove();
+	};
+
 	bind(content, {
 		"analysis-name":          analysis_name,
 		"toggle_column_selector": function() {
@@ -151,7 +174,8 @@ export function show(results) {
 
 	const footer = tmpl('#high-priority-areas-list-all-footer-template');
 	bind(footer, {
-		"download": () => download_high_priority_areas(results, { "visible_headers": get_visible_headers() }),
+		"label":    opts.action_label,
+		"download": () => opts.on_download(get_selected() || state.results, get_visible_headers()),
 	});
 
 	function update_selection_overlay() {
@@ -299,8 +323,8 @@ export function show(results) {
 
 	const header = tmpl('#modal-header-template');
 	bind(header, {
-		"title":    `High priority areas (${area_type_str})`,
-		"subtitle": analysis_name,
+		"title":    opts.title,
+		"subtitle": opts.subtitle,
 	});
 
 	const m = new modal({

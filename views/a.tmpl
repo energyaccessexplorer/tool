@@ -39,7 +39,7 @@
         <a for="vectors" description="Search Features"><i class="bi bi-search"></i></a>
         <a for="locations" description="Search POI's"><i class="bi bi-geo"></i></a>
         <a for="points" description="Points Loading"><i class="bi bi-crosshair"></i></a>
-        <a id="drawer-info" description="About" bind-listen="click" bind-func="show_info"><i class="bi bi-question-circle"></i></a>
+        <a id="drawer-info" description="Disclaimer" bind-listen="click" bind-func="show_info"><i class="bi bi-info-circle"></i></a>
       </div>
 
       <div id="left-panel" style="display: none;">
@@ -200,50 +200,81 @@
               <span>Hide</span>
             </button>
           </div>
-          <p class="header-subtitle">Click on an area on the map to learn more about it.</p>
-
           <div id="right-panel-top-actions">
             <button id="summary-button" class="button-icon top-action-button">
               <i class="bi bi-file-text"></i>
               <span>Report</span>
             </button>
-
-            <button id="disclaimer-button" class="button-icon top-action-button">
-              <i class="bi bi-info-circle"></i>
-              <span>Disclaimer</span>
-              <div id="disclaimer-message">
-                <p>
-                  The maps are for illustrative purposes and do not imply the
-                  expression of any opinion on the part of WRI, concerning the
-                  legal status of any country or territory or concerning the
-                  delimitation of frontiers or boundaries.
-                </p>
-
-                <p>
-                  If you use this platform, partially or entirely, you must follow
-                  the <a href="https://www.energyaccessexplorer.org/attribution/">attribution instructions</a>.
-                </p>
-              </div>
-            </button>
           </div>
         </header>
 
+        <div id="location-summary" style="display: none;">
+          <div class="location-summary-top">
+            <span class="location-coordinates"></span>
+            <span class="location-priority-badge"></span>
+          </div>
+          <div class="location-area-type">
+            <i class="bi bi-record-circle"></i>
+            <span></span>
+          </div>
+          <div class="location-name">
+            <i class="bi bi-geo-alt-fill"></i>
+            <span></span>
+          </div>
+        </div>
+
+        <div id="right-panel-tabs" role="tablist">
+          <button class="right-panel-tab active" role="tab" data-tab="prioritization" aria-selected="true">
+            <i class="bi bi-lightning-fill"></i>
+            <span>Prioritization</span>
+          </button>
+          <button class="right-panel-tab" role="tab" data-tab="data" aria-selected="false">
+            <i class="bi bi-bar-chart-line-fill"></i>
+            <span>Data</span>
+          </button>
+        </div>
+
+        <svg style="display: none" xmlns="http://www.w3.org/2000/svg">
+          <symbol id="blank-state-icon" viewBox="0 0 64 64" fill="none">
+            <path d="M64 60.25H60.25V22.5H48.875V60.25H45.125V37.5H33.875V60.25H30.125V30H18.875V60.25H15.125V41.25H3.75V60.25H0V64H64V60.25Z" fill="#A0D4C1"/>
+            <path d="M63.999 15V0H48.874V3.75H57.598L39.499 21.7236L24.499 6.72361L0.549023 30.5494L3.20002 33.2006L24.499 12.0264L39.499 27.0264L60.249 6.40137V15H63.999Z" fill="#A0D4C1"/>
+          </symbol>
+        </svg>
+
         <div id="right-panel-content">
-          <div id="analysis-blank-state">
+          <div id="analysis-loading-state">
             <div class="blank-state-content">
-              <svg class="blank-state-icon" width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M64 60.25H60.25V22.5H48.875V60.25H45.125V37.5H33.875V60.25H30.125V30H18.875V60.25H15.125V41.25H3.75V60.25H0V64H64V60.25Z" fill="#A0D4C1"/>
-                <path d="M63.999 15V0H48.874V3.75H57.598L39.499 21.7236L24.499 6.72361L0.549023 30.5494L3.20002 33.2006L24.499 12.0264L39.499 27.0264L60.249 6.40137V15H63.999Z" fill="#A0D4C1"/>
-              </svg>
-              <p class="blank-state-title">Add data to prioritize analysis</p>
-              <p class="blank-state-subtitle">Select a dataset from the left panel to add it to the map and start your prioritization analysis.</p>
+              <div class="spinner"></div>
+              <p class="blank-state-title">Loading data layers</p>
+              <p class="blank-state-subtitle">Please wait while datasets are being processed.</p>
             </div>
           </div>
 
-          <div id="analysis-sections-wrapper">
-            <div id="analysis-locations"></div>
+          <div id="right-panel-tab-prioritization" class="right-panel-tab-panel" role="tabpanel">
+            <div id="index-priority-container"></div>
+            <div id="poi-card-container"></div>
+            <div id="analysis-blank-state">
+              <div class="blank-state-content">
+                <svg class="blank-state-icon" width="64" height="64"><use href="#blank-state-icon"/></svg>
+                <p class="blank-state-title">Add data to prioritize analysis</p>
+                <p class="blank-state-subtitle">Select a dataset from the left panel to add it to the map and start your prioritization analysis.</p>
+              </div>
+            </div>
+            <div id="analysis-sections-wrapper">
+              <div id="analysis-locations"></div>
+            </div>
           </div>
 
+          <div id="right-panel-tab-data" class="right-panel-tab-panel" role="tabpanel" hidden>
+            <div id="data-blank-state" style="display: flex">
+              <div class="blank-state-content">
+                <svg class="blank-state-icon" width="64" height="64"><use href="#blank-state-icon"/></svg>
+                <p class="blank-state-title" bind="title"></p>
+                <p class="blank-state-subtitle" bind="subtitle"></p>
+              </div>
+            </div>
+            <div id="data-cards-container"></div>
+          </div>
         </div>
 
         <footer id="right-panel-footer">
@@ -535,7 +566,7 @@
 
     <br><div style="border-bottom: 1px solid lightgray;"></div><br><br>
 
-    <h3>Prioritization indexes</h3>
+    <h3 id="prioritization-indexes">Prioritization indexes</h3>
     <p>
       There are 4 different methods to generate a prioritization, depending on
       the aim of your analysis; these are known as the different
@@ -561,19 +592,7 @@
 
     <br><div style="border-bottom: 1px solid lightgray;"></div><br><br>
 
-    <h3>Disclaimer</h3>
-    <p>
-      The maps are for illustrative purposes and do not imply the
-      expression of any opinion on the part of WRI, concerning the
-      legal status of any country or territory or concerning the
-      delimitation of frontiers or boundaries.
-    </p>
-
-    <br>
-    <p>
-      If you use this platform, partially or entirely, you must follow
-      the <a href="https://www.energyaccessexplorer.org/attribution/">attribution instructions</a>.
-    </p>
+    {{template "disclaimer" .}}
 
     <br><div style="border-bottom: 1px solid lightgray;"></div><br><br>
 
@@ -585,6 +604,10 @@
     </p>
 
     <br>
+  </template>
+
+  <template id="disclaimer-template">
+    {{template "disclaimer" .}}
   </template>
 
   <template id="ds-info-modal">
@@ -642,6 +665,11 @@
         <section bind-cond="content_date">
           <h3>Date of Content</h3>
           <span bind="content_date"></span>
+        </section>
+
+        <section bind-cond="publication_date">
+          <h3>Date of Publication</h3>
+          <span bind="publication_date"></span>
         </section>
       </div>
     </div>
@@ -753,6 +781,38 @@
     </panel-section>
   </template>
 
+  <template id="poi-card-template">
+    <panel-section class="poi-section">
+      <h2 slot="title">Intersecting points of interest</h2>
+      <div slot="actions">
+        <button class="button-icon button-info button-about">
+          <span>About</span>
+          <i class="bi bi-info-circle"></i>
+        </button>
+      </div>
+      <div class="poi-body">
+        <p class="poi-description" bind="description"></p>
+        <div bind-each="points" class="poi-row">
+          <span class="poi-name" bind="name"></span>
+          <span class="poi-kind" bind="kind"></span>
+        </div>
+      </div>
+    </panel-section>
+  </template>
+
+  <template id="index-priority-card-template">
+    <panel-section class="index-priority-section">
+      <h2 slot="title">Index Priority</h2>
+      <div slot="actions">
+        <button class="button-icon button-info button-about">
+          <span>About</span>
+          <i class="bi bi-info-circle"></i>
+        </button>
+      </div>
+      <div class="index-priority-values"></div>
+    </panel-section>
+  </template>
+
   <template id="analysis-locations-template">
     <panel-section id="analysis-locations-section" collapsible collapsed>
       <h2 slot="title">High priority areas</h2>
@@ -766,11 +826,7 @@
       <footer class="locations-footer">
         <button id="view-all-locations" class="button-icon button-icon-mid" bind-listen="click" bind-func="view_all_locations">
           <i class="bi bi-table"></i>
-          <span>View all</span>
-        </button>
-        <button id="download-locations-data" class="button-icon button-icon-mid" bind-listen="click" bind-func="download_locations_data">
-          <i class="bi bi-download"></i>
-          <span>Download data</span>
+          <span>View or Download data</span>
         </button>
       </footer>
     </panel-section>
@@ -885,7 +941,10 @@
       <content bind-cond="has-basic">
         <table>
           <tr bind-each="basicData">
-            <td bind="label"></td>
+            <td>
+              <span bind="label"></span>
+              <button class="map-info-info-button" bind-cond="has_info_button"><i class="bi-info-circle"></i></button>
+            </td>
             <td bind="value"></td>
           </tr>
         </table>
@@ -906,6 +965,8 @@
       </div>
     </main>
   </template>
+
+  {{template "toast" .}}
 
   <template id="toast-notification-template">
     <div class="toast-icon">
@@ -1101,7 +1162,7 @@
     <div class="modal-footer-bar">
       <button class="button-icon button-icon-mid" bind-listen="click" bind-func="download">
         <i class="bi bi-download"></i>
-        <span>Download all (.csv)</span>
+        <span bind="label"></span>
       </button>
       <div class="info">
         <i class="bi bi-info-circle"></i>
@@ -1156,11 +1217,13 @@
   {{template "env" .}}
 
   <script type="module">
-    import flash from '../lib/flash.js';
     import pgrest from '../lib/pgrest.js';
+    import { show_error } from './toast.js';
 
-    window.FLASH = new flash();
-    window.API = new pgrest(EAE['settings'].database, FLASH);
+    window.API = new pgrest(EAE['settings'].database, {
+      push(e) { show_error(e.title, e.message); return this; },
+      clear() { return this; },
+    });
 
     window.GEOGRAPHY = null;
     window.SNAPSHOT = null;

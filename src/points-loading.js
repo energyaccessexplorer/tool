@@ -100,7 +100,7 @@ width: calc(${g}% - 1.5em);
 };
 
 async function fileload(data) {
-	const a = await analysis_plot_active(STATE.index, false);
+	const a = await analysis_plot_active(STATE.index);
 
 	COORDINATES = d3.csvParseRows(data, d => {
 		const c = [parseFloat(d[0]), parseFloat(d[1])];
@@ -117,7 +117,7 @@ async function fileload(data) {
 };
 
 async function reload() {
-	const a = await analysis_plot_active(STATE.index, false);
+	const a = await analysis_plot_active(STATE.index);
 
 	COORDINATES = COORDINATES.map(c => {
 		const p = coordinates_to_raster_pixel(c.c, {

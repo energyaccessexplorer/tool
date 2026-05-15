@@ -5,10 +5,13 @@ export default class Toast extends HTMLElement {
 	constructor(options) {
 		super();
 
-		const { label, caption } = options;
+		const { label, caption, variant } = options;
 
-		const content = tmpl('#toast-notification-template');
+		const templateId = variant === 'error' ? '#toast-error-template' : '#toast-notification-template';
+		const content = tmpl(templateId);
 		bind(content, { label, caption });
+
+		if (variant === 'error') this.classList.add('error');
 
 		this.append(content);
 	}
@@ -23,3 +26,7 @@ export default class Toast extends HTMLElement {
 }
 
 customElements.define('toast-notification', Toast);
+
+export function show_error(title, caption) {
+	new Toast({ "label": title, "caption": caption ?? '', "variant": 'error' }).show();
+}

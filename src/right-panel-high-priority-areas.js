@@ -47,12 +47,21 @@ import {
 import bind from '../lib/bind.js';
 
 function view_all_locations() {
-	show_modal_table(paginationState.allResults);
+	const area_type_str = area_type(STATE.variant);
+	const analysis_name = EAE['indexes'][STATE.index]['name'];
+	const results = paginationState.allResults;
+
+	show_modal_table(results, {
+		"title":              `High priority areas (${area_type_str})`,
+		"subtitle":           analysis_name,
+		"action_label":       "Download all (.csv)",
+		"column_toggle_hint": "Selected columns will be included in the CSV download",
+		on_download(results, visible_headers) {
+			download_high_priority_areas(results, { visible_headers });
+		},
+	});
 }
 
-function download_locations_data() {
-	download_high_priority_areas(paginationState.allResults);
-}
 
 function format_area_type(variant) {
 	const type = area_type(variant);
@@ -256,7 +265,7 @@ function render_page(page) {
 			return acc;
 		}, {});
 
-		Object.entries(groups).forEach(([score, items]) => {
+		Object.entries(groups).sort(([a], [b]) => Number(b) - Number(a)).forEach(([score, items]) => {
 			const template = tmpl('#location-group-template');
 			const group = template.firstElementChild;
 			group.setAttribute('data-score', score);
@@ -318,7 +327,7 @@ export function get_locations_results() {
 
 export function init() {
 	const analysis_locations = tmpl('#analysis-locations-template');
-	bind(analysis_locations, { download_locations_data, view_all_locations });
+	bind(analysis_locations, { view_all_locations });
 	qs('#analysis-locations').replaceWith(analysis_locations);
 
 	const section = qs('#right-panel #analysis-locations-section');
@@ -327,7 +336,7 @@ export function init() {
 };
 
 async function all_points() {
-	const a = await plot_active(STATE.index, false);
+	const a = await plot_active(STATE.index);
 
 	const points = a.raster.reduce((t,v,i) => {
 		if (v > 0) {

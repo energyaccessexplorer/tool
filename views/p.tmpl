@@ -26,12 +26,16 @@
 
   <body></body>
 
-  <script type="module">
-    import flash from '../lib/flash.js';
-    import pgrest from '../lib/pgrest.js';
+  {{template "toast" .}}
 
-    window.FLASH = new flash();
-    window.API = new pgrest(EAE['settings'].database, FLASH);
+  <script type="module">
+    import pgrest from '../lib/pgrest.js';
+    import { show_error } from '../a/toast.js';
+
+    window.API = new pgrest(EAE['settings'].database, {
+      push(e) { show_error(e.title, e.message); return this; },
+      clear() { return this; },
+    });
   </script>
 
   {{template "env" .}}

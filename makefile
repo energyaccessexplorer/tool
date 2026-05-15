@@ -60,6 +60,7 @@ build-m:
 		${SRC}/user.js \
 		${SRC}/utils.js \
 		${SRC}/tabs.js \
+		${SRC}/toast.js \
 		${SRC}/m.js \
 		${DIST}/m/
 
@@ -126,6 +127,7 @@ build-a:
 		${SRC}/browser.js \
 		${SRC}/session.js \
 		${SRC}/analysis.js \
+		${SRC}/analysis-model-pixel-scale-estimation.js \
 		${SRC}/cards.js \
 		${SRC}/config.js \
 		${SRC}/controls.js \
@@ -144,6 +146,9 @@ build-a:
 		${SRC}/parse.js \
 		${SRC}/output-widget.js \
 		${SRC}/right-panel-graphs.js \
+		${SRC}/right-panel-data-tab.js \
+		${SRC}/right-panel-prioritization-tab.js \
+		${SRC}/right-panel-poi-card.js \
 		${SRC}/right-panel.js \
 		${SRC}/mapbox.js \
 		${SRC}/plot.js \
@@ -216,6 +221,7 @@ build-s:
 		${SRC}/utils.js \
 		${SRC}/browser.js \
 		${SRC}/user.js \
+		${SRC}/toast.js \
 		${SRC}/s.js \
 		${DIST}/s/
 

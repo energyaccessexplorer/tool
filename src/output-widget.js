@@ -82,7 +82,7 @@ function ramp() {
 export function show_eae_info_modal() {
 	new modal({
 		"id":      'eae-info-modal',
-		"header":  "Generate prioritization",
+		"header":  "About Energy Access Explorer prioritization",
 		"content": bind(tmpl('#eae-info-modal-template'), EAE['indexes']),
 		"destroy": true,
 	}).show();
@@ -90,7 +90,15 @@ export function show_eae_info_modal() {
 
 function eae_info_modal() {
 	qs('#eae-info-button').onclick = show_eae_info_modal;
-	bind(qs('#drawer-info'), { "show_info": show_eae_info_modal });
+
+	bind(qs('#drawer-info'), {
+		"show_info": () => new modal({
+			"id":      'disclaimer-modal',
+			"header":  "Disclaimer",
+			"content": tmpl('#disclaimer-template'),
+			"destroy": true,
+		}).show(),
+	});
 };
 
 export function indexes() {

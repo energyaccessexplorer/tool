@@ -35,6 +35,15 @@ function get_feature_indexes() {
 				if (ri !== undefined && ri !== null) {
 					map.set(ri, feature.properties);
 				}
+
+				const ris = feature.properties['__rasterindexes'];
+				if (ris) {
+					for (const idx of ris) {
+						if (idx !== undefined && idx !== null && !map.has(idx)) {
+							map.set(idx, feature.properties);
+						}
+					}
+				}
 			}
 			return { "index": map, dataset };
 		});
@@ -81,7 +90,7 @@ export function value_tree(raster_index) {
 export function get_admin_area_layer_data(variant, area_id) {
 	const fields = [];
 	const props = {};
-	const raw = { "values": {}, "units": {} };
+	const raw = { "values": {}, "units": {}, "aggregations": {} };
 
 	const layer_data = maybe(GEOGRAPHY, 'divisions', variant, 'layerData');
 	if (layer_data) {
@@ -95,18 +104,16 @@ export function get_admin_area_layer_data(variant, area_id) {
 			if (area_result.type === 'points') {
 				value = area_result.value;
 				unit = 'count';
-			} else if (area_result.value === null) {
-				value = 'Not aggregated';
-				unit = '';
 			} else {
 				value = parseFloat(area_result.value.toFixed(2));
-				unit = layer.unit || '';
+				unit = resolve_unit(layer, DST.get(layer_id), value);
 			}
 
 			fields.push([layer_id, layer.name]);
 			props[layer_id] = value;
 			raw.values[layer_id] = value;
 			raw.units[layer_id] = unit;
+			raw.aggregations[layer_id] = layer.aggregation;
 		}
 	}
 
@@ -144,7 +151,7 @@ function analysis_entries(analysis_value, analysis_name, admin_info) {
 		: lowmedhigh_scale;
 
 	return [
-		...(analysis_name ? [{ "label": analysis_name, "value": scale(analysis_value), "raw_value": scale(analysis_value) }] : []),
+		...(analysis_name ? [{ "label": analysis_name, "value": scale(analysis_value), "raw_value": scale(analysis_value), "has_info_button": true }] : []),
 		{ "label": "Priority score", "value": `${(analysis_value * 100).toFixed(1)}%`, "raw_value": analysis_value },
 	];
 }
@@ -155,16 +162,34 @@ function format_coordinates(ll) {
 		: null;
 }
 
+export function admin_location_name(variant, id) {
+	const csv_data = maybe(DST.get('admin-tiers'), 'csv', 'data');
+	if (csv_data) {
+		const tier_col = `TIER${variant}`;
+		 
+		const row = csv_data.find(r => r[tier_col] == id);
+		if (row) {
+			const names = [];
+			for (let i = variant; i >= 1; i--) {
+				const name = maybe(GEOGRAPHY, 'divisions', i, 'csv', 'table', row[`TIER${i}`]);
+				if (name) names.push(name);
+			}
+			names.push(GEOGRAPHY.name);
+			return names.join(', ');
+		}
+	}
+	return [maybe(GEOGRAPHY, 'divisions', variant, 'name'), GEOGRAPHY.name].filter(Boolean).join(', ');
+}
+
 function location_entry(fields, props) {
 	const division_fields = fields.filter(field => field?.[0]?.startsWith('_') && !field[0].includes('analysis'));
 	const values = division_fields
-		.slice(1)
 		.map(field => props[field[0]])
 		.filter(Boolean);
 
-	return values.length
-		? { "label": "Location", "value": values.join(', ') }
-		: null;
+	if (!values.length) return null;
+	values.push(GEOGRAPHY.name);
+	return { "label": "Location", "value": values.join(', ') };
 }
 
 function format_detail(key, label, value, raw, subordinate) {
@@ -177,6 +202,7 @@ function format_detail(key, label, value, raw, subordinate) {
 		"value":       `${formatted} ${display_unit}`.trim(),
 		"raw_value":    raw.values[key],
 		"unit":        unit,
+		"aggregation": raw.aggregations?.[key],
 		"subordinate": subordinate,
 	};
 }
@@ -218,7 +244,11 @@ function layer_detail_entries(fields, props, raw) {
 			? Object.entries(node.children).map(([target, value]) =>
 				format_detail(target, target, value, raw, true),
 			)
-			: [];
+			: (maybe(STATE.datasets.find(d => d.id === layer_id), 'config', 'attributes_map') || [])
+				.map(attr => props[attr.dataset] != null && props[attr.dataset] !== ''
+					? format_detail(attr.target, attr.target, props[attr.dataset], raw, true)
+					: null)
+				.filter(Boolean);
 
 		return [
 			{ ...format_detail(key, label, raw.values[key], raw), ...(children.length ? { "has_subordinates": true } : {}) },
@@ -242,7 +272,9 @@ export function area_info(fields, props, ll, analysis_value, analysis_name, feat
 	const coord = (!admin_info && coordinates && feature)
 		? [{ "label": "Coordinates", "value": coordinates, "raw_value": coordinates }]
 		: [];
-	const location = location_entry(fields, props);
+	const location = admin_info
+		? { "label": "Location", "value": admin_location_name(admin_info.variant, admin_info.id) }
+		: location_entry(fields, props);
 
 	const basicData = [...analysis, ...coord, ...(location ? [location] : [])];
 	const detailedData = [
@@ -282,9 +314,13 @@ function resolve_raster_value(dataset, raw) {
 	return maybe(dataset, 'csv', 'key') ? dataset.csv.table[rounded] : rounded;
 }
 
-function dataset_unit(dataset, value) {
+export function dataset_unit(dataset, value) {
 	return dataset.category.unit
 		|| (Number.isFinite(value) && dataset.vectors ? "km (proximity to)" : null);
+}
+
+export function resolve_unit(layer, dataset, value) {
+	return layer.unit || dataset_unit(dataset, value) || '';
 }
 
 function flatten_value_tree(tree) {

@@ -1,3 +1,5 @@
+import Toast from './toast.js';
+
 import {
 	extract as user_extract,
 } from './user.js';
@@ -70,11 +72,7 @@ function share(snapshots) {
 
 	function copy() {
 		if (!navigator.clipboard) {
-			FLASH.push({
-				"type":    'error',
-				"timeout": 2000,
-				"title":   "Clipboard functionality not available",
-			});
+			new Toast({ "label": "Clipboard functionality not available", "variant": 'error' }).show();
 
 			this.closest('button').remove();
 
@@ -83,11 +81,7 @@ function share(snapshots) {
 
 		navigator.clipboard.writeText(url)
 			.then(_ => {
-				FLASH.push({
-					"type":    'success',
-					"timeout": 2000,
-					"title":   "Link copied!",
-				});
+				new Toast({ "label": "Link copied!" }).show();
 			});
 	};
 
@@ -147,7 +141,7 @@ padding: 7px 12px;
 			},
 		}).then(_ => {
 			div.querySelector('.title').innerText = i.value;
-			API.flash.push({ "message": "Title updated", "type": "success" });
+			new Toast({ "label": "Title updated" }).show();
 		});
 
 		return false;
@@ -169,7 +163,7 @@ function drop(snapshots) {
 		"time": `eq.${s.time}`,
 	}).then(_ => {
 		div.remove();
-		API.flash.push({ "message": `Analysis '${s.title}' deleted.`, "type": "success" });
+		new Toast({ "label": `Analysis '${s.title}' deleted.` }).show();
 	});
 };
 

@@ -3,6 +3,27 @@ import {
 } from './area-analysis.js';
 
 import {
+	update as data_tab_update,
+	clear as data_tab_clear,
+} from './right-panel-data-tab.js';
+
+import {
+	update as prioritization_tab_update,
+	clear as prioritization_tab_clear,
+	update_location_summary,
+	clear_location_summary,
+} from './right-panel-prioritization-tab.js';
+
+import {
+	update as poi_update,
+	clear as poi_clear,
+} from './right-panel-poi-card.js';
+
+import {
+	show_eae_info_modal,
+} from './output-widget.js';
+
+import {
 	tmpl,
 	qs,
 } from '../lib/helpers.js';
@@ -55,8 +76,13 @@ export default class mapinfo extends HTMLElement {
 	render() {
 		const { "data": rawData, onClose } = this.opts;
 
-		const { fields, props, ll, analysis_value, analysis_name, feature_name, "admin_info": info, raw } = rawData;
+		const { fields, props, ll, analysis_value, analysis_name, feature_name, "admin_info": info, raw, raster_index } = rawData;
 		const data = area_info(fields, props, ll, analysis_value, analysis_name, feature_name, info, raw);
+
+		data_tab_update(data.detailedData, info, raster_index);
+		prioritization_tab_update(raster_index, info, analysis_value);
+		update_location_summary(data, info);
+		if (!info) poi_update(ll);
 
 		const content = tmpl('#map-info-template');
 		bind(content, data);
@@ -90,9 +116,24 @@ export default class mapinfo extends HTMLElement {
 
 		const closeButton = qs('.close-button', this);
 		closeButton.onclick = () => {
+			data_tab_clear();
+			prioritization_tab_clear();
+			clear_location_summary();
+			poi_clear();
 			if (onClose) onClose();
 			else this.remove();
 		};
+
+		const infoButton = qs('.map-info-info-button', this);
+		if (infoButton) {
+			infoButton.onclick = () => {
+				show_eae_info_modal();
+				requestAnimationFrame(() => {
+					const target = document.getElementById('prioritization-indexes');
+					if (target) target.scrollIntoView();
+				});
+			};
+		}
 
 		const analyseButton = qs('.analyse-button', this);
 		if (analyseButton) {

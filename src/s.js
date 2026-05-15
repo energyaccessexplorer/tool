@@ -1,3 +1,5 @@
+import Toast from './toast.js';
+
 import {
 	loading,
 	self,
@@ -265,11 +267,7 @@ export async function init() {
 	API.get("geographies", params)
 		.then(r => list(r))
 		.catch(error => {
-			FLASH.push({
-				"type":    'error',
-				"title":   "Fetch error",
-				"message": error,
-			});
+			new Toast({ "label": "Fetch error", "caption": String(error), "variant": 'error' }).show();
 
 			throw error;
 		});

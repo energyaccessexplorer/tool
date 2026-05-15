@@ -22,6 +22,20 @@ import {
 
 import summary_analyse from './summary.js';
 
+import {
+	init as data_tab_init,
+	clear as data_tab_clear,
+} from './right-panel-data-tab.js';
+
+import {
+	clear as prioritization_tab_clear,
+	clear_location_summary,
+} from './right-panel-prioritization-tab.js';
+
+import {
+	clear as poi_clear,
+} from './right-panel-poi-card.js';
+
 import bind from '../lib/bind.js';
 
 import modal from '../lib/modal.js';
@@ -34,6 +48,19 @@ import {
 
 const user_id = user_extract('id');
 
+export function loading_analysis(loading) {
+	qs('#analysis-loading-state').style.display = loading ? 'flex' : 'none';
+	qs('#analysis-sections-wrapper').style.display = 'none';
+	qs('#analysis-blank-state').style.display = 'none';
+	if (loading) {
+		data_tab_clear();
+		prioritization_tab_clear();
+		clear_location_summary();
+		poi_clear();
+		document.querySelectorAll('.right-panel-tab-panel').forEach(p => { p.hidden = true; });
+	}
+}
+
 export function update_analysis(has_data) {
 	const save_button = qs('#save-snapshot-button');
 	const share_button = qs('#share-snapshot-button');
@@ -43,11 +70,25 @@ export function update_analysis(has_data) {
 	if (share_button) share_button.disabled = !has_data;
 	if (download_button) download_button.disabled = !has_data;
 
+	qs('#analysis-loading-state').style.display = 'none';
+
 	const blank_state = qs('#analysis-blank-state');
 	const sections_wrapper = qs('#analysis-sections-wrapper');
 
+	data_tab_clear();
+	prioritization_tab_clear();
+	clear_location_summary();
+	poi_clear();
 	blank_state.style.display = has_data ? 'none' : 'flex';
 	sections_wrapper.style.display = has_data ? 'flex' : 'none';
+
+	document.querySelectorAll('.right-panel-tab-panel').forEach(p => { p.hidden = true; });
+
+	const active_tab = qs('#right-panel-tabs .right-panel-tab.active');
+	if (active_tab) {
+		const target = qs(`#right-panel-tab-${active_tab.dataset.tab}`);
+		if (target) target.hidden = false;
+	}
 }
 
 export async function graphs(raster) {
@@ -89,6 +130,24 @@ export function init() {
 
 	graphs_init();
 
+	const tabs = document.querySelectorAll('#right-panel-tabs .right-panel-tab');
+	tabs.forEach(tab => {
+		tab.onclick = () => {
+			tabs.forEach(t => {
+				t.classList.remove('active');
+				t.setAttribute('aria-selected', 'false');
+			});
+			tab.classList.add('active');
+			tab.setAttribute('aria-selected', 'true');
+
+			document.querySelectorAll('.right-panel-tab-panel').forEach(panel => {
+				panel.hidden = true;
+			});
+			const target = qs(`#right-panel-tab-${tab.dataset.tab}`);
+			if (target) target.hidden = false;
+		};
+	});
+
 	const panel = qs('#right-panel');
 	const header = qs('#right-panel-header');
 	const hide_button = qs('#right-panel-hide');
@@ -107,6 +166,7 @@ export function init() {
 	};
 
 	analysis_locations_panel_init();
+	data_tab_init();
 };
 
 function share_url() {

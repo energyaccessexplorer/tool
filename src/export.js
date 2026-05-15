@@ -16,7 +16,7 @@ import bind from '../lib/bind.js';
 
 import modal from '../lib/modal.js';
 
-import { generate_summary_data } from './summary.js';
+import { generate_summary_data, compute_share_amounts } from './summary.js';
 
 import {
 	pptx,
@@ -30,6 +30,10 @@ import {
 import {
 	get_locations_results,
 } from './right-panel-high-priority-areas.js';
+
+import {
+	show as show_modal_table,
+} from './modal-table-high-priority-areas.js';
 
 import {
 	prepare_tabular_data,
@@ -93,7 +97,7 @@ export function generate_share_csv_content() {
 		for (const k of Object.keys(SUMMARY)) {
 			const name = `${EAE['indexes'][k]['name']} (${label})`;
 			columns.push(name);
-			data.push(SUMMARY[k][type]['amounts'].map(x => Math.round(x)));
+			data.push(compute_share_amounts(SUMMARY[k][type]).amounts);
 		}
 	}
 
@@ -118,7 +122,7 @@ export function download_share_csv() {
 	fake_blob_download(blob, export_filename('population-area-share', 'csv'));
 }
 
-export async function export_all() {
+async function export_all(results, visible_headers) {
 	let cancelled = false;
 
 	const update = (progress) => loading("Generating...", {
@@ -140,9 +144,10 @@ export async function export_all() {
 	let pptx_blob, tiff_blob, high_priority_csv, share_csv;
 	try {
 		[pptx_blob, tiff_blob, high_priority_csv, share_csv] = await Promise.all([
-			pptx().then(p => p.write('blob')),
+			pptx({ results, visible_headers }).then(p => p.write('blob')),
 			analysis(type).then(a => a.tiff),
-			generate_high_priority_areas_csv(get_locations_results(), {
+			generate_high_priority_areas_csv(results, {
+				visible_headers,
 				"onProgress":  (p) => update(20 + (p * 50)),
 				"isCancelled": () => cancelled,
 			}),
@@ -181,15 +186,22 @@ export function show_export_modal() {
 
 	bind(content, {
 		"area_type":  area_type(STATE.variant).toLowerCase(),
-		"export_ppt": async function() {
-			loading("Generating...");
-
-			await delay(0.1);
-			await generate_summary_data();
-			const p = await pptx();
-			p.writeFile({ "filename": export_filename('summary', 'pptx') });
-
-			loading(false);
+		"export_ppt": () => {
+			document.querySelector('#export-options-modal')?.remove();
+			show_modal_table(get_locations_results(), {
+				"title":              "Export PowerPoint presentation",
+				"subtitle":           "Select priority areas columns and rows",
+				"action_label":       "Download .ppt",
+				"column_toggle_hint": "Selected columns will be included in the PowerPoint tables",
+				async on_download(results, visible_headers) {
+					loading("Generating...");
+					await delay(0.1);
+					await generate_summary_data();
+					const p = await pptx({ results, visible_headers });
+					p.writeFile({ "filename": export_filename('summary', 'pptx') });
+					loading(false);
+				},
+			});
 		},
 		"export_tiff": async () => {
 			loading("Generating...");
@@ -198,7 +210,22 @@ export function show_export_modal() {
 			fake_blob_download((await analysis(type)).tiff, export_filename(`${index_slug}-map`, 'tif'));
 			loading(false);
 		},
-		"export_csv":       () => download_high_priority_areas(get_locations_results()),
+		"export_csv":       () => {
+			const area_type_str = area_type(STATE.variant);
+			const analysis_name = EAE['indexes'][STATE.index]['name'];
+			const results = get_locations_results();
+
+			document.querySelector('#export-options-modal')?.remove();
+			show_modal_table(results, {
+				"title":              `High priority areas (${area_type_str})`,
+				"subtitle":           analysis_name,
+				"action_label":       "Download all (.csv)",
+				"column_toggle_hint": "Selected columns will be included in the CSV download",
+				on_download(results, visible_headers) {
+					download_high_priority_areas(results, { visible_headers });
+				},
+			});
+		},
 		"export_share_csv": async () => {
 			loading("Generating...");
 			await generate_summary_data();
@@ -209,7 +236,18 @@ export function show_export_modal() {
 
 	const footer = tmpl('#export-options-modal-footer');
 	bind(footer, {
-		"export_all": () => export_all(),
+		"export_all": () => {
+			document.querySelector('#export-options-modal')?.remove();
+			show_modal_table(get_locations_results(), {
+				"title":              "Download all",
+				"subtitle":           "Select priority areas columns and rows",
+				"action_label":       "Download all (.zip)",
+				"column_toggle_hint": "Selected columns will be included in the CSV and PowerPoint downloads",
+				on_download(results, visible_headers) {
+					export_all(results, visible_headers);
+				},
+			});
+		},
 	});
 
 	const header = ce('span', 'Export options', { "class": 'modal-title' });
@@ -262,13 +300,14 @@ export async function download_high_priority_areas(results, opts = {}) {
 async function generate_high_priority_areas_csv(results, opts = {}) {
 	if (!results || results.length === 0) return '';
 
-	const { onProgress, isCancelled } = opts;
+	const { visible_headers, onProgress, isCancelled } = opts;
 	const { headers, is_raster, analysis_name } = prepare_tabular_data(results);
+	const csv_headers = visible_headers || headers;
 
 	const rows = await build_csv_rows(results, {
-		headers, is_raster, analysis_name, onProgress, isCancelled,
+		"headers": csv_headers, is_raster, analysis_name, onProgress, isCancelled,
 	});
 
 	if (rows === null) return null;
-	return [headers.join(','), ...rows].join('\n');
+	return [csv_headers.join(','), ...rows].join('\n');
 }

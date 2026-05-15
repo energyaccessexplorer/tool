@@ -82,6 +82,7 @@ import {
 
 import {
 	init as right_panel_init,
+	graphs as right_panel_graphs,
 	update_analysis as right_panel_update_analysis,
 } from './right-panel.js';
 
@@ -104,6 +105,8 @@ import DS from './ds.js';
 import admintiers from './admin-tiers.js';
 
 import bubblemessage from '../lib/bubblemessage.js';
+
+export const STANDARD_TABS = new Set(['census', 'demand', 'supply', 'other']);
 
 COMMIT = debounce(function() {
 	if (DEBUG || ENV.includes("test")) console.trace("commit!", ...arguments);
@@ -270,22 +273,22 @@ async function init_1() {
 		"select": ['*', 'parent_sort_branches', 'parent_sort_subbranches', 'parent_sort_datasets'],
 	}, { "one": true });
 
-	MOBILE = screen.width < 1152;
+	// MOBILE= screen.width < 1152;
 
 	GEOGRAPHY.timeline = maybe(GEOGRAPHY, 'configuration', 'timeline');
 	GEOGRAPHY.timeline_dates = maybe(GEOGRAPHY, 'configuration', 'timeline_dates');
 
 	layout();
 
-	const mac = navigator.userAgent.indexOf('Mac') > -1;
+	// const mac = navigator.userAgent.indexOf('Mac') > -1;
 
-	if (!MOBILE && window.devicePixelRatio !== 1) alert(`
-Energy Access Explorer is optimised for display settings that differ from yours.
+	// if (!MOBILE && window.devicePixelRatio !== 1) alert(`
+	// Energy Access Explorer is optimised for display settings that differ from yours.
 
-If the layout feels cramped, try zooming out to ${Math.round(1/window.devicePixelRatio * 100)}%.
+	// If the layout feels cramped, try zooming out to ${Math.round(1/window.devicePixelRatio * 100)}%.
 
-On your OS, you can do this by pressing (${mac ? "⌘" : "ctrl"} −) a couple times.
-`);
+	// On your OS, you can do this by pressing (${mac ? "⌘" : "ctrl"} −) a couple times.
+	// `);
 
 	loading("Initialising mapbox...");
 
@@ -327,6 +330,9 @@ This is fatal. Thanks for all the fish.`;
 		}
 
 		OUTLINE = new DS(json);
+
+		OUTLINE.vectors.fill = 'transparent';
+		OUTLINE.vectors.opacity = 1;
 
 		await OUTLINE.load('vectors');
 		await OUTLINE.load('raster');
@@ -423,6 +429,9 @@ async function init_4() {
 	left_panel("cards");
 
 	output_widget_init();
+
+	await OUTLINE.active(true, true);
+	STATE.datasets = [...STATE.datasets, OUTLINE];
 
 	qs('#left-panel').style.display = '';
 	qs('#left-panel input[id="controls-search"]').focus();
@@ -574,7 +583,7 @@ async function reload(k,v) {
 	function priority_visibility_pick() {
 		const x = variant !== "raster";
 
-		GEOGRAPHY.divisions.forEach((d,i) => {
+		GEOGRAPHY.divisions.forEach((_,i) => {
 			if (MAPBOX.getLayer(`priority-layer-${i}`)) {
 				const t = and(x, STATE.variant === i, output_shown);
 
@@ -590,11 +599,13 @@ async function reload(k,v) {
 		return Promise.all(STATE.datasets.map(x => x.active(true, x.visible)));
 	})();
 
-	const a = await analysis_plot_active(index, true);
+	const a = await analysis_plot_active(index);
 
 	if (GEOGRAPHY.divisions[variant]) {
-		priority(GEOGRAPHY.divisions[variant], a, variant);
+		await priority(GEOGRAPHY.divisions[variant], a, variant);
 	}
+
+	right_panel_graphs(a.raster);
 
 	indexes_list();
 

@@ -594,6 +594,10 @@ export function update() {
 		.map(d => d.card)
 		.filter(c => c);
 
+	const children = [...cards_list.children];
+	if (list.length === children.length && list.every((c, i) => c === children[i]))
+		return;
+
 	if (list.length) sortable(cards_list, 'disable');
 
 	cards_list.append(...list);
@@ -665,6 +669,10 @@ export default class dscard extends HTMLElement {
 			"manual-max":       this.manual_max,
 			"mutant-options":   mutant_options.call(this),
 		}), { "final": false });
+
+		if (this.ds.cannot_deactivate(false)) {
+			qs('[bind-func="close"]', this)?.remove();
+		}
 	};
 
 	disable() {

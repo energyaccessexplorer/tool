@@ -4,7 +4,6 @@ mapbox-gl.js	https://api.mapbox.com/mapbox-gl-js/v2.11.1/mapbox-gl.js
 mapbox-gl.css	https://api.mapbox.com/mapbox-gl-js/v2.11.1/mapbox-gl.css
 html5sortable.js	https://cdn.jsdelivr.net/npm/html5sortable@0.14.0/dist/html5sortable.min.js
 helpers.js	https://gitlab.com/noop.nu/web-toolbelt/-/raw/main/helpers.js
-flash.js	https://gitlab.com/noop.nu/web-toolbelt/-/raw/main/flash.js
 modal.js	https://gitlab.com/noop.nu/web-toolbelt/-/raw/main/modal.js
 nanny.js	https://gitlab.com/noop.nu/web-toolbelt/-/raw/main/nanny.js
 bubblemessage.js	https://gitlab.com/noop.nu/web-toolbelt/-/raw/main/bubblemessage.js

@@ -368,7 +368,7 @@ async function update_top_level_geography() {
 
 		let value, unit;
 		if (area_result.type === 'points') {
-			value = DST.get(id)?.vectors?.data?.features?.length ?? area_result.value;
+			value = area_result.value;
 			unit = 'count';
 		} else {
 			value = layer.aggregation === 'SUM'

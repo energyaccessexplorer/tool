@@ -138,7 +138,7 @@ export default async function run(type) {
 		.reduce((a,c) => ((c.analysis_scale(type) === "key-delta") ? a : c.weight + a), 0);
 
 	if (list.find(l => !maybe(l, 'raster', 'data')))
-		await until((_ => list.filter(d => and(d.on, d.raster, d.analysis, !d.raster.data)).length === 0), Infinity);
+		await until((_ => list.filter(d => d.on && d.raster && d.analysis && !d.raster.data).length === 0), Infinity);
 
 	if (list.length === 1 && full_weight === 0) return { "raster": it };
 
@@ -394,7 +394,7 @@ export async function aggregate_layer_values(division) {
 	const area_ids = [...new Set(divisions.filter(e => e !== -1))];
 
 	const valid_datasets = STATE.datasets
-		.filter(d => and(d.raster, d.raster.data))
+		.filter(d => d.raster?.data)
 		.filter(d => d.category.name !== 'boundaries' && d.category.name !== 'outline');
 
 	const entries = await Promise.all(

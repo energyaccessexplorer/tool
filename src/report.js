@@ -74,7 +74,7 @@ function footer($) {
 
 	$.addText(
 		"ENERGY ACCESS EXPLORER",
-		textopts({ "x": "60%", "y": a4(100, 'y') - (h/2), "color": white, "valign": "middle" }),
+		textopts({ "x": "60%", "y": a4(100, 'y') - h, "w": "38%", "h": h, "color": white, "valign": "middle" }),
 	);
 };
 
@@ -88,12 +88,12 @@ function chapter(number, name) {
 
 	$.addText(
 		number,
-		{ "x": a4(5, 'x') + 0.2, "y": a4(5, 'y') + 0.3, "color": white, "fontSize": 24, "bold": true },
+		{ "x": a4(5, 'x') + 0.2, "y": a4(5, 'y') + 0.1, "w": 0.5, "h": 0.5, "color": white, "fontSize": 24, "bold": true },
 	);
 
 	$.addText(
 		name,
-		{ "color": green, x, "y": a4(50, 'y'), "fontSize": 48, bold },
+		{ "color": green, x, "y": a4(50, 'y'), "w": "90%", "h": 2, "fontSize": 48, bold },
 	);
 
 	footer($);
@@ -102,7 +102,7 @@ function chapter(number, name) {
 function title($, text) {
 	$.addText(
 		text,
-		{ "color": green, x, "y": 0.5, "w": "100%", "fontSize": 22, bold },
+		{ "color": green, x, "y": 0.3, "w": "90%", "h": 0.5, "fontSize": 22, bold },
 	);
 };
 
@@ -120,7 +120,7 @@ function front() {
 
 	$.addText(
 		"ENERGY ACCESS EXPLORER",
-		{ color, "x": "50%", "y": 0.5, bold },
+		{ color, "x": "50%", "y": 0.5, "w": "45%", "h": 0.4, bold },
 	);
 
 	$.addText(
@@ -136,7 +136,7 @@ function front() {
 				"options": { "fontSize": 10 },
 			},
 		],
-		{ color, x, "y": "50%", "w": "100%" },
+		{ color, x, "y": "50%", "w": "90%", "h": 2.5 },
 	);
 
 	$.addText(
@@ -152,12 +152,12 @@ function front() {
 				"options": { "fontSize": 8 },
 			},
 		],
-		{ x, "y": "90%", "fontSize": 10 },
+		{ x, "y": "90%", "w": "70%", "h": 0.8, "fontSize": 10 },
 	);
 
 	$.addText(
 		(new Date()).toDateString(),
-		{ "x": "85%", "y": "90%", "fontSize": 9, bold },
+		{ "x": "85%", "y": "90%", "w": "12%", "h": 0.3, "fontSize": 9, bold },
 	);
 };
 
@@ -169,12 +169,12 @@ function platform_overview() {
 
 	$.addText(
 		"Energy Access Explorer is an online, open-source, interactive platform that uses mapping to visualize the state of energy access in unserved and underserved areas. It analyzes credible and public data to make the connection between the demand and supply of energy. Individuals can create custom analyses on Energy Access Explorer to identify and prioritize areas where energy markets can be expanded.",
-		{ color, x, "y": first_paragraph_y, "fontSize": 12, bold },
+		{ color, x, "y": first_paragraph_y, "w": "90%", "h": 0.9, "fontSize": 12, bold },
 	);
 
 	$.addText(
 		"The use of transparent data and analysis from Energy Access Explorer enables the following:",
-		{ color, x, "y": 3, "fontSize": 12 },
+		{ color, x, "y": 3, "w": "90%", "h": 0.4, "fontSize": 12 },
 	);
 
 	$.addText(
@@ -186,7 +186,7 @@ function platform_overview() {
 				"text": "Analysts and/or decision-makers within energy planning functions (a rural electrification agency, a planning unit of an energy ministry, etc.) can use the tool to improve linking electrification and socioeconomic development to meet people's needs. Energy Access Explorer complements the cost-optimization planning tools these agencies use and provides a bottom-up representation of aspects of affordability and demand. Further, it serves as a database that aggregates up-todate information. This reduces high transaction costs for data aggregation and sharing.",
 			},
 		],
-		textopts({ color, x, "y": 3.5 }),
+		textopts({ color, x, "y": 3.5, "w": "90%", "h": 1.2 }),
 	);
 
 	$.addText(
@@ -198,7 +198,7 @@ function platform_overview() {
 				"text": "Off-grid and mini-grid developers can use the tool to better assess the level of service needed. Understanding where their customers are likely to be located and where there is a concentration of demand will help clean energy entrepreneurs identify market opportunities.",
 			},
 		],
-		textopts({ color, x, "y": 5 }),
+		textopts({ color, x, "y": 5, "w": "90%", "h": 1.2 }),
 	);
 
 	$.addText(
@@ -210,7 +210,7 @@ function platform_overview() {
 				"text": "Analysts and/or decisionmakers within development finance institutions and donors can understand better where to most effectively channel funds into electrification efforts to ensure that no one is left behind.",
 			},
 		],
-		textopts({ color, x, "y": 6 }),
+		textopts({ color, x, "y": 6, "w": "90%", "h": 1.2 }),
 	);
 
 	footer($);
@@ -224,17 +224,17 @@ function how_it_works() {
 
 	$.addText(
 		"Energy Access Explorer (EAE) is an online, open-source, interactive, geospatial platform that enables clean energy entrepreneurs, energy planners, donors, and development-oriented institutions to identify high priority areas where energy access can be expanded. Using spatial data to link energy supply with growing or unmet demand is essential to gaining a better picture of energy access and expanding energy services to those who need it the most.",
-		{ color, x, "y": first_paragraph_y, "fontSize": 12, bold },
+		{ color, x, "y": first_paragraph_y, "w": "90%", "h": 1.2, "fontSize": 12, bold },
 	);
 
 	$.addText(
 		"It is a multi-criteria analysis tool that uses location-specific resource availability and infrastructure data to represent energy supply. It also incorporates demographic data and data on social and productive uses to visualize demand for energy services. Together, these supply and demand indicators enable more comprehensive energy planning. Spatial analysis tools, including multi-criteria analysis, overlays, filters and buffer zones, help users identify and prioritize areas where energy access can be expanded.",
-		{ color, x, "y": 3.5, "fontSize": 12 },
+		{ color, x, "y": 3.5, "w": "90%", "h": 1.2, "fontSize": 12 },
 	);
 
 	$.addText(
 		"The tool incorporates remote sensing data as well as data from global, national, sub-national and census databases that are either publicly available or provided by international partners and local stakeholders. It can host data available in various resolutions, scales and formats allowing for better or new datasets to be incorporated once available. The selection of data is based on a literature review and a survey WRI conducts on the importance of certain datasets in geospatial energy access planning. The list of essential data is reviewed by local stakeholders to ensure the platform is relevant and applicable in the local context.",
-		{ color, x, "y": 5, "fontSize": 12 },
+		{ color, x, "y": 5, "w": "90%", "h": 1.5, "fontSize": 12 },
 	);
 
 	footer($);
@@ -310,7 +310,7 @@ function geography_indexes_left($) {
 
 	$.addText(
 		"Geospatial Analytical Outputs",
-		textopts({ x, "y": 1, bold }),
+		textopts({ x, "y": 1, "w": "45%", "h": 0.4, bold }),
 	);
 
 	let y = 2;
@@ -326,7 +326,7 @@ function geography_indexes_left($) {
 					"text": index['explain'].replace(/\n/g, ' '),
 				},
 			],
-			textopts({ x, y, "w": "45%", "fontSize": 11 }),
+			textopts({ x, y, "w": "45%", "h": 1, "fontSize": 11 }),
 		);
 
 		y += 1.2;
@@ -374,14 +374,14 @@ function geography_indexes_right($) {
 
 	$.addText(
 		`Share of area for each Index (${area_type(STATE.variant)})`,
-		textopts({ "x": "55%", "y": 1.5, bold, "color": green }),
+		textopts({ "x": "55%", "y": 1.5, "w": "40%", "h": 0.4, bold, "color": green }),
 	);
 
 	table('area', 2);
 
 	$.addText(
 		"Share of population for each Index",
-		textopts({ "x": "55%", "y": 4.5, bold, "color": green }),
+		textopts({ "x": "55%", "y": 4.5, "w": "40%", "h": 0.4, bold, "color": green }),
 	);
 
 	table('population-density', 5);
@@ -624,7 +624,7 @@ function analysis_left($, index) {
 
 	$.addText(
 		long_index_texts[index],
-		textopts({ x, "y": 1, bold, "w": "45%" }),
+		textopts({ x, "y": 1, "w": "45%", "h": 1.5, bold }),
 	);
 
 	const s = btoa(new XMLSerializer().serializeToString(analysis_colorscale_svg));
@@ -690,7 +690,7 @@ function analysis_right($, index, rows) {
 
 		$.addText(
 			t,
-			textopts({ x, "y": 4, "w": 2, bold }),
+			textopts({ x, "y": 4, "w": 2, "h": 0.4, bold }),
 		);
 
 		const s = btoa(SUMMARY[index][k]['pie'].svg.outerHTML);
@@ -734,7 +734,12 @@ function toplocations_table(slide_title, columns, rows_data) {
 		})),
 	])];
 
-	$.addTable(rows, textopts({ x, "y": 1, "w": "96%", "colW": [0.5, ...Array(columns.length).fill(null)], border }));
+	const tableWidth = a4(96, 'x');
+	const firstColWidth = 0.5;
+	const remainingColWidth = (tableWidth - firstColWidth) / columns.length;
+	const colW = [firstColWidth, ...Array(columns.length).fill(remainingColWidth)];
+
+	$.addTable(rows, textopts({ x, "y": 1.1, "w": tableWidth, "colW": colW, "rowH": 0.27, border }));
 
 	footer($);
 };

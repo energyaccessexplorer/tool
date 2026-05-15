@@ -473,8 +473,8 @@ async function aggregate_scalar_values(division_raster, dataset, area_ids) {
 			const values = values_by_area[id];
 
 			return [id, {
-				"result": values.length
-					? { "type": 'scalar', "value": aggregate(values, agg_fn) }
+				"result": (values.length || agg_fn === 'SUM')
+					? { "type": 'scalar', "value": values.length ? aggregate(values, agg_fn) : 0 }
 					: null,
 			}];
 		}),

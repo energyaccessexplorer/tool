@@ -153,7 +153,7 @@ async function summary() {
 		for (const k in SUMMARY) {
 			const tr = ce('tr', ce('td', EAE['indexes'][k]['name'], { "class": 'index-name' }));
 			const { amounts } = compute_share_amounts(SUMMARY[k][j]);
-			s.forEach((x,i) => tr.append(ce('td', amounts[i].toLocaleString())));
+			s.forEach((_,i) => tr.append(ce('td', amounts[i].toLocaleString())));
 
 			tbody.append(tr);
 		}

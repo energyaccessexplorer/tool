@@ -87,6 +87,12 @@ function title_p(area) {
 	return p;
 }
 
+function active_geography_name() {
+	return (STATE.divtier > 0 && typeof STATE.subdiv === 'number')
+		? admin_location_name(STATE.divtier, STATE.subdiv)
+		: GEOGRAPHY.name;
+}
+
 function make_title(admin_info, raster_index) {
 	const variant = qs('select#output-variant-select')?.value;
 	const location_selected = admin_info || raster_index != null;
@@ -95,14 +101,14 @@ function make_title(admin_info, raster_index) {
 		const subtitle = ce('p', null, { "class": 'data-tab-subtitle' });
 		subtitle.textContent = 'Click anywhere on the map to see data for that location.';
 		const fragment = document.createDocumentFragment();
-		fragment.append(title_p(GEOGRAPHY.name), subtitle);
+		fragment.append(title_p(active_geography_name()), subtitle);
 		return fragment;
 	} else if (admin_info && variant && variant !== 'raster') {
 		return title_p(admin_location_name(admin_info.variant, admin_info.id));
 	} else if ((GEOGRAPHY.resolution % 1000) === 0) {
-		return title_p(`${GEOGRAPHY.name} at ${GEOGRAPHY.resolution / 1000}km²`);
+		return title_p(`${active_geography_name()} at ${GEOGRAPHY.resolution / 1000}km²`);
 	} else {
-		return title_p(`${GEOGRAPHY.name} at ${GEOGRAPHY.resolution}m²`);
+		return title_p(`${active_geography_name()} at ${GEOGRAPHY.resolution}m²`);
 	}
 }
 
@@ -144,6 +150,14 @@ const cache = {
 	"geo_dist":            new Map(),
 	"national_layer_data": null,
 };
+
+// Set by right-panel.js after each analysis run. Contains layer aggregates computed from
+// the analysis raster mask, so values are clipped to the active geography + active layers.
+let analysis_layer_data = null;
+
+export function set_analysis_layer_data(data) {
+	analysis_layer_data = data;
+}
 
 function count_pixels(raster_data, nodata, mask_data, mask_nodata, mask_id, counts) {
 	let total = 0;
@@ -333,14 +347,22 @@ async function update_top_level_geography() {
 		return;
 	}
 
-	if (!cache.national_layer_data) {
-		if (!OUTLINE?.raster?.data) { set_blank_state(true); return; }
-		const national_raster = OUTLINE.raster.data.map(v => v === OUTLINE.raster.nodata ? -1 : 0);
-		cache.national_layer_data = await aggregate_layer_values({ "raster": { "data": national_raster } });
+	// Prefer analysis-filtered data (set by graphs() after each analysis run).
+	// Falls back to the full outline when no analysis has run yet.
+	let national_layer_data = analysis_layer_data;
+	if (!national_layer_data) {
+		if (!cache.national_layer_data) {
+			if (!OUTLINE?.raster?.data) { set_blank_state(true); return; }
+			const national_raster = OUTLINE.raster.data.map(v => v === OUTLINE.raster.nodata ? -1 : 0);
+			cache.national_layer_data = await aggregate_layer_values({ "raster": { "data": national_raster } });
+		}
+		national_layer_data = cache.national_layer_data;
 	}
 
+	if (!national_layer_data) { set_blank_state(true); return; }
+
 	const detailedData = [];
-	for (const [id, layer] of Object.entries(cache.national_layer_data)) {
+	for (const [id, layer] of Object.entries(national_layer_data)) {
 		const area_result = layer.areas?.[0]?.result;
 		if (!area_result) continue;
 
@@ -349,7 +371,9 @@ async function update_top_level_geography() {
 			value = DST.get(id)?.vectors?.data?.features?.length ?? area_result.value;
 			unit = 'count';
 		} else {
-			value = parseFloat(area_result.value.toFixed(2));
+			value = layer.aggregation === 'SUM'
+				? Math.round(area_result.value)
+				: parseFloat(area_result.value.toFixed(2));
 			unit = resolve_unit(layer, DST.get(id), value);
 		}
 

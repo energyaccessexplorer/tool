@@ -25,7 +25,12 @@ import summary_analyse from './summary.js';
 import {
 	init as data_tab_init,
 	clear as data_tab_clear,
+	set_analysis_layer_data,
 } from './right-panel-data-tab.js';
+
+import {
+	aggregate_layer_values,
+} from './analysis.js';
 
 import {
 	clear as prioritization_tab_clear,
@@ -92,7 +97,13 @@ export function update_analysis(has_data) {
 }
 
 export async function graphs(raster) {
-	const summary = await summary_analyse(raster);
+	// Single computation of layer aggregates for all analysis-valid pixels.
+	// Shared with both summary (for correct population total) and the Data tab.
+	const analysis_mask = { "raster": { "data": raster.map(v => v === -1 ? -1 : 0) } };
+	const layer_data = await aggregate_layer_values(analysis_mask);
+	set_analysis_layer_data(layer_data);
+
+	const summary = await summary_analyse(raster, layer_data);
 
 	const has_population = maybe(summary, 'population-density', 'total') > 0;
 	const has_area = maybe(summary, 'area', 'total') > 0;

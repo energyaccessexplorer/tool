@@ -301,7 +301,7 @@ function make_card(ds, entry, admin_info) {
 	if (entry.value != null) {
 		desc.innerHTML = describe(ds.category.datatype, entry.unit || ds.category.unit, ds.name, entry.value, entry.aggregation ?? ds.category.analysis?.aggregation);
 	} else {
-		desc.append('Data about ', ce('strong', null, { "bind": "name" }), ' in this area.');
+		desc.append('No data available for ', ce('strong', null, { "bind": "name" }), ' in this area.');
 		bind(desc, { "name": ds.name });
 	}
 	body.append(desc);

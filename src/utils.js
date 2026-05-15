@@ -1,3 +1,5 @@
+import Toast from './toast.js';
+
 import {
 	and,
 	ce,
@@ -95,7 +97,7 @@ export function colorscale_svg(stops, height = 16, mouseenter = noop, mouseleave
 	return svg.node();
 };
 
-export function svg_pie(data, outer, inner, colors, inner_text, parse, bubble) {
+export function svg_pie(data, outer, inner, colors, parse, bubble) {
 	if (typeof parse !== 'function')
 		parse = x => (x * 100).toFixed(2);
 
@@ -377,19 +379,39 @@ export function elem_collapse(el, t, open) {
 	}
 };
 
-export function loading(msg, _perc) {
+export function loading(msg, opts) {
 	const el = qs('#app-loading');
 	el.style['display'] = msg ? 'block' : 'none';
 	qs('#loading-message', el).innerText = (typeof msg === 'string') ? msg : "Loading...";
+
+	const progress_el = qs('#loading-progress', el);
+	const cancel_el = qs('#loading-cancel', el);
+
+	if (!msg || !opts) {
+		progress_el.style.display = 'none';
+		cancel_el.style.display = 'none';
+		cancel_el.onclick = null;
+		return;
+	}
+
+	if (typeof opts.progress === 'number') {
+		progress_el.style.display = '';
+		progress_el.innerText = `${Math.round(opts.progress)}%`;
+	} else {
+		progress_el.style.display = 'none';
+	}
+
+	if (typeof opts.cancel === 'function') {
+		cancel_el.style.display = '';
+		cancel_el.onclick = opts.cancel;
+	} else {
+		cancel_el.style.display = 'none';
+		cancel_el.onclick = null;
+	}
 };
 
-export function super_error(t, m, e = "error") {
-	FLASH.push({
-		"type":    e,
-		"timeout": 0,
-		"title":   t,
-		"message": m,
-	});
+export function super_error(t, m) {
+	new Toast({ "label": t, "caption": m ?? '', "variant": 'error' }).show();
 
 	const l = qs('#app-loading');
 	qs('.spinner', l).style.animation = 'none';
@@ -530,3 +552,38 @@ export function extent_contained(extent, raster) {
 export function bi_icon(v) {
 	return ce('i', null, { "class": "bi-" + v });
 };
+
+export function copy_to_clipboard(url, button) {
+	if (!navigator.clipboard) {
+		new Toast({ "label": "Clipboard functionality not available", "variant": 'error' }).show();
+
+		button.remove();
+		return;
+	}
+
+	navigator.clipboard.writeText(url)
+		.then(_ => {
+			const icon = button.querySelector('i');
+			const text = button.querySelector('span');
+
+			icon.className = 'bi bi-check-lg';
+			text.textContent = 'Copied';
+			button.classList.add('copied');
+
+			setTimeout(() => {
+				icon.className = 'bi bi-copy';
+				text.textContent = 'Copy link';
+				button.classList.remove('copied');
+			}, 5000);
+		});
+};
+
+export function area_type(variant) {
+	if (variant === 'raster') {
+		const r = GEOGRAPHY.resolution;
+		return (r % 1000) === 0 ? (r / 1000) + 'km²' : r + 'm²';
+	} else {
+		return GEOGRAPHY.divisions[variant]?.name || 'areas';
+	}
+}
+

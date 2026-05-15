@@ -1,30 +1,30 @@
-import {
-	coordinates_to_raster_pixel,
-} from './utils.js';
+import { compute_share_amounts } from './summary.js';
 
 import '../lib/jszip.js';
 
 import '../lib/pptxgen.js';
 
 import {
-	context,
-} from './complicated.js';
-
-import {
 	analysis_colorscale,
 	analysis_colorscale_svg,
 	medhigh_point_count,
-	getpoints as toplocations_fetch,
 } from './analysis.js';
 
 import {
-	coords_search_pois,
-} from './mapbox.js';
+	get_locations_results,
+} from './right-panel-high-priority-areas.js';
+
+import {
+	prepare_tabular_data,
+	generate_rows,
+} from './area-analysis.js';
+
+import {
+	area_type,
+} from './utils.js';
 
 import {
 	and,
-	coalesce,
-	maybe,
 	or,
 } from '../lib/helpers.js';
 
@@ -359,7 +359,7 @@ function geography_indexes_right($) {
 
 			r.push({ "text": EAE['indexes'][k]['name'], "options": { bold } });
 
-			r.push(...SUMMARY[k][c]['amounts'].map(i => ({ "text": Math.round(i).toLocaleString() })));
+			r.push(...compute_share_amounts(SUMMARY[k][c]).amounts.map(i => ({ "text": i.toLocaleString() })));
 
 			rows.push(r);
 		}
@@ -373,7 +373,7 @@ function geography_indexes_right($) {
 	);
 
 	$.addText(
-		"Share of area for each Index in km²",
+		`Share of area for each Index (${area_type(STATE.variant)})`,
 		textopts({ "x": "55%", "y": 1.5, bold, "color": green }),
 	);
 
@@ -404,8 +404,6 @@ function analysis(index) {
 	const pop = DST.get('population-density');
 	const pop_data = pop.raster.data;
 
-	const e = (1000/GEOGRAPHY.resolution)**2;
-
 	let right_rows = [];
 	switch (index) {
 	case 'demand': {
@@ -420,7 +418,7 @@ function analysis(index) {
 		right_rows = [
 			row({
 				"text":  "Population where demand is medium-high or high",
-				"value": Math.round(population_demand / e),
+				"value": Math.round(population_demand),
 			}),
 		];
 
@@ -498,7 +496,7 @@ function analysis(index) {
 			right_rows.push(
 				row({
 					"text":  "Aproximate amount of people living with 1km of an electricity line",
-					"value": Math.round(population_lines / e),
+					"value": Math.round(population_lines),
 				}),
 			);
 		}
@@ -582,7 +580,7 @@ function analysis(index) {
 		right_rows = [
 			row({
 				"text":  "Aproximate amount of people living in the area covered by the analysis",
-				"value": Math.round(population_count / e),
+				"value": Math.round(population_count),
 			}),
 		];
 
@@ -590,7 +588,7 @@ function analysis(index) {
 			right_rows.push(
 				row({
 					"text":  "Aproximate amount of people living with 1km of an electricity line",
-					"value": Math.round(population_lines / e),
+					"value": Math.round(population_lines),
 				}),
 			);
 		}
@@ -707,185 +705,41 @@ function analysis_right($, index, rows) {
 	}
 };
 
-async function toplocation_prepare(t) {
-	const r = {};
-
-	for (const k in SUMMARY)
-		r[k] = SUMMARY[k].raw_raster[t.i];
-
-	const poi = await coords_search_pois({ "coords": t.c, "limit": 1 });
-
-	return Object.assign(
-		r,
-		context(coordinates_to_raster_pixel(t.c))[1],
-		{
-			"long": t.c[0],
-			"lat":  t.c[1],
-			"poi":  maybe(poi, 0, 'name'),
-		},
-	);
-};
-
-function toplocations_list(points) {
+function toplocations_table(slide_title, columns, rows_data) {
 	const $ = this.addSlide();
 
 	const border = tableborder;
 
-	title($, `Locations with highest ${STATE.index.toUpperCase()} Index`);
-
-	const divs = GEOGRAPHY.divisions.slice(1).map(d => d.name);
-
-	const vtot = v => d3.scaleQuantile()
-		.domain([0,1])
-		.range(["low", "low-med", "medium", "med-high", "high"])(v);
-
-	const color = v => d3.rgb(...analysis_colorscale.fn(v)).formatHex();
-
-	const font = v => v > 0.80 ? black : white;
-
-	// const path = p => divs.map(d => p["_" + d]).join(" → ");
-	//
-	function row(p,i) {
-		return [
-			{
-				"text":    i+1,
-				"options": { bold, "align": "right", "fontSize": 10, "fontFace": "monospace" },
-			},
-			...divs.map(t => ({
-				"text":    p["_" + t],
-				"options": { "fontSize": 9 },
-			})),
-			{
-				"text":    p.poi,
-				"options": { "align": "left", "fontSize": 8, "fontFace": "monospace" },
-			}, {
-				"text":    `[${(p.long).toFixed(4)}, ${(p.lat).toFixed(4)}]`,
-				"options": { "align": "center", "fontSize": 8, "fontFace": "monospace" },
-			}, {
-				"text":    vtot(p.eai),
-				"options": { bold, "align": "center", "fontSize": 9, "color": font(p.eai), "fill": { "color": color(p.eai) } },
-			}, {
-				"text":    vtot(p.ani),
-				"options": { bold, "align": "center", "fontSize": 9, "color": font(p.ani), "fill": { "color": color(p.ani) } },
-			}, {
-				"text":    vtot(p.demand),
-				"options": { bold, "align": "center", "fontSize": 9, "color": font(p.demand), "fill": { "color": color(p.demand) } },
-			}, {
-				"text":    vtot(p.supply),
-				"options": { bold, "align": "center", "fontSize": 9, "color": font(p.supply), "fill": { "color": color(p.supply) } },
-			},
-		];
-	};
+	title($, slide_title);
 
 	const header = [
 		{
 			"text":    "#",
-			"options": textopts({ "align": "right", bold }),
+			"options": textopts({ "align": "right", bold, "fontSize": 8 }),
 		},
-		...divs.map(t => ({
-			"text":    t,
-			"options": textopts({ "align": "center", bold }),
+		...columns.map(name => ({
+			"text":    name.replace(/\b\w/g, c => c.toUpperCase()),
+			"options": textopts({ "align": "center", bold, "fontSize": 8 }),
 		})),
-		{
-			"text":    "POI",
-			"options": textopts({ "align": "center", bold }),
-		}, {
-			"text":    "Long/Lat",
-			"options": textopts({ "align": "center", bold }),
-		}, {
-			"text":    "EAI",
-			"options": textopts({ "align": "center", bold }),
-		}, {
-			"text":    "ANI",
-			"options": textopts({ "align": "center", bold }),
-		}, {
-			"text":    "Demand",
-			"options": textopts({ "align": "center", bold }),
-		}, {
-			"text":    "Supply",
-			"options": textopts({ "align": "center", bold }),
-		},
 	];
 
-	const rows = [header, ...points.map((p,i) => row(p,i))];
-
-	$.addTable(rows, textopts({ x, "y": 1, "w": "96%", "colW": [0.5, ...Array(divs.length).fill(1.5), 2, 2, 1, 1, 1, 1], border }));
-
-	footer($);
-};
-
-function toplocations_index(index, points) {
-	const $ = this.addSlide();
-
-	const border = tableborder;
-
-	title($, `High Priority Locations for Energy Interventions (${EAE['indexes'][index]['name']} Info)`);
-
-	const datasets = STATE.datasets.filter(d => d.index === index);
-
-	const divs = GEOGRAPHY.divisions.slice(1).map(d => d.name);
-
-	const cell = (p,d) => {
-		let t = p[d.id];
-
-		if (t) {
-			t = t
-				.replace(/<\/?code>/g, '')
-				.replace(d.category.unit || "", "")
-				.replace("km (proximity to)", "");
-		}
-
-		return {
-			"text":    coalesce(t, ""),
-			"options": { "align": "center", "fontSize": 8, "fontFace": "monospace", "fill": "#F5FAF8" },
-		};
-	};
-
-	const numcell = t => ({
-		"text":    t+1,
-		"options": { "align": "right", "fontFace": "monospace", bold, "fontSize": 10 },
-	});
-
-	const header = [
+	const rows = [header, ...rows_data.map((row, i) => [
 		{
-			"text":    "#",
-			"options": { "align": "right", bold },
+			"text":    i + 1,
+			"options": { "align": "right", "fontSize": 8, "fontFace": "monospace" },
 		},
-		...divs.map(t => ({
-			"text":    t,
-			"options": textopts({ bold, "align": "center", "fontSize": 9 }),
+		...columns.map(col => ({
+			"text":    row[col] != null ? String(row[col]) : "",
+			"options": { "align": "center", "fontSize": 7 },
 		})),
-		{
-			"text":    "Long/Lat",
-			"options": textopts({ bold, "align": "center", "fontSize": 9 }),
-		},
-	].concat(datasets.map(d => ({
-		"text":    d.name + "\n\n" + (d.category.unit || "km (proximity to)"),
-		"options": { "align": "center", "valign": "middle", "fill": "#F0F5F3", "fontFace": "monospace", "fontSize": 6, bold },
-	})));
+	])];
 
-	const rows = [header];
-
-	rows.push(...points.map((p,i) => [
-		numcell(i),
-		...divs.map(t => {
-			return {
-				"text":    p["_" + t],
-				"options": { "fontSize": 7 },
-			};
-		}),
-		{
-			"text":    `[${(p.long).toFixed(4)}, ${(p.lat).toFixed(4)}]`,
-			"options": { "align": "center", "fontSize": 7, "fontFace": "monospace" },
-		},
-	].concat(datasets.map(d => cell(p,d)))));
-
-	$.addTable(rows, textopts({ x, "y": 1, "w": "96%", "colW": [0.5, ...Array(divs.length).fill(1.5), 1.5, ...Array(datasets.length).fill(1)], border }));
+	$.addTable(rows, textopts({ x, "y": 1, "w": "96%", "colW": [0.5, ...Array(columns.length).fill(null)], border }));
 
 	footer($);
 };
 
-export async function pptx() {
+export async function pptx(opts = {}) {
 	const p = new PptxGenJS();
 
 	p.defineLayout({ "name": "A4", "width": a4(100, 'x'), "height": a4(100, 'y') });
@@ -914,16 +768,28 @@ export async function pptx() {
 	}
 
 	{
-		chapter.call(p, "" + (c++), "Top Locations");
+		const area_label = area_type(STATE.variant);
+		const is_admin = STATE.variant !== 'raster';
+		chapter.call(p, "" + (c++), is_admin ? `Top ${area_label}` : "Top Locations");
 
-		const points = await toplocations_fetch(N_POINTS)
-			.then(r => r.slice(0, N_POINTS))
-			.then(async r => await Promise.all(r.map(async t => await toplocation_prepare(t))));
+		const results = (opts.results || get_locations_results()).slice(0, N_POINTS);
 
-		toplocations_list.call(p, points);
-		toplocations_index.call(p, 'demand', points);
-		toplocations_index.call(p, 'supply', points);
+		if (results.length) {
+			const { headers, is_raster, analysis_name, column_meta } = prepare_tabular_data(results);
+			const rows = [...generate_rows(results, is_raster, analysis_name, 0, results.length)];
+
+			const FIXED = ['Priority score', analysis_name, 'Latitude', 'Longitude'];
+			const admin_cols = headers.filter(h => column_meta.get(h)?.locked && !FIXED.includes(h));
+			const fixed_cols = FIXED.filter(h => headers.includes(h));
+			const columns = [...fixed_cols, ...admin_cols];
+
+			const slide_title = is_admin
+				? `${area_label} with highest ${STATE.index.toUpperCase()} Index`
+				: `Locations with highest ${STATE.index.toUpperCase()} Index`;
+			toplocations_table.call(p, slide_title, columns, rows);
+		}
 	}
 
-	p.writeFile({ "filename": null });
+	return p;
 };
+

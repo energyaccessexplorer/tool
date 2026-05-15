@@ -47,23 +47,50 @@ body {
 
 #right-panel {
   position: absolute;
-  top: 20px;
-  right: 20px;
-
+  top: 0;
+  right: 0;
+  width: 366px;
+  height: calc(100vh - 5em);
   display: flex;
-  flex-flow: column nowrap;
-  width: 24em;
+  flex-direction: column;
+  background-color: white;
+  transition: transform 0.3s ease;
+}
+
+#right-panel-header,
+#right-panel-footer {
+  flex-shrink: 0;
+  background-color: white;
+}
+
+#right-panel-header {
+  padding: 16px 16px 8px 16px;
+  border-bottom: 1px solid #E7E6E6;
+}
+
+#right-panel-content {
+  flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+}
+
+#right-panel-footer {
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  gap: 12px;
+  height: 64px;
+  border-top: 1px solid #E7E6E6;
+  z-index: 2;
 }
 
 #right-panel .graphs {
   padding: 0 0.5em;
 }
 
-#filtered-pane,
-#index-graphs {
-  border-top: 1px solid lightgray;
-}
 
 #cards-list {
   flex-grow: 1;
@@ -103,24 +130,6 @@ body {
 
 [bind=help-message] {
   display: none;
-}
-
-#disclaimer-message {
-  display: none;
-  position: absolute;
-  background-color: #141414;
-  right: 0;
-  bottom: 0;
-  padding-right: 2em;
-}
-
-#disclaimer-message p {
-  color: #f1f1f1;
-  white-space: pre;
-}
-
-#drawer-right-panel > div:hover #disclaimer-message {
-  display: block;
 }
 
 #mapbox-container {

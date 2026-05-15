@@ -1,14 +1,15 @@
+import { copy_to_clipboard } from './utils.js';
+import { show_export_modal } from './export.js';
+
 import {
-	svg_pie,
-} from './utils.js';
+	init as graphs_init,
+	graphs as render_graphs,
+} from './right-panel-graphs.js';
 
-import bind from '../lib/bind.js';
-
-import modal from '../lib/modal.js';
-
-import summary_analyse from './summary.js';
-
-import bubblemessage from '../lib/bubblemessage.js';
+import {
+	init as analysis_locations_panel_init,
+	update as analysis_locations_panel_update,
+} from './right-panel-high-priority-areas.js';
 
 import {
 	extract as user_extract,
@@ -16,91 +17,94 @@ import {
 } from './user.js';
 
 import {
-	analysis,
-	analysis_colorscale,
-	analysis_colorscale_svg,
-} from './analysis.js';
-
-import {
 	snapshot,
 } from  './session.js';
 
+import summary_analyse from './summary.js';
+
 import {
-	and,
-	ce,
-	fake_blob_download,
+	init as data_tab_init,
+	clear as data_tab_clear,
+} from './right-panel-data-tab.js';
+
+import {
+	clear as prioritization_tab_clear,
+	clear_location_summary,
+} from './right-panel-prioritization-tab.js';
+
+import {
+	clear as poi_clear,
+} from './right-panel-poi-card.js';
+
+import bind from '../lib/bind.js';
+
+import modal from '../lib/modal.js';
+
+import {
 	maybe,
 	qs,
 	tmpl,
 } from '../lib/helpers.js';
 
-const PIES = {};
+const user_id = user_extract('id');
 
-const bubble = (v,e) => new bubblemessage({ "message": v + "%", "position": "C", "close": false, "noevents": true }, e);
+export function loading_analysis(loading) {
+	qs('#analysis-loading-state').style.display = loading ? 'flex' : 'none';
+	qs('#analysis-sections-wrapper').style.display = 'none';
+	qs('#analysis-blank-state').style.display = 'none';
+	if (loading) {
+		data_tab_clear();
+		prioritization_tab_clear();
+		clear_location_summary();
+		poi_clear();
+		document.querySelectorAll('.right-panel-tab-panel').forEach(p => { p.hidden = true; });
+	}
+}
+
+export function update_analysis(has_data) {
+	const save_button = qs('#save-snapshot-button');
+	const share_button = qs('#share-snapshot-button');
+	const download_button = qs('#tiff-download');
+
+	if (save_button) save_button.disabled = !has_data;
+	if (share_button) share_button.disabled = !has_data;
+	if (download_button) download_button.disabled = !has_data;
+
+	qs('#analysis-loading-state').style.display = 'none';
+
+	const blank_state = qs('#analysis-blank-state');
+	const sections_wrapper = qs('#analysis-sections-wrapper');
+
+	data_tab_clear();
+	prioritization_tab_clear();
+	clear_location_summary();
+	poi_clear();
+	blank_state.style.display = has_data ? 'none' : 'flex';
+	sections_wrapper.style.display = has_data ? 'flex' : 'none';
+
+	document.querySelectorAll('.right-panel-tab-panel').forEach(p => { p.hidden = true; });
+
+	const active_tab = qs('#right-panel-tabs .right-panel-tab.active');
+	if (active_tab) {
+		const target = qs(`#right-panel-tab-${active_tab.dataset.tab}`);
+		if (target) target.hidden = false;
+	}
+}
 
 export async function graphs(raster) {
-	const t = await summary_analyse(raster);
+	const summary = await summary_analyse(raster);
 
-	const e = (1000/GEOGRAPHY.resolution)**2;
+	const has_population = maybe(summary, 'population-density', 'total') > 0;
+	const has_area = maybe(summary, 'area', 'total') > 0;
+	update_analysis(has_population || has_area);
 
-	const outline_raster = DST.get('outline').raster;
-	const outline_cover = outline_raster.data.filter(x => x != outline_raster.nodata).length;
-	const f = GEOGRAPHY.area ? (GEOGRAPHY.area / outline_cover) : (1/e);
-
-	let g = maybe(t, 'population-density'); if (g) {
-		g['distribution'].forEach((x,i) => PIES['population']['data'][i].push(x));
-
-		PIES['population'].change(1);
-
-		qs('#population-number').innerHTML = Math.round(g['total']).toLocaleString() + "&nbsp;" + "people";
-
-		g['distribution'].forEach((x,i) => PIES['population']['data'][i].shift());
-	} else {
-		const pn = qs('#population-number');
-		if (pn) pn.closest('.index-graphs-group').remove();
-	}
-
-	g = maybe(t, 'area'); if (g) {
-		g['distribution'].forEach((x,i) => PIES['area']['data'][i].push(x));
-
-		PIES['area'].change(1);
-
-		qs('#area-number').innerHTML = Math.round(g['total'] * f).toLocaleString() + "&nbsp;" + "km<sup>2</sup>";
-
-		g['distribution'].forEach((x,i) => PIES['area']['data'][i].shift());
-	} else {
-		const an = qs('#area-number');
-		if (an) an.closest('.index-graphs-group').remove();
-	}
+	render_graphs(summary);
+	analysis_locations_panel_update();
 };
 
 export function init() {
-	PIES["population"] = svg_pie([[0], [0], [0], [0], [0]], 70, 0, analysis_colorscale.stops, null, null, bubble);
-	PIES["area"]       = svg_pie([[0], [0], [0], [0], [0]], 70, 0, analysis_colorscale.stops, null, null, bubble);
-
-	const user_id = user_extract('id');
-
-	const r = bind(tmpl('#ramp'), {
-		"left":   "Low",
-		"middle": "Medium",
-		"right":  "High",
-	});
-
-	const scale = ce('div', null, { "class": 'index-graphs-scale' });
-	scale.append(analysis_colorscale_svg.cloneNode(true), r);
-
 	const snap = qs('#save-snapshot-button');
-	snap.onclick = _ => {
-		if (snapshot())
-			qs('span', snap).innerText = "Update Analysis";
-	};
-
-	const suid = maybe(SNAPSHOT, 'user_id');
-
-	if (and(suid, suid !== SELF.id))
-		qs('span', snap).innerText = "Duplicate Analysis";
-	else if (and(suid, suid === SELF.id))
-		qs('span', snap).innerText = "Update Analysis";
+	snap.onclick = _ => { snapshot(); };
 
 	const share = qs('#share-snapshot-button');
 	share.onclick = _ => {
@@ -109,32 +113,60 @@ export function init() {
 		if (u.searchParams.get('snapshot')) {
 			share_url();
 			return;
-
 		}
-		if (snapshot(share_url))
-			qs('span', snap).innerText = "Update Analysis";
+
+		snapshot(share_url);
 	};
 
 	const download = qs('#tiff-download');
-	download.onclick = async _ => {
+	download.onclick = _ => {
 		if (!user_id) {
 			register_login();
 			return;
 		}
 
-		const type = STATE.index;
-		fake_blob_download((await analysis(type)).tiff, `energyaccessexplorer-${type}.tif`);
+		show_export_modal();
 	};
 
-	const graphs = tmpl('#index-graphs-container-template');
+	graphs_init();
 
-	qs('.index-graphs-group #area-number', graphs).parentElement.append(PIES['area'].svg);
-	qs('.index-graphs-group #population-number', graphs).parentElement.append(PIES['population'].svg);
+	const tabs = document.querySelectorAll('#right-panel-tabs .right-panel-tab');
+	tabs.forEach(tab => {
+		tab.onclick = () => {
+			tabs.forEach(t => {
+				t.classList.remove('active');
+				t.setAttribute('aria-selected', 'false');
+			});
+			tab.classList.add('active');
+			tab.setAttribute('aria-selected', 'true');
 
-	qs('#index-graphs').append(graphs, scale);
+			document.querySelectorAll('.right-panel-tab-panel').forEach(panel => {
+				panel.hidden = true;
+			});
+			const target = qs(`#right-panel-tab-${tab.dataset.tab}`);
+			if (target) target.hidden = false;
+		};
+	});
 
-	const collapse = qs('#right-panel-collapse');
-	collapse.onclick = toggle.bind(qs('#right-panel'));
+	const panel = qs('#right-panel');
+	const header = qs('#right-panel-header');
+	const hide_button = qs('#right-panel-hide');
+	const show_button = qs('#right-panel-show');
+
+	hide_button.onclick = () => {
+		panel.setAttribute('closed', '');
+		header.style.display = 'none';
+		show_button.style.display = 'flex';
+	};
+
+	show_button.onclick = () => {
+		panel.removeAttribute('closed');
+		header.style.display = 'block';
+		show_button.style.display = 'none';
+	};
+
+	analysis_locations_panel_init();
+	data_tab_init();
 };
 
 function share_url() {
@@ -144,30 +176,7 @@ function share_url() {
 	const id = u.searchParams.get('snapshot');
 	const url = `${u.protocol}//${u.hostname}${window.BASE}/tool/p?${id}`;
 
-	function copy() {
-		if (!navigator.clipboard) {
-			FLASH.push({
-				"type":    'error',
-				"timeout": 2000,
-				"title":   "Clipboard functionality not available",
-			});
-
-			this.closest('button').remove();
-
-			return;
-		}
-
-		navigator.clipboard.writeText(url)
-			.then(_ => {
-				FLASH.push({
-					"type":    'success',
-					"timeout": 2000,
-					"title":   "Link copied!",
-				});
-			});
-	};
-
-	bind(c, { url, copy });
+	bind(c, { url, "copy": function() { copy_to_clipboard(url, this); } });
 
 	new modal({
 		"id":      'share-link-modal',
@@ -175,21 +184,4 @@ function share_url() {
 		"content": c,
 		"destroy": true,
 	}).show();
-};
-
-export function updated_plot(type, index) {
-	qs('#index-graphs-title').innerText = index['name'];
-	qs('#index-graphs-subtext').innerText = index['subtext'];
-};
-
-function toggle() {
-	const caret = this.querySelector('#right-panel-collapse span');
-
-	if (this.getAttribute('closed') === '') {
-		this.removeAttribute('closed');
-		caret.className = 'bi-caret-up-fill';
-	} else {
-		this.setAttribute('closed', '');
-		caret.className = 'bi-caret-down-fill';
-	}
 };

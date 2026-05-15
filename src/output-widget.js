@@ -79,17 +79,26 @@ function ramp() {
 	);
 };
 
-function eae_info_modal() {
-	const b = qs('#eae-info-button');
+export function show_eae_info_modal() {
+	new modal({
+		"id":      'eae-info-modal',
+		"header":  "About Energy Access Explorer prioritization",
+		"content": bind(tmpl('#eae-info-modal-template'), EAE['indexes']),
+		"destroy": true,
+	}).show();
+}
 
-	b.onclick = function() {
-		new modal({
-			"id":      'eae-info-modal',
-			"header":  "Generate prioritization",
-			"content": bind(tmpl('#eae-info-modal-template'), EAE['indexes']),
+function eae_info_modal() {
+	qs('#eae-info-button').onclick = show_eae_info_modal;
+
+	bind(qs('#drawer-info'), {
+		"show_info": () => new modal({
+			"id":      'disclaimer-modal',
+			"header":  "Disclaimer",
+			"content": tmpl('#disclaimer-template'),
 			"destroy": true,
-		}).show();
-	};
+		}).show(),
+	});
 };
 
 export function indexes() {

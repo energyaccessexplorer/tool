@@ -14,7 +14,7 @@ let ul, input, resultscontainer;
 
 let ds, resultsinfo, attr, searchable, searchable_attrs;
 
-function pointto(f, a = false) {
+function pointto(f, centerPointer = false) {
 	const t = MAPBOX.querySourceFeatures(ds.id, {
 		"filter": ['==', attr, f.properties[attr] || "<justnotnull>"],
 	});
@@ -33,7 +33,7 @@ function pointto(f, a = false) {
 	const dict = [[ "name", ds.name ]];
 	const props = { "name": f.properties[attr] };
 
-	search_pointto([x,y], dict, props, a);
+	search_pointto([x,y], dict, props, centerPointer);
 };
 
 async function reset() {

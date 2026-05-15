@@ -7,6 +7,8 @@ import bubblemessage from '../lib/bubblemessage.js';
 import analysis_run, {
 	analysis_colorscale,
 	analysis_colorscale_svg,
+	division_averages,
+	priority_scale,
 } from './analysis.js';
 
 import {
@@ -38,9 +40,64 @@ import {
 	tmpl,
 } from '../lib/helpers.js';
 
-async function summary() {
+function variant_raster(raster) {
+	const division = (STATE.variant !== "raster") ? GEOGRAPHY.divisions[STATE.variant] : null;
+	const areas = division?.raster?.data ? division_averages(raster, division.raster.data) : null;
+	const n = analysis_colorscale.stops.length;
+	const scale = areas ? priority_scale(areas, analysis_colorscale.stops.map((_, i) => i / (n - 1))) : null;
+
+	if (scale) {
+		return Float32Array.from(raster, (_, i) => {
+			const id = division.raster.data[i];
+			if (id !== -1 && id in areas) {
+				return scale(areas[id].average);
+			} else {
+				return -1;
+			}
+		});
+	} else {
+		return raster;
+	}
+}
+
+export async function generate_summary_data() {
 	const pop = DST.get('population-density');
 	await pop.load('raster');
+
+	SUMMARY = {};
+
+	const bubble = (v,e) => new bubblemessage({ "message": v + "%", "position": "C", "close": false, "noevents": true }, e);
+
+	async function get_summary(idxn) {
+		const raster = (await analysis_run(idxn)).raster;
+
+		SUMMARY[idxn] = await analyse(raster);
+		SUMMARY[idxn]['raw_raster'] = raster;
+
+		const ppie = svg_pie(SUMMARY[idxn]['population-density']['distribution'].map(x => [x]), 75, 0, analysis_colorscale.stops, null, bubble);
+		const apie = svg_pie(SUMMARY[idxn]['area']['distribution'].map(x => [x]), 75, 0, analysis_colorscale.stops, null, bubble);
+
+		ppie.change(0);
+		apie.change(0);
+
+		const c = qs('#canvas-' + idxn) || ce('canvas', null, { "id": 'canvas-' + idxn});
+		c.style.display = 'none';
+		document.body.append(c);
+
+		plot_outputcanvas(variant_raster(raster), c);
+
+		SUMMARY[idxn]['canvas'] = c;
+		SUMMARY[idxn]['population-density']['pie'] = ppie;
+		SUMMARY[idxn]['area']['pie'] = apie;
+	}
+
+	await Promise.all(Object.keys(EAE['indexes']).map(i => get_summary(i)));
+
+	return SUMMARY;
+}
+
+async function summary() {
+	await generate_summary_data();
 
 	const content = ce('div');
 
@@ -53,21 +110,12 @@ async function summary() {
 		"right":  "High",
 	});
 
-	SUMMARY = {};
-
 	const scale = ce('div');
 	scale.append(analysis_colorscale_svg.cloneNode(true), r);
 
-	const bubble = (v,e) => new bubblemessage({ "message": v + "%", "position": "C", "close": false, "noevents": true }, e);
-
-	async function get_summaries(idxn) {
-		const raster = (await analysis_run(idxn)).raster;
-
-		SUMMARY[idxn] = await analyse(raster);
-		SUMMARY[idxn]['raw_raster'] = raster;
-
-		const ppie = svg_pie(SUMMARY[idxn]['population-density']['distribution'].map(x => [x]), 75, 0, analysis_colorscale.stops, null, null, bubble);
-		const apie = svg_pie(SUMMARY[idxn]['area']['distribution'].map(x => [x]), 75, 0, analysis_colorscale.stops, null, null, bubble);
+	for (const idxn of Object.keys(EAE['indexes'])) {
+		const apie = SUMMARY[idxn]['area']['pie'];
+		const ppie = SUMMARY[idxn]['population-density']['pie'];
 
 		const container = tmpl('#index-graphs-container-template');
 		qs('.index-graphs-group #area-number', container).parentElement.append(apie.svg);
@@ -81,22 +129,7 @@ async function summary() {
 				   ce('div', (SUMMARY[idxn]['area']['total'] === 0) ? ce('code', "(no datasets selected)") : null, { "style": "text-align: center; font-size: smaller;" }),
 			   ],
 			   { "class": 'index-group' }));
-
-		ppie.change(0);
-		apie.change(0);
-
-		const c = qs('#canvas-' + idxn) || ce('canvas', null, { "id": 'canvas-' + idxn});
-		c.style.display = 'none';
-		document.body.append(c);
-
-		plot_outputcanvas(raster, c);
-
-		SUMMARY[idxn]['canvas'] = c;
-		SUMMARY[idxn]['population-density']['pie'] = ppie;
-		SUMMARY[idxn]['area']['pie'] = apie;
-	};
-
-	await Promise.all(Object.keys(EAE['indexes']).map(i => get_summaries(i)));
+	}
 
 	graphs.append(ce('div', scale.cloneNode(true), { "class": "index-graphs-scale" }));
 
@@ -118,7 +151,8 @@ async function summary() {
 
 		for (const k in SUMMARY) {
 			const tr = ce('tr', ce('td', EAE['indexes'][k]['name'], { "class": 'index-name' }));
-			s.forEach((x,i) => tr.append(ce('td', Math.round(SUMMARY[k][j]['amounts'][i]).toLocaleString())));
+			const { amounts } = compute_share_amounts(SUMMARY[k][j]);
+			s.forEach((x,i) => tr.append(ce('td', amounts[i].toLocaleString())));
 
 			tbody.append(tr);
 		}
@@ -171,7 +205,17 @@ async function summary() {
 	return content;
 };
 
+export function compute_share_amounts(data) {
+	const total = Math.round(data['total']);
+	return {
+		total,
+		"amounts": data['distribution'].map(x => Math.round(x * total)),
+	};
+}
+
 export default async function analyse(raster) {
+	const pixels_per_km2 = (1000/GEOGRAPHY.resolution)**2;
+
 	let ds = DST.get('population-density');
 
 	if (!ds) {
@@ -218,24 +262,23 @@ export default async function analyse(raster) {
 		}
 	}
 
-	const e = (1000/GEOGRAPHY.resolution)**2;
 	const c = OUTLINE.raster.data.filter(x => x !== OUTLINE.raster.nodata).length;
 
 	const ptotal = population_groups.reduce((a,b) => a + b, 0);
 	const atotal = area_groups.reduce((a,b) => a + b, 0);
 
 	const s = STATE.divtier ?
-		x => x / e :
+		x => x / pixels_per_km2 :
 		d3.scaleLinear()
 			.domain([0, c])
-			.range([0, (GEOGRAPHY.area || c/e)])
+			.range([0, (GEOGRAPHY.area || c/pixels_per_km2)])
 			.clamp(true);
 
 	const o = {};
 	if (ds.id === 'population-density')
 		o['population-density'] = {
-			"total":        ptotal / e,
-			"amounts":      population_groups.map(x => x / e),
+			"total":        ptotal,
+			"amounts":      population_groups,
 			"distribution": population_groups.reduce((a,b) => { a.push(b/ptotal); return a; }, []),
 		};
 

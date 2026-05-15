@@ -26,7 +26,6 @@ export default [
 				"SNAPSHOT": "writable",
 				"OUTLINE": "writable",
 				"MAPBOX": "writable",
-				"INFOMODE": "writable",
 				"COORDINATES": "writable",
 				"COORDINATESMODE": "writable",
 				"MOBILE": "writable",

@@ -80,11 +80,11 @@ function value_checkboxes() {
 		return null;
 	};
 
-	ds.domain_select = ds._domain_select = ds.csv.data.map(x => x['KEY']);
-
 	const pick = _ => {
 		this.checkboxes = qsa('.checkbox-row > input', this, true);
-		return ds._domain_select = [...new Set(this.checkboxes.filter(i => i.checked).map(i => +i.value))];
+		ds._domain_select = [...new Set(this.checkboxes.filter(i => i.checked).map(i => +i.value))];
+
+		if (ds.host) ds.host._domain_select = ds._domain_select;
 	};
 
 	const change = _ => {
@@ -93,10 +93,10 @@ function value_checkboxes() {
 	};
 
 	const payload = ds.csv.data.map(x => ({
-		"name":    x['VALUE'],
-		"value":   x['KEY'],
-		"color":   d => d.style['background-color'] = `rgba(${ds.colorscale.fn(+x['KEY'])})`,
-		"checked": (!ds._domain_select.length ? true : ds._domain_select.indexOf(x['KEY']) > -1),
+		"name":    x[ds.csv.column],
+		"value":   x[ds.csv.key],
+		"color":   d => d.style['background-color'] = `rgba(${ds.colorscale.fn(+x[ds.csv.key])})`,
+		"checked": (!ds._domain_select.length ? true : ds._domain_select.indexOf(x[ds.csv.key]) > -1),
 		change,
 	}));
 
@@ -482,16 +482,14 @@ function colorscale() {
 };
 
 function ramp() {
-	const ds = this.ds;
+	const ds = this.ds.hosts ? this.ds.host : this.ds;
 	const cat = this.ds.category;
 
 	if (!ds.domain) return "";
 
-	if (ds._domain_select) {
-		return bind(tmpl('#ramp'), {
-			"middle": coalesce(cat.controls.range_label, cat.unit),
-		});
-	}
+	if (ds._domain_select) return bind(tmpl('#ramp'), {
+		"middle": coalesce(cat.controls.range_label, cat.unit),
+	});
 
 	const {min,max} = ds.domain;
 
@@ -596,6 +594,10 @@ export function update() {
 		.map(d => d.card)
 		.filter(c => c);
 
+	const children = [...cards_list.children];
+	if (list.length === children.length && list.every((c, i) => c === children[i]))
+		return;
+
 	if (list.length) sortable(cards_list, 'disable');
 
 	cards_list.append(...list);
@@ -667,6 +669,10 @@ export default class dscard extends HTMLElement {
 			"manual-max":       this.manual_max,
 			"mutant-options":   mutant_options.call(this),
 		}), { "final": false });
+
+		if (this.ds.cannot_deactivate(false)) {
+			qs('[bind-func="close"]', this)?.remove();
+		}
 	};
 
 	disable() {
@@ -686,8 +692,6 @@ export default class dscard extends HTMLElement {
 			"min": 0,
 			"max": 1,
 		});
-
-		this.ds.visibility(true);
 
 		if (this.range_svg) {
 			this.range_svg.change({

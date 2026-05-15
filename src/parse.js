@@ -1,3 +1,5 @@
+import Toast from './toast.js';
+
 import {
 	super_error,
 	coordinates_to_raster_pixel,
@@ -49,16 +51,7 @@ ${msg}`);
 		return;
 	}
 
-	FLASH.push({
-		"type":    'error',
-		"timeout": 5000,
-		"title":   "Dataset error",
-		"message": `
-Failed to process dataset '${this.name}'.
-This is not fatal but the dataset is now disabled.
-
-${msg}`,
-	});
+	new Toast({ "label": "Dataset error", "caption": `Failed to process dataset '${this.name}'. This is not fatal but the dataset is now disabled.`, "variant": 'error' }).show();
 
 	this.disable(msg);
 };
@@ -168,6 +161,12 @@ export function raster() {
 			this.raster.height = image.getHeight();
 			this.raster.nodata = parseFloat(image.fileDirectory.GDAL_NODATA);
 			this.raster.tiff = tiff;
+
+			if (Number.isNaN(this.raster.nodata)) this.raster.nodata = -Infinity;
+			const { "data": rdata, "nodata": rnodata } = this.raster;
+			for (let i = 0; i < rdata.length; i++) {
+				if (Number.isNaN(rdata[i])) rdata[i] = rnodata;
+			}
 
 			if (this.timeline)
 				this.timeline.rasters = rasters;

@@ -1,3 +1,5 @@
+import Toast from './toast.js';
+
 import {
 	colorscale,
 	colorscale_svg,
@@ -26,6 +28,10 @@ import {
 	average,
 	crop_to,
 } from './rasters.js';
+
+import {
+	loading_analysis,
+} from './right-panel.js';
 
 import {
 	and,
@@ -91,13 +97,12 @@ export default class DS {
 
 		this.hosts = null;
 
-		if (o.mutant_configuration) {
+		this.config = {};
+
+		if (o.mutant_configuration)
 			this.config = o.mutant_configuration;
-			this.hosts = Object.assign([], o.mutant_configuration.hosts);
-		}
-		else if (o.vectors_configuration) {
+		else if (o.vectors_configuration)
 			this.config = o.vectors_configuration;
-		}
 
 		DST.set(this.id, this);
 
@@ -112,15 +117,7 @@ export default class DS {
 			const b = GEOGRAPHY.divisions[this.config.divisions_tier];
 
 			if (!b) {
-				FLASH.push({
-					"type":    'error',
-					"timeout": 5000,
-					"title":   "Dataset/File error",
-					"message": `
-'${this.name}' requires a geography->divisions->${this.config.divisions_tier}.
-
-This is not fatal but the dataset is now disabled.`,
-				});
+				new Toast({ "label": "Dataset/File error", "caption": `'${this.name}' requires a geography->divisions->${this.config.divisions_tier}. This is not fatal but the dataset is now disabled.`, "variant": 'error' }).show();
 
 				this.disable(`Missing geography->divisions->${this.config.divisions_tier}.`);
 
@@ -145,15 +142,7 @@ This is not fatal but the dataset is now disabled.`,
 
 			if (this.category.name === 'outline') return true;
 
-			FLASH.push({
-				"type":    'error',
-				"timeout": 5000,
-				"title":   "Dataset/File error",
-				"message": `
-'${this.name}' has category '${this.category.name}' which requires a ${t} file.
-
-This is not fatal but the dataset is now disabled.`,
-			});
+			new Toast({ "label": "Dataset/File error", "caption": `'${this.name}' has category '${this.category.name}' which requires a ${t} file. This is not fatal but the dataset is now disabled.`, "variant": 'error' }).show();
 
 			this.disable(`Missing ${t}`);
 
@@ -336,6 +325,10 @@ This is not fatal but the dataset is now disabled.`,
 		DST.delete(this.id);
 	};
 
+	cannot_deactivate(visible) {
+		return !visible && this.category.name === 'outline';
+	};
+
 	get source() {
 		return MAPBOX.getSource(this.id);
 	};
@@ -375,48 +368,29 @@ This is not fatal but the dataset is now disabled.`,
 	};
 
 	mutant_init() {
-		for (const [i,h] of this.hosts.entries()) {
+		this.hosts = [];
+
+		for (const h of this.config.hosts) {
 			const ds = DST.get(h);
 
 			if (!ds) {
 				const msg = `'${this.id}' claims to have host '${h}'. No such DS.`;
-				FLASH.push({
-					"type":    'error',
-					"timeout": 10000,
-					"title":   "Dataset/File error",
-					"message": `
-${msg}
-
-This is not fatal but the dataset is now disabled.`,
-				});
+				new Toast({ "label": "Dataset/File error", "caption": `${msg} This is not fatal but the dataset is now disabled.`, "variant": 'error' }).show();
 
 				this.disable(msg);
 
 				return;
 			}
 
-			this.hosts[i] = ds;
+			this.hosts.push(ds);
 		}
 
-		const m = this.host = this.hosts.filter(Boolean)[0];
-
-		this.csv = m.csv;
-		this.raster = m.raster;
-		this.vectors = m.vectors;
-		this.colorscale = m.colorscale;
-
-		const min = Math.min(...this.hosts.map(h => h.domain.min));
-		const max = Math.max(...this.hosts.map(h => h.domain.max));
-
-		this.domain = { min, max };
-		this._domain = { min, max };
-
-		this.fn = this.host.fn;
-
-		this._domain_select = m._domain_select;
+		this.host = this.hosts.filter(Boolean)[0];
 	};
 
 	async mutate(host) {
+		await host.loadall();
+
 		await host.raster.parse();
 
 		this.host = host;
@@ -425,6 +399,13 @@ This is not fatal but the dataset is now disabled.`,
 		this.raster = host.raster;
 		this.vectors = host.vectors;
 		this.colorscale = host.colorscale;
+		this.domain = host.domain;
+		this._domain = json_clone(host.domain);
+
+		this.domain_select = this.host.domain_select;
+		this._domain_select = this.host._domain_select;
+
+		this.fn = this.host.fn;
 
 		this.opacity(1);
 
@@ -518,7 +499,7 @@ This is not fatal but the dataset is now disabled.`,
 		if (c) c.checked = t;
 
 		if (this.host) {
-			this.hosts.forEach(d => MAPBOX.setLayoutProperty(d.id, 'visibility', 'none'));
+			this.hosts.forEach(d => d.layers && MAPBOX.setLayoutProperty(d.id, 'visibility', 'none'));
 			MAPBOX.setLayoutProperty(this.host.id, 'visibility', t ? 'visible' : 'none');
 		}
 	};
@@ -705,11 +686,14 @@ This is not fatal but the dataset is now disabled.`,
 		}).show();
 	};
 
-	async active(v, draw) {
-		this.on = v;
+	async active(visible, draw) {
+		if (this.cannot_deactivate(visible)) return;
 
-		if (v) {
+		this.on = visible;
+
+		if (visible) {
 			if (this.controls) this.controls.loading(true);
+			loading_analysis(true);
 
 			await this.loadall();
 
@@ -735,11 +719,11 @@ This is not fatal but the dataset is now disabled.`,
 
 		if (!this.card) this.card = new dscard(this);
 
-		if (this.controls) this.controls.turn(v);
+		if (this.controls) this.controls.turn(visible);
 
-		this.visibility(v && draw);
+		this.visibility(visible && draw);
 
-		if (!v && this.card) this.card.remove();
+		if (!visible && this.card) this.card.remove();
 	};
 
 	loadall() {
@@ -811,10 +795,12 @@ This is not fatal but the dataset is now disabled.`,
 			MAPBOX.setPaintProperty(this.id, a, v);
 	};
 
-	turn(v) {
-		v = v ?? !this.on;
+	turn(visible) {
+		visible = visible ?? !this.on;
 
-		this.active(v, true);
+		if (this.cannot_deactivate(visible)) return;
+
+		this.active(visible, true);
 
 		let copy = [...STATE.datasets];
 

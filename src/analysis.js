@@ -2,6 +2,7 @@ import {
 	uniform_split,
 	colorscale,
 	colorscale_svg,
+	coordinates_to_raster_pixel,
 	raster_pixel_to_coordinates,
 } from './utils.js';
 
@@ -10,16 +11,16 @@ import {
 } from './plot.js';
 
 import {
-	graphs as indexes_graphs,
-	updated_plot as indexes_updated_plot,
-} from './right-panel.js';
-
-import {
 	and,
 	json_clone,
 	maybe,
 	until,
 } from '../lib/helpers.js';
+
+import {
+	estimate_oversampling_block_size,
+	fetch_unscaled_raster,
+} from './analysis-model-pixel-scale-estimation.js';
 
 const filter_types = ["key-delta", "exclusion-buffer", "inclusion-buffer"];
 
@@ -35,6 +36,16 @@ export const analysis_colorscale_svg = colorscale_svg(analysis_colorscale.stops)
 export const lowmedhigh_scale = d3.scaleQuantize()
 	.domain([0,1])
 	.range(["Low", "Low-Medium", "Medium", "Medium-High", "High"]);
+
+export function priority_scale(priorityData, range) {
+	const averages = Object.values(priorityData)
+		.map(d => d.average)
+		.filter(v => v !== -1 && Number.isFinite(v));
+	if (averages.length === 0) return null;
+	return d3.scaleQuantile()
+		.domain([Math.min(...averages), Math.max(...averages)])
+		.range(range);
+}
 
 /*
  * run
@@ -231,7 +242,7 @@ function datasets(type) {
 				return false;
 			}
 
-			if (d._domain_select)
+			if (d._domain_select?.length)
 				d._afn = _ => x => (d._domain_select.indexOf(x) > -1) ? 1 : -1;
 			else if (typeof d.analysis_fn(type) !== 'function')
 				d._afn = _ => x => (x < d._domain.min || x > d._domain.max) ? -1 : 1;
@@ -266,7 +277,7 @@ function datasets(type) {
  *   - an index name
  */
 
-export async function plot_active(type, doindexes) {
+export async function plot_active(type) {
 	const a = await run(type);
 	plot_outputcanvas(a.raster);
 
@@ -280,8 +291,6 @@ export async function plot_active(type, doindexes) {
 		return a;
 	}
 
-	indexes_updated_plot(type, index);
-
 	// 'animate' is set to false on mapbox's configuration, since we don't want
 	// mapbox eating the CPU at 60FPS for nothing.
 	//
@@ -292,8 +301,6 @@ export async function plot_active(type, doindexes) {
 		canvas_source.play();
 		canvas_source.pause();
 	}
-
-	if (doindexes) indexes_graphs(a.raster);
 
 	return a;
 };
@@ -330,53 +337,190 @@ export async function analysis(type) {
 	};
 };
 
-export function priority(d, a, i) {
-	const source = MAPBOX.getSource(`priority-source-${i}`);
-	if (!source) {
-		console.debug(`priority-source-${i}: not yet...`);
-		return;
-	}
+// Compute average analysis value per division area.
+// Returns { [area_id]: { average } }
+export function division_averages(analysis_raster, division_data) {
+	return Object.fromEntries(
+		Object.entries(
+			Array.from(analysis_raster).reduce((acc, value, i) => {
+				const id = division_data[i];
+				// skip nodata pixels
+				if (id === -1 || value === -1) {
+					return acc;
+				} else {
+					return Object.assign(acc, {
+						[id]: {
+							"sum":   (acc[id]?.sum || 0) + value,
+							"count": (acc[id]?.count || 0) + 1,
+						},
+					});
+				}
+			}, {}),
+		).map(([id, { sum, count }]) => [id, { "average": sum / count }]),
+	);
+}
 
-	const g = d.raster.data;
+export async function priority(division, analysis, tier) {
+	const source = MAPBOX.getSource(`priority-source-${tier}`);
 
-	const o = {};
+	if (source) {
+		const areas = division_averages(analysis.raster, division.raster.data);
 
-	const u = [];
-	for (const e of g) if (u.indexOf(e) === -1) u.push(e);
-	for (const e of u.sort()) {
-		if (e === -1) continue;
+		source._data.features.forEach(f => f.properties['__fill'] = "transparent");
 
-		o[e] = {
-			"values":  [],
-			"average": 0,
-		};
-	}
+		const scale = priority_scale(areas, analysis_colorscale.stops);
 
-	for (let i = 0; i < a.raster.length; i += 1)
-		if (g[i] > -1) o[g[i]]['values'].push(a.raster[i]);
+		for (const area_id in areas) {
+			const feature = source._data.features.find(f => f.id === +area_id);
 
-	for (const e in o) {
-		o[e]['average'] = o[e]['values'].reduce((a,b) => a+b, 0) / o[e]['values'].length;
-	}
-
-	const actives = Object.keys(o).filter(k => o[k]['average'] !== -1);
-	const averages = actives.map(k => o[k]['average']);
-
-	const s = d3.scaleQuantile().domain([Math.min(...averages),Math.max(...averages)]).range(analysis_colorscale.stops);
-
-	for (const e in o) {
-		if (o[e]['average'] === -1) {
-			source._data.features.find(f => f.id === +e).properties['__fill'] = "transparent";
-			continue;
+			if (areas[area_id]['average'] === -1) {
+				feature.properties['__fill'] = "transparent";
+			} else {
+				feature.properties['__fill'] = scale(areas[area_id]['average']);
+			}
 		}
 
-		source._data.features.find(f => f.id === +e).properties['__fill'] = s(o[e]['average']);
+		source.setData(json_clone(source._data));
+
+		division.priorityData = areas;
+		division.layerData = await aggregate_layer_values(division);
+	} else {
+		console.debug(`priority-source-${tier}: not yet...`);
+	}
+};
+
+export async function aggregate_layer_values(division) {
+	const divisions = division.raster.data;
+	const area_ids = [...new Set(divisions.filter(e => e !== -1))];
+
+	const valid_datasets = STATE.datasets
+		.filter(d => and(d.raster, d.raster.data))
+		.filter(d => d.category.name !== 'boundaries' && d.category.name !== 'outline');
+
+	const entries = await Promise.all(
+		valid_datasets.map(async dataset => {
+			const is_point_layer = dataset.vectors?.shape_type === 'points';
+			const areas = is_point_layer
+				? aggregate_point_values(divisions, dataset, area_ids)
+				: await aggregate_scalar_values(divisions, dataset, area_ids);
+
+			return [dataset.id, {
+				"name":           dataset.name,
+				"unit":           dataset.category.unit,
+				"is_point_layer": is_point_layer,
+				"aggregation":    is_point_layer ? 'SUM' : (dataset.category.analysis?.aggregation ?? 'AVG'),
+				areas,
+			}];
+		}),
+	);
+
+	return Object.fromEntries(entries);
+}
+
+function aggregate_point_values(division_raster, dataset, area_ids) {
+	const features = maybe(dataset, 'vectors', 'data', 'features') || [];
+	const counts = Object.fromEntries(area_ids.map(id => [id, 0]));
+
+	for (const feature of features) {
+		const coords = maybe(feature, 'geometry', 'coordinates');
+		if (!coords) continue;
+
+		const pixel = coordinates_to_raster_pixel(coords, OUTLINE.raster);
+		if (!pixel) continue;
+
+		const area_id = division_raster[pixel.index];
+		if (area_id === -1) continue;
+		if (!(area_id in counts)) continue;
+
+		counts[area_id]++;
 	}
 
-	source.setData(json_clone(source._data));
+	return Object.fromEntries(
+		area_ids.map(id => [id, {
+			"result": { "type": 'points', "value": counts[id] },
+		}]),
+	);
+}
 
-	return o;
-};
+function aggregate(values, fn) {
+	const sum = values.reduce((a, b) => a + b, 0);
+
+	switch (fn) {
+	case "SUM":
+		return sum;
+
+	case "AVG":
+	default:
+		return sum / values.length;
+	}
+}
+
+async function aggregate_scalar_values(division_raster, dataset, area_ids) {
+	const agg_fn = dataset.category.analysis?.aggregation ?? 'AVG';
+	const src = agg_fn === "SUM"
+		? await (dataset._oversampling_source ??= fetch_unscaled_raster(dataset).catch(e => {
+			console.warn(`oversampling '${dataset.id}': could not fetch original (${e.message}), falling back to estimation`);
+			return null;
+		}))
+		: null;
+
+	const values_by_area = src?.data
+		? collect_values_from_unscaled(src, division_raster, dataset, area_ids)
+		: collect_values_from_upscaled(division_raster, dataset, area_ids, src && !src.data);
+
+	return Object.fromEntries(
+		area_ids.map(id => {
+			const values = values_by_area[id];
+
+			return [id, {
+				"result": values.length
+					? { "type": 'scalar', "value": aggregate(values, agg_fn) }
+					: null,
+			}];
+		}),
+	);
+}
+
+// The upscaled raster repeats each pixel many times, so summing it directly
+// overcounts. Instead, iterate the unscaled raster (when available) mapping
+// each pixel to its area. Each pixel is counted once.
+function collect_values_from_unscaled(src, division_raster, dataset, area_ids) {
+	const { "width": raster_w, "height": raster_h } = dataset.raster;
+	const nodata = src.nodata;
+	const result = Object.fromEntries(area_ids.map(id => [id, []]));
+
+	for (let row = 0; row < src.h; row++) {
+		for (let col = 0; col < src.w; col++) {
+			const value = src.data[row * src.w + col];
+
+			if (value !== nodata) {
+				const raster_row = Math.floor((row + 0.5) * raster_h / src.h);
+				const raster_col = Math.floor((col + 0.5) * raster_w / src.w);
+				const area_id = division_raster[raster_row * raster_w + raster_col];
+
+				if (area_id !== -1 && area_id in result) result[area_id].push(value);
+			}
+		}
+	}
+
+	return result;
+}
+
+function collect_values_from_upscaled(division_raster, dataset, area_ids, correct_oversampling) {
+	const { data, width, height, nodata } = dataset.raster;
+	const result = Object.fromEntries(area_ids.map(id => [id, []]));
+
+	const estimated_block_factor = correct_oversampling
+		? estimate_oversampling_block_size(data, width, height, nodata).reduce((a, b) => a * b)
+		: null;
+
+	division_raster.forEach((area_id, i) => {
+		if (area_id !== -1 && data[i] !== nodata && area_id in result)
+			result[area_id].push(estimated_block_factor ? data[i] / estimated_block_factor : data[i]);
+	});
+
+	return result;
+}
 
 export function enough_datasets(t) {
 	if (["eai", "ani"].includes(t)) {
@@ -404,7 +548,7 @@ export function medhigh_point_count(d, a) {
 };
 
 export async function getpoints(n = 0) {
-	const a = await plot_active(STATE.index, false);
+	const a = await plot_active(STATE.index);
 
 	const threshold = a.raster.slice(0)
 		.sort((a,b) => a > b ? -1 : 1)

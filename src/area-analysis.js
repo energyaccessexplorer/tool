@@ -105,7 +105,9 @@ export function get_admin_area_layer_data(variant, area_id) {
 				value = area_result.value;
 				unit = 'count';
 			} else {
-				value = parseFloat(area_result.value.toFixed(2));
+				value = layer.aggregation === 'SUM'
+					? Math.round(area_result.value)
+					: parseFloat(area_result.value.toFixed(2));
 				unit = resolve_unit(layer, DST.get(layer_id), value);
 			}
 

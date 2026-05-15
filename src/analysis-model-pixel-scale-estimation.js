@@ -40,8 +40,11 @@ export async function fetch_unscaled_raster(dataset) {
 
 	const data = (await image.readRasters())[0];
 
-	// Source nodata cast to match data's typed array precision. Fixes [EAE-424]
-	const nodata = new data.constructor([parseFloat(image.fileDirectory.GDAL_NODATA)])[0];
+	let nodata = new data.constructor([parseFloat(image.fileDirectory.GDAL_NODATA)])[0];
+	if (Number.isNaN(nodata)) nodata = -Infinity;
+	for (let idx = 0; idx < data.length; idx++) {
+		if (Number.isNaN(data[idx])) data[idx] = nodata;
+	}
 
 	console.info(`oversampling '${dataset.id}': fetched original ${image.getWidth()}×${image.getHeight()}`);
 	return { "w": image.getWidth(), "h": image.getHeight(), data, nodata };

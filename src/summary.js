@@ -9,6 +9,7 @@ import analysis_run, {
 	analysis_colorscale_svg,
 	division_averages,
 	priority_scale,
+	aggregate_layer_values,
 } from './analysis.js';
 
 import {
@@ -152,7 +153,7 @@ async function summary() {
 		for (const k in SUMMARY) {
 			const tr = ce('tr', ce('td', EAE['indexes'][k]['name'], { "class": 'index-name' }));
 			const { amounts } = compute_share_amounts(SUMMARY[k][j]);
-			s.forEach((x,i) => tr.append(ce('td', amounts[i].toLocaleString())));
+			s.forEach((_,i) => tr.append(ce('td', amounts[i].toLocaleString())));
 
 			tbody.append(tr);
 		}
@@ -213,7 +214,7 @@ export function compute_share_amounts(data) {
 	};
 }
 
-export default async function analyse(raster) {
+export default async function analyse(raster, layer_data = null) {
 	const pixels_per_km2 = (1000/GEOGRAPHY.resolution)**2;
 
 	let ds = DST.get('population-density');
@@ -264,8 +265,19 @@ export default async function analyse(raster) {
 
 	const c = OUTLINE.raster.data.filter(x => x !== OUTLINE.raster.nodata).length;
 
-	const ptotal = population_groups.reduce((a,b) => a + b, 0);
+	const raw_ptotal = population_groups.reduce((a,b) => a + b, 0);
 	const atotal = area_groups.reduce((a,b) => a + b, 0);
+
+	// Get the correct population total from layer_data aggregated over analysis-valid pixels
+	// (unscaled raster via aggregate_layer_values, avoids overcounting from oversampled display raster).
+	// When layer_data is not provided (e.g. snapshot modal), compute it now from the analysis mask.
+	// Distribution proportions from the display raster above are still correct (overcounting cancels).
+	if (!layer_data) {
+		const mask = { "raster": { "data": raster.map(v => v === -1 ? -1 : 0) } };
+		layer_data = await aggregate_layer_values(mask);
+	}
+	const pop_result = layer_data?.['population-density']?.areas?.[0]?.result;
+	const ptotal = pop_result?.value ?? raw_ptotal;
 
 	const s = STATE.divtier ?
 		x => x / pixels_per_km2 :
@@ -279,7 +291,7 @@ export default async function analyse(raster) {
 		o['population-density'] = {
 			"total":        ptotal,
 			"amounts":      population_groups,
-			"distribution": population_groups.reduce((a,b) => { a.push(b/ptotal); return a; }, []),
+			"distribution": population_groups.reduce((a,b) => { a.push(b/raw_ptotal); return a; }, []),
 		};
 
 	o['area'] = {

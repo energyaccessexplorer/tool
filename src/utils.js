@@ -592,3 +592,8 @@ export function resolve_raster_value(dataset, raw) {
 	return maybe(dataset, 'csv', 'key') ? dataset.csv.table[rounded] : rounded;
 }
 
+export function format_value_unit(value, unit) {
+	if (!unit) return String(value);
+	return unit === '%' ? `${value}${unit}` : `${value} ${unit}`;
+}
+

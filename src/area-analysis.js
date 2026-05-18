@@ -1,6 +1,7 @@
 import {
 	area_type,
 	resolve_raster_value,
+	format_value_unit,
 } from './utils.js';
 
 import {
@@ -202,7 +203,7 @@ function format_detail(key, label, value, raw, subordinate) {
 	const formatted = Number.isFinite(num) ? num.toLocaleString() : value;
 	return {
 		"label":       label || key,
-		"value":       `${formatted} ${display_unit}`.trim(),
+		"value":       format_value_unit(formatted, display_unit),
 		"raw_value":    raw.values[key],
 		"unit":        unit,
 		"aggregation": raw.aggregations?.[key],

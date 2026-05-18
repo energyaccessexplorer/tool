@@ -587,3 +587,8 @@ export function area_type(variant) {
 	}
 }
 
+export function resolve_raster_value(dataset, raw) {
+	const rounded = String(raw).match(/[0-9]\.[0-9]{3}/) ? parseFloat(raw.toFixed(2)) : raw;
+	return maybe(dataset, 'csv', 'key') ? dataset.csv.table[rounded] : rounded;
+}
+

@@ -4,6 +4,7 @@ import {
 	colorscale_svg,
 	coordinates_to_raster_pixel,
 	raster_pixel_to_coordinates,
+	resolve_raster_value,
 } from './utils.js';
 
 import {
@@ -468,9 +469,15 @@ async function aggregate_scalar_values(division_raster, dataset, area_ids) {
 		? collect_values_from_unscaled(src, division_raster, dataset, area_ids)
 		: collect_values_from_upscaled(division_raster, dataset, area_ids, src && !src.data);
 
+	const has_csv_lookup = dataset.csv?.key != null;
+
 	return Object.fromEntries(
 		area_ids.map(id => {
-			const values = values_by_area[id];
+			let values = values_by_area[id];
+
+			if (has_csv_lookup) {
+				values = values.map(v => resolve_raster_value(dataset, v)).filter(v => typeof v === 'number' && Number.isFinite(v));
+			}
 
 			return [id, {
 				"result": (values.length || agg_fn === 'SUM')

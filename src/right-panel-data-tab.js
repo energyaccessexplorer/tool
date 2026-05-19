@@ -21,6 +21,7 @@ import {
 
 import {
 	svg_pie,
+	format_value_unit,
 } from './utils.js';
 
 const POINTS_DESCRIPTIONS = {
@@ -383,7 +384,7 @@ async function update_top_level_geography() {
 
 		detailedData.push({
 			"label":       layer.name,
-			"value":       display_unit ? `${formatted} ${display_unit}` : formatted,
+			"value":       format_value_unit(formatted, display_unit),
 			"raw_value":   value,
 			"unit":        unit,
 			"aggregation": layer.aggregation,

@@ -1,5 +1,7 @@
 import {
 	area_type,
+	resolve_raster_value,
+	format_value_unit,
 } from './utils.js';
 
 import {
@@ -201,7 +203,7 @@ function format_detail(key, label, value, raw, subordinate) {
 	const formatted = Number.isFinite(num) ? num.toLocaleString() : value;
 	return {
 		"label":       label || key,
-		"value":       `${formatted} ${display_unit}`.trim(),
+		"value":       format_value_unit(formatted, display_unit),
 		"raw_value":    raw.values[key],
 		"unit":        unit,
 		"aggregation": raw.aggregations?.[key],
@@ -311,10 +313,6 @@ function get_row(item, is_raster, analysis_name) {
 	return row;
 }
 
-function resolve_raster_value(dataset, raw) {
-	const rounded = String(raw).match(/[0-9]\.[0-9]{3}/) ? parseFloat(raw.toFixed(2)) : raw;
-	return maybe(dataset, 'csv', 'key') ? dataset.csv.table[rounded] : rounded;
-}
 
 export function dataset_unit(dataset, value) {
 	return dataset.category.unit

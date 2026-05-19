@@ -2,6 +2,7 @@ import {
 	super_error,
 	bi_icon,
 	coordinates_to_raster_pixel,
+	raster_pixel_to_coordinates,
 } from './utils.js';
 
 import {
@@ -434,6 +435,11 @@ export async function sort() {
 
 export function show_location_info(ll, position, centerPointer = true) {
 	const raster_pixel = coordinates_to_raster_pixel(ll, OUTLINE.raster);
+
+	if (raster_pixel) {
+		ll = raster_pixel_to_coordinates(raster_pixel.index);
+		Object.assign(position, get_map_position(ll));
+	}
 
 	const pt = MAPBOX.project(ll);
 	const features = MAPBOX.queryRenderedFeatures([[pt.x - 10, pt.y - 10],

@@ -37,7 +37,7 @@
         <a for="controls" description="Add Layers"><i class="bi bi-plus-lg"></i></a>
         <a for="geographies" description="Change Geographies"><i class="bi bi-globe"></i></a>
         <a for="vectors" description="Search Features"><i class="bi bi-search"></i></a>
-        <a for="locations" description="Search POI's"><i class="bi bi-geo"></i></a>
+        {{if ne .env "production"}}<a for="locations" description="Search POI's"><i class="bi bi-geo"></i></a>{{end}}
         <a for="points" description="Points Loading"><i class="bi bi-crosshair"></i></a>
         <a id="drawer-info" description="Disclaimer" bind-listen="click" bind-func="show_info"><i class="bi bi-info-circle"></i></a>
       </div>

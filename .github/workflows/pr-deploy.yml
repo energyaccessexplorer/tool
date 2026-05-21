@@ -51,6 +51,10 @@ jobs:
           key:      ${{ secrets.PR_DEPLOY_KEY }}
           script:   |
             mkdir -p ${{ secrets.PR_DEPLOY_PATH }}/${{ env.DESTINATION }}
+            ln -sfn ${{ secrets.PR_DEPLOY_PATH }}/trunk/stylesheets  ${{ secrets.PR_DEPLOY_PATH }}/${{ env.DESTINATION }}/stylesheets
+            ln -sfn ${{ secrets.PR_DEPLOY_PATH }}/trunk/images        ${{ secrets.PR_DEPLOY_PATH }}/${{ env.DESTINATION }}/images
+            ln -sfn ${{ secrets.PR_DEPLOY_PATH }}/trunk/javascripts   ${{ secrets.PR_DEPLOY_PATH }}/${{ env.DESTINATION }}/javascripts
+            ln -sfn ${{ secrets.PR_DEPLOY_PATH }}/trunk/lib           ${{ secrets.PR_DEPLOY_PATH }}/${{ env.DESTINATION }}/lib
 
       - name: Deploy the thing
         uses: burnett01/rsync-deployments@7.1.0

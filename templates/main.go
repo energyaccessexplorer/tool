@@ -15,12 +15,13 @@ func main() {
 		templateName = flag.String("template", "", "Template name to compile")
 		outputFile   = flag.String("output", "", "Output file path")
 		dataFile     = flag.String("data", "", "JSON data file (optional)")
+		dataJSON     = flag.String("json", "", "JSON data string (optional)")
 		templateDir  = flag.String("templates", "./views", "Templates directory")
 	)
 	flag.Parse()
 
 	if *templateName == "" || *outputFile == "" {
-		fmt.Println("Usage: templates -template=<name> -output=<file> [-data=<json>] [-templates=<dir>]")
+		fmt.Println("Usage: templates -template=<name> -output=<file> [-data=<file>|-json=<json>] [-templates=<dir>]")
 		os.Exit(1)
 	}
 
@@ -30,7 +31,11 @@ func main() {
 	}
 
 	var data interface{} = struct{}{}
-	if *dataFile != "" {
+	if *dataJSON != "" {
+		if err := json.Unmarshal([]byte(*dataJSON), &data); err != nil {
+			log.Fatalf("Failed to parse JSON data: %v", err)
+		}
+	} else if *dataFile != "" {
 		jsonData, err := os.ReadFile(*dataFile)
 		if err != nil {
 			log.Fatalf("Failed to read data file: %v", err)

@@ -1,0 +1,52 @@
+name: PRODUCTION DEPLOY
+
+on:
+  push:
+    branches: [ production ]
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: production
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get install -y bmake curl jq
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PROD_DEPLOY_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ vars.PROD_DEPLOY_HOST }} >> ~/.ssh/known_hosts
+          printf "Host %s\n  IdentityFile ~/.ssh/deploy_key\n" "${{ vars.PROD_DEPLOY_HOST }}" >> ~/.ssh/config
+
+      - name: Build .env
+        run: |
+          echo '{{define "base"}}{{end}}' > views/base.tmpl
+
+          cat <<- EOF >.env
+          	DOMAIN       = "${{ vars.DOMAIN }}"
+          	WORLD        = "${{ vars.WORLD_URL }}"
+          	TITLE        = "${{ vars.TITLE }}"
+          	API_URL      = "${{ vars.API_URL }}"
+          	STORAGE_URL  = "${{ vars.STORAGE_URL }}"
+          	MAPBOX_TOKEN = "${{ vars.MAPBOX_TOKEN }}"
+          	MAPBOX_THEME = "${{ vars.MAPBOX_THEME }}"
+          	SSH_USER     = ${{ vars.PROD_DEPLOY_USER }}
+          	SSH_HOST     = ${{ vars.PROD_DEPLOY_HOST }}
+          	TOOL_DEST    = ${{ vars.PROD_DEPLOY_PATH }}
+          EOF
+
+      - name: Backup current deployment
+        run: |
+          ssh ${{ vars.PROD_DEPLOY_USER }}@${{ vars.PROD_DEPLOY_HOST }} \
+            "rsync -a ${{ vars.PROD_DEPLOY_PATH }}/ ${{ vars.PROD_DEPLOY_PATH }}.${GITHUB_SHA:0:7}/" || true
+
+      - name: Deploy
+        run: |
+          bmake deps deploy env=production

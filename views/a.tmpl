@@ -37,7 +37,7 @@
         <a for="controls" description="Add Layers"><i class="bi bi-plus-lg"></i></a>
         <a for="geographies" description="Change Geographies"><i class="bi bi-globe"></i></a>
         <a for="vectors" description="Search Features"><i class="bi bi-search"></i></a>
-        <a for="locations" description="Search POI's"><i class="bi bi-geo"></i></a>
+        {{if ne .env "production"}}<a for="locations" description="Search POI's"><i class="bi bi-geo"></i></a>{{end}}
         <a for="points" description="Points Loading"><i class="bi bi-crosshair"></i></a>
         <a id="drawer-info" description="Disclaimer" bind-listen="click" bind-func="show_info"><i class="bi bi-info-circle"></i></a>
       </div>
@@ -187,14 +187,14 @@
       </div>
 
       <button id="right-panel-show" class="button-icon button-icon-mid">
-        <span>Show analysis results</span>
+        <span>Show Analysis Results</span>
         <i class="bi bi-eye-fill"></i>
       </button>
 
       <div id="right-panel" closed>
         <header id="right-panel-header" style="display: none;">
           <div class="header-top">
-            <h2 class="header-title">Analysis results</h2>
+            <h2 class="header-title">Analysis Results</h2>
             <button id="right-panel-hide" class="button-icon button-icon-sm">
               <i class="bi bi-eye-slash"></i>
               <span>Hide</span>
@@ -782,7 +782,7 @@
   </template>
 
   <template id="poi-card-template">
-    <panel-section class="poi-section">
+    <panel-section class="poi-section" collapsible collapsed>
       <h2 slot="title">Intersecting points of interest</h2>
       <div slot="actions">
         <button class="button-icon button-info button-about">

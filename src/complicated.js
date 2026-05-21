@@ -8,6 +8,8 @@ import {
 
 import {
 	extent_contained,
+	resolve_raster_value,
+	format_value_unit,
 } from './utils.js';
 
 import {
@@ -40,21 +42,16 @@ export function context(raster_pixel, features = []) {
 			return;
 		}
 
-		let v = d.raster.data[x];
+		const raw = d.raster.data[x];
 		const k = d.id;
 
-		if (v === d.raster.nodata) return;
+		if (raw === d.raster.nodata) return;
 
-		if ((v + "").match('[0-9]\\.[0-9]{3}'))
-			v = v.toFixed(2);
-
-		if (maybe(d, 'csv', 'key')) {
-			v = d.csv.table[v];
-		}
+		const v = resolve_raster_value(d, raw);
 
 		if (d.category.unit) {
 			dict.push([k, d.name]);
-			props[k] = `<code>${v} ${d.category.unit}</code>`;
+			props[k] = `<code>${format_value_unit(v, d.category.unit)}</code>`;
 			values[k] = v;
 			units[k] = d.category.unit;
 		}

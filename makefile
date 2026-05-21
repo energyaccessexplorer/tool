@@ -35,7 +35,7 @@ clean:
 	@ rm -rf ${LIB} ${DIST} ${BIN}/templates
 
 build: deps templates build-a build-s build-m build-p
-	@ ${BIN}/templates -template=index -output=${DIST}/index.html
+	@ ${BIN}/templates -template=index -output=${DIST}/index.html -json='{"env":"${env}"}'
 
 lint:
 	@ ${BIN}/lint ${SRC}
@@ -51,7 +51,7 @@ build-m:
 	@ echo "Building my screen"
 	@ mkdir -p ${DIST}/m
 
-	@ ${BIN}/templates -template=m -output=${DIST}/m/index.html
+	@ ${BIN}/templates -template=m -output=${DIST}/m/index.html -json='{"env":"${env}"}'
 
 	@ sed -r -i.orig 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/m/index.html
 	@ rm ${DIST}/m/index.html.orig
@@ -84,7 +84,7 @@ build-p:
 	@ echo "Building snapshot screen"
 	@ mkdir -p ${DIST}/p
 
-	@ ${BIN}/templates -template=p -output=${DIST}/p/index.html
+	@ ${BIN}/templates -template=p -output=${DIST}/p/index.html -json='{"env":"${env}"}'
 
 	@ sed -r -i.orig 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/p/index.html
 	@ rm ${DIST}/p/index.html.orig
@@ -114,7 +114,7 @@ build-a:
 	@ echo "Building analysis screen"
 	@ mkdir -p ${DIST}/a
 
-	@ ${BIN}/templates -template=a -output=${DIST}/a/index.html
+	@ ${BIN}/templates -template=a -output=${DIST}/a/index.html -json='{"env":"${env}"}'
 
 	@ sed -r -i.orig 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/a/index.html
 	@ rm ${DIST}/a/index.html.orig
@@ -168,6 +168,7 @@ build-a:
 		${SRC}/panel-section.js \
 		${SRC}/export.js \
 		${SRC}/toast.js \
+		${SRC}/filtered.js \
 		${SRC}/a.js \
 		${DIST}/a/
 
@@ -212,7 +213,7 @@ build-s:
 	@ echo "Building select screen"
 	@ mkdir -p ${DIST}/s
 
-	@ ${BIN}/templates -template=s -output=${DIST}/s/index.html
+	@ ${BIN}/templates -template=s -output=${DIST}/s/index.html -json='{"env":"${env}"}'
 
 	@ sed -r -i.orig 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/s/index.html
 	@ rm ${DIST}/s/index.html.orig

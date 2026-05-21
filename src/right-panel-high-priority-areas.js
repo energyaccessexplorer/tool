@@ -80,10 +80,6 @@ const paginationState = {
 	"itemsPerPage": 10,
 };
 
-function show_info_on_hover(p) {
-	show_location_info(p.c, get_map_position(p.c), false);
-};
-
 function raster_item(p) {
 	const pi3 = (p.c).map(c => +c.toFixed(3));
 	const score = (p.priority ? Math.round((p.priority).toFixed(2) * 100) : "");
@@ -97,7 +93,6 @@ function raster_item(p) {
 	});
 
 	el.setAttribute('data-score', score);
-	el.onmouseenter = show_info_on_hover.bind(null, p);
 	el.onclick = zoom.bind(null, p, () => show_location_info(p.c, get_map_position(p.c), true));
 
 	const locationName = qs('.location-name', el);
@@ -111,11 +106,6 @@ function get_admin_area_position(item) {
 	const bounds = geojsonExtent(item.feature);
 	const center = [(bounds[0] + bounds[2]) / 2, (bounds[1] + bounds[3]) / 2];
 	return get_map_position(center);
-}
-
-function show_admin_info_on_hover(item) {
-	if (!item.feature) return;
-	show_admin_area_info(item, get_admin_area_position(item), false);
 }
 
 function show_admin_info_on_click(item) {
@@ -138,7 +128,6 @@ function admin_area_item(item, rank) {
 	});
 
 	if (item.feature) {
-		el.onmouseenter = () => show_admin_info_on_hover(item);
 		el.onclick = () => show_admin_info_on_click(item);
 	}
 

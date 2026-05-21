@@ -149,7 +149,7 @@ export function init() {
 	MAPBOX.addControl((new MapboxProjectionControl()), 'top-left');
 
 	MAPBOX.coords = fit(GEOGRAPHY.envelope);
-	MAPBOX.setStyle(theme_pick(EAE['settings'].mapbox_theme));
+	change_theme(EAE['settings'].mapbox_theme);
 };
 
 function projection_control_popup(_) {
@@ -293,6 +293,11 @@ export function change_theme(theme, soft) {
 		await until(_ => MAPBOX.isStyleLoaded());
 
 		worldview();
+
+		for (const l of MAPBOX.getStyle().layers) {
+			if (l.id.startsWith('admin'))
+				MAPBOX.setLayoutProperty(l.id, 'visibility', 'none');
+		}
 	};
 
 	MAPBOX.once('style.load', go);

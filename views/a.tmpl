@@ -949,6 +949,9 @@
           </tr>
         </table>
       </content>
+      <div class="analyse-button-container" bind-cond="inside-boundary">
+        <button class="analyse-button">Analyse selected area</button>
+      </div>
       <content class="detailed-data hidden" bind-cond="has-detailed">
         <table>
           <tr bind-each="detailedData">
@@ -960,9 +963,6 @@
           </tr>
         </table>
       </content>
-      <div class="analyse-button-container" bind-cond="has-detailed">
-        <button class="analyse-button">Analyse selected area</button>
-      </div>
     </main>
   </template>
 

@@ -2,6 +2,7 @@ import {
 	area_type,
 	resolve_raster_value,
 	format_value_unit,
+	coordinates_to_raster_pixel,
 } from './utils.js';
 
 import {
@@ -288,15 +289,22 @@ export function area_info(fields, props, ll, analysis_value, analysis_name, feat
 		...division_detail_entries(fields, props),
 	];
 
+	let inside_boundary = true;
+	if (ll && OUTLINE?.raster) {
+		const rp = coordinates_to_raster_pixel(ll, OUTLINE.raster);
+		inside_boundary = rp !== null && rp.value !== null;
+	}
+
 	return {
 		feature,
 		feature_type,
 		basicData,
 		detailedData,
-		"coordinate-title": !feature && coordinates,
+		"coordinate-title":  !feature && coordinates,
 		coordinates,
-		"has-basic":        basicData.length > 0,
-		"has-detailed":     STATE.datasets.length > 0,
+		"has-basic":         basicData.length > 0,
+		"has-detailed":      STATE.datasets.length > 0,
+		"inside-boundary":   inside_boundary,
 	};
 }
 

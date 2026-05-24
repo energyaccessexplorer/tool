@@ -476,7 +476,7 @@ export function show_location_info(ll, position, centerPointer = true) {
 			const { drop } = pointer(position, { fields, props, ll, analysis_value, analysis_name, feature_name, raw, "raster_index": raster_pixel?.index });
 			current_map_info_drop = drop;
 
-			if (centerPointer) ensure_map_info_visible();
+			if (centerPointer && raster_pixel) ensure_map_info_visible();
 		});
 }
 

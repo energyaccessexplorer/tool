@@ -111,7 +111,7 @@ export const STANDARD_TABS = new Set(['census', 'demand', 'supply', 'other']);
 COMMIT = debounce(function() {
 	if (DEBUG || ENV.includes("test")) console.trace("commit!", ...arguments);
 
-	if (!OUTLINE.raster.data) {
+	if (!OUTLINE?.raster?.data) {
 		console.warn("waiting for OUTLINE...");
 		COMMIT();
 

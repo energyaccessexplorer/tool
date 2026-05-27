@@ -495,8 +495,8 @@ export function coordinates_to_raster_pixel(coords, raster) {
 
 	const s = GEOGRAPHY.resolution;
 
-	const plng = Math.round(Math.abs(mx - bx) / s);
-	const plat = Math.round(Math.abs(my - by) / s);
+	const plng = Math.round((mx - bx) / s);
+	const plat = Math.round((by - my) / s);
 
 	let a = null;
 

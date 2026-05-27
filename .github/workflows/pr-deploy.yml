@@ -42,6 +42,15 @@ jobs:
         run: |
           bmake deps reconfig build env=test
 
+      - name: Deploy website
+        run: |
+          curl -X POST \
+            --header "Authorization: Bearer ${{ secrets.PR_DEPLOY_TOKEN }}" \
+            --header "Accept: application/vnd.github+json" \
+            --header "X-GitHub-Api-Version: 2022-11-28" \
+            --data "{\"event_type\": \"trigger-workflow\", \"client_payload\": {\"branch_name\": \"trunk\", \"destination\": \"$DESTINATION\"}}" \
+            https://api.github.com/repos/energyaccessexplorer/website/dispatches
+
       - name: Make destination directory
         uses: appleboy/ssh-action@v1.2.2
         with:

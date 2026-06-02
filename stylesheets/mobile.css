@@ -2,7 +2,62 @@
   display: none;
 }
 
-@media (max-width: 72em) {
+#mobile-warning {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  html {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  #mobile-warning {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    background-color: #fff;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2em;
+    box-sizing: border-box;
+  }
+
+  #mobile-warning-content {
+    max-width: 320px;
+  }
+
+  #mobile-warning-content img {
+    width: 64px;
+    margin-bottom: 1.5em;
+  }
+
+  #mobile-warning-content h2 {
+    margin: 0 0 0.75em;
+    font-size: 1.4em;
+    color: #222;
+  }
+
+  #mobile-warning-content p {
+    margin: 0;
+    color: #555;
+    line-height: 1.5;
+  }
+
   #drawer {
     display: none;
   }

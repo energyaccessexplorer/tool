@@ -225,6 +225,8 @@ function state_set(conf, p, v) {
 };
 
 export function init() {
+	if (window.innerWidth <= 768) return;
+
 	self();
 
 	Whatever

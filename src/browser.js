@@ -1,5 +1,7 @@
 import browsers from '../lib/browsers.js';
 
+alert("fresh!");
+
 browsers({
 	"IE": null,
 

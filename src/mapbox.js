@@ -24,6 +24,7 @@ import {
 } from '../lib/helpers.js';
 
 import mapinfo from './map-info.js';
+import bubblemessage from '../lib/bubblemessage.js';
 
 export function get_admin_area_item(variant, id) {
 	const division = GEOGRAPHY.divisions[variant];
@@ -81,6 +82,12 @@ const projections = [{
 	"value": "mercator",
 }];
 
+function attach_tooltip(el, message) {
+	let p;
+	el.addEventListener('mouseenter', () => { p = new bubblemessage({ "position": "E", "message": message, "close": false }, el); });
+	el.addEventListener('mouseleave', () => { if (p) p.remove(); });
+}
+
 class MapboxThemeControl {
 	onAdd(map) {
 		this._map = map;
@@ -88,11 +95,12 @@ class MapboxThemeControl {
 		this._container.className = 'mapboxgl-ctrl';
 		this._container.classList.add('mapboxgl-ctrl-group');
 
-		const button = ce('button', ce('div', bi_icon('layers-fill'), { "style": "transform: scale(0.75)" }), { "type": 'button', "class": 'mapboxgl-ctrl-icon'});
+		const button = ce('button', ce('div', bi_icon('layers-fill'), { "style": "transform: scale(0.75)" }), { "type": 'button', "class": 'mapboxgl-ctrl-icon' });
 
 		this._container.append(button);
 
 		button.addEventListener('mouseup', e => theme_control_popup(e.target.closest('button')));
+		attach_tooltip(button, 'Basemap');
 
 		return this._container;
 	};
@@ -110,11 +118,12 @@ class MapboxProjectionControl {
 		this._container.className = 'mapboxgl-ctrl';
 		this._container.classList.add('mapboxgl-ctrl-group');
 
-		const button = ce('button', ce('div', bi_icon('dribbble'), { "style": "transform: scale(0.75)" }), { "type": 'button', "class": 'mapboxgl-ctrl-icon'});
+		const button = ce('button', ce('div', bi_icon('dribbble'), { "style": "transform: scale(0.75)" }), { "type": 'button', "class": 'mapboxgl-ctrl-icon' });
 
 		this._container.append(button);
 
 		button.addEventListener('mouseup', e => projection_control_popup(e.target.closest('button')));
+		attach_tooltip(button, 'Projection');
 
 		return this._container;
 	};
@@ -137,6 +146,11 @@ export function init() {
 	});
 
 	MAPBOX.addControl(new mapboxgl.NavigationControl({ "showCompass": false }), 'top-left');
+
+	const zoom_in = qs('.mapboxgl-ctrl-zoom-in');
+	const zoom_out = qs('.mapboxgl-ctrl-zoom-out');
+	if (zoom_in) attach_tooltip(zoom_in, 'Zoom in');
+	if (zoom_out) attach_tooltip(zoom_out, 'Zoom out');
 
 	MAPBOX.zoomTo(MAPBOX.getZoom() * 0.95, {"duration": 0});
 	MAPBOX.doubleClickZoom.disable();
@@ -182,16 +196,6 @@ function projection_control_popup(_) {
 
 	x.append(radios);
 
-	x.style = `
-position: absolute;
-top: 120px;
-left: 10px;
-background-color: white;
-box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
-border-radius: 4px;
-padding: 16px;
-`;
-
 	qs('#maparea').append(x);
 };
 
@@ -224,16 +228,6 @@ function theme_control_popup(_) {
 	x.addEventListener('mouseleave', x.remove);
 
 	x.append(radios);
-
-	x.style = `
-position: absolute;
-top: 120px;
-left: 10px;
-background-color: white;
-box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
-border-radius: 4px;
-padding: 16px;
-`;
 
 	qs('#maparea').append(x);
 };

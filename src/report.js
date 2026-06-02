@@ -669,6 +669,38 @@ function analysis_left($, index) {
 		w, h,
 		data,
 	});
+
+	const [minLng, minLat, maxLng, maxLat] = GEOGRAPHY.envelope;
+	const centerLat = (minLat + maxLat) / 2;
+	const totalKm   = (maxLng - minLng) * 111.32 * Math.cos(centerLat * Math.PI / 180);
+	const kmPerInch = totalKm / w;
+	const nice_vals = [0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000, 5000];
+	const target_km = kmPerInch * w * 0.3;
+	const niceKm    = nice_vals.reduce((p, c) => Math.abs(c - target_km) < Math.abs(p - target_km) ? c : p);
+	const barW      = niceKm / kmPerInch;
+	const niceMi    = niceKm * 0.621371;
+	const kmLabel   = niceKm >= 1 ? `${niceKm} km` : `${Math.round(niceKm * 1000)} m`;
+	const miLabel   = niceMi >= 1 ? `${Math.round(niceMi)} mi` : `${Math.round(niceMi * 5280)} ft`;
+
+	const oy = 3.5 + h + 0.12;
+	const ox = a4(10, 'x');
+	// North arrow as SVG so N and needle are always aligned
+	const north_svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 26">
+		<text x="10" y="7" text-anchor="middle" font-family="sans-serif" font-size="8" font-weight="bold" fill="#333">N</text>
+		<polygon points="10,9 14,19 10,17 6,19" fill="#333"/>
+	</svg>`;
+	$.addImage({ "x": ox, "y": oy, "w": 0.26, "h": 0.34, "data": `data:image/svg+xml;base64,${btoa(north_svg)}` });
+
+	// Scale bar
+	const bx = ox + 0.26 + 0.12;
+	const by = oy + 0.15;
+	const bh = 0.04;
+
+	$.addShape(this.ShapeType.rect, { "x": bx,                  "y": by - 0.02, "w": 0.01, "h": bh + 0.04, "fill": { "color": "333333" } });
+	$.addShape(this.ShapeType.rect, { "x": bx,                  "y": by,        "w": barW, "h": bh,         "fill": { "color": "333333" } });
+	$.addShape(this.ShapeType.rect, { "x": bx + barW - 0.01,    "y": by - 0.02, "w": 0.01, "h": bh + 0.04, "fill": { "color": "333333" } });
+
+	$.addText(`${kmLabel} / ${miLabel}`, textopts({ "x": bx, "y": by + bh + 0.02, "w": barW, "h": 0.12, "fontSize": 6, "align": "center" }));
 };
 
 function analysis_right($, index, rows) {

@@ -51,3 +51,12 @@ canvas.mapboxgl-canvas {
 .mapbox-control-popup .radio-group + .radio-group {
   margin-top: 8px;
 }
+
+.north-arrow-ctrl {
+  padding: 4px 6px;
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
+  line-height: 0;
+  cursor: default;
+}

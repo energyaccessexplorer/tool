@@ -134,6 +134,24 @@ class MapboxProjectionControl {
 	};
 };
 
+class MapboxNorthArrowControl {
+	onAdd(map) {
+		this._map = map;
+		this._container = document.createElement('div');
+		this._container.className = 'mapboxgl-ctrl north-arrow-ctrl';
+		this._container.innerHTML = `<svg width="28" height="40" viewBox="0 0 28 40" xmlns="http://www.w3.org/2000/svg">
+			<text x="14" y="9" text-anchor="middle" font-size="9" font-weight="bold" fill="#333" font-family="sans-serif">N</text>
+			<polygon points="14,12 20,26 14,23 8,26" fill="#333"/>
+		</svg>`;
+		return this._container;
+	};
+
+	onRemove() {
+		this._container.parentNode.removeChild(this._container);
+		this._map = undefined;
+	};
+};
+
 
 export function init() {
 	mapboxgl.accessToken = EAE['settings'].mapbox_token;
@@ -161,6 +179,10 @@ export function init() {
 
 	MAPBOX.addControl((new MapboxThemeControl()), 'top-left');
 	MAPBOX.addControl((new MapboxProjectionControl()), 'top-left');
+
+	MAPBOX.addControl(new MapboxNorthArrowControl(), 'bottom-left');
+	MAPBOX.addControl(new mapboxgl.ScaleControl({ "maxWidth": 150, "unit": "metric" }), 'bottom-left');
+	MAPBOX.addControl(new mapboxgl.ScaleControl({ "maxWidth": 150, "unit": "imperial" }), 'bottom-left');
 
 	MAPBOX.coords = fit(GEOGRAPHY.envelope);
 	change_theme(EAE['settings'].mapbox_theme);

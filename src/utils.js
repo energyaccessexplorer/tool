@@ -555,7 +555,7 @@ export function bi_icon(v) {
 
 export function copy_to_clipboard(url, button) {
 	if (!navigator.clipboard) {
-		new Toast({ "label": "Clipboard functionality not available", "variant": 'error' }).show();
+		new Toast({ "label": "Clipboard functionality not available", "variant": 'warn' }).show();
 
 		button.remove();
 		return;

@@ -7,16 +7,26 @@ export default class Toast extends HTMLElement {
 
 		const { label, caption, variant } = options;
 
-		const templateId = variant === 'error' ? '#toast-error-template' : '#toast-notification-template';
+		this._label   = label;
+		this._caption = caption;
+		this._variant = variant;
+
+		const templateId = (variant === 'error' || variant === 'warn') ? '#toast-error-template' : '#toast-notification-template';
 		const content = tmpl(templateId);
 		bind(content, { label, caption });
 
-		if (variant === 'error') this.classList.add('error');
+		if (variant === 'error' || variant === 'warn') this.classList.add('error');
 
 		this.append(content);
 	}
 
 	show() {
+		if (this._variant === 'error')
+			window.Sentry?.captureMessage(this._label, {
+				"level": 'error',
+				"extra": { "caption": this._caption },
+			});
+
 		document.body.append(this);
 
 		setTimeout(() => {

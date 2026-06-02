@@ -72,7 +72,7 @@ function share(snapshots) {
 
 	function copy() {
 		if (!navigator.clipboard) {
-			new Toast({ "label": "Clipboard functionality not available", "variant": 'error' }).show();
+			new Toast({ "label": "Clipboard functionality not available", "variant": 'warn' }).show();
 
 			this.closest('button').remove();
 

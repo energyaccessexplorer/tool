@@ -544,7 +544,7 @@ export function init() {
 	const visible_all = function() {
 		visible = !visible;
 
-		STATE.datasets.forEach(x => x.visibility(visible));
+		STATE.datasets.filter(x => !x.cannot_deactivate(false)).forEach(x => x.visibility(visible));
 
 		qs('span', this).innerText = visible ? "Hide all layers" : "Show all layers";
 		qs('i', this).className = visible ? 'bi-eye-slash-fill' : 'bi-eye-fill';
@@ -648,30 +648,33 @@ export default class dscard extends HTMLElement {
 
 	bind() {
 		bind(this, Object.assign({}, this.ds, {
-			"unit-label":       coalesce(this.ds.category.controls.range_label, this.ds.category.unit, "Range"),
-			"range":            maybe(range.call(this), 'svg'),
-			"value-checkboxes": value_checkboxes.call(this),
-			"pvna":             (this.ds.type === 'polygons-valued'),
-			"info":             this.ds.info_modal.bind(this.ds),
-			"index":            coalesce(this.ds.index, "Filter").replace(/(ani|eai)/, "Filter"),
-			"specs":            specs.call(this),
-			"symbol":           symbol.call(this),
-			"colorscale":       colorscale.call(this),
-			"ramp":             ramp.call(this),
-			"visibility":       (_, e) => this.ds.visibility(e.target.checked),
-			"opacity":          opacity.call(this),
-			"close":            _ => { this.ds.turn(false); COMMIT("datasets"); },
-			"weight-group":     weight_group.call(this),
-			"settings":         (_, e) => settings.call(this, _, e.target.closest('button')),
-			"table":            this.ds.features_table_modal.bind(this.ds),
-			"manual-inputs":    manual_inputs.call(this),
-			"manual-min":       this.manual_min,
-			"manual-max":       this.manual_max,
-			"mutant-options":   mutant_options.call(this),
+			"unit-label":        coalesce(this.ds.category.controls.range_label, this.ds.category.unit, "Range"),
+			"range":             maybe(range.call(this), 'svg'),
+			"value-checkboxes":  value_checkboxes.call(this),
+			"pvna":              (this.ds.type === 'polygons-valued'),
+			"info":              this.ds.info_modal.bind(this.ds),
+			"index":             coalesce(this.ds.index, "Filter").replace(/(ani|eai)/, "Filter"),
+			"specs":             specs.call(this),
+			"symbol":            symbol.call(this),
+			"colorscale":        colorscale.call(this),
+			"ramp":              ramp.call(this),
+			"visibility":        (_, e) => this.ds.visibility(e.target.checked),
+			"opacity":           opacity.call(this),
+			"close":             _ => { this.ds.turn(false); COMMIT("datasets"); },
+			"weight-group":      weight_group.call(this),
+			"settings":          (_, e) => settings.call(this, _, e.target.closest('button')),
+			"table":             this.ds.features_table_modal.bind(this.ds),
+			"show-info-buttons": this.ds.category.name !== 'outline',
+			"manual-inputs":     manual_inputs.call(this),
+			"manual-min":        this.manual_min,
+			"manual-max":        this.manual_max,
+			"mutant-options":    mutant_options.call(this),
 		}), { "final": false });
 
 		if (this.ds.cannot_deactivate(false)) {
 			qs('[bind-func="close"]', this)?.remove();
+			const visCheckbox = qs('[bind-func="visibility"]', this);
+			if (visCheckbox) visCheckbox.disabled = true;
 		}
 	};
 

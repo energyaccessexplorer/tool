@@ -1,0 +1,28 @@
+{{define "sentry"}}
+<script>
+  (function() {
+    if (location.hostname.match(/(localhost|linux)/)) return;
+
+    window.sentryOnLoad = function() {
+      Sentry.init({
+        environment: "{{.env}}",
+        integrations: [
+          Sentry.browserTracingIntegration(),
+          Sentry.replayIntegration({
+            maskAllText: true,
+            blockAllMedia: true,
+          }),
+        ],
+        tracesSampleRate: 0.2,
+        replaysSessionSampleRate: 0.1,
+        replaysOnErrorSampleRate: 1.0,
+      });
+    };
+
+    var s = document.createElement('script');
+    s.src = 'https://js-de.sentry-cdn.com/fbc1206c3bb3dfaa5b9dcfce5e426ebc.min.js';
+    s.crossOrigin = 'anonymous';
+    document.head.appendChild(s);
+  })();
+</script>
+{{end}}

@@ -190,6 +190,8 @@ async function presets_init() {
 };
 
 export async function init() {
+	if (window.innerWidth <= 768) return;
+
 	await self();
 
 	const playground = qs('#playground');

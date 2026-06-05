@@ -301,7 +301,7 @@ async function worldview() {
 	]);
 }
 
-export function change_theme(theme, soft) {
+export function change_theme(theme) {
 	async function go() {
 		const c = MAPBOX.getStyle().layers.find(l => l.type === 'symbol');
 		MAPBOX.first_symbol = maybe(c, 'id');
@@ -309,17 +309,23 @@ export function change_theme(theme, soft) {
 		await until(_ => MAPBOX.isStyleLoaded());
 
 		worldview();
-
-		for (const l of MAPBOX.getStyle().layers) {
-			if (l.id.startsWith('admin'))
-				MAPBOX.setLayoutProperty(l.id, 'visibility', 'none');
-		}
 	};
 
 	MAPBOX.once('style.load', go);
 
-	if (!soft)
-		MAPBOX.setStyle(theme_pick(EAE['settings'].mapbox_theme = theme));
+	const style = theme_pick(EAE['settings'].mapbox_theme = theme);
+
+	if (typeof style === 'object') {
+		MAPBOX.setStyle(style);
+	} else {
+		const url = style.replace('mapbox://styles/', 'https://api.mapbox.com/styles/v1/') + `?access_token=${EAE['settings'].mapbox_token}`;
+		fetch(url)
+			.then(r => r.json())
+			.then(s => {
+				s.layers = s.layers.filter(l => !l.id.startsWith('admin'));
+				MAPBOX.setStyle(s);
+			});
+	}
 
 	if (theme === "") go();
 

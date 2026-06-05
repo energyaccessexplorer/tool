@@ -2,7 +2,6 @@ import {
 	super_error,
 	bi_icon,
 	coordinates_to_raster_pixel,
-	raster_pixel_to_coordinates,
 } from './utils.js';
 
 import {
@@ -455,22 +454,38 @@ export async function sort() {
 };
 
 export function show_location_info(ll, position, centerPointer = true) {
-	const raster_pixel = coordinates_to_raster_pixel(ll, OUTLINE.raster);
-
-	if (raster_pixel) {
-		ll = raster_pixel_to_coordinates(raster_pixel.index);
-		Object.assign(position, get_map_position(ll));
-	}
-
 	const pt = MAPBOX.project(ll);
-	const features = MAPBOX.queryRenderedFeatures([[pt.x - 10, pt.y - 10],
-		[pt.x + 10, pt.y + 10]]);
+	const radius = 10;
+	const snap_radius = 25;
+	const features = MAPBOX.queryRenderedFeatures([[pt.x - radius, pt.y - radius],
+		[pt.x + radius, pt.y + radius]]);
 
-	const dotFeature = features.find(feat => feat && maybe(feat, 'geometry', 'type') === 'Point');
-	if (dotFeature) {
-		ll = dotFeature.geometry.coordinates;
+	const pixel_distance = feat => {
+		const fp = MAPBOX.project(feat.geometry.coordinates);
+		return Math.hypot(fp.x - pt.x, fp.y - pt.y);
+	};
+
+	const circleLayers = MAPBOX.getStyle().layers
+		.filter(l => l.type === 'circle')
+		.map(l => l.id);
+
+	const snapFeature = (circleLayers.length ? MAPBOX.queryRenderedFeatures({ "layers": circleLayers }) : [])
+		.filter(feat => feat.geometry?.type === 'Point' && !maybe(feat, 'properties', 'point_count'))
+		.map(feat => [feat, pixel_distance(feat)])
+		.filter(([, d]) => d <= snap_radius)
+		.sort((a, b) => a[1] - b[1])
+		.map(([feat]) => feat)[0];
+
+	const poiFeature  = !snapFeature && features.find(feat => feat?.geometry?.type === 'Point');
+
+	if (snapFeature) {
+		ll = snapFeature.geometry.coordinates;
 		Object.assign(position, get_map_position(ll));
+
+		if (!features.includes(snapFeature)) features.unshift(snapFeature);
 	}
+
+	const raster_pixel = coordinates_to_raster_pixel(ll, OUTLINE.raster);
 
 	const [fields, props, raw] = context(raster_pixel, features);
 
@@ -486,14 +501,17 @@ export function show_location_info(ll, position, centerPointer = true) {
 		analysis_name = EAE['indexes'][STATE.index]['name'];
 	}
 
-	coords_search_pois({ "coords": ll, "limit": 1 })
-		.then(r => {
-			const feature_name = maybe(r, 0, 'name');
-			const { drop } = pointer(position, { fields, props, ll, analysis_value, analysis_name, feature_name, raw, "raster_index": raster_pixel?.index });
-			current_map_info_drop = drop;
+	const poi_name = maybe(poiFeature, 'properties', 'name');
+	const name_promise = poi_name
+		? Promise.resolve(poi_name)
+		: coords_search_pois({ "coords": ll, "limit": 1 }).then(r => maybe(r, 0, 'name'));
 
-			if (centerPointer && raster_pixel) ensure_map_info_visible();
-		});
+	name_promise.then(feature_name => {
+		const { drop } = pointer(position, { fields, props, ll, analysis_value, analysis_name, feature_name, raw, "raster_index": raster_pixel?.index });
+		current_map_info_drop = drop;
+
+		if (centerPointer && raster_pixel) ensure_map_info_visible();
+	});
 }
 
 function ensure_map_info_visible() {

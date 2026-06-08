@@ -30,7 +30,8 @@ function preload_boundaries(id) {
 		"category_name": "in.(outline,boundaries)",
 	}).then(r => {
 		r.map(d => d['processed_files'].find(f => f['func'] === 'vectors'))
-			.forEach(f => fetch(f['endpoint']));
+			.filter(Boolean)
+			.forEach(f => fetch(f['endpoint']).catch(() => {}));
 	});
 };
 

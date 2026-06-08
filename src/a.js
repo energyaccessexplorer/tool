@@ -149,7 +149,7 @@ function state_get(conf, p) {
 	}
 
 	case "datasets": {
-		return conf.datasets.map(d => DST.get(d.id));
+		return conf.datasets.map(d => DST.get(d.id)).filter(Boolean);
 	}
 
 	default: {
@@ -248,6 +248,11 @@ async function init_1() {
 	const url = new URL(location);
 	const id = url.searchParams.get('id');
 
+	if (!id) {
+		super_error("Geography error", "No geography id provided. Please select a geography.");
+		throw new Error("No geography id in URL");
+	}
+
 	let conf = sessionStorage.getItem('config');
 	if (conf) conf = JSON.parse(conf);
 
@@ -284,6 +289,11 @@ async function init_1() {
 		"id":     `eq.${id}`,
 		"select": ['*', 'parent_sort_branches', 'parent_sort_subbranches', 'parent_sort_datasets'],
 	}, { "one": true });
+
+	if (!GEOGRAPHY) {
+		super_error("Geography error", `Geography with id '${id}' was not found.`);
+		throw new Error(`Geography not found: ${id}`);
+	}
 
 	// MOBILE= screen.width < 1152;
 

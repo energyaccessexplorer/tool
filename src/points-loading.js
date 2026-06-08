@@ -134,7 +134,7 @@ async function reload() {
 export function init() {
 	const panel = qs('#points.search-panel');
 
-	const file_input = ce('input', null, { "type": "file", "id": "points-input", "style": "width: 0; height: 0;", "accept": "text/csv" });
+	const file_input = qs('#points-file-input', panel);
 	const upload = qs('#points-upload', panel);
 	const upmsg = `
 <h1>Upload a CSV file</h1>
@@ -278,8 +278,6 @@ This file should be <strong>strictly</strong> formatted.
 	};
 
 	panel.addEventListener('activate', reload);
-
-	panel.prepend(file_input);
 
 	resultscontainer = qs('#points .search-results');
 	ul = ce('ul');

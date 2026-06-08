@@ -1,7 +1,7 @@
 {{define "cookie"}}
 <script>
   (function() {
-    if (location.hostname.match(/(localhost|linux)/)) return;
+    if (location.hostname.match(/(localhost|linux|^test\.)/)) return;
 
     const s = document.createElement('script');
     s.async = true;

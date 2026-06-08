@@ -1,6 +1,10 @@
 import Toast from './toast.js';
 
 import {
+	sentry_setup_global_handlers,
+} from './sentry.js';
+
+import {
 	loading,
 	self,
 } from './utils.js';
@@ -26,7 +30,8 @@ function preload_boundaries(id) {
 		"category_name": "in.(outline,boundaries)",
 	}).then(r => {
 		r.map(d => d['processed_files'].find(f => f['func'] === 'vectors'))
-			.forEach(f => fetch(f['endpoint']));
+			.filter(Boolean)
+			.forEach(f => fetch(f['endpoint']).catch(() => {}));
 	});
 };
 
@@ -186,12 +191,14 @@ async function presets_init() {
 
 				preset.datasets.push(ds);
 			});
-		});
+		})
+		.catch(err => console.warn("presets_init: failed to load presets.csv", err));
 };
 
 export async function init() {
 	if (window.innerWidth <= 768) return;
 
+	sentry_setup_global_handlers(ENV[0]);
 	await self();
 
 	const playground = qs('#playground');

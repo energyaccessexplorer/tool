@@ -282,6 +282,8 @@ export async function update() {
 	clear_row_cache();
 
 	const section = qs('#right-panel #analysis-locations-section');
+	if (!section) return;
+
 	const resultscontainer = qs('.locations-paginated-list', section);
 
 	const ul = qs('.locations-list', resultscontainer);

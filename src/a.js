@@ -113,6 +113,8 @@ import admintiers from './admin-tiers.js';
 
 import bubblemessage from '../lib/bubblemessage.js';
 
+import { translateNode, initLocalePicker, t } from './translate.js';
+
 export const STANDARD_TABS = new Set(['census', 'demand', 'supply', 'other']);
 
 COMMIT = debounce(function() {
@@ -235,6 +237,15 @@ export function init() {
 	if (window.innerWidth <= 768) return;
 
 	sentry_setup_global_handlers(ENV[0]);
+
+	window.LOCALE = new URLSearchParams(location.search).get('lang')
+		?? localStorage.getItem('locale')
+		?? navigator.language.split('-')[0]
+		?? 'en';
+
+	translateNode(LOCALE, document);
+	initLocalePicker(LOCALE);
+
 	self();
 
 	Whatever
@@ -258,7 +269,7 @@ async function init_1() {
 
 	const s = url.searchParams.get('snapshot');
 	if (s) {
-		loading("Fetching snapshot...");
+		loading(t(LOCALE, 'overlay.fetching_snapshot'));
 
 		sessionStorage.removeItem('config');
 
@@ -283,7 +294,7 @@ async function init_1() {
 	drawer_init();
 	cards_init();
 
-	loading("Fetching geography...");
+	loading(t(LOCALE, 'overlay.fetching_geography'));
 
 	GEOGRAPHY = await API.get("geographies", {
 		"id":     `eq.${id}`,
@@ -314,7 +325,7 @@ async function init_1() {
 	// On your OS, you can do this by pressing (${mac ? "⌘" : "ctrl"} −) a couple times.
 	// `);
 
-	loading("Initialising mapbox...");
+	loading(t(LOCALE, 'overlay.initialising_mapbox'));
 
 	mapbox_init();
 
@@ -332,7 +343,7 @@ async function init_2(conf) {
 
 	GEOGRAPHY.divisions = [];
 
-	loading("Fetching datasets...");
+	loading(t(LOCALE, 'overlay.fetching_datasets'));
 
 	const ALL = await API.get("datasets", {
 		"geography_id": `eq.${GEOGRAPHY.id}`,
@@ -365,7 +376,7 @@ This is fatal. Thanks for all the fish.`;
 	})();
 
 	await (function fetch_divisions() {
-		loading("Fetching divisions...");
+		loading(t(LOCALE, 'overlay.fetching_divisions'));
 
 		const divisions_ids = divisions.slice(1).map(d => d.dataset_id);
 
@@ -386,7 +397,7 @@ This is fatal. Thanks for all the fish.`;
 	(async function fetch_admintiers() {
 		let o = ALL.find(x => x.category.name === 'admin-tiers');
 
-		loading("Fetching administrative tiers...");
+		loading(t(LOCALE, 'overlay.fetching_admin_tiers'));
 
 		if (!o) {
 			const pid = maybe(
@@ -407,7 +418,7 @@ This is fatal. Thanks for all the fish.`;
 		admintiers(o);
 	})();
 
-	loading("Setting up datasets...");
+	loading(t(LOCALE, 'overlay.setting_up_datasets'));
 
 	GEOGRAPHY.divisions = divisions
 		.map(d => DS.array.find(t => t.dataset_id === d.dataset_id))
@@ -438,7 +449,7 @@ This is fatal. Thanks for all the fish.`;
 };
 
 async function init_3() {
-	loading("Setting up UI elements...");
+	loading(t(LOCALE, 'overlay.setting_up_ui'));
 
 	right_panel_init();
 	controlssearch_init();

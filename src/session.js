@@ -19,12 +19,15 @@ import {
 } from './utils.js';
 
 import bind from '../lib/bind.js';
+import { t, translateNode } from './translate.js';
 
 const url = new URL(location);
 
 function show_save_toast(label, caption) {
 	const toast = new Toast({ label, caption });
-	toast.append(tmpl('#toast-save-action-template'));
+	const action = tmpl('#toast-save-action-template');
+	translateNode(window.LOCALE, action);
+	toast.append(action);
 	toast.show();
 }
 
@@ -36,8 +39,10 @@ function request_authentication() {
 	const footer = document.createDocumentFragment();
 	footer.append(...children.slice(1));
 
+	translateNode(window.LOCALE, template);
+
 	const m = new modal({
-		"header":  "Save analysis to My EAE",
+		"header":  t(window.LOCALE, 'modals.save_analysis.header'),
 		"content": content,
 		"footer":  footer,
 	});
@@ -47,12 +52,12 @@ function request_authentication() {
 
 function saved_analysis_modal(s, updateCallback, saveAsNewCallback) {
 	const lastViewedDate = new Date(s.time);
-	const lastViewed = `Last viewed on ${lastViewedDate.toLocaleDateString()}.`;
+	const lastViewed = t(window.LOCALE, 'modal.save_analysis.last_viewed', { "date": lastViewedDate.toLocaleDateString(window.LOCALE) });
 
 	const template = tmpl('#saved-analysis-modal-template');
 
 	bind(template, {
-		"title":        s.title || 'Untitled Analysis',
+		"title":        s.title || t(window.LOCALE, 'modal.save_analysis.untitled_analysis'),
 		"last-viewed":  lastViewed,
 		"update":       () => {
 			m.remove();
@@ -64,6 +69,8 @@ function saved_analysis_modal(s, updateCallback, saveAsNewCallback) {
 		},
 	});
 
+	translateNode(window.LOCALE, template);
+
 	const children = Array.from(template.children);
 	const content = document.createDocumentFragment();
 	content.append(children[0], children[1]);
@@ -72,7 +79,7 @@ function saved_analysis_modal(s, updateCallback, saveAsNewCallback) {
 	footer.append(...children.slice(2));
 
 	const m = new modal({
-		"header":  "Save analysis to My EAE",
+		"header":  t(window.LOCALE, 'modals.save_analysis.header'),
 		"content": content,
 		"footer":  footer,
 	});
@@ -82,6 +89,7 @@ function saved_analysis_modal(s, updateCallback, saveAsNewCallback) {
 
 function edit_title(s, callback) {
 	const template = tmpl('#edit-title-form-template');
+	translateNode(window.LOCALE, template);
 	const children = Array.from(template.children);
 
 	const f = children[0];
@@ -96,7 +104,7 @@ function edit_title(s, callback) {
 	});
 
 	const m = new modal({
-		"header":  "Save analysis to My EAE",
+		"header":  t(window.LOCALE, 'modals.save_analysis.header'),
 		"content": f,
 		"footer":  x,
 	});
@@ -139,13 +147,13 @@ export function snapshot(callback) {
 	}
 
 	function patch() {
-		loading('Saving analysis...');
+		loading(t(window.LOCALE, 'session.saving'));
 		with_timeout(API.patch('snapshots', { "time": `eq.${snapshot_id}` }, { "payload": { config } }))
 			.then(r => {
-				if (r) show_save_toast('Analysis updated successfully', 'Your analysis was updated in your My EAE account.');
+				if (r) show_save_toast(t(window.LOCALE, 'modal.save_analysis.updated_toast'), t(window.LOCALE, 'modal.save_analysis.updated_toast_caption'));
 			})
 			.catch(err => {
-				const toast = new Toast({ "label": 'Save failed', "caption": err.message, "variant": 'error' });
+				const toast = new Toast({ "label": t(window.LOCALE, 'modal.save_analysis.save_failed'), "caption": err.message, "variant": 'error' });
 				toast.show();
 			})
 			.finally(() => loading(false));
@@ -166,17 +174,17 @@ export function snapshot(callback) {
 		edit_title(s, _ => {
 			SNAPSHOT = s;
 
-			loading('Saving analysis...');
+			loading(t(window.LOCALE, 'session.saving'));
 			with_timeout(API.post('snapshots', null, { "payload": s }))
 				.then(r => {
 					if (!r) return;
-					show_save_toast('Analysis saved successfully', 'Your analysis was saved to your My EAE account.');
+					show_save_toast(t(window.LOCALE, 'modal.save_analysis.saved_toast'), t(window.LOCALE, 'modal.save_analysis.saved_toast_caption'));
 					url.searchParams.set('snapshot', s['time']);
 					history.replaceState(null, null, url);
 					if (typeof callback === 'function') callback();
 				})
 				.catch(err => {
-					const toast = new Toast({ "label": 'Save failed', "caption": err.message, "variant": 'error' });
+					const toast = new Toast({ "label": t(window.LOCALE, 'modal.save_analysis.save_failed'), "caption": err.message, "variant": 'error' });
 					toast.show();
 				})
 				.finally(() => loading(false));

@@ -4,6 +4,8 @@ import {
 
 import DS from './ds.js';
 
+import { translateDatasetName, translateDatasetAttribute, translateCategoryName, translateSubbranchName, registerUIUpdater } from './translate.js';
+
 import {
 	select_tab,
 } from './controls-search.js';
@@ -15,7 +17,6 @@ import {
 import bind from '../lib/bind.js';
 
 import {
-	ce,
 	maybe,
 	qs,
 	qsa,
@@ -59,6 +60,92 @@ export function recount() {
 
 const tabs_el = qs('#controls-tabs');
 
+function create_or_update_tab(name, translations, locale = window.LOCALE) {
+	const id = 'controls-tab-' + name;
+	let t = qs(`#${id}.controls-branch-tab`);
+
+	if (!t) {
+		t = tmpl('#branch-tab-template').querySelector('.controls-branch-tab');
+		t.id = id;
+		if (EAE['indexes'][name]) t.setAttribute('bind', name);
+		tabs_el.append(t);
+	}
+
+	bind(t, {
+		"label":  translateCategoryName(locale, name, translations),
+		"select": (_) => select_tab(t, name),
+	}, { "final": false });
+
+	return t;
+}
+
+function create_or_update_branch(name) {
+	const id = 'controls-branch-' + name;
+	let b = qs(`#${id}.controls-branch`, contents_el);
+
+	if (!b) {
+		b = tmpl('#branch-container-template').querySelector('.controls-branch');
+		b.id = id;
+		if (EAE['indexes'][name]) b.setAttribute('bind', name);
+		contents_el.append(b);
+	}
+
+	return b;
+}
+
+function create_or_update_subbranch(name, parent, translations, locale = window.LOCALE) {
+	const id = 'controls-subbranch-' + name;
+	let sb = qs(`#${id}.controls-subbranch`, parent);
+
+	if (!sb) {
+		sb = tmpl('#subbranch-template').querySelector('.controls-subbranch');
+		sb.id = id;
+		parent.append(sb);
+		const container = qs('.controls-container', sb);
+		const titleEl = qs('.controls-subbranch-title', sb);
+		elem_collapse(container, sb);
+		titleEl.addEventListener('mouseup', (_) => elem_collapse(container, sb));
+	}
+
+	const titleEl = qs('.controls-subbranch-title', sb);
+
+	bind(titleEl, {
+		"label": translateSubbranchName(locale, name, translations),
+	}, { "final": false });
+
+	return sb;
+}
+
+registerUIUpdater(() => refreshControlsUI(window.LOCALE));
+
+export function refreshControlsUI(locale) {
+	if (typeof DST === 'undefined' || !DST.size) return;
+
+	const seenTabs = new Set();
+	const seenSubbranches = new Set();
+
+	for (const ds of DST.values()) {
+		const path = maybe(ds.category, 'controls', 'path');
+		if (!maybe(path, 'length')) continue;
+
+		const ptr = maybe(ds.category, 'controls', 'path_translations') || [];
+
+		if (!seenTabs.has(path[0])) {
+			create_or_update_tab(path[0], ptr[0], locale);
+			seenTabs.add(path[0]);
+		}
+
+		if (path.length >= 2) {
+			const branchId = `${path[0]}-${path[1]}`;
+			if (!seenSubbranches.has(branchId)) {
+				const b = create_or_update_branch(path[0]);
+				create_or_update_subbranch(path[1], b, ptr[1], locale);
+				seenSubbranches.add(branchId);
+			}
+		}
+	}
+}
+
 export default class dscontrols extends HTMLElement {
 	constructor(d) {
 		if (!(d instanceof DS)) throw new Error(`dscontrols: Expected a DS but got ${d}`);
@@ -82,17 +169,23 @@ export default class dscontrols extends HTMLElement {
 
 		this.header.onclick = header_click.call(this);
 
-		bind(this, Object.assign({}, this.ds, {
-			"checkbox":    this.checkbox.svg,
-			"description": this.ds.description || this.ds.category.description,
-			"card":        (_, e) => { e.stopPropagation(); this.ds.card.discover(); },
-			"info":        (_, e) => { e.stopPropagation(); this.ds.info_modal(); },
-		}), { "final": false });
-
+		this.bind();
 		this.inject();
 
 		return this;
-	};
+	}
+
+	bind() {
+		const desc = this.ds.description || this.ds.category.description;
+
+		bind(this, Object.assign({}, this.ds, {
+			"name":        translateDatasetName(window.LOCALE, this.ds),
+			"checkbox":    this.checkbox.svg,
+			"description": translateDatasetAttribute(window.LOCALE, this.ds, desc, 'description'),
+			"card":        (_, e) => { e.stopPropagation(); this.ds.card.discover(); },
+			"info":        (_, e) => { e.stopPropagation(); this.ds.info_modal(); },
+		}), { "final": false });
+	}
 
 	loading(t) {
 		this.spinner.style.display = t ? 'block' : 'none';
@@ -113,50 +206,11 @@ export default class dscontrols extends HTMLElement {
 
 		if (!maybe(path, 'length')) return;
 
-		function create_tab(name) {
-			const t = ce('div', humanformat(name), { "id": 'controls-tab-' + name, "class": 'controls-branch-tab up-title' });
-			if (EAE['indexes'][name]) t.setAttribute('bind', name);
-			return t;
-		};
+		const ptr = maybe(ds.category, 'controls', 'path_translations') || [];
 
-		function create_branch(name) {
-			const t = ce('div', null, { "id": 'controls-branch-' + name, "class": 'controls-branch' });
-			if (EAE['indexes'][name]) t.setAttribute('bind', name);
-			return t;
-		};
-
-		function create_subbranch(name) {
-			let conel, title;
-			const el = ce('div', null, { "id": 'controls-subbranch-' + name, "class": 'controls-subbranch' });
-
-			el.append(
-				title = ce('div', ce('span', humanformat(name), { "class": "text" }), { "class": 'controls-subbranch-title up-title' }),
-				conel = ce('div', null, { "class": 'controls-container' }),
-			);
-
-			title.prepend(ce('span', null, { "class": 'collapse triangle' }));
-			title.append(ce('span', "0", { "class": 'count' }));
-			title.addEventListener('mouseup', _ => elem_collapse(conel, el));
-
-			elem_collapse(conel, el);
-
-			return el;
-		};
-
-		let t = qs(`#controls-tab-${path[0]}.controls-branch-tab`);
-		if (!t) {
-			t = create_tab(path[0]);
-			t.onclick = _ => select_tab(t, path[0]);
-			tabs_el.append(t);
-		}
-
-		let b = qs(`#controls-branch-${path[0]}.controls-branch`, contents_el);
-		if (!b) b = create_branch(path[0]);
-		contents_el.append(b);
-
-		let sb = qs(`#controls-subbranch-${path[1]}.controls-subbranch`, b);
-		if (!sb) sb = create_subbranch(path[1]);
-		b.append(sb);
+		create_or_update_tab(path[0], ptr[0]);
+		const b = create_or_update_branch(path[0]);
+		const sb = create_or_update_subbranch(path[1], b, ptr[1]);
 
 		const container = qs('.controls-container', sb);
 		if (container) container.append(this);
@@ -174,14 +228,6 @@ export default class dscontrols extends HTMLElement {
 };
 
 customElements.define('ds-controls', dscontrols);
-
-function humanformat(s) {
-	return s
-		.replace('_', ' ')
-		.replace('-', ' ')
-		.replace(/^([a-z])/, x => x.toUpperCase())
-		.replace(/ ([a-z])/g, x => x.toUpperCase());
-};
 
 function toggle_switch(init, callback) {
 	const radius = 10;

@@ -6,6 +6,8 @@ import {
 	setup_about_button,
 } from './right-panel-graphs.js';
 
+import { translateNode, t } from './translate.js';
+
 import {
 	tmpl,
 	qs,
@@ -41,16 +43,15 @@ export async function update(ll) {
 	const card = tmpl('#poi-card-template');
 
 	bind(card, {
-		"description": `There ${n === 1 ? 'is' : 'are'} <strong>${n}</strong> `
-			+ `point${n === 1 ? '' : 's'} of interest within <strong>${radius_km}km</strong> `
-			+ `of this area of interest.`,
-		"points": results.map(poi => ({
+		"description": t(window.LOCALE, n === 1 ? 'right_panel.poi.count_html_one' : 'right_panel.poi.count_html_other', { n, radius_km }),
+		"points":      results.map(poi => ({
 			"name": poi.name,
 			"kind": poi.kind ?? '',
 		})),
 	});
 
-	setup_about_button(card, 'Shows points of interest near the selected pixel.');
+	setup_about_button(card, t(window.LOCALE, 'right_panel.poi.about_tooltip'));
+	translateNode(window.LOCALE, card);
 	container.append(card);
 }
 

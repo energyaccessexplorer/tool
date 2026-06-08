@@ -13,6 +13,8 @@ import {
 	area_type,
 } from './utils.js';
 
+import { translateNode, t, translateIndexName, getScaleLabels } from './translate.js';
+
 import {
 	make_title,
 } from './right-panel-tabs.js';
@@ -90,18 +92,20 @@ export async function update(raster_index, admin_info, analysis_value) {
 	body.append(make_row('supply', entries['supply'], true));
 	body.append(make_row('ani', entries['ani']));
 
-	setup_about_button(card, EAE['indexes']['eai']['explain']);
+	setup_about_button(card, t(window.LOCALE, 'modal.eae_info.index.eai.explain'));
+	translateNode(window.LOCALE, card);
 
 	container.append(card);
 }
 
 function make_row(key, entry, subordinate = false) {
-	const index = EAE['indexes'][key];
-	const formatted = (entry?.value != null && entry?.scale) ? entry.scale(entry.value) : '—';
+	const raw = (entry?.value != null && entry?.scale) ? entry.scale(entry.value) : null;
+	const raw_index = raw != null ? lowmedhigh_scale.range().indexOf(raw) : -1;
+	const formatted = raw_index !== -1 ? getScaleLabels(window.LOCALE)[raw_index] : (raw ?? '—');
 
 	const row = ce('div', null, { 'class': subordinate ? 'index-priority-row subordinate' : 'index-priority-row' });
 	const name = ce('span', null, { 'class': 'index-priority-name' });
-	name.textContent = index.name;
+	name.textContent = translateIndexName(window.LOCALE, key);
 	const val = ce('span', null, { 'class': 'index-priority-value' });
 	val.textContent = formatted;
 	row.append(name, val);
@@ -118,20 +122,20 @@ export function update_location_summary(data, admin_info) {
 	const container = qs('#location-summary');
 	if (!container) return;
 
-	const score_entry = data?.basicData?.find(e => e.label === 'Priority score');
+	const score_entry = data?.basicData?.find(e => e.key === 'Priority score');
 	if (!score_entry) return;
 
 	const area_label = admin_info
 		? area_type(admin_info.variant)
-		: 'Priority areas (' + area_type('raster') + ')';
+		: t(window.LOCALE, 'right_panel.prioritization.priority_areas', { "area": area_type('raster') });
 
-	const location_entry = data.basicData.find(e => e.label === 'Location');
+	const location_entry = data.basicData.find(e => e.key === 'Location');
 
 	const coords_el = qs('.location-coordinates', container);
 	coords_el.textContent = data.coordinates ?? '';
 	coords_el.style.display = data.coordinates ? '' : 'none';
 
-	qs('.location-priority-badge', container).textContent = score_entry.value + ' priority score';
+	qs('.location-priority-badge', container).textContent = t(window.LOCALE, 'right_panel.prioritization.priority_score_badge', { "score": score_entry.value });
 
 	qs('.location-area-type span', container).textContent = area_label;
 

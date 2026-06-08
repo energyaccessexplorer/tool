@@ -1,5 +1,6 @@
 import { copy_to_clipboard } from './utils.js';
 import { show_export_modal } from './export.js';
+import { t, translateNode } from './translate.js';
 
 import {
 	init as graphs_init,
@@ -182,6 +183,7 @@ export function init() {
 
 function share_url() {
 	const c = tmpl('#share-link-modal-content');
+	translateNode(window.LOCALE, c);
 
 	const u = new URL(location);
 	const id = u.searchParams.get('snapshot');
@@ -191,7 +193,7 @@ function share_url() {
 
 	new modal({
 		"id":      'share-link-modal',
-		"header":  "Share link",
+		"header":  t(window.LOCALE, 'right_panel.share_link.header'),
 		"content": c,
 		"destroy": true,
 	}).show();

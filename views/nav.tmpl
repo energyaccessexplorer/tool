@@ -17,27 +17,32 @@
 
   <div id="navigation-links">
     <a href="{{template "base" .}}/tool/s"
-       class="toggleable">
+       class="toggleable"
+       data-t="nav.tool">
       Tool
     </a>
 
     <a href="{{template "base" .}}/about"
-       class="toggleable">
+       class="toggleable"
+       data-t="nav.about">
       About
     </a>
 
     <a href="{{template "base" .}}/get-involved"
-       class="toggleable">
+       class="toggleable"
+       data-t="nav.get_involved">
       Get Involved
     </a>
 
     <a href="{{template "base" .}}/user-stories"
-       class="toggleable">
+       class="toggleable"
+       data-t="nav.user_stories">
       User Stories
     </a>
 
     <a href="{{template "base" .}}/partners"
-       class="toggleable">
+       class="toggleable"
+       data-t="nav.partners">
       Partners
     </a>
   </div>
@@ -48,8 +53,8 @@
 <div id="mobile-warning">
   <div id="mobile-warning-content">
     <img src="{{template "base" .}}/images/EAE Logo_Emblem.svg" alt="Energy Access Explorer">
-    <h2>Desktop Required</h2>
-    <p>Energy Access Explorer is designed for larger screens. Please open this page on a desktop or laptop computer for the best experience.</p>
+    <h2 data-t="nav.desktop_required.title">Desktop Required</h2>
+    <p data-t="nav.desktop_required.message">Energy Access Explorer is designed for larger screens. Please open this page on a desktop or laptop computer for the best experience.</p>
   </div>
 </div>
 {{end}}

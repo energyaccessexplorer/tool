@@ -26,6 +26,8 @@ import {
 import mapinfo from './map-info.js';
 import bubblemessage from '../lib/bubblemessage.js';
 
+import { t, translateIndexName } from './translate.js';
+
 export function get_admin_area_item(variant, id) {
 	const division = GEOGRAPHY.divisions[variant];
 	if (!division || !division.priorityData || !division.vectors) return null;
@@ -83,9 +85,9 @@ const projections = [{
 	"value": "mercator",
 }];
 
-function attach_tooltip(el, message) {
+function attach_tooltip(el, key) {
 	let p;
-	el.addEventListener('mouseenter', () => { p = new bubblemessage({ "position": "E", "message": message, "close": false }, el); });
+	el.addEventListener('mouseenter', () => { p = new bubblemessage({ "position": "E", "message": t(window.LOCALE, key), "close": false }, el); });
 	el.addEventListener('mouseleave', () => { if (p) p.remove(); });
 }
 
@@ -101,7 +103,7 @@ class MapboxThemeControl {
 		this._container.append(button);
 
 		button.addEventListener('mouseup', e => theme_control_popup(e.target.closest('button')));
-		attach_tooltip(button, 'Basemap');
+		attach_tooltip(button, 'map.controls.basemap');
 
 		return this._container;
 	};
@@ -124,7 +126,7 @@ class MapboxProjectionControl {
 		this._container.append(button);
 
 		button.addEventListener('mouseup', e => projection_control_popup(e.target.closest('button')));
-		attach_tooltip(button, 'Projection');
+		attach_tooltip(button, 'map.controls.projection');
 
 		return this._container;
 	};
@@ -168,8 +170,8 @@ export function init() {
 
 	const zoom_in = qs('.mapboxgl-ctrl-zoom-in');
 	const zoom_out = qs('.mapboxgl-ctrl-zoom-out');
-	if (zoom_in) attach_tooltip(zoom_in, 'Zoom in');
-	if (zoom_out) attach_tooltip(zoom_out, 'Zoom out');
+	if (zoom_in) attach_tooltip(zoom_in, 'map.controls.zoom_in');
+	if (zoom_out) attach_tooltip(zoom_out, 'map.controls.zoom_out');
 
 	MAPBOX.zoomTo(MAPBOX.getZoom() * 0.95, {"duration": 0});
 	MAPBOX.doubleClickZoom.disable();
@@ -512,7 +514,7 @@ export function show_location_info(ll, position, centerPointer = true) {
 		let analysis_name = null;
 		if (Number.isFinite(maybe(ac, 'value'))) {
 			analysis_value = ac.value;
-			analysis_name = EAE['indexes'][STATE.index]['name'];
+			analysis_name = translateIndexName(window.LOCALE, STATE.index);
 		}
 
 		const { drop } = pointer(position, { fields, props, ll, analysis_value, analysis_name, feature_name, raw, "raster_index": raster_pixel?.index });
@@ -618,7 +620,7 @@ export function show_admin_area_info(item, position, centerPointer = false) {
 	const [fields, props, raw] = get_admin_area_layer_data(variant, item.id);
 
 	const info = { "variant": variant, "name": item.name, "id": item.id };
-	const analysis_name = EAE['indexes'][STATE.index]['name'];
+	const analysis_name = translateIndexName(window.LOCALE, STATE.index);
 
 	const { drop } = pointer(position, {
 		fields,

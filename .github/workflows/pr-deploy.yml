@@ -1,4 +1,4 @@
-name: PR DEPLOY
+name: COMMIT DEPLOY
 
 on:
   push:
@@ -48,16 +48,6 @@ jobs:
         run: |
           bmake deps reconfig build env=test
 
-      - name: Deploy website
-        if: steps.ticket.outputs.matched == 'true'
-        run: |
-          curl -X POST \
-            --header "Authorization: Bearer ${{ secrets.PR_DEPLOY_TOKEN }}" \
-            --header "Accept: application/vnd.github+json" \
-            --header "X-GitHub-Api-Version: 2022-11-28" \
-            --data "{\"event_type\": \"trigger-workflow\", \"client_payload\": {\"branch_name\": \"trunk\", \"destination\": \"${{ steps.ticket.outputs.id }}\"}}" \
-            https://api.github.com/repos/energyaccessexplorer/website/dispatches
-
       - name: Make destination directory
         if: steps.ticket.outputs.matched == 'true'
         uses: appleboy/ssh-action@v1.2.2
@@ -68,10 +58,6 @@ jobs:
           key:      ${{ secrets.PR_DEPLOY_KEY }}
           script:   |
             mkdir -p ${{ secrets.PR_DEPLOY_PATH }}/${{ steps.ticket.outputs.id }}
-            ln -sfn ${{ secrets.PR_DEPLOY_PATH }}/trunk/stylesheets  ${{ secrets.PR_DEPLOY_PATH }}/${{ steps.ticket.outputs.id }}/stylesheets
-            ln -sfn ${{ secrets.PR_DEPLOY_PATH }}/trunk/images        ${{ secrets.PR_DEPLOY_PATH }}/${{ steps.ticket.outputs.id }}/images
-            ln -sfn ${{ secrets.PR_DEPLOY_PATH }}/trunk/javascripts   ${{ secrets.PR_DEPLOY_PATH }}/${{ steps.ticket.outputs.id }}/javascripts
-            ln -sfn ${{ secrets.PR_DEPLOY_PATH }}/trunk/lib           ${{ secrets.PR_DEPLOY_PATH }}/${{ steps.ticket.outputs.id }}/lib
 
       - name: Deploy the thing
         if: steps.ticket.outputs.matched == 'true'

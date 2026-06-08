@@ -17,6 +17,8 @@ import {
 
 import bind from '../lib/bind.js';
 
+import { t, translateNode } from './translate.js';
+
 import bubblemessage from '../lib/bubblemessage.js';
 
 export function show(results, opts = {}) {
@@ -86,6 +88,7 @@ export function show(results, opts = {}) {
 	}
 
 	const content = tmpl('#high-priority-areas-list-all-template');
+	translateNode(window.LOCALE, content);
 
 	const tbody = qs('tbody', content);
 	const selection_overlay = qs('.selection-overlay', content);
@@ -166,7 +169,7 @@ export function show(results, opts = {}) {
 
 	bind(content, {
 		"analysis-name":          analysis_name,
-		"column-limit-notice":    selectable_max ? `A maximum of ${selectable_max} columns can be exported. Uncheck one to select another.` : '',
+		"column-limit-notice":    selectable_max ? t(window.LOCALE, 'modal.high_priority_table.column_limit_notice', { "max": selectable_max }) : '',
 		"toggle_column_selector": function() {
 			this.closest('.high-priority-areas-list-all-content').querySelector('.column-selector-panel').classList.toggle('hidden');
 		},
@@ -202,6 +205,7 @@ export function show(results, opts = {}) {
 	enforce_column_limit();
 
 	const footer = tmpl('#high-priority-areas-list-all-footer-template');
+	translateNode(window.LOCALE, footer);
 	bind(footer, {
 		"label":    opts.action_label,
 		"download": () => opts.on_download(get_selected() || state.results, get_visible_headers()),
@@ -212,7 +216,7 @@ export function show(results, opts = {}) {
 		if (count > 0) {
 			selection_overlay.classList.remove('hidden');
 			select_all_checkbox.classList.remove('hidden');
-			selection_count.textContent = `${count} row${count > 1 ? 's' : ''} currently selected.`;
+			selection_count.textContent = t(window.LOCALE, 'modal.high_priority_table.selection_count', { count });
 		} else {
 			selection_overlay.classList.add('hidden');
 			select_all_checkbox.classList.add('hidden');
@@ -318,7 +322,7 @@ export function show(results, opts = {}) {
 			bind(row, {
 				"cells":     get_visible_headers().map(header => {
 					const raw = row_data[header];
-					const value = typeof raw === 'number' ? raw.toLocaleString() : (raw || '');
+					const value = typeof raw === 'number' ? raw.toLocaleString(window.LOCALE) : (raw || '');
 					return { value };
 				}),
 				"on_select": function() {

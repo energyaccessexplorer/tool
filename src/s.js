@@ -23,6 +23,8 @@ import {
 	qs,
 } from '../lib/helpers.js';
 
+import { t, translateNode, initLocalePicker } from './translate.js';
+
 function preload_boundaries(id) {
 	return API.get('datasets', {
 		"select":        ['processed_files'],
@@ -45,7 +47,7 @@ async function geography(c) {
 	if (c.datasets_count > 2) coll.unshift(c); // 2 datasets: outline and admin-tiers
 
 	if (!coll.length) {
-		alert("No available geographies. Need: outline, admin-tiers and population-density datasets");
+		alert(t(window.LOCALE, 'geography_picker.no_geographies'));
 		return;
 	}
 
@@ -72,7 +74,7 @@ async function geography(c) {
 
 	const content = ce('div');
 	content.append(
-		ce('p', `We have several geographies for ${c.name}. Please do select one.`),
+		ce('p', t(window.LOCALE, 'geography_picker.multiple', { "name": c.name })),
 		sl.el,
 	);
 
@@ -89,6 +91,7 @@ async function geography(c) {
 
 const presets = [
 	{
+		"key":         "strategic_planning",
 		"name":        "Strategic and Integrated Energy Planning",
 		"index":       "eai",
 		"view":        "analysis",
@@ -97,6 +100,7 @@ const presets = [
 		"tab":         "controls",
 	},
 	{
+		"key":         "clean_energy_markets",
 		"name":        "The expansion of clean energy markets",
 		"index":       "eai",
 		"view":        "analysis",
@@ -105,6 +109,7 @@ const presets = [
 		"tab":         "controls",
 	},
 	{
+		"key":         "impact_investment",
 		"name":        "Impact investment",
 		"index":       "ani",
 		"view":        "analysis",
@@ -113,6 +118,7 @@ const presets = [
 		"tab":         "controls",
 	},
 	{
+		"key":         "energy_needs",
 		"name":        "Bottom-up assessment of energy needs",
 		"index":       "demand",
 		"view":        "analysis",
@@ -121,6 +127,7 @@ const presets = [
 		"tab":         "controls",
 	},
 	{
+		"key":         "custom_analysis",
 		"name":        "Generate custom geospatial analysis based on your own criteria",
 		"description": null,
 		"index":       "eai",
@@ -132,14 +139,18 @@ const presets = [
 ];
 
 function usertype(gid) {
-	const content = ce('div', ce('p', "What are you interested in?"), { "id": "presets" });
+	const content = ce('div', ce('p', t(window.LOCALE, 'geography_picker.interest_prompt')), { "id": "presets" });
 
 	const ul = ce('ul');
-	for (const t of presets) {
-		const p = ce('p', t.description);
-		const li = ce('li', ce('a', [ce('h3', t.name), p], { "href": `${window.BASE}/tool/a?id=${gid}` }));
+	for (const preset of presets) {
+		const title = t(window.LOCALE, `geography_picker.presets.${preset.key}.title`);
+		const desc = preset.description
+			? t(window.LOCALE, `geography_picker.presets.${preset.key}.description`)
+			: null;
+		const p = ce('p', desc);
+		const li = ce('li', ce('a', [ce('h3', title), p], { "href": `${window.BASE}/tool/a?id=${gid}` }));
 		li.onclick = function() {
-			sessionStorage.setItem('config', JSON.stringify(t));
+			sessionStorage.setItem('config', JSON.stringify(preset));
 		};
 
 		ul.append(li);
@@ -154,7 +165,7 @@ function usertype(gid) {
 	new modal({
 		content,
 		"id":      'usertype-modal',
-		"header":  "Choose your area of interest",
+		"header":  t(window.LOCALE, 'geography_picker.choose_area'),
 		"footer":  null,
 		"destroy": true,
 	}).show();
@@ -196,7 +207,16 @@ async function presets_init() {
 };
 
 export async function init() {
+	window.LOCALE = new URLSearchParams(location.search).get('lang')
+		?? localStorage.getItem('locale')
+		?? navigator.language.split('-')[0]
+		?? 'en';
+
+	translateNode(window.LOCALE, document);
+
 	if (window.innerWidth <= 768) return;
+
+	initLocalePicker(window.LOCALE);
 
 	sentry_setup_global_handlers(ENV[0]);
 	await self();
@@ -267,7 +287,7 @@ export async function init() {
 		"deployment": `ov.{${ENV}}`,
 	};
 
-	if (and(or(ENV.includes('protected'),
+	if (SELF && and(or(ENV.includes('protected'),
 	           ENV.includes('training')),
 	        !["director", "root"].includes(SELF.role))) {
 		params['with_access'] = "is.true";
@@ -276,7 +296,7 @@ export async function init() {
 	API.get("geographies", params)
 		.then(r => list(r))
 		.catch(error => {
-			new Toast({ "label": "Fetch error", "caption": String(error), "variant": 'error' }).show();
+			new Toast({ "label": t(window.LOCALE, 'toast.fetch_error.label'), "caption": String(error), "variant": 'error' }).show();
 
 			throw error;
 		});

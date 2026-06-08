@@ -31,10 +31,13 @@ TIMESTAMP != date -u +'%Y-%m-%d--%T'
 templates:
 	@ go build -o ${BIN}/templates ./templates
 
-clean:
-	@ rm -rf ${LIB} ${DIST} ${BIN}/templates
+locales:
+	@ go build -o ${BIN}/locales ./locales
 
-build: deps templates build-a build-s build-m build-p
+clean:
+	@ rm -rf ${LIB} ${DIST} ${BIN}/templates ${BIN}/locales
+
+build: deps templates locales build-translations build-a build-s build-m build-p
 	@ ${BIN}/templates -template=index -output=${DIST}/index.html -json='{"env":"${env}"}'
 
 lint:
@@ -61,6 +64,7 @@ build-m:
 		${SRC}/utils.js \
 		${SRC}/sentry.js \
 		${SRC}/tabs.js \
+		${SRC}/translate.js \
 		${SRC}/toast.js \
 		${SRC}/m.js \
 		${DIST}/m/
@@ -72,6 +76,7 @@ build-m:
 
 	@ echo "window.EAE = {};" | cat - \
 		settings.tmp.json \
+		locales/translations.js.tmp \
 		${SRC}/eae.part.js \
 		> ${DIST}/m/main.js
 
@@ -103,6 +108,7 @@ build-p:
 
 	@ echo "window.EAE = {};" | cat - \
 		settings.tmp.json \
+		locales/translations.js.tmp \
 		${SRC}/eae.part.js \
 		> ${DIST}/p/main.js
 
@@ -170,6 +176,7 @@ build-a:
 		${SRC}/panel-section.js \
 		${SRC}/export.js \
 		${SRC}/sentry.js \
+		${SRC}/translate.js \
 		${SRC}/toast.js \
 		${SRC}/filtered.js \
 		${SRC}/a.js \
@@ -187,6 +194,7 @@ build-a:
 
 	@ echo "window.EAE = {};" | cat - \
 		settings.tmp.json \
+		locales/translations.js.tmp \
 		${SRC}/eae.part.js \
 		> ${DIST}/a/main.js
 
@@ -227,6 +235,7 @@ build-s:
 		${SRC}/sentry.js \
 		${SRC}/toast.js \
 		${SRC}/s.js \
+		${SRC}/translate.js \
 		${DIST}/s/
 
 	@ cat \
@@ -236,6 +245,7 @@ build-s:
 
 	@ echo "window.EAE = {};" | cat - \
 		settings.tmp.json \
+		locales/translations.js.tmp \
 		> ${DIST}/s/main.js
 
 	@ cat \
@@ -296,6 +306,13 @@ deploy:
 
 	@ bmake reconfig build env=development
 
+build-translations: locales/translations.csv locales/units.csv
+	@ echo "Building translations"
+	@ ${BIN}/locales \
+		-translations=locales/translations.csv \
+		-units=locales/units.csv \
+		-output=locales/translations.js.tmp
+
 reconfig:
 	@ echo "Building settings.tmp.json - ${env}"
 
@@ -314,4 +331,4 @@ reconfig:
 	@ sed -i.orig -e '$$s/$$/;\n/' settings.tmp.json
 	@ rm settings.tmp.json.orig
 
-.PHONY: templates
+.PHONY: templates locales

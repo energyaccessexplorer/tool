@@ -1,5 +1,7 @@
 import bubblemessage from '../lib/bubblemessage.js';
 
+import { t } from './translate.js';
+
 import {
 	and,
 	ce,
@@ -301,7 +303,7 @@ export async function init() {
 		qs('#maparea').append(ce('div', null, { "id": 'timeline' }));
 	else return;
 
-	await until(_ => GEOGRAPHY.timeline_dates.length > 0);
+	await until(_ => maybe(GEOGRAPHY, 'timeline_dates', 'length') > 0);
 
 	const steps = GEOGRAPHY.timeline_dates.map(x => parseInt(x.replace('(^[0-9]{4}-)', '\\1'))); // <- \/\/ due to strict mode in modules
 
@@ -370,12 +372,12 @@ export function lines_draw() {
 			const table = document.createElement('table');
 
 			const t1 = ce('tr', [
-				ce('td', ce('strong', "Value: &nbsp;")),
+				ce('td', ce('strong', `${t(window.LOCALE, 'timeline.value_label')}: &nbsp;`)),
 				ce('td', a.toString()),
 			]);
 
 			const t2 = ce('tr', [
-				ce('td', ce('strong', "State Average: &nbsp;")),
+				ce('td', ce('strong', `${t(window.LOCALE, 'timeline.state_average_label')}: &nbsp;`)),
 				ce('td', (Math.round(average.find(x => x.id === m.id).values[i] * 100) / 100).toString()),
 			]);
 

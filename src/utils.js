@@ -1,6 +1,10 @@
 import Toast from './toast.js';
 
 import {
+	sentry_set_user,
+} from './sentry.js';
+
+import {
 	and,
 	ce,
 	maybe,
@@ -22,6 +26,8 @@ export async function self() {
 	} catch (err) {
 		console.warn("token:", token, err);
 	}
+
+	sentry_set_user(SELF);
 };
 
 export function uniform_split(n) {

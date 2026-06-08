@@ -1,6 +1,10 @@
 import Toast from './toast.js';
 
 import {
+	sentry_setup_global_handlers,
+} from './sentry.js';
+
+import {
 	loading,
 	self,
 } from './utils.js';
@@ -192,6 +196,7 @@ async function presets_init() {
 export async function init() {
 	if (window.innerWidth <= 768) return;
 
+	sentry_setup_global_handlers(ENV[0]);
 	await self();
 
 	const playground = qs('#playground');

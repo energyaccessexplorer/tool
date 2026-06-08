@@ -1,6 +1,10 @@
 import Toast from './toast.js';
 
 import {
+	sentry_update_datasets,
+} from './sentry.js';
+
+import {
 	colorscale,
 	colorscale_svg,
 	uniform_split,
@@ -810,6 +814,7 @@ export default class DS {
 		STATE.datasets = copy.filter(Boolean);
 
 		COMMIT("datasets");
+		sentry_update_datasets(DST);
 	};
 
 	static get array() {

@@ -59,6 +59,7 @@ build-m:
 	@ cp \
 		${SRC}/user.js \
 		${SRC}/utils.js \
+		${SRC}/sentry.js \
 		${SRC}/tabs.js \
 		${SRC}/toast.js \
 		${SRC}/m.js \
@@ -78,6 +79,7 @@ build-m:
 		${CSS}/general.css \
 		${CSS}/m.css \
 		${CSS}/buttons.css \
+		${CSS}/mobile.css \
 		> ${DIST}/m/main.css
 
 build-p:
@@ -167,6 +169,7 @@ build-a:
 		${SRC}/map-info.js \
 		${SRC}/panel-section.js \
 		${SRC}/export.js \
+		${SRC}/sentry.js \
 		${SRC}/toast.js \
 		${SRC}/filtered.js \
 		${SRC}/a.js \
@@ -222,6 +225,7 @@ build-s:
 		${SRC}/utils.js \
 		${SRC}/browser.js \
 		${SRC}/user.js \
+		${SRC}/sentry.js \
 		${SRC}/toast.js \
 		${SRC}/s.js \
 		${DIST}/s/

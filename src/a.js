@@ -12,6 +12,13 @@ import {
 } from './utils.js';
 
 import {
+	sentry_set_geography,
+	sentry_set_snapshot,
+	sentry_setup_global_handlers,
+	sentry_update_datasets,
+} from './sentry.js';
+
+import {
 	analysis_dataset_intersect,
 } from './complicated.js';
 
@@ -227,6 +234,7 @@ function state_set(conf, p, v) {
 export function init() {
 	if (window.innerWidth <= 768) return;
 
+	sentry_setup_global_handlers(ENV[0]);
 	self();
 
 	Whatever
@@ -255,6 +263,8 @@ async function init_1() {
 			.then(r => r['config']);
 	}
 
+	if (SNAPSHOT) sentry_set_snapshot(SNAPSHOT);
+
 	conf = conf ?? {
 		"index":    "eai",
 		"view":     "data",
@@ -279,6 +289,8 @@ async function init_1() {
 
 	GEOGRAPHY.timeline = maybe(GEOGRAPHY, 'configuration', 'timeline');
 	GEOGRAPHY.timeline_dates = maybe(GEOGRAPHY, 'configuration', 'timeline_dates');
+
+	sentry_set_geography(GEOGRAPHY);
 
 	layout();
 
@@ -412,6 +424,7 @@ This is fatal. Thanks for all the fish.`;
 			.map(d => d.mutant_init()));
 
 	await load_datasets(conf.datasets);
+	sentry_update_datasets(DST);
 };
 
 async function init_3() {

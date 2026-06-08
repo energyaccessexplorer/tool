@@ -16,6 +16,7 @@ import {
 
 import bind from '../lib/bind.js';
 import bubblemessage from '../lib/bubblemessage.js';
+import { t, translateUnit, translateDatasetName, registerUIUpdater } from './translate.js';
 
 import {
 	ce,
@@ -27,96 +28,94 @@ import {
 	format_value_unit,
 } from './utils.js';
 
-const POINTS_DESCRIPTIONS = {
-	'count':             'There are <strong>{value}</strong> {name} in the selected area.',
-	'distance in km':   'The nearest {name} is <strong>{value}</strong> from this area.',
-	'proximity in km':  'The nearest {name} is <strong>{value}</strong> from this area.',
-	'Kwp':              'The total installed capacity of {name} in this area is <strong>{value}</strong>.',
-	'kVA':              'The total capacity of {name} in this area is <strong>{value}</strong>.',
-	'km':               'The total distance covered by {name} in this area is <strong>{value}</strong>.',
+const POINTS_KEYS = {
+	'count':           'right_panel.data.descriptions.points.count',
+	'distance in km':  'right_panel.data.descriptions.points.distance',
+	'proximity in km': 'right_panel.data.descriptions.points.distance',
+	'Kwp':             'right_panel.data.descriptions.points.kwp',
+	'kVA':             'right_panel.data.descriptions.points.kva',
+	'km':              'right_panel.data.descriptions.points.km',
 };
 
-const RASTER_DESCRIPTIONS_SUM = {
-	'count':         'The total {name} count in this area is <strong>{value}</strong>.',
-	'people':        'The total population in this area is <strong>{value}</strong>.',
-	'households':    'There are <strong>{value}</strong> households in this area.',
-	'MW':            'The total energy demand in this area is <strong>{value}</strong>.',
-	'GWh':           'The total energy in this area is <strong>{value}</strong>.',
-	'Metric Tonnes': 'The total crop production in this area is <strong>{value}</strong>.',
-	'tCO2eq':        'The total emissions in this area are <strong>{value}</strong>.',
-	'USD':           'The total cost for {name} in this area is <strong>{value}</strong>.',
-	'm³/yr':         'The total water availability in this area is <strong>{value}</strong>.',
+const RASTER_SUM_KEYS = {
+	'count':         'right_panel.data.descriptions.raster_sum.count',
+	'people':        'right_panel.data.descriptions.raster_sum.people',
+	'households':    'right_panel.data.descriptions.raster_sum.households',
+	'MW':            'right_panel.data.descriptions.raster_sum.mw',
+	'GWh':           'right_panel.data.descriptions.raster_sum.gwh',
+	'Metric Tonnes': 'right_panel.data.descriptions.raster_sum.metric_tonnes',
+	'tCO2eq':        'right_panel.data.descriptions.raster_sum.tco2eq',
+	'USD':           'right_panel.data.descriptions.raster_sum.usd',
+	'm³/yr':         'right_panel.data.descriptions.raster_sum.m3yr',
 };
 
-const RASTER_DESCRIPTIONS = {
-	'count':                      'The average {name} count in this area is <strong>{value}</strong>.',
-	'km (proximity to)':          'The average distance to {name} in this area is <strong>{value}</strong>.',
-	'kWh/m²':                     'The average {name} is <strong>{value}</strong> in this area.',
-	'ppl/km²':                    'The population density in this area is <strong>{value}</strong>.',
-	'people':                     'The estimated population in this area is <strong>{value}</strong>.',
-	'households':                 'There are approximately <strong>{value}</strong> households in this area.',
-	'%':                          '<strong>{value}</strong> of this area has {name}.',
-	'Coverage (%) per km²':       '<strong>{value}</strong> of this area is covered by {name}.',
-	'MW':                         'The estimated energy demand in this area is <strong>{value}</strong>.',
-	'GWh':                        'The estimated energy in this area is <strong>{value}</strong>.',
-	'kWh/ha/year':                'The estimated yield for {name} in this area is <strong>{value}</strong>.',
-	'minutes':                    'The average travel time to {name} is <strong>{value}</strong> in this area.',
-	'hours':                      'The average {name} in this area is <strong>{value}</strong>.',
-	'hours/hh.day':               'Households in this area spend on average <strong>{value}</strong> on {name}.',
-	'm/s':                        'The average wind speed in this area is <strong>{value}</strong>.',
-	'degree':                     'The average temperature in this area is <strong>{value}</strong>.',
-	'degree celcius':             'The average temperature in this area is <strong>{value}</strong>.',
-	'mm':                         'The average annual rainfall in this area is <strong>{value}</strong>.',
-	'm³/yr':                      'The estimated water availability in this area is <strong>{value}</strong>.',
-	'metre':                      'The average elevation in this area is <strong>{value}</strong>.',
-	'kg/ha':                      'The estimated agricultural yield in this area is <strong>{value}</strong>.',
-	'Metric Tonnes':              'The estimated crop production in this area is <strong>{value}</strong>.',
-	'Gigajoule per sq km':        'The bioenergy potential in this area is <strong>{value}</strong>.',
-	'USD':                        'The estimated cost for {name} in this area is <strong>{value}</strong>.',
-	'USD/household':              'The estimated cost per household for {name} is <strong>{value}</strong>.',
-	'bldgs/km²':                  'The building density in this area is <strong>{value}</strong>.',
-	'tCO2eq':                     'The estimated emissions in this area are <strong>{value}</strong>.',
-	'tier':                       'The average electrification tier in this area is <strong>{value}</strong>.',
-	'year':                       'The estimated electrification year for this area is <strong>{value}</strong>.',
-	'< 2USD/day':                 '<strong>{value}</strong> of the population in this area lives on less than $2/day.',
-	'RWI':                        'The Relative Wealth Index for this area is <strong>{value}</strong>.',
-	'Aridity Index':              'The aridity index for this area is <strong>{value}</strong>.',
-	'calibrated radiance':        'The nighttime light intensity in this area is <strong>{value}</strong>.',
-	'People per 100k population': 'There are <strong>{value}</strong> per 100k population affected by {name} in this area.',
+const RASTER_KEYS = {
+	'count':                      'right_panel.data.descriptions.raster.count',
+	'km (proximity to)':          'right_panel.data.descriptions.raster.km_proximity',
+	'kWh/m²':                     'right_panel.data.descriptions.raster.kwh_m2',
+	'ppl/km²':                    'right_panel.data.descriptions.raster.ppl_km2',
+	'people':                     'right_panel.data.descriptions.raster.people',
+	'households':                 'right_panel.data.descriptions.raster.households',
+	'%':                          'right_panel.data.descriptions.raster.pct',
+	'Coverage (%) per km²':       'right_panel.data.descriptions.raster.coverage_pct',
+	'MW':                         'right_panel.data.descriptions.raster.mw',
+	'GWh':                        'right_panel.data.descriptions.raster.gwh',
+	'kWh/ha/year':                'right_panel.data.descriptions.raster.kwh_ha_year',
+	'minutes':                    'right_panel.data.descriptions.raster.minutes',
+	'hours':                      'right_panel.data.descriptions.raster.hours',
+	'hours/hh.day':               'right_panel.data.descriptions.raster.hours_hh_day',
+	'm/s':                        'right_panel.data.descriptions.raster.m_s',
+	'degree':                     'right_panel.data.descriptions.raster.degree',
+	'degree celcius':             'right_panel.data.descriptions.raster.degree_celcius',
+	'mm':                         'right_panel.data.descriptions.raster.mm',
+	'm³/yr':                      'right_panel.data.descriptions.raster.m3yr',
+	'metre':                      'right_panel.data.descriptions.raster.metre',
+	'kg/ha':                      'right_panel.data.descriptions.raster.kg_ha',
+	'Metric Tonnes':              'right_panel.data.descriptions.raster.metric_tonnes',
+	'Gigajoule per sq km':        'right_panel.data.descriptions.raster.gigajoule',
+	'USD':                        'right_panel.data.descriptions.raster.usd',
+	'USD/household':              'right_panel.data.descriptions.raster.usd_household',
+	'bldgs/km²':                  'right_panel.data.descriptions.raster.bldgs_km2',
+	'tCO2eq':                     'right_panel.data.descriptions.raster.tco2eq',
+	'tier':                       'right_panel.data.descriptions.raster.tier',
+	'year':                       'right_panel.data.descriptions.raster.year',
+	'< 2USD/day':                 'right_panel.data.descriptions.raster.lt2usd',
+	'RWI':                        'right_panel.data.descriptions.raster.rwi',
+	'Aridity Index':              'right_panel.data.descriptions.raster.aridity',
+	'calibrated radiance':        'right_panel.data.descriptions.raster.nighttime',
+	'People per 100k population': 'right_panel.data.descriptions.raster.per100k',
 };
-
-function fill(template, name, value) {
-	return template.replaceAll('{name}', name.toLowerCase()).replaceAll('{value}', value);
-}
 
 function describe(datatype, unit, name, value, aggregation) {
+	const locale = window.LOCALE;
+	const vars = { "name": name.toLowerCase(), value };
+
 	if (datatype === 'points') {
-		const key = unit || 'count';
-		const tmpl = POINTS_DESCRIPTIONS[key] ?? POINTS_DESCRIPTIONS['count'];
-		return fill(tmpl, name, value);
+		const key = POINTS_KEYS[unit] ?? POINTS_KEYS['count'];
+		return t(locale, key, vars);
 	}
 
 	if (datatype === 'lines')
-		return fill('The total length of {name} in this region is <strong>{value}</strong>.', name, value);
+		return t(locale, 'right_panel.data.descriptions.lines', vars);
 
 	if (datatype?.startsWith('raster')) {
-		const tmpl = (aggregation === 'SUM' ? RASTER_DESCRIPTIONS_SUM[unit] : null)
-			?? RASTER_DESCRIPTIONS[unit]
-			?? (aggregation === 'SUM' ? 'The total {name} in this area is <strong>{value}</strong>.' : 'The average {name} in this area is <strong>{value}</strong>.');
-		return fill(tmpl, name, value);
+		const key = (aggregation === 'SUM' ? RASTER_SUM_KEYS[unit] : null)
+			?? RASTER_KEYS[unit]
+			?? (aggregation === 'SUM' ? 'right_panel.data.descriptions.raster_sum.default' : 'right_panel.data.descriptions.raster.default');
+		return t(locale, key, vars);
 	}
 
 	if (datatype?.startsWith('polygons')) {
-		const tmpl = unit
-			? 'The total {name} in this area is <strong>{value}</strong>.'
-			: 'There are <strong>{value}</strong> {name} in the selected area.';
-		return fill(tmpl, name, value);
+		const key = unit
+			? 'right_panel.data.descriptions.polygons_sum'
+			: 'right_panel.data.descriptions.polygons_count';
+		return t(locale, key, vars);
 	}
 
-	const tmpl = (aggregation === 'SUM' ? RASTER_DESCRIPTIONS_SUM[unit] : null)
-		?? RASTER_DESCRIPTIONS[unit]
-		?? (aggregation === 'SUM' ? 'The total {name} in this area is <strong>{value}</strong>.' : 'The average {name} in this area is <strong>{value}</strong>.');
-	return fill(tmpl, name, value);
+	const key = (aggregation === 'SUM' ? RASTER_SUM_KEYS[unit] : null)
+		?? RASTER_KEYS[unit]
+		?? (aggregation === 'SUM' ? 'right_panel.data.descriptions.raster_sum.default' : 'right_panel.data.descriptions.raster.default');
+	return t(locale, key, vars);
 }
 
 const cache = {
@@ -245,9 +244,9 @@ function make_card(ds, entry, admin_info) {
 	const path0  = ds.category?.controls?.path?.[0];
 	const tab_el = path0 && !STANDARD_TABS.has(path0) ? qs('#controls-tab-' + path0) : null;
 	const tab_label = tab_el?.textContent?.trim();
-	const title     = ce('span', tab_label ? `${tab_label} - ${ds.name}` : ds.name, { "class": 'data-card-title' });
+	const title     = ce('span', tab_label ? `${tab_label} - ${translateDatasetName(window.LOCALE, ds)}` : translateDatasetName(window.LOCALE, ds), { "class": 'data-card-title' });
 	const about  = ce('button', null, { "class": 'button-icon button-info button-about' });
-	about.innerHTML = '<span>About</span><i class="bi bi-info-circle"></i>';
+	about.innerHTML = `<span>${t(window.LOCALE, 'left_panel.cards.card.about_button')}</span><i class="bi bi-info-circle"></i>`;
 	header.append(title, about);
 
 	const body = ce('div', null, { "class": 'data-card-body' });
@@ -259,8 +258,7 @@ function make_card(ds, entry, admin_info) {
 			const n           = ds.csv.data.length;
 			const active_name = typeof entry.raw_value === 'string' ? entry.raw_value : null;
 			const dist_desc = ce('p', null, { "class": 'data-card-description' });
-			dist_desc.append('Showing the percentage distribution of ', ce('strong', null, { "bind": "name" }), ' categories in the selected area.');
-			bind(dist_desc, { "name": ds.name });
+			dist_desc.innerHTML = t(window.LOCALE, 'right_panel.data.categorical_desc', { "name": translateDatasetName(window.LOCALE, ds) });
 			body.append(dist_desc, n <= 5
 				? make_donut_chart(distribution, active_name)
 				: make_bar_chart(distribution, active_name));
@@ -272,10 +270,9 @@ function make_card(ds, entry, admin_info) {
 
 	const desc = ce('p', null, { "class": 'data-card-description' });
 	if (entry.value != null) {
-		desc.innerHTML = describe(ds.category.datatype, entry.unit || ds.category.unit, ds.name, entry.value, entry.aggregation ?? ds.category.analysis?.aggregation);
+		desc.innerHTML = describe(ds.category.datatype, entry.unit || ds.category.unit, translateDatasetName(window.LOCALE, ds), entry.value, entry.aggregation ?? ds.category.analysis?.aggregation);
 	} else {
-		desc.append('No data available for ', ce('strong', null, { "bind": "name" }), ' in this area.');
-		bind(desc, { "name": ds.name });
+		desc.innerHTML = t(window.LOCALE, 'right_panel.data.no_data', { "name": translateDatasetName(window.LOCALE, ds) });
 	}
 	body.append(desc);
 
@@ -286,18 +283,26 @@ function make_card(ds, entry, admin_info) {
 	return card;
 }
 
-const BLANK_NO_LAYERS = {
-	"title":    'Add data to prioritize analysis',
-	"subtitle": 'Select a dataset from the left panel to add it to the map and start your prioritization analysis.',
-};
-
 function set_blank_state(visible) {
 	const blank = qs('#data-blank-state');
 	if (!blank) return;
 
-	if (visible) bind(blank, BLANK_NO_LAYERS, { "final": false });
+	if (visible) bind(blank, {
+		"title":    t(window.LOCALE, 'right_panel.prioritization.blank_state.title'),
+		"subtitle": t(window.LOCALE, 'right_panel.prioritization.blank_state.subtitle'),
+	}, { "final": false });
 
 	blank.style.display = visible ? 'flex' : 'none';
+}
+
+export function refreshBlankStateTranslation() {
+	const blank = qs('#data-blank-state');
+	if (!blank || blank.style.display === 'none') return;
+
+	bind(blank, {
+		"title":    t(window.LOCALE, 'right_panel.prioritization.blank_state.title'),
+		"subtitle": t(window.LOCALE, 'right_panel.prioritization.blank_state.subtitle'),
+	}, { "final": false });
 }
 
 function resolve_admin_info(admin_info, raster_index) {
@@ -351,8 +356,8 @@ async function update_top_level_geography() {
 		}
 
 		const num = Number(value);
-		const formatted = Number.isFinite(num) ? num.toLocaleString() : String(value);
-		const display_unit = unit === 'count' ? '' : unit;
+		const formatted = Number.isFinite(num) ? num.toLocaleString(window.LOCALE) : String(value);
+		const display_unit = unit === 'count' ? '' : translateUnit(window.LOCALE, unit);
 
 		detailedData.push({
 			"label":       layer.name,
@@ -406,3 +411,17 @@ export function clear() {
 	cache.national_layer_data = null;
 	update_top_level_geography();
 }
+
+function refreshDataTabTranslations() {
+	const blank = qs('#data-blank-state');
+	if (blank && blank.style.display !== 'none') {
+		bind(blank, {
+			"title":    t(window.LOCALE, 'right_panel.prioritization.blank_state.title'),
+			"subtitle": t(window.LOCALE, 'right_panel.prioritization.blank_state.subtitle'),
+		}, { "final": false });
+	} else {
+		update_top_level_geography();
+	}
+}
+
+registerUIUpdater(refreshDataTabTranslations);

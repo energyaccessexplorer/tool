@@ -45,17 +45,18 @@ import {
 } from '../lib/helpers.js';
 
 import bind from '../lib/bind.js';
+import { translateNode, t, translateIndexName } from './translate.js';
 
 function view_all_locations() {
 	const area_type_str = area_type(STATE.variant);
-	const analysis_name = EAE['indexes'][STATE.index]['name'];
+	const analysis_name = translateIndexName(window.LOCALE, STATE.index);
 	const results = paginationState.allResults;
 
 	show_modal_table(results, {
-		"title":              `High priority areas (${area_type_str})`,
+		"title":              `${t(window.LOCALE, 'modal.export.high_priority.title')} (${area_type_str})`,
 		"subtitle":           analysis_name,
-		"action_label":       "Download all (.csv)",
-		"column_toggle_hint": "Selected columns will be included in the CSV download",
+		"action_label":       t(window.LOCALE, 'modal.export.download_csv'),
+		"column_toggle_hint": t(window.LOCALE, 'modal.export.csv_hint'),
 		on_download(results, visible_headers) {
 			download_high_priority_areas(results, { visible_headers });
 		},
@@ -66,7 +67,7 @@ function view_all_locations() {
 function format_area_type(variant) {
 	const type = area_type(variant);
 	if (variant === 'raster') {
-		return `areas (${type})`;
+		return t(window.LOCALE, 'right_panel.high_priority.raster_areas', { "area": type });
 	} else {
 		return type.toLowerCase();
 	}
@@ -97,7 +98,7 @@ function raster_item(p) {
 
 	const locationName = qs('.location-name', el);
 	mapbox_coords_search_pois({ "coords": p.c, "limit": 1 })
-		.then(r => locationName.textContent = maybe(r, 0, 'name') || 'Unknown location');
+		.then(r => locationName.textContent = maybe(r, 0, 'name') || t(window.LOCALE, 'right_panel.high_priority.unknown_location'));
 
 	return template;
 };
@@ -170,13 +171,13 @@ function render_pagination() {
 	if (!paginationInfo || !paginationDiv) return;
 
 	if (totalPages <= 1 && totalCount > 0) {
-		paginationInfo.textContent = `Showing ${totalCount.toLocaleString()} result${totalCount !== 1 ? 's' : ''}`;
+		paginationInfo.textContent = t(window.LOCALE, totalCount === 1 ? 'right_panel.high_priority.showing_count_one' : 'right_panel.high_priority.showing_count_other', { "count": totalCount.toLocaleString(window.LOCALE) });
 		return;
 	}
 
 	if (totalCount === 0) return;
 
-	paginationInfo.textContent = `Showing ${(startIdx + 1).toLocaleString()}-${endIdx.toLocaleString()} of ${totalCount.toLocaleString()}`;
+	paginationInfo.textContent = t(window.LOCALE, 'right_panel.high_priority.showing_range', { "start": (startIdx + 1).toLocaleString(window.LOCALE), "end": endIdx.toLocaleString(window.LOCALE), "total": totalCount.toLocaleString(window.LOCALE) });
 
 	const prevBtn = ce('button', null, { "class": 'pagination-btn chevron' });
 	prevBtn.innerHTML = '<i class="bi bi-chevron-left"></i>';
@@ -259,9 +260,9 @@ function render_page(page) {
 			const group = template.firstElementChild;
 			group.setAttribute('data-score', score);
 
-			const areaCount = scoreCounts[score] === 1 ? '1 area' : `${scoreCounts[score]} areas`;
+			const areaCount = t(window.LOCALE, scoreCounts[score] === 1 ? 'right_panel.high_priority.area_count_one' : 'right_panel.high_priority.area_count_other', { "count": scoreCounts[score] });
 			bind(template, {
-				"score-text": `${score}% priority score`,
+				"score-text": t(window.LOCALE, 'right_panel.high_priority.priority_score', { score }),
 				"area-count": areaCount,
 			});
 
@@ -308,7 +309,7 @@ export async function update() {
 	render_page(paginationState.currentPage);
 
 	_precompute_controller = new AbortController();
-	const analysis_name = EAE['indexes'][STATE.index]['name'];
+	const analysis_name = translateIndexName(window.LOCALE, STATE.index);
 	precompute_rows(paginationState.allResults, isRaster, analysis_name, _precompute_controller.signal);
 };
 
@@ -322,7 +323,8 @@ export function init() {
 	qs('#analysis-locations').replaceWith(analysis_locations);
 
 	const section = qs('#right-panel #analysis-locations-section');
-	setup_about_button(section, () => `Showing ${format_area_type(STATE.variant)} with the highest prioritization scores based on your analysis criteria.`);
+	translateNode(window.LOCALE, section);
+	setup_about_button(section, () => t(window.LOCALE, 'right_panel.high_priority.about', { "area": format_area_type(STATE.variant) }));
 
 };
 

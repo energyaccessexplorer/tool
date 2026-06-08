@@ -1,5 +1,6 @@
+import { t, translateNode, registerUIUpdater, getScaleLabels, translateIndexName } from './translate.js';
 import { svg_pie } from './utils.js';
-import { analysis_colorscale, lowmedhigh_scale } from './analysis.js';
+import { analysis_colorscale } from './analysis.js';
 import { compute_share_amounts } from './summary.js';
 import bubblemessage from '../lib/bubblemessage.js';
 import bind from '../lib/bind.js';
@@ -16,13 +17,13 @@ const PIES = {};
 const bubble = (v,e) => new bubblemessage({ "message": v + "%", "position": "C", "close": false, "noevents": true }, e);
 
 function update_graph_section(section, amounts, unit, description) {
-	const labels = lowmedhigh_scale.range();
+	const labels = getScaleLabels(window.LOCALE);
 
 	const scale = ce('dl', null, { "class": 'discrete-scale' });
 
 	analysis_colorscale.stops.slice().reverse().map((color, i) => {
 		const idx = analysis_colorscale.stops.length - 1 - i;
-		const value = `${amounts[idx].toLocaleString()} ${unit}`;
+		const value = `${amounts[idx].toLocaleString(window.LOCALE)} ${unit}`;
 
 		const item = tmpl('#discrete-scale-item-template');
 		bind(item, {
@@ -39,13 +40,18 @@ function update_graph_section(section, amounts, unit, description) {
 	scale_container.append(scale);
 
 	const descEl = qs('.section-description', section);
-	descEl.innerHTML = '';
-	descEl.append(description);
+	if (typeof description === 'string') {
+		descEl.innerHTML = description;
+	} else {
+		descEl.innerHTML = '';
+		descEl.append(description);
+	}
 }
 
-function create_graph_section(title, type, numberId, descId) {
+function create_graph_section(titleKey, type, numberId, descId) {
 	const section = tmpl('#index-graph-section-template');
-	qs('[slot="title"]', section).textContent = title;
+	translateNode(window.LOCALE, section);
+	qs('[slot="title"]', section).textContent = t(window.LOCALE, titleKey);
 	qs('.index-graphs-group', section).id = numberId;
 	qs('.section-description', section).id = descId;
 	qs('.index-graphs-group', section).append(PIES[type].svg);
@@ -73,20 +79,19 @@ export function setup_about_button(section, about) {
 }
 
 export function graphs(summary) {
-	const indexName = EAE['indexes'][STATE.index]['name'].toLowerCase();
+	const locale = window.LOCALE;
+	const indexName = translateIndexName(locale, STATE.index).toLowerCase();
 
 	process_graph(summary, {
 		"dataKey":     'population-density',
 		"pieKey":      'population',
 		"selector":    '#population-number',
-		"unit":        'people',
-		"description": (total, high) => [
-			`Showing ${indexName} for areas affecting `,
-			ce('strong', total.toLocaleString() + ' people'),
-			', of whom ',
-			ce('strong', high.toLocaleString() + ' people'),
-			` are situated in areas of high ${indexName}.`,
-		],
+		"unit":        t(locale, 'right_panel.prioritization.graphs.people_unit'),
+		"description": (total, high) => t(locale, 'right_panel.prioritization.graphs.pop_desc', {
+			indexName,
+			"x": total.toLocaleString(window.LOCALE),
+			"y": high.toLocaleString(window.LOCALE),
+		}),
 	});
 
 	process_graph(summary, {
@@ -94,13 +99,11 @@ export function graphs(summary) {
 		"pieKey":      'area',
 		"selector":    '#area-number',
 		"unit":        'km²',
-		"description": (total, high) => [
-			`Showing ${indexName} for areas spanning `,
-			ce('strong', total.toLocaleString() + ' km²'),
-			', of which ',
-			ce('strong', high.toLocaleString() + ' km²'),
-			` has high ${indexName}.`,
-		],
+		"description": (total, high) => t(locale, 'right_panel.prioritization.graphs.area_desc', {
+			indexName,
+			"x": `${total.toLocaleString(window.LOCALE)} km²`,
+			"y": `${high.toLocaleString(window.LOCALE)} km²`,
+		}),
 	});
 };
 
@@ -120,9 +123,7 @@ function process_graph(analysis_summary, config) {
 	PIES[config.pieKey].change(1);
 
 	const high = amounts[4];
-
-	const description = document.createDocumentFragment();
-	description.append(...config.description(total, high));
+	const description = config.description(total, high);
 
 	const section = qs(config.selector).closest('.index-graphs-section');
 	update_graph_section(section, amounts, config.unit, description);
@@ -136,12 +137,30 @@ export function init() {
 	PIES["population"] = svg_pie([[0], [0], [0], [0], [0]], 70, 0, analysis_colorscale.stops, null, bubble);
 	PIES["area"]       = svg_pie([[0], [0], [0], [0], [0]], 70, 0, analysis_colorscale.stops, null, bubble);
 
-	const area_section = create_graph_section('Area share', 'area', 'area-number', 'area-description');
-	const population_section = create_graph_section('Population share', 'population', 'population-number', 'population-description');
+	const area_section = create_graph_section('right_panel.prioritization.graphs.area_share_title', 'area', 'area-number', 'area-description');
+	const population_section = create_graph_section('right_panel.prioritization.graphs.pop_share_title', 'population', 'population-number', 'population-description');
 
-	setup_about_button(area_section, "Shows the 'Prioritization Index' results as area shares, based on your analysis criteria.");
-	setup_about_button(population_section, "Shows the 'Prioritization Index' results as population shares, based on your analysis criteria.");
+	setup_about_button(area_section, t(window.LOCALE, 'right_panel.prioritization.graphs.area_about'));
+	setup_about_button(population_section, t(window.LOCALE, 'right_panel.prioritization.graphs.pop_about'));
 
 	qs('#analysis-sections-wrapper').append(area_section);
 	qs('#analysis-sections-wrapper').append(population_section);
 };
+
+function refreshGraphTranslations() {
+	const area_section = qs('#area-number')?.closest('.index-graphs-section');
+	const pop_section  = qs('#population-number')?.closest('.index-graphs-section');
+
+	if (area_section) {
+		qs('[slot="title"]', area_section).textContent
+			= t(window.LOCALE, 'right_panel.prioritization.graphs.area_share_title');
+		setup_about_button(area_section, t(window.LOCALE, 'right_panel.prioritization.graphs.area_about'));
+	}
+	if (pop_section) {
+		qs('[slot="title"]', pop_section).textContent
+			= t(window.LOCALE, 'right_panel.prioritization.graphs.pop_share_title');
+		setup_about_button(pop_section, t(window.LOCALE, 'right_panel.prioritization.graphs.pop_about'));
+	}
+}
+
+registerUIUpdater(refreshGraphTranslations);

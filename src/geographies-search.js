@@ -10,12 +10,13 @@ import {
 	until,
 } from '../lib/helpers.js';
 
+import { t } from './translate.js';
+
 let input, resultscontainer;
 let all = [];
 let details = [];
 
-const defaultinfo = "Showing all subgeographies";
-const resultsinfo = ce('div', defaultinfo, { "class": 'search-results-info' });
+const resultsinfo = ce('div', '', { "class": 'search-results-info' });
 
 function trigger(value) {
 	details.forEach(x => x.removeAttribute('open'));
@@ -29,7 +30,7 @@ function trigger(value) {
 
 		details[0]?.setAttribute('open', '');
 
-		resultsinfo.innerText = defaultinfo;
+		resultsinfo.innerText = t(window.LOCALE, 'left_panel.geographies_search.default_info');
 
 		return;
 	}
@@ -49,7 +50,7 @@ function trigger(value) {
 	});
 
 	const l = resultscontainer.querySelectorAll('.matches').length;
-	resultsinfo.innerText = l ? l + " results" : defaultinfo;
+	resultsinfo.innerText = l ? l + " results" : t(window.LOCALE, 'left_panel.geographies_search.default_info');
 };
 
 export async function load(x,y) {
@@ -69,7 +70,10 @@ export async function load(x,y) {
 export async function init() {
 	const panel = qs('#geographies.search-panel');
 	input = ce('input', null, { "id": 'geographies-search', "autocomplete": 'off', "class": 'search-input' });
-	input.setAttribute('placeholder', 'Geographies search');
+	input.dataset.tPlaceholder = 'left_panel.geographies_search.placeholder';
+	input.setAttribute('placeholder', t(window.LOCALE, 'left_panel.geographies_search.placeholder'));
+	resultsinfo.dataset.t = 'left_panel.geographies_search.default_info';
+	resultsinfo.innerText = t(window.LOCALE, 'left_panel.geographies_search.default_info');
 
 	panel.prepend(input);
 

@@ -4,23 +4,25 @@ import {
 	maybe,
 } from '../lib/helpers.js';
 
+import { t } from './translate.js';
+
 export function register_login() {
 	const d = document.createElement('div');
 	const p1 = document.createElement('p');
 	const p2 = document.createElement('p');
 
-	p1.innerText = "In order to save an analysis, you need to be registered with us.";
+	p1.innerText = t(window.LOCALE, 'auth.prompt');
 	p2.innerHTML = `
 <div style="display: flex; justify-content: space-around;">
-	<a href="/login">Login</a>
-	<a href="/subscribe/?select=account">Register</a>
+	<a href="/login">${t(window.LOCALE, 'nav.login')}</a>
+	<a href="/subscribe/?select=account">${t(window.LOCALE, 'auth.register')}</a>
 </div>
 `;
 
 	d.append(p1, p2);
 
 	const m = new modal({
-		"header":  "Register/Login",
+		"header":  t(window.LOCALE, 'auth.register_login'),
 		"content": d,
 	});
 

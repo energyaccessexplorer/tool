@@ -33,40 +33,40 @@
 
     <div id="playground">
       <div id="drawer">
-        <a for="cards" description="Active Layers"><i class="bi bi-list-task"></i></a>
-        <a for="controls" description="Add Layers"><i class="bi bi-plus-lg"></i></a>
-        <a for="geographies" description="Change Geographies"><i class="bi bi-globe"></i></a>
-        <a for="vectors" description="Search Features"><i class="bi bi-search"></i></a>
-        <a for="locations" description="Search POI's"><i class="bi bi-geo"></i></a>
-        {{if ne .env "production"}}<a for="points" description="Points Loading"><i class="bi bi-crosshair"></i></a>{{end}}
-        <a id="drawer-info" description="Disclaimer" bind-listen="click" bind-func="show_info"><i class="bi bi-info-circle"></i></a>
+        <a for="cards" description="Active Layers" data-t-description="left_panel.drawer.active_layers"><i class="bi bi-list-task"></i></a>
+        <a for="controls" description="Add Layers" data-t-description="left_panel.drawer.add_layers"><i class="bi bi-plus-lg"></i></a>
+        <a for="geographies" description="Change Geographies" data-t-description="left_panel.drawer.geographies"><i class="bi bi-globe"></i></a>
+        <a for="vectors" description="Search Features" data-t-description="left_panel.drawer.search_features"><i class="bi bi-search"></i></a>
+        <a for="locations" description="Search POI's" data-t-description="left_panel.drawer.search_pois"><i class="bi bi-geo"></i></a>
+        {{if ne .env "production"}}<a for="points" description="Points Loading" data-t-description="left_panel.drawer.points_loading"><i class="bi bi-crosshair"></i></a>{{end}}
+        <a id="drawer-info" description="Disclaimer" data-t-description="left_panel.drawer.disclaimer" bind-listen="click" bind-func="show_info"><i class="bi bi-info-circle"></i></a>
       </div>
 
       <div id="left-panel" style="display: none;">
         <div id="cards" class="search-panel">
           <div id="output-widget">
             <h4>
-              Generate Analysis
+              <span data-t="left_panel.output.generate_analysis">Generate Analysis</span>
               <button id="eae-info-button">
                 <i class="bi-info-circle"></i>
-                <span>About</span>
+                <span data-t="left_panel.cards.card.about_button">About</span>
               </button>
             </h4>
 
             <div id="selects">
               <div>
-                Analysis Area
+                <span data-t="left_panel.output.analysis_area_label">Analysis Area</span>
                 <select id="output-variant-select"></select>
               </div>
 
               <div>
-                Prioritization Index
+                <span data-t="left_panel.output.prioritization_index_label">Prioritization Index</span>
                 <select id="index-select"></select>
               </div>
             </div>
 
             <div id="output-ramp">
-              <strong>Priority Legend</strong>
+              <strong data-t="left_panel.output.priority_legend">Priority Legend</strong>
             </div>
 
             <div class="visibility-group">
@@ -75,43 +75,43 @@
                   <input id="output-on-map"
                          type="checkbox" checked>
                   &nbsp;
-                  Show analysis on map
+                  <span data-t="left_panel.output.show_on_map">Show analysis on map</span>
                 </label>
               </div>
 
               <div id="output-opacity"
                    class="opacity-group">
-                <span>Opacity</span>
+                <span data-t="left_panel.output.opacity_label">Opacity</span>
               </div>
             </div>
           </div>
 
-          <h4>Active Data Layers</h4>
+          <h4 data-t="left_panel.cards.title">Active Data Layers</h4>
 
           <div id="cards-buttons">
             <button bind-listen="click"
                     bind-func="visible_all">
               <i class="bi-eye-slash-fill"></i>
-              <span>Hide all layers</span>
+              <span data-t="left_panel.cards.hide_all">Hide all layers</span>
             </button>
 
             <button bind-listen="click"
                     bind-func="reset_all">
               <i class="bi bi-arrow-repeat"></i>
-              <span>Reset all settings</span>
+              <span data-t="left_panel.cards.reset_all">Reset all settings</span>
             </button>
 
             <button bind-listen="click"
                     bind-func="expand_all">
               <i class="bi bi-arrows-angle-expand"></i>
-              <span>Expand all settings</span>
+              <span data-t="left_panel.cards.expand_all">Expand all settings</span>
             </button>
 
             <button bind-listen="click"
                     bind-func="remove_all">
               <span style="color: #c30000;">
                 <i class="bi-x-lg"></i>
-                <span>Remove all layers</span>
+                <span data-t="left_panel.cards.remove_all">Remove all layers</span>
               </span>
             </button>
           </div>
@@ -143,40 +143,46 @@
         </div>
 
         <div id="vectors" class="search-panel">
-          <div class="search-results"></div>
+          <div class="search-results">
+            <div class="search-results-info"><span bind="text"></span></div>
+          </div>
         </div>
 
         <div id="locations" class="search-panel">
-          <div class="search-results"></div>
+          <div class="search-results">
+            <div class="search-results-info"><span bind="text"></span></div>
+          </div>
         </div>
 
         <div id="points" class="search-panel">
           <div id="ponits-buttons" class="panel-buttons">
             <a id="points-download"
-               title="Download CSV file of the currents points selection">
+               data-t-title="left_panel.points_loading.download_button">
               <i class="bi-box-arrow-in-down"></i>
             </a>
 
             <a id="points-upload">
               <label for="points-file-input"
-                     title="Load a CSV file with points to find within the analysis">
+                     data-t-title="left_panel.points_loading.upload_button">
                 <i class="bi-box-arrow-in-up"></i>
               </label>
               <input type="file" id="points-file-input" accept="text/csv" hidden>
             </a>
 
             <a id="points-pick"
-               title="Pick points on the map to add to the list">
+               data-t-title="left_panel.points_loading.pick_button">
               <i class="bi-geo-alt"></i>
             </a>
 
             <a id="points-input"
-               title="Input coordinates manually">
+               data-t-title="left_panel.points_loading.input_button">
               <i class="bi-cursor-text"></i>
             </a>
           </div>
 
-          <div class="search-results"></div>
+          <div class="search-results">
+            <div class="search-results-info"><span bind="text"></span></div>
+          </div>
         </div>
       </div>
 
@@ -188,17 +194,17 @@
       </div>
 
       <button id="right-panel-show" class="button-icon button-icon-mid">
-        <span>Show Analysis Results</span>
+        <span data-t="right_panel.header.show">Show Analysis Results</span>
         <i class="bi bi-eye-fill"></i>
       </button>
 
       <div id="right-panel" closed>
         <header id="right-panel-header" style="display: none;">
           <div class="header-top">
-            <h2 class="header-title">Analysis Results</h2>
+            <h2 class="header-title" data-t="right_panel.header.title">Analysis Results</h2>
             <button id="right-panel-hide" class="button-icon button-icon-sm">
               <i class="bi bi-eye-slash"></i>
-              <span>Hide</span>
+              <span data-t="right_panel.header.hide">Hide</span>
             </button>
           </div>
         </header>
@@ -221,11 +227,11 @@
         <div id="right-panel-tabs" role="tablist">
           <button class="right-panel-tab active" role="tab" data-tab="prioritization" aria-selected="true">
             <i class="bi bi-lightning-fill"></i>
-            <span>Prioritization</span>
+            <span data-t="right_panel.tabs.prioritization">Prioritization</span>
           </button>
           <button class="right-panel-tab" role="tab" data-tab="data" aria-selected="false">
             <i class="bi bi-bar-chart-line-fill"></i>
-            <span>Data</span>
+            <span data-t="right_panel.tabs.data">Data</span>
           </button>
         </div>
 
@@ -240,8 +246,8 @@
           <div id="analysis-loading-state">
             <div class="blank-state-content">
               <div class="spinner"></div>
-              <p class="blank-state-title">Loading data layers</p>
-              <p class="blank-state-subtitle">Please wait while datasets are being processed.</p>
+              <p class="blank-state-title" data-t="right_panel.prioritization.loading.title">Loading data layers</p>
+              <p class="blank-state-subtitle" data-t="right_panel.prioritization.loading.subtitle">Please wait while datasets are being processed.</p>
             </div>
           </div>
 
@@ -252,8 +258,8 @@
             <div id="analysis-blank-state">
               <div class="blank-state-content">
                 <svg class="blank-state-icon" width="64" height="64"><use href="#blank-state-icon"/></svg>
-                <p class="blank-state-title">Add data to prioritize analysis</p>
-                <p class="blank-state-subtitle">Select a dataset from the left panel to add it to the map and start your prioritization analysis.</p>
+                <p class="blank-state-title" data-t="right_panel.prioritization.blank_state.title">Add data to prioritize analysis</p>
+                <p class="blank-state-subtitle" data-t="right_panel.prioritization.blank_state.subtitle">Select a dataset from the left panel to add it to the map and start your prioritization analysis.</p>
               </div>
             </div>
             <div id="analysis-sections-wrapper">
@@ -276,17 +282,17 @@
         <footer id="right-panel-footer">
           <button id="save-snapshot-button" class="button-icon button-icon-mid footer-action-button">
             <i class="bi bi-bookmark"></i>
-            <span>Save</span>
+            <span data-t="right_panel.footer.save">Save</span>
           </button>
 
           <button id="share-snapshot-button" class="button-icon button-icon-mid footer-action-button">
             <i class="bi bi-share"></i>
-            <span>Share</span>
+            <span data-t="right_panel.footer.share">Share</span>
           </button>
 
-          <button id="export-button" class="button-icon button-icon-mid footer-action-button" title="Export analysis (PowerPoint, TIFF, CSV)">
+          <button id="export-button" class="button-icon button-icon-mid footer-action-button" title="Export analysis (PowerPoint, TIFF, CSV)" data-t-title="right_panel.footer.export_title">
             <i class="bi bi-download"></i>
-            <span>Export</span>
+            <span data-t="right_panel.footer.export">Export</span>
           </button>
         </footer>
       </div>
@@ -363,7 +369,8 @@
           </div>
 
           <div style="display: inline-block;
-                      font-size: x-small;">
+                      font-size: x-small;"
+               data-t="left_panel.cards.card.not_available">
             Not Available
           </div>
         </span>
@@ -386,7 +393,7 @@
         <strong bind="unit-label">Range</strong>
 
         <p class="explain"
-           bind="category.unit-explain">
+           data-t="left_panel.cards.card.range_hint">
           Analysis will restrict the dataset to the selected range.
         </p>
 
@@ -406,9 +413,9 @@
 
       <div bind-if="weight-group"
            class="group">
-        <strong>Importance</strong>
+        <strong data-t="left_panel.cards.card.importance_label">Importance</strong>
 
-        <p class="explain">
+        <p class="explain" data-t="left_panel.cards.card.importance_hint">
           Change importance to provide different weightings for data in the
           analysis calculation.
         </p>
@@ -425,12 +432,12 @@
                      bind-func="visibility"
                      checked />
               &nbsp;
-              Show layer
+              <span data-t="left_panel.cards.card.show_layer">Show layer</span>
             </label>
           </div>
 
           <div class="opacity-group">
-            <span>Opacity</span>
+            <span data-t="left_panel.cards.card.opacity_label">Opacity</span>
             <span bind="opacity" bind-replace></span>
           </div>
         </div>
@@ -440,13 +447,13 @@
         <buttons>
           <button bind-listen="click"
                   bind-func="info">
-            <i class="bi-info-circle"></i> <span>About</span>
+            <i class="bi-info-circle"></i> <span data-t="left_panel.cards.card.about_button">About</span>
           </button>
 
           <button bind-if="vectors.data"
                   bind-listen="click"
                   bind-func="table">
-            <i class="bi-table"></i> <span>Table</span>
+            <i class="bi-table"></i> <span data-t="left_panel.cards.card.table_button">Table</span>
           </button>
         </buttons>
       </div>
@@ -461,75 +468,9 @@
     </div>
   </template>
 
-  <template id="country-overview">
-    <div class="country-overview">
-      <section>
-        <strong>Population:</strong> <span bind="population"></span> million
-      </section>
-
-      <section>
-        <strong>&nbsp;&nbsp;&nbsp;&nbsp; Urban:</strong> <span bind="urban_population"></span>%
-      </section>
-
-      <section>
-        <strong>&nbsp;&nbsp;&nbsp;&nbsp; Rural:</strong> <span bind="rural_population"></span>%
-      </section>
-
-      <section>
-        <strong>Area:</strong> <span bind="area"></span> km<sup>2</sup>
-      </section>
-
-      <section>
-        <strong>GDP per capita:</strong> USD <span bind="gdp_percapita"></span>
-      </section>
-
-      <section>
-        <strong>Electrification Rate:</strong> <span bind="electrification"></span>%
-      </section>
-
-      <section>
-        <div style="display: flex; justify-content: space-around;
-                    text-align: center;
-                    text-transform: uppercase;
-                    color: var(--the-green);">
-          <strong style="margin: 0.5em;">Urban</strong>
-          <strong style="margin: 0.5em;">Rural</strong>
-        </div>
-
-        <div style="display: flex; justify-content: space-around;
-                    margin-bottom: 30px;">
-          <div style="display: flex; justify-content: space-around; width: 240px; padding: 0 1em;
-                      border-right: 1px solid lightgray;">
-            <span class="small">
-              Electrified:&nbsp; <strong><span bind="urban_electrification"></span>%</strong>
-            </span>
-
-            <span bind="urban_electrification_pie"></span>
-          </div>
-
-          <div style="display: flex; justify-content: space-around; width: 240px; padding: 0 1em;">
-            <span class="small">
-              Electrified:&nbsp; <strong><span bind="rural_electrification"></span>%</strong>
-            </span>
-
-            <span bind="rural_electrification_pie"></span>
-          </div>
-        </div>
-      </section>
-
-      <section>
-        <strong>Energy intensity level of primary energy (MJ/$2011 PPP GDP):</strong> <span bind="primary_intensity"></span>
-      </section>
-
-      <section>
-        <strong>Power outages in firms in a typical month:</strong> <span bind="outages_average"></span>
-      </section>
-    </div>
-  </template>
-
   <template id="eae-info-modal-template">
-    <h3>About Energy Access Explorer prioritizaton</h3>
-    <p>
+    <h3 data-t="modal.eae_info.title">About Energy Access Explorer prioritizaton</h3>
+    <p data-t="modal.eae_info.body">
       Energy Access Explorer enables you to identify high-priority areas for
       energy access interventions. EAE uses multi-criteria analysis that uses
       location-specific resource availability and infrastructure data to
@@ -539,22 +480,22 @@
 
     <br><div style="border-bottom: 1px solid lightgray;"></div><br><br>
 
-    <h3>Analysis areas</h3>
-    <p>
+    <h3 data-t="modal.eae_info.analysis_areas.title">Analysis areas</h3>
+    <p data-t="modal.eae_info.analysis_areas.body">
       Energy Access Explorer offers the option to generate an analysis across
       various different administrative priorities.
     </p>
 
     <br>
-    <h4>Priority areas (1km²)</h4>
-    <p>
+    <h4 data-t="modal.eae_info.priority_1km.title">Priority areas (1km²)</h4>
+    <p data-t="modal.eae_info.priority_1km.body">
       Selecting this analysis area provides a raster analysis in 1km2 tiles
       across the entirity of the selected geography.
     </p>
 
     <br>
-    <h4>Other analysis areas</h4>
-    <p>
+    <h4 data-t="modal.eae_info.other_areas.title">Other analysis areas</h4>
+    <p data-t="modal.eae_info.other_areas.body">
       Depending on the currently selected geography, it is possible to change
       the priotitization output to wider geographical areas such as districts,
       regions or zones for more high level analysis.
@@ -562,8 +503,8 @@
 
     <br><div style="border-bottom: 1px solid lightgray;"></div><br><br>
 
-    <h3 id="prioritization-indexes">Prioritization indexes</h3>
-    <p>
+    <h3 id="prioritization-indexes" data-t="modal.eae_info.indexes.title">Prioritization indexes</h3>
+    <p data-t="modal.eae_info.indexes.body">
       There are 4 different methods to generate a prioritization, depending on
       the aim of your analysis; these are known as the different
       "indexes". Energy Access Potential is the standard recommended index as it
@@ -595,7 +536,7 @@
     <p>
       <a href="https://www.wri.org/publication/energy-access-explorer-data-and-methods">
         <i class="bi-box-arrow-up-right"></i>
-        <span>View technical note</span>
+        <span data-t="modal.eae_info.view_technical_note">View technical note</span>
       </a>
     </p>
 
@@ -610,19 +551,19 @@
     <div style="display:flex; flex-flow: row nowrap;">
       <div class="left" style="flex: 1;">
         <section bind-cond="description">
-          <h3>Description</h3><pre class="description-text" bind="description"></pre>
+          <h3 data-t="dataset_info.description">Description</h3><pre class="description-text" bind="description"></pre>
         </section>
 
         <section bind-cond="category-description">
-          <h3>Why is this dataset used?</h3><pre class="description-text" bind="category-description"></pre>
+          <h3 data-t="dataset_info.why_used">Why is this dataset used?</h3><pre class="description-text" bind="category-description"></pre>
         </section>
 
         <section bind-cond="suggested_citation">
-          <h3>Suggested Citation</h3><pre class="description-text" bind="suggested_citation"></pre>
+          <h3 data-t="dataset_info.suggested_citation">Suggested Citation</h3><pre class="description-text" bind="suggested_citation"></pre>
         </section>
 
         <section bind-cond="cautions">
-          <h3>Cautions</h3><pre class="description-text" bind="cautions"></pre>
+          <h3 data-t="dataset_info.cautions">Cautions</h3><pre class="description-text" bind="cautions"></pre>
         </section>
       </div>
 
@@ -632,7 +573,7 @@
              bind-cond="download_original_url"
              bind-attr="href"
              bind-arg="download_original_url"
-             target="_blank">Download from Source</a>
+             target="_blank" data-t="dataset_info.download_from_source">Download from Source</a>
         </section>
 
         <section>
@@ -640,31 +581,31 @@
              bind-cond="learn_more_url"
              bind-attr="href"
              bind-arg="learn_more_url"
-             target="_blank">Learn More</a>
+             target="_blank" data-t="dataset_info.learn_more">Learn More</a>
         </section>
 
         <section bind-cond="sources">
-          <h3>Sources</h3>
+          <h3 data-t="dataset_info.sources">Sources</h3>
           <pre class="description-text" bind="sources"></pre>
         </section>
 
         <section bind-cond="spatial_resolution">
-          <h3>Spatial Resolution</h3>
+          <h3 data-t="dataset_info.spatial_resolution">Spatial Resolution</h3>
           <span bind="spatial_resolution"></span>
         </section>
 
         <section bind-cond="license">
-          <h3>License</h3>
+          <h3 data-t="dataset_info.license">License</h3>
           <span bind="license"></span>
         </section>
 
         <section bind-cond="content_date">
-          <h3>Date of Content</h3>
+          <h3 data-t="dataset_info.content_date">Date of Content</h3>
           <span bind="content_date"></span>
         </section>
 
         <section bind-cond="publication_date">
-          <h3>Date of Publication</h3>
+          <h3 data-t="dataset_info.publication_date">Date of Publication</h3>
           <span bind="publication_date"></span>
         </section>
       </div>
@@ -672,7 +613,7 @@
   </template>
 
   <template id="share-link-modal-content">
-    <p>
+    <p data-t="my_eae.modal.share.instructions">
       Sharing the following link will load the Energy Access Explorer platform in
       the current state: layers and analysis.
 
@@ -692,7 +633,7 @@
               bind-listen="click"
               bind-func="copy">
         <i class="bi bi-copy"></i>
-        <span>Copy link</span>
+        <span data-t="my_eae.modal.share.copy_link">Copy link</span>
       </button>
     </div>
   </template>
@@ -703,11 +644,11 @@
         <div class="export-option-icon">
           <i class="bi bi-easel"></i>
         </div>
-        <h3 class="card-title">Summary presentation</h3>
-        <p class="card-description">A summary presentation explaining the outputs of your current analysis view.</p>
+        <h3 class="card-title" data-t="modal.export.summary_presentation.title">Summary presentation</h3>
+        <p class="card-description" data-t="modal.export.summary_presentation.desc">A summary presentation explaining the outputs of your current analysis view.</p>
         <button type="button" class="button-small" bind-listen="click" bind-func="export_ppt">
           <i class="bi bi-download"></i>
-          <span>Download .ppt</span>
+          <span data-t="modal.export.summary_presentation.button">Download .ppt</span>
         </button>
       </div>
 
@@ -715,11 +656,11 @@
         <div class="export-option-icon">
           <i class="bi bi-image"></i>
         </div>
-        <h3 class="card-title">Map TIFF</h3>
-        <p class="card-description">A TIFF file of the prioritization raster image generated from your analysis.</p>
+        <h3 class="card-title" data-t="modal.export.map_tiff.title">Map TIFF</h3>
+        <p class="card-description" data-t="modal.export.map_tiff.desc">A TIFF file of the prioritization raster image generated from your analysis.</p>
         <button type="button" class="button-small" bind-listen="click" bind-func="export_tiff">
           <i class="bi bi-download"></i>
-          <span>Download .TIFF</span>
+          <span data-t="modal.export.map_tiff.button">Download .TIFF</span>
         </button>
       </div>
 
@@ -727,11 +668,11 @@
         <div class="export-option-icon">
           <i class="bi bi-table"></i>
         </div>
-        <h3 class="card-title">High priority areas</h3>
-        <p class="card-description">A table of the highest priority <span bind="area_type"></span> areas from your analysis.</p>
+        <h3 class="card-title" data-t="modal.export.high_priority.title">High priority areas</h3>
+        <p class="card-description" data-t-html="modal.export.high_priority.desc">A table of the highest priority <span bind="area_type"></span> areas from your analysis.</p>
         <button type="button" class="button-small" bind-listen="click" bind-func="export_csv">
           <i class="bi bi-download"></i>
-          <span>Download .csv</span>
+          <span data-t="modal.export.high_priority.button">Download .csv</span>
         </button>
       </div>
 
@@ -739,21 +680,25 @@
         <div class="export-option-icon">
           <i class="bi bi-pie-chart"></i>
         </div>
-        <h3 class="card-title">Population and area share</h3>
-        <p class="card-description">CSV data for the population and area share.</p>
+        <h3 class="card-title" data-t="modal.export.pop_area_share.title">Population and area share</h3>
+        <p class="card-description" data-t="modal.export.pop_area_share.desc">CSV data for the population and area share.</p>
         <button type="button" class="button-small" bind-listen="click" bind-func="export_share_csv">
           <i class="bi bi-download"></i>
-          <span>Download .csv</span>
+          <span data-t="modal.export.pop_area_share.button">Download .csv</span>
         </button>
       </div>
     </div>
+  </template>
+
+  <template id="export-options-modal-header">
+    <span class="modal-title" data-t="modal.export.header">Export options</span>
   </template>
 
   <template id="export-options-modal-footer">
     <div class="modal-footer-bar">
       <button type="button" class="button-icon button-icon-mid" bind-listen="click" bind-func="export_all">
         <i class="bi bi-file-earmark-zip"></i>
-        <span>Download all</span>
+        <span data-t="modal.export.download_all">Download all</span>
       </button>
     </div>
   </template>
@@ -763,7 +708,7 @@
       <span slot="title"></span>
       <div slot="actions">
         <button class="button-icon button-info button-about">
-          <span>About</span>
+          <span data-t="left_panel.cards.card.about_button">About</span>
           <i class="bi bi-info-circle"></i>
         </button>
       </div>
@@ -779,10 +724,10 @@
 
   <template id="poi-card-template">
     <panel-section class="poi-section" collapsible collapsed>
-      <h2 slot="title">Intersecting points of interest</h2>
+      <h2 slot="title" data-t="right_panel.prioritization.poi.title">Intersecting points of interest</h2>
       <div slot="actions">
         <button class="button-icon button-info button-about">
-          <span>About</span>
+          <span data-t="left_panel.cards.card.about_button">About</span>
           <i class="bi bi-info-circle"></i>
         </button>
       </div>
@@ -798,10 +743,10 @@
 
   <template id="index-priority-card-template">
     <panel-section class="index-priority-section">
-      <h2 slot="title">Index Priority</h2>
+      <h2 slot="title" data-t="right_panel.prioritization.index_priority.title">Index Priority</h2>
       <div slot="actions">
         <button class="button-icon button-info button-about">
-          <span>About</span>
+          <span data-t="left_panel.cards.card.about_button">About</span>
           <i class="bi bi-info-circle"></i>
         </button>
       </div>
@@ -811,10 +756,10 @@
 
   <template id="analysis-locations-template">
     <panel-section id="analysis-locations-section" collapsible collapsed>
-      <h2 slot="title">High priority areas</h2>
+      <h2 slot="title" data-t="right_panel.prioritization.high_priority.section_title">High priority areas</h2>
       <div slot="actions">
         <button class="button-icon button-info button-about">
-          <span>About</span>
+          <span data-t="left_panel.cards.card.about_button">About</span>
           <i class="bi bi-info-circle"></i>
         </button>
       </div>
@@ -822,7 +767,7 @@
       <footer class="locations-footer">
         <button id="view-all-locations" class="button-icon button-icon-mid" bind-listen="click" bind-func="view_all_locations">
           <i class="bi bi-table"></i>
-          <span>View or Download data</span>
+          <span data-t="right_panel.prioritization.high_priority.view_download">View or Download data</span>
         </button>
       </footer>
     </panel-section>
@@ -848,19 +793,21 @@
              type="number"
              step="any"
              placeholder="Longitude"
+             data-t-placeholder="modal.points_input.longitude_placeholder"
              style="padding: 5px 7px;">
 
       <input id="lat"
              type="number"
              step="any"
              placeholder="Latitude"
+             data-t-placeholder="modal.points_input.latitude_placeholder"
              style="padding: 5px 7px;">
 
       <br><br>
 
       <button type="submit"
               class="big-green-button"
-              style="font-size: 0.8em; margin: auto;">Add point</button>
+              style="font-size: 0.8em; margin: auto;" data-t="modal.points_input.add_button">Add point</button>
     </form>
   </template>
 
@@ -901,13 +848,15 @@
     <buttons>
       <button bind-listen="click"
               bind-func="settings"
-              title="Hide/Show settings">
+              title="Hide/Show settings"
+              data-t-title="left_panel.cards.card.settings_toggle_title">
         <i class="bi-chevron-down"></i>
       </button>
 
       <button bind-listen="click"
               bind-func="close"
-              title="Remove dataset">
+              title="Remove dataset"
+              data-t-title="left_panel.cards.card.remove_dataset_title">
         <i class="bi-x-lg"></i>
       </button>
     </buttons>
@@ -946,7 +895,7 @@
         </table>
       </content>
       <div class="analyse-button-container" bind-cond="inside-boundary">
-        <button class="analyse-button">Analyse selected area</button>
+        <button class="analyse-button"><span data-t="map_popup.analyse_button">Analyse selected area</span></button>
       </div>
       <content class="detailed-data hidden" bind-cond="has-detailed">
         <table>
@@ -982,19 +931,19 @@
   </template>
 
   <template id="toast-save-action-template">
-    <a href="/tool/m/" target="_blank" class="button-small" slot="action">View in My EAE</a>
+    <a href="/tool/m/" target="_blank" class="button-small" slot="action" data-t="modals.save_analysis.view_in_my_eae">View in My EAE</a>
   </template>
 
   <template id="request-authentication-modal-template">
-    <p>
+    <p data-t-html="modals.save_analysis.auth_message">
       Create a My EAE account, or sign in to your existing account in order to save your current analysis view and receive important updates about the Energy Access Explorer platform.
     </p>
-    <a href="/subscribe/?select=account" target="_blank" class="primary-button">Create account</a>
-    <a href="/login" class="secondary-button">Sign in</a>
+    <a href="/subscribe/?select=account" target="_blank" class="primary-button" data-t="modals.save_analysis.auth_create">Create account</a>
+    <a href="/login" class="secondary-button" data-t="modals.save_analysis.auth_signin">Sign in</a>
   </template>
 
   <template id="saved-analysis-modal-template">
-    <p>
+    <p data-t-html="modals.save_analysis.saved_message">
       You are currently viewing an analysis already saved to your My EAE account. You can either update your existing saved analysis, or save your changes as a new analysis.
     </p>
     <div class="saved-analysis-info">
@@ -1004,21 +953,21 @@
       </div>
       <div class="saved-analysis-last-viewed" bind="last-viewed"></div>
     </div>
-    <button class="button primary-button" bind-listen="click" bind-func="update">Update saved analysis</button>
-    <button class="button secondary-button" bind-listen="click" bind-func="saveAsNew">Save as new analysis</button>
+    <button class="button primary-button" bind-listen="click" bind-func="update" data-t="modal.save_analysis.update_button">Update saved analysis</button>
+    <button class="button secondary-button" bind-listen="click" bind-func="saveAsNew" data-t="modal.save_analysis.save_as_new_button">Save as new analysis</button>
   </template>
 
   <template id="edit-title-form-template">
     <form id="save-analysis" class="save-analysis-form">
       <div class="text-input-wrapper">
-        <label class="text-input-label required">Analysis title</label>
-        <div class="text-input-hint">Enter a memorable name for the current configuration.</div>
+        <label class="text-input-label required" data-t="modal.save_analysis.title_label">Analysis title</label>
+        <div class="text-input-hint" data-t="modal.save_analysis.title_hint">Enter a memorable name for the current configuration.</div>
       </div>
       <div class="field-wrapper">
         <input class="text-input" name="title" required />
       </div>
     </form>
-    <button type="submit" form="save-analysis" class="primary-button">Save analysis</button>
+    <button type="submit" form="save-analysis" class="primary-button" data-t="modal.save_analysis.save_button">Save analysis</button>
   </template>
 
   <template id="discrete-scale-item-template">
@@ -1103,7 +1052,7 @@
         <p class="high-priority-areas-list-all-subtitle" bind="analysis-name"></p>
         <button class="button-icon button-icon-sm column-selector-toggle"
                 bind-listen="click" bind-func="toggle_column_selector">
-          <i class="bi bi-gear"></i> <span>Toggle columns</span>
+          <i class="bi bi-gear"></i> <span data-t="modal.high_priority_table.toggle_columns">Toggle columns</span>
         </button>
       </div>
       <div class="column-selector-panel hidden">
@@ -1129,7 +1078,7 @@
         <div class="selection-overlay hidden">
           <span class="selection-count"></span>
           <button class="button-icon button-icon-mid" bind-listen="click" bind-func="download_selected">
-            <span>Download selected rows</span>
+            <span data-t="modal.high_priority_table.download_selected">Download selected rows</span>
           </button>
         </div>
       </div>
@@ -1141,7 +1090,7 @@
             <option value="50">50</option>
             <option value="100">100</option>
           </select>
-          <span class="per-page-label">Per page</span>
+          <span class="per-page-label" data-t="modal.high_priority_table.per_page">Per page</span>
         </div>
         <div class="pagination">
           <button class="pagination-btn chevron" bind-listen="click" bind-func="on_prev">
@@ -1164,7 +1113,7 @@
       </button>
       <div class="info">
         <i class="bi bi-info-circle"></i>
-        <span>Data download will include a summary of your analysis.</span>
+        <span data-t="modal.high_priority_table.data_download_summary">Data download will include a summary of your analysis.</span>
       </div>
     </div>
   </template>
@@ -1209,6 +1158,31 @@
     <div>
       <div class="modal-title" bind="title"></div>
       <div class="modal-subtitle" bind="subtitle"></div>
+    </div>
+  </template>
+
+  <template id="branch-tab-template">
+    <div class="controls-branch-tab up-title" bind-listen="click" bind-func="select">
+      <span bind="label"></span>
+    </div>
+  </template>
+
+  <template id="branch-container-template">
+    <div class="controls-branch"></div>
+  </template>
+
+  <template id="subbranch-template">
+    <div class="controls-subbranch">
+      <div class="controls-subbranch-title up-title" bind-listen="mouseup" bind-func="toggle">
+        <span class="collapse triangle">
+          <svg width="12" height="12" viewBox="0 0 12 12" style="transform: rotate(-45deg)translate(0,0);">
+            <polyline points="12,0 12,12 0,12 "></polyline>
+          </svg>
+        </span>
+        <span class="text" bind="label"></span>
+        <span class="count" style="visibility: hidden;">0</span>
+      </div>
+      <div class="controls-container"></div>
     </div>
   </template>
 

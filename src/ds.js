@@ -18,6 +18,8 @@ import dscard from './cards.js';
 
 import dscontrols from './controls.js';
 
+import { t, translateNode, translateDatasetName, translateDatasetAttribute } from './translate.js';
+
 import {
 	csv as parse_csv,
 	raster as parse_raster,
@@ -121,7 +123,7 @@ export default class DS {
 			const b = GEOGRAPHY.divisions[this.config.divisions_tier];
 
 			if (!b) {
-				new Toast({ "label": "Dataset/File error", "caption": `'${this.name}' requires a geography->divisions->${this.config.divisions_tier}. This is not fatal but the dataset is now disabled.`, "variant": 'error' }).show();
+				new Toast({ "label": t(window.LOCALE, 'toast.dataset_error.label'), "caption": t(window.LOCALE, 'toast.dataset_error.divisions', { "name": this.name, "tier": this.config.divisions_tier }), "variant": 'error' }).show();
 
 				this.disable(`Missing geography->divisions->${this.config.divisions_tier}.`);
 
@@ -141,14 +143,14 @@ export default class DS {
 			indicator = true;
 		}
 
-		function ok(t) {
-			if (indicator && ['vectors', 'raster'].includes(t)) return true;
+		function ok(type) {
+			if (indicator && ['vectors', 'raster'].includes(type)) return true;
 
 			if (this.category.name === 'outline') return true;
 
-			new Toast({ "label": "Dataset/File error", "caption": `'${this.name}' has category '${this.category.name}' which requires a ${t} file. This is not fatal but the dataset is now disabled.`, "variant": 'error' }).show();
+			new Toast({ "label": t(window.LOCALE, 'toast.dataset_error.label'), "caption": t(window.LOCALE, 'toast.dataset_error.category', { "name": this.name, "category": this.category.name, type }), "variant": 'error' }).show();
 
-			this.disable(`Missing ${t}`);
+			this.disable(`Missing ${type}`);
 
 			return false;
 		};
@@ -379,7 +381,7 @@ export default class DS {
 
 			if (!ds) {
 				const msg = `'${this.id}' claims to have host '${h}'. No such DS.`;
-				new Toast({ "label": "Dataset/File error", "caption": `${msg} This is not fatal but the dataset is now disabled.`, "variant": 'error' }).show();
+				new Toast({ "label": t(window.LOCALE, 'toast.dataset_error.label'), "caption": t(window.LOCALE, 'toast.dataset_error.no_host', { "id": this.id, "host": h }), "variant": 'error' }).show();
 
 				this.disable(msg);
 
@@ -630,13 +632,27 @@ export default class DS {
 				});
 		} else {
 			const m = Object.assign({}, this.metadata, { "category-description": this.category.description });
+
+			// Translate metadata fields if translations are available
+			for (const field of ['description', 'cautions', 'suggested_citation', 'sources', 'license', 'spatial_resolution', 'content_date', 'download_original_url', 'learn_more_url']) {
+				if (m[field]) {
+					m[field] = translateDatasetAttribute(window.LOCALE, this, m[field], field);
+				}
+			}
+
+			// Translate category description
+			if (m['category-description']) {
+				m['category-description'] = translateDatasetAttribute(window.LOCALE, this.category, m['category-description'], 'description');
+			}
+
 			content = tmpl('#ds-info-modal');
+			translateNode(window.LOCALE, content);
 			bind(content, m);
 		}
 
 		new modal({
 			"id":      'ds-info',
-			"header":  this.name,
+			"header":  translateDatasetName(window.LOCALE, this),
 			content,
 			"destroy": true,
 		}).show();
@@ -676,7 +692,7 @@ export default class DS {
 			head.append(ce('th', p));
 		}
 
-		if (points) head.append(ce('th', "long/lat"));
+		if (points) head.append(ce('th', t(window.LOCALE, 'dataset_info.long_lat')));
 
 		rows.unshift(head);
 
@@ -684,7 +700,7 @@ export default class DS {
 
 		new modal({
 			"id":      'ds-features-table',
-			"header":  this.name + " - " + features.length + " features",
+			"header":  `${translateDatasetName(window.LOCALE, this)} - ${features.length} ${t(window.LOCALE, 'dataset_info.features')}`,
 			content,
 			"destroy": true,
 		}).show();

@@ -23,6 +23,8 @@ import {
 	show_eae_info_modal,
 } from './output-widget.js';
 
+import { translateNode } from './translate.js';
+
 import {
 	tmpl,
 	qs,
@@ -86,6 +88,7 @@ export default class mapinfo extends HTMLElement {
 
 		const content = tmpl('#map-info-template');
 		bind(content, data);
+		translateNode(window.LOCALE, content);
 
 		this.append(content);
 

@@ -279,6 +279,11 @@ EAE['translations'] = {
     "fr": "Opacité",
     "zh": "不透明度"
   },
+  "left_panel.cards.card.range_hint": {
+    "en": "Analysis will restrict the dataset to the selected range.",
+    "fr": "L'analyse limitera l'ensemble de données à la plage sélectionnée.",
+    "zh": "分析将把数据集限制在所选范围内。"
+  },
   "left_panel.cards.card.remove_dataset_title": {
     "en": "Remove dataset",
     "fr": "Supprimer le jeu de données",

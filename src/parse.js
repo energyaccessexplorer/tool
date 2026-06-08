@@ -1,5 +1,7 @@
 import Toast from './toast.js';
 
+import { t } from './translate.js';
+
 import {
 	super_error,
 	coordinates_to_raster_pixel,
@@ -51,7 +53,7 @@ ${msg}`);
 		return;
 	}
 
-	new Toast({ "label": "Dataset error", "caption": `Failed to process dataset '${this.name}'. This is not fatal but the dataset is now disabled.`, "variant": 'error' }).show();
+	new Toast({ "label": t(window.LOCALE, 'toast.dataset_error.process_label'), "caption": t(window.LOCALE, 'toast.dataset_error.process', { "name": this.name }), "variant": 'error' }).show();
 
 	this.disable(msg);
 };

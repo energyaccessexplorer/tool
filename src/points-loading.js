@@ -29,10 +29,12 @@ import {
 	tmpl,
 } from '../lib/helpers.js';
 
+import { t, tbind, translateNode, translateIndexName } from './translate.js';
+
 let ul, resultscontainer, resultsinfo;
 
 function pointto(p, centerPointer = false) {
-	const dict = [[ "v", EAE['indexes'][STATE.index]['name'] ]];
+	const dict = [[ "v", translateIndexName(window.LOCALE, STATE.index) ]];
 	const props = { "v": lowmedhigh_scale(p.v) };
 
 	search_pointto(p.c, dict, props, centerPointer);
@@ -79,7 +81,7 @@ function trigger() {
 
 	ul.append(...list);
 
-	resultsinfo.innerHTML = `${list.length} points selected:`;
+	tbind(LOCALE, resultsinfo, { "text": ['left_panel.points_loading.selected', { "count": list.length }] });
 
 	for (const g in groups) {
 		const el = ul.querySelector(`[group='${g}']`);
@@ -137,18 +139,18 @@ export function init() {
 	const file_input = qs('#points-file-input', panel);
 	const upload = qs('#points-upload', panel);
 	const upmsg = `
-<h1>Upload a CSV file</h1>
+<h1>${t(window.LOCALE, 'left_panel.points_loading.upload_message_title')}</h1>
 
-This file should be <strong>strictly</strong> formatted.
+${t(window.LOCALE, 'left_panel.points_loading.upload_message_intro')}
 <ul>
-  <li>Two numbers per line: longitud and latitude</li>
-  <li>Separated by a comma</li>
-  <li>Decimal points</li>
-  <li>No quotation marks</li>
-  <li>Nothing more</li>
+  <li>${t(window.LOCALE, 'left_panel.points_loading.upload_message_list_item_1')}</li>
+  <li>${t(window.LOCALE, 'left_panel.points_loading.upload_message_list_item_2')}</li>
+  <li>${t(window.LOCALE, 'left_panel.points_loading.upload_message_list_item_3')}</li>
+  <li>${t(window.LOCALE, 'left_panel.points_loading.upload_message_list_item_4')}</li>
+  <li>${t(window.LOCALE, 'left_panel.points_loading.upload_message_list_item_5')}</li>
 </ul>
 
-<p>Example with two coordinates:</p>
+<p>${t(window.LOCALE, 'left_panel.points_loading.upload_message_example')}</p>
 <pre>
     -12.09156,9.05680
     -10.90457,7.93582
@@ -170,9 +172,9 @@ This file should be <strong>strictly</strong> formatted.
 	upload.onmouseleave = _ => upbubble.remove();
 
 	const download = qs('#points-download', panel);
-	const downmsg = `Download a CSV file with the points/values below`;
 
 	download.onmouseenter = _ => {
+		const downmsg = t(window.LOCALE, 'left_panel.points_loading.download_tooltip');
 		downbubble = new bubblemessage({
 			"position": "S",
 			"message":  downmsg,
@@ -194,9 +196,9 @@ This file should be <strong>strictly</strong> formatted.
 	};
 
 	const pointspick = qs('#points-pick', panel);
-	const pickmsg = `Pick a sequence of points from the map`;
 
 	pointspick.onmouseenter = _ => {
+		const pickmsg = t(window.LOCALE, 'left_panel.points_loading.pick_tooltip');
 		pickbubble = new bubblemessage({
 			"position": "S",
 			"message":  pickmsg,
@@ -213,9 +215,9 @@ This file should be <strong>strictly</strong> formatted.
 	};
 
 	const pointsinput = qs('#points-input', panel);
-	const inputmsg = `Input coordinates manually`;
 
 	pointsinput.onmouseenter = _ => {
+		const inputmsg = t(window.LOCALE, 'left_panel.points_loading.input_tooltip');
 		inputbubble = new bubblemessage({
 			"position": "S",
 			"message":  inputmsg,
@@ -229,7 +231,8 @@ This file should be <strong>strictly</strong> formatted.
 
 	pointsinput.onclick = _ => {
 		const content = tmpl('#points-input-form');
-		const header = "Input Longitude/Latitude";
+		translateNode(window.LOCALE, content);
+		const header = t(window.LOCALE, 'left_panel.points_loading.input_modal_header');
 
 		const m = new modal({
 			"id":      'points-input-modal',
@@ -280,9 +283,9 @@ This file should be <strong>strictly</strong> formatted.
 	panel.addEventListener('activate', reload);
 
 	resultscontainer = qs('#points .search-results');
+	resultsinfo = qs('#points .search-results-info');
 	ul = ce('ul');
 	resultscontainer.append(ul);
 
-	resultsinfo = ce('div', ce('b', "Picked points"), { "class": 'search-results-info' });
-	resultscontainer.prepend(resultsinfo);
+	tbind(LOCALE, resultsinfo, { "text": 'left_panel.points_loading.header' });
 };

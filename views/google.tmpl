@@ -1,7 +1,7 @@
 {{define "google"}}
 <script>
   (function(w,d,s,l,i){
-	if (location.hostname.match(/(localhost|linux)/)) return;
+	if (location.hostname.match(/(localhost|linux|^test\.)/)) return;
 
 	w[l] = w[l]||[];
 	w[l].push({'gtm.start': new Date().getTime(), event: 'gtm.js'});

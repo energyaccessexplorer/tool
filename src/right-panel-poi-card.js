@@ -6,6 +6,8 @@ import {
 	setup_about_button,
 } from './right-panel-graphs.js';
 
+import { translateNode } from './translate.js';
+
 import {
 	tmpl,
 	qs,
@@ -51,6 +53,7 @@ export async function update(ll) {
 	});
 
 	setup_about_button(card, 'Shows points of interest near the selected pixel.');
+	translateNode(window.LOCALE, card);
 	container.append(card);
 }
 

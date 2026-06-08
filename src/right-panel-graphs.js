@@ -1,3 +1,4 @@
+import { t, translateNode } from './translate.js';
 import { svg_pie } from './utils.js';
 import { analysis_colorscale, lowmedhigh_scale } from './analysis.js';
 import { compute_share_amounts } from './summary.js';
@@ -39,13 +40,18 @@ function update_graph_section(section, amounts, unit, description) {
 	scale_container.append(scale);
 
 	const descEl = qs('.section-description', section);
-	descEl.innerHTML = '';
-	descEl.append(description);
+	if (typeof description === 'string') {
+		descEl.innerHTML = description;
+	} else {
+		descEl.innerHTML = '';
+		descEl.append(description);
+	}
 }
 
-function create_graph_section(title, type, numberId, descId) {
+function create_graph_section(titleKey, type, numberId, descId) {
 	const section = tmpl('#index-graph-section-template');
-	qs('[slot="title"]', section).textContent = title;
+	translateNode(window.LOCALE, section);
+	qs('[slot="title"]', section).textContent = t(window.LOCALE, titleKey);
 	qs('.index-graphs-group', section).id = numberId;
 	qs('.section-description', section).id = descId;
 	qs('.index-graphs-group', section).append(PIES[type].svg);
@@ -73,20 +79,19 @@ export function setup_about_button(section, about) {
 }
 
 export function graphs(summary) {
+	const locale = window.LOCALE;
 	const indexName = EAE['indexes'][STATE.index]['name'].toLowerCase();
 
 	process_graph(summary, {
 		"dataKey":     'population-density',
 		"pieKey":      'population',
 		"selector":    '#population-number',
-		"unit":        'people',
-		"description": (total, high) => [
-			`Showing ${indexName} for areas affecting `,
-			ce('strong', total.toLocaleString() + ' people'),
-			', of whom ',
-			ce('strong', high.toLocaleString() + ' people'),
-			` are situated in areas of high ${indexName}.`,
-		],
+		"unit":        t(locale, 'right_panel.prioritization.graphs.people_unit'),
+		"description": (total, high) => t(locale, 'right_panel.prioritization.graphs.pop_desc', {
+			indexName,
+			"x": total.toLocaleString(),
+			"y": high.toLocaleString(),
+		}),
 	});
 
 	process_graph(summary, {
@@ -94,13 +99,11 @@ export function graphs(summary) {
 		"pieKey":      'area',
 		"selector":    '#area-number',
 		"unit":        'km²',
-		"description": (total, high) => [
-			`Showing ${indexName} for areas spanning `,
-			ce('strong', total.toLocaleString() + ' km²'),
-			', of which ',
-			ce('strong', high.toLocaleString() + ' km²'),
-			` has high ${indexName}.`,
-		],
+		"description": (total, high) => t(locale, 'right_panel.prioritization.graphs.area_desc', {
+			indexName,
+			"x": `${total.toLocaleString()} km²`,
+			"y": `${high.toLocaleString()} km²`,
+		}),
 	});
 };
 
@@ -120,9 +123,7 @@ function process_graph(analysis_summary, config) {
 	PIES[config.pieKey].change(1);
 
 	const high = amounts[4];
-
-	const description = document.createDocumentFragment();
-	description.append(...config.description(total, high));
+	const description = config.description(total, high);
 
 	const section = qs(config.selector).closest('.index-graphs-section');
 	update_graph_section(section, amounts, config.unit, description);
@@ -136,11 +137,11 @@ export function init() {
 	PIES["population"] = svg_pie([[0], [0], [0], [0], [0]], 70, 0, analysis_colorscale.stops, null, bubble);
 	PIES["area"]       = svg_pie([[0], [0], [0], [0], [0]], 70, 0, analysis_colorscale.stops, null, bubble);
 
-	const area_section = create_graph_section('Area share', 'area', 'area-number', 'area-description');
-	const population_section = create_graph_section('Population share', 'population', 'population-number', 'population-description');
+	const area_section = create_graph_section('right_panel.prioritization.graphs.area_share_title', 'area', 'area-number', 'area-description');
+	const population_section = create_graph_section('right_panel.prioritization.graphs.pop_share_title', 'population', 'population-number', 'population-description');
 
-	setup_about_button(area_section, "Shows the 'Prioritization Index' results as area shares, based on your analysis criteria.");
-	setup_about_button(population_section, "Shows the 'Prioritization Index' results as population shares, based on your analysis criteria.");
+	setup_about_button(area_section, t(window.LOCALE, 'right_panel.prioritization.graphs.area_about'));
+	setup_about_button(population_section, t(window.LOCALE, 'right_panel.prioritization.graphs.pop_about'));
 
 	qs('#analysis-sections-wrapper').append(area_section);
 	qs('#analysis-sections-wrapper').append(population_section);

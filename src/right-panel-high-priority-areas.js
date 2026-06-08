@@ -45,6 +45,7 @@ import {
 } from '../lib/helpers.js';
 
 import bind from '../lib/bind.js';
+import { translateNode } from './translate.js';
 
 function view_all_locations() {
 	const area_type_str = area_type(STATE.variant);
@@ -322,6 +323,7 @@ export function init() {
 	qs('#analysis-locations').replaceWith(analysis_locations);
 
 	const section = qs('#right-panel #analysis-locations-section');
+	translateNode(window.LOCALE, section);
 	setup_about_button(section, () => `Showing ${format_area_type(STATE.variant)} with the highest prioritization scores based on your analysis criteria.`);
 
 };

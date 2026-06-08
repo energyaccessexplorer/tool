@@ -29,6 +29,8 @@ import {
 	tmpl,
 } from '../lib/helpers.js';
 
+import { tbind } from './translate.js';
+
 let ul, resultscontainer, resultsinfo;
 
 function pointto(p, centerPointer = false) {
@@ -79,7 +81,7 @@ function trigger() {
 
 	ul.append(...list);
 
-	resultsinfo.innerHTML = `${list.length} points selected:`;
+	tbind(LOCALE, resultsinfo, { "text": ['left_panel.points_loading.selected', { "count": list.length }] });
 
 	for (const g in groups) {
 		const el = ul.querySelector(`[group='${g}']`);
@@ -280,9 +282,9 @@ This file should be <strong>strictly</strong> formatted.
 	panel.addEventListener('activate', reload);
 
 	resultscontainer = qs('#points .search-results');
+	resultsinfo = qs('#points .search-results-info');
 	ul = ce('ul');
 	resultscontainer.append(ul);
 
-	resultsinfo = ce('div', ce('b', "Picked points"), { "class": 'search-results-info' });
-	resultscontainer.prepend(resultsinfo);
+	tbind(LOCALE, resultsinfo, { "text": 'left_panel.points_loading.header' });
 };

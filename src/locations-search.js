@@ -17,9 +17,9 @@ import {
 	qs,
 } from '../lib/helpers.js';
 
-let ul, input, resultscontainer;
+import { tbind } from './translate.js';
 
-let resultsinfo;
+let ul, input, resultscontainer, resultsinfo;
 
 function pointto(p, centerPointer = false) {
 	const dict = [[ "name", "Name" ]];
@@ -31,7 +31,7 @@ function pointto(p, centerPointer = false) {
 async function reset(v) {
 	ul.replaceChildren();
 
-	resultsinfo.replaceChildren(ce('b', "Results"), ` for "${v}":`);
+	tbind(LOCALE, resultsinfo, { "text": ['left_panel.locations_search.results_for', { "query": v }] });
 };
 
 function icon(t) {
@@ -78,7 +78,7 @@ function trigger(v) {
 	mapbox_text_search({ "query": v })
 		.then(r => {
 			if (!maybe(r, 'features', 'length')) {
-				resultsinfo.innerHTML = `No results for "${v}".`;
+				tbind(LOCALE, resultsinfo, { "text": ['left_panel.locations_search.no_results', { "query": v }] });
 				return;
 			}
 
@@ -94,11 +94,11 @@ export async function init() {
 	panel.prepend(input);
 
 	resultscontainer = qs('#locations .search-results');
+	resultsinfo = qs('#locations .search-results-info');
 	ul = ce('ul');
 	resultscontainer.append(ul);
 
-	resultsinfo = ce('div', ce('i', "City, region, park..."), { "class": 'search-results-info' });
-	resultscontainer.prepend(resultsinfo);
+	tbind(LOCALE, resultsinfo, { "text": 'left_panel.locations_search.hint' });
 
 	input.onchange = function(_) {
 		reset(input.value);

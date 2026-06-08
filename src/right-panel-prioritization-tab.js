@@ -13,6 +13,8 @@ import {
 	area_type,
 } from './utils.js';
 
+import { translateNode } from './translate.js';
+
 import {
 	make_title,
 } from './right-panel-tabs.js';
@@ -91,6 +93,7 @@ export async function update(raster_index, admin_info, analysis_value) {
 	body.append(make_row('ani', entries['ani']));
 
 	setup_about_button(card, EAE['indexes']['eai']['explain']);
+	translateNode(window.LOCALE, card);
 
 	container.append(card);
 }

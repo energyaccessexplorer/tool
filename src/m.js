@@ -19,6 +19,8 @@ import {
 	tmpl,
 } from '../lib/helpers.js';
 
+import { translateNode, initLocalePicker } from './translate.js';
+
 const user_id = user_extract('id');
 
 function loading(bool) {
@@ -213,6 +215,14 @@ function draw_snapshots(snapshots, geographies, container, trees) {
 };
 
 export async function init() {
+	window.LOCALE = new URLSearchParams(location.search).get('lang')
+		?? localStorage.getItem('locale')
+		?? navigator.language.split('-')[0]
+		?? 'en';
+
+	translateNode(LOCALE, document);
+	initLocalePicker(LOCALE);
+
 	if (!user_id) {
 		console.warn("NOT logged in.");
 		loading(false);

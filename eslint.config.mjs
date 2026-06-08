@@ -35,6 +35,7 @@ export default [
 				"STATE": "writable",
 				"COMMIT": "writable",
 				"SUMMARY": "writable",
+				"LOCALE": "writable",
 			},
 			"ecmaVersion": "latest",
 			"sourceType": "module",

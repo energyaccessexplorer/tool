@@ -33,40 +33,40 @@
 
     <div id="playground">
       <div id="drawer">
-        <a for="cards" description="Active Layers"><i class="bi bi-list-task"></i></a>
-        <a for="controls" description="Add Layers"><i class="bi bi-plus-lg"></i></a>
-        <a for="geographies" description="Change Geographies"><i class="bi bi-globe"></i></a>
-        <a for="vectors" description="Search Features"><i class="bi bi-search"></i></a>
-        <a for="locations" description="Search POI's"><i class="bi bi-geo"></i></a>
-        {{if ne .env "production"}}<a for="points" description="Points Loading"><i class="bi bi-crosshair"></i></a>{{end}}
-        <a id="drawer-info" description="Disclaimer" bind-listen="click" bind-func="show_info"><i class="bi bi-info-circle"></i></a>
+        <a for="cards" description="Active Layers" data-t-description="left_panel.drawer.active_layers"><i class="bi bi-list-task"></i></a>
+        <a for="controls" description="Add Layers" data-t-description="left_panel.drawer.add_layers"><i class="bi bi-plus-lg"></i></a>
+        <a for="geographies" description="Change Geographies" data-t-description="left_panel.drawer.geographies"><i class="bi bi-globe"></i></a>
+        <a for="vectors" description="Search Features" data-t-description="left_panel.drawer.search_features"><i class="bi bi-search"></i></a>
+        <a for="locations" description="Search POI's" data-t-description="left_panel.drawer.search_pois"><i class="bi bi-geo"></i></a>
+        {{if ne .env "production"}}<a for="points" description="Points Loading" data-t-description="left_panel.drawer.points_loading"><i class="bi bi-crosshair"></i></a>{{end}}
+        <a id="drawer-info" description="Disclaimer" data-t-description="left_panel.drawer.disclaimer" bind-listen="click" bind-func="show_info"><i class="bi bi-info-circle"></i></a>
       </div>
 
       <div id="left-panel" style="display: none;">
         <div id="cards" class="search-panel">
           <div id="output-widget">
             <h4>
-              Generate Analysis
+              <span data-t="left_panel.output.generate_analysis">Generate Analysis</span>
               <button id="eae-info-button">
                 <i class="bi-info-circle"></i>
-                <span>About</span>
+                <span data-t="left_panel.cards.card.about_button">About</span>
               </button>
             </h4>
 
             <div id="selects">
               <div>
-                Analysis Area
+                <span data-t="left_panel.output.analysis_area_label">Analysis Area</span>
                 <select id="output-variant-select"></select>
               </div>
 
               <div>
-                Prioritization Index
+                <span data-t="left_panel.output.prioritization_index_label">Prioritization Index</span>
                 <select id="index-select"></select>
               </div>
             </div>
 
             <div id="output-ramp">
-              <strong>Priority Legend</strong>
+              <strong data-t="left_panel.output.priority_legend">Priority Legend</strong>
             </div>
 
             <div class="visibility-group">
@@ -75,43 +75,43 @@
                   <input id="output-on-map"
                          type="checkbox" checked>
                   &nbsp;
-                  Show analysis on map
+                  <span data-t="left_panel.output.show_on_map">Show analysis on map</span>
                 </label>
               </div>
 
               <div id="output-opacity"
                    class="opacity-group">
-                <span>Opacity</span>
+                <span data-t="left_panel.output.opacity_label">Opacity</span>
               </div>
             </div>
           </div>
 
-          <h4>Active Data Layers</h4>
+          <h4 data-t="left_panel.cards.title">Active Data Layers</h4>
 
           <div id="cards-buttons">
             <button bind-listen="click"
                     bind-func="visible_all">
               <i class="bi-eye-slash-fill"></i>
-              <span>Hide all layers</span>
+              <span data-t="left_panel.cards.hide_all">Hide all layers</span>
             </button>
 
             <button bind-listen="click"
                     bind-func="reset_all">
               <i class="bi bi-arrow-repeat"></i>
-              <span>Reset all settings</span>
+              <span data-t="left_panel.cards.reset_all">Reset all settings</span>
             </button>
 
             <button bind-listen="click"
                     bind-func="expand_all">
               <i class="bi bi-arrows-angle-expand"></i>
-              <span>Expand all settings</span>
+              <span data-t="left_panel.cards.expand_all">Expand all settings</span>
             </button>
 
             <button bind-listen="click"
                     bind-func="remove_all">
               <span style="color: #c30000;">
                 <i class="bi-x-lg"></i>
-                <span>Remove all layers</span>
+                <span data-t="left_panel.cards.remove_all">Remove all layers</span>
               </span>
             </button>
           </div>
@@ -143,11 +143,15 @@
         </div>
 
         <div id="vectors" class="search-panel">
-          <div class="search-results"></div>
+          <div class="search-results">
+            <div class="search-results-info"><span bind="text"></span></div>
+          </div>
         </div>
 
         <div id="locations" class="search-panel">
-          <div class="search-results"></div>
+          <div class="search-results">
+            <div class="search-results-info"><span bind="text"></span></div>
+          </div>
         </div>
 
         <div id="points" class="search-panel">
@@ -176,7 +180,9 @@
             </a>
           </div>
 
-          <div class="search-results"></div>
+          <div class="search-results">
+            <div class="search-results-info"><span bind="text"></span></div>
+          </div>
         </div>
       </div>
 
@@ -188,17 +194,17 @@
       </div>
 
       <button id="right-panel-show" class="button-icon button-icon-mid">
-        <span>Show Analysis Results</span>
+        <span data-t="right_panel.header.show">Show Analysis Results</span>
         <i class="bi bi-eye-fill"></i>
       </button>
 
       <div id="right-panel" closed>
         <header id="right-panel-header" style="display: none;">
           <div class="header-top">
-            <h2 class="header-title">Analysis Results</h2>
+            <h2 class="header-title" data-t="right_panel.header.title">Analysis Results</h2>
             <button id="right-panel-hide" class="button-icon button-icon-sm">
               <i class="bi bi-eye-slash"></i>
-              <span>Hide</span>
+              <span data-t="right_panel.header.hide">Hide</span>
             </button>
           </div>
         </header>
@@ -221,11 +227,11 @@
         <div id="right-panel-tabs" role="tablist">
           <button class="right-panel-tab active" role="tab" data-tab="prioritization" aria-selected="true">
             <i class="bi bi-lightning-fill"></i>
-            <span>Prioritization</span>
+            <span data-t="right_panel.tabs.prioritization">Prioritization</span>
           </button>
           <button class="right-panel-tab" role="tab" data-tab="data" aria-selected="false">
             <i class="bi bi-bar-chart-line-fill"></i>
-            <span>Data</span>
+            <span data-t="right_panel.tabs.data">Data</span>
           </button>
         </div>
 
@@ -240,8 +246,8 @@
           <div id="analysis-loading-state">
             <div class="blank-state-content">
               <div class="spinner"></div>
-              <p class="blank-state-title">Loading data layers</p>
-              <p class="blank-state-subtitle">Please wait while datasets are being processed.</p>
+              <p class="blank-state-title" data-t="right_panel.prioritization.loading.title">Loading data layers</p>
+              <p class="blank-state-subtitle" data-t="right_panel.prioritization.loading.subtitle">Please wait while datasets are being processed.</p>
             </div>
           </div>
 
@@ -252,8 +258,8 @@
             <div id="analysis-blank-state">
               <div class="blank-state-content">
                 <svg class="blank-state-icon" width="64" height="64"><use href="#blank-state-icon"/></svg>
-                <p class="blank-state-title">Add data to prioritize analysis</p>
-                <p class="blank-state-subtitle">Select a dataset from the left panel to add it to the map and start your prioritization analysis.</p>
+                <p class="blank-state-title" data-t="right_panel.prioritization.blank_state.title">Add data to prioritize analysis</p>
+                <p class="blank-state-subtitle" data-t="right_panel.prioritization.blank_state.subtitle">Select a dataset from the left panel to add it to the map and start your prioritization analysis.</p>
               </div>
             </div>
             <div id="analysis-sections-wrapper">
@@ -276,17 +282,17 @@
         <footer id="right-panel-footer">
           <button id="save-snapshot-button" class="button-icon button-icon-mid footer-action-button">
             <i class="bi bi-bookmark"></i>
-            <span>Save</span>
+            <span data-t="right_panel.footer.save">Save</span>
           </button>
 
           <button id="share-snapshot-button" class="button-icon button-icon-mid footer-action-button">
             <i class="bi bi-share"></i>
-            <span>Share</span>
+            <span data-t="right_panel.footer.share">Share</span>
           </button>
 
           <button id="export-button" class="button-icon button-icon-mid footer-action-button" title="Export analysis (PowerPoint, TIFF, CSV)">
             <i class="bi bi-download"></i>
-            <span>Export</span>
+            <span data-t="right_panel.footer.export">Export</span>
           </button>
         </footer>
       </div>
@@ -363,7 +369,8 @@
           </div>
 
           <div style="display: inline-block;
-                      font-size: x-small;">
+                      font-size: x-small;"
+               data-t="left_panel.cards.card.not_available">
             Not Available
           </div>
         </span>
@@ -406,7 +413,7 @@
 
       <div bind-if="weight-group"
            class="group">
-        <strong>Importance</strong>
+        <strong data-t="left_panel.cards.card.importance_label">Importance</strong>
 
         <p class="explain">
           Change importance to provide different weightings for data in the
@@ -425,12 +432,12 @@
                      bind-func="visibility"
                      checked />
               &nbsp;
-              Show layer
+              <span data-t="left_panel.cards.card.show_layer">Show layer</span>
             </label>
           </div>
 
           <div class="opacity-group">
-            <span>Opacity</span>
+            <span data-t="left_panel.cards.card.opacity_label">Opacity</span>
             <span bind="opacity" bind-replace></span>
           </div>
         </div>
@@ -440,13 +447,13 @@
         <buttons>
           <button bind-listen="click"
                   bind-func="info">
-            <i class="bi-info-circle"></i> <span>About</span>
+            <i class="bi-info-circle"></i> <span data-t="left_panel.cards.card.about_button">About</span>
           </button>
 
           <button bind-if="vectors.data"
                   bind-listen="click"
                   bind-func="table">
-            <i class="bi-table"></i> <span>Table</span>
+            <i class="bi-table"></i> <span data-t="left_panel.cards.card.table_button">Table</span>
           </button>
         </buttons>
       </div>
@@ -763,7 +770,7 @@
       <span slot="title"></span>
       <div slot="actions">
         <button class="button-icon button-info button-about">
-          <span>About</span>
+          <span data-t="left_panel.cards.card.about_button">About</span>
           <i class="bi bi-info-circle"></i>
         </button>
       </div>
@@ -779,10 +786,10 @@
 
   <template id="poi-card-template">
     <panel-section class="poi-section" collapsible collapsed>
-      <h2 slot="title">Intersecting points of interest</h2>
+      <h2 slot="title" data-t="right_panel.prioritization.poi.title">Intersecting points of interest</h2>
       <div slot="actions">
         <button class="button-icon button-info button-about">
-          <span>About</span>
+          <span data-t="left_panel.cards.card.about_button">About</span>
           <i class="bi bi-info-circle"></i>
         </button>
       </div>
@@ -798,10 +805,10 @@
 
   <template id="index-priority-card-template">
     <panel-section class="index-priority-section">
-      <h2 slot="title">Index Priority</h2>
+      <h2 slot="title" data-t="right_panel.prioritization.index_priority.title">Index Priority</h2>
       <div slot="actions">
         <button class="button-icon button-info button-about">
-          <span>About</span>
+          <span data-t="left_panel.cards.card.about_button">About</span>
           <i class="bi bi-info-circle"></i>
         </button>
       </div>
@@ -811,10 +818,10 @@
 
   <template id="analysis-locations-template">
     <panel-section id="analysis-locations-section" collapsible collapsed>
-      <h2 slot="title">High priority areas</h2>
+      <h2 slot="title" data-t="right_panel.prioritization.high_priority.section_title">High priority areas</h2>
       <div slot="actions">
         <button class="button-icon button-info button-about">
-          <span>About</span>
+          <span data-t="left_panel.cards.card.about_button">About</span>
           <i class="bi bi-info-circle"></i>
         </button>
       </div>
@@ -822,7 +829,7 @@
       <footer class="locations-footer">
         <button id="view-all-locations" class="button-icon button-icon-mid" bind-listen="click" bind-func="view_all_locations">
           <i class="bi bi-table"></i>
-          <span>View or Download data</span>
+          <span data-t="right_panel.prioritization.high_priority.view_download">View or Download data</span>
         </button>
       </footer>
     </panel-section>
@@ -946,7 +953,7 @@
         </table>
       </content>
       <div class="analyse-button-container" bind-cond="inside-boundary">
-        <button class="analyse-button">Analyse selected area</button>
+        <button class="analyse-button"><span data-t="map_popup.analyse_button">Analyse selected area</span></button>
       </div>
       <content class="detailed-data hidden" bind-cond="has-detailed">
         <table>

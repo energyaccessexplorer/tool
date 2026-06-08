@@ -10,9 +10,11 @@ import {
 	until,
 } from '../lib/helpers.js';
 
-let ul, input, resultscontainer;
+import { tbind } from './translate.js';
 
-let ds, resultsinfo, attr, searchable, searchable_attrs;
+let ul, input, resultscontainer, resultsinfo;
+
+let ds, attr, searchable, searchable_attrs;
 
 function pointto(f, centerPointer = false) {
 	const t = MAPBOX.querySourceFeatures(ds.id, {
@@ -43,13 +45,8 @@ async function reset() {
 
 	ul.replaceChildren();
 
-	resultsinfo = ce('div', ce('b', ds.name), { "class": 'search-results-info' });
-
 	if (!ds || !ds.vectors) {
-		resultsinfo.replaceChildren(
-			ce('b', ds.name), "is not searchable.",
-			ce('br'), "Try a dataset with points, lines or polygons ;)",
-		);
+		tbind(LOCALE, resultsinfo, { "text": ['left_panel.vectors_search.no_vectors', { "name": ds.name }] });
 		searchable = false;
 		return;
 	}
@@ -69,7 +66,7 @@ async function reset() {
 	}
 
 	if (!(searchable = !!attr)) {
-		resultsinfo.replaceChildren(ce('b', ds.name), " is not searchable (for now...)");
+		tbind(LOCALE, resultsinfo, { "text": ['left_panel.vectors_search.not_searchable', { "name": ds.name }] });
 		resultscontainer.replaceChildren(resultsinfo);
 		return;
 	}
@@ -103,13 +100,13 @@ function trigger(value) {
 	ul.replaceChildren();
 
 	let count = 0;
+	let tooMany = false;
+
 	for (let i = 0; i < ds.vectors.data.features.length; i++) {
 		if (count > 100) {
-			qs('div.search-results-info', resultscontainer).innerHTML = `Searching <b>${ds.name}</b>. Too many results. Showing first 101 <i>only</i>:`;
+			tooMany = true;
 			break;
 		}
-
-		resultsinfo.innerHTML = `Searching <b>${ds.name}</b>. ${count} results:`;
 
 		const f = ds.vectors.data.features[i];
 		let matches = false;
@@ -128,6 +125,11 @@ function trigger(value) {
 			count += 1;
 		}
 	}
+
+	if (tooMany)
+		tbind(LOCALE, resultsinfo, { "text": ['left_panel.vectors_search.too_many', { "name": ds.name }] });
+	else
+		tbind(LOCALE, resultsinfo, { "text": ['left_panel.vectors_search.results_count', { "name": ds.name, count }] });
 };
 
 export function init() {
@@ -138,6 +140,7 @@ export function init() {
 	panel.prepend(input);
 
 	resultscontainer = qs('#vectors .search-results');
+	resultsinfo = qs('#vectors .search-results-info');
 	ul = ce('ul');
 
 	input.oninput = function(_) {

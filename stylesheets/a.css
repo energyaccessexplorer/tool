@@ -2,6 +2,54 @@ h1, h2, h3, h4 {
   padding: unset;
 }
 
+#locale-picker {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  color: white;
+  font-size: 0.8em;
+  padding: 0 1em;
+  white-space: nowrap;
+  user-select: none;
+}
+
+#locale-picker:hover {
+  opacity: 0.8;
+}
+
+#locale-dropdown {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background-color: white;
+  box-shadow: 0px 1px 5px rgba(0,0,0,0.3);
+  width: max-content;
+  line-height: 3em;
+}
+
+#locale-picker:hover #locale-dropdown {
+  display: block;
+}
+
+#locale-dropdown a {
+  display: block;
+  font-size: 1.2em;
+  color: black;
+  text-decoration: none;
+  padding: 0 1.5em;
+}
+
+#locale-dropdown a:hover {
+  background-color: #f5f5f5;
+}
+
+#locale-dropdown a.active {
+  font-weight: bold;
+  color: var(--the-green);
+}
+
 input[type=checkbox]:checked {
   accent-color: var(--the-green);
 }

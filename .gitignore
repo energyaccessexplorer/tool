@@ -4,6 +4,7 @@
 *.orig
 *.rej
 /settings.tmp.json
+/locales/translations.js.tmp
 /.env
 /.LASTDEPLOY
 node_modules

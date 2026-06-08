@@ -28,17 +28,17 @@
     {{template "nav" .}}
 
     <div id="banner">
-      <h1>My EAE</h1>
+      <h1 data-t="my_eae.page.title">My EAE</h1>
 
       <div id="tabs">
         <div tab="saved-analysis" active>
           <i class="bi bi-folder-fill"></i>
-          Saved Analysis
+          <span data-t="my_eae.tabs.saved_analysis">Saved Analysis</span>
         </div>
 
         <div tab="account">
           <i class="bi bi-person-fill"></i>
-          Account
+          <span data-t="my_eae.tabs.account">Account</span>
         </div>
       </div>
     </div>
@@ -46,11 +46,12 @@
     <div id="playground">
       <main tab-content="saved-analysis" active>
         <input id="search"
+               data-t-placeholder="my_eae.snapshots.filter_placeholder"
                placeholder="Filter by title or geography name">
 
         <select id="sort">
-          <option value="time">Sort by: Date</option>
-          <option value="title">Sort by: Title</option>
+          <option value="time" data-t="my_eae.snapshots.sort_by_date">Sort by: Date</option>
+          <option value="title" data-t="my_eae.snapshots.sort_by_title">Sort by: Title</option>
         </select>
 
         <div id="snapshots">
@@ -63,6 +64,7 @@
       <main tab-content="account">
         <div style="padding: 3em;">
           <button id="change-password"
+                  data-t="my_eae.account.change_password"
                   style="padding: 5px 12px;">Change password</button>
         </div>
       </main>
@@ -104,20 +106,20 @@
            bind-arg="url"
            target="_blank">
           <i class="bi bi-box-arrow-up-right"></i>
-          Open
+          <span data-t="my_eae.snapshot_card.open">Open</span>
         </a>
 
         <span>
           <button class="download">
             <i class="bi bi-download"></i>
-            Download
+            <span data-t="my_eae.snapshot_card.download">Download</span>
           </button>
 
           &nbsp;
 
           <button class="share">
             <i class="bi bi-share"></i>
-            Share
+            <span data-t="my_eae.snapshot_card.share">Share</span>
           </button>
         </span>
       </footer>

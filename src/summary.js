@@ -220,7 +220,7 @@ export default async function analyse(raster, layer_data = null) {
 	let ds = DST.get('population-density');
 
 	if (!ds) {
-		console.warn("No 'population-density' dataset present... Will use boundaries");
+		console.info("No 'population-density' dataset present... Will use boundaries");
 		ds = OUTLINE;
 	}
 

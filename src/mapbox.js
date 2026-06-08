@@ -319,7 +319,7 @@ export function change_theme(theme, soft) {
 	MAPBOX.once('style.load', go);
 
 	if (!soft)
-		MAPBOX.setStyle(theme_pick(EAE['settings'].mapbox_theme = theme));
+		MAPBOX.setStyle(theme_pick(EAE['settings'].mapbox_theme = theme), { "diff": false });
 
 	if (theme === "") go();
 

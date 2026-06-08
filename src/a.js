@@ -119,7 +119,7 @@ COMMIT = debounce(function() {
 	if (DEBUG || ENV.includes("test")) console.trace("commit!", ...arguments);
 
 	if (!OUTLINE?.raster?.data) {
-		console.warn("waiting for OUTLINE...");
+		console.info("waiting for OUTLINE...");
 		COMMIT();
 
 		return;

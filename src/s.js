@@ -191,7 +191,8 @@ async function presets_init() {
 
 				preset.datasets.push(ds);
 			});
-		});
+		})
+		.catch(err => console.warn("presets_init: failed to load presets.csv", err));
 };
 
 export async function init() {

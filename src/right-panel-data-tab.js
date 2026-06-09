@@ -16,7 +16,7 @@ import {
 
 import bind from '../lib/bind.js';
 import bubblemessage from '../lib/bubblemessage.js';
-import { t } from './translate.js';
+import { t, translateUnit } from './translate.js';
 
 import {
 	ce,
@@ -347,7 +347,7 @@ async function update_top_level_geography() {
 
 		const num = Number(value);
 		const formatted = Number.isFinite(num) ? num.toLocaleString() : String(value);
-		const display_unit = unit === 'count' ? '' : unit;
+		const display_unit = unit === 'count' ? '' : translateUnit(window.LOCALE, unit);
 
 		detailedData.push({
 			"label":       layer.name,

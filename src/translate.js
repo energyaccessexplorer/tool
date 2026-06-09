@@ -119,6 +119,19 @@ export function initLocalePicker(locale) {
 	nav.append(picker);
 }
 
+export function translateUnit(locale, unit) {
+	if (!unit || locale === 'en') return unit;
+	const entry = window.EAE['units']?.[unit];
+	if (!entry || !(locale in entry)) {
+		reportError(new Error(!entry
+			? `Missing unit key: "${unit}"`
+			: `Missing "${locale}" translation for unit: "${unit}"`,
+		));
+		return unit;
+	}
+	return entry[locale];
+}
+
 export function translateNode(locale, node) {
 	for (const el of node.querySelectorAll('[data-t]'))
 		el.textContent = t(locale, el.dataset.t);

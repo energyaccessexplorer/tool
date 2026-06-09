@@ -301,10 +301,12 @@ deploy:
 
 	@ bmake reconfig build env=development
 
-build-translations: locales/translations.json
+build-translations: locales/translations.json locales/units.json
 	@ echo "Building translations"
 	@ (printf "EAE['translations'] = "; cat locales/translations.json; printf ";\n") \
 		> locales/translations.js.tmp
+	@ (printf "EAE['units'] = "; cat locales/units.json; printf ";\n") \
+		>> locales/translations.js.tmp
 
 reconfig:
 	@ echo "Building settings.tmp.json - ${env}"

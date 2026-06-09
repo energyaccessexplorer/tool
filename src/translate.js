@@ -16,26 +16,6 @@ function applyVars(template, vars) {
 	});
 }
 
-const translatorCache = {};
-const translatedCache = new Map();
-
-async function browserTranslate(locale, text) {
-	const api = window.Translator ?? window.ai?.translator ?? window.translation;
-	if (!api) return null;
-
-	const cacheKey = `en-${locale}`;
-	try {
-		if (!translatorCache[cacheKey]) {
-			const create = api.create?.bind(api) ?? api.createTranslator?.bind(api);
-			if (!create) return null;
-			translatorCache[cacheKey] = await create({ "sourceLanguage": 'en', "targetLanguage": locale });
-		}
-		return await translatorCache[cacheKey].translate(text);
-	} catch {
-		return null;
-	}
-}
-
 export function t(locale, key, vars = {}) {
 	const entry = window.EAE['translations']?.[key];
 
@@ -43,20 +23,6 @@ export function t(locale, key, vars = {}) {
 		reportError(new Error(!entry
 			? `Missing translation key: "${key}"`
 			: `Missing "${locale}" translation for key: "${key}"`));
-
-		// Interpolate first so the browser translator sees a real sentence.
-		const enText = applyVars(entry?.en ?? key, vars);
-
-		if (locale !== 'en') {
-			const cKey = `${locale}\0${enText}`;
-
-			if (translatedCache.has(cKey)) return translatedCache.get(cKey);
-
-			// Fire background translation; next call with same text returns from cache.
-			browserTranslate(locale, enText).then(translated => {
-				if (translated) translatedCache.set(cKey, translated);
-			});
-		}
 
 		return applyVars(entry?.en ?? key, vars);
 	}
@@ -119,6 +85,14 @@ export function initLocalePicker(locale) {
 	nav.append(picker);
 }
 
+export function translateDatasetName(_locale, dataset) {
+	return dataset?.name ?? '';
+}
+
+export function translateDatasetAttribute(_locale, _dataset, attribute) {
+	return attribute ?? '';
+}
+
 export function translateUnit(locale, unit) {
 	if (!unit || locale === 'en') return unit;
 	const entry = window.EAE['units']?.[unit];
@@ -145,4 +119,3 @@ export function translateNode(locale, node) {
 	for (const el of node.querySelectorAll('[data-t-html]'))
 		el.innerHTML = t(locale, el.dataset.tHtml);
 }
-

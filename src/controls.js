@@ -4,6 +4,8 @@ import {
 
 import DS from './ds.js';
 
+import { translateDatasetName, translateDatasetAttribute } from './translate.js';
+
 import {
 	select_tab,
 } from './controls-search.js';
@@ -82,9 +84,12 @@ export default class dscontrols extends HTMLElement {
 
 		this.header.onclick = header_click.call(this);
 
+		const desc = this.ds.description || this.ds.category.description;
+
 		bind(this, Object.assign({}, this.ds, {
+			"name":        translateDatasetName(window.LOCALE, this.ds),
 			"checkbox":    this.checkbox.svg,
-			"description": this.ds.description || this.ds.category.description,
+			"description": translateDatasetAttribute(window.LOCALE, this.ds, desc),
 			"card":        (_, e) => { e.stopPropagation(); this.ds.card.discover(); },
 			"info":        (_, e) => { e.stopPropagation(); this.ds.info_modal(); },
 		}), { "final": false });

@@ -1,5 +1,7 @@
 import DS from './ds.js';
 
+import { translateDatasetName, translateDatasetAttribute } from './translate.js';
+
 import bind from '../lib/bind.js';
 
 import bubblemessage from '../lib/bubblemessage.js';
@@ -317,7 +319,7 @@ function specs() {
 
 		return {
 			"csymbol": f.call(this, l),
-			"cname":   l.params.map(p => l[p] ?? 'default').join(", "),
+			"cname":   translateDatasetAttribute(window.LOCALE, this.ds, l.params.map(p => l[p] ?? 'default').join(", ")),
 			"checked": true,
 			change,
 		};
@@ -648,6 +650,7 @@ export default class dscard extends HTMLElement {
 
 	bind() {
 		bind(this, Object.assign({}, this.ds, {
+			"name":              translateDatasetName(window.LOCALE, this.ds),
 			"unit-label":        coalesce(this.ds.category.controls.range_label, this.ds.category.unit, "Range"),
 			"range":             maybe(range.call(this), 'svg'),
 			"value-checkboxes":  value_checkboxes.call(this),

@@ -17,6 +17,8 @@ import {
 	tmpl,
 } from '../lib/helpers.js';
 
+import { t, translateNode } from './translate.js';
+
 export let opacity = 1;
 
 export let shown = true;
@@ -92,12 +94,16 @@ function eae_info_modal() {
 	qs('#eae-info-button').onclick = show_eae_info_modal;
 
 	bind(qs('#drawer-info'), {
-		"show_info": () => new modal({
-			"id":      'disclaimer-modal',
-			"header":  "Disclaimer",
-			"content": tmpl('#disclaimer-template'),
-			"destroy": true,
-		}).show(),
+		"show_info": () => {
+			const content = tmpl('#disclaimer-template');
+			translateNode(window.LOCALE, content);
+			new modal({
+				"id":      'disclaimer-modal',
+				"header":  t(window.LOCALE, 'disclaimer.title'),
+				"content": content,
+				"destroy": true,
+			}).show();
+		},
 	});
 };
 

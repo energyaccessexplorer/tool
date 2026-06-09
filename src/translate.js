@@ -141,5 +141,8 @@ export function translateNode(locale, node) {
 
 	for (const el of node.querySelectorAll('[data-t-description]'))
 		el.setAttribute('description', t(locale, el.dataset.tDescription));
+
+	for (const el of node.querySelectorAll('[data-t-html]'))
+		el.innerHTML = t(locale, el.dataset.tHtml);
 }
 

@@ -17,7 +17,7 @@ import {
 	qs,
 } from '../lib/helpers.js';
 
-import { tbind } from './translate.js';
+import { t, tbind } from './translate.js';
 
 let ul, input, resultscontainer, resultsinfo;
 
@@ -89,7 +89,8 @@ function trigger(v) {
 export async function init() {
 	const panel = qs('#locations.search-panel');
 	input = ce('input', null, { "id": 'locations-search', "autocomplete": 'off', "class": 'search-input' });
-	input.setAttribute('placeholder', 'Search for a location');
+	input.dataset.tPlaceholder = 'left_panel.locations_search.placeholder';
+	input.setAttribute('placeholder', t(window.LOCALE, 'left_panel.locations_search.placeholder'));
 
 	panel.prepend(input);
 
@@ -98,7 +99,8 @@ export async function init() {
 	ul = ce('ul');
 	resultscontainer.append(ul);
 
-	tbind(LOCALE, resultsinfo, { "text": 'left_panel.locations_search.hint' });
+	resultsinfo.dataset.t = 'left_panel.locations_search.hint';
+	resultsinfo.textContent = t(window.LOCALE, 'left_panel.locations_search.hint');
 
 	input.onchange = function(_) {
 		reset(input.value);

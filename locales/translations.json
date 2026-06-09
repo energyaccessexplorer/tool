@@ -111,6 +111,22 @@
     "en": "{{count}} points selected:",
     "fr": "{{count}} points sélectionnés :"
   },
+  "left_panel.geographies_search.placeholder": {
+    "en": "Geographies search",
+    "fr": "Recherche de géographies"
+  },
+  "left_panel.geographies_search.default_info": {
+    "en": "Showing all subgeographies",
+    "fr": "Affichage de toutes les sous-géographies"
+  },
+  "left_panel.vectors_search.placeholder": {
+    "en": "Search features",
+    "fr": "Rechercher des entités"
+  },
+  "left_panel.locations_search.placeholder": {
+    "en": "Search for a location",
+    "fr": "Rechercher un lieu"
+  },
   "left_panel.vectors_search.no_vectors": {
     "en": "<b>{{name}}</b> is not searchable. Try a dataset with points, lines or polygons ;)",
     "fr": "<b>{{name}}</b> n'est pas consultable. Essayez un jeu de données avec des points, lignes ou polygones."
@@ -897,11 +913,11 @@
   },
   "disclaimer.maps_note": {
     "en": "The maps are for illustrative purposes and do not imply the expression of any opinion on the part of WRI, concerning the legal status of any country or territory or concerning the delimitation of frontiers or boundaries.",
-    "fr": "Les cartes sont à titre indicatif et n'impliquent pas l'expression d'une opinion."
+    "fr": "Les cartes sont à titre indicatif et n'impliquent pas l'expression d'une opinion de la part du WRI concernant le statut juridique d'un pays ou d'un territoire, ni concernant la délimitation des frontières ou des limites."
   },
   "disclaimer.attribution": {
-    "en": "If you use this platform, partially or entirely, you must follow the attribution instructions.",
-    "fr": "Si vous utilisez cette plateforme, partiellement ou entièrement, vous devez suivre les attributions."
+    "en": "If you use this platform, partially or entirely, you must follow the <a href=\"https://www.energyaccessexplorer.org/attribution/\">attribution instructions</a>.",
+    "fr": "Si vous utilisez cette plateforme, partiellement ou entièrement, vous devez suivre les <a href=\"https://www.energyaccessexplorer.org/attribution/\">instructions d'attribution</a>."
   },
   "dataset_info.covered_by_analysis": {
     "en": "covered by the analysis.",

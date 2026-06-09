@@ -10,7 +10,7 @@ import {
 	until,
 } from '../lib/helpers.js';
 
-import { tbind } from './translate.js';
+import { t, tbind } from './translate.js';
 
 let ul, input, resultscontainer, resultsinfo;
 
@@ -135,7 +135,8 @@ function trigger(value) {
 export function init() {
 	const panel = qs('#vectors.search-panel');
 	input = ce('input', null, { "id": 'vectors-search', "autocomplete": 'off', "class": 'search-input' });
-	input.setAttribute('placeholder', 'Search features');
+	input.dataset.tPlaceholder = 'left_panel.vectors_search.placeholder';
+	input.setAttribute('placeholder', t(window.LOCALE, 'left_panel.vectors_search.placeholder'));
 
 	panel.prepend(input);
 

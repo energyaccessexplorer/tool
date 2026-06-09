@@ -14,6 +14,8 @@ import {
 	maybe,
 } from '../lib/helpers.js';
 
+import { t, translateUnit } from './translate.js';
+
 const row_cache = new Map();
 let feature_indexes = null;
 
@@ -157,7 +159,7 @@ function analysis_entries(analysis_value, analysis_name, admin_info) {
 
 	return [
 		...(analysis_name ? [{ "label": analysis_name, "value": scale(analysis_value), "raw_value": scale(analysis_value), "has_info_button": true }] : []),
-		{ "label": "Priority score", "value": `${(analysis_value * 100).toFixed(1)}%`, "raw_value": analysis_value },
+		{ "key": "Priority score", "label": t(window.LOCALE, 'map_popup.priority_score'), "value": `${(analysis_value * 100).toFixed(1)}%`, "raw_value": analysis_value },
 	];
 }
 
@@ -208,12 +210,12 @@ function location_entry(fields, props) {
 
 	if (!values.length) return null;
 	values.push(GEOGRAPHY.name);
-	return { "label": "Location", "value": values.join(', ') };
+	return { "key": "Location", "label": t(window.LOCALE, 'map_popup.location'), "value": values.join(', ') };
 }
 
 function format_detail(key, label, value, raw, subordinate) {
 	const unit = raw.units[key];
-	const display_unit = unit === 'count' ? '' : (unit || '');
+	const display_unit = unit === 'count' ? '' : translateUnit(window.LOCALE, unit || '');
 	const num = Number(value);
 	const formatted = Number.isFinite(num) ? num.toLocaleString() : value;
 	return {
@@ -289,10 +291,10 @@ export function area_info(fields, props, ll, analysis_value, analysis_name, feat
 
 	const analysis = analysis_entries(analysis_value, analysis_name, admin_info);
 	const coord = (!admin_info && coordinates && feature)
-		? [{ "label": "Coordinates", "value": coordinates, "raw_value": coordinates }]
+		? [{ "key": "Coordinates", "label": t(window.LOCALE, 'map_popup.coordinates'), "value": coordinates, "raw_value": coordinates }]
 		: [];
 	const location = admin_info
-		? { "label": "Location", "value": admin_location_name(admin_info.variant, admin_info.id) }
+		? { "key": "Location", "label": t(window.LOCALE, 'map_popup.location'), "value": admin_location_name(admin_info.variant, admin_info.id) }
 		: location_entry(fields, props);
 
 	const basicData = [...analysis, ...coord, ...(location ? [location] : [])];
@@ -435,8 +437,9 @@ function build_admin_row(item, analysis_name) {
 		...(feature && feature_type ? { [feature_type]: feature } : {}),
 		...Object.fromEntries(
 			detailedData.map(data => {
-				const header = data.unit ? `${data.label} - ${data.unit}` : data.label;
-				return [header, data.label === "Priority score" ? data.value : data.raw_value];
+				const id = data.key || data.label;
+				const header = data.unit ? `${id} - ${data.unit}` : id;
+				return [header, data.key === "Priority score" ? data.value : data.raw_value];
 			}),
 		),
 	};

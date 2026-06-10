@@ -31,10 +31,13 @@ TIMESTAMP != date -u +'%Y-%m-%d--%T'
 templates:
 	@ go build -o ${BIN}/templates ./templates
 
-clean:
-	@ rm -rf ${LIB} ${DIST} ${BIN}/templates
+locales:
+	@ go build -o ${BIN}/locales ./locales
 
-build: deps templates build-translations build-a build-s build-m build-p
+clean:
+	@ rm -rf ${LIB} ${DIST} ${BIN}/templates ${BIN}/locales
+
+build: deps templates locales build-translations build-a build-s build-m build-p
 	@ ${BIN}/templates -template=index -output=${DIST}/index.html -json='{"env":"${env}"}'
 
 lint:
@@ -301,12 +304,12 @@ deploy:
 
 	@ bmake reconfig build env=development
 
-build-translations: locales/translations.json locales/units.json
+build-translations: locales/translations.csv locales/units.csv
 	@ echo "Building translations"
-	@ (printf "EAE['translations'] = "; cat locales/translations.json; printf ";\n") \
-		> locales/translations.js.tmp
-	@ (printf "EAE['units'] = "; cat locales/units.json; printf ";\n") \
-		>> locales/translations.js.tmp
+	@ ${BIN}/locales \
+		-translations=locales/translations.csv \
+		-units=locales/units.csv \
+		-output=locales/translations.js.tmp
 
 reconfig:
 	@ echo "Building settings.tmp.json - ${env}"
@@ -326,4 +329,4 @@ reconfig:
 	@ sed -i.orig -e '$$s/$$/;\n/' settings.tmp.json
 	@ rm settings.tmp.json.orig
 
-.PHONY: templates
+.PHONY: templates locales

@@ -9,3 +9,4 @@
 /.LASTDEPLOY
 node_modules
 bin/templates
+bin/locales

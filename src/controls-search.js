@@ -4,6 +4,8 @@ import {
 	elem_collapse,
 } from './utils.js';
 
+import { t } from './translate.js';
+
 import {
 	ce,
 	maybe,
@@ -101,7 +103,8 @@ async function trigger(value) {
 export function init() {
 	const panel = qs('#controls.search-panel');
 	input = ce('input', null, { "id": 'controls-search', "autocomplete": 'off', "class": 'search-input' });
-	input.setAttribute('placeholder', 'Filter datasets');
+	input.setAttribute('placeholder', t(window.LOCALE, 'left_panel.controls_search.placeholder'));
+	input.dataset.tPlaceholder = 'left_panel.controls_search.placeholder';
 
 	panel.prepend(input);
 

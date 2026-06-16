@@ -1,4 +1,5 @@
 import bind from '../lib/bind.js';
+import { refreshControlsUI } from './controls.js';
 
 export function esc(str) {
 	return String(str)
@@ -63,19 +64,13 @@ function updateDatasetTranslations() {
 	}
 
 	updateCategoryTabLabels();
+	refreshControlsUI(window.LOCALE);
 }
 
 function updateCategoryTabLabels() {
-	const tabs = document.querySelectorAll('.controls-branch-tab[id^="controls-tab-"]');
-	for (const tab of tabs) {
-		const categoryName = tab.id.replace('controls-tab-', '');
-
-		if (categoryName === 'all') {
-			tab.textContent = t(window.LOCALE, 'controls.tab.all');
-		} else {
-			const label = translateCategoryName(window.LOCALE, categoryName);
-			tab.textContent = label;
-		}
+	const allTab = document.querySelector('#controls-tab-all');
+	if (allTab) {
+		allTab.textContent = t(window.LOCALE, 'controls.path.tab.all');
 	}
 }
 
@@ -156,7 +151,29 @@ export function translateDatasetAttribute(locale, dataset, attributeValue, field
 export function translateCategoryName(locale, categoryName) {
 	if (!categoryName) return '';
 
-	return t(locale, `controls.tab.${categoryName}`);
+	return t(locale, `controls.path.tab.${categoryName}`);
+}
+
+export function translateSubbranchName(locale, subranchName) {
+	if (!subranchName) return '';
+
+	const key = `controls.path.subbranch.${subranchName}`;
+	const entry = window.EAE['translations']?.[key];
+
+	if (entry) {
+		return t(locale, key);
+	}
+
+	reportError(new Error(`Missing subbranch translation key: "${key}"`));
+	return humanformat(subranchName);
+}
+
+function humanformat(s) {
+	return s
+		.replace(/_/g, ' ')
+		.replace(/-/g, ' ')
+		.replace(/^([a-z])/, x => x.toUpperCase())
+		.replace(/ ([a-z])/g, x => x.toUpperCase());
 }
 
 export function translateUnit(locale, unit) {

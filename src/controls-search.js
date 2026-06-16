@@ -125,7 +125,7 @@ export function init() {
 		if (c) c.ds.turn();
 	};
 
-	const tab_all = ce('div', t(window.LOCALE, 'controls.tab.all'), { "id": 'controls-tab-all', "class": 'controls-branch-tab up-title' });
+	const tab_all = ce('div', t(window.LOCALE, 'controls.path.tab.all'), { "id": 'controls-tab-all', "class": 'controls-branch-tab up-title' });
 
 	tabs_el.append(tab_all);
 

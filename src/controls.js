@@ -4,7 +4,7 @@ import {
 
 import DS from './ds.js';
 
-import { translateDatasetName, translateDatasetAttribute, translateCategoryName } from './translate.js';
+import { translateDatasetName, translateDatasetAttribute, translateCategoryName, translateSubbranchName } from './translate.js';
 
 import {
 	select_tab,
@@ -60,6 +60,91 @@ export function recount() {
 };
 
 const tabs_el = qs('#controls-tabs');
+
+function create_or_update_tab(name, locale = window.LOCALE) {
+	const id = 'controls-tab-' + name;
+	let t = qs(`#${id}.controls-branch-tab`);
+
+	if (!t) {
+		const label = translateCategoryName(locale, name);
+		t = ce('div', label, { "id": id, "class": 'controls-branch-tab up-title' });
+		if (EAE['indexes'][name]) t.setAttribute('bind', name);
+		t.onclick = _ => select_tab(t, name);
+		tabs_el.append(t);
+	} else {
+		t.textContent = translateCategoryName(locale, name);
+	}
+
+	return t;
+}
+
+function create_or_update_branch(name) {
+	const id = 'controls-branch-' + name;
+	let b = qs(`#${id}.controls-branch`, contents_el);
+
+	if (!b) {
+		b = ce('div', null, { "id": id, "class": 'controls-branch' });
+		if (EAE['indexes'][name]) b.setAttribute('bind', name);
+		contents_el.append(b);
+	}
+
+	return b;
+}
+
+function create_or_update_subbranch(name, parent, locale = window.LOCALE) {
+	const id = 'controls-subbranch-' + name;
+	let sb = qs(`#${id}.controls-subbranch`, parent);
+
+	if (!sb) {
+		let conel, title;
+		sb = ce('div', null, { "id": id, "class": 'controls-subbranch' });
+
+		sb.append(
+			title = ce('div', ce('span', translateSubbranchName(locale, name), { "class": "text" }), { "class": 'controls-subbranch-title up-title' }),
+			conel = ce('div', null, { "class": 'controls-container' }),
+		);
+
+		title.prepend(ce('span', null, { "class": 'collapse triangle' }));
+		title.append(ce('span', "0", { "class": 'count' }));
+		title.addEventListener('mouseup', _ => elem_collapse(conel, sb));
+
+		elem_collapse(conel, sb);
+		parent.append(sb);
+	} else {
+		const textEl = qs('.controls-subbranch-title .text', sb);
+		if (textEl) {
+			textEl.textContent = translateSubbranchName(locale, name);
+		}
+	}
+
+	return sb;
+}
+
+export function refreshControlsUI(locale) {
+	if (typeof DST === 'undefined' || !DST.size) return;
+
+	const seenTabs = new Set();
+	const seenSubbranches = new Set();
+
+	for (const ds of DST.values()) {
+		const path = maybe(ds.category, 'controls', 'path');
+		if (!maybe(path, 'length')) continue;
+
+		if (!seenTabs.has(path[0])) {
+			create_or_update_tab(path[0], locale);
+			seenTabs.add(path[0]);
+		}
+
+		if (path.length >= 2) {
+			const branchId = `${path[0]}-${path[1]}`;
+			if (!seenSubbranches.has(branchId)) {
+				const b = create_or_update_branch(path[0]);
+				create_or_update_subbranch(path[1], b, locale);
+				seenSubbranches.add(branchId);
+			}
+		}
+	}
+}
 
 export default class dscontrols extends HTMLElement {
 	constructor(d) {
@@ -121,51 +206,9 @@ export default class dscontrols extends HTMLElement {
 
 		if (!maybe(path, 'length')) return;
 
-		function create_tab(name) {
-			const label = translateCategoryName(window.LOCALE, name);
-			const t = ce('div', label, { "id": 'controls-tab-' + name, "class": 'controls-branch-tab up-title' });
-			if (EAE['indexes'][name]) t.setAttribute('bind', name);
-			return t;
-		};
-
-		function create_branch(name) {
-			const t = ce('div', null, { "id": 'controls-branch-' + name, "class": 'controls-branch' });
-			if (EAE['indexes'][name]) t.setAttribute('bind', name);
-			return t;
-		};
-
-		function create_subbranch(name) {
-			let conel, title;
-			const el = ce('div', null, { "id": 'controls-subbranch-' + name, "class": 'controls-subbranch' });
-
-			el.append(
-				title = ce('div', ce('span', humanformat(name), { "class": "text" }), { "class": 'controls-subbranch-title up-title' }),
-				conel = ce('div', null, { "class": 'controls-container' }),
-			);
-
-			title.prepend(ce('span', null, { "class": 'collapse triangle' }));
-			title.append(ce('span', "0", { "class": 'count' }));
-			title.addEventListener('mouseup', _ => elem_collapse(conel, el));
-
-			elem_collapse(conel, el);
-
-			return el;
-		};
-
-		let t = qs(`#controls-tab-${path[0]}.controls-branch-tab`);
-		if (!t) {
-			t = create_tab(path[0]);
-			t.onclick = _ => select_tab(t, path[0]);
-			tabs_el.append(t);
-		}
-
-		let b = qs(`#controls-branch-${path[0]}.controls-branch`, contents_el);
-		if (!b) b = create_branch(path[0]);
-		contents_el.append(b);
-
-		let sb = qs(`#controls-subbranch-${path[1]}.controls-subbranch`, b);
-		if (!sb) sb = create_subbranch(path[1]);
-		b.append(sb);
+		create_or_update_tab(path[0]);
+		const b = create_or_update_branch(path[0]);
+		const sb = create_or_update_subbranch(path[1], b);
 
 		const container = qs('.controls-container', sb);
 		if (container) container.append(this);
@@ -183,14 +226,6 @@ export default class dscontrols extends HTMLElement {
 };
 
 customElements.define('ds-controls', dscontrols);
-
-function humanformat(s) {
-	return s
-		.replace('_', ' ')
-		.replace('-', ' ')
-		.replace(/^([a-z])/, x => x.toUpperCase())
-		.replace(/ ([a-z])/g, x => x.toUpperCase());
-};
 
 function toggle_switch(init, callback) {
 	const radius = 10;

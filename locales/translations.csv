@@ -249,8 +249,60 @@ right_panel.prioritization.index_priority.title,Index Priority,Priorité d'index
 right_panel.prioritization.poi.title,Intersecting points of interest,Points d'intérêt intersectants,相交的兴趣点
 right_panel.data.no_data,No data available for <strong>{{name}}</strong> in this area.,Aucune donnée disponible pour <strong>{{name}}</strong> dans cette zone.,此区域内 <strong>{{name}}</strong> 没有可用数据。
 right_panel.data.categorical_desc,Showing the percentage distribution of <strong>{{name}}</strong> categories in the selected area.,Affichage de la répartition en pourcentage des catégories <strong>{{name}}</strong> dans la zone sélectionnée.,显示所选区域内<strong>{{name}}</strong>类别的百分比分布。
-controls.tab.all,All,Tout,全部
-controls.tab.census,Census,Recensement,人口普查
-controls.tab.demand,Demand,Demande,需求
-controls.tab.supply,Supply,Offre,供给
-controls.tab.other,Other,Autre,其他
+controls.path.tab.all,All,Tout,全部
+controls.path.tab.census,Census,Recensement,人口普查
+controls.path.tab.demand,Demand,Demande,需求
+controls.path.tab.supply,Supply,Offre,供给
+controls.path.tab.other,Other,Autre,其他
+controls.path.subbranch.sub-national,Sub-National,Sub-National,次级国家
+controls.path.subbranch.demographics,Demographics,Démographie,人口统计
+controls.path.subbranch.healthcare,Healthcare,Soins de santé,医疗保健
+controls.path.subbranch.hrea,HREA,HREA,HREA
+controls.path.subbranch.infrastructure,Infrastructure,Infrastructure,基础设施
+controls.path.subbranch.infrastructure-geodata,Infrastructure Geodata,Infrastructure Geodata,基础设施地理数据
+controls.path.subbranch.mled,MLED,MLED,MLED
+controls.path.subbranch.productive-use,Productive Use,Utilisation Productive,生产性用途
+controls.path.subbranch.productive-uses,Productive Uses,Utilisations Productives,生产性用途
+controls.path.subbranch.test,Test,Test,测试
+controls.path.subbranch.vulnerability,Vulnerability,Vulnérabilité,易受伤害性
+controls.path.subbranch.geodata,Geodata,Données Géographiques,地理数据
+controls.path.subbranch.pue,PUE,PUE,PUE
+controls.path.subbranch.geodata-gumla,Geodata Gumla,Données Géographiques Gumla,地理数据古姆拉
+controls.path.subbranch.building-type,Building Type,Type de Bâtiment,建筑类型
+controls.path.subbranch.chc-geodata,CHC Geodata,Données Géographiques CHC,CHC 地理数据
+controls.path.subbranch.geolocation,Geolocation,Géolocalisation,地理位置
+controls.path.subbranch.texture,Texture,Texture,纹理
+controls.path.subbranch.least-cost-electrification,Least Cost Electrification,Électrification au Moindre Coût,最低成本电气化
+controls.path.subbranch.benefits,Benefits,Avantages,好处
+controls.path.subbranch.costs,Costs,Coûts,成本
+controls.path.subbranch.net-benefits,Net Benefits,Avantages Nets,净收益
+controls.path.subbranch.subsidies,Subsidies,Subventions,补贴
+controls.path.subbranch.administrative-boundaries,Administrative Boundaries,Limites Administratives,行政边界
+controls.path.subbranch.buildings,Buildings,Bâtiments,建筑物
+controls.path.subbranch.climate,Climate,Climat,气候
+controls.path.subbranch.demographics-other,Demographics Other,Démographie Autre,其他人口统计
+controls.path.subbranch.depth,Depth,Profondeur,深度
+controls.path.subbranch.energy-consumption,Energy Consumption,Consommation d'Énergie,能源消耗
+controls.path.subbranch.environment,Environment,Environnement,环境
+controls.path.subbranch.finance,Finance,Finance,财务
+controls.path.subbranch.household-energy,Household Energy,Énergie Ménagère,家庭能源
+controls.path.subbranch.land-cover,Land Cover,Couverture des Terres,土地覆盖
+controls.path.subbranch.landuse-landcover,Land Use Land Cover,Utilisation et Couverture des Terres,土地利用和土地覆盖
+controls.path.subbranch.livelihood,Livelihood,Moyens de Subsistance,生计
+controls.path.subbranch.livestock,Livestock,Élevage,牲畜
+controls.path.subbranch.lulc,LULC,LULC,LULC
+controls.path.subbranch.refugees,Refugees,Réfugiés,难民
+controls.path.subbranch.settlements,Settlements,Établissements,定居点
+controls.path.subbranch.terrain,Terrain,Terrain,地形
+controls.path.subbranch.transport,Transport,Transport,运输
+controls.path.subbranch.travel-time,Travel Time,Temps de Voyage,旅行时间
+controls.path.subbranch.urbanization,Urbanization,Urbanisation,城市化
+controls.path.subbranch.water-access,Water Access,Accès à l'Eau,获取水
+controls.path.subbranch.water,Water,Eau,水
+controls.path.subbranch.test-1,Test 1,Test 1,测试 1
+controls.path.subbranch.timeline,Timeline,Chronologie,时间轴
+controls.path.subbranch.points,Points,Points,点
+controls.path.subbranch.data,Data,Données,数据
+controls.path.subbranch.lighting-region,Lighting Region,Région de L'Éclairage,照明地区
+controls.path.subbranch.cooking-region,Cooking Region,Région de la Cuisine,烹饪地区
+controls.path.subbranch.assets-region,Assets Region,Région des Actifs,资产地区

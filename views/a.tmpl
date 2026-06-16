@@ -1219,6 +1219,31 @@
     </div>
   </template>
 
+  <template id="branch-tab-template">
+    <div class="controls-branch-tab up-title" bind-listen="click" bind-func="select">
+      <span bind="label"></span>
+    </div>
+  </template>
+
+  <template id="branch-container-template">
+    <div class="controls-branch"></div>
+  </template>
+
+  <template id="subbranch-template">
+    <div class="controls-subbranch">
+      <div class="controls-subbranch-title up-title" bind-listen="mouseup" bind-func="toggle">
+        <span class="collapse triangle">
+          <svg width="12" height="12" viewBox="0 0 12 12" style="transform: rotate(-45deg)translate(0,0);">
+            <polyline points="12,0 12,12 0,12 "></polyline>
+          </svg>
+        </span>
+        <span class="text" bind="label"></span>
+        <span class="count" style="visibility: hidden;">0</span>
+      </div>
+      <div class="controls-container"></div>
+    </div>
+  </template>
+
   {{template "env" .}}
 
   <script type="module">

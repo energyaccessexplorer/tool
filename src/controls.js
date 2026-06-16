@@ -17,7 +17,6 @@ import {
 import bind from '../lib/bind.js';
 
 import {
-	ce,
 	maybe,
 	qs,
 	qsa,
@@ -66,14 +65,16 @@ function create_or_update_tab(name, locale = window.LOCALE) {
 	let t = qs(`#${id}.controls-branch-tab`);
 
 	if (!t) {
-		const label = translateCategoryName(locale, name);
-		t = ce('div', label, { "id": id, "class": 'controls-branch-tab up-title' });
+		t = tmpl('#branch-tab-template').querySelector('.controls-branch-tab');
+		t.id = id;
 		if (EAE['indexes'][name]) t.setAttribute('bind', name);
-		t.onclick = _ => select_tab(t, name);
 		tabs_el.append(t);
-	} else {
-		t.textContent = translateCategoryName(locale, name);
 	}
+
+	bind(t, {
+		"label":  translateCategoryName(locale, name),
+		"select": (_) => select_tab(t, name),
+	}, { "final": false });
 
 	return t;
 }
@@ -83,7 +84,8 @@ function create_or_update_branch(name) {
 	let b = qs(`#${id}.controls-branch`, contents_el);
 
 	if (!b) {
-		b = ce('div', null, { "id": id, "class": 'controls-branch' });
+		b = tmpl('#branch-container-template').querySelector('.controls-branch');
+		b.id = id;
 		if (EAE['indexes'][name]) b.setAttribute('bind', name);
 		contents_el.append(b);
 	}
@@ -96,26 +98,20 @@ function create_or_update_subbranch(name, parent, locale = window.LOCALE) {
 	let sb = qs(`#${id}.controls-subbranch`, parent);
 
 	if (!sb) {
-		let conel, title;
-		sb = ce('div', null, { "id": id, "class": 'controls-subbranch' });
-
-		sb.append(
-			title = ce('div', ce('span', translateSubbranchName(locale, name), { "class": "text" }), { "class": 'controls-subbranch-title up-title' }),
-			conel = ce('div', null, { "class": 'controls-container' }),
-		);
-
-		title.prepend(ce('span', null, { "class": 'collapse triangle' }));
-		title.append(ce('span', "0", { "class": 'count' }));
-		title.addEventListener('mouseup', _ => elem_collapse(conel, sb));
-
-		elem_collapse(conel, sb);
+		sb = tmpl('#subbranch-template').querySelector('.controls-subbranch');
+		sb.id = id;
 		parent.append(sb);
-	} else {
-		const textEl = qs('.controls-subbranch-title .text', sb);
-		if (textEl) {
-			textEl.textContent = translateSubbranchName(locale, name);
-		}
+		const container = qs('.controls-container', sb);
+		const titleEl = qs('.controls-subbranch-title', sb);
+		elem_collapse(container, sb);
+		titleEl.addEventListener('mouseup', (_) => elem_collapse(container, sb));
 	}
+
+	const titleEl = qs('.controls-subbranch-title', sb);
+
+	bind(titleEl, {
+		"label": translateSubbranchName(locale, name),
+	}, { "final": false });
 
 	return sb;
 }

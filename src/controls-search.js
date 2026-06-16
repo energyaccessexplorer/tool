@@ -23,8 +23,11 @@ function openall() {
 	input.dispatchEvent(new Event('input'));
 
 	select_tab(qs('#controls-tab-all'), "all");
-	for (const sb of qsa('.controls-container')) {
-		elem_collapse(sb, sb.previousSibling, "open");
+	for (const container of qsa('.controls-container')) {
+		const subbranch = container.closest('.controls-subbranch');
+		if (subbranch) {
+			elem_collapse(container, subbranch, "open");
+		}
 	}
 };
 
@@ -82,21 +85,34 @@ export function select_tab(tab, name) {
 	if (b) b.style.display = 'block';
 };
 
-async function trigger(value) {
-	const containers = qsa('.controls-container');
+async function trigger(filterRegex) {
+	const { translateDatasetName } = await import('./translate.js');
+	const subbranches = qsa('.controls-subbranch');
 
-	for (const c of containers)
-		c.previousSibling.style.display = '';
+	// Show all subbranches initially
+	for (const sb of subbranches) {
+		qs('.controls-subbranch-title', sb).style.display = '';
+	}
 
-	const r = DS.array.filter(d => !d.disabled && (d.id + ";" + d.name).match(value));
+	// Filter datasets by translated name or id
+	const filtered = DS.array.filter(d => {
+		if (d.disabled) return false;
+		const translatedName = translateDatasetName(window.LOCALE, d);
+		const searchText = d.id + ";" + translatedName;
+		return searchText.match(filterRegex);
+	});
 
+	// Hide/show dataset controls based on filter
 	DS.array
 		.filter(d => d.controls)
-		.forEach(d => d.controls.style.display = r.indexOf(d) > -1 ? '' : 'none');
+		.forEach(d => d.controls.style.display = filtered.indexOf(d) > -1 ? '' : 'none');
 
-	for (const c of containers) {
-		if (Array.from(qsa('ds-controls', c)).every(d => d.style.display === 'none'))
-			c.previousSibling.style.display = 'none';
+	// Hide subbranches if all their datasets are hidden
+	for (const sb of subbranches) {
+		const container = qs('.controls-container', sb);
+		if (Array.from(qsa('ds-controls', container)).every(d => d.style.display === 'none')) {
+			qs('.controls-subbranch-title', sb).style.display = 'none';
+		}
 	}
 };
 

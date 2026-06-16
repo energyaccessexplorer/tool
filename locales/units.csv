@@ -1,40 +1,40 @@
-unit,fr
-count,nombre
-distance in km,distance en km
-proximity in km,proximité en km
-Kwp,Kwp
-kVA,kVA
-km,km
-people,personnes
-households,ménages
-MW,MW
-GWh,GWh
-Metric Tonnes,tonnes métriques
-tCO2eq,tCO2eq
-USD,USD
-m³/yr,m³/an
-km (proximity to),km (proximité de)
-kWh/m²,kWh/m²
-ppl/km²,pers/km²
-%,%
-Coverage (%) per km²,couverture (%) par km²
-kWh/ha/year,kWh/ha/an
-minutes,minutes
-hours,heures
-hours/hh.day,heures/mén.jour
-m/s,m/s
-degree,degré
-degree celcius,degré Celsius
-mm,mm
-metre,mètre
-kg/ha,kg/ha
-Gigajoule per sq km,gigajoule par km²
-USD/household,USD/ménage
-bldgs/km²,bât./km²
-tier,niveau
-year,année
-< 2USD/day,< 2 USD/jour
-RWI,RWI
-Aridity Index,indice d'aridité
-calibrated radiance,radiance calibrée
-People per 100k population,personnes pour 100k habitants
+unit,fr,zh
+count,nombre,计数
+distance in km,distance en km,距离（公里）
+proximity in km,proximité en km,邻近度（公里）
+Kwp,Kwp,Kwp
+kVA,kVA,kVA
+km,km,公里
+people,personnes,人
+households,ménages,家庭
+MW,MW,MW
+GWh,GWh,GWh
+Metric Tonnes,tonnes métriques,公制吨
+tCO2eq,tCO2eq,tCO2eq
+USD,USD,美元
+m³/yr,m³/an,立方米/年
+km (proximity to),km (proximité de),公里（邻近度）
+kWh/m²,kWh/m²,千瓦时/平方米
+ppl/km²,pers/km²,人/平方公里
+%,%,%
+Coverage (%) per km²,couverture (%) par km²,覆盖率(%)每平方公里
+kWh/ha/year,kWh/ha/an,千瓦时/公顷/年
+minutes,minutes,分钟
+hours,heures,小时
+hours/hh.day,heures/mén.jour,小时/户·天
+m/s,m/s,米/秒
+degree,degré,度
+degree celcius,degré Celsius,摄氏度
+mm,mm,毫米
+metre,mètre,米
+kg/ha,kg/ha,公斤/公顷
+Gigajoule per sq km,gigajoule par km²,吉焦每平方公里
+USD/household,USD/ménage,美元/家庭
+bldgs/km²,bât./km²,建筑物/平方公里
+tier,niveau,级别
+year,année,年
+< 2USD/day,< 2 USD/jour,< 2美元/天
+RWI,RWI,RWI
+Aridity Index,indice d'aridité,干旱指数
+calibrated radiance,radiance calibrée,校准辐射
+People per 100k population,personnes pour 100k habitants,每10万人口中的人数

@@ -1,253 +1,256 @@
-key,en,fr
-left_panel.drawer.active_layers,Active Layers,Couches actives
-left_panel.drawer.add_layers,Add Layers,Ajouter les couches
-left_panel.drawer.geographies,Change Geographies,Changer de région
-left_panel.drawer.search_features,Search Features,Caractéristiques de la recherche
-left_panel.drawer.search_pois,Search POI's,Rechercher points d'intérêts
-left_panel.drawer.points_loading,Points Loading,Chargement des points
-left_panel.drawer.disclaimer,Disclaimer,Clause de non-responsabilité
-left_panel.output.generate_analysis,Generate Analysis,Générer une analyse
-left_panel.output.about_button,About,À propos
-left_panel.output.analysis_area_label,Analysis Area,Zone d'analyse
-left_panel.output.prioritization_index_label,Prioritization Index,Indice de priorisation
-left_panel.output.priority_legend,Priority Legend,Légende des priorités
-left_panel.output.show_on_map,Show analysis on map,Afficher l'analyse sur la carte
-left_panel.output.opacity_label,Opacity,Opacité
-left_panel.cards.title,Active Data Layers,Couches de données actives
-left_panel.cards.hide_all,Hide all layers,Masquer toutes les couches
-left_panel.cards.reset_all,Reset all settings,Réinitialiser tous les paramètres
-left_panel.cards.expand_all,Expand all settings,Afficher tous les paramètres
-left_panel.cards.remove_all,Remove all layers,Supprimer toutes les couches
-left_panel.cards.card.not_available,Not Available,Non disponible
-left_panel.cards.card.importance_label,Importance,Importance
-left_panel.cards.card.importance_hint,Change importance to provide different weightings for data in the analysis calculation.,Modifier le niveau d'importance afin d'attribuer des pondérations différentes aux données dans le calcul de l'analyse.
-left_panel.cards.card.show_layer,Show layer,Afficher la couche
-left_panel.cards.card.opacity_label,Opacity,Opacité
-left_panel.cards.card.about_button,About,À propos
-left_panel.cards.card.table_button,Table,Table
-left_panel.points_loading.header,<b>Picked points</b>,<b>Points choisis</b>
-left_panel.points_loading.selected,{{count}} points selected:,{{count}} points sélectionnés :
-left_panel.geographies_search.placeholder,Geographies search,Recherche de géographies
-left_panel.geographies_search.default_info,Showing all subgeographies,Affichage de toutes les sous-géographies
-left_panel.vectors_search.placeholder,Search features,Rechercher des entités
-left_panel.locations_search.placeholder,Search for a location,Rechercher un lieu
-left_panel.vectors_search.no_vectors,"<b>{{name}}</b> is not searchable. Try a dataset with points, lines or polygons ;)","<b>{{name}}</b> n'est pas consultable. Essayez un jeu de données avec des points, lignes ou polygones."
-left_panel.vectors_search.not_searchable,<b>{{name}}</b> is not searchable (for now...),<b>{{name}}</b> n'est pas consultable (pour l'instant...)
-left_panel.vectors_search.too_many,Searching <b>{{name}}</b>. Too many results. Showing first 101 only:,Recherche <b>{{name}}</b>. Trop de résultats. Affichage des 101 premiers uniquement :
-left_panel.vectors_search.results_count,Searching <b>{{name}}</b>. {{count}} results:,Recherche <b>{{name}}</b>. {{count}} résultats :
-left_panel.controls_search.placeholder,Filter datasets,Filtrer les jeux de données
-left_panel.locations_search.hint,"City, region, park...","Ville, région, parc..."
-left_panel.locations_search.results_for,"<b>Results</b> for ""{{query}}"":",<b>Résultats</b> pour « {{query}} » :
-left_panel.locations_search.no_results,"No results for ""{{query}}"".",Aucun résultat pour « {{query}} ».
-left_panel.analysis_search.top_results,Searching <b>analysis coordinates</b>. Top {{count}} results:,Recherche <b>coordonnées d'analyse</b>. Les {{count}} résultats prioritaires:
-left_panel.analysis_search.overflow,Searching <b>analysis coordinates</b>. Showing first {{n}} of {{total}}:,Recherche <b>coordonnées d'analyse</b>. Affichage des {{n}} premiers résultats sur {{total}}:
-right_panel.header.title,Analysis Results,Résultats d'analyse
-right_panel.header.hide,Hide,Masquer
-right_panel.header.show,Show Analysis Results,Afficher les résultats d'analyse
-right_panel.header.report,Report,Rapport
-right_panel.tabs.prioritization,Prioritization,Priorisation
-right_panel.tabs.data,Data,Données
-right_panel.prioritization.loading.title,Loading data layers,Chargement des couches de données
-right_panel.prioritization.loading.subtitle,Please wait while datasets are being processed.,Veuillez patienter pendant le traitement des jeux de données.
-right_panel.prioritization.blank_state.title,Add data to prioritize analysis,Ajouter des données pour prioriser l'analyse
-right_panel.prioritization.blank_state.subtitle,Select a dataset from the left panel to add it to the map and start your prioritization analysis.,Sélectionnez un jeu de données dans le panneau gauche pour l'ajouter à la carte et commencer votre analyse.
-right_panel.prioritization.high_priority.section_title,High priority areas,Zones hautement prioritaires
-right_panel.prioritization.high_priority.about_text,Showing {{variant}} with the highest prioritization scores based on your analysis criteria.,Affichage de {{variant}} avec les scores de priorisation les plus élevés selon vos critères d'analyse.
-right_panel.prioritization.high_priority.unknown_location,Unknown location,Emplacement inconnu
-right_panel.prioritization.high_priority.view_download,View or Download data,Voir ou télécharger les données
-right_panel.prioritization.high_priority.score_text,{{score}}% priority score,{{score}} % de score de priorité
-right_panel.prioritization.high_priority.area_count_single,1 area,1 zone
-right_panel.prioritization.high_priority.area_count_plural,{{count}} areas,{{count}} zones
-right_panel.prioritization.high_priority.pagination.single,Showing {{count}} result(s),Affichage de {{count}} résultat(s)
-right_panel.prioritization.high_priority.pagination.multi,Showing {{start}}-{{end}} of {{total}},Affichage de {{start}}-{{end}} sur {{total}}
-right_panel.prioritization.graphs.area_share_title,Area share,Part de la zone
-right_panel.prioritization.graphs.pop_share_title,Population share,Répartition de la population
-right_panel.prioritization.graphs.area_desc,"Showing {{indexName}} for areas spanning <strong>{{x}}</strong>, of which <strong>{{y}}</strong> has high {{indexName}}.","Affichage de {{indexName}} pour des zones couvrant <strong>{{x}}</strong>, dont <strong>{{y}}</strong> présentent un {{indexName}} élevé."
-right_panel.prioritization.graphs.pop_desc,"Showing {{indexName}} for areas affecting <strong>{{x}}</strong>, of whom <strong>{{y}}</strong> are situated in areas of high {{indexName}}.","Affichage de {{indexName}} pour des zones affectant <strong>{{x}}</strong> personnes, dont <strong>{{y}}</strong> se trouvent dans des zones à {{indexName}} élevé."
-right_panel.prioritization.graphs.people_unit,people,personnes
-right_panel.prioritization.graphs.area_about,"Shows the 'Prioritization Index' results as area shares, based on your analysis criteria.",Affiche les résultats de l'indice de priorisation sous forme de parts de superficie.
-right_panel.prioritization.graphs.pop_about,"Shows the 'Prioritization Index' results as population shares, based on your analysis criteria.",Affiche les résultats de l'indice de priorisation sous forme de parts de population.
-right_panel.data.title,Analysing selected datasets in <strong>{{area}}</strong>.,Analyse des ensembles de données sélectionnés dans <strong>{{area}}</strong>.
-right_panel.data.subtitle,Click anywhere on the map to see data for that location.,Cliquez n'importe où sur la carte pour voir les données de cet emplacement.
-right_panel.data.descriptions.points.count,There are <strong>{{value}}</strong> {{name}} in the selected area.,Il y a <strong>{{value}}</strong> {{name}} dans la zone sélectionnée.
-right_panel.data.descriptions.points.distance,The nearest {{name}} is <strong>{{value}}</strong> from this area.,Le {{name}} le plus proche est à <strong>{{value}}</strong> de cette zone.
-right_panel.data.descriptions.points.kwp,The total installed capacity of {{name}} in this area is <strong>{{value}}</strong>.,La capacité installée totale de {{name}} dans cette zone est de <strong>{{value}}</strong>.
-right_panel.data.descriptions.points.kva,The total capacity of {{name}} in this area is <strong>{{value}}</strong>.,La capacité totale de {{name}} dans cette zone est de <strong>{{value}}</strong>.
-right_panel.data.descriptions.points.km,The total distance covered by {{name}} in this area is <strong>{{value}}</strong>.,La distance totale couverte par {{name}} dans cette zone est de <strong>{{value}}</strong>.
-right_panel.data.descriptions.lines,The total length of {{name}} in this region is <strong>{{value}}</strong>.,La longueur totale de {{name}} dans cette région est de <strong>{{value}}</strong>.
-right_panel.data.descriptions.polygons_count,There are <strong>{{value}}</strong> {{name}} in the selected area.,Il y a <strong>{{value}}</strong> {{name}} dans la zone sélectionnée.
-right_panel.data.descriptions.polygons_sum,The total {{name}} in this area is <strong>{{value}}</strong>.,Le total de {{name}} dans cette zone est de <strong>{{value}}</strong>.
-right_panel.data.descriptions.raster_sum.count,The total {{name}} count in this area is <strong>{{value}}</strong>.,Le nombre total de {{name}} dans cette zone est de <strong>{{value}}</strong>.
-right_panel.data.descriptions.raster_sum.people,The total population in this area is <strong>{{value}}</strong>.,La population totale dans cette zone est de <strong>{{value}}</strong>.
-right_panel.data.descriptions.raster_sum.households,There are <strong>{{value}}</strong> households in this area.,Il y a <strong>{{value}}</strong> ménages dans cette zone.
-right_panel.data.descriptions.raster_sum.mw,The total energy demand in this area is <strong>{{value}}</strong>.,La demande totale en énergie dans cette zone est de <strong>{{value}}</strong>.
-right_panel.data.descriptions.raster_sum.gwh,The total energy in this area is <strong>{{value}}</strong>.,L'énergie totale dans cette zone est de <strong>{{value}}</strong>.
-right_panel.data.descriptions.raster_sum.metric_tonnes,The total crop production in this area is <strong>{{value}}</strong>.,La production totale de cultures dans cette zone est de <strong>{{value}}</strong>.
-right_panel.data.descriptions.raster_sum.tco2eq,The total emissions in this area are <strong>{{value}}</strong>.,Les émissions totales dans cette zone sont de <strong>{{value}}</strong>.
-right_panel.data.descriptions.raster_sum.usd,The total cost for {{name}} in this area is <strong>{{value}}</strong>.,Le coût total pour {{name}} dans cette zone est de <strong>{{value}}</strong>.
-right_panel.data.descriptions.raster_sum.m3yr,The total water availability in this area is <strong>{{value}}</strong>.,La disponibilité totale en eau dans cette zone est de <strong>{{value}}</strong>.
-right_panel.data.descriptions.raster_sum.default,The total {{name}} in this area is <strong>{{value}}</strong>.,Le total de {{name}} dans cette zone est de <strong>{{value}}</strong>.
-right_panel.data.descriptions.raster.count,The average {{name}} count in this area is <strong>{{value}}</strong>.,Le nombre moyen de {{name}} dans cette zone est de <strong>{{value}}</strong>.
-right_panel.data.descriptions.raster.km_proximity,The average distance to {{name}} in this area is <strong>{{value}}</strong>.,La distance moyenne à {{name}} dans cette zone est de <strong>{{value}}</strong>.
-right_panel.data.descriptions.raster.kwh_m2,The average {{name}} is <strong>{{value}}</strong> in this area.,La moyenne de {{name}} est de <strong>{{value}}</strong> dans cette zone.
-right_panel.data.descriptions.raster.ppl_km2,The population density in this area is <strong>{{value}}</strong>.,La densité de population dans cette zone est de <strong>{{value}}</strong>.
-right_panel.data.descriptions.raster.people,The estimated population in this area is <strong>{{value}}</strong>.,La population estimée dans cette zone est de <strong>{{value}}</strong>.
-right_panel.data.descriptions.raster.households,There are approximately <strong>{{value}}</strong> households in this area.,Il y a environ <strong>{{value}}</strong> ménages dans cette zone.
-right_panel.data.descriptions.raster.pct,<strong>{{value}}</strong> of this area has {{name}}.,<strong>{{value}}</strong> de cette zone a {{name}}.
-right_panel.data.descriptions.raster.coverage_pct,<strong>{{value}}</strong> of this area is covered by {{name}}.,<strong>{{value}}</strong> de cette zone est couverte par {{name}}.
-right_panel.data.descriptions.raster.mw,The estimated energy demand in this area is <strong>{{value}}</strong>.,La demande énergétique estimée dans cette zone est de <strong>{{value}}</strong>.
-right_panel.data.descriptions.raster.gwh,The estimated energy in this area is <strong>{{value}}</strong>.,L'énergie estimée dans cette zone est de <strong>{{value}}</strong>.
-right_panel.data.descriptions.raster.kwh_ha_year,The estimated yield for {{name}} in this area is <strong>{{value}}</strong>.,Le rendement estimé pour {{name}} dans cette zone est de <strong>{{value}}</strong>.
-right_panel.data.descriptions.raster.minutes,The average travel time to {{name}} is <strong>{{value}}</strong> in this area.,Le temps de trajet moyen vers {{name}} est de <strong>{{value}}</strong> dans cette zone.
-right_panel.data.descriptions.raster.hours,The average {{name}} in this area is <strong>{{value}}</strong>.,La moyenne de {{name}} dans cette zone est de <strong>{{value}}</strong>.
-right_panel.data.descriptions.raster.hours_hh_day,Households in this area spend on average <strong>{{value}}</strong> on {{name}}.,Les ménages dans cette zone consacrent en moyenne <strong>{{value}}</strong> à {{name}}.
-right_panel.data.descriptions.raster.m_s,The average wind speed in this area is <strong>{{value}}</strong>.,La vitesse moyenne du vent dans cette zone est de <strong>{{value}}</strong>.
-right_panel.data.descriptions.raster.degree,The average temperature in this area is <strong>{{value}}</strong>.,La température moyenne dans cette zone est de <strong>{{value}}</strong>.
-right_panel.data.descriptions.raster.degree_celcius,The average temperature in this area is <strong>{{value}}</strong>.,La température moyenne dans cette zone est de <strong>{{value}}</strong>.
-right_panel.data.descriptions.raster.mm,The average annual rainfall in this area is <strong>{{value}}</strong>.,Les précipitations annuelles moyennes dans cette zone sont de <strong>{{value}}</strong>.
-right_panel.data.descriptions.raster.m3yr,The estimated water availability in this area is <strong>{{value}}</strong>.,La disponibilité en eau estimée dans cette zone est de <strong>{{value}}</strong>.
-right_panel.data.descriptions.raster.metre,The average elevation in this area is <strong>{{value}}</strong>.,L'altitude moyenne dans cette zone est de <strong>{{value}}</strong>.
-right_panel.data.descriptions.raster.kg_ha,The estimated agricultural yield in this area is <strong>{{value}}</strong>.,Le rendement agricole estimé dans cette zone est de <strong>{{value}}</strong>.
-right_panel.data.descriptions.raster.metric_tonnes,The estimated crop production in this area is <strong>{{value}}</strong>.,La production de cultures estimée dans cette zone est de <strong>{{value}}</strong>.
-right_panel.data.descriptions.raster.gigajoule,The bioenergy potential in this area is <strong>{{value}}</strong>.,Le potentiel bioénergétique dans cette zone est de <strong>{{value}}</strong>.
-right_panel.data.descriptions.raster.usd,The estimated cost for {{name}} in this area is <strong>{{value}}</strong>.,Le coût estimé pour {{name}} dans cette zone est de <strong>{{value}}</strong>.
-right_panel.data.descriptions.raster.usd_household,The estimated cost per household for {{name}} is <strong>{{value}}</strong>.,Le coût estimé par ménage pour {{name}} est de <strong>{{value}}</strong>.
-right_panel.data.descriptions.raster.bldgs_km2,The building density in this area is <strong>{{value}}</strong>.,La densité de bâtiments dans cette zone est de <strong>{{value}}</strong>.
-right_panel.data.descriptions.raster.tco2eq,The estimated emissions in this area are <strong>{{value}}</strong>.,Les émissions estimées dans cette zone sont de <strong>{{value}}</strong>.
-right_panel.data.descriptions.raster.tier,The average electrification tier in this area is <strong>{{value}}</strong>.,Le niveau moyen d'électrification dans cette zone est de <strong>{{value}}</strong>.
-right_panel.data.descriptions.raster.year,The estimated electrification year for this area is <strong>{{value}}</strong>.,L'année d'électrification estimée pour cette zone est de <strong>{{value}}</strong>.
-right_panel.data.descriptions.raster.lt2usd,<strong>{{value}}</strong> of the population in this area lives on less than $2/day.,<strong>{{value}}</strong> de la population dans cette zone vit avec moins de 2 $/jour.
-right_panel.data.descriptions.raster.rwi,The Relative Wealth Index for this area is <strong>{{value}}</strong>.,L'indice de richesse relative pour cette zone est de <strong>{{value}}</strong>.
-right_panel.data.descriptions.raster.aridity,The aridity index for this area is <strong>{{value}}</strong>.,L'indice d'aridité pour cette zone est de <strong>{{value}}</strong>.
-right_panel.data.descriptions.raster.nighttime,The nighttime light intensity in this area is <strong>{{value}}</strong>.,L'intensité lumineuse nocturne dans cette zone est de <strong>{{value}}</strong>.
-right_panel.data.descriptions.raster.per100k,There are <strong>{{value}}</strong> per 100k population affected by {{name}} in this area.,Il y a <strong>{{value}}</strong> pour 100 000 habitants affectés par {{name}} dans cette zone.
-right_panel.data.descriptions.raster.default,The average {{name}} in this area is <strong>{{value}}</strong>.,La moyenne de {{name}} dans cette zone est de <strong>{{value}}</strong>.
-right_panel.footer.save,Save,Enregistrer
-right_panel.footer.share,Share,Partager
-right_panel.footer.export,Export,Exporter
-map_popup.priority_score,Priority score,Score de priorité
-map_popup.location,Location,Emplacement
-map_popup.km_proximity,{{n}} km (proximity to),{{n}} km (proximité)
-map_popup.coordinates,Coordinates,Coordonnées
-map_popup.longitude,Longitude,Longitude
-map_popup.latitude,Latitude,Latitude
-map_popup.not_aggregated,Not aggregated,Non agrégé
-map_popup.count_unit,count,nombre
-map_popup.analyse_button,Analyse selected area,Analyser la zone sélectionnée
-summary.table,Summary Table,Tableau résumé
-summary.graphs,Summary Graphs,Graphiques résumés
-summary.export_button,Export Presentation,Exporter la présentation
-summary.snapshot_header,Snapshot,Instantané
-summary.area_share_title,area share,Part de la zone
-summary.pop_share_title,population-density share,Répartition de la population
-modal.save_analysis.header,Save analysis to My EAE,Sauvegarder l'analyse dans Mon EAE
-modal.save_analysis.title_label,Analysis title,Titre de l'analyse
-modal.save_analysis.title_hint,Enter a memorable name for the current configuration.,Entrez un nom mémorable pour la configuration actuelle.
-modal.save_analysis.save_button,Save analysis,Enregistrer l'analyse
-modal.save_analysis.update_button,Update saved analysis,Mettre à jour l'analyse sauvegardée
-modal.save_analysis.save_as_new_button,Save as new analysis,Sauvegarder comme nouvelle analyse
-modal.save_analysis.untitled_analysis,Untitled Analysis,Analyse sans titre
-modal.save_analysis.last_viewed,Last viewed on {{date}}.,Dernière consultation le {{date}}.
-modal.save_analysis.updated_toast,Analysis updated successfully,Analyse mise à jour avec succès
-modal.save_analysis.updated_toast_caption,Your analysis was updated in your My EAE account.,Votre analyse a été mise à jour dans votre compte Mon EAE.
-modal.save_analysis.saved_toast,Analysis saved successfully,Analyse sauvegardée avec succès
-modal.save_analysis.saved_toast_caption,Your analysis was saved to your My EAE account.,Votre analyse a été sauvegardée dans votre compte Mon EAE.
-modal.export.header,Export options,Options d'exportation
-modal.export.generating,Generating...,Génération en cours...
-modal.export.download_all,Download all,Tout télécharger
-modal.export.summary_presentation.title,Summary presentation,Présentation résumée
-modal.export.summary_presentation.desc,A summary presentation explaining the outputs of your current analysis view.,Une présentation résumant les résultats de votre analyse actuelle.
-modal.export.summary_presentation.button,Download .ppt,Télécharger .ppt
-modal.export.map_tiff.title,Map TIFF,Carte TIFF
-modal.export.map_tiff.desc,A TIFF file of the prioritization raster image generated from your analysis.,Un fichier TIFF de l'image raster de priorisation générée par votre analyse.
-modal.export.map_tiff.button,Download .TIFF,Télécharger .TIFF
-modal.export.high_priority.title,High priority areas,Zones hautement prioritaires
-modal.export.high_priority.desc,A table of the highest priority areas from your analysis.,Un tableau des zones les plus prioritaires de votre analyse.
-modal.export.high_priority.button,Download .csv,Télécharger .csv
-modal.export.pop_area_share.title,Population and area share,Part de population et de superficie
-modal.export.pop_area_share.desc,CSV data for the population and area share.,Données CSV pour la part de population et de superficie.
-modal.export.pop_area_share.button,Download .csv,Télécharger .csv
-modal.export.ppt.header,Export PowerPoint presentation,Exporter la présentation PowerPoint
-modal.export.ppt.subtitle,Select priority areas columns and rows,Sélectionner les colonnes et lignes des zones prioritaires
-modal.export.ppt.column_toggle_hint,Selected columns will be included in the PowerPoint tables,Les colonnes sélectionnées seront incluses dans les tableaux PowerPoint
-modal.export.ppt.download_all_zip,Download all (.zip),Tout télécharger (.zip)
-modal.export.csv.column_toggle_hint,Selected columns will be included in the CSV download,Les colonnes sélectionnées seront incluses dans le téléchargement CSV
-modal.export.csv.download_all,Download all (.csv),Tout télécharger (.csv)
-modal.export.csv_headers.area_share,Area share,Part de la zone
-modal.export.csv_headers.pop_share,Population share,Répartition de la population
-modal.export.csv_headers.level,Level,Niveau
-modal.share_link.header,Share link,Partager le lien
-modal.share_link.instructions,Sharing the following link will load the Energy Access Explorer platform in the current state: layers and analysis. Users might need the necessary permissions to view this snapshot fully.,Partager ce lien chargera la plateforme Energy Access Explorer dans l'état actuel : couches et analyse.
-modal.share_link.copy_link,Copy link,Copier le lien
-modal.eae_info.title,About Energy Access Explorer prioritization,À propos de la priorisation Energy Access Explorer
-modal.eae_info.body,"Energy Access Explorer enables you to identify high-priority areas for energy access interventions. EAE uses multi-criteria analysis that uses location-specific resource availability and infrastructure data to represent energy supply, and incorporates demographic data and data on social and productive uses to visualize demand for energy services.",Energy Access Explorer vous permet d'identifier les zones prioritaires pour les interventions en matière d'accès à l'énergie.
-modal.eae_info.analysis_areas.title,Analysis areas,Zones d'analyse
-modal.eae_info.analysis_areas.body,Energy Access Explorer offers the option to generate an analysis across various different administrative priorities.,Energy Access Explorer offre la possibilité de générer une analyse sur différentes priorités administratives.
-modal.eae_info.priority_1km.title,Priority areas (1km²),Zones prioritaires (1 km²)
-modal.eae_info.priority_1km.body,Selecting this analysis area provides a raster analysis in 1km2 tiles across the entirety of the selected geography.,Cette zone d'analyse fournit une analyse raster en tuiles de 1 km² sur l'ensemble de la géographie sélectionnée.
-modal.eae_info.other_areas.title,Other analysis areas,Autres zones d'analyse
-modal.eae_info.other_areas.body,"Depending on the currently selected geography, it is possible to change the prioritization output to wider geographical areas such as districts, regions or zones for more high level analysis.","Selon la géographie sélectionnée, il est possible de modifier la sortie de priorisation vers des zones géographiques plus larges."
-modal.eae_info.view_technical_note,View technical note,Voir la note technique
-modal.points_input.header,Input Longitude/Latitude,Saisir Longitude / Latitude
-modal.points_input.longitude_placeholder,Longitude,Longitude
-modal.points_input.latitude_placeholder,Latitude,Latitude
-modal.points_input.add_button,Add point,Ajouter un point
-modal.high_priority_table.column_toggle_hint,Selected columns will be included in the CSV download,Les colonnes sélectionnées seront incluses dans le téléchargement CSV
-modal.high_priority_table.selection_count,{{count}} row(s) currently selected.,{{count}} ligne(s) sélectionnée(s).
-modal.high_priority_table.download_selected,Download selected rows,Télécharger les lignes sélectionnées
-modal.high_priority_table.data_download_summary,Data download will include a summary of your analysis.,Le téléchargement de données inclura un résumé de votre analyse.
-modal.high_priority_table.per_page,Per page,Par page
-modal.high_priority_table.toggle_columns,Toggle columns,Afficher/masquer les colonnes
-my_eae.page.title,My EAE,Mon EAE
-my_eae.tabs.saved_analysis,Saved Analysis,Analyse sauvegardée
-my_eae.tabs.account,Account,Compte
-my_eae.snapshots.filter_placeholder,Filter by title or geography name,Filtrer par titre ou par nom de région
-my_eae.snapshots.sort_by_date,Sort by: Date,Trier par : Date
-my_eae.snapshots.sort_by_title,Sort by: Title,Trier par : Titre
-my_eae.snapshots.count,{{count}} Analyses,{{count}} analyses
-my_eae.snapshots.untitled,-- untitled --,-- sans titre --
-my_eae.account.change_password,Change password,Changer le mot de passe
-my_eae.snapshot_card.open,Open,Ouvrir
-my_eae.snapshot_card.download,Download,Télécharger
-my_eae.snapshot_card.share,Share,Partager
-my_eae.modal.share.header,Share analysis view,Partager la vue d'analyse
-my_eae.modal.share.instructions,Sharing the following link will load the Energy Access Explorer platform in the current state: layers and analysis. Users might need the necessary permissions to view this snapshot fully.,Partager ce lien chargera la plateforme Energy Access Explorer dans l'état actuel : couches et analyse.
-my_eae.modal.share.copy_link,Copy link,Copier le lien
-my_eae.modal.share.link_copied_toast,Link copied!,Lien copié !
-my_eae.modal.set_title.header,Set Analysis Title,Définir le titre de l'analyse
-my_eae.modal.set_title.title_updated_toast,Title updated,Titre mis à jour
-my_eae.modal.delete.confirm,Are you sure you want to delete this analysis? '{{name}}',Êtes-vous sûr de vouloir supprimer cette analyse ? « {{name}} »
-my_eae.modal.delete.deleted_toast,Analysis '{{name}}' deleted.,Analyse « {{name}} » supprimée.
-overlay.fetching_snapshot,Fetching snapshot...,Récupération de l'instantané...
-overlay.fetching_geography,Fetching geography...,Recherche de géographie...
-overlay.fetching_datasets,Fetching datasets...,Recherche des jeux de données...
-overlay.fetching_divisions,Fetching divisions...,Recherche des divisions...
-overlay.fetching_admin_tiers,Fetching administrative tiers...,Récupération des niveaux administratifs...
-overlay.geography_error,Geography error,Erreur de géographie
-overlay.failed_outline,Failed to get the geography's OUTLINE...,Échec de la récupération du contour de la géographie...
-toast.clipboard_error,Clipboard functionality not available,Fonctionnalité du presse-papiers non disponible
-toast.value_out_of_range,Value out of range,Valeur hors plage
-disclaimer.title,Disclaimer,Clause de non-responsabilité
-disclaimer.maps_note,"The maps are for illustrative purposes and do not imply the expression of any opinion on the part of WRI, concerning the legal status of any country or territory or concerning the delimitation of frontiers or boundaries.","Les cartes sont à titre indicatif et n'impliquent pas l'expression d'une opinion de la part du WRI concernant le statut juridique d'un pays ou d'un territoire, ni concernant la délimitation des frontières ou des limites."
-disclaimer.attribution,"If you use this platform, partially or entirely, you must follow the <a href=""https://www.energyaccessexplorer.org/attribution/"">attribution instructions</a>.","Si vous utilisez cette plateforme, partiellement ou entièrement, vous devez suivre les <a href=""https://www.energyaccessexplorer.org/attribution/"">instructions d'attribution</a>."
-dataset_info.covered_by_analysis,covered by the analysis.,couverts par l'analyse.
-dataset_info.intersect,(intersect),(intersection)
-dataset_info.long_lat,long/lat,lon/lat
-dataset_info.features,features,entités
-dataset_info.file_error,Dataset/File error,Erreur de fichier / jeu de données
-auth.prompt,"In order to save an analysis, you need to be registered with us.","Pour sauvegarder une analyse, vous devez être inscrit."
-auth.register_login,Register/Login,S'inscrire / Se connecter
-mapbox.style.light,Light,Clair
-nav.tool,Tool,Outil
-nav.about,About,À propos
-nav.get_involved,Get Involved,Soyez impliqué
-nav.user_stories,User Stories,Témoignages des utilisateurs
-nav.partners,Partners,Partenaires
-nav.login,Login,Connexion
-overlay.initialising_mapbox,Initialising mapbox...,Initialisation de la carte...
-overlay.setting_up_datasets,Setting up datasets...,Configuration des jeux de données...
-overlay.setting_up_ui,Setting up UI elements...,Configuration de l'interface...
-right_panel.prioritization.index_priority.title,Index Priority,Priorité d'index
-right_panel.prioritization.poi.title,Intersecting points of interest,Points d'intérêt intersectants
-right_panel.data.no_data,No data available for <strong>{{name}}</strong> in this area.,Aucune donnée disponible pour <strong>{{name}}</strong> dans cette zone.
-right_panel.data.categorical_desc,Showing the percentage distribution of <strong>{{name}}</strong> categories in the selected area.,Distribution en pourcentage des catégories <strong>{{name}}</strong> dans la zone sélectionnée.
+key,en,fr,zh
+left_panel.drawer.active_layers,Active Layers,Couches actives,活跃图层
+left_panel.drawer.add_layers,Add Layers,Ajouter les couches,添加图层
+left_panel.drawer.geographies,Change Geographies,Changer de région,更改地理区域
+left_panel.drawer.search_features,Search Features,Caractéristiques de la recherche,搜索要素
+left_panel.drawer.search_pois,Search POI's,Rechercher points d'intérêts,搜索兴趣点
+left_panel.drawer.points_loading,Points Loading,Chargement des points,点加载中
+left_panel.drawer.disclaimer,Disclaimer,Clause de non-responsabilité,免责声明
+left_panel.output.generate_analysis,Generate Analysis,Générer une analyse,生成分析
+left_panel.output.about_button,About,À propos,关于
+left_panel.output.analysis_area_label,Analysis Area,Zone d'analyse,分析区域
+left_panel.output.prioritization_index_label,Prioritization Index,Indice de priorisation,优先级指数
+left_panel.output.priority_legend,Priority Legend,Légende des priorités,优先级图例
+left_panel.output.show_on_map,Show analysis on map,Afficher l'analyse sur la carte,在地图上显示分析
+left_panel.output.opacity_label,Opacity,Opacité,不透明度
+left_panel.cards.title,Active Data Layers,Couches de données actives,活跃数据图层
+left_panel.cards.hide_all,Hide all layers,Masquer toutes les couches,隐藏所有图层
+left_panel.cards.reset_all,Reset all settings,Réinitialiser tous les paramètres,重置所有设置
+left_panel.cards.expand_all,Expand all settings,Afficher tous les paramètres,展开所有设置
+left_panel.cards.remove_all,Remove all layers,Supprimer toutes les couches,删除所有图层
+left_panel.cards.card.not_available,Not Available,Non disponible,不可用
+left_panel.cards.card.importance_label,Importance,Importance,重要性
+left_panel.cards.card.importance_hint,Change importance to provide different weightings for data in the analysis calculation.,Modifier le niveau d'importance afin d'attribuer des pondérations différentes aux données dans le calcul de l'analyse.,更改重要性以为分析计算中的数据提供不同的权重。
+left_panel.cards.card.show_layer,Show layer,Afficher la couche,显示图层
+left_panel.cards.card.opacity_label,Opacity,Opacité,不透明度
+left_panel.cards.card.about_button,About,À propos,关于
+left_panel.cards.card.table_button,Table,Table,表格
+left_panel.points_loading.header,<b>Picked points</b>,<b>Points choisis</b>,<b>选定的点</b>
+left_panel.points_loading.selected,{{count}} points selected:,{{count}} points sélectionnés :,已选择 {{count}} 个点：
+left_panel.geographies_search.placeholder,Geographies search,Recherche de géographies,地理区域搜索
+left_panel.geographies_search.default_info,Showing all subgeographies,Affichage de toutes les sous-géographies,显示所有下级地理区域
+left_panel.vectors_search.placeholder,Search features,Rechercher des entités,搜索要素
+left_panel.locations_search.placeholder,Search for a location,Rechercher un lieu,搜索位置
+left_panel.vectors_search.no_vectors,"<b>{{name}}</b> is not searchable. Try a dataset with points, lines or polygons ;)","<b>{{name}}</b> n'est pas consultable. Essayez un jeu de données avec des points, lignes ou polygones.","<b>{{name}}</b> 不可搜索。请尝试包含点、线或多边形的数据集 ;)"
+left_panel.vectors_search.not_searchable,<b>{{name}}</b> is not searchable (for now...),<b>{{name}}</b> n'est pas consultable (pour l'instant...),<b>{{name}}</b> 目前不可搜索...
+left_panel.vectors_search.too_many,Searching <b>{{name}}</b>. Too many results. Showing first 101 only:,Recherche <b>{{name}}</b>. Trop de résultats. Affichage des 101 premiers uniquement :,搜索 <b>{{name}}</b>。结果过多。仅显示前 101 个：
+left_panel.vectors_search.results_count,Searching <b>{{name}}</b>. {{count}} results:,Recherche <b>{{name}}</b>. {{count}} résultats :,搜索 <b>{{name}}</b>。{{count}} 个结果：
+left_panel.controls_search.placeholder,Filter datasets,Filtrer les jeux de données,筛选数据集
+left_panel.locations_search.hint,"City, region, park...","Ville, région, parc...","城市、地区、公园..."
+left_panel.locations_search.results_for,"<b>Results</b> for ""{{query}}"":",<b>Résultats</b> pour « {{query}} » :,"<b>结果</b>""{{query}}""："
+left_panel.locations_search.no_results,"No results for ""{{query}}"".",Aucun résultat pour « {{query}} ».,"没有""{{query}}""的结果。"
+left_panel.analysis_search.top_results,Searching <b>analysis coordinates</b>. Top {{count}} results:,Recherche <b>coordonnées d'analyse</b>. Les {{count}} résultats prioritaires:,搜索<b>分析坐标</b>。前 {{count}} 个结果：
+left_panel.analysis_search.overflow,Searching <b>analysis coordinates</b>. Showing first {{n}} of {{total}}:,Recherche <b>coordonnées d'analyse</b>. Affichage des {{n}} premiers résultats sur {{total}}:,搜索<b>分析坐标</b>。显示 {{n}} 个结果（共 {{total}} 个）：
+right_panel.header.title,Analysis Results,Résultats d'analyse,分析结果
+right_panel.header.hide,Hide,Masquer,隐藏
+right_panel.header.show,Show Analysis Results,Afficher les résultats d'analyse,显示分析结果
+right_panel.header.report,Report,Rapport,报告
+right_panel.tabs.prioritization,Prioritization,Priorisation,优先级
+right_panel.tabs.data,Data,Données,数据
+right_panel.prioritization.loading.title,Loading data layers,Chargement des couches de données,正在加载数据图层
+right_panel.prioritization.loading.subtitle,Please wait while datasets are being processed.,Veuillez patienter pendant le traitement des jeux de données.,请稍等，数据集正在处理中。
+right_panel.prioritization.blank_state.title,Add data to prioritize analysis,Ajouter des données pour prioriser l'analyse,添加数据以优先进行分析
+right_panel.prioritization.blank_state.subtitle,Select a dataset from the left panel to add it to the map and start your prioritization analysis.,Sélectionnez un jeu de données dans le panneau gauche pour l'ajouter à la carte et commencer votre analyse.,从左面板选择数据集将其添加到地图并开始优先级分析。
+right_panel.prioritization.high_priority.section_title,High priority areas,Zones hautement prioritaires,高优先级区域
+right_panel.prioritization.high_priority.about_text,Showing {{variant}} with the highest prioritization scores based on your analysis criteria.,Affichage de {{variant}} avec les scores de priorisation les plus élevés selon vos critères d'analyse.,显示根据您的分析条件得分最高的 {{variant}}。
+right_panel.prioritization.high_priority.unknown_location,Unknown location,Emplacement inconnu,未知位置
+right_panel.prioritization.high_priority.view_download,View or Download data,Voir ou télécharger les données,查看或下载数据
+right_panel.prioritization.high_priority.score_text,{{score}}% priority score,{{score}} % de score de priorité,{{score}}% 优先级评分
+right_panel.prioritization.high_priority.area_count_single,1 area,1 zone,1 个区域
+right_panel.prioritization.high_priority.area_count_plural,{{count}} areas,{{count}} zones,{{count}} 个区域
+right_panel.prioritization.high_priority.pagination.single,Showing {{count}} result(s),Affichage de {{count}} résultat(s),显示 {{count}} 个结果
+right_panel.prioritization.high_priority.pagination.multi,Showing {{start}}-{{end}} of {{total}},Affichage de {{start}}-{{end}} sur {{total}},显示 {{start}}-{{end}}（共 {{total}} 个）
+right_panel.prioritization.graphs.area_share_title,Area share,Part de la zone,面积份额
+right_panel.prioritization.graphs.pop_share_title,Population share,Répartition de la population,人口份额
+right_panel.prioritization.graphs.area_desc,"Showing {{indexName}} for areas spanning <strong>{{x}}</strong>, of which <strong>{{y}}</strong> has high {{indexName}}.","Affichage de {{indexName}} pour des zones couvrant <strong>{{x}}</strong>, dont <strong>{{y}}</strong> présentent un {{indexName}} élevé.","显示跨越 <strong>{{x}}</strong> 的区域的 {{indexName}}，其中 <strong>{{y}}</strong> 具有高 {{indexName}}。"
+right_panel.prioritization.graphs.pop_desc,"Showing {{indexName}} for areas affecting <strong>{{x}}</strong>, of whom <strong>{{y}}</strong> are situated in areas of high {{indexName}}.","Affichage de {{indexName}} pour des zones affectant <strong>{{x}}</strong> personnes, dont <strong>{{y}}</strong> se trouvent dans des zones à {{indexName}} élevé.","显示影响 <strong>{{x}}</strong> 的区域的 {{indexName}}，其中 <strong>{{y}}</strong> 位于 {{indexName}} 高的区域。"
+right_panel.prioritization.graphs.people_unit,people,personnes,人
+right_panel.prioritization.graphs.area_about,"Shows the 'Prioritization Index' results as area shares, based on your analysis criteria.",Affiche les résultats de l'indice de priorisation sous forme de parts de superficie.,"根据您的分析条件，显示'优先级指数'结果作为面积份额。"
+right_panel.prioritization.graphs.pop_about,"Shows the 'Prioritization Index' results as population shares, based on your analysis criteria.",Affiche les résultats de l'indice de priorisation sous forme de parts de population.,"根据您的分析条件，显示'优先级指数'结果作为人口份额。"
+right_panel.data.title,Analysing selected datasets in <strong>{{area}}</strong>.,Analyse des ensembles de données sélectionnés dans <strong>{{area}}</strong>.,分析在 <strong>{{area}}</strong> 中选定的数据集。
+right_panel.data.subtitle,Click anywhere on the map to see data for that location.,Cliquez n'importe où sur la carte pour voir les données de cet emplacement.,单击地图上的任何位置以查看该位置的数据。
+right_panel.data.descriptions.points.count,There are <strong>{{value}}</strong> {{name}} in the selected area.,Il y a <strong>{{value}}</strong> {{name}} dans la zone sélectionnée.,在选定区域内有 <strong>{{value}}</strong> {{name}}。
+right_panel.data.descriptions.points.distance,The nearest {{name}} is <strong>{{value}}</strong> from this area.,Le {{name}} le plus proche est à <strong>{{value}}</strong> de cette zone.,最近的 {{name}} 距离此区域 <strong>{{value}}</strong>。
+right_panel.data.descriptions.points.kwp,The total installed capacity of {{name}} in this area is <strong>{{value}}</strong>.,La capacité installée totale de {{name}} dans cette zone est de <strong>{{value}}</strong>.,此区域内 {{name}} 的总装机容量为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.points.kva,The total capacity of {{name}} in this area is <strong>{{value}}</strong>.,La capacité totale de {{name}} dans cette zone est de <strong>{{value}}</strong>.,此区域内 {{name}} 的总容量为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.points.km,The total distance covered by {{name}} in this area is <strong>{{value}}</strong>.,La distance totale couverte par {{name}} dans cette zone est de <strong>{{value}}</strong>.,此区域内 {{name}} 覆盖的总距离为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.lines,The total length of {{name}} in this region is <strong>{{value}}</strong>.,La longueur totale de {{name}} dans cette région est de <strong>{{value}}</strong>.,此区域内 {{name}} 的总长度为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.polygons_count,There are <strong>{{value}}</strong> {{name}} in the selected area.,Il y a <strong>{{value}}</strong> {{name}} dans la zone sélectionnée.,在选定区域内有 <strong>{{value}}</strong> {{name}}。
+right_panel.data.descriptions.polygons_sum,The total {{name}} in this area is <strong>{{value}}</strong>.,Le total de {{name}} dans cette zone est de <strong>{{value}}</strong>.,此区域内 {{name}} 的总计为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster_sum.count,The total {{name}} count in this area is <strong>{{value}}</strong>.,Le nombre total de {{name}} dans cette zone est de <strong>{{value}}</strong>.,此区域内 {{name}} 的总计数为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster_sum.people,The total population in this area is <strong>{{value}}</strong>.,La population totale dans cette zone est de <strong>{{value}}</strong>.,此区域内的总人口为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster_sum.households,There are <strong>{{value}}</strong> households in this area.,Il y a <strong>{{value}}</strong> ménages dans cette zone.,此区域内有 <strong>{{value}}</strong> 个家庭。
+right_panel.data.descriptions.raster_sum.mw,The total energy demand in this area is <strong>{{value}}</strong>.,La demande totale en énergie dans cette zone est de <strong>{{value}}</strong>.,此区域内的总能源需求为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster_sum.gwh,The total energy in this area is <strong>{{value}}</strong>.,L'énergie totale dans cette zone est de <strong>{{value}}</strong>.,此区域内的总能源为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster_sum.metric_tonnes,The total crop production in this area is <strong>{{value}}</strong>.,La production totale de cultures dans cette zone est de <strong>{{value}}</strong>.,此区域内的总农作物产量为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster_sum.tco2eq,The total emissions in this area are <strong>{{value}}</strong>.,Les émissions totales dans cette zone sont de <strong>{{value}}</strong>.,此区域内的总排放量为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster_sum.usd,The total cost for {{name}} in this area is <strong>{{value}}</strong>.,Le coût total pour {{name}} dans cette zone est de <strong>{{value}}</strong>.,此区域内 {{name}} 的总成本为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster_sum.m3yr,The total water availability in this area is <strong>{{value}}</strong>.,La disponibilité totale en eau dans cette zone est de <strong>{{value}}</strong>.,此区域内的总水资源可用性为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster_sum.default,The total {{name}} in this area is <strong>{{value}}</strong>.,Le total de {{name}} dans cette zone est de <strong>{{value}}</strong>.,此区域内 {{name}} 的总计为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster.count,The average {{name}} count in this area is <strong>{{value}}</strong>.,Le nombre moyen de {{name}} dans cette zone est de <strong>{{value}}</strong>.,此区域内 {{name}} 的平均计数为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster.km_proximity,The average distance to {{name}} in this area is <strong>{{value}}</strong>.,La distance moyenne à {{name}} dans cette zone est de <strong>{{value}}</strong>.,此区域内到 {{name}} 的平均距离为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster.kwh_m2,The average {{name}} is <strong>{{value}}</strong> in this area.,La moyenne de {{name}} est de <strong>{{value}}</strong> dans cette zone.,此区域内 {{name}} 的平均值为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster.ppl_km2,The population density in this area is <strong>{{value}}</strong>.,La densité de population dans cette zone est de <strong>{{value}}</strong>.,此区域内的人口密度为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster.people,The estimated population in this area is <strong>{{value}}</strong>.,La population estimée dans cette zone est de <strong>{{value}}</strong>.,此区域内的估计人口为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster.households,There are approximately <strong>{{value}}</strong> households in this area.,Il y a environ <strong>{{value}}</strong> ménages dans cette zone.,此区域内大约有 <strong>{{value}}</strong> 个家庭。
+right_panel.data.descriptions.raster.pct,<strong>{{value}}</strong> of this area has {{name}}.,<strong>{{value}}</strong> de cette zone a {{name}}.,"此区域的 <strong>{{value}}</strong> 具有 {{name}}。"
+right_panel.data.descriptions.raster.coverage_pct,<strong>{{value}}</strong> of this area is covered by {{name}}.,<strong>{{value}}</strong> de cette zone est couverte par {{name}}.,此区域的 <strong>{{value}}</strong> 被 {{name}} 覆盖。
+right_panel.data.descriptions.raster.mw,The estimated energy demand in this area is <strong>{{value}}</strong>.,La demande énergétique estimée dans cette zone est de <strong>{{value}}</strong>.,此区域内的估计能源需求为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster.gwh,The estimated energy in this area is <strong>{{value}}</strong>.,L'énergie estimée dans cette zone est de <strong>{{value}}</strong>.,此区域内的估计能源为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster.kwh_ha_year,The estimated yield for {{name}} in this area is <strong>{{value}}</strong>.,Le rendement estimé pour {{name}} dans cette zone est de <strong>{{value}}</strong>.,此区域内 {{name}} 的估计产量为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster.minutes,The average travel time to {{name}} is <strong>{{value}}</strong> in this area.,Le temps de trajet moyen vers {{name}} est de <strong>{{value}}</strong> dans cette zone.,此区域内到 {{name}} 的平均旅行时间为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster.hours,The average {{name}} in this area is <strong>{{value}}</strong>.,La moyenne de {{name}} dans cette zone est de <strong>{{value}}</strong>.,此区域内 {{name}} 的平均值为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster.hours_hh_day,Households in this area spend on average <strong>{{value}}</strong> on {{name}}.,Les ménages dans cette zone consacrent en moyenne <strong>{{value}}</strong> à {{name}}.,"此区域的家庭平均在 {{name}} 上花费 <strong>{{value}}</strong>。"
+right_panel.data.descriptions.raster.m_s,The average wind speed in this area is <strong>{{value}}</strong>.,La vitesse moyenne du vent dans cette zone est de <strong>{{value}}</strong>.,此区域内的平均风速为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster.degree,The average temperature in this area is <strong>{{value}}</strong>.,La température moyenne dans cette zone est de <strong>{{value}}</strong>.,此区域内的平均温度为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster.degree_celcius,The average temperature in this area is <strong>{{value}}</strong>.,La température moyenne dans cette zone est de <strong>{{value}}</strong>.,此区域内的平均温度为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster.mm,The average annual rainfall in this area is <strong>{{value}}</strong>.,Les précipitations annuelles moyennes dans cette zone sont de <strong>{{value}}</strong>.,此区域内的平均年降雨量为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster.m3yr,The estimated water availability in this area is <strong>{{value}}</strong>.,La disponibilité en eau estimée dans cette zone est de <strong>{{value}}</strong>.,此区域内的估计水资源可用性为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster.metre,The average elevation in this area is <strong>{{value}}</strong>.,L'altitude moyenne dans cette zone est de <strong>{{value}}</strong>.,此区域内的平均海拔高度为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster.kg_ha,The estimated agricultural yield in this area is <strong>{{value}}</strong>.,Le rendement agricole estimé dans cette zone est de <strong>{{value}}</strong>.,此区域内的估计农业产量为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster.metric_tonnes,The estimated crop production in this area is <strong>{{value}}</strong>.,La production de cultures estimée dans cette zone est de <strong>{{value}}</strong>.,此区域内的估计农作物产量为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster.gigajoule,The bioenergy potential in this area is <strong>{{value}}</strong>.,Le potentiel bioénergétique dans cette zone est de <strong>{{value}}</strong>.,此区域内的生物能源潜力为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster.usd,The estimated cost for {{name}} in this area is <strong>{{value}}</strong>.,Le coût estimé pour {{name}} dans cette zone est de <strong>{{value}}</strong>.,此区域内 {{name}} 的估计成本为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster.usd_household,The estimated cost per household for {{name}} is <strong>{{value}}</strong>.,Le coût estimé par ménage pour {{name}} est de <strong>{{value}}</strong>.,{{name}} 的每户估计成本为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster.bldgs_km2,The building density in this area is <strong>{{value}}</strong>.,La densité de bâtiments dans cette zone est de <strong>{{value}}</strong>.,此区域内的建筑密度为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster.tco2eq,The estimated emissions in this area are <strong>{{value}}</strong>.,Les émissions estimées dans cette zone sont de <strong>{{value}}</strong>.,此区域内的估计排放量为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster.tier,The average electrification tier in this area is <strong>{{value}}</strong>.,Le niveau moyen d'électrification dans cette zone est de <strong>{{value}}</strong>.,此区域内的平均电气化等级为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster.year,The estimated electrification year for this area is <strong>{{value}}</strong>.,L'année d'électrification estimée pour cette zone est de <strong>{{value}}</strong>.,此区域内的估计电气化年份为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster.lt2usd,<strong>{{value}}</strong> of the population in this area lives on less than $2/day.,<strong>{{value}}</strong> de la population dans cette zone vit avec moins de 2 $/jour.,此区域内 <strong>{{value}}</strong> 的人口每天生活费不足 2 美元。
+right_panel.data.descriptions.raster.rwi,The Relative Wealth Index for this area is <strong>{{value}}</strong>.,L'indice de richesse relative pour cette zone est de <strong>{{value}}</strong>.,此区域内的相对财富指数为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster.aridity,The aridity index for this area is <strong>{{value}}</strong>.,L'indice d'aridité pour cette zone est de <strong>{{value}}</strong>.,此区域内的干旱指数为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster.nighttime,The nighttime light intensity in this area is <strong>{{value}}</strong>.,L'intensité lumineuse nocturne dans cette zone est de <strong>{{value}}</strong>.,此区域内的夜间光强度为 <strong>{{value}}</strong>。
+right_panel.data.descriptions.raster.per100k,There are <strong>{{value}}</strong> per 100k population affected by {{name}} in this area.,Il y a <strong>{{value}}</strong> pour 100 000 habitants affectés par {{name}} dans cette zone.,此区域内受 {{name}} 影响的每 10 万人中有 <strong>{{value}}</strong> 个。
+right_panel.data.descriptions.raster.default,The average {{name}} in this area is <strong>{{value}}</strong>.,La moyenne de {{name}} dans cette zone est de <strong>{{value}}</strong>.,此区域内 {{name}} 的平均值为 <strong>{{value}}</strong>。
+right_panel.footer.save,Save,Enregistrer,保存
+right_panel.footer.share,Share,Partager,分享
+right_panel.footer.export,Export,Exporter,导出
+map_popup.priority_score,Priority score,Score de priorité,优先级评分
+map_popup.location,Location,Emplacement,位置
+map_popup.km_proximity,{{n}} km (proximity to),{{n}} km (proximité),{{n}} 公里（接近度）
+map_popup.coordinates,Coordinates,Coordonnées,坐标
+map_popup.longitude,Longitude,Longitude,经度
+map_popup.latitude,Latitude,Latitude,纬度
+map_popup.not_aggregated,Not aggregated,Non agrégé,未聚合
+map_popup.count_unit,count,nombre,计数
+map_popup.analyse_button,Analyse selected area,Analyser la zone sélectionnée,分析选定区域
+summary.table,Summary Table,Tableau résumé,汇总表
+summary.graphs,Summary Graphs,Graphiques résumés,汇总图表
+summary.export_button,Export Presentation,Exporter la présentation,导出演示文稿
+summary.snapshot_header,Snapshot,Instantané,快照
+summary.area_share_title,area share,Part de la zone,面积份额
+summary.pop_share_title,population-density share,Répartition de la population,人口密度份额
+modal.save_analysis.header,Save analysis to My EAE,Sauvegarder l'analyse dans Mon EAE,保存分析到我的 EAE
+modal.save_analysis.title_label,Analysis title,Titre de l'analyse,分析标题
+modal.save_analysis.title_hint,Enter a memorable name for the current configuration.,Entrez un nom mémorable pour la configuration actuelle.,输入当前配置的易记名称。
+modal.save_analysis.save_button,Save analysis,Enregistrer l'analyse,保存分析
+modal.save_analysis.update_button,Update saved analysis,Mettre à jour l'analyse sauvegardée,更新保存的分析
+modal.save_analysis.save_as_new_button,Save as new analysis,Sauvegarder comme nouvelle analyse,另存为新分析
+modal.save_analysis.untitled_analysis,Untitled Analysis,Analyse sans titre,无标题分析
+modal.save_analysis.last_viewed,Last viewed on {{date}}.,Dernière consultation le {{date}}.,上次查看于 {{date}}。
+modal.save_analysis.updated_toast,Analysis updated successfully,Analyse mise à jour avec succès,分析已成功更新
+modal.save_analysis.updated_toast_caption,Your analysis was updated in your My EAE account.,Votre analyse a été mise à jour dans votre compte Mon EAE.,"您的分析已在您的""我的 EAE""账户中更新。"
+modal.save_analysis.saved_toast,Analysis saved successfully,Analyse sauvegardée avec succès,分析已成功保存
+modal.save_analysis.saved_toast_caption,Your analysis was saved to your My EAE account.,Votre analyse a été sauvegardée dans votre compte Mon EAE.,"您的分析已保存到您的""我的 EAE""账户。"
+modal.export.header,Export options,Options d'exportation,导出选项
+modal.export.generating,Generating...,Génération en cours...,生成中...
+modal.export.download_all,Download all,Tout télécharger,全部下载
+modal.export.summary_presentation.title,Summary presentation,Présentation résumée,汇总演示文稿
+modal.export.summary_presentation.desc,A summary presentation explaining the outputs of your current analysis view.,Une présentation résumant les résultats de votre analyse actuelle.,解释当前分析视图输出的汇总演示文稿。
+modal.export.summary_presentation.button,Download .ppt,Télécharger .ppt,下载 .ppt
+modal.export.map_tiff.title,Map TIFF,Carte TIFF,地图 TIFF
+modal.export.map_tiff.desc,A TIFF file of the prioritization raster image generated from your analysis.,Un fichier TIFF de l'image raster de priorisation générée par votre analyse.,从您的分析生成的优先级光栅图像的 TIFF 文件。
+modal.export.map_tiff.button,Download .TIFF,Télécharger .TIFF,下载 .TIFF
+modal.export.high_priority.title,High priority areas,Zones hautement prioritaires,高优先级区域
+modal.export.high_priority.desc,A table of the highest priority areas from your analysis.,Un tableau des zones les plus prioritaires de votre analyse.,来自您的分析的最高优先级区域表。
+modal.export.high_priority.button,Download .csv,Télécharger .csv,下载 .csv
+modal.export.pop_area_share.title,Population and area share,Part de population et de superficie,人口和面积份额
+modal.export.pop_area_share.desc,CSV data for the population and area share.,Données CSV pour la part de population et de superficie.,人口和面积份额的 CSV 数据。
+modal.export.pop_area_share.button,Download .csv,Télécharger .csv,下载 .csv
+modal.export.ppt.header,Export PowerPoint presentation,Exporter la présentation PowerPoint,导出 PowerPoint 演示文稿
+modal.export.ppt.subtitle,Select priority areas columns and rows,Sélectionner les colonnes et lignes des zones prioritaires,选择优先级区域的列和行
+modal.export.ppt.column_toggle_hint,Selected columns will be included in the PowerPoint tables,Les colonnes sélectionnées seront incluses dans les tableaux PowerPoint,所选列将包含在 PowerPoint 表中
+modal.export.csv.column_toggle_hint,Selected columns will be included in the CSV download,Les colonnes sélectionnées seront incluses dans le téléchargement CSV,所选列将包含在 CSV 下载中
+modal.export.csv.download_all,Download all (.csv),Tout télécharger (.csv),全部下载 (.csv)
+modal.export.csv_headers.area_share,Area share,Part de la zone,面积份额
+modal.export.csv_headers.pop_share,Population share,Répartition de la population,人口份额
+modal.export.csv_headers.level,Level,Niveau,级别
+modal.share_link.header,Share link,Partager le lien,分享链接
+modal.share_link.instructions,Sharing the following link will load the Energy Access Explorer platform in the current state: layers and analysis. Users might need the necessary permissions to view this snapshot fully.,Partager ce lien chargera la plateforme Energy Access Explorer dans l'état actuel : couches et analyse.,分享以下链接将在当前状态下加载能源获取浏览器平台：图层和分析。用户可能需要必要的权限才能完整查看此快照。
+modal.eae_info.title,About Energy Access Explorer prioritization,À propos de la priorisation Energy Access Explorer,关于能源获取浏览器优先级
+modal.eae_info.body,"Energy Access Explorer enables you to identify high-priority areas for energy access interventions. EAE uses multi-criteria analysis that uses location-specific resource availability and infrastructure data to represent energy supply, and incorporates demographic data and data on social and productive uses to visualize demand for energy services.",Energy Access Explorer vous permet d'identifier les zones prioritaires pour les interventions en matière d'accès à l'énergie.,"能源获取浏览器使您能够确定能源获取干预的高优先级区域。EAE 使用多标准分析，该分析使用特定于位置的资源可用性和基础设施数据来表示能源供应，并合并人口数据和社会和生产使用数据来可视化能源服务的需求。"
+modal.eae_info.analysis_areas.title,Analysis areas,Zones d'analyse,分析区域
+modal.eae_info.analysis_areas.body,Energy Access Explorer offers the option to generate an analysis across various different administrative priorities.,Energy Access Explorer offre la possibilité de générer une analyse sur différentes priorités administratives.,能源获取浏览器提供生成跨越各种不同行政优先事项分析的选项。
+modal.eae_info.priority_1km.title,Priority areas (1km²),Zones prioritaires (1 km²),优先级区域 (1 公里²)
+modal.eae_info.priority_1km.body,Selecting this analysis area provides a raster analysis in 1km2 tiles across the entirety of the selected geography.,Cette zone d'analyse fournit une analyse raster en tuiles de 1 km² sur l'ensemble de la géographie sélectionnée.,选择此分析区域将在整个选定地理区域中提供 1 公里² 瓷砖中的光栅分析。
+modal.eae_info.other_areas.title,Other analysis areas,Autres zones d'analyse,其他分析区域
+modal.eae_info.other_areas.body,"Depending on the currently selected geography, it is possible to change the prioritization output to wider geographical areas such as districts, regions or zones for more high level analysis.","Selon la géographie sélectionnée, il est possible de modifier la sortie de priorisation vers des zones géographiques plus larges.","根据当前选定的地理位置，可以将优先级输出更改为更广泛的地理区域（如地区、地区或区域）以进行更高级别的分析。"
+modal.eae_info.view_technical_note,View technical note,Voir la note technique,查看技术说明
+modal.points_input.header,Input Longitude/Latitude,Saisir Longitude / Latitude,输入经度/纬度
+modal.points_input.longitude_placeholder,Longitude,Longitude,经度
+modal.points_input.latitude_placeholder,Latitude,Latitude,纬度
+modal.points_input.add_button,Add point,Ajouter un point,添加点
+modal.high_priority_table.column_toggle_hint,Selected columns will be included in the CSV download,Les colonnes sélectionnées seront incluses dans le téléchargement CSV,所选列将包含在 CSV 下载中
+modal.high_priority_table.selection_count,{{count}} row(s) currently selected.,{{count}} ligne(s) sélectionnée(s).,当前选择的 {{count}} 行。
+modal.high_priority_table.download_selected,Download selected rows,Télécharger les lignes sélectionnées,下载选定的行
+modal.high_priority_table.data_download_summary,Data download will include a summary of your analysis.,Le téléchargement de données inclura un résumé de votre analyse.,数据下载将包含您的分析摘要。
+modal.high_priority_table.per_page,Per page,Par page,每页
+modal.high_priority_table.toggle_columns,Toggle columns,Afficher/masquer les colonnes,切换列
+my_eae.page.title,My EAE,Mon EAE,我的 EAE
+my_eae.tabs.saved_analysis,Saved Analysis,Analyse sauvegardée,保存的分析
+my_eae.tabs.account,Account,Compte,账户
+my_eae.snapshots.filter_placeholder,Filter by title or geography name,Filtrer par titre ou par nom de région,按标题或地理名称筛选
+my_eae.snapshots.sort_by_date,Sort by: Date,Trier par : Date,排序方式：日期
+my_eae.snapshots.sort_by_title,Sort by: Title,Trier par : Titre,排序方式：标题
+my_eae.snapshots.count,{{count}} Analyses,{{count}} analyses,{{count}} 个分析
+my_eae.snapshots.untitled,-- untitled --,-- sans titre --,-- 无标题 --
+my_eae.account.change_password,Change password,Changer le mot de passe,更改密码
+my_eae.snapshot_card.open,Open,Ouvrir,打开
+my_eae.snapshot_card.download,Download,Télécharger,下载
+my_eae.snapshot_card.share,Share,Partager,分享
+my_eae.modal.share.header,Share analysis view,Partager la vue d'analyse,分享分析视图
+my_eae.modal.share.instructions,Sharing the following link will load the Energy Access Explorer platform in the current state: layers and analysis. Users might need the necessary permissions to view this snapshot fully.,Partager ce lien chargera la plateforme Energy Access Explorer dans l'état actuel : couches et analyse.,分享以下链接将在当前状态下加载能源获取浏览器平台：图层和分析。用户可能需要必要的权限才能完整查看此快照。
+my_eae.modal.share.copy_link,Copy link,Copier le lien,复制链接
+my_eae.modal.share.link_copied_toast,Link copied!,Lien copié !,已复制链接！
+my_eae.modal.set_title.header,Set Analysis Title,Définir le titre de l'analyse,设置分析标题
+my_eae.modal.set_title.title_updated_toast,Title updated,Titre mis à jour,标题已更新
+my_eae.modal.delete.confirm,Are you sure you want to delete this analysis? '{{name}}',Êtes-vous sûr de vouloir supprimer cette analyse ? « {{name}} »,您确定要删除此分析吗？'{{name}}'
+my_eae.modal.delete.deleted_toast,Analysis '{{name}}' deleted.,Analyse « {{name}} » supprimée.,分析'{{name}}'已删除。
+overlay.fetching_snapshot,Fetching snapshot...,Récupération de l'instantané...,正在获取快照...
+overlay.fetching_geography,Fetching geography...,Recherche de géographie...,正在获取地理信息...
+overlay.fetching_datasets,Fetching datasets...,Recherche des jeux de données...,正在获取数据集...
+overlay.fetching_divisions,Fetching divisions...,Recherche des divisions...,正在获取分区...
+overlay.fetching_admin_tiers,Fetching administrative tiers...,Récupération des niveaux administratifs...,正在获取行政级别...
+overlay.geography_error,Geography error,Erreur de géographie,地理错误
+overlay.failed_outline,Failed to get the geography's OUTLINE...,Échec de la récupération du contour de la géographie...,无法获取地理轮廓...
+toast.clipboard_error,Clipboard functionality not available,Fonctionnalité du presse-papiers non disponible,剪贴板功能不可用
+toast.value_out_of_range,Value out of range,Valeur hors plage,值超出范围
+disclaimer.title,Disclaimer,Clause de non-responsabilité,免责声明
+disclaimer.maps_note,"The maps are for illustrative purposes and do not imply the expression of any opinion on the part of WRI, concerning the legal status of any country or territory or concerning the delimitation of frontiers or boundaries.","Les cartes sont à titre indicatif et n'impliquent pas l'expression d'une opinion de la part du WRI concernant le statut juridique d'un pays ou d'un territoire, ni concernant la délimitation des frontières ou des limites.","地图仅用于说明目的，不代表世界资源研究所关于任何国家或领土的法律地位或关于边界划分的任何意见。"
+disclaimer.attribution,"If you use this platform, partially or entirely, you must follow the <a href=""https://www.energyaccessexplorer.org/attribution/"">attribution instructions</a>.","Si vous utilisez cette plateforme, partiellement ou entièrement, vous devez suivre les <a href=""https://www.energyaccessexplorer.org/attribution/"">instructions d'attribution</a>.","如果您使用此平台（部分或全部），您必须遵循<a href=""https://www.energyaccessexplorer.org/attribution/"">归属说明</a>。"
+dataset_info.covered_by_analysis,covered by the analysis.,couverts par l'analyse.,由分析覆盖。
+dataset_info.intersect,(intersect),(intersection),（相交）
+dataset_info.long_lat,long/lat,lon/lat,经度/纬度
+dataset_info.features,features,entités,要素
+dataset_info.file_error,Dataset/File error,Erreur de fichier / jeu de données,数据集/文件错误
+auth.prompt,"In order to save an analysis, you need to be registered with us.","Pour sauvegarder une analyse, vous devez être inscrit.","为了保存分析，您需要向我们注册。"
+auth.register_login,Register/Login,S'inscrire / Se connecter,注册/登录
+mapbox.style.light,Light,Clair,浅色
+nav.tool,Tool,Outil,工具
+nav.about,About,À propos,关于
+nav.get_involved,Get Involved,Soyez impliqué,参与其中
+nav.user_stories,User Stories,Témoignages des utilisateurs,用户故事
+nav.partners,Partners,Partenaires,合作伙伴
+nav.login,Login,Connexion,登录
+overlay.initialising_mapbox,Initialising mapbox...,Initialisation de la carte...,初始化 Mapbox...
+overlay.setting_up_datasets,Setting up datasets...,Configuration des jeux de données...,正在设置数据集...
+overlay.setting_up_ui,Setting up UI elements...,Configuration de l'interface...,正在设置 UI 元素...
+right_panel.prioritization.index_priority.title,Index Priority,Priorité d'index,指数优先级
+right_panel.prioritization.poi.title,Intersecting points of interest,Points d'intérêt intersectants,相交的兴趣点
+right_panel.data.no_data,No data available for <strong>{{name}}</strong> in this area.,Aucune donnée disponible pour <strong>{{name}}</strong> dans cette zone.,此区域内 <strong>{{name}}</strong> 没有可用数据。
+right_panel.data.categorical_desc,Showing the percentage distribution of <strong>{{name}}</strong> categories in the selected area.,Affichage de la répartition en pourcentage des catégories <strong>{{name}}</strong> dans la zone sélectionnée.,显示所选区域内<strong>{{name}}</strong>类别的百分比分布。
+controls.tab.all,All,Tout,全部
+controls.tab.census,Census,Recensement,人口普查
+controls.tab.demand,Demand,Demande,需求
+controls.tab.supply,Supply,Offre,供给
+controls.tab.other,Other,Autre,其他

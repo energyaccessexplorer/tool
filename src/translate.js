@@ -50,6 +50,19 @@ const LOCALE_LABELS = {
 	"fr": "Français",
 };
 
+function updateDatasetTranslations() {
+	if (typeof DST === 'undefined') return;
+
+	for (const ds of DST.values()) {
+		if (ds.card) {
+			ds.card.bind();
+		}
+		if (ds.controls) {
+			ds.controls.bind();
+		}
+	}
+}
+
 export function initLocalePicker(locale) {
 	const nav = document.querySelector('nav');
 	if (!nav) return;
@@ -77,6 +90,7 @@ export function initLocalePicker(locale) {
 			current.textContent = l.toUpperCase();
 			dropdown.querySelectorAll('a').forEach(a => a.classList.toggle('active', a.dataset.locale === l));
 			translateNode(l, document);
+			updateDatasetTranslations();
 		};
 		dropdown.append(item);
 	}
@@ -85,12 +99,42 @@ export function initLocalePicker(locale) {
 	nav.append(picker);
 }
 
-export function translateDatasetName(_locale, dataset) {
-	return dataset?.name ?? '';
+function getTranslation(obj, fieldName, locale) {
+	if (!obj || !fieldName) return null;
+
+	const translationFieldName = fieldName.replace(/\./g, '_') + '_translations';
+	if (obj[translationFieldName] && typeof obj[translationFieldName] === 'object') {
+		const translated = obj[translationFieldName][locale];
+		if (translated) return translated;
+	}
+
+	return null;
 }
 
-export function translateDatasetAttribute(_locale, _dataset, attribute) {
-	return attribute ?? '';
+export function translateDatasetName(locale, dataset) {
+	if (!dataset) return '';
+
+	const translated = getTranslation(dataset, 'name_long', locale);
+	if (translated) return translated;
+
+	const categoryTranslated = getTranslation(dataset.category, 'name_long', locale);
+	if (categoryTranslated) return categoryTranslated;
+
+	return dataset?.name_long ?? dataset?.name ?? dataset?.category?.name_long ?? dataset?.category?.name ?? '';
+}
+
+export function translateDatasetAttribute(locale, dataset, attributeValue, fieldName) {
+	if (!attributeValue) return '';
+
+	if (!fieldName) return attributeValue;
+
+	const translated = getTranslation(dataset, fieldName, locale);
+	if (translated) return translated;
+
+	const categoryTranslated = getTranslation(dataset?.category, fieldName, locale);
+	if (categoryTranslated) return categoryTranslated;
+
+	return attributeValue;
 }
 
 export function translateUnit(locale, unit) {

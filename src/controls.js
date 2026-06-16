@@ -89,7 +89,7 @@ export default class dscontrols extends HTMLElement {
 		bind(this, Object.assign({}, this.ds, {
 			"name":        translateDatasetName(window.LOCALE, this.ds),
 			"checkbox":    this.checkbox.svg,
-			"description": translateDatasetAttribute(window.LOCALE, this.ds, desc),
+			"description": translateDatasetAttribute(window.LOCALE, this.ds, desc, 'description'),
 			"card":        (_, e) => { e.stopPropagation(); this.ds.card.discover(); },
 			"info":        (_, e) => { e.stopPropagation(); this.ds.info_modal(); },
 		}), { "final": false });

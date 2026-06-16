@@ -51,6 +51,10 @@ import {
 	Whatever,
 } from '../lib/helpers.js';
 
+import {
+	translateDatasetAttribute,
+} from './translate.js';
+
 export const default_colorscale = colorscale({
 	"stops":  d3.schemeRdBu[5].reverse(),
 	"domain": { "min": 0, "max": 1 },
@@ -630,6 +634,19 @@ export default class DS {
 				});
 		} else {
 			const m = Object.assign({}, this.metadata, { "category-description": this.category.description });
+
+			// Translate metadata fields if translations are available
+			for (const field of ['description', 'cautions', 'suggested_citation', 'sources', 'license', 'spatial_resolution', 'content_date', 'download_original_url', 'learn_more_url']) {
+				if (m[field]) {
+					m[field] = translateDatasetAttribute(window.LOCALE, this, m[field], field);
+				}
+			}
+
+			// Translate category description
+			if (m['category-description']) {
+				m['category-description'] = translateDatasetAttribute(window.LOCALE, this.category, m['category-description'], 'description');
+			}
+
 			content = tmpl('#ds-info-modal');
 			bind(content, m);
 		}

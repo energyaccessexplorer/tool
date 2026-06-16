@@ -61,6 +61,22 @@ function updateDatasetTranslations() {
 			ds.controls.bind();
 		}
 	}
+
+	updateCategoryTabLabels();
+}
+
+function updateCategoryTabLabels() {
+	const tabs = document.querySelectorAll('.controls-branch-tab[id^="controls-tab-"]');
+	for (const tab of tabs) {
+		const categoryName = tab.id.replace('controls-tab-', '');
+
+		if (categoryName === 'all') {
+			tab.textContent = t(window.LOCALE, 'controls.tab.all');
+		} else {
+			const label = translateCategoryName(window.LOCALE, categoryName);
+			tab.textContent = label;
+		}
+	}
 }
 
 export function initLocalePicker(locale) {
@@ -135,6 +151,12 @@ export function translateDatasetAttribute(locale, dataset, attributeValue, field
 	if (categoryTranslated) return categoryTranslated;
 
 	return attributeValue;
+}
+
+export function translateCategoryName(locale, categoryName) {
+	if (!categoryName) return '';
+
+	return t(locale, `controls.tab.${categoryName}`);
 }
 
 export function translateUnit(locale, unit) {

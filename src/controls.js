@@ -4,7 +4,7 @@ import {
 
 import DS from './ds.js';
 
-import { translateDatasetName, translateDatasetAttribute } from './translate.js';
+import { translateDatasetName, translateDatasetAttribute, translateCategoryName } from './translate.js';
 
 import {
 	select_tab,
@@ -84,6 +84,13 @@ export default class dscontrols extends HTMLElement {
 
 		this.header.onclick = header_click.call(this);
 
+		this.bind();
+		this.inject();
+
+		return this;
+	}
+
+	bind() {
 		const desc = this.ds.description || this.ds.category.description;
 
 		bind(this, Object.assign({}, this.ds, {
@@ -93,11 +100,7 @@ export default class dscontrols extends HTMLElement {
 			"card":        (_, e) => { e.stopPropagation(); this.ds.card.discover(); },
 			"info":        (_, e) => { e.stopPropagation(); this.ds.info_modal(); },
 		}), { "final": false });
-
-		this.inject();
-
-		return this;
-	};
+	}
 
 	loading(t) {
 		this.spinner.style.display = t ? 'block' : 'none';
@@ -119,7 +122,8 @@ export default class dscontrols extends HTMLElement {
 		if (!maybe(path, 'length')) return;
 
 		function create_tab(name) {
-			const t = ce('div', humanformat(name), { "id": 'controls-tab-' + name, "class": 'controls-branch-tab up-title' });
+			const label = translateCategoryName(window.LOCALE, name);
+			const t = ce('div', label, { "id": 'controls-tab-' + name, "class": 'controls-branch-tab up-title' });
 			if (EAE['indexes'][name]) t.setAttribute('bind', name);
 			return t;
 		};

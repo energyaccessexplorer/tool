@@ -1,4 +1,4 @@
-import { t, translateNode } from './translate.js';
+import { t, translateNode, registerUIUpdater, getScaleLabels } from './translate.js';
 import { svg_pie } from './utils.js';
 import { analysis_colorscale, lowmedhigh_scale } from './analysis.js';
 import { compute_share_amounts } from './summary.js';
@@ -17,7 +17,7 @@ const PIES = {};
 const bubble = (v,e) => new bubblemessage({ "message": v + "%", "position": "C", "close": false, "noevents": true }, e);
 
 function update_graph_section(section, amounts, unit, description) {
-	const labels = lowmedhigh_scale.range();
+	const labels = getScaleLabels(window.LOCALE);
 
 	const scale = ce('dl', null, { "class": 'discrete-scale' });
 
@@ -146,3 +146,21 @@ export function init() {
 	qs('#analysis-sections-wrapper').append(area_section);
 	qs('#analysis-sections-wrapper').append(population_section);
 };
+
+function refreshGraphTranslations() {
+	const area_section = qs('#area-number')?.closest('.index-graphs-section');
+	const pop_section  = qs('#population-number')?.closest('.index-graphs-section');
+
+	if (area_section) {
+		qs('[slot="title"]', area_section).textContent
+			= t(window.LOCALE, 'right_panel.prioritization.graphs.area_share_title');
+		setup_about_button(area_section, t(window.LOCALE, 'right_panel.prioritization.graphs.area_about'));
+	}
+	if (pop_section) {
+		qs('[slot="title"]', pop_section).textContent
+			= t(window.LOCALE, 'right_panel.prioritization.graphs.pop_share_title');
+		setup_about_button(pop_section, t(window.LOCALE, 'right_panel.prioritization.graphs.pop_about'));
+	}
+}
+
+registerUIUpdater(refreshGraphTranslations);

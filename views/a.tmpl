@@ -157,25 +157,25 @@
         <div id="points" class="search-panel">
           <div id="ponits-buttons" class="panel-buttons">
             <a id="points-download"
-               title="Download CSV file of the currents points selection">
+               data-t-title="left_panel.points_loading.download_button">
               <i class="bi-box-arrow-in-down"></i>
             </a>
 
             <a id="points-upload">
               <label for="points-file-input"
-                     title="Load a CSV file with points to find within the analysis">
+                     data-t-title="left_panel.points_loading.upload_button">
                 <i class="bi-box-arrow-in-up"></i>
               </label>
               <input type="file" id="points-file-input" accept="text/csv" hidden>
             </a>
 
             <a id="points-pick"
-               title="Pick points on the map to add to the list">
+               data-t-title="left_panel.points_loading.pick_button">
               <i class="bi-geo-alt"></i>
             </a>
 
             <a id="points-input"
-               title="Input coordinates manually">
+               data-t-title="left_panel.points_loading.input_button">
               <i class="bi-cursor-text"></i>
             </a>
           </div>
@@ -993,15 +993,15 @@
   </template>
 
   <template id="request-authentication-modal-template">
-    <p>
+    <p data-t-html="modals.save_analysis.auth_message">
       Create a My EAE account, or sign in to your existing account in order to save your current analysis view and receive important updates about the Energy Access Explorer platform.
     </p>
-    <a href="/subscribe/?select=account" target="_blank" class="primary-button">Create account</a>
-    <a href="/login" class="secondary-button">Sign in</a>
+    <a href="/subscribe/?select=account" target="_blank" class="primary-button" data-t="modals.save_analysis.auth_create">Create account</a>
+    <a href="/login" class="secondary-button" data-t="modals.save_analysis.auth_signin">Sign in</a>
   </template>
 
   <template id="saved-analysis-modal-template">
-    <p>
+    <p data-t-html="modals.save_analysis.saved_message">
       You are currently viewing an analysis already saved to your My EAE account. You can either update your existing saved analysis, or save your changes as a new analysis.
     </p>
     <div class="saved-analysis-info">

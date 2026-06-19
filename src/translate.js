@@ -52,6 +52,12 @@ const LOCALE_LABELS = {
 	"zh": "中文",
 };
 
+const _uiUpdaters = new Set();
+
+export function registerUIUpdater(fn) {
+	_uiUpdaters.add(fn);
+}
+
 function updateDatasetTranslations() {
 	if (typeof DST === 'undefined') return;
 
@@ -66,6 +72,18 @@ function updateDatasetTranslations() {
 
 	updateCategoryTabLabels();
 	refreshControlsUI(window.LOCALE);
+}
+
+function updateNavTranslations() {
+	const myEae = document.querySelector('#my-eae');
+	if (myEae && myEae.dataset.t) {
+		myEae.textContent = t(window.LOCALE, myEae.dataset.t);
+	}
+
+	const navItems = document.querySelectorAll('#my-eae-dropdown a[data-t]');
+	for (const item of navItems) {
+		item.textContent = t(window.LOCALE, item.dataset.t);
+	}
 }
 
 function updateCategoryTabLabels() {
@@ -103,12 +121,16 @@ export function initLocalePicker(locale) {
 			dropdown.querySelectorAll('a').forEach(a => a.classList.toggle('active', a.dataset.locale === l));
 			translateNode(l, document);
 			updateDatasetTranslations();
+			updateNavTranslations();
+			_uiUpdaters.forEach(fn => fn());
 		};
 		dropdown.append(item);
 	}
 
 	picker.append(current, dropdown);
 	nav.append(picker);
+
+	updateNavTranslations();
 }
 
 function getTranslation(obj, fieldName, locale) {
@@ -190,6 +212,16 @@ export function translateUnit(locale, unit) {
 	return entry[locale];
 }
 
+export function getScaleLabels(locale) {
+	return [
+		t(locale, 'left_panel.output.ramp.low'),
+		t(locale, 'left_panel.output.ramp.low_medium'),
+		t(locale, 'left_panel.output.ramp.medium'),
+		t(locale, 'left_panel.output.ramp.medium_high'),
+		t(locale, 'left_panel.output.ramp.high'),
+	];
+}
+
 export function translateNode(locale, node) {
 	for (const el of node.querySelectorAll('[data-t]'))
 		el.textContent = t(locale, el.dataset.t);
@@ -199,6 +231,9 @@ export function translateNode(locale, node) {
 
 	for (const el of node.querySelectorAll('[data-t-description]'))
 		el.setAttribute('description', t(locale, el.dataset.tDescription));
+
+	for (const el of node.querySelectorAll('[data-t-title]'))
+		el.setAttribute('title', t(locale, el.dataset.tTitle));
 
 	for (const el of node.querySelectorAll('[data-t-html]'))
 		el.innerHTML = t(locale, el.dataset.tHtml);

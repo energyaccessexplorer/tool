@@ -17,7 +17,7 @@ import {
 	tmpl,
 } from '../lib/helpers.js';
 
-import { t, translateNode } from './translate.js';
+import { t, translateNode, registerUIUpdater } from './translate.js';
 
 export let opacity = 1;
 
@@ -32,7 +32,7 @@ function variants() {
 		u = "km²";
 		r = r / 1000;
 	}
-	s.append(ce('option', `Prioritized Areas - ${r}${u}`, { "value": "raster" }));
+	s.append(ce('option', `${t(window.LOCALE, 'left_panel.output.variant.prioritized_areas')} - ${r}${u}`, { "value": "raster" }));
 
 	GEOGRAPHY.divisions.forEach((d,i) => {
 		if (i === 0) return;
@@ -74,9 +74,9 @@ function ramp() {
 	qs('#output-ramp').append(
 		analysis_colorscale_svg,
 		bind(tmpl('#ramp'), {
-			"left":   "Low",
-			"middle": "Medium",
-			"right":  "High",
+			"left":   t(window.LOCALE, 'left_panel.output.ramp.low'),
+			"middle": t(window.LOCALE, 'left_panel.output.ramp.medium'),
+			"right":  t(window.LOCALE, 'left_panel.output.ramp.high'),
 		}),
 	);
 };
@@ -122,8 +122,8 @@ export function indexes() {
 		return d;
 	};
 
-	for (const t in EAE['indexes'])
-		nodes.push(i_elem(t, EAE['indexes'][t]['name']));
+	for (const k in EAE['indexes'])
+		nodes.push(i_elem(k, t(window.LOCALE, 'left_panel.output.index.' + k)));
 
 	select.append(...nodes);
 
@@ -143,3 +143,25 @@ export function init() {
 	eae_info_modal();
 	ramp();
 };
+
+registerUIUpdater(() => {
+	const select = qs('#output-variant-select');
+	const opt = select.querySelector('option[value="raster"]');
+	if (opt) {
+		let u = "m²";
+		let r = GEOGRAPHY.resolution;
+		if ((r % 1000) === 0) {
+			u = "km²";
+			r = r / 1000;
+		}
+		opt.textContent = `${t(window.LOCALE, 'left_panel.output.variant.prioritized_areas')} - ${r}${u}`;
+	}
+
+	indexes();
+
+	const rampEl = qs('#output-ramp');
+	if (rampEl) {
+		rampEl.innerHTML = '';
+		ramp();
+	}
+});

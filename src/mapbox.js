@@ -26,6 +26,8 @@ import {
 import mapinfo from './map-info.js';
 import bubblemessage from '../lib/bubblemessage.js';
 
+import { t } from './translate.js';
+
 export function get_admin_area_item(variant, id) {
 	const division = GEOGRAPHY.divisions[variant];
 	if (!division || !division.priorityData || !division.vectors) return null;
@@ -82,9 +84,11 @@ const projections = [{
 	"value": "mercator",
 }];
 
-function attach_tooltip(el, message) {
+function attach_tooltip(el, messageOrKey) {
 	let p;
-	el.addEventListener('mouseenter', () => { p = new bubblemessage({ "position": "E", "message": message, "close": false }, el); });
+	const isKey = messageOrKey.includes('.');
+	const getMessage = () => isKey ? t(window.LOCALE, messageOrKey) : messageOrKey;
+	el.addEventListener('mouseenter', () => { p = new bubblemessage({ "position": "E", "message": getMessage(), "close": false }, el); });
 	el.addEventListener('mouseleave', () => { if (p) p.remove(); });
 }
 
@@ -100,7 +104,7 @@ class MapboxThemeControl {
 		this._container.append(button);
 
 		button.addEventListener('mouseup', e => theme_control_popup(e.target.closest('button')));
-		attach_tooltip(button, 'Basemap');
+		attach_tooltip(button, 'map.controls.basemap');
 
 		return this._container;
 	};
@@ -123,7 +127,7 @@ class MapboxProjectionControl {
 		this._container.append(button);
 
 		button.addEventListener('mouseup', e => projection_control_popup(e.target.closest('button')));
-		attach_tooltip(button, 'Projection');
+		attach_tooltip(button, 'map.controls.projection');
 
 		return this._container;
 	};
@@ -167,8 +171,8 @@ export function init() {
 
 	const zoom_in = qs('.mapboxgl-ctrl-zoom-in');
 	const zoom_out = qs('.mapboxgl-ctrl-zoom-out');
-	if (zoom_in) attach_tooltip(zoom_in, 'Zoom in');
-	if (zoom_out) attach_tooltip(zoom_out, 'Zoom out');
+	if (zoom_in) attach_tooltip(zoom_in, 'map.controls.zoom_in');
+	if (zoom_out) attach_tooltip(zoom_out, 'map.controls.zoom_out');
 
 	MAPBOX.zoomTo(MAPBOX.getZoom() * 0.95, {"duration": 0});
 	MAPBOX.doubleClickZoom.disable();

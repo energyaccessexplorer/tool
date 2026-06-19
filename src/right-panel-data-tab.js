@@ -16,7 +16,7 @@ import {
 
 import bind from '../lib/bind.js';
 import bubblemessage from '../lib/bubblemessage.js';
-import { t, translateUnit } from './translate.js';
+import { t, translateUnit, translateDatasetName, registerUIUpdater } from './translate.js';
 
 import {
 	ce,
@@ -244,7 +244,7 @@ function make_card(ds, entry, admin_info) {
 	const path0  = ds.category?.controls?.path?.[0];
 	const tab_el = path0 && !STANDARD_TABS.has(path0) ? qs('#controls-tab-' + path0) : null;
 	const tab_label = tab_el?.textContent?.trim();
-	const title     = ce('span', tab_label ? `${tab_label} - ${ds.name}` : ds.name, { "class": 'data-card-title' });
+	const title     = ce('span', tab_label ? `${tab_label} - ${translateDatasetName(window.LOCALE, ds)}` : translateDatasetName(window.LOCALE, ds), { "class": 'data-card-title' });
 	const about  = ce('button', null, { "class": 'button-icon button-info button-about' });
 	about.innerHTML = `<span>${t(window.LOCALE, 'left_panel.cards.card.about_button')}</span><i class="bi bi-info-circle"></i>`;
 	header.append(title, about);
@@ -258,7 +258,7 @@ function make_card(ds, entry, admin_info) {
 			const n           = ds.csv.data.length;
 			const active_name = typeof entry.raw_value === 'string' ? entry.raw_value : null;
 			const dist_desc = ce('p', null, { "class": 'data-card-description' });
-			dist_desc.innerHTML = t(window.LOCALE, 'right_panel.data.categorical_desc', { "name": ds.name });
+			dist_desc.innerHTML = t(window.LOCALE, 'right_panel.data.categorical_desc', { "name": translateDatasetName(window.LOCALE, ds) });
 			body.append(dist_desc, n <= 5
 				? make_donut_chart(distribution, active_name)
 				: make_bar_chart(distribution, active_name));
@@ -270,9 +270,9 @@ function make_card(ds, entry, admin_info) {
 
 	const desc = ce('p', null, { "class": 'data-card-description' });
 	if (entry.value != null) {
-		desc.innerHTML = describe(ds.category.datatype, entry.unit || ds.category.unit, ds.name, entry.value, entry.aggregation ?? ds.category.analysis?.aggregation);
+		desc.innerHTML = describe(ds.category.datatype, entry.unit || ds.category.unit, translateDatasetName(window.LOCALE, ds), entry.value, entry.aggregation ?? ds.category.analysis?.aggregation);
 	} else {
-		desc.innerHTML = t(window.LOCALE, 'right_panel.data.no_data', { "name": ds.name });
+		desc.innerHTML = t(window.LOCALE, 'right_panel.data.no_data', { "name": translateDatasetName(window.LOCALE, ds) });
 	}
 	body.append(desc);
 
@@ -411,3 +411,17 @@ export function clear() {
 	cache.national_layer_data = null;
 	update_top_level_geography();
 }
+
+function refreshDataTabTranslations() {
+	const blank = qs('#data-blank-state');
+	if (blank && blank.style.display !== 'none') {
+		bind(blank, {
+			"title":    t(window.LOCALE, 'right_panel.prioritization.blank_state.title'),
+			"subtitle": t(window.LOCALE, 'right_panel.prioritization.blank_state.subtitle'),
+		}, { "final": false });
+	} else {
+		update_top_level_geography();
+	}
+}
+
+registerUIUpdater(refreshDataTabTranslations);

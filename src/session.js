@@ -19,6 +19,7 @@ import {
 } from './utils.js';
 
 import bind from '../lib/bind.js';
+import { t, translateNode } from './translate.js';
 
 const url = new URL(location);
 
@@ -36,8 +37,10 @@ function request_authentication() {
 	const footer = document.createDocumentFragment();
 	footer.append(...children.slice(1));
 
+	translateNode(window.LOCALE, template);
+
 	const m = new modal({
-		"header":  "Save analysis to My EAE",
+		"header":  t(window.LOCALE, 'modals.save_analysis.header'),
 		"content": content,
 		"footer":  footer,
 	});
@@ -64,6 +67,8 @@ function saved_analysis_modal(s, updateCallback, saveAsNewCallback) {
 		},
 	});
 
+	translateNode(window.LOCALE, template);
+
 	const children = Array.from(template.children);
 	const content = document.createDocumentFragment();
 	content.append(children[0], children[1]);
@@ -72,7 +77,7 @@ function saved_analysis_modal(s, updateCallback, saveAsNewCallback) {
 	footer.append(...children.slice(2));
 
 	const m = new modal({
-		"header":  "Save analysis to My EAE",
+		"header":  t(window.LOCALE, 'modals.save_analysis.header'),
 		"content": content,
 		"footer":  footer,
 	});
@@ -96,7 +101,7 @@ function edit_title(s, callback) {
 	});
 
 	const m = new modal({
-		"header":  "Save analysis to My EAE",
+		"header":  t(window.LOCALE, 'modals.save_analysis.header'),
 		"content": f,
 		"footer":  x,
 	});

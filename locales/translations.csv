@@ -27,6 +27,40 @@ left_panel.cards.card.about_button,About,À propos,关于
 left_panel.cards.card.table_button,Table,Table,表格
 left_panel.points_loading.header,<b>Picked points</b>,<b>Points choisis</b>,<b>选定的点</b>
 left_panel.points_loading.selected,{{count}} points selected:,{{count}} points sélectionnés :,已选择 {{count}} 个点：
+left_panel.points_loading.download_button,Download CSV file of the currents points selection,Télécharger le fichier CSV de la sélection des points courants,下载当前点选择的 CSV 文件
+left_panel.points_loading.upload_button,Load a CSV file with points to find within the analysis,Charger un fichier CSV avec des points à trouver dans l'analyse,加载包含要在分析中查找的点的 CSV 文件
+left_panel.points_loading.download_tooltip,Download a CSV file with the points/values below,Télécharger un fichier CSV avec les points/valeurs ci-dessous,下载包含以下点/值的 CSV 文件
+left_panel.points_loading.pick_button,Pick points on the map to add to the list,Choisir des points sur la carte à ajouter à la liste,从地图中选择要添加到列表的点
+left_panel.points_loading.pick_tooltip,Pick a sequence of points from the map,Sélectionner une séquence de points sur la carte,从地图中选择一系列点
+left_panel.points_loading.input_button,Input coordinates manually,Entrer les coordonnées manuellement,手动输入坐标
+left_panel.points_loading.input_modal_header,Input Longitude/Latitude,Entrée Longitude/Latitude,输入经度/纬度
+left_panel.points_loading.upload_message_title,Upload a CSV file,Télécharger un fichier CSV,上传 CSV 文件
+left_panel.points_loading.upload_message_intro,This file should be <strong>strictly</strong> formatted.,Ce fichier doit être formaté <strong>strictement</strong>.,此文件应<strong>严格</strong>格式化。
+left_panel.points_loading.upload_message_list_item_1,Two numbers per line: longitude and latitude,Deux nombres par ligne : longitude et latitude,每行两个数字：经度和纬度
+left_panel.points_loading.upload_message_list_item_2,Separated by a comma,Séparé par une virgule,用逗号分隔
+left_panel.points_loading.upload_message_list_item_3,Decimal points,Points décimaux,小数点
+left_panel.points_loading.upload_message_list_item_4,No quotation marks,Pas de guillemets,无引号
+left_panel.points_loading.upload_message_list_item_5,Nothing more,Rien de plus,没有其他
+left_panel.points_loading.upload_message_example,Example with two coordinates:,Exemple avec deux coordonnées :,包含两个坐标的示例：
+map.controls.projection,Projection,Projection,投影
+map.controls.basemap,Basemap,Carte de base,底图
+map.controls.zoom_in,Zoom in,Zoomer,放大
+map.controls.zoom_out,Zoom out,Dézoom,缩小
+left_panel.output.variant.prioritized_areas,Prioritized Areas,Zones prioritaires,优先区域
+left_panel.output.ramp.low,Low,Faible,低
+left_panel.output.ramp.low_medium,Low-Medium,Faible-Moyen,低-中
+left_panel.output.ramp.medium,Medium,Moyen,中
+left_panel.output.ramp.medium_high,Medium-High,Moyen-Élevé,中-高
+left_panel.output.ramp.high,High,Élevé,高
+left_panel.output.index.eai,Energy Access Potential,Potentiel d'accès à l'énergie,能源获取潜力
+left_panel.output.index.demand,Demand Index,Indice de demande,需求指数
+left_panel.output.index.supply,Supply Index,Indice d'offre,供应指数
+left_panel.output.index.ani,Assistance Need Index,Indice de besoin d'assistance,援助需求指数
+modals.save_analysis.header,Save analysis to My EAE,Enregistrer l'analyse sur Mon EAE,将分析保存到我的 EAE
+modals.save_analysis.auth_message,"Create a My EAE account, or sign in to your existing account in order to save your current analysis view and receive important updates about the Energy Access Explorer platform.","Créez un compte Mon EAE ou connectez-vous à votre compte existant pour enregistrer votre vue d'analyse actuelle et recevoir des mises à jour importantes sur la plateforme Energy Access Explorer.","创建 My EAE 帐户或登录您的现有帐户，以保存当前分析视图并接收关于 Energy Access Explorer 平台的重要更新。"
+modals.save_analysis.auth_create,Create account,Créer un compte,创建帐户
+modals.save_analysis.auth_signin,Sign in,Se connecter,登录
+modals.save_analysis.saved_message,"You are currently viewing an analysis already saved to your My EAE account. You can either update your existing saved analysis or save your changes as a new analysis.","Vous consultez actuellement une analyse déjà enregistrée sur votre compte Mon EAE. Vous pouvez soit mettre à jour votre analyse enregistrée existante, soit enregistrer vos modifications en tant que nouvelle analyse.","您当前正在查看已保存到您的 My EAE 帐户的分析。您可以更新现有的保存分析，也可以将更改保存为新分析。"
 left_panel.geographies_search.placeholder,Geographies search,Recherche de géographies,地理区域搜索
 left_panel.geographies_search.default_info,Showing all subgeographies,Affichage de toutes les sous-géographies,显示所有下级地理区域
 left_panel.vectors_search.placeholder,Search features,Rechercher des entités,搜索要素
@@ -38,6 +72,10 @@ left_panel.vectors_search.results_count,Searching <b>{{name}}</b>. {{count}} res
 left_panel.controls_search.placeholder,Filter datasets,Filtrer les jeux de données,筛选数据集
 left_panel.locations_search.hint,"City, region, park...","Ville, région, parc...",城市、地区、公园...
 left_panel.locations_search.results_for,"<b>Results</b> for ""{{query}}"":",<b>Résultats</b> pour « {{query}} » :,"<b>结果</b>""{{query}}""："
+nav.login,Login,Connexion,登录
+nav.my_eae,My EAE,Mon EAE,我的 EAE
+nav.dashboard,Dashboard,Tableau de bord,仪表板
+nav.logout,Log Out,Déconnecter,登出
 left_panel.locations_search.no_results,"No results for ""{{query}}"".",Aucun résultat pour « {{query}} ».,"没有""{{query}}""的结果。"
 left_panel.analysis_search.top_results,Searching <b>analysis coordinates</b>. Top {{count}} results:,Recherche <b>coordonnées d'analyse</b>. Les {{count}} résultats prioritaires:,搜索<b>分析坐标</b>。前 {{count}} 个结果：
 left_panel.analysis_search.overflow,Searching <b>analysis coordinates</b>. Showing first {{n}} of {{total}}:,Recherche <b>coordonnées d'analyse</b>. Affichage des {{n}} premiers résultats sur {{total}}:,搜索<b>分析坐标</b>。显示 {{n}} 个结果（共 {{total}} 个）：

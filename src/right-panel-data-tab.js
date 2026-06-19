@@ -295,6 +295,16 @@ function set_blank_state(visible) {
 	blank.style.display = visible ? 'flex' : 'none';
 }
 
+export function refreshBlankStateTranslation() {
+	const blank = qs('#data-blank-state');
+	if (!blank || blank.style.display === 'none') return;
+
+	bind(blank, {
+		"title":    t(window.LOCALE, 'right_panel.prioritization.blank_state.title'),
+		"subtitle": t(window.LOCALE, 'right_panel.prioritization.blank_state.subtitle'),
+	}, { "final": false });
+}
+
 function resolve_admin_info(admin_info, raster_index) {
 	if (admin_info) return admin_info;
 	if (raster_index == null || STATE.variant === 'raster') return null;

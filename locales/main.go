@@ -49,7 +49,11 @@ func readTranslations(path string) (map[string]map[string]string, error) {
 	}
 	result := make(map[string]map[string]string, len(rows))
 	for _, row := range rows {
-		result[row[0]] = map[string]string{"en": row[1], "fr": row[2]}
+		entry := map[string]string{"en": row[1], "fr": row[2]}
+		if len(row) > 3 && row[3] != "" {
+			entry["zh"] = row[3]
+		}
+		result[row[0]] = entry
 	}
 	return result, nil
 }

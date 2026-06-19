@@ -31,12 +31,12 @@ left_panel.geographies_search.placeholder,Geographies search,Recherche de géogr
 left_panel.geographies_search.default_info,Showing all subgeographies,Affichage de toutes les sous-géographies,显示所有下级地理区域
 left_panel.vectors_search.placeholder,Search features,Rechercher des entités,搜索要素
 left_panel.locations_search.placeholder,Search for a location,Rechercher un lieu,搜索位置
-left_panel.vectors_search.no_vectors,"<b>{{name}}</b> is not searchable. Try a dataset with points, lines or polygons ;)","<b>{{name}}</b> n'est pas consultable. Essayez un jeu de données avec des points, lignes ou polygones.","<b>{{name}}</b> 不可搜索。请尝试包含点、线或多边形的数据集 ;)"
+left_panel.vectors_search.no_vectors,"<b>{{name}}</b> is not searchable. Try a dataset with points, lines or polygons ;)","<b>{{name}}</b> n'est pas consultable. Essayez un jeu de données avec des points, lignes ou polygones.",<b>{{name}}</b> 不可搜索。请尝试包含点、线或多边形的数据集 ;)
 left_panel.vectors_search.not_searchable,<b>{{name}}</b> is not searchable (for now...),<b>{{name}}</b> n'est pas consultable (pour l'instant...),<b>{{name}}</b> 目前不可搜索...
 left_panel.vectors_search.too_many,Searching <b>{{name}}</b>. Too many results. Showing first 101 only:,Recherche <b>{{name}}</b>. Trop de résultats. Affichage des 101 premiers uniquement :,搜索 <b>{{name}}</b>。结果过多。仅显示前 101 个：
 left_panel.vectors_search.results_count,Searching <b>{{name}}</b>. {{count}} results:,Recherche <b>{{name}}</b>. {{count}} résultats :,搜索 <b>{{name}}</b>。{{count}} 个结果：
 left_panel.controls_search.placeholder,Filter datasets,Filtrer les jeux de données,筛选数据集
-left_panel.locations_search.hint,"City, region, park...","Ville, région, parc...","城市、地区、公园..."
+left_panel.locations_search.hint,"City, region, park...","Ville, région, parc...",城市、地区、公园...
 left_panel.locations_search.results_for,"<b>Results</b> for ""{{query}}"":",<b>Résultats</b> pour « {{query}} » :,"<b>结果</b>""{{query}}""："
 left_panel.locations_search.no_results,"No results for ""{{query}}"".",Aucun résultat pour « {{query}} ».,"没有""{{query}}""的结果。"
 left_panel.analysis_search.top_results,Searching <b>analysis coordinates</b>. Top {{count}} results:,Recherche <b>coordonnées d'analyse</b>. Les {{count}} résultats prioritaires:,搜索<b>分析坐标</b>。前 {{count}} 个结果：
@@ -62,11 +62,11 @@ right_panel.prioritization.high_priority.pagination.single,Showing {{count}} res
 right_panel.prioritization.high_priority.pagination.multi,Showing {{start}}-{{end}} of {{total}},Affichage de {{start}}-{{end}} sur {{total}},显示 {{start}}-{{end}}（共 {{total}} 个）
 right_panel.prioritization.graphs.area_share_title,Area share,Part de la zone,面积份额
 right_panel.prioritization.graphs.pop_share_title,Population share,Répartition de la population,人口份额
-right_panel.prioritization.graphs.area_desc,"Showing {{indexName}} for areas spanning <strong>{{x}}</strong>, of which <strong>{{y}}</strong> has high {{indexName}}.","Affichage de {{indexName}} pour des zones couvrant <strong>{{x}}</strong>, dont <strong>{{y}}</strong> présentent un {{indexName}} élevé.","显示跨越 <strong>{{x}}</strong> 的区域的 {{indexName}}，其中 <strong>{{y}}</strong> 具有高 {{indexName}}。"
-right_panel.prioritization.graphs.pop_desc,"Showing {{indexName}} for areas affecting <strong>{{x}}</strong>, of whom <strong>{{y}}</strong> are situated in areas of high {{indexName}}.","Affichage de {{indexName}} pour des zones affectant <strong>{{x}}</strong> personnes, dont <strong>{{y}}</strong> se trouvent dans des zones à {{indexName}} élevé.","显示影响 <strong>{{x}}</strong> 的区域的 {{indexName}}，其中 <strong>{{y}}</strong> 位于 {{indexName}} 高的区域。"
+right_panel.prioritization.graphs.area_desc,"Showing {{indexName}} for areas spanning <strong>{{x}}</strong>, of which <strong>{{y}}</strong> has high {{indexName}}.","Affichage de {{indexName}} pour des zones couvrant <strong>{{x}}</strong>, dont <strong>{{y}}</strong> présentent un {{indexName}} élevé.",显示跨越 <strong>{{x}}</strong> 的区域的 {{indexName}}，其中 <strong>{{y}}</strong> 具有高 {{indexName}}。
+right_panel.prioritization.graphs.pop_desc,"Showing {{indexName}} for areas affecting <strong>{{x}}</strong>, of whom <strong>{{y}}</strong> are situated in areas of high {{indexName}}.","Affichage de {{indexName}} pour des zones affectant <strong>{{x}}</strong> personnes, dont <strong>{{y}}</strong> se trouvent dans des zones à {{indexName}} élevé.",显示影响 <strong>{{x}}</strong> 的区域的 {{indexName}}，其中 <strong>{{y}}</strong> 位于 {{indexName}} 高的区域。
 right_panel.prioritization.graphs.people_unit,people,personnes,人
-right_panel.prioritization.graphs.area_about,"Shows the 'Prioritization Index' results as area shares, based on your analysis criteria.",Affiche les résultats de l'indice de priorisation sous forme de parts de superficie.,"根据您的分析条件，显示'优先级指数'结果作为面积份额。"
-right_panel.prioritization.graphs.pop_about,"Shows the 'Prioritization Index' results as population shares, based on your analysis criteria.",Affiche les résultats de l'indice de priorisation sous forme de parts de population.,"根据您的分析条件，显示'优先级指数'结果作为人口份额。"
+right_panel.prioritization.graphs.area_about,"Shows the 'Prioritization Index' results as area shares, based on your analysis criteria.",Affiche les résultats de l'indice de priorisation sous forme de parts de superficie.,根据您的分析条件，显示'优先级指数'结果作为面积份额。
+right_panel.prioritization.graphs.pop_about,"Shows the 'Prioritization Index' results as population shares, based on your analysis criteria.",Affiche les résultats de l'indice de priorisation sous forme de parts de population.,根据您的分析条件，显示'优先级指数'结果作为人口份额。
 right_panel.data.title,Analysing selected datasets in <strong>{{area}}</strong>.,Analyse des ensembles de données sélectionnés dans <strong>{{area}}</strong>.,分析在 <strong>{{area}}</strong> 中选定的数据集。
 right_panel.data.subtitle,Click anywhere on the map to see data for that location.,Cliquez n'importe où sur la carte pour voir les données de cet emplacement.,单击地图上的任何位置以查看该位置的数据。
 right_panel.data.descriptions.points.count,There are <strong>{{value}}</strong> {{name}} in the selected area.,Il y a <strong>{{value}}</strong> {{name}} dans la zone sélectionnée.,在选定区域内有 <strong>{{value}}</strong> {{name}}。
@@ -93,14 +93,14 @@ right_panel.data.descriptions.raster.kwh_m2,The average {{name}} is <strong>{{va
 right_panel.data.descriptions.raster.ppl_km2,The population density in this area is <strong>{{value}}</strong>.,La densité de population dans cette zone est de <strong>{{value}}</strong>.,此区域内的人口密度为 <strong>{{value}}</strong>。
 right_panel.data.descriptions.raster.people,The estimated population in this area is <strong>{{value}}</strong>.,La population estimée dans cette zone est de <strong>{{value}}</strong>.,此区域内的估计人口为 <strong>{{value}}</strong>。
 right_panel.data.descriptions.raster.households,There are approximately <strong>{{value}}</strong> households in this area.,Il y a environ <strong>{{value}}</strong> ménages dans cette zone.,此区域内大约有 <strong>{{value}}</strong> 个家庭。
-right_panel.data.descriptions.raster.pct,<strong>{{value}}</strong> of this area has {{name}}.,<strong>{{value}}</strong> de cette zone a {{name}}.,"此区域的 <strong>{{value}}</strong> 具有 {{name}}。"
+right_panel.data.descriptions.raster.pct,<strong>{{value}}</strong> of this area has {{name}}.,<strong>{{value}}</strong> de cette zone a {{name}}.,此区域的 <strong>{{value}}</strong> 具有 {{name}}。
 right_panel.data.descriptions.raster.coverage_pct,<strong>{{value}}</strong> of this area is covered by {{name}}.,<strong>{{value}}</strong> de cette zone est couverte par {{name}}.,此区域的 <strong>{{value}}</strong> 被 {{name}} 覆盖。
 right_panel.data.descriptions.raster.mw,The estimated energy demand in this area is <strong>{{value}}</strong>.,La demande énergétique estimée dans cette zone est de <strong>{{value}}</strong>.,此区域内的估计能源需求为 <strong>{{value}}</strong>。
 right_panel.data.descriptions.raster.gwh,The estimated energy in this area is <strong>{{value}}</strong>.,L'énergie estimée dans cette zone est de <strong>{{value}}</strong>.,此区域内的估计能源为 <strong>{{value}}</strong>。
 right_panel.data.descriptions.raster.kwh_ha_year,The estimated yield for {{name}} in this area is <strong>{{value}}</strong>.,Le rendement estimé pour {{name}} dans cette zone est de <strong>{{value}}</strong>.,此区域内 {{name}} 的估计产量为 <strong>{{value}}</strong>。
 right_panel.data.descriptions.raster.minutes,The average travel time to {{name}} is <strong>{{value}}</strong> in this area.,Le temps de trajet moyen vers {{name}} est de <strong>{{value}}</strong> dans cette zone.,此区域内到 {{name}} 的平均旅行时间为 <strong>{{value}}</strong>。
 right_panel.data.descriptions.raster.hours,The average {{name}} in this area is <strong>{{value}}</strong>.,La moyenne de {{name}} dans cette zone est de <strong>{{value}}</strong>.,此区域内 {{name}} 的平均值为 <strong>{{value}}</strong>。
-right_panel.data.descriptions.raster.hours_hh_day,Households in this area spend on average <strong>{{value}}</strong> on {{name}}.,Les ménages dans cette zone consacrent en moyenne <strong>{{value}}</strong> à {{name}}.,"此区域的家庭平均在 {{name}} 上花费 <strong>{{value}}</strong>。"
+right_panel.data.descriptions.raster.hours_hh_day,Households in this area spend on average <strong>{{value}}</strong> on {{name}}.,Les ménages dans cette zone consacrent en moyenne <strong>{{value}}</strong> à {{name}}.,此区域的家庭平均在 {{name}} 上花费 <strong>{{value}}</strong>。
 right_panel.data.descriptions.raster.m_s,The average wind speed in this area is <strong>{{value}}</strong>.,La vitesse moyenne du vent dans cette zone est de <strong>{{value}}</strong>.,此区域内的平均风速为 <strong>{{value}}</strong>。
 right_panel.data.descriptions.raster.degree,The average temperature in this area is <strong>{{value}}</strong>.,La température moyenne dans cette zone est de <strong>{{value}}</strong>.,此区域内的平均温度为 <strong>{{value}}</strong>。
 right_panel.data.descriptions.raster.degree_celcius,The average temperature in this area is <strong>{{value}}</strong>.,La température moyenne dans cette zone est de <strong>{{value}}</strong>.,此区域内的平均温度为 <strong>{{value}}</strong>。
@@ -178,13 +178,13 @@ modal.export.csv_headers.level,Level,Niveau,级别
 modal.share_link.header,Share link,Partager le lien,分享链接
 modal.share_link.instructions,Sharing the following link will load the Energy Access Explorer platform in the current state: layers and analysis. Users might need the necessary permissions to view this snapshot fully.,Partager ce lien chargera la plateforme Energy Access Explorer dans l'état actuel : couches et analyse.,分享以下链接将在当前状态下加载能源获取浏览器平台：图层和分析。用户可能需要必要的权限才能完整查看此快照。
 modal.eae_info.title,About Energy Access Explorer prioritization,À propos de la priorisation Energy Access Explorer,关于能源获取浏览器优先级
-modal.eae_info.body,"Energy Access Explorer enables you to identify high-priority areas for energy access interventions. EAE uses multi-criteria analysis that uses location-specific resource availability and infrastructure data to represent energy supply, and incorporates demographic data and data on social and productive uses to visualize demand for energy services.",Energy Access Explorer vous permet d'identifier les zones prioritaires pour les interventions en matière d'accès à l'énergie.,"能源获取浏览器使您能够确定能源获取干预的高优先级区域。EAE 使用多标准分析，该分析使用特定于位置的资源可用性和基础设施数据来表示能源供应，并合并人口数据和社会和生产使用数据来可视化能源服务的需求。"
+modal.eae_info.body,"Energy Access Explorer enables you to identify high-priority areas for energy access interventions. EAE uses multi-criteria analysis that uses location-specific resource availability and infrastructure data to represent energy supply, and incorporates demographic data and data on social and productive uses to visualize demand for energy services.",Energy Access Explorer vous permet d'identifier les zones prioritaires pour les interventions en matière d'accès à l'énergie.,能源获取浏览器使您能够确定能源获取干预的高优先级区域。EAE 使用多标准分析，该分析使用特定于位置的资源可用性和基础设施数据来表示能源供应，并合并人口数据和社会和生产使用数据来可视化能源服务的需求。
 modal.eae_info.analysis_areas.title,Analysis areas,Zones d'analyse,分析区域
 modal.eae_info.analysis_areas.body,Energy Access Explorer offers the option to generate an analysis across various different administrative priorities.,Energy Access Explorer offre la possibilité de générer une analyse sur différentes priorités administratives.,能源获取浏览器提供生成跨越各种不同行政优先事项分析的选项。
 modal.eae_info.priority_1km.title,Priority areas (1km²),Zones prioritaires (1 km²),优先级区域 (1 公里²)
 modal.eae_info.priority_1km.body,Selecting this analysis area provides a raster analysis in 1km2 tiles across the entirety of the selected geography.,Cette zone d'analyse fournit une analyse raster en tuiles de 1 km² sur l'ensemble de la géographie sélectionnée.,选择此分析区域将在整个选定地理区域中提供 1 公里² 瓷砖中的光栅分析。
 modal.eae_info.other_areas.title,Other analysis areas,Autres zones d'analyse,其他分析区域
-modal.eae_info.other_areas.body,"Depending on the currently selected geography, it is possible to change the prioritization output to wider geographical areas such as districts, regions or zones for more high level analysis.","Selon la géographie sélectionnée, il est possible de modifier la sortie de priorisation vers des zones géographiques plus larges.","根据当前选定的地理位置，可以将优先级输出更改为更广泛的地理区域（如地区、地区或区域）以进行更高级别的分析。"
+modal.eae_info.other_areas.body,"Depending on the currently selected geography, it is possible to change the prioritization output to wider geographical areas such as districts, regions or zones for more high level analysis.","Selon la géographie sélectionnée, il est possible de modifier la sortie de priorisation vers des zones géographiques plus larges.",根据当前选定的地理位置，可以将优先级输出更改为更广泛的地理区域（如地区、地区或区域）以进行更高级别的分析。
 modal.eae_info.view_technical_note,View technical note,Voir la note technique,查看技术说明
 modal.points_input.header,Input Longitude/Latitude,Saisir Longitude / Latitude,输入经度/纬度
 modal.points_input.longitude_placeholder,Longitude,Longitude,经度
@@ -226,14 +226,14 @@ overlay.failed_outline,Failed to get the geography's OUTLINE...,Échec de la ré
 toast.clipboard_error,Clipboard functionality not available,Fonctionnalité du presse-papiers non disponible,剪贴板功能不可用
 toast.value_out_of_range,Value out of range,Valeur hors plage,值超出范围
 disclaimer.title,Disclaimer,Clause de non-responsabilité,免责声明
-disclaimer.maps_note,"The maps are for illustrative purposes and do not imply the expression of any opinion on the part of WRI, concerning the legal status of any country or territory or concerning the delimitation of frontiers or boundaries.","Les cartes sont à titre indicatif et n'impliquent pas l'expression d'une opinion de la part du WRI concernant le statut juridique d'un pays ou d'un territoire, ni concernant la délimitation des frontières ou des limites.","地图仅用于说明目的，不代表世界资源研究所关于任何国家或领土的法律地位或关于边界划分的任何意见。"
+disclaimer.maps_note,"The maps are for illustrative purposes and do not imply the expression of any opinion on the part of WRI, concerning the legal status of any country or territory or concerning the delimitation of frontiers or boundaries.","Les cartes sont à titre indicatif et n'impliquent pas l'expression d'une opinion de la part du WRI concernant le statut juridique d'un pays ou d'un territoire, ni concernant la délimitation des frontières ou des limites.",地图仅用于说明目的，不代表世界资源研究所关于任何国家或领土的法律地位或关于边界划分的任何意见。
 disclaimer.attribution,"If you use this platform, partially or entirely, you must follow the <a href=""https://www.energyaccessexplorer.org/attribution/"">attribution instructions</a>.","Si vous utilisez cette plateforme, partiellement ou entièrement, vous devez suivre les <a href=""https://www.energyaccessexplorer.org/attribution/"">instructions d'attribution</a>.","如果您使用此平台（部分或全部），您必须遵循<a href=""https://www.energyaccessexplorer.org/attribution/"">归属说明</a>。"
 dataset_info.covered_by_analysis,covered by the analysis.,couverts par l'analyse.,由分析覆盖。
 dataset_info.intersect,(intersect),(intersection),（相交）
 dataset_info.long_lat,long/lat,lon/lat,经度/纬度
 dataset_info.features,features,entités,要素
 dataset_info.file_error,Dataset/File error,Erreur de fichier / jeu de données,数据集/文件错误
-auth.prompt,"In order to save an analysis, you need to be registered with us.","Pour sauvegarder une analyse, vous devez être inscrit.","为了保存分析，您需要向我们注册。"
+auth.prompt,"In order to save an analysis, you need to be registered with us.","Pour sauvegarder une analyse, vous devez être inscrit.",为了保存分析，您需要向我们注册。
 auth.register_login,Register/Login,S'inscrire / Se connecter,注册/登录
 mapbox.style.light,Light,Clair,浅色
 nav.tool,Tool,Outil,工具
@@ -254,6 +254,17 @@ controls.path.tab.census,Census,Recensement,人口普查
 controls.path.tab.demand,Demand,Demande,需求
 controls.path.tab.supply,Supply,Offre,供给
 controls.path.tab.other,Other,Autre,其他
+controls.path.tab.assorted,Assorted,Assortis,杂项
+controls.path.tab.demographics,Demographics,Démographie,人口统计
+controls.path.tab.district,District,District,地区
+controls.path.tab.education,Education,Éducation,教育
+controls.path.tab.health,Health,Santé,健康
+controls.path.tab.khipre,KHIPRE,KHIPRE,KHIPRE
+controls.path.tab.onsset,OnSSET,OnSSET,OnSSET
+controls.path.tab.onstove,OnStove,OnStove,OnStove
+controls.path.tab.test,Test,Test,测试
+controls.path.tab.timeline,Timeline,Chronologie,时间轴
+controls.path.tab.vulnerability,Vulnerability,Vulnérabilité,易受伤害性
 controls.path.subbranch.sub-national,Sub-National,Sub-National,次级国家
 controls.path.subbranch.demographics,Demographics,Démographie,人口统计
 controls.path.subbranch.healthcare,Healthcare,Soins de santé,医疗保健
@@ -305,4 +316,145 @@ controls.path.subbranch.points,Points,Points,点
 controls.path.subbranch.data,Data,Données,数据
 controls.path.subbranch.lighting-region,Lighting Region,Région de L'Éclairage,照明地区
 controls.path.subbranch.cooking-region,Cooking Region,Région de la Cuisine,烹饪地区
+controls.path.subbranch.administrative-boundaries,Administrative Boundaries,Limites Administratives,行政边界
+controls.path.subbranch.benefits,Benefits,Avantages,好处
+controls.path.subbranch.building-type,Building Type,Type de Bâtiment,建筑类型
+controls.path.subbranch.buildings,Buildings,Bâtiments,建筑物
+controls.path.subbranch.chc-geodata,CHC Geodata,Données Géographiques CHC,CHC 地理数据
+controls.path.subbranch.climate,Climate,Climat,气候
+controls.path.subbranch.costs,Costs,Coûts,成本
+controls.path.subbranch.data,Data,Données,数据
+controls.path.subbranch.demographics,Demographics,Démographie,人口统计
+controls.path.subbranch.demographics-other,Demographics Other,Démographie Autre,其他人口统计
+controls.path.subbranch.depth,Depth,Profondeur,深度
+controls.path.subbranch.energy-consumption,Energy Consumption,Consommation d'Énergie,能源消耗
+controls.path.subbranch.environment,Environment,Environnement,环境
+controls.path.subbranch.finance,Finance,Finance,财务
+controls.path.subbranch.geodata,Geodata,Données Géographiques,地理数据
+controls.path.subbranch.geodata-gumla,Geodata Gumla,Données Géographiques Gumla,地理数据古姆拉
+controls.path.subbranch.geolocation,Geolocation,Géolocalisation,地理位置
+controls.path.subbranch.healthcare,Healthcare,Soins de santé,医疗保健
+controls.path.subbranch.household-energy,Household Energy,Énergie Ménagère,家庭能源
+controls.path.subbranch.hrea,HREA,HREA,HREA
+controls.path.subbranch.infrastructure,Infrastructure,Infrastructure,基础设施
+controls.path.subbranch.infrastructure-geodata,Infrastructure Geodata,Infrastructure Géodonnées,基础设施地理数据
+controls.path.subbranch.land-cover,Land Cover,Couverture des Terres,土地覆盖
+controls.path.subbranch.landuse-landcover,Land Use Land Cover,Utilisation et Couverture des Terres,土地利用和土地覆盖
+controls.path.subbranch.least-cost-electrification,Least Cost Electrification,Électrification au Moindre Coût,最低成本电气化
+controls.path.subbranch.livelihood,Livelihood,Moyens de Subsistance,生计
+controls.path.subbranch.livestock,Livestock,Élevage,牲畜
+controls.path.subbranch.lulc,LULC,LULC,LULC
+controls.path.subbranch.mled,MLED,MLED,MLED
+controls.path.subbranch.net-benefits,Net Benefits,Avantages Nets,净收益
+controls.path.subbranch.points,Points,Points,点
+controls.path.subbranch.productive-use,Productive Use,Utilisation Productive,生产性用途
+controls.path.subbranch.productive-uses,Productive Uses,Utilisations Productives,生产性用途
+controls.path.subbranch.pue,PUE,PUE,PUE
+controls.path.subbranch.refugees,Refugees,Réfugiés,难民
+controls.path.subbranch.resources,Resources,Ressources,资源
+controls.path.subbranch.settlements,Settlements,Établissements,定居点
+controls.path.subbranch.sub-national,Sub-National,Sub-National,次级国家
+controls.path.subbranch.subsidies,Subsidies,Subventions,补贴
+controls.path.subbranch.terrain,Terrain,Terrain,地形
+controls.path.subbranch.test,Test,Test,测试
+controls.path.subbranch.test-1,Test 1,Test 1,测试 1
+controls.path.subbranch.texture,Texture,Texture,纹理
+controls.path.subbranch.timeline,Timeline,Chronologie,时间轴
+controls.path.subbranch.transport,Transport,Transport,运输
+controls.path.subbranch.travel-time,Travel Time,Temps de Voyage,旅行时间
+controls.path.subbranch.urbanization,Urbanization,Urbanisation,城市化
+controls.path.subbranch.vulnerability,Vulnerability,Vulnérabilité,易受伤害性
+controls.path.subbranch.water,Water,Eau,水
+controls.path.subbranch.water-access,Water Access,Accès à l'Eau,获取水
+controls.path.subbranch.assorted,Assorted,Assortis,分类
+controls.path.subbranch.census,Census,Recensement,人口普查
+controls.path.subbranch.demand,Demand,Demande,需求
+controls.path.subbranch.district,District,District,地区
+controls.path.subbranch.education,Education,Éducation,教育
+controls.path.subbranch.health,Health,Santé,健康
+controls.path.subbranch.khipre,KHIPRE,KHIPRE,KHIPRE
+controls.path.subbranch.onsset,ONSSET,ONSSET,ONSSET
+controls.path.subbranch.onstove,OnStove,OnStove,OnStove
+controls.path.subbranch.other,Other,Autre,其他
+controls.path.subbranch.supply,Supply,Approvisionnement,供应
+controls.path.subbranch.lighting-county,Lighting County,Comté d'Éclairage,照明县
+controls.path.subbranch.cooking-county,Cooking County,Comté de Cuisine,烹饪县
+controls.path.subbranch.lighting-subcounty,Lighting Subcounty,Sous-Comté d'Éclairage,照明亚县
+controls.path.subbranch.cooking-subcounty,Cooking Subcounty,Sous-Comté de Cuisine,烹饪亚县
 controls.path.subbranch.assets-region,Assets Region,Région des Actifs,资产地区
+controls.path.subbranch.economy,Economy,Économie,经济
+controls.path.subbranch.assets-county,Assets County,Comté des Actifs,资产县
+controls.path.subbranch.assets-subcounty,Assets Subcounty,Sous-Comté des Actifs,资产亚县
+controls.path.subbranch.Aanganwadi-Centers,Aanganwadi Centers,Aanganwadi Centers,Aanganwadi Centers
+controls.path.subbranch.Crops,Crops,Crops,Crops
+controls.path.subbranch.Irrigation-pump,Irrigation Pump,Irrigation Pump,Irrigation Pump
+controls.path.subbranch.Lighting PV timeline,Lighting PV Timeline,Lighting PV Timeline,Lighting PV Timeline
+controls.path.subbranch.Offices,Offices,Offices,Offices
+controls.path.subbranch.Schools with Electricity,Schools With Electricity,Schools With Electricity,Schools With Electricity
+controls.path.subbranch.administrative-headquarters,Administrative Headquarters,Administrative Headquarters,Administrative Headquarters
+controls.path.subbranch.agriculture,Agriculture,Agriculture,Agriculture
+controls.path.subbranch.apdcl-installations,Apdcl Installations,Apdcl Installations,Apdcl Installations
+controls.path.subbranch.asdma,Asdma,Asdma,Asdma
+controls.path.subbranch.assets-district,Assets District,Assets District,Assets District
+controls.path.subbranch.assets-municipality,Assets Municipality,Assets Municipality,Assets Municipality
+controls.path.subbranch.assets-province,Assets Province,Assets Province,Assets Province
+controls.path.subbranch.assets-state,Assets State,Assets State,Assets State
+controls.path.subbranch.bioenergy-available-crop-residues,Bioenergy Available Crop Residues,Bioenergy Available Crop Residues,Bioenergy Available Crop Residues
+controls.path.subbranch.bioenergy-available-manure,Bioenergy Available Manure,Bioenergy Available Manure,Bioenergy Available Manure
+controls.path.subbranch.community-electricity-access-region,Community Electricity Access Region,Community Electricity Access Region,Community Electricity Access Region
+controls.path.subbranch.consumption-region,Consumption Region,Consumption Region,Consumption Region
+controls.path.subbranch.cooking-district,Cooking District,Cooking District,Cooking District
+controls.path.subbranch.cooking-firewood-source-subregion,Cooking Firewood Source Subregion,Cooking Firewood Source Subregion,Cooking Firewood Source Subregion
+controls.path.subbranch.cooking-municipality,Cooking Municipality,Cooking Municipality,Cooking Municipality
+controls.path.subbranch.cooking-province,Cooking Province,Cooking Province,Cooking Province
+controls.path.subbranch.cooking-source-region,Cooking Source Region,Cooking Source Region,Cooking Source Region
+controls.path.subbranch.cooking-source-subregion,Cooking Source Subregion,Cooking Source Subregion,Cooking Source Subregion
+controls.path.subbranch.cooking-subregion,Cooking Subregion,Cooking Subregion,Cooking Subregion
+controls.path.subbranch.deaths-avoided,Deaths Avoided,Deaths Avoided,Deaths Avoided
+controls.path.subbranch.district-sdg-index,District Sdg Index,District Sdg Index,District Sdg Index
+controls.path.subbranch.education-infrastructure,Education Infrastructure,Education Infrastructure,Education Infrastructure
+controls.path.subbranch.electricity-access-state,Electricity Access State,Electricity Access State,Electricity Access State
+controls.path.subbranch.electricity-municipality,Electricity Municipality,Electricity Municipality,Electricity Municipality
+controls.path.subbranch.electrification-province,Electrification Province,Electrification Province,Electrification Province
+controls.path.subbranch.emissions-avoided,Emissions Avoided,Emissions Avoided,Emissions Avoided
+controls.path.subbranch.energy-transitions,Energy Transitions,Energy Transitions,Energy Transitions
+controls.path.subbranch.energy-transitions-modelling,Energy Transitions Modelling,Energy Transitions Modelling,Energy Transitions Modelling
+controls.path.subbranch.health-costs-avoided,Health Costs Avoided,Health Costs Avoided,Health Costs Avoided
+controls.path.subbranch.health-infrastructure,Health Infrastructure,Health Infrastructure,Health Infrastructure
+controls.path.subbranch.health-services,Health Services,Health Services,Health Services
+controls.path.subbranch.healthcare-infrastructure,Healthcare Infrastructure,Healthcare Infrastructure,Healthcare Infrastructure
+controls.path.subbranch.historical,Historical,Historical,Historical
+controls.path.subbranch.household-cookstove-tier-region,Household Cookstove Tier Region,Household Cookstove Tier Region,Household Cookstove Tier Region
+controls.path.subbranch.household-electricity-region,Household Electricity Region,Household Electricity Region,Household Electricity Region
+controls.path.subbranch.household-electricity-tier-region,Household Electricity Tier Region,Household Electricity Tier Region,Household Electricity Tier Region
+controls.path.subbranch.household-main-cookstove-region,Household Main Cookstove Region,Household Main Cookstove Region,Household Main Cookstove Region
+controls.path.subbranch.household-municipality,Household Municipality,Household Municipality,Household Municipality
+controls.path.subbranch.housing-province,Housing Province,Housing Province,Housing Province
+controls.path.subbranch.hq,Hq,Hq,Hq
+controls.path.subbranch.information,Information,Information,Information
+controls.path.subbranch.infrastructure-grid,Infrastructure Grid,Infrastructure Grid,Infrastructure Grid
+controls.path.subbranch.infrastructure-off-grid,Infrastructure Off Grid,Infrastructure Off Grid,Infrastructure Off Grid
+controls.path.subbranch.infrastructure-other,Infrastructure Other,Infrastructure Other,Infrastructure Other
+controls.path.subbranch.institutes,Institutes,Institutes,Institutes
+controls.path.subbranch.keshav,Keshav,Keshav,Keshav
+controls.path.subbranch.kiphire,Kiphire,Kiphire,Kiphire
+controls.path.subbranch.kiphire-analysis,Kiphire Analysis,Kiphire Analysis,Kiphire Analysis
+controls.path.subbranch.lighting-district,Lighting District,Lighting District,Lighting District
+controls.path.subbranch.lighting-municipality,Lighting Municipality,Lighting Municipality,Lighting Municipality
+controls.path.subbranch.lighting-province,Lighting Province,Lighting Province,Lighting Province
+controls.path.subbranch.lighting-subregion,Lighting Subregion,Lighting Subregion,Lighting Subregion
+controls.path.subbranch.nagaland-health-project,Nagaland Health Project,Nagaland Health Project,Nagaland Health Project
+controls.path.subbranch.nalbari,Nalbari,Nalbari,Nalbari
+controls.path.subbranch.net-benefit,Net Benefit,Net Benefit,Net Benefit
+controls.path.subbranch.offices,Offices,Offices,Offices
+controls.path.subbranch.projections,Projections,Projections,Projections
+controls.path.subbranch.relative wealth index,Relative Wealth Index,Relative Wealth Index,Relative Wealth Index
+controls.path.subbranch.route,Route,Route,Route
+controls.path.subbranch.scenarios,Scenarios,Scenarios,Scenarios
+controls.path.subbranch.school,School,School,School
+controls.path.subbranch.service,Service,Service,Service
+controls.path.subbranch.site-locations,Site Locations,Site Locations,Site Locations
+controls.path.subbranch.solarized,Solarized,Solarized,Solarized
+controls.path.subbranch.transportation,Transportation,Transportation,Transportation
+controls.path.subbranch.village-attributes,Village Attributes,Village Attributes,Village Attributes
+"controls.path.subbranch.land, soil & water","Land, Soil & Water","Land, Soil & Water","Land, Soil & Water"

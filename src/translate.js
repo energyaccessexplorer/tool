@@ -49,6 +49,7 @@ export function tbind(locale, template, obj, opts = { "final": false }) {
 const LOCALE_LABELS = {
 	"en": "English",
 	"fr": "Français",
+	"zh": "中文",
 };
 
 function updateDatasetTranslations() {

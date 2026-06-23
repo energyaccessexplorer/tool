@@ -529,18 +529,23 @@ function collect_values_from_upscaled(division_raster, dataset, area_ids, correc
 	return result;
 }
 
-export function enough_datasets(t) {
+export function dataset_feeds_index(d, index) {
+	if (!d.analysis) return false;
+	if (d.index === index) return true;
+
+	const indexes = maybe(d, 'analysis', 'indexes');
+	return Array.isArray(indexes) && indexes.some(i => i.index === index);
+};
+
+export function enough_datasets_for_index(t) {
+	if (STATE.datasets.some(d => dataset_feeds_index(d, t))) return true;
+
 	if (["eai", "ani"].includes(t)) {
 		const required = EAE['indexes'][t].compound;
-
-		for (const r of required)
-			if (!STATE.datasets.find(d => and(d.analysis, d.index === r))) return false;
-
-		return true;
+		return required.every(r => STATE.datasets.some(d => dataset_feeds_index(d, r)));
 	}
 
-	else
-		return STATE.datasets.filter(d => and(d.analysis, d.index === t)).length > 0;
+	return false;
 };
 
 export function medhigh_point_count(d, a) {

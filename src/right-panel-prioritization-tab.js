@@ -1,4 +1,5 @@
 import analysis_run, {
+	dataset_feeds_index,
 	division_averages,
 	lowmedhigh_scale,
 	priority_scale,
@@ -20,7 +21,8 @@ import {
 
 function has_datasets_for(key) {
 	const compound = EAE['indexes'][key].compound;
-	return STATE.datasets.some(d => compound.includes(d.index));
+	return STATE.datasets.some(d =>
+		dataset_feeds_index(d, key) || compound.some(c => dataset_feeds_index(d, c)));
 }
 
 function pixel_result(raster, raster_index) {

@@ -69,7 +69,7 @@ export function loading_analysis(loading) {
 export function update_analysis(has_data) {
 	const save_button = qs('#save-snapshot-button');
 	const share_button = qs('#share-snapshot-button');
-	const download_button = qs('#tiff-download');
+	const download_button = qs('#export-button');
 
 	if (save_button) save_button.disabled = !has_data;
 	if (share_button) share_button.disabled = !has_data;
@@ -129,7 +129,7 @@ export function init() {
 		snapshot(share_url);
 	};
 
-	const download = qs('#tiff-download');
+	const download = qs('#export-button');
 	download.onclick = _ => {
 		if (!user_id) {
 			register_login();

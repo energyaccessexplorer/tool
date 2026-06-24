@@ -164,7 +164,6 @@ build-a:
 		${SRC}/complicated.js \
 		${SRC}/qa-controls.js \
 		${SRC}/qa-outputs.js \
-		${SRC}/qa-snapshot.js \
 		${SRC}/qa-indexes.js \
 		${SRC}/map-info.js \
 		${SRC}/panel-section.js \
@@ -202,7 +201,6 @@ build-a:
 		${CSS}/filtered.css \
 		${CSS}/ripple.css \
 		${CSS}/buttons.css \
-		${CSS}/summary.css \
 		${CSS}/mobile.css \
 		${CSS}/cards.css \
 		${CSS}/config.css \

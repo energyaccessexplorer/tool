@@ -13,6 +13,10 @@ import {
 } from './utils.js';
 
 import {
+	make_title,
+} from './right-panel-tabs.js';
+
+import {
 	ce,
 	tmpl,
 	qs,
@@ -38,11 +42,21 @@ function admin_area_result(raster, admin_info) {
 	};
 }
 
+function render_title(admin_info = null, raster_index = null) {
+	const el = qs('#tab-title');
+	if (!el) return;
+
+	const active = STATE.datasets.some(d => d.on && d.category.name !== 'boundaries' && d.category.name !== 'outline');
+
+	el.replaceChildren(...(active ? [make_title(admin_info, raster_index)] : []));
+}
+
 export async function update(raster_index, admin_info, analysis_value) {
 	const container = qs('#index-priority-container');
 	if (!container) return;
 
 	container.innerHTML = '';
+	render_title(admin_info, raster_index);
 
 	if (raster_index == null && !admin_info) return;
 
@@ -95,6 +109,7 @@ function make_row(key, entry, subordinate = false) {
 export function clear() {
 	const container = qs('#index-priority-container');
 	if (container) container.innerHTML = '';
+	render_title();
 }
 
 export function update_location_summary(data, admin_info) {

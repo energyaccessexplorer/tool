@@ -96,6 +96,12 @@
   padding: 12px;
 }
 
+.tab-title {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 .data-tab-title {
   font-size: 16px;
   line-height: 24px;

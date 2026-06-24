@@ -148,6 +148,7 @@ build-a:
 		${SRC}/parse.js \
 		${SRC}/output-widget.js \
 		${SRC}/right-panel-graphs.js \
+		${SRC}/right-panel-tabs.js \
 		${SRC}/right-panel-data-tab.js \
 		${SRC}/right-panel-prioritization-tab.js \
 		${SRC}/right-panel-poi-card.js \

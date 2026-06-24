@@ -1,7 +1,10 @@
 import {
-	admin_location_name,
 	resolve_unit,
 } from './area-analysis.js';
+
+import {
+	make_title,
+} from './right-panel-tabs.js';
 
 import {
 	aggregate_layer_values,
@@ -81,37 +84,6 @@ const RASTER_DESCRIPTIONS = {
 	'calibrated radiance':        'The nighttime light intensity in this area is <strong>{value}</strong>.',
 	'People per 100k population': 'There are <strong>{value}</strong> per 100k population affected by {name} in this area.',
 };
-
-function title_p(area) {
-	const p = ce('p', null, { "class": 'data-tab-title' });
-	p.innerHTML = `Analysing selected datasets in <strong>${area}</strong>.`;
-	return p;
-}
-
-function active_geography_name() {
-	return (STATE.divtier > 0 && typeof STATE.subdiv === 'number')
-		? admin_location_name(STATE.divtier, STATE.subdiv)
-		: GEOGRAPHY.name;
-}
-
-function make_title(admin_info, raster_index) {
-	const variant = qs('select#output-variant-select')?.value;
-	const location_selected = admin_info || raster_index != null;
-
-	if (!location_selected) {
-		const subtitle = ce('p', null, { "class": 'data-tab-subtitle' });
-		subtitle.textContent = 'Click anywhere on the map to see data for that location.';
-		const fragment = document.createDocumentFragment();
-		fragment.append(title_p(active_geography_name()), subtitle);
-		return fragment;
-	} else if (admin_info && variant && variant !== 'raster') {
-		return title_p(admin_location_name(admin_info.variant, admin_info.id));
-	} else if ((GEOGRAPHY.resolution % 1000) === 0) {
-		return title_p(`${active_geography_name()} at ${GEOGRAPHY.resolution / 1000}km²`);
-	} else {
-		return title_p(`${active_geography_name()} at ${GEOGRAPHY.resolution}m²`);
-	}
-}
 
 function fill(template, name, value) {
 	return template.replaceAll('{name}', name.toLowerCase()).replaceAll('{value}', value);

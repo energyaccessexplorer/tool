@@ -27,8 +27,10 @@ const filter_types = ["key-delta", "exclusion-buffer", "inclusion-buffer"];
 
 const inclusion_filters = ["key-delta", "inclusion-buffer"];
 
+const analysis_low = 0.167;
+
 export const analysis_colorscale = colorscale({
-	"stops":  uniform_split(5).map(x => d3.interpolateMagma(x)),
+	"stops":  uniform_split(5).map(x => d3.interpolateMagma(analysis_low + (x * (1 - analysis_low)))),
 	"domain": { "min": 0, "max": 1 },
 });
 

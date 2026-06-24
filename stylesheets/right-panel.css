@@ -983,6 +983,24 @@ dialog .saved-analysis-last-viewed {
   padding-left: 20px;
 }
 
+.column-group-label {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  color: #3D3B3B;
+}
+
+.column-limit-notice {
+  font-size: 13px;
+  line-height: 16px;
+  color: #7A7878;
+  margin-bottom: 8px;
+}
+
+.column-limit-notice.hidden {
+  display: none;
+}
+
 .high-priority-areas-list-all-table-container {
   flex: 1;
   overflow: auto;

@@ -20,6 +20,7 @@ import { generate_summary_data, compute_share_amounts } from './summary.js';
 
 import {
 	pptx,
+	PPT_MAX_COLUMNS,
 } from './report.js';
 
 import {
@@ -181,6 +182,29 @@ async function export_all(results, visible_headers) {
 	}
 }
 
+function location_columns() {
+	if (STATE.variant === 'raster') return new Set(["Latitude", "Longitude"]);
+	return new Set([GEOGRAPHY.divisions[STATE.variant].name]);
+}
+
+function ppt_enabled_columns(total) {
+	const location = location_columns();
+	const results = get_locations_results();
+	if (!results?.length) return location;
+
+	const { headers, column_meta, selector_groups } = prepare_tabular_data(results);
+	const location_group = selector_groups.find(g => g.synthetic);
+	const all_location = new Set(location_group ? location_group.children : []);
+
+	const dataset_cols = headers.filter(h => {
+		const m = column_meta.get(h);
+		return m && !m.locked && !m.subordinate && !all_location.has(h);
+	});
+
+	const fixed_count = headers.filter(h => column_meta.get(h)?.locked).length;
+	return new Set([...location, ...dataset_cols].slice(0, total - fixed_count));
+}
+
 export function show_export_modal() {
 	const content = tmpl('#export-options-modal-content');
 
@@ -193,6 +217,8 @@ export function show_export_modal() {
 				"subtitle":           "Select priority areas columns and rows",
 				"action_label":       "Download .ppt",
 				"column_toggle_hint": "Selected columns will be included in the PowerPoint tables",
+				"enabled_columns":    ppt_enabled_columns(PPT_MAX_COLUMNS),
+				"max_columns":        PPT_MAX_COLUMNS,
 				async on_download(results, visible_headers) {
 					loading("Generating...");
 					await delay(0.1);
@@ -221,6 +247,7 @@ export function show_export_modal() {
 				"subtitle":           analysis_name,
 				"action_label":       "Download all (.csv)",
 				"column_toggle_hint": "Selected columns will be included in the CSV download",
+				"enabled_columns":    new Set(),
 				on_download(results, visible_headers) {
 					download_high_priority_areas(results, { visible_headers });
 				},
@@ -243,6 +270,8 @@ export function show_export_modal() {
 				"subtitle":           "Select priority areas columns and rows",
 				"action_label":       "Download all (.zip)",
 				"column_toggle_hint": "Selected columns will be included in the CSV and PowerPoint downloads",
+				"enabled_columns":    ppt_enabled_columns(PPT_MAX_COLUMNS),
+				"max_columns":        PPT_MAX_COLUMNS,
 				on_download(results, visible_headers) {
 					export_all(results, visible_headers);
 				},

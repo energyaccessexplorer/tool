@@ -30,6 +30,8 @@ import {
 
 const N_POINTS = 20;
 
+export const PPT_MAX_COLUMNS = 8;
+
 const green = "#00794C";
 const white = "#ffffff";
 const black = "#393F44";
@@ -766,7 +768,7 @@ function toplocations_table(slide_title, columns, rows_data) {
 		})),
 	])];
 
-	const tableWidth = a4(96, 'x');
+	const tableWidth = a4(100, 'x') - x * 2;
 	const firstColWidth = 0.5;
 	const remainingColWidth = (tableWidth - firstColWidth) / columns.length;
 	const colW = [firstColWidth, ...Array(columns.length).fill(remainingColWidth)];
@@ -815,10 +817,11 @@ export async function pptx(opts = {}) {
 			const { headers, is_raster, analysis_name, column_meta } = prepare_tabular_data(results);
 			const rows = [...generate_rows(results, is_raster, analysis_name, 0, results.length)];
 
-			const FIXED = ['Priority score', analysis_name, 'Latitude', 'Longitude'];
-			const admin_cols = headers.filter(h => column_meta.get(h)?.locked && !FIXED.includes(h));
+			const FIXED = ['Priority score', analysis_name];
+			const selected = opts.visible_headers || headers.filter(h => column_meta.get(h)?.visible);
 			const fixed_cols = FIXED.filter(h => headers.includes(h));
-			const columns = [...fixed_cols, ...admin_cols];
+			const extra_cols = selected.filter(h => headers.includes(h) && !FIXED.includes(h));
+			const columns = [...fixed_cols, ...extra_cols].slice(0, PPT_MAX_COLUMNS);
 
 			const slide_title = is_admin
 				? `${area_label} with highest ${STATE.index.toUpperCase()} Index`

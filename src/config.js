@@ -1,5 +1,7 @@
 import Toast from './toast.js';
 
+import { t } from './translate.js';
+
 export function validate(conf) {
 	const base = [
 		'datasets',
@@ -17,7 +19,7 @@ export function validate(conf) {
 
 	for (const b of base)
 		if (!conf.hasOwnProperty(b)) {
-			new Toast({ "label": "Configuration File Error", "caption": "The provided configuration does not comply with the necessary format.", "variant": 'error' }).show();
+			new Toast({ "label": t(window.LOCALE, 'toast.config_error.label'), "caption": t(window.LOCALE, 'toast.config_error.caption'), "variant": 'error' }).show();
 
 			return false;
 		}

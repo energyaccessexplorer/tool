@@ -1,5 +1,4 @@
 import bind from '../lib/bind.js';
-import { refreshControlsUI } from './controls.js';
 
 export function esc(str) {
 	return String(str)
@@ -71,7 +70,6 @@ function updateDatasetTranslations() {
 	}
 
 	updateCategoryTabLabels();
-	refreshControlsUI(window.LOCALE);
 }
 
 function updateNavTranslations() {

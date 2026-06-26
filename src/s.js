@@ -23,6 +23,8 @@ import {
 	qs,
 } from '../lib/helpers.js';
 
+import { t } from './translate.js';
+
 function preload_boundaries(id) {
 	return API.get('datasets', {
 		"select":        ['processed_files'],
@@ -45,7 +47,7 @@ async function geography(c) {
 	if (c.datasets_count > 2) coll.unshift(c); // 2 datasets: outline and admin-tiers
 
 	if (!coll.length) {
-		alert("No available geographies. Need: outline, admin-tiers and population-density datasets");
+		alert(t(window.LOCALE, 'geography_picker.no_geographies'));
 		return;
 	}
 
@@ -72,7 +74,7 @@ async function geography(c) {
 
 	const content = ce('div');
 	content.append(
-		ce('p', `We have several geographies for ${c.name}. Please do select one.`),
+		ce('p', t(window.LOCALE, 'geography_picker.multiple', { "name": c.name })),
 		sl.el,
 	);
 
@@ -132,7 +134,7 @@ const presets = [
 ];
 
 function usertype(gid) {
-	const content = ce('div', ce('p', "What are you interested in?"), { "id": "presets" });
+	const content = ce('div', ce('p', t(window.LOCALE, 'geography_picker.interest_prompt')), { "id": "presets" });
 
 	const ul = ce('ul');
 	for (const t of presets) {
@@ -154,7 +156,7 @@ function usertype(gid) {
 	new modal({
 		content,
 		"id":      'usertype-modal',
-		"header":  "Choose your area of interest",
+		"header":  t(window.LOCALE, 'geography_picker.choose_area'),
 		"footer":  null,
 		"destroy": true,
 	}).show();
@@ -196,6 +198,11 @@ async function presets_init() {
 };
 
 export async function init() {
+	window.LOCALE = new URLSearchParams(location.search).get('lang')
+		?? localStorage.getItem('locale')
+		?? navigator.language.split('-')[0]
+		?? 'en';
+
 	if (window.innerWidth <= 768) return;
 
 	sentry_setup_global_handlers(ENV[0]);
@@ -276,7 +283,7 @@ export async function init() {
 	API.get("geographies", params)
 		.then(r => list(r))
 		.catch(error => {
-			new Toast({ "label": "Fetch error", "caption": String(error), "variant": 'error' }).show();
+			new Toast({ "label": t(window.LOCALE, 'toast.fetch_error.label'), "caption": String(error), "variant": 'error' }).show();
 
 			throw error;
 		});

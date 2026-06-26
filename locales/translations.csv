@@ -24,7 +24,7 @@ left_panel.cards.card.importance_hint,Change importance to provide different wei
 left_panel.cards.card.show_layer,Show layer,Afficher la couche,显示图层
 left_panel.cards.card.opacity_label,Opacity,Opacité,不透明度
 left_panel.cards.card.about_button,About,À propos,关于
-left_panel.cards.card.table_button,Table,Table,表格
+left_panel.cards.card.table_button,Table,Tableau,表格
 left_panel.points_loading.header,<b>Picked points</b>,<b>Points choisis</b>,<b>选定的点</b>
 left_panel.points_loading.selected,{{count}} points selected:,{{count}} points sélectionnés :,已选择 {{count}} 个点：
 left_panel.points_loading.download_button,Download CSV file of the currents points selection,Télécharger le fichier CSV de la sélection des points courants,下载当前点选择的 CSV 文件
@@ -57,10 +57,10 @@ left_panel.output.index.demand,Demand Index,Indice de demande,需求指数
 left_panel.output.index.supply,Supply Index,Indice d'offre,供应指数
 left_panel.output.index.ani,Assistance Need Index,Indice de besoin d'assistance,援助需求指数
 modals.save_analysis.header,Save analysis to My EAE,Enregistrer l'analyse sur Mon EAE,将分析保存到我的 EAE
-modals.save_analysis.auth_message,"Create a My EAE account, or sign in to your existing account in order to save your current analysis view and receive important updates about the Energy Access Explorer platform.","Créez un compte Mon EAE ou connectez-vous à votre compte existant pour enregistrer votre vue d'analyse actuelle et recevoir des mises à jour importantes sur la plateforme Energy Access Explorer.","创建 My EAE 帐户或登录您的现有帐户，以保存当前分析视图并接收关于 Energy Access Explorer 平台的重要更新。"
+modals.save_analysis.auth_message,"Create a My EAE account, or sign in to your existing account in order to save your current analysis view and receive important updates about the Energy Access Explorer platform.",Créez un compte Mon EAE ou connectez-vous à votre compte existant pour enregistrer votre vue d'analyse actuelle et recevoir des mises à jour importantes sur la plateforme Energy Access Explorer.,创建 My EAE 帐户或登录您的现有帐户，以保存当前分析视图并接收关于 Energy Access Explorer 平台的重要更新。
 modals.save_analysis.auth_create,Create account,Créer un compte,创建帐户
 modals.save_analysis.auth_signin,Sign in,Se connecter,登录
-modals.save_analysis.saved_message,"You are currently viewing an analysis already saved to your My EAE account. You can either update your existing saved analysis or save your changes as a new analysis.","Vous consultez actuellement une analyse déjà enregistrée sur votre compte Mon EAE. Vous pouvez soit mettre à jour votre analyse enregistrée existante, soit enregistrer vos modifications en tant que nouvelle analyse.","您当前正在查看已保存到您的 My EAE 帐户的分析。您可以更新现有的保存分析，也可以将更改保存为新分析。"
+modals.save_analysis.saved_message,You are currently viewing an analysis already saved to your My EAE account. You can either update your existing saved analysis or save your changes as a new analysis.,"Vous consultez actuellement une analyse déjà enregistrée sur votre compte Mon EAE. Vous pouvez soit mettre à jour votre analyse enregistrée existante, soit enregistrer vos modifications en tant que nouvelle analyse.",您当前正在查看已保存到您的 My EAE 帐户的分析。您可以更新现有的保存分析，也可以将更改保存为新分析。
 left_panel.geographies_search.placeholder,Geographies search,Recherche de géographies,地理区域搜索
 left_panel.geographies_search.default_info,Showing all subgeographies,Affichage de toutes les sous-géographies,显示所有下级地理区域
 left_panel.vectors_search.placeholder,Search features,Rechercher des entités,搜索要素
@@ -496,3 +496,88 @@ controls.path.subbranch.solarized,Solarized,Solarized,Solarized
 controls.path.subbranch.transportation,Transportation,Transportation,Transportation
 controls.path.subbranch.village-attributes,Village Attributes,Village Attributes,Village Attributes
 "controls.path.subbranch.land, soil & water","Land, Soil & Water","Land, Soil & Water","Land, Soil & Water"
+session.saving,Saving analysis...,Sauvegarde de l'analyse...,正在保存分析...
+geography_picker.no_geographies,"No available geographies. Need: outline, admin-tiers and population-density datasets","Aucune géographie disponible. Requis : jeux de données outline, admin-tiers et population-density",没有可用的地理区域。需要：outline、admin-tiers 和 population-density 数据集
+geography_picker.multiple,We have several geographies for {{name}}. Please do select one.,Nous avons plusieurs géographies pour {{name}}. Veuillez en sélectionner une.,我们有多个 {{name}} 的地理区域。请选择一个。
+geography_picker.interest_prompt,What are you interested in?,Qu'est-ce qui vous intéresse ?,您对什么感兴趣？
+geography_picker.choose_area,Choose your area of interest,Choisissez votre domaine d'intérêt,选择您感兴趣的领域
+left_panel.cards.show_all,Show all layers,Afficher toutes les couches,显示所有图层
+left_panel.cards.collapse_all,Collapse all settings,Réduire tous les paramètres,折叠所有设置
+utils.loading,Loading...,Chargement...,加载中...
+utils.copied,Copied,Copié,已复制
+right_panel.high_priority.showing_count_one,Showing {{count}} result,Affichage de {{count}} résultat,显示 {{count}} 个结果
+right_panel.high_priority.showing_count_other,Showing {{count}} results,Affichage de {{count}} résultats,显示 {{count}} 个结果
+right_panel.high_priority.showing_range,Showing {{start}}-{{end}} of {{total}},Affichage de {{start}}-{{end}} sur {{total}},显示 {{total}} 个中的 {{start}}-{{end}}
+right_panel.high_priority.area_count_one,{{count}} area,{{count}} zone,{{count}} 个区域
+right_panel.high_priority.area_count_other,{{count}} areas,{{count}} zones,{{count}} 个区域
+right_panel.high_priority.priority_score,{{score}}% priority score,score de priorité de {{score}} %,{{score}}% 优先级评分
+right_panel.poi.count_html_one,There is <strong>{{n}}</strong> point of interest within <strong>{{radius_km}}km</strong> of this area of interest.,Il y a <strong>{{n}}</strong> point d'intérêt à moins de <strong>{{radius_km}} km</strong> de cette zone d'intérêt.,在此关注区域 <strong>{{radius_km}}km</strong> 范围内有 <strong>{{n}}</strong> 个关注点。
+right_panel.poi.count_html_other,There are <strong>{{n}}</strong> points of interest within <strong>{{radius_km}}km</strong> of this area of interest.,Il y a <strong>{{n}}</strong> points d'intérêt à moins de <strong>{{radius_km}} km</strong> de cette zone d'intérêt.,在此关注区域 <strong>{{radius_km}}km</strong> 范围内有 <strong>{{n}}</strong> 个关注点。
+right_panel.poi.about_tooltip,Shows points of interest near the selected pixel.,Affiche les points d'intérêt à proximité du pixel sélectionné.,显示所选像素附近的关注点。
+right_panel.prioritization.priority_score_badge,{{score}} priority score,score de priorité de {{score}},{{score}} 优先级评分
+toast.dataset_error.label,Dataset/File error,Erreur de jeu de données/fichier,数据集/文件错误
+toast.dataset_error.divisions,'{{name}}' requires a geography->divisions->{{tier}}. This is not fatal but the dataset is now disabled.,« {{name}} » nécessite une geography->divisions->{{tier}}. Ce n'est pas fatal mais le jeu de données est maintenant désactivé.,'{{name}}' 需要 geography->divisions->{{tier}}。这不是致命错误，但该数据集现已禁用。
+toast.dataset_error.category,'{{name}}' has category '{{category}}' which requires a {{type}} file. This is not fatal but the dataset is now disabled.,« {{name}} » a la catégorie « {{category}} » qui nécessite un fichier {{type}}. Ce n'est pas fatal mais le jeu de données est maintenant désactivé.,'{{name}}' 的类别 '{{category}}' 需要 {{type}} 文件。这不是致命错误，但该数据集现已禁用。
+toast.dataset_error.process_label,Dataset error,Erreur de jeu de données,数据集错误
+toast.dataset_error.process,Failed to process dataset '{{name}}'. This is not fatal but the dataset is now disabled.,Échec du traitement du jeu de données « {{name}} ». Ce n'est pas fatal mais le jeu de données est maintenant désactivé.,处理数据集 '{{name}}' 失败。这不是致命错误，但该数据集现已禁用。
+toast.config_error.label,Configuration File Error,Erreur de fichier de configuration,配置文件错误
+toast.config_error.caption,The provided configuration does not comply with the necessary format.,La configuration fournie n'est pas conforme au format requis.,提供的配置不符合所需的格式。
+left_panel.points_loading.input_tooltip,Input coordinates manually,Saisir les coordonnées manuellement,手动输入坐标
+country_overview.population,Population:,Population :,人口：
+country_overview.urban,Urban:,Urbain :,城市：
+country_overview.rural,Rural:,Rural :,农村：
+country_overview.area,Area:,Superficie :,面积：
+country_overview.gdp_per_capita,GDP per capita:,PIB par habitant :,人均 GDP：
+country_overview.electrification_rate,Electrification Rate:,Taux d'électrification :,电气化率：
+country_overview.urban_header,Urban,Urbain,城市
+country_overview.rural_header,Rural,Rural,农村
+country_overview.electrified,Electrified:,Électrifié :,已电气化：
+country_overview.energy_intensity,Energy intensity level of primary energy (MJ/$2011 PPP GDP):,Intensité énergétique de l'énergie primaire (MJ/$2011 PPA PIB) :,一次能源强度水平 (MJ/$2011 PPP GDP)：
+country_overview.power_outages,Power outages in firms in a typical month:,Coupures de courant dans les entreprises au cours d'un mois typique :,企业在典型月份内的停电次数：
+country_overview.unit_million,million,million,百万
+country_overview.unit_usd,USD,USD,美元
+modal.eae_info.indexes.title,Prioritization indexes,Indices de priorisation,优先级指数
+modal.eae_info.indexes.body,"There are 4 different methods to generate a prioritization, depending on the aim of your analysis; these are known as the different ""indexes"". Energy Access Potential is the standard recommended index as it is an aggregation across demand and supply categories.","Il existe 4 méthodes différentes pour générer une priorisation, selon l'objectif de votre analyse ; elles sont appelées les différents « indices ». Le Potentiel d'accès à l'énergie est l'indice standard recommandé car il s'agit d'une agrégation des catégories de demande et d'offre.","根据您的分析目标，有 4 种不同的方法来生成优先级；这些被称为不同的指数""。能源获取潜力是标准推荐的指数，因为它是需求和供应类别的聚合。"""
+dataset_info.description,Description,Description,描述
+dataset_info.why_used,Why is this dataset used?,Pourquoi ce jeu de données est-il utilisé ?,为什么使用此数据集？
+dataset_info.suggested_citation,Suggested Citation,Citation suggérée,建议引用
+dataset_info.cautions,Cautions,Précautions,注意事项
+dataset_info.sources,Sources,Sources,来源
+dataset_info.spatial_resolution,Spatial Resolution,Résolution spatiale,空间分辨率
+dataset_info.license,License,Licence,许可证
+dataset_info.content_date,Date of Content,Date du contenu,内容日期
+dataset_info.publication_date,Date of Publication,Date de publication,发布日期
+dataset_info.download_from_source,Download from Source,Télécharger depuis la source,从来源下载
+dataset_info.learn_more,Learn More,En savoir plus,了解更多
+left_panel.cards.card.settings_toggle_title,Hide/Show settings,Masquer/Afficher les paramètres,隐藏/显示设置
+left_panel.cards.card.remove_dataset_title,Remove dataset,Supprimer le jeu de données,删除数据集
+left_panel.output.tiff_download_title,Download TIFF image of the current analysis,Télécharger l'image TIFF de l'analyse actuelle,下载当前分析的 TIFF 图像
+nav.desktop_required.title,Desktop Required,Ordinateur de bureau requis,需要桌面设备
+nav.desktop_required.message,Energy Access Explorer is designed for larger screens. Please open this page on a desktop or laptop computer for the best experience.,Energy Access Explorer est conçu pour les grands écrans. Veuillez ouvrir cette page sur un ordinateur de bureau ou portable pour une expérience optimale.,Energy Access Explorer 专为大屏幕设计。为获得最佳体验，请在台式机或笔记本电脑上打开此页面。
+loading.message,Loading...,Chargement...,加载中...
+toast.dataset_error.no_host,'{{id}}' claims to have host '{{host}}'. No such DS. This is not fatal but the dataset is now disabled.,« {{id}} » prétend avoir l'hôte « {{host}} ». Aucun jeu de données de ce type. Ce n'est pas fatal mais le jeu de données est maintenant désactivé.,'{{id}}' 声称拥有主机 '{{host}}'。无此数据集。这不是致命错误，但该数据集现已禁用。
+right_panel.share_link.header,Share link,Lien de partage,分享链接
+toast.fetch_error.label,Fetch error,Erreur de récupération,获取错误
+left_panel.analysis_search.input_label,Analysis top locations,Principaux emplacements d'analyse,分析热门位置
+left_panel.analysis_search.coordinates_label,Analysis coordinates,Coordonnées d'analyse,分析坐标
+timeline.value_label,Value,Valeur,值
+timeline.state_average_label,State Average,Moyenne de l'État,州平均值
+modal.export.ppt_title,Export PowerPoint presentation,Exporter la présentation PowerPoint,导出 PowerPoint 演示文稿
+modal.export.select_subtitle,Select priority areas columns and rows,Sélectionnez les colonnes et lignes des zones prioritaires,选择优先区域的列和行
+modal.export.download_ppt,Download .ppt,Télécharger .ppt,下载 .ppt
+modal.export.ppt_hint,Selected columns will be included in the PowerPoint tables,Les colonnes sélectionnées seront incluses dans les tableaux PowerPoint,所选列将包含在 PowerPoint 表格中
+modal.export.download_csv,Download all (.csv),Tout télécharger (.csv),全部下载 (.csv)
+modal.export.csv_hint,Selected columns will be included in the CSV download,Les colonnes sélectionnées seront incluses dans le téléchargement CSV,所选列将包含在 CSV 下载中
+modal.export.download_zip,Download all (.zip),Tout télécharger (.zip),全部下载 (.zip)
+modal.export.zip_hint,Selected columns will be included in the CSV and PowerPoint downloads,Les colonnes sélectionnées seront incluses dans les téléchargements CSV et PowerPoint,所选列将包含在 CSV 和 PowerPoint 下载中
+help.welcome_title,Welcome to {{title}},Bienvenue sur {{title}},欢迎使用 {{title}}
+help.welcome_text,Check out the highlights and learn what<br>you can do with the map.,Découvrez les points forts et apprenez ce que<br>vous pouvez faire avec la carte.,查看亮点，了解您可以<br>用地图做什么。
+help.step1,Select <strong>sub-national level data</strong>. These can be used as filters to identify regions of interest.,Sélectionnez des <strong>données infranationales</strong>. Elles peuvent servir de filtres pour identifier les régions d'intérêt.,选择<strong>地方级数据</strong>。这些数据可用作筛选条件来识别目标区域。
+help.step2,Click on the <strong>Demand</strong> data group.,Cliquez sur le groupe de données <strong>Demande</strong>.,点击<strong>需求</strong>数据组。
+help.step3,Select data on <strong>Demographics</strong> and <strong>Social and Productive Uses</strong>. These will be used to visualize current and/or potential demand for energy.,Sélectionnez des données sur la <strong>démographie</strong> et les <strong>usages sociaux et productifs</strong>. Elles serviront à visualiser la demande énergétique actuelle et/ou potentielle.,选择<strong>人口</strong>以及<strong>社会与生产用途</strong>的数据。这些将用于可视化当前和/或潜在的能源需求。
+help.step4,Select the <strong>Healthcare Facilities</strong> dataset,Sélectionnez le jeu de données <strong>Établissements de santé</strong>,选择<strong>医疗设施</strong>数据集
+help.step5,<strong>Filter areas</strong> that are close to social loads by selecting a short proximity (e.g. set proximity to healthcare facilities at 10km),<strong>Filtrez les zones</strong> proches des charges sociales en sélectionnant une faible proximité (par ex. définir la proximité des établissements de santé à 10 km),通过选择较短的邻近距离来<strong>筛选</strong>靠近社会负荷的区域（例如将医疗设施的邻近距离设为 10 公里）
+help.step6,Click on the <strong>Supply</strong> data group.,Cliquez sur le groupe de données <strong>Offre</strong>.,点击<strong>供应</strong>数据组。
+help.step7,Select data on <strong>Resources</strong> and <strong>Infrastructure</strong> to visualize current and/or potential energy supply.,Sélectionnez des données sur les <strong>ressources</strong> et les <strong>infrastructures</strong> pour visualiser l'offre énergétique actuelle et/ou potentielle.,选择<strong>资源</strong>和<strong>基础设施</strong>数据，以可视化当前和/或潜在的能源供应。
+help.step8,<strong>Visualize Underlying Data</strong> Click on the map to read location specific information of the top most layer.,<strong>Visualisez les données sous-jacentes</strong> Cliquez sur la carte pour lire les informations propres à un lieu de la couche supérieure.,<strong>可视化底层数据</strong> 点击地图以读取最上层图层的特定位置信息。
+help.step9,Analysis indicates low hanging fruits (energy access potential index) areas where demand or supply are likely to be higher (demand and supply index) and areas where finance assistance is needed the most,"L'analyse met en évidence les opportunités faciles (indice de potentiel d'accès à l'énergie), les zones où la demande ou l'offre sont susceptibles d'être plus élevées (indice de demande et d'offre) et les zones où l'aide financière est la plus nécessaire",分析可揭示容易实现的机会（能源获取潜力指数）、需求或供应可能较高的区域（需求与供应指数）以及最需要资金援助的区域

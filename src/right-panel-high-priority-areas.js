@@ -45,7 +45,7 @@ import {
 } from '../lib/helpers.js';
 
 import bind from '../lib/bind.js';
-import { translateNode } from './translate.js';
+import { translateNode, t } from './translate.js';
 
 function view_all_locations() {
 	const area_type_str = area_type(STATE.variant);
@@ -53,10 +53,10 @@ function view_all_locations() {
 	const results = paginationState.allResults;
 
 	show_modal_table(results, {
-		"title":              `High priority areas (${area_type_str})`,
+		"title":              `${t(window.LOCALE, 'modal.export.high_priority.title')} (${area_type_str})`,
 		"subtitle":           analysis_name,
-		"action_label":       "Download all (.csv)",
-		"column_toggle_hint": "Selected columns will be included in the CSV download",
+		"action_label":       t(window.LOCALE, 'modal.export.download_csv'),
+		"column_toggle_hint": t(window.LOCALE, 'modal.export.csv_hint'),
 		on_download(results, visible_headers) {
 			download_high_priority_areas(results, { visible_headers });
 		},
@@ -171,13 +171,13 @@ function render_pagination() {
 	if (!paginationInfo || !paginationDiv) return;
 
 	if (totalPages <= 1 && totalCount > 0) {
-		paginationInfo.textContent = `Showing ${totalCount.toLocaleString()} result${totalCount !== 1 ? 's' : ''}`;
+		paginationInfo.textContent = t(window.LOCALE, totalCount === 1 ? 'right_panel.high_priority.showing_count_one' : 'right_panel.high_priority.showing_count_other', { "count": totalCount.toLocaleString() });
 		return;
 	}
 
 	if (totalCount === 0) return;
 
-	paginationInfo.textContent = `Showing ${(startIdx + 1).toLocaleString()}-${endIdx.toLocaleString()} of ${totalCount.toLocaleString()}`;
+	paginationInfo.textContent = t(window.LOCALE, 'right_panel.high_priority.showing_range', { "start": (startIdx + 1).toLocaleString(), "end": endIdx.toLocaleString(), "total": totalCount.toLocaleString() });
 
 	const prevBtn = ce('button', null, { "class": 'pagination-btn chevron' });
 	prevBtn.innerHTML = '<i class="bi bi-chevron-left"></i>';
@@ -260,9 +260,9 @@ function render_page(page) {
 			const group = template.firstElementChild;
 			group.setAttribute('data-score', score);
 
-			const areaCount = scoreCounts[score] === 1 ? '1 area' : `${scoreCounts[score]} areas`;
+			const areaCount = t(window.LOCALE, scoreCounts[score] === 1 ? 'right_panel.high_priority.area_count_one' : 'right_panel.high_priority.area_count_other', { "count": scoreCounts[score] });
 			bind(template, {
-				"score-text": `${score}% priority score`,
+				"score-text": t(window.LOCALE, 'right_panel.high_priority.priority_score', { score }),
 				"area-count": areaCount,
 			});
 

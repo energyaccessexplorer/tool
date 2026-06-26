@@ -19,7 +19,7 @@ import {
 	tmpl,
 } from '../lib/helpers.js';
 
-import { translateNode, initLocalePicker } from './translate.js';
+import { t, translateNode, initLocalePicker } from './translate.js';
 
 const user_id = user_extract('id');
 
@@ -68,13 +68,14 @@ function share(snapshots) {
 	if (!s) return;
 
 	const c = tmpl('#share-link-modal-content');
+	translateNode(window.LOCALE, c);
 
 	const u = new URL(location);
 	const url = `${u.protocol}//${u.hostname}${window.BASE}/tool/p?${s.time}`;
 
 	function copy() {
 		if (!navigator.clipboard) {
-			new Toast({ "label": "Clipboard functionality not available", "variant": 'warn' }).show();
+			new Toast({ "label": t(window.LOCALE, 'toast.clipboard_error'), "variant": 'warn' }).show();
 
 			this.closest('button').remove();
 
@@ -83,7 +84,7 @@ function share(snapshots) {
 
 		navigator.clipboard.writeText(url)
 			.then(_ => {
-				new Toast({ "label": "Link copied!" }).show();
+				new Toast({ "label": t(window.LOCALE, 'my_eae.modal.share.link_copied_toast') }).show();
 			});
 	};
 
@@ -91,7 +92,7 @@ function share(snapshots) {
 
 	new modal({
 		"id":      'share-link-modal',
-		"header":  "Share analysis view",
+		"header":  t(window.LOCALE, 'my_eae.modal.share.header'),
 		"content": c,
 		"destroy": true,
 	}).show();
@@ -120,11 +121,11 @@ padding: 7px 12px;
 	f.append(i);
 
 	x.type = "submit";
-	x.innerText = "Save";
+	x.innerText = t(window.LOCALE, 'right_panel.footer.save');
 	x.setAttribute('form', 'save-analysis');
 
 	const m = new modal({
-		"header":  "Set Analysis Title",
+		"header":  t(window.LOCALE, 'my_eae.modal.set_title.header'),
 		"content": f,
 		"footer":  x,
 	});
@@ -143,7 +144,7 @@ padding: 7px 12px;
 			},
 		}).then(_ => {
 			div.querySelector('.title').innerText = i.value;
-			new Toast({ "label": "Title updated" }).show();
+			new Toast({ "label": t(window.LOCALE, 'my_eae.modal.set_title.title_updated_toast') }).show();
 		});
 
 		return false;
@@ -159,13 +160,13 @@ function drop(snapshots) {
 	const s = snapshots.find(s => s.time === +data);
 	if (!s) return;
 
-	if (!confirm(`Are you sure you want to delete this analysis? '${s.title}'`)) return;
+	if (!confirm(t(window.LOCALE, 'my_eae.modal.delete.confirm', { "name": s.title }))) return;
 
 	API.delete('snapshots', {
 		"time": `eq.${s.time}`,
 	}).then(_ => {
 		div.remove();
-		new Toast({ "label": `Analysis '${s.title}' deleted.` }).show();
+		new Toast({ "label": t(window.LOCALE, 'my_eae.modal.delete.deleted_toast', { "name": s.title }) }).show();
 	});
 };
 

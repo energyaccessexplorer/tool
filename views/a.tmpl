@@ -415,7 +415,7 @@
            class="group">
         <strong data-t="left_panel.cards.card.importance_label">Importance</strong>
 
-        <p class="explain">
+        <p class="explain" data-t="left_panel.cards.card.importance_hint">
           Change importance to provide different weightings for data in the
           analysis calculation.
         </p>
@@ -471,27 +471,27 @@
   <template id="country-overview">
     <div class="country-overview">
       <section>
-        <strong>Population:</strong> <span bind="population"></span> million
+        <strong data-t="country_overview.population">Population:</strong> <span bind="population"></span> <span data-t="country_overview.unit_million">million</span>
       </section>
 
       <section>
-        <strong>&nbsp;&nbsp;&nbsp;&nbsp; Urban:</strong> <span bind="urban_population"></span>%
+        <strong>&nbsp;&nbsp;&nbsp;&nbsp; <span data-t="country_overview.urban">Urban:</span></strong> <span bind="urban_population"></span>%
       </section>
 
       <section>
-        <strong>&nbsp;&nbsp;&nbsp;&nbsp; Rural:</strong> <span bind="rural_population"></span>%
+        <strong>&nbsp;&nbsp;&nbsp;&nbsp; <span data-t="country_overview.rural">Rural:</span></strong> <span bind="rural_population"></span>%
       </section>
 
       <section>
-        <strong>Area:</strong> <span bind="area"></span> km<sup>2</sup>
+        <strong data-t="country_overview.area">Area:</strong> <span bind="area"></span> km<sup>2</sup>
       </section>
 
       <section>
-        <strong>GDP per capita:</strong> USD <span bind="gdp_percapita"></span>
+        <strong data-t="country_overview.gdp_per_capita">GDP per capita:</strong> <span data-t="country_overview.unit_usd">USD</span> <span bind="gdp_percapita"></span>
       </section>
 
       <section>
-        <strong>Electrification Rate:</strong> <span bind="electrification"></span>%
+        <strong data-t="country_overview.electrification_rate">Electrification Rate:</strong> <span bind="electrification"></span>%
       </section>
 
       <section>
@@ -499,8 +499,8 @@
                     text-align: center;
                     text-transform: uppercase;
                     color: var(--the-green);">
-          <strong style="margin: 0.5em;">Urban</strong>
-          <strong style="margin: 0.5em;">Rural</strong>
+          <strong style="margin: 0.5em;" data-t="country_overview.urban_header">Urban</strong>
+          <strong style="margin: 0.5em;" data-t="country_overview.rural_header">Rural</strong>
         </div>
 
         <div style="display: flex; justify-content: space-around;
@@ -508,7 +508,7 @@
           <div style="display: flex; justify-content: space-around; width: 240px; padding: 0 1em;
                       border-right: 1px solid lightgray;">
             <span class="small">
-              Electrified:&nbsp; <strong><span bind="urban_electrification"></span>%</strong>
+              <span data-t="country_overview.electrified">Electrified:</span>&nbsp; <strong><span bind="urban_electrification"></span>%</strong>
             </span>
 
             <span bind="urban_electrification_pie"></span>
@@ -516,7 +516,7 @@
 
           <div style="display: flex; justify-content: space-around; width: 240px; padding: 0 1em;">
             <span class="small">
-              Electrified:&nbsp; <strong><span bind="rural_electrification"></span>%</strong>
+              <span data-t="country_overview.electrified">Electrified:</span>&nbsp; <strong><span bind="rural_electrification"></span>%</strong>
             </span>
 
             <span bind="rural_electrification_pie"></span>
@@ -525,18 +525,18 @@
       </section>
 
       <section>
-        <strong>Energy intensity level of primary energy (MJ/$2011 PPP GDP):</strong> <span bind="primary_intensity"></span>
+        <strong data-t="country_overview.energy_intensity">Energy intensity level of primary energy (MJ/$2011 PPP GDP):</strong> <span bind="primary_intensity"></span>
       </section>
 
       <section>
-        <strong>Power outages in firms in a typical month:</strong> <span bind="outages_average"></span>
+        <strong data-t="country_overview.power_outages">Power outages in firms in a typical month:</strong> <span bind="outages_average"></span>
       </section>
     </div>
   </template>
 
   <template id="eae-info-modal-template">
-    <h3>About Energy Access Explorer prioritizaton</h3>
-    <p>
+    <h3 data-t="modal.eae_info.title">About Energy Access Explorer prioritizaton</h3>
+    <p data-t="modal.eae_info.body">
       Energy Access Explorer enables you to identify high-priority areas for
       energy access interventions. EAE uses multi-criteria analysis that uses
       location-specific resource availability and infrastructure data to
@@ -546,22 +546,22 @@
 
     <br><div style="border-bottom: 1px solid lightgray;"></div><br><br>
 
-    <h3>Analysis areas</h3>
-    <p>
+    <h3 data-t="modal.eae_info.analysis_areas.title">Analysis areas</h3>
+    <p data-t="modal.eae_info.analysis_areas.body">
       Energy Access Explorer offers the option to generate an analysis across
       various different administrative priorities.
     </p>
 
     <br>
-    <h4>Priority areas (1km²)</h4>
-    <p>
+    <h4 data-t="modal.eae_info.priority_1km.title">Priority areas (1km²)</h4>
+    <p data-t="modal.eae_info.priority_1km.body">
       Selecting this analysis area provides a raster analysis in 1km2 tiles
       across the entirity of the selected geography.
     </p>
 
     <br>
-    <h4>Other analysis areas</h4>
-    <p>
+    <h4 data-t="modal.eae_info.other_areas.title">Other analysis areas</h4>
+    <p data-t="modal.eae_info.other_areas.body">
       Depending on the currently selected geography, it is possible to change
       the priotitization output to wider geographical areas such as districts,
       regions or zones for more high level analysis.
@@ -569,8 +569,8 @@
 
     <br><div style="border-bottom: 1px solid lightgray;"></div><br><br>
 
-    <h3 id="prioritization-indexes">Prioritization indexes</h3>
-    <p>
+    <h3 id="prioritization-indexes" data-t="modal.eae_info.indexes.title">Prioritization indexes</h3>
+    <p data-t="modal.eae_info.indexes.body">
       There are 4 different methods to generate a prioritization, depending on
       the aim of your analysis; these are known as the different
       "indexes". Energy Access Potential is the standard recommended index as it
@@ -602,7 +602,7 @@
     <p>
       <a href="https://www.wri.org/publication/energy-access-explorer-data-and-methods">
         <i class="bi-box-arrow-up-right"></i>
-        <span>View technical note</span>
+        <span data-t="modal.eae_info.view_technical_note">View technical note</span>
       </a>
     </p>
 
@@ -617,19 +617,19 @@
     <div style="display:flex; flex-flow: row nowrap;">
       <div class="left" style="flex: 1;">
         <section bind-cond="description">
-          <h3>Description</h3><pre class="description-text" bind="description"></pre>
+          <h3 data-t="dataset_info.description">Description</h3><pre class="description-text" bind="description"></pre>
         </section>
 
         <section bind-cond="category-description">
-          <h3>Why is this dataset used?</h3><pre class="description-text" bind="category-description"></pre>
+          <h3 data-t="dataset_info.why_used">Why is this dataset used?</h3><pre class="description-text" bind="category-description"></pre>
         </section>
 
         <section bind-cond="suggested_citation">
-          <h3>Suggested Citation</h3><pre class="description-text" bind="suggested_citation"></pre>
+          <h3 data-t="dataset_info.suggested_citation">Suggested Citation</h3><pre class="description-text" bind="suggested_citation"></pre>
         </section>
 
         <section bind-cond="cautions">
-          <h3>Cautions</h3><pre class="description-text" bind="cautions"></pre>
+          <h3 data-t="dataset_info.cautions">Cautions</h3><pre class="description-text" bind="cautions"></pre>
         </section>
       </div>
 
@@ -639,7 +639,7 @@
              bind-cond="download_original_url"
              bind-attr="href"
              bind-arg="download_original_url"
-             target="_blank">Download from Source</a>
+             target="_blank" data-t="dataset_info.download_from_source">Download from Source</a>
         </section>
 
         <section>
@@ -647,31 +647,31 @@
              bind-cond="learn_more_url"
              bind-attr="href"
              bind-arg="learn_more_url"
-             target="_blank">Learn More</a>
+             target="_blank" data-t="dataset_info.learn_more">Learn More</a>
         </section>
 
         <section bind-cond="sources">
-          <h3>Sources</h3>
+          <h3 data-t="dataset_info.sources">Sources</h3>
           <pre class="description-text" bind="sources"></pre>
         </section>
 
         <section bind-cond="spatial_resolution">
-          <h3>Spatial Resolution</h3>
+          <h3 data-t="dataset_info.spatial_resolution">Spatial Resolution</h3>
           <span bind="spatial_resolution"></span>
         </section>
 
         <section bind-cond="license">
-          <h3>License</h3>
+          <h3 data-t="dataset_info.license">License</h3>
           <span bind="license"></span>
         </section>
 
         <section bind-cond="content_date">
-          <h3>Date of Content</h3>
+          <h3 data-t="dataset_info.content_date">Date of Content</h3>
           <span bind="content_date"></span>
         </section>
 
         <section bind-cond="publication_date">
-          <h3>Date of Publication</h3>
+          <h3 data-t="dataset_info.publication_date">Date of Publication</h3>
           <span bind="publication_date"></span>
         </section>
       </div>
@@ -679,7 +679,7 @@
   </template>
 
   <template id="share-link-modal-content">
-    <p>
+    <p data-t="my_eae.modal.share.instructions">
       Sharing the following link will load the Energy Access Explorer platform in
       the current state: layers and analysis.
 
@@ -699,7 +699,7 @@
               bind-listen="click"
               bind-func="copy">
         <i class="bi bi-copy"></i>
-        <span>Copy link</span>
+        <span data-t="my_eae.modal.share.copy_link">Copy link</span>
       </button>
     </div>
   </template>
@@ -710,11 +710,11 @@
         <div class="export-option-icon">
           <i class="bi bi-easel"></i>
         </div>
-        <h3 class="card-title">Summary presentation</h3>
-        <p class="card-description">A summary presentation explaining the outputs of your current analysis view.</p>
+        <h3 class="card-title" data-t="modal.export.summary_presentation.title">Summary presentation</h3>
+        <p class="card-description" data-t="modal.export.summary_presentation.desc">A summary presentation explaining the outputs of your current analysis view.</p>
         <button type="button" class="button-small" bind-listen="click" bind-func="export_ppt">
           <i class="bi bi-download"></i>
-          <span>Download .ppt</span>
+          <span data-t="modal.export.summary_presentation.button">Download .ppt</span>
         </button>
       </div>
 
@@ -722,11 +722,11 @@
         <div class="export-option-icon">
           <i class="bi bi-image"></i>
         </div>
-        <h3 class="card-title">Map TIFF</h3>
-        <p class="card-description">A TIFF file of the prioritization raster image generated from your analysis.</p>
+        <h3 class="card-title" data-t="modal.export.map_tiff.title">Map TIFF</h3>
+        <p class="card-description" data-t="modal.export.map_tiff.desc">A TIFF file of the prioritization raster image generated from your analysis.</p>
         <button type="button" class="button-small" bind-listen="click" bind-func="export_tiff">
           <i class="bi bi-download"></i>
-          <span>Download .TIFF</span>
+          <span data-t="modal.export.map_tiff.button">Download .TIFF</span>
         </button>
       </div>
 
@@ -734,11 +734,11 @@
         <div class="export-option-icon">
           <i class="bi bi-table"></i>
         </div>
-        <h3 class="card-title">High priority areas</h3>
+        <h3 class="card-title" data-t="modal.export.high_priority.title">High priority areas</h3>
         <p class="card-description">A table of the highest priority <span bind="area_type"></span> areas from your analysis.</p>
         <button type="button" class="button-small" bind-listen="click" bind-func="export_csv">
           <i class="bi bi-download"></i>
-          <span>Download .csv</span>
+          <span data-t="modal.export.high_priority.button">Download .csv</span>
         </button>
       </div>
 
@@ -746,11 +746,11 @@
         <div class="export-option-icon">
           <i class="bi bi-pie-chart"></i>
         </div>
-        <h3 class="card-title">Population and area share</h3>
-        <p class="card-description">CSV data for the population and area share.</p>
+        <h3 class="card-title" data-t="modal.export.pop_area_share.title">Population and area share</h3>
+        <p class="card-description" data-t="modal.export.pop_area_share.desc">CSV data for the population and area share.</p>
         <button type="button" class="button-small" bind-listen="click" bind-func="export_share_csv">
           <i class="bi bi-download"></i>
-          <span>Download .csv</span>
+          <span data-t="modal.export.pop_area_share.button">Download .csv</span>
         </button>
       </div>
     </div>
@@ -760,7 +760,7 @@
     <div class="modal-footer-bar">
       <button type="button" class="button-icon button-icon-mid" bind-listen="click" bind-func="export_all">
         <i class="bi bi-file-earmark-zip"></i>
-        <span>Download all</span>
+        <span data-t="modal.export.download_all">Download all</span>
       </button>
     </div>
   </template>
@@ -855,19 +855,21 @@
              type="number"
              step="any"
              placeholder="Longitude"
+             data-t-placeholder="modal.points_input.longitude_placeholder"
              style="padding: 5px 7px;">
 
       <input id="lat"
              type="number"
              step="any"
              placeholder="Latitude"
+             data-t-placeholder="modal.points_input.latitude_placeholder"
              style="padding: 5px 7px;">
 
       <br><br>
 
       <button type="submit"
               class="big-green-button"
-              style="font-size: 0.8em; margin: auto;">Add point</button>
+              style="font-size: 0.8em; margin: auto;" data-t="modal.points_input.add_button">Add point</button>
     </form>
   </template>
 
@@ -908,13 +910,15 @@
     <buttons>
       <button bind-listen="click"
               bind-func="settings"
-              title="Hide/Show settings">
+              title="Hide/Show settings"
+              data-t-title="left_panel.cards.card.settings_toggle_title">
         <i class="bi-chevron-down"></i>
       </button>
 
       <button bind-listen="click"
               bind-func="close"
-              title="Remove dataset">
+              title="Remove dataset"
+              data-t-title="left_panel.cards.card.remove_dataset_title">
         <i class="bi-x-lg"></i>
       </button>
     </buttons>
@@ -1011,21 +1015,21 @@
       </div>
       <div class="saved-analysis-last-viewed" bind="last-viewed"></div>
     </div>
-    <button class="button primary-button" bind-listen="click" bind-func="update">Update saved analysis</button>
-    <button class="button secondary-button" bind-listen="click" bind-func="saveAsNew">Save as new analysis</button>
+    <button class="button primary-button" bind-listen="click" bind-func="update" data-t="modal.save_analysis.update_button">Update saved analysis</button>
+    <button class="button secondary-button" bind-listen="click" bind-func="saveAsNew" data-t="modal.save_analysis.save_as_new_button">Save as new analysis</button>
   </template>
 
   <template id="edit-title-form-template">
     <form id="save-analysis" class="save-analysis-form">
       <div class="text-input-wrapper">
-        <label class="text-input-label required">Analysis title</label>
-        <div class="text-input-hint">Enter a memorable name for the current configuration.</div>
+        <label class="text-input-label required" data-t="modal.save_analysis.title_label">Analysis title</label>
+        <div class="text-input-hint" data-t="modal.save_analysis.title_hint">Enter a memorable name for the current configuration.</div>
       </div>
       <div class="field-wrapper">
         <input class="text-input" name="title" required />
       </div>
     </form>
-    <button type="submit" form="save-analysis" class="primary-button">Save analysis</button>
+    <button type="submit" form="save-analysis" class="primary-button" data-t="modal.save_analysis.save_button">Save analysis</button>
   </template>
 
   <template id="discrete-scale-item-template">
@@ -1110,7 +1114,7 @@
         <p class="high-priority-areas-list-all-subtitle" bind="analysis-name"></p>
         <button class="button-icon button-icon-sm column-selector-toggle"
                 bind-listen="click" bind-func="toggle_column_selector">
-          <i class="bi bi-gear"></i> <span>Toggle columns</span>
+          <i class="bi bi-gear"></i> <span data-t="modal.high_priority_table.toggle_columns">Toggle columns</span>
         </button>
       </div>
       <div class="column-selector-panel hidden">
@@ -1136,7 +1140,7 @@
         <div class="selection-overlay hidden">
           <span class="selection-count"></span>
           <button class="button-icon button-icon-mid" bind-listen="click" bind-func="download_selected">
-            <span>Download selected rows</span>
+            <span data-t="modal.high_priority_table.download_selected">Download selected rows</span>
           </button>
         </div>
       </div>
@@ -1148,7 +1152,7 @@
             <option value="50">50</option>
             <option value="100">100</option>
           </select>
-          <span class="per-page-label">Per page</span>
+          <span class="per-page-label" data-t="modal.high_priority_table.per_page">Per page</span>
         </div>
         <div class="pagination">
           <button class="pagination-btn chevron" bind-listen="click" bind-func="on_prev">
@@ -1171,7 +1175,7 @@
       </button>
       <div class="info">
         <i class="bi bi-info-circle"></i>
-        <span>Data download will include a summary of your analysis.</span>
+        <span data-t="modal.high_priority_table.data_download_summary">Data download will include a summary of your analysis.</span>
       </div>
     </div>
   </template>

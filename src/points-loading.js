@@ -29,7 +29,7 @@ import {
 	tmpl,
 } from '../lib/helpers.js';
 
-import { t, tbind } from './translate.js';
+import { t, tbind, translateNode } from './translate.js';
 
 let ul, resultscontainer, resultsinfo;
 
@@ -231,6 +231,7 @@ ${t(window.LOCALE, 'left_panel.points_loading.upload_message_intro')}
 
 	pointsinput.onclick = _ => {
 		const content = tmpl('#points-input-form');
+		translateNode(window.LOCALE, content);
 		const header = t(window.LOCALE, 'left_panel.points_loading.input_modal_header');
 
 		const m = new modal({

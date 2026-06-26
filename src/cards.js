@@ -1,6 +1,6 @@
 import DS from './ds.js';
 
-import { translateDatasetName, translateDatasetAttribute } from './translate.js';
+import { t, translateDatasetName, translateDatasetAttribute, translateNode, registerUIUpdater } from './translate.js';
 
 import bind from '../lib/bind.js';
 
@@ -37,6 +37,9 @@ import {
 } from '../lib/helpers.js';
 
 const cards_list = qs('#cards-list');
+
+let visible = true;
+let collapsed = true;
 
 const slider_width = 320;
 
@@ -542,13 +545,12 @@ export function init() {
 		update();
 	};
 
-	let visible = true;
 	const visible_all = function() {
 		visible = !visible;
 
 		STATE.datasets.filter(x => !x.cannot_deactivate(false)).forEach(x => x.visibility(visible));
 
-		qs('span', this).innerText = visible ? "Hide all layers" : "Show all layers";
+		qs('span', this).innerText = t(window.LOCALE, visible ? 'left_panel.cards.hide_all' : 'left_panel.cards.show_all');
 		qs('i', this).className = visible ? 'bi-eye-slash-fill' : 'bi-eye-fill';
 	};
 
@@ -573,13 +575,12 @@ export function init() {
 		});
 	};
 
-	let collapsed = true;
 	const expand_all = function() {
 		collapsed = !collapsed;
 
 		STATE.datasets.forEach(d => d.card.toggle_settings(!collapsed));
 
-		qs('span', this).innerText = collapsed ? "Expand all settings" : "Collapse all settings";
+		qs('span', this).innerText = t(window.LOCALE, collapsed ? 'left_panel.cards.expand_all' : 'left_panel.cards.collapse_all');
 		qs('i', this).className = collapsed ? 'bi-arrows-angle-expand' : 'bi-arrows-angle-contract';
 	};
 
@@ -606,6 +607,20 @@ export function update() {
 
 	if (list.length) sortable(cards_list, 'enable');
 };
+
+registerUIUpdater(() => {
+	const buttons = qs('#cards #cards-buttons');
+	if (!buttons) return;
+
+	// Button order is fixed in views/a.tmpl: visible_all, reset_all, expand_all, remove_all.
+	const visible_span = buttons.children[0]?.querySelector('span');
+	if (visible_span)
+		visible_span.innerText = t(window.LOCALE, visible ? 'left_panel.cards.hide_all' : 'left_panel.cards.show_all');
+
+	const expand_span = buttons.children[2]?.querySelector('span');
+	if (expand_span)
+		expand_span.innerText = t(window.LOCALE, collapsed ? 'left_panel.cards.expand_all' : 'left_panel.cards.collapse_all');
+});
 
 function settings(_, button, value) {
 	if (value === null || value === undefined) {
@@ -644,6 +659,7 @@ export default class dscard extends HTMLElement {
 		this.append(tmpl('#card-template'));
 
 		this.bind();
+		translateNode(window.LOCALE, this);
 
 		return this;
 	};

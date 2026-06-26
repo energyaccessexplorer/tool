@@ -18,6 +18,8 @@ import dscard from './cards.js';
 
 import dscontrols from './controls.js';
 
+import { t, translateNode } from './translate.js';
+
 import {
 	csv as parse_csv,
 	raster as parse_raster,
@@ -125,7 +127,7 @@ export default class DS {
 			const b = GEOGRAPHY.divisions[this.config.divisions_tier];
 
 			if (!b) {
-				new Toast({ "label": "Dataset/File error", "caption": `'${this.name}' requires a geography->divisions->${this.config.divisions_tier}. This is not fatal but the dataset is now disabled.`, "variant": 'error' }).show();
+				new Toast({ "label": t(window.LOCALE, 'toast.dataset_error.label'), "caption": t(window.LOCALE, 'toast.dataset_error.divisions', { "name": this.name, "tier": this.config.divisions_tier }), "variant": 'error' }).show();
 
 				this.disable(`Missing geography->divisions->${this.config.divisions_tier}.`);
 
@@ -145,14 +147,14 @@ export default class DS {
 			indicator = true;
 		}
 
-		function ok(t) {
-			if (indicator && ['vectors', 'raster'].includes(t)) return true;
+		function ok(type) {
+			if (indicator && ['vectors', 'raster'].includes(type)) return true;
 
 			if (this.category.name === 'outline') return true;
 
-			new Toast({ "label": "Dataset/File error", "caption": `'${this.name}' has category '${this.category.name}' which requires a ${t} file. This is not fatal but the dataset is now disabled.`, "variant": 'error' }).show();
+			new Toast({ "label": t(window.LOCALE, 'toast.dataset_error.label'), "caption": t(window.LOCALE, 'toast.dataset_error.category', { "name": this.name, "category": this.category.name, type }), "variant": 'error' }).show();
 
-			this.disable(`Missing ${t}`);
+			this.disable(`Missing ${type}`);
 
 			return false;
 		};
@@ -383,7 +385,7 @@ export default class DS {
 
 			if (!ds) {
 				const msg = `'${this.id}' claims to have host '${h}'. No such DS.`;
-				new Toast({ "label": "Dataset/File error", "caption": `${msg} This is not fatal but the dataset is now disabled.`, "variant": 'error' }).show();
+				new Toast({ "label": t(window.LOCALE, 'toast.dataset_error.label'), "caption": t(window.LOCALE, 'toast.dataset_error.no_host', { "id": this.id, "host": h }), "variant": 'error' }).show();
 
 				this.disable(msg);
 
@@ -648,6 +650,7 @@ export default class DS {
 			}
 
 			content = tmpl('#ds-info-modal');
+			translateNode(window.LOCALE, content);
 			bind(content, m);
 		}
 

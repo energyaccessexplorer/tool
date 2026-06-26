@@ -4,7 +4,7 @@ import {
 
 import DS from './ds.js';
 
-import { translateDatasetName, translateDatasetAttribute, translateCategoryName, translateSubbranchName } from './translate.js';
+import { translateDatasetName, translateDatasetAttribute, translateCategoryName, translateSubbranchName, registerUIUpdater } from './translate.js';
 
 import {
 	select_tab,
@@ -115,6 +115,8 @@ function create_or_update_subbranch(name, parent, locale = window.LOCALE) {
 
 	return sb;
 }
+
+registerUIUpdater(() => refreshControlsUI(window.LOCALE));
 
 export function refreshControlsUI(locale) {
 	if (typeof DST === 'undefined' || !DST.size) return;

@@ -82,10 +82,13 @@ function ramp() {
 };
 
 export function show_eae_info_modal() {
+	const content = tmpl('#eae-info-modal-template');
+	translateNode(window.LOCALE, content);
+
 	new modal({
 		"id":      'eae-info-modal',
-		"header":  "About Energy Access Explorer prioritization",
-		"content": bind(tmpl('#eae-info-modal-template'), EAE['indexes']),
+		"header":  t(window.LOCALE, 'modal.eae_info.title'),
+		"content": bind(content, EAE['indexes']),
 		"destroy": true,
 	}).show();
 }

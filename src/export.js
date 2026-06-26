@@ -16,6 +16,8 @@ import bind from '../lib/bind.js';
 
 import modal from '../lib/modal.js';
 
+import { t, translateNode } from './translate.js';
+
 import { generate_summary_data, compute_share_amounts } from './summary.js';
 
 import {
@@ -126,7 +128,7 @@ export function download_share_csv() {
 async function export_all(results, visible_headers) {
 	let cancelled = false;
 
-	const update = (progress) => loading("Generating...", {
+	const update = (progress) => loading(t(window.LOCALE, 'modal.export.generating'), {
 		"progress": progress,
 		"cancel":   () => { cancelled = true; },
 	});
@@ -207,20 +209,21 @@ function ppt_enabled_columns(total) {
 
 export function show_export_modal() {
 	const content = tmpl('#export-options-modal-content');
+	translateNode(window.LOCALE, content);
 
 	bind(content, {
 		"area_type":  area_type(STATE.variant).toLowerCase(),
 		"export_ppt": () => {
 			document.querySelector('#export-options-modal')?.remove();
 			show_modal_table(get_locations_results(), {
-				"title":              "Export PowerPoint presentation",
-				"subtitle":           "Select priority areas columns and rows",
-				"action_label":       "Download .ppt",
-				"column_toggle_hint": "Selected columns will be included in the PowerPoint tables",
+				"title":              t(window.LOCALE, 'modal.export.ppt_title'),
+				"subtitle":           t(window.LOCALE, 'modal.export.select_subtitle'),
+				"action_label":       t(window.LOCALE, 'modal.export.download_ppt'),
+				"column_toggle_hint": t(window.LOCALE, 'modal.export.ppt_hint'),
 				"enabled_columns":    ppt_enabled_columns(PPT_MAX_COLUMNS),
 				"max_columns":        PPT_MAX_COLUMNS,
 				async on_download(results, visible_headers) {
-					loading("Generating...");
+					loading(t(window.LOCALE, 'modal.export.generating'));
 					await delay(0.1);
 					await generate_summary_data();
 					const p = await pptx({ results, visible_headers });
@@ -230,7 +233,7 @@ export function show_export_modal() {
 			});
 		},
 		"export_tiff": async () => {
-			loading("Generating...");
+			loading(t(window.LOCALE, 'modal.export.generating'));
 			const type = STATE.index;
 			const index_slug = slugify(EAE['indexes'][type]['name']);
 			fake_blob_download((await analysis(type)).tiff, export_filename(`${index_slug}-map`, 'tif'));
@@ -243,10 +246,10 @@ export function show_export_modal() {
 
 			document.querySelector('#export-options-modal')?.remove();
 			show_modal_table(results, {
-				"title":              `High priority areas (${area_type_str})`,
+				"title":              `${t(window.LOCALE, 'modal.export.high_priority.title')} (${area_type_str})`,
 				"subtitle":           analysis_name,
-				"action_label":       "Download all (.csv)",
-				"column_toggle_hint": "Selected columns will be included in the CSV download",
+				"action_label":       t(window.LOCALE, 'modal.export.download_csv'),
+				"column_toggle_hint": t(window.LOCALE, 'modal.export.csv_hint'),
 				"enabled_columns":    new Set(),
 				on_download(results, visible_headers) {
 					download_high_priority_areas(results, { visible_headers });
@@ -254,7 +257,7 @@ export function show_export_modal() {
 			});
 		},
 		"export_share_csv": async () => {
-			loading("Generating...");
+			loading(t(window.LOCALE, 'modal.export.generating'));
 			await generate_summary_data();
 			download_share_csv();
 			loading(false);
@@ -262,14 +265,15 @@ export function show_export_modal() {
 	});
 
 	const footer = tmpl('#export-options-modal-footer');
+	translateNode(window.LOCALE, footer);
 	bind(footer, {
 		"export_all": () => {
 			document.querySelector('#export-options-modal')?.remove();
 			show_modal_table(get_locations_results(), {
-				"title":              "Download all",
-				"subtitle":           "Select priority areas columns and rows",
-				"action_label":       "Download all (.zip)",
-				"column_toggle_hint": "Selected columns will be included in the CSV and PowerPoint downloads",
+				"title":              t(window.LOCALE, 'modal.export.download_all'),
+				"subtitle":           t(window.LOCALE, 'modal.export.select_subtitle'),
+				"action_label":       t(window.LOCALE, 'modal.export.download_zip'),
+				"column_toggle_hint": t(window.LOCALE, 'modal.export.zip_hint'),
 				"enabled_columns":    ppt_enabled_columns(PPT_MAX_COLUMNS),
 				"max_columns":        PPT_MAX_COLUMNS,
 				on_download(results, visible_headers) {
@@ -296,7 +300,7 @@ export async function download_high_priority_areas(results, opts = {}) {
 
 	let cancelled = false;
 
-	loading("Generating...", {
+	loading(t(window.LOCALE, 'modal.export.generating'), {
 		"progress": 0,
 		"cancel":   () => { cancelled = true; },
 	});
@@ -309,7 +313,7 @@ export async function download_high_priority_areas(results, opts = {}) {
 
 	const rows = await build_csv_rows(results, {
 		"headers":    csv_headers, is_raster, analysis_name,
-		"onProgress":  (p) => loading("Generating...", {
+		"onProgress":  (p) => loading(t(window.LOCALE, 'modal.export.generating'), {
 			"progress": p * 100,
 			"cancel":   () => { cancelled = true; },
 		}),

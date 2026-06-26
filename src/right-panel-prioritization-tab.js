@@ -13,7 +13,7 @@ import {
 	area_type,
 } from './utils.js';
 
-import { translateNode } from './translate.js';
+import { translateNode, t } from './translate.js';
 
 import {
 	make_title,
@@ -134,7 +134,7 @@ export function update_location_summary(data, admin_info) {
 	coords_el.textContent = data.coordinates ?? '';
 	coords_el.style.display = data.coordinates ? '' : 'none';
 
-	qs('.location-priority-badge', container).textContent = score_entry.value + ' priority score';
+	qs('.location-priority-badge', container).textContent = t(window.LOCALE, 'right_panel.prioritization.priority_score_badge', { "score": score_entry.value });
 
 	qs('.location-area-type span', container).textContent = area_label;
 

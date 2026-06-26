@@ -17,6 +17,8 @@ import {
 
 import bind from '../lib/bind.js';
 
+import { translateNode } from './translate.js';
+
 import bubblemessage from '../lib/bubblemessage.js';
 
 export function show(results, opts = {}) {
@@ -84,6 +86,7 @@ export function show(results, opts = {}) {
 	}
 
 	const content = tmpl('#high-priority-areas-list-all-template');
+	translateNode(window.LOCALE, content);
 
 	const tbody = qs('tbody', content);
 	const selection_overlay = qs('.selection-overlay', content);
@@ -200,6 +203,7 @@ export function show(results, opts = {}) {
 	enforce_column_limit();
 
 	const footer = tmpl('#high-priority-areas-list-all-footer-template');
+	translateNode(window.LOCALE, footer);
 	bind(footer, {
 		"label":    opts.action_label,
 		"download": () => opts.on_download(get_selected() || state.results, get_visible_headers()),

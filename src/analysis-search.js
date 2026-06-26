@@ -19,6 +19,8 @@ import {
 	qs,
 } from '../lib/helpers.js';
 
+import { t as translate } from './translate.js';
+
 let ul, resultscontainer, resultsinfo;
 
 function pointto(p, a = false) {
@@ -59,7 +61,7 @@ async function trigger({ points = getpoints, n = 20 }) {
 
 	const count = results.length;
 
-	resultsinfo.innerHTML = `Searching <b>analysis coordinates</b>. Top ${count} results:`;
+	resultsinfo.innerHTML = translate(window.LOCALE, 'left_panel.analysis_search.top_results', { count });
 
 	const list = results
 		.sort((a,b) => a.v > b.v ? -1 : 1)
@@ -94,12 +96,12 @@ width: calc(${g}% - 1.5em);
 	}
 
 	if (count > n)
-		qs('div.search-results-info', resultscontainer).innerHTML = `Searching <b>analysis coordinates</b>. Showing first ${n} of ${count}:`;
+		qs('div.search-results-info', resultscontainer).innerHTML = translate(window.LOCALE, 'left_panel.analysis_search.overflow', { n, "total": count });
 };
 
 export function init() {
 	const panel = qs('#analysis.search-panel');
-	const input = ce('span', "Analysis top locations", { "id": 'analysis-search', "class": 'search-input' });
+	const input = ce('span', translate(window.LOCALE, 'left_panel.analysis_search.input_label'), { "id": 'analysis-search', "class": 'search-input' });
 
 	panel.addEventListener('activate', trigger);
 
@@ -109,6 +111,6 @@ export function init() {
 	ul = ce('ul');
 	resultscontainer.append(ul);
 
-	resultsinfo = ce('div', ce('b', "Analysis coordinates"), { "class": 'search-results-info' });
+	resultsinfo = ce('div', ce('b', translate(window.LOCALE, 'left_panel.analysis_search.coordinates_label')), { "class": 'search-results-info' });
 	resultscontainer.prepend(resultsinfo);
 };

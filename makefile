@@ -235,6 +235,7 @@ build-s:
 		${SRC}/sentry.js \
 		${SRC}/toast.js \
 		${SRC}/s.js \
+		${SRC}/translate.js \
 		${DIST}/s/
 
 	@ cat \
@@ -244,6 +245,7 @@ build-s:
 
 	@ echo "window.EAE = {};" | cat - \
 		settings.tmp.json \
+		locales/translations.js.tmp \
 		> ${DIST}/s/main.js
 
 	@ cat \

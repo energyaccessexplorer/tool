@@ -1,6 +1,6 @@
 import { t, translateNode, registerUIUpdater, getScaleLabels } from './translate.js';
 import { svg_pie } from './utils.js';
-import { analysis_colorscale, lowmedhigh_scale } from './analysis.js';
+import { analysis_colorscale } from './analysis.js';
 import { compute_share_amounts } from './summary.js';
 import bubblemessage from '../lib/bubblemessage.js';
 import bind from '../lib/bind.js';

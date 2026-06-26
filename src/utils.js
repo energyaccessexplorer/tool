@@ -13,6 +13,8 @@ import {
 	qs,
 } from '../lib/helpers.js';
 
+import { t } from './translate.js';
+
 export async function self() {
 	SELF = {};
 
@@ -388,7 +390,7 @@ export function elem_collapse(el, t, open) {
 export function loading(msg, opts) {
 	const el = qs('#app-loading');
 	el.style['display'] = msg ? 'block' : 'none';
-	qs('#loading-message', el).innerText = (typeof msg === 'string') ? msg : "Loading...";
+	qs('#loading-message', el).innerText = (typeof msg === 'string') ? msg : t(window.LOCALE, 'utils.loading');
 
 	const progress_el = qs('#loading-progress', el);
 	const cancel_el = qs('#loading-cancel', el);
@@ -561,7 +563,7 @@ export function bi_icon(v) {
 
 export function copy_to_clipboard(url, button) {
 	if (!navigator.clipboard) {
-		new Toast({ "label": "Clipboard functionality not available", "variant": 'warn' }).show();
+		new Toast({ "label": t(window.LOCALE, 'toast.clipboard_error'), "variant": 'warn' }).show();
 
 		button.remove();
 		return;
@@ -573,12 +575,12 @@ export function copy_to_clipboard(url, button) {
 			const text = button.querySelector('span');
 
 			icon.className = 'bi bi-check-lg';
-			text.textContent = 'Copied';
+			text.textContent = t(window.LOCALE, 'utils.copied');
 			button.classList.add('copied');
 
 			setTimeout(() => {
 				icon.className = 'bi bi-copy';
-				text.textContent = 'Copy link';
+				text.textContent = t(window.LOCALE, 'my_eae.modal.share.copy_link');
 				button.classList.remove('copied');
 			}, 5000);
 		});

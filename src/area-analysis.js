@@ -167,23 +167,37 @@ function format_coordinates(ll) {
 		: null;
 }
 
-export function admin_location_name(variant, id) {
-	const csv_data = maybe(DST.get('admin-tiers'), 'csv', 'data');
-	if (csv_data) {
-		const tier_col = `TIER${variant}`;
-		 
-		const row = csv_data.find(r => r[tier_col] == id);
-		if (row) {
-			const names = [];
-			for (let i = variant; i >= 1; i--) {
-				const name = maybe(GEOGRAPHY, 'divisions', i, 'csv', 'table', row[`TIER${i}`]);
-				if (name) names.push(name);
-			}
-			names.push(GEOGRAPHY.name);
-			return names.join(', ');
-		}
+function admin_area_raster_index(variant, id) {
+	const data = maybe(GEOGRAPHY, 'divisions', variant, 'raster', 'data');
+	return data ? data.findIndex(v => v == id) : -1;
+}
+
+export function admin_location_path(variant, id) {
+	const raster_index = admin_area_raster_index(variant, id);
+	const tiers = [];
+
+	if (raster_index < 0) {
+		const name = maybe(GEOGRAPHY, 'divisions', variant, 'csv', 'table', id);
+		if (name) tiers.push({ "label": maybe(GEOGRAPHY, 'divisions', variant, 'name'), "name": name });
+		return tiers;
 	}
-	return [maybe(GEOGRAPHY, 'divisions', variant, 'name'), GEOGRAPHY.name].filter(Boolean).join(', ');
+
+	for (let i = 1; i <= variant; i++) {
+		const area_id = maybe(GEOGRAPHY, 'divisions', i, 'raster', 'data', raster_index);
+		const name = maybe(GEOGRAPHY, 'divisions', i, 'csv', 'table', area_id);
+		if (name) tiers.push({ "label": maybe(GEOGRAPHY, 'divisions', i, 'name'), "name": name });
+	}
+	return tiers;
+}
+
+export function admin_location_name(variant, id) {
+	const path = admin_location_path(variant, id);
+	const names = path.length
+		? path.map(t => t.name).reverse()
+		: [maybe(GEOGRAPHY, 'divisions', variant, 'name')];
+
+	names.push(GEOGRAPHY.name);
+	return names.filter(Boolean).join(', ');
 }
 
 function location_entry(fields, props) {
@@ -395,12 +409,12 @@ function build_admin_row(item, analysis_name) {
 	const info = { "variant": STATE.variant, "name": item.name };
 	const [fields, props, raw] = get_admin_area_layer_data(STATE.variant, item.id);
 
-	const { feature, feature_type, detailedData } = area_info(
+	const { detailedData } = area_info(
 		fields, props, null, item.priority, analysis_name, null, info, raw,
 	);
 
 	return {
-		...(feature && feature_type ? { [feature_type]: feature } : {}),
+		...Object.fromEntries(admin_location_path(STATE.variant, item.id).map(t => [t.label, t.name])),
 		...Object.fromEntries(
 			detailedData.map(data => {
 				const header = data.unit ? `${data.label} - ${data.unit}` : data.label;

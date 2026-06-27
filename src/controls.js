@@ -9,7 +9,7 @@ import {
 } from './controls-search.js';
 
 import {
-	enough_datasets,
+	enough_datasets_for_index,
 } from './analysis.js';
 
 import bind from '../lib/bind.js';
@@ -31,7 +31,7 @@ function branch_recount() {
 		const attr = b.getAttribute('bind');
 		const t = qs(`.controls-branch-tab[bind=${attr}]`);
 
-		if (enough_datasets(attr))
+		if (enough_datasets_for_index(attr))
 			t.classList.remove('missing');
 		else
 			t.classList.add('missing');

@@ -3,7 +3,7 @@ import bind from '../lib/bind.js';
 import modal from '../lib/modal.js';
 
 import {
-	enough_datasets,
+	enough_datasets_for_index,
 	analysis_colorscale_svg,
 } from './analysis.js';
 
@@ -110,7 +110,7 @@ export function indexes() {
 	function i_elem(t, v) {
 		const d = ce('option',  v, { "value": t });
 
-		if (!enough_datasets(t))
+		if (!enough_datasets_for_index(t))
 			d.setAttribute('disabled', "");
 
 		return d;

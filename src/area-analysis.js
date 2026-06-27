@@ -405,16 +405,34 @@ function build_raster_row(item, analysis_name) {
 	};
 }
 
+function admin_tier_names(variant, id) {
+	const csv = maybe(DST.get('admin-tiers'), 'csv', 'data');
+	const cols = csv?.columns;
+	if (!cols) return {};
+
+	const row = csv.find(r => r[cols[variant - 1]] == id);
+	if (!row) return {};
+
+	const out = {};
+	for (let i = 1; i <= variant; i++) {
+		const division = GEOGRAPHY.divisions[i];
+		const name = maybe(division, 'csv', 'table', row[cols[i - 1]]);
+		if (division?.name && name) out[division.name] = name;
+	}
+	return out;
+}
+
 function build_admin_row(item, analysis_name) {
 	const info = { "variant": STATE.variant, "name": item.name };
 	const [fields, props, raw] = get_admin_area_layer_data(STATE.variant, item.id);
 
-	const { detailedData } = area_info(
+	const { feature, feature_type, detailedData } = area_info(
 		fields, props, null, item.priority, analysis_name, null, info, raw,
 	);
 
 	return {
-		...Object.fromEntries(admin_location_path(STATE.variant, item.id).map(t => [t.label, t.name])),
+		...admin_tier_names(STATE.variant, item.id),
+		...(feature && feature_type ? { [feature_type]: feature } : {}),
 		...Object.fromEntries(
 			detailedData.map(data => {
 				const header = data.unit ? `${data.label} - ${data.unit}` : data.label;
@@ -496,10 +514,7 @@ export function prepare_tabular_data(results) {
 		[h, ...(children_of.get(h) || []).filter(c => row.hasOwnProperty(c))],
 	);
 
-	const locked = new Set([
-		...fixed_order,
-		...GEOGRAPHY.divisions.slice(is_raster ? 1 : 0).filter(d => row.hasOwnProperty(d.name)).map(d => d.name),
-	]);
+	const locked = new Set(["Priority score", analysis_name]);
 
 	const column_meta = new Map(headers.map(h => {
 		const is_sub = sub_targets.has(h);
@@ -512,9 +527,18 @@ export function prepare_tabular_data(results) {
 		}];
 	}));
 
-	const selector_groups = headers
-		.filter(h => { const m = column_meta.get(h); return !m.locked && !m.subordinate; })
+	const admin_name_headers = GEOGRAPHY.divisions.slice(is_raster ? 1 : 0)
+		.filter(d => row.hasOwnProperty(d.name)).map(d => d.name);
+	const location_headers = ["Latitude", "Longitude", ...admin_name_headers].filter(h => headers.includes(h));
+	const location_set = new Set(location_headers);
+
+	const data_groups = headers
+		.filter(h => { const m = column_meta.get(h); return !m.locked && !m.subordinate && !location_set.has(h); })
 		.map(h => ({ "header": h, "children": (children_of.get(h) || []).filter(c => row.hasOwnProperty(c)) }));
+
+	const selector_groups = location_headers.length
+		? [{ "header": "Location", "synthetic": true, "children": location_headers }, ...data_groups]
+		: data_groups;
 
 	return { headers, "area_type": area_type(STATE.variant), analysis_name, is_raster, column_meta, selector_groups };
 }

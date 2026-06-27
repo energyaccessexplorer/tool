@@ -307,16 +307,6 @@
   background: #006640;
 }
 
-#right-panel-top-actions {
-  display: none;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid #E7E6E6;
-}
-
 #analysis-blank-state,
 #data-blank-state {
   display: none;
@@ -987,6 +977,24 @@ dialog .saved-analysis-last-viewed {
 
 .column-selector-item.subordinate {
   padding-left: 20px;
+}
+
+.column-group-label {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  color: #3D3B3B;
+}
+
+.column-limit-notice {
+  font-size: 13px;
+  line-height: 16px;
+  color: #7A7878;
+  margin-bottom: 8px;
+}
+
+.column-limit-notice.hidden {
+  display: none;
 }
 
 .high-priority-areas-list-all-table-container {

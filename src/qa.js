@@ -18,8 +18,6 @@ import controls from './qa-controls.js';
 
 import outputs from './qa-outputs.js';
 
-import snapshot from './qa-snapshot.js';
-
 import indexes from './qa-indexes.js';
 
 import {
@@ -53,7 +51,6 @@ const batches = {
 	],
 	controls,
 	outputs,
-	snapshot,
 	indexes,
 };
 
@@ -69,7 +66,7 @@ export function run() {
 	if (!p) return;
 
 	if (p === "all")
-		for (const b of ['controls', 'outputs', 'snapshot', 'indexes'])
+		for (const b of ['controls', 'outputs', 'indexes'])
 			QA.steps = QA.steps.concat(batches[b]);
 
 	else if (!batches[p])

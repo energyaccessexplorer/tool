@@ -1,12 +1,7 @@
-import bind from '../lib/bind.js';
-
-import modal from '../lib/modal.js';
-
 import bubblemessage from '../lib/bubblemessage.js';
 
 import analysis_run, {
 	analysis_colorscale,
-	analysis_colorscale_svg,
 	division_averages,
 	priority_scale,
 	aggregate_layer_values,
@@ -18,27 +13,15 @@ import {
 
 import {
 	svg_pie,
-	loading,
 } from './utils.js';
-
-import {
-	extract as user_extract,
-	register_login,
-} from './user.js';
 
 import {
 	outputcanvas as plot_outputcanvas,
 } from './plot.js';
 
 import {
-	pptx as report_pptx,
-} from './report.js';
-
-import {
 	ce,
-	delay,
 	qs,
-	tmpl,
 } from '../lib/helpers.js';
 
 function variant_raster(raster) {
@@ -96,115 +79,6 @@ export async function generate_summary_data() {
 
 	return SUMMARY;
 }
-
-async function summary() {
-	await generate_summary_data();
-
-	const content = ce('div');
-
-	const graphs = ce('div', null, { "id": "summary-graphs" });
-	const graphs_tab = ce('div', graphs, { "class": 'tab' });
-
-	const r = bind(tmpl('#ramp'), {
-		"left":   "Low",
-		"middle": "Medium",
-		"right":  "High",
-	});
-
-	const scale = ce('div');
-	scale.append(analysis_colorscale_svg.cloneNode(true), r);
-
-	for (const idxn of Object.keys(EAE['indexes'])) {
-		const apie = SUMMARY[idxn]['area']['pie'];
-		const ppie = SUMMARY[idxn]['population-density']['pie'];
-
-		const container = tmpl('#index-graphs-container-template');
-		qs('.index-graphs-group #area-number', container).parentElement.append(apie.svg);
-		qs('.index-graphs-group #population-number', container).parentElement.append(ppie.svg);
-
-		graphs.append(
-			ce('div',
-			   [
-				   ce('div', EAE['indexes'][idxn]['name'], { "class": 'up-title' }),
-				   container,
-				   ce('div', (SUMMARY[idxn]['area']['total'] === 0) ? ce('code', "(no datasets selected)") : null, { "style": "text-align: center; font-size: smaller;" }),
-			   ],
-			   { "class": 'index-group' }));
-	}
-
-	graphs.append(ce('div', scale.cloneNode(true), { "class": "index-graphs-scale" }));
-
-	const s = analysis_colorscale.stops;
-
-	const lowmedhigh = i => ["low", "low-med", "medium", "med-high", "high"][i];
-
-	const tables_tab = ce('div', null, { "class": 'tab hidden' });
-
-	for (const j of ['area', 'population-density']) {
-		const table = ce('table', null, { "class": 'summary' });
-		let thead, tbody, thr;
-
-		const title = ce('div', `${j} share`, { "class": 'up-title' });
-
-		table.append(thead = ce('thead'), tbody = ce('tbody'));
-		thead.append(thr = ce('tr', ce('th'), { "class": 'number-labels-row' }));
-		s.forEach((x,i) => thr.append(ce('th', lowmedhigh(i), { "style": `background-color: ${x};`})));
-
-		for (const k in SUMMARY) {
-			const tr = ce('tr', ce('td', EAE['indexes'][k]['name'], { "class": 'index-name' }));
-			const { amounts } = compute_share_amounts(SUMMARY[k][j]);
-			s.forEach((_,i) => tr.append(ce('td', amounts[i].toLocaleString())));
-
-			tbody.append(tr);
-		}
-
-		tables_tab.append(title, table);
-	}
-
-	let ss = true;
-
-	const switcher = ce('button', "Summary Table", { "class": 'big-green-button' });
-	switcher.onclick = function() {
-		ss = !ss;
-
-		graphs_tab.classList.toggle('hidden');
-		tables_tab.classList.toggle('hidden');
-
-		this.innerText = ss ? "Summary Table" : "Summary Graphs";
-	};
-
-	const user_id = user_extract('id');
-
-	const pptx_button = ce('button', "Export Presentation", { "class": 'big-green-button' });
-	pptx_button.onclick = async _ => {
-		if (!user_id) {
-			register_login();
-			return;
-		}
-
-		loading(true);
-
-		await delay(0.1);
-		await report_pptx();
-		await delay(5);
-
-		loading(false);
-	};
-
-	content.append(graphs_tab, tables_tab);
-
-	const footer = ce('div', [switcher, pptx_button], { "style": "text-align: center;" });
-
-	new modal({
-		"id":      'snapshot-modal',
-		"header":  "Snapshot",
-		"content": content,
-		"footer":  footer,
-		"destroy": true,
-	}).show();
-
-	return content;
-};
 
 export function compute_share_amounts(data) {
 	const total = Math.round(data['total']);
@@ -270,7 +144,7 @@ export default async function analyse(raster, layer_data = null) {
 
 	// Get the correct population total from layer_data aggregated over analysis-valid pixels
 	// (unscaled raster via aggregate_layer_values, avoids overcounting from oversampled display raster).
-	// When layer_data is not provided (e.g. snapshot modal), compute it now from the analysis mask.
+	// When layer_data is not provided (e.g. PPTX summary data), compute it now from the analysis mask.
 	// Distribution proportions from the display raster above are still correct (overcounting cancels).
 	if (!layer_data) {
 		const mask = { "raster": { "data": raster.map(v => v === -1 ? -1 : 0) } };
@@ -305,22 +179,3 @@ export default async function analyse(raster, layer_data = null) {
 	return o;
 };
 
-/*
- * wrapper
- *
- * A hack. For javascript reasons, loading does not get executed in a
- * blocking manner.
- */
-
-function summary_wrapper() {
-	const prom = new Promise((resolve, _) => {
-		loading(true);
-		setTimeout(_ => resolve("Success!"), 100);
-	});
-
-	prom
-		.then(summary)
-		.then(_ => loading(false));
-};
-
-qs('#summary-button').onclick = summary_wrapper;

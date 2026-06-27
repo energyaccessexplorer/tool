@@ -25,6 +25,13 @@ export function show(results, opts = {}) {
 
 	const { headers, is_raster, analysis_name, column_meta, selector_groups } = data;
 
+	if (opts.enabled_columns?.size) {
+		for (const h of headers) {
+			const meta = column_meta.get(h);
+			if (!meta.locked) meta.visible = opts.enabled_columns.has(h);
+		}
+	}
+
 	const selected_indices = new Set();
 
 	function get_visible_headers() {
@@ -103,17 +110,18 @@ export function show(results, opts = {}) {
 		const grid = document.createElement('div');
 		grid.className = 'column-selector-columns';
 
-		function make_item(header) {
+		function make_item(header, indent) {
 			const meta = column_meta.get(header);
 			const item = tmpl('#column-selector-item-template');
 			bind(item, {
 				"label":     meta.display || header,
 				"checked":   meta.visible ? '' : false,
-				"css_class": meta.subordinate ? 'column-selector-item subordinate' : 'column-selector-item',
+				"css_class": (meta.subordinate || indent) ? 'column-selector-item subordinate' : 'column-selector-item',
 				"on_toggle": function() {
 					meta.visible = this.checked;
 					render_headers();
 					render_page();
+					enforce_column_limit();
 				},
 			});
 			return item;
@@ -122,9 +130,15 @@ export function show(results, opts = {}) {
 		for (const group of selector_groups) {
 			const wrapper = document.createElement('div');
 			wrapper.className = group.children.length ? 'column-group has-children' : 'column-group';
-			wrapper.append(make_item(group.header));
-			for (const child of group.children) {
-				wrapper.append(make_item(child));
+			if (group.synthetic) {
+				const label = document.createElement('span');
+				label.className = 'column-group-label';
+				label.textContent = group.header;
+				wrapper.append(label);
+				for (const child of group.children) wrapper.append(make_item(child, true));
+			} else {
+				wrapper.append(make_item(group.header));
+				for (const child of group.children) wrapper.append(make_item(child));
 			}
 			grid.append(wrapper);
 		}
@@ -150,6 +164,7 @@ export function show(results, opts = {}) {
 
 	bind(content, {
 		"analysis-name":          analysis_name,
+		"column-limit-notice":    opts.max_columns ? `A maximum of ${opts.max_columns} columns can be exported. Uncheck one to select another.` : '',
 		"toggle_column_selector": function() {
 			this.closest('.high-priority-areas-list-all-content').querySelector('.column-selector-panel').classList.toggle('hidden');
 		},
@@ -169,8 +184,20 @@ export function show(results, opts = {}) {
 		},
 	});
 
-	qs('.column-selector-panel', content).append(column_selector_grid());
+	const column_selector_panel = qs('.column-selector-panel', content);
+	const limit_notice = qs('.column-limit-notice', content);
+
+	function enforce_column_limit() {
+		if (!opts.max_columns) return;
+		const at_max = get_visible_headers().length >= opts.max_columns;
+		for (const cb of column_selector_panel.querySelectorAll('input[type="checkbox"]'))
+			cb.disabled = at_max && !cb.checked;
+		limit_notice.classList.toggle('hidden', !at_max);
+	}
+
+	column_selector_panel.append(column_selector_grid());
 	render_headers();
+	enforce_column_limit();
 
 	const footer = tmpl('#high-priority-areas-list-all-footer-template');
 	bind(footer, {

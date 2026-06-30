@@ -169,23 +169,34 @@ export function translateDatasetAttribute(locale, dataset, attributeValue, field
 	return attributeValue;
 }
 
-export function translateCategoryName(locale, categoryName) {
-	if (!categoryName) return '';
-
-	return t(locale, `controls.path.tab.${categoryName}`);
+// Controls-tree tab/subbranch labels are translated from the category's
+// `controls.path_translations` ({ en, fr, zh } per path element), backfilled
+// alongside `controls.path` in the database. Falls back to a humanized slug.
+function pathLabel(locale, translations) {
+	if (translations && typeof translations === 'object') {
+		const v = translations[locale] ?? translations['en'];
+		if (v) return v;
+	}
+	return null;
 }
 
-export function translateSubbranchName(locale, subranchName) {
+export function translateCategoryName(locale, categoryName, translations) {
+	if (!categoryName) return '';
+
+	const label = pathLabel(locale, translations);
+	if (label) return label;
+
+	reportError(new Error(`Missing path_translations for tab: "${categoryName}"`));
+	return humanformat(categoryName);
+}
+
+export function translateSubbranchName(locale, subranchName, translations) {
 	if (!subranchName) return '';
 
-	const key = `controls.path.subbranch.${subranchName}`;
-	const entry = window.EAE['translations']?.[key];
+	const label = pathLabel(locale, translations);
+	if (label) return label;
 
-	if (entry) {
-		return t(locale, key);
-	}
-
-	reportError(new Error(`Missing subbranch translation key: "${key}"`));
+	reportError(new Error(`Missing path_translations for subbranch: "${subranchName}"`));
 	return humanformat(subranchName);
 }
 

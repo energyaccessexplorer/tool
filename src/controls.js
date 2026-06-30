@@ -60,7 +60,7 @@ export function recount() {
 
 const tabs_el = qs('#controls-tabs');
 
-function create_or_update_tab(name, locale = window.LOCALE) {
+function create_or_update_tab(name, translations, locale = window.LOCALE) {
 	const id = 'controls-tab-' + name;
 	let t = qs(`#${id}.controls-branch-tab`);
 
@@ -72,7 +72,7 @@ function create_or_update_tab(name, locale = window.LOCALE) {
 	}
 
 	bind(t, {
-		"label":  translateCategoryName(locale, name),
+		"label":  translateCategoryName(locale, name, translations),
 		"select": (_) => select_tab(t, name),
 	}, { "final": false });
 
@@ -93,7 +93,7 @@ function create_or_update_branch(name) {
 	return b;
 }
 
-function create_or_update_subbranch(name, parent, locale = window.LOCALE) {
+function create_or_update_subbranch(name, parent, translations, locale = window.LOCALE) {
 	const id = 'controls-subbranch-' + name;
 	let sb = qs(`#${id}.controls-subbranch`, parent);
 
@@ -110,7 +110,7 @@ function create_or_update_subbranch(name, parent, locale = window.LOCALE) {
 	const titleEl = qs('.controls-subbranch-title', sb);
 
 	bind(titleEl, {
-		"label": translateSubbranchName(locale, name),
+		"label": translateSubbranchName(locale, name, translations),
 	}, { "final": false });
 
 	return sb;
@@ -128,8 +128,10 @@ export function refreshControlsUI(locale) {
 		const path = maybe(ds.category, 'controls', 'path');
 		if (!maybe(path, 'length')) continue;
 
+		const ptr = maybe(ds.category, 'controls', 'path_translations') || [];
+
 		if (!seenTabs.has(path[0])) {
-			create_or_update_tab(path[0], locale);
+			create_or_update_tab(path[0], ptr[0], locale);
 			seenTabs.add(path[0]);
 		}
 
@@ -137,7 +139,7 @@ export function refreshControlsUI(locale) {
 			const branchId = `${path[0]}-${path[1]}`;
 			if (!seenSubbranches.has(branchId)) {
 				const b = create_or_update_branch(path[0]);
-				create_or_update_subbranch(path[1], b, locale);
+				create_or_update_subbranch(path[1], b, ptr[1], locale);
 				seenSubbranches.add(branchId);
 			}
 		}
@@ -204,9 +206,11 @@ export default class dscontrols extends HTMLElement {
 
 		if (!maybe(path, 'length')) return;
 
-		create_or_update_tab(path[0]);
+		const ptr = maybe(ds.category, 'controls', 'path_translations') || [];
+
+		create_or_update_tab(path[0], ptr[0]);
 		const b = create_or_update_branch(path[0]);
-		const sb = create_or_update_subbranch(path[1], b);
+		const sb = create_or_update_subbranch(path[1], b, ptr[1]);
 
 		const container = qs('.controls-container', sb);
 		if (container) container.append(this);

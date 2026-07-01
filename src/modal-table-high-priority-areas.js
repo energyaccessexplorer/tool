@@ -167,7 +167,7 @@ export function show(results, opts = {}) {
 
 	bind(content, {
 		"analysis-name":          analysis_name,
-		"column-limit-notice":    opts.max_columns ? `A maximum of ${opts.max_columns} columns can be exported. Uncheck one to select another.` : '',
+		"column-limit-notice":    opts.max_columns ? t(window.LOCALE, 'modal.high_priority_table.column_limit_notice', { "max": opts.max_columns }) : '',
 		"toggle_column_selector": function() {
 			this.closest('.high-priority-areas-list-all-content').querySelector('.column-selector-panel').classList.toggle('hidden');
 		},
@@ -320,7 +320,7 @@ export function show(results, opts = {}) {
 			bind(row, {
 				"cells":     get_visible_headers().map(header => {
 					const raw = row_data[header];
-					const value = typeof raw === 'number' ? raw.toLocaleString() : (raw || '');
+					const value = typeof raw === 'number' ? raw.toLocaleString(window.LOCALE) : (raw || '');
 					return { value };
 				}),
 				"on_select": function() {

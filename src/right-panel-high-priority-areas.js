@@ -67,7 +67,7 @@ function view_all_locations() {
 function format_area_type(variant) {
 	const type = area_type(variant);
 	if (variant === 'raster') {
-		return `areas (${type})`;
+		return t(window.LOCALE, 'right_panel.high_priority.raster_areas', { "area": type });
 	} else {
 		return type.toLowerCase();
 	}
@@ -171,13 +171,13 @@ function render_pagination() {
 	if (!paginationInfo || !paginationDiv) return;
 
 	if (totalPages <= 1 && totalCount > 0) {
-		paginationInfo.textContent = t(window.LOCALE, totalCount === 1 ? 'right_panel.high_priority.showing_count_one' : 'right_panel.high_priority.showing_count_other', { "count": totalCount.toLocaleString() });
+		paginationInfo.textContent = t(window.LOCALE, totalCount === 1 ? 'right_panel.high_priority.showing_count_one' : 'right_panel.high_priority.showing_count_other', { "count": totalCount.toLocaleString(window.LOCALE) });
 		return;
 	}
 
 	if (totalCount === 0) return;
 
-	paginationInfo.textContent = t(window.LOCALE, 'right_panel.high_priority.showing_range', { "start": (startIdx + 1).toLocaleString(), "end": endIdx.toLocaleString(), "total": totalCount.toLocaleString() });
+	paginationInfo.textContent = t(window.LOCALE, 'right_panel.high_priority.showing_range', { "start": (startIdx + 1).toLocaleString(window.LOCALE), "end": endIdx.toLocaleString(window.LOCALE), "total": totalCount.toLocaleString(window.LOCALE) });
 
 	const prevBtn = ce('button', null, { "class": 'pagination-btn chevron' });
 	prevBtn.innerHTML = '<i class="bi bi-chevron-left"></i>';
@@ -324,7 +324,7 @@ export function init() {
 
 	const section = qs('#right-panel #analysis-locations-section');
 	translateNode(window.LOCALE, section);
-	setup_about_button(section, () => `Showing ${format_area_type(STATE.variant)} with the highest prioritization scores based on your analysis criteria.`);
+	setup_about_button(section, () => t(window.LOCALE, 'right_panel.high_priority.about', { "area": format_area_type(STATE.variant) }));
 
 };
 

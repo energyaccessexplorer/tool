@@ -217,7 +217,7 @@ function format_detail(key, label, value, raw, subordinate) {
 	const unit = raw.units[key];
 	const display_unit = unit === 'count' ? '' : translateUnit(window.LOCALE, unit || '');
 	const num = Number(value);
-	const formatted = Number.isFinite(num) ? num.toLocaleString() : value;
+	const formatted = Number.isFinite(num) ? num.toLocaleString(window.LOCALE) : value;
 	return {
 		"label":       label || key,
 		"value":       format_value_unit(formatted, display_unit),

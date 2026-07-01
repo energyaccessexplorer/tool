@@ -92,7 +92,7 @@ export async function update(raster_index, admin_info, analysis_value) {
 	body.append(make_row('supply', entries['supply'], true));
 	body.append(make_row('ani', entries['ani']));
 
-	setup_about_button(card, EAE['indexes']['eai']['explain']);
+	setup_about_button(card, t(window.LOCALE, 'modal.eae_info.index.eai.explain'));
 	translateNode(window.LOCALE, card);
 
 	container.append(card);
@@ -121,14 +121,14 @@ export function update_location_summary(data, admin_info) {
 	const container = qs('#location-summary');
 	if (!container) return;
 
-	const score_entry = data?.basicData?.find(e => e.label === 'Priority score');
+	const score_entry = data?.basicData?.find(e => e.key === 'Priority score');
 	if (!score_entry) return;
 
 	const area_label = admin_info
 		? area_type(admin_info.variant)
-		: 'Priority areas (' + area_type('raster') + ')';
+		: t(window.LOCALE, 'right_panel.prioritization.priority_areas', { "area": area_type('raster') });
 
-	const location_entry = data.basicData.find(e => e.label === 'Location');
+	const location_entry = data.basicData.find(e => e.key === 'Location');
 
 	const coords_el = qs('.location-coordinates', container);
 	coords_el.textContent = data.coordinates ?? '';

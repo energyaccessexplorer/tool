@@ -187,7 +187,7 @@ function draw_snapshots(snapshots, geographies, container, trees) {
 		s.url = base(s.env) + `/tool/a/?id=${s.geography_id}&snapshot=${s.time}`;
 
 		const d = new Date(s.time);
-		s.date = d.toLocaleDateString() + " at " + d.toLocaleTimeString();
+		s.date = d.toLocaleString(window.LOCALE, { "dateStyle": 'long', "timeStyle": 'short' });
 
 		const geos = trees.find(t => t.id === s.geography_id).path.map(e => geographies.find(g => g.id === e).name);
 

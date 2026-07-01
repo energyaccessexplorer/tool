@@ -85,10 +85,17 @@ export function show_eae_info_modal() {
 	const content = tmpl('#eae-info-modal-template');
 	translateNode(window.LOCALE, content);
 
+	const index_info = {};
+	for (const k in EAE['indexes'])
+		index_info[k] = {
+			"name":    t(window.LOCALE, 'left_panel.output.index.' + k),
+			"explain": t(window.LOCALE, 'modal.eae_info.index.' + k + '.explain'),
+		};
+
 	new modal({
 		"id":      'eae-info-modal',
 		"header":  t(window.LOCALE, 'modal.eae_info.title'),
-		"content": bind(content, EAE['indexes']),
+		"content": bind(content, index_info),
 		"destroy": true,
 	}).show();
 }

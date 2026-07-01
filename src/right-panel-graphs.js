@@ -23,7 +23,7 @@ function update_graph_section(section, amounts, unit, description) {
 
 	analysis_colorscale.stops.slice().reverse().map((color, i) => {
 		const idx = analysis_colorscale.stops.length - 1 - i;
-		const value = `${amounts[idx].toLocaleString()} ${unit}`;
+		const value = `${amounts[idx].toLocaleString(window.LOCALE)} ${unit}`;
 
 		const item = tmpl('#discrete-scale-item-template');
 		bind(item, {
@@ -89,8 +89,8 @@ export function graphs(summary) {
 		"unit":        t(locale, 'right_panel.prioritization.graphs.people_unit'),
 		"description": (total, high) => t(locale, 'right_panel.prioritization.graphs.pop_desc', {
 			indexName,
-			"x": total.toLocaleString(),
-			"y": high.toLocaleString(),
+			"x": total.toLocaleString(window.LOCALE),
+			"y": high.toLocaleString(window.LOCALE),
 		}),
 	});
 
@@ -101,8 +101,8 @@ export function graphs(summary) {
 		"unit":        'km²',
 		"description": (total, high) => t(locale, 'right_panel.prioritization.graphs.area_desc', {
 			indexName,
-			"x": `${total.toLocaleString()} km²`,
-			"y": `${high.toLocaleString()} km²`,
+			"x": `${total.toLocaleString(window.LOCALE)} km²`,
+			"y": `${high.toLocaleString(window.LOCALE)} km²`,
 		}),
 	});
 };

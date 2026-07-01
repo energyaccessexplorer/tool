@@ -222,6 +222,10 @@ modal.eae_info.priority_1km.body,Selecting this analysis area provides a raster 
 modal.eae_info.other_areas.title,Other analysis areas,Autres zones d'analyse,其他分析区域
 modal.eae_info.other_areas.body,"Depending on the currently selected geography, it is possible to change the prioritization output to wider geographical areas such as districts, regions or zones for more high level analysis.","Selon la géographie sélectionnée, il est possible de modifier la sortie de priorisation vers des zones géographiques plus larges.",根据当前选定的地理位置，可以将优先级输出更改为更广泛的地理区域（如地区、地区或区域）以进行更高级别的分析。
 modal.eae_info.view_technical_note,View technical note,Voir la note technique,查看技术说明
+modal.eae_info.index.eai.explain,"Identifies areas with higher energy demand and supply which are characterized with higher index values. It is an aggregated measure of all selected data sets under both Demand and Supply categories.","Identifie les zones à plus forte demande et offre d'énergie, caractérisées par des valeurs d'indice plus élevées. Il s'agit d'une mesure agrégée de tous les jeux de données sélectionnés dans les catégories Demande et Offre.",识别能源需求和供应较高的区域，这些区域的指数值较高。它是需求和供应类别下所有选定数据集的汇总度量。
+modal.eae_info.index.demand.explain,"Identifies areas with higher energy demand which are characterized with higher index values. It is an aggregated and weighted measure of all selected data sets under Demographics and Socio-economic activities.","Identifie les zones à plus forte demande d'énergie, caractérisées par des valeurs d'indice plus élevées. Il s'agit d'une mesure agrégée et pondérée de tous les jeux de données sélectionnés sous Démographie et Activités socio-économiques.",识别能源需求较高的区域，这些区域的指数值较高。它是人口统计和社会经济活动下所有选定数据集的汇总加权度量。
+modal.eae_info.index.supply.explain,"Identifies areas with higher energy supply which are characterized with higher index values. It is an aggregated and weighted measure of all selected data sets under Resource Availability and Infrastructure.","Identifie les zones à plus forte offre d'énergie, caractérisées par des valeurs d'indice plus élevées. Il s'agit d'une mesure agrégée et pondérée de tous les jeux de données sélectionnés sous Disponibilité des ressources et Infrastructure.",识别能源供应较高的区域，这些区域的指数值较高。它是资源可用性和基础设施下所有选定数据集的汇总加权度量。
+modal.eae_info.index.ani.explain,"Identifies areas where market assistance is needed the most which are characterized with higher index values. It is an aggregated and weighted measure of selected data sets under both Demand and Supply categories indicating high energy demand, low economic activity, and low access to infrastructure and resources.","Identifie les zones où l'assistance du marché est la plus nécessaire, caractérisées par des valeurs d'indice plus élevées. Il s'agit d'une mesure agrégée et pondérée des jeux de données sélectionnés dans les catégories Demande et Offre, indiquant une forte demande énergétique, une faible activité économique et un faible accès aux infrastructures et aux ressources.",识别最需要市场援助的区域，这些区域的指数值较高。它是需求和供应类别下选定数据集的汇总加权度量，表明能源需求高、经济活动低以及基础设施和资源获取低。
 modal.points_input.header,Input Longitude/Latitude,Saisir Longitude / Latitude,输入经度/纬度
 modal.points_input.longitude_placeholder,Longitude,Longitude,经度
 modal.points_input.latitude_placeholder,Latitude,Latitude,纬度
@@ -232,6 +236,7 @@ modal.high_priority_table.download_selected,Download selected rows,Télécharger
 modal.high_priority_table.data_download_summary,Data download will include a summary of your analysis.,Le téléchargement de données inclura un résumé de votre analyse.,数据下载将包含您的分析摘要。
 modal.high_priority_table.per_page,Per page,Par page,每页
 modal.high_priority_table.toggle_columns,Toggle columns,Afficher/masquer les colonnes,切换列
+modal.high_priority_table.column_limit_notice,A maximum of {{max}} columns can be exported. Uncheck one to select another.,Un maximum de {{max}} colonnes peut être exporté. Décochez-en une pour en sélectionner une autre.,最多可导出 {{max}} 列。取消选中一列以选择另一列。
 my_eae.page.title,My EAE,Mon EAE,我的 EAE
 my_eae.tabs.saved_analysis,Saved Analysis,Analyse sauvegardée,保存的分析
 my_eae.tabs.account,Account,Compte,账户
@@ -312,10 +317,14 @@ right_panel.high_priority.unknown_location,Unknown location,Lieu inconnu,未知�
 right_panel.high_priority.area_count_one,{{count}} area,{{count}} zone,{{count}} 个区域
 right_panel.high_priority.area_count_other,{{count}} areas,{{count}} zones,{{count}} 个区域
 right_panel.high_priority.priority_score,{{score}}% priority score,score de priorité de {{score}} %,{{score}}% 优先级评分
+right_panel.high_priority.areas,areas,zones,区域
+right_panel.high_priority.raster_areas,areas ({{area}}),zones ({{area}}),区域（{{area}}）
+right_panel.high_priority.about,Showing {{area}} with the highest prioritization scores based on your analysis criteria.,Affichage de {{area}} avec les scores de priorisation les plus élevés selon vos critères d'analyse.,根据您的分析标准显示优先级得分最高的{{area}}。
 right_panel.poi.count_html_one,There is <strong>{{n}}</strong> point of interest within <strong>{{radius_km}}km</strong> of this area of interest.,Il y a <strong>{{n}}</strong> point d'intérêt à moins de <strong>{{radius_km}} km</strong> de cette zone d'intérêt.,在此关注区域 <strong>{{radius_km}}km</strong> 范围内有 <strong>{{n}}</strong> 个关注点。
 right_panel.poi.count_html_other,There are <strong>{{n}}</strong> points of interest within <strong>{{radius_km}}km</strong> of this area of interest.,Il y a <strong>{{n}}</strong> points d'intérêt à moins de <strong>{{radius_km}} km</strong> de cette zone d'intérêt.,在此关注区域 <strong>{{radius_km}}km</strong> 范围内有 <strong>{{n}}</strong> 个关注点。
 right_panel.poi.about_tooltip,Shows points of interest near the selected pixel.,Affiche les points d'intérêt à proximité du pixel sélectionné.,显示所选像素附近的关注点。
 right_panel.prioritization.priority_score_badge,{{score}} priority score,score de priorité de {{score}},{{score}} 优先级评分
+right_panel.prioritization.priority_areas,Priority areas ({{area}}),Zones prioritaires ({{area}}),优先区域（{{area}}）
 toast.dataset_error.label,Dataset/File error,Erreur de jeu de données/fichier,数据集/文件错误
 toast.dataset_error.divisions,'{{name}}' requires a geography->divisions->{{tier}}. This is not fatal but the dataset is now disabled.,« {{name}} » nécessite une geography->divisions->{{tier}}. Ce n'est pas fatal mais le jeu de données est maintenant désactivé.,'{{name}}' 需要 geography->divisions->{{tier}}。这不是致命错误，但该数据集现已禁用。
 toast.dataset_error.category,'{{name}}' has category '{{category}}' which requires a {{type}} file. This is not fatal but the dataset is now disabled.,« {{name}} » a la catégorie « {{category}} » qui nécessite un fichier {{type}}. Ce n'est pas fatal mais le jeu de données est maintenant désactivé.,'{{name}}' 的类别 '{{category}}' 需要 {{type}} 文件。这不是致命错误，但该数据集现已禁用。

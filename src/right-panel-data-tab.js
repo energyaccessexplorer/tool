@@ -356,7 +356,7 @@ async function update_top_level_geography() {
 		}
 
 		const num = Number(value);
-		const formatted = Number.isFinite(num) ? num.toLocaleString() : String(value);
+		const formatted = Number.isFinite(num) ? num.toLocaleString(window.LOCALE) : String(value);
 		const display_unit = unit === 'count' ? '' : translateUnit(window.LOCALE, unit);
 
 		detailedData.push({

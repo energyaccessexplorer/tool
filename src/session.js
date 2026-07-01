@@ -52,7 +52,7 @@ function request_authentication() {
 
 function saved_analysis_modal(s, updateCallback, saveAsNewCallback) {
 	const lastViewedDate = new Date(s.time);
-	const lastViewed = t(window.LOCALE, 'modal.save_analysis.last_viewed', { "date": lastViewedDate.toLocaleDateString() });
+	const lastViewed = t(window.LOCALE, 'modal.save_analysis.last_viewed', { "date": lastViewedDate.toLocaleDateString(window.LOCALE) });
 
 	const template = tmpl('#saved-analysis-modal-template');
 

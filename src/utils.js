@@ -591,7 +591,7 @@ export function area_type(variant) {
 		const r = GEOGRAPHY.resolution;
 		return (r % 1000) === 0 ? (r / 1000) + 'km²' : r + 'm²';
 	} else {
-		return GEOGRAPHY.divisions[variant]?.name || 'areas';
+		return GEOGRAPHY.divisions[variant]?.name || t(window.LOCALE, 'right_panel.high_priority.areas');
 	}
 }
 

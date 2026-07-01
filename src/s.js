@@ -23,7 +23,7 @@ import {
 	qs,
 } from '../lib/helpers.js';
 
-import { t, translateNode } from './translate.js';
+import { t, translateNode, initLocalePicker } from './translate.js';
 
 function preload_boundaries(id) {
 	return API.get('datasets', {
@@ -215,6 +215,8 @@ export async function init() {
 	translateNode(window.LOCALE, document);
 
 	if (window.innerWidth <= 768) return;
+
+	initLocalePicker(window.LOCALE);
 
 	sentry_setup_global_handlers(ENV[0]);
 	await self();

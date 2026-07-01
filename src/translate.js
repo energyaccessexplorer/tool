@@ -111,22 +111,37 @@ export function initLocalePicker(locale) {
 		item.textContent = label;
 		item.dataset.locale = l;
 		if (l === locale) item.classList.add('active');
-		item.onclick = e => {
-			e.preventDefault();
-			window.LOCALE = l;
-			localStorage.setItem('locale', l);
-			current.textContent = l.toUpperCase();
-			dropdown.querySelectorAll('a').forEach(a => a.classList.toggle('active', a.dataset.locale === l));
-			translateNode(l, document);
+		function applyLocale(code) {
+			window.LOCALE = code;
+			localStorage.setItem('locale', code);
+			current.textContent = code.toUpperCase();
+			dropdown.querySelectorAll('a').forEach(a => a.classList.toggle('active', a.dataset.locale === code));
+			translateNode(code, document);
 			updateDatasetTranslations();
 			updateNavTranslations();
 			_uiUpdaters.forEach(fn => fn());
+
+			if (window.Transifex?.live?.translateTo) {
+				window.Transifex.live.translateTo(code);
+			}
+		}
+
+		item.onclick = e => {
+			e.preventDefault();
+			applyLocale(l);
 		};
 		dropdown.append(item);
 	}
 
 	picker.append(current, dropdown);
 	nav.append(picker);
+
+	window.addEventListener('storage', e => {
+		if (e.key === 'locale' && e.newValue && e.newValue !== window.LOCALE) {
+			const item = dropdown.querySelector(`a[data-locale="${e.newValue}"]`);
+			if (item) item.click();
+		}
+	});
 
 	updateNavTranslations();
 }

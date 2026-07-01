@@ -61,6 +61,7 @@ modals.save_analysis.auth_message,"Create a My EAE account, or sign in to your e
 modals.save_analysis.auth_create,Create account,Créer un compte,创建帐户
 modals.save_analysis.auth_signin,Sign in,Se connecter,登录
 modals.save_analysis.saved_message,You are currently viewing an analysis already saved to your My EAE account. You can either update your existing saved analysis or save your changes as a new analysis.,"Vous consultez actuellement une analyse déjà enregistrée sur votre compte Mon EAE. Vous pouvez soit mettre à jour votre analyse enregistrée existante, soit enregistrer vos modifications en tant que nouvelle analyse.",您当前正在查看已保存到您的 My EAE 帐户的分析。您可以更新现有的保存分析，也可以将更改保存为新分析。
+modals.save_analysis.view_in_my_eae,View in My EAE,Voir dans Mon EAE,在“我的 EAE”中查看
 left_panel.geographies_search.placeholder,Geographies search,Recherche de géographies,地理区域搜索
 left_panel.geographies_search.default_info,Showing all subgeographies,Affichage de toutes les sous-géographies,显示所有下级地理区域
 left_panel.vectors_search.placeholder,Search features,Rechercher des entités,搜索要素
@@ -164,6 +165,7 @@ right_panel.data.descriptions.raster.default,The average {{name}} in this area i
 right_panel.footer.save,Save,Enregistrer,保存
 right_panel.footer.share,Share,Partager,分享
 right_panel.footer.export,Export,Exporter,导出
+right_panel.footer.export_title,"Export analysis (PowerPoint, TIFF, CSV)","Exporter l'analyse (PowerPoint, TIFF, CSV)",导出分析（PowerPoint、TIFF、CSV）
 map_popup.priority_score,Priority score,Score de priorité,优先级评分
 map_popup.location,Location,Emplacement,位置
 map_popup.km_proximity,{{n}} km (proximity to),{{n}} km (proximité),{{n}} 公里（接近度）
@@ -185,6 +187,7 @@ modal.save_analysis.updated_toast,Analysis updated successfully,Analyse mise à 
 modal.save_analysis.updated_toast_caption,Your analysis was updated in your My EAE account.,Votre analyse a été mise à jour dans votre compte Mon EAE.,"您的分析已在您的""我的 EAE""账户中更新。"
 modal.save_analysis.saved_toast,Analysis saved successfully,Analyse sauvegardée avec succès,分析已成功保存
 modal.save_analysis.saved_toast_caption,Your analysis was saved to your My EAE account.,Votre analyse a été sauvegardée dans votre compte Mon EAE.,"您的分析已保存到您的""我的 EAE""账户。"
+modal.save_analysis.save_failed,Save failed,Échec de l'enregistrement,保存失败
 modal.export.header,Export options,Options d'exportation,导出选项
 modal.export.generating,Generating...,Génération en cours...,生成中...
 modal.export.download_all,Download all,Tout télécharger,全部下载
@@ -195,7 +198,7 @@ modal.export.map_tiff.title,Map TIFF,Carte TIFF,地图 TIFF
 modal.export.map_tiff.desc,A TIFF file of the prioritization raster image generated from your analysis.,Un fichier TIFF de l'image raster de priorisation générée par votre analyse.,从您的分析生成的优先级光栅图像的 TIFF 文件。
 modal.export.map_tiff.button,Download .TIFF,Télécharger .TIFF,下载 .TIFF
 modal.export.high_priority.title,High priority areas,Zones hautement prioritaires,高优先级区域
-modal.export.high_priority.desc,A table of the highest priority areas from your analysis.,Un tableau des zones les plus prioritaires de votre analyse.,来自您的分析的最高优先级区域表。
+modal.export.high_priority.desc,"A table of the highest priority <span bind=""area_type""></span> areas from your analysis.","Un tableau des zones <span bind=""area_type""></span> les plus prioritaires de votre analyse.","您分析中优先级最高的<span bind=""area_type""></span>区域表。"
 modal.export.high_priority.button,Download .csv,Télécharger .csv,下载 .csv
 modal.export.pop_area_share.title,Population and area share,Part de population et de superficie,人口和面积份额
 modal.export.pop_area_share.desc,CSV data for the population and area share.,Données CSV pour la part de population et de superficie.,人口和面积份额的 CSV 数据。
@@ -268,6 +271,7 @@ dataset_info.features,features,entités,要素
 dataset_info.file_error,Dataset/File error,Erreur de fichier / jeu de données,数据集/文件错误
 auth.prompt,"In order to save an analysis, you need to be registered with us.","Pour sauvegarder une analyse, vous devez être inscrit.",为了保存分析，您需要向我们注册。
 auth.register_login,Register/Login,S'inscrire / Se connecter,注册/登录
+auth.register,Register,S'inscrire,注册
 mapbox.style.light,Light,Clair,浅色
 nav.tool,Tool,Outil,工具
 nav.about,About,À propos,关于
@@ -304,6 +308,7 @@ utils.copied,Copied,Copié,已复制
 right_panel.high_priority.showing_count_one,Showing {{count}} result,Affichage de {{count}} résultat,显示 {{count}} 个结果
 right_panel.high_priority.showing_count_other,Showing {{count}} results,Affichage de {{count}} résultats,显示 {{count}} 个结果
 right_panel.high_priority.showing_range,Showing {{start}}-{{end}} of {{total}},Affichage de {{start}}-{{end}} sur {{total}},显示 {{total}} 个中的 {{start}}-{{end}}
+right_panel.high_priority.unknown_location,Unknown location,Lieu inconnu,未知位置
 right_panel.high_priority.area_count_one,{{count}} area,{{count}} zone,{{count}} 个区域
 right_panel.high_priority.area_count_other,{{count}} areas,{{count}} zones,{{count}} 个区域
 right_panel.high_priority.priority_score,{{score}}% priority score,score de priorité de {{score}} %,{{score}}% 优先级评分

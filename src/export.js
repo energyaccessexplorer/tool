@@ -283,7 +283,8 @@ export function show_export_modal() {
 		},
 	});
 
-	const header = ce('span', 'Export options', { "class": 'modal-title' });
+	const header = tmpl('#export-options-modal-header');
+	translateNode(window.LOCALE, header);
 
 	new modal({
 		"id":      'export-options-modal',

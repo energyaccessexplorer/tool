@@ -290,7 +290,7 @@
             <span data-t="right_panel.footer.share">Share</span>
           </button>
 
-          <button id="export-button" class="button-icon button-icon-mid footer-action-button" title="Export analysis (PowerPoint, TIFF, CSV)">
+          <button id="export-button" class="button-icon button-icon-mid footer-action-button" title="Export analysis (PowerPoint, TIFF, CSV)" data-t-title="right_panel.footer.export_title">
             <i class="bi bi-download"></i>
             <span data-t="right_panel.footer.export">Export</span>
           </button>
@@ -669,7 +669,7 @@
           <i class="bi bi-table"></i>
         </div>
         <h3 class="card-title" data-t="modal.export.high_priority.title">High priority areas</h3>
-        <p class="card-description">A table of the highest priority <span bind="area_type"></span> areas from your analysis.</p>
+        <p class="card-description" data-t-html="modal.export.high_priority.desc">A table of the highest priority <span bind="area_type"></span> areas from your analysis.</p>
         <button type="button" class="button-small" bind-listen="click" bind-func="export_csv">
           <i class="bi bi-download"></i>
           <span data-t="modal.export.high_priority.button">Download .csv</span>
@@ -688,6 +688,10 @@
         </button>
       </div>
     </div>
+  </template>
+
+  <template id="export-options-modal-header">
+    <span class="modal-title" data-t="modal.export.header">Export options</span>
   </template>
 
   <template id="export-options-modal-footer">
@@ -927,7 +931,7 @@
   </template>
 
   <template id="toast-save-action-template">
-    <a href="/tool/m/" target="_blank" class="button-small" slot="action">View in My EAE</a>
+    <a href="/tool/m/" target="_blank" class="button-small" slot="action" data-t="modals.save_analysis.view_in_my_eae">View in My EAE</a>
   </template>
 
   <template id="request-authentication-modal-template">

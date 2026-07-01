@@ -98,7 +98,7 @@ function raster_item(p) {
 
 	const locationName = qs('.location-name', el);
 	mapbox_coords_search_pois({ "coords": p.c, "limit": 1 })
-		.then(r => locationName.textContent = maybe(r, 0, 'name') || 'Unknown location');
+		.then(r => locationName.textContent = maybe(r, 0, 'name') || t(window.LOCALE, 'right_panel.high_priority.unknown_location'));
 
 	return template;
 };

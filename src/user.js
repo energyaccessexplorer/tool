@@ -14,8 +14,8 @@ export function register_login() {
 	p1.innerText = t(window.LOCALE, 'auth.prompt');
 	p2.innerHTML = `
 <div style="display: flex; justify-content: space-around;">
-	<a href="/login">Login</a>
-	<a href="/subscribe/?select=account">Register</a>
+	<a href="/login">${t(window.LOCALE, 'nav.login')}</a>
+	<a href="/subscribe/?select=account">${t(window.LOCALE, 'auth.register')}</a>
 </div>
 `;
 

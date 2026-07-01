@@ -17,7 +17,7 @@ import {
 
 import bind from '../lib/bind.js';
 
-import { translateNode } from './translate.js';
+import { t, translateNode } from './translate.js';
 
 import bubblemessage from '../lib/bubblemessage.js';
 
@@ -214,7 +214,7 @@ export function show(results, opts = {}) {
 		if (count > 0) {
 			selection_overlay.classList.remove('hidden');
 			select_all_checkbox.classList.remove('hidden');
-			selection_count.textContent = `${count} row${count > 1 ? 's' : ''} currently selected.`;
+			selection_count.textContent = t(window.LOCALE, 'modal.high_priority_table.selection_count', { count });
 		} else {
 			selection_overlay.classList.add('hidden');
 			select_all_checkbox.classList.add('hidden');

@@ -696,7 +696,7 @@ export default class DS {
 			head.append(ce('th', p));
 		}
 
-		if (points) head.append(ce('th', "long/lat"));
+		if (points) head.append(ce('th', t(window.LOCALE, 'dataset_info.long_lat')));
 
 		rows.unshift(head);
 
@@ -704,7 +704,7 @@ export default class DS {
 
 		new modal({
 			"id":      'ds-features-table',
-			"header":  this.name + " - " + features.length + " features",
+			"header":  `${this.name} - ${features.length} ${t(window.LOCALE, 'dataset_info.features')}`,
 			content,
 			"destroy": true,
 		}).show();

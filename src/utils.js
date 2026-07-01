@@ -430,7 +430,7 @@ export function super_error(t, m) {
 };
 
 export function table_data(dict, props, lnglat) {
-	const t = ce('table');
+	const table = ce('table');
 	const s = ce('tr', [ce('td', "&nbsp;"), ce('td', "&nbsp;")]);
 
 	let prev;
@@ -439,7 +439,7 @@ export function table_data(dict, props, lnglat) {
 		prev = e;
 
 		if (!e) {
-			t.append(s.cloneNode(true));
+			table.append(s.cloneNode(true));
 			continue;
 		}
 
@@ -457,24 +457,24 @@ export function table_data(dict, props, lnglat) {
 			);
 		}
 
-		t.append(tr);
+		table.append(tr);
 	};
 
 	if (maybe(lnglat, 'length') === 2) {
-		t.append(
-			qs('tr', t) ? s.cloneNode(true) : "",
+		table.append(
+			qs('tr', table) ? s.cloneNode(true) : "",
 			ce('tr', [
-				ce('td', "longitude"),
+				ce('td', t(window.LOCALE, 'map_popup.longitude')),
 				ce('td', ce('code', lnglat[0].toFixed(5))),
 			]),
 			ce('tr', [
-				ce('td', "latitude"),
+				ce('td', t(window.LOCALE, 'map_popup.latitude')),
 				ce('td', ce('code', lnglat[1].toFixed(5))),
 			]),
 		);
 	}
 
-	return t;
+	return table;
 };
 
 /*

@@ -25,7 +25,9 @@ const url = new URL(location);
 
 function show_save_toast(label, caption) {
 	const toast = new Toast({ label, caption });
-	toast.append(tmpl('#toast-save-action-template'));
+	const action = tmpl('#toast-save-action-template');
+	translateNode(window.LOCALE, action);
+	toast.append(action);
 	toast.show();
 }
 
@@ -151,7 +153,7 @@ export function snapshot(callback) {
 				if (r) show_save_toast(t(window.LOCALE, 'modal.save_analysis.updated_toast'), t(window.LOCALE, 'modal.save_analysis.updated_toast_caption'));
 			})
 			.catch(err => {
-				const toast = new Toast({ "label": 'Save failed', "caption": err.message, "variant": 'error' });
+				const toast = new Toast({ "label": t(window.LOCALE, 'modal.save_analysis.save_failed'), "caption": err.message, "variant": 'error' });
 				toast.show();
 			})
 			.finally(() => loading(false));
@@ -182,7 +184,7 @@ export function snapshot(callback) {
 					if (typeof callback === 'function') callback();
 				})
 				.catch(err => {
-					const toast = new Toast({ "label": 'Save failed', "caption": err.message, "variant": 'error' });
+					const toast = new Toast({ "label": t(window.LOCALE, 'modal.save_analysis.save_failed'), "caption": err.message, "variant": 'error' });
 					toast.show();
 				})
 				.finally(() => loading(false));

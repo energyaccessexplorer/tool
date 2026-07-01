@@ -288,6 +288,15 @@ geography_picker.no_geographies,"No available geographies. Need: outline, admin-
 geography_picker.multiple,We have several geographies for {{name}}. Please do select one.,Nous avons plusieurs géographies pour {{name}}. Veuillez en sélectionner une.,我们有多个 {{name}} 的地理区域。请选择一个。
 geography_picker.interest_prompt,What are you interested in?,Qu'est-ce qui vous intéresse ?,您对什么感兴趣？
 geography_picker.choose_area,Choose your area of interest,Choisissez votre domaine d'intérêt,选择您感兴趣的领域
+geography_picker.presets.strategic_planning.title,Strategic and Integrated Energy Planning,Planification énergétique stratégique et intégrée,战略性综合能源规划
+geography_picker.presets.strategic_planning.description,Electrification planning agencies are able to link electrification and development outcomes.,Les agences de planification de l'électrification peuvent relier l'électrification aux résultats de développement.,电气化规划机构能够将电气化与发展成果联系起来。
+geography_picker.presets.clean_energy_markets.title,The expansion of clean energy markets,L'expansion des marchés de l'énergie propre,清洁能源市场的扩张
+geography_picker.presets.clean_energy_markets.description,Technology suppliers (whether mini grid developers or solar home system providers) can get a better understanding of aspects of affordability and level of service needed.,Les fournisseurs de technologies (développeurs de mini-réseaux ou fournisseurs de systèmes solaires domestiques) peuvent mieux comprendre les aspects d'accessibilité financière et le niveau de service nécessaire.,技术供应商（无论是微电网开发商还是户用太阳能系统供应商）可以更好地了解可负担性和所需服务水平等方面。
+geography_picker.presets.impact_investment.title,Impact investment,Investissement à impact,影响力投资
+geography_picker.presets.impact_investment.description,Donors and development finance institutions can identify areas where grants and support will have the most impact.,Les bailleurs de fonds et les institutions de financement du développement peuvent identifier les zones où les subventions et le soutien auront le plus d'impact.,捐助者和发展金融机构可以确定赠款和支持将产生最大影响的地区。
+geography_picker.presets.energy_needs.title,Bottom-up assessment of energy needs,Évaluation ascendante des besoins énergétiques,自下而上的能源需求评估
+geography_picker.presets.energy_needs.description,"Service delivery institutions in the health, education and agriculture sectors are able to estimate energy needs associated to development services.","Les institutions de prestation de services dans les secteurs de la santé, de l'éducation et de l'agriculture peuvent estimer les besoins énergétiques associés aux services de développement.",卫生、教育和农业部门的服务提供机构能够估算与发展服务相关的能源需求。
+geography_picker.presets.custom_analysis.title,Generate custom geospatial analysis based on your own criteria,Générer une analyse géospatiale personnalisée selon vos propres critères,根据您自己的标准生成自定义地理空间分析
 left_panel.cards.show_all,Show all layers,Afficher toutes les couches,显示所有图层
 left_panel.cards.collapse_all,Collapse all settings,Réduire tous les paramètres,折叠所有设置
 utils.loading,Loading...,Chargement...,加载中...
@@ -329,6 +338,7 @@ left_panel.output.tiff_download_title,Download TIFF image of the current analysi
 nav.desktop_required.title,Desktop Required,Ordinateur de bureau requis,需要桌面设备
 nav.desktop_required.message,Energy Access Explorer is designed for larger screens. Please open this page on a desktop or laptop computer for the best experience.,Energy Access Explorer est conçu pour les grands écrans. Veuillez ouvrir cette page sur un ordinateur de bureau ou portable pour une expérience optimale.,Energy Access Explorer 专为大屏幕设计。为获得最佳体验，请在台式机或笔记本电脑上打开此页面。
 loading.message,Loading...,Chargement...,加载中...
+loading.cancel,Cancel,Annuler,取消
 toast.dataset_error.no_host,'{{id}}' claims to have host '{{host}}'. No such DS. This is not fatal but the dataset is now disabled.,« {{id}} » prétend avoir l'hôte « {{host}} ». Aucun jeu de données de ce type. Ce n'est pas fatal mais le jeu de données est maintenant désactivé.,'{{id}}' 声称拥有主机 '{{host}}'。无此数据集。这不是致命错误，但该数据集现已禁用。
 right_panel.share_link.header,Share link,Lien de partage,分享链接
 toast.fetch_error.label,Fetch error,Erreur de récupération,获取错误

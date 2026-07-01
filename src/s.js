@@ -23,7 +23,7 @@ import {
 	qs,
 } from '../lib/helpers.js';
 
-import { t } from './translate.js';
+import { t, translateNode } from './translate.js';
 
 function preload_boundaries(id) {
 	return API.get('datasets', {
@@ -91,6 +91,7 @@ async function geography(c) {
 
 const presets = [
 	{
+		"key":         "strategic_planning",
 		"name":        "Strategic and Integrated Energy Planning",
 		"index":       "eai",
 		"view":        "analysis",
@@ -99,6 +100,7 @@ const presets = [
 		"tab":         "controls",
 	},
 	{
+		"key":         "clean_energy_markets",
 		"name":        "The expansion of clean energy markets",
 		"index":       "eai",
 		"view":        "analysis",
@@ -107,6 +109,7 @@ const presets = [
 		"tab":         "controls",
 	},
 	{
+		"key":         "impact_investment",
 		"name":        "Impact investment",
 		"index":       "ani",
 		"view":        "analysis",
@@ -115,6 +118,7 @@ const presets = [
 		"tab":         "controls",
 	},
 	{
+		"key":         "energy_needs",
 		"name":        "Bottom-up assessment of energy needs",
 		"index":       "demand",
 		"view":        "analysis",
@@ -123,6 +127,7 @@ const presets = [
 		"tab":         "controls",
 	},
 	{
+		"key":         "custom_analysis",
 		"name":        "Generate custom geospatial analysis based on your own criteria",
 		"description": null,
 		"index":       "eai",
@@ -137,11 +142,15 @@ function usertype(gid) {
 	const content = ce('div', ce('p', t(window.LOCALE, 'geography_picker.interest_prompt')), { "id": "presets" });
 
 	const ul = ce('ul');
-	for (const t of presets) {
-		const p = ce('p', t.description);
-		const li = ce('li', ce('a', [ce('h3', t.name), p], { "href": `${window.BASE}/tool/a?id=${gid}` }));
+	for (const preset of presets) {
+		const title = t(window.LOCALE, `geography_picker.presets.${preset.key}.title`);
+		const desc = preset.description
+			? t(window.LOCALE, `geography_picker.presets.${preset.key}.description`)
+			: null;
+		const p = ce('p', desc);
+		const li = ce('li', ce('a', [ce('h3', title), p], { "href": `${window.BASE}/tool/a?id=${gid}` }));
 		li.onclick = function() {
-			sessionStorage.setItem('config', JSON.stringify(t));
+			sessionStorage.setItem('config', JSON.stringify(preset));
 		};
 
 		ul.append(li);
@@ -202,6 +211,8 @@ export async function init() {
 		?? localStorage.getItem('locale')
 		?? navigator.language.split('-')[0]
 		?? 'en';
+
+	translateNode(window.LOCALE, document);
 
 	if (window.innerWidth <= 768) return;
 

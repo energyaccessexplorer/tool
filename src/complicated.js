@@ -21,7 +21,7 @@ import {
 	maybe,
 } from '../lib/helpers.js';
 
-export function context(raster_pixel, features = []) {
+export function context(raster_pixel, winner = null) {
 	const dict = [];
 	const props = {};
 	const values = {};
@@ -63,23 +63,15 @@ export function context(raster_pixel, features = []) {
 			units[k] = "km (proximity to)";
 		}
 
-		if (d.vectors && !dotState.used) {
-			const match = features.find(feat => feat && feat.source === d.id);
-			if (match) {
-				if (maybe(d.config, 'attributes_map', 'length')) {
-					Object.assign(props, match.properties);
+		if (winner && winner.dataset.id === d.id && !dotState.used) {
+			Object.assign(props, winner.feature.properties);
 
-					const a = d.config.attributes_map.map(e => [e.dataset, e.target]);
-					if (a.length) {
-						dict.unshift(
-							["_" + d.id, `<strong style="font-size: 1.1em;">${d.name.toUpperCase()}</strong>`],
-							...a,
-						);
-					}
+			dict.unshift(
+				["_" + d.id, `<strong style="font-size: 1.1em;">${d.name.toUpperCase()}</strong>`],
+				...d.config.attributes_map.map(e => [e.dataset, e.target]),
+			);
 
-					dotState.used = true;
-				}
-			}
+			dotState.used = true;
 		}
 	};
 

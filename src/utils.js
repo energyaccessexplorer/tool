@@ -540,6 +540,59 @@ export function raster_pixel_to_coordinates(i) {
 	return merc.inverse([o[0] + (x * s), o[1] - (y * s)]);
 };
 
+const GEOMETRY_VERTEX_DEPTH = {
+	"Point":           0,
+	"MultiPoint":      1,
+	"LineString":      1,
+	"MultiLineString": 2,
+	"Polygon":         2,
+	"MultiPolygon":    3,
+};
+
+function flatten_coordinates(coords, depth) {
+	if (depth <= 0) return [coords];
+	return coords.flatMap(c => flatten_coordinates(c, depth - 1));
+};
+
+function nearest_vertex_distance(geometry, ll) {
+	const depth = GEOMETRY_VERTEX_DEPTH[maybe(geometry, 'type')];
+	if (depth === undefined || !ll) return Infinity;
+
+	let min = Infinity;
+	for (const v of flatten_coordinates(geometry.coordinates, depth)) {
+		const dx = v[0] - ll[0];
+		const dy = v[1] - ll[1];
+		const d = Math.sqrt((dx * dx) + (dy * dy));
+		if (d < min) min = d;
+	}
+
+	return min;
+};
+
+/*
+ * closest_feature
+ *
+ * Among "features" matching "predicate", return the one whose nearest
+ * vertex is geometrically closest to "ll" (a [lng, lat] pair), along with
+ * that distance. Returns null if nothing matches.
+ *
+ * If "ll" is omitted, every candidate is treated as equidistant, so the
+ * first match wins (same as a plain Array#find).
+ */
+
+export function closest_feature(features, ll, predicate = _ => true) {
+	let best = null;
+
+	for (const feature of features) {
+		if (!feature || !predicate(feature)) continue;
+
+		const distance = ll ? nearest_vertex_distance(feature.geometry, ll) : 0;
+		if (!best || distance < best.distance) best = { feature, distance };
+	}
+
+	return best;
+};
+
 export function extent_contained(extent, raster) {
 	const [left,bottom,right,top] = extent;
 

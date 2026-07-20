@@ -1,8 +1,8 @@
 import {
 	super_error,
 	bi_icon,
+	closest_feature,
 	coordinates_to_raster_pixel,
-	raster_pixel_to_coordinates,
 } from './utils.js';
 
 import {
@@ -46,6 +46,7 @@ export function get_admin_area_item(variant, id) {
 }
 
 let current_map_info_drop = null;
+let popup_token = 0;
 
 export function get_map_position(coords) {
 	const {x, y} = MAPBOX.project(coords);
@@ -454,46 +455,65 @@ export async function sort() {
 	}
 };
 
-export function show_location_info(ll, position, centerPointer = true) {
+async function resolve_click_selection(ll) {
+	const SNAP_RADIUS_M = 50;
+
 	const raster_pixel = coordinates_to_raster_pixel(ll, OUTLINE.raster);
 
-	if (raster_pixel) {
-		ll = raster_pixel_to_coordinates(raster_pixel.index);
-		Object.assign(position, get_map_position(ll));
-	}
+	const meters_per_pixel = 156543.03392 * Math.cos(ll[1] * Math.PI / 180) / Math.pow(2, MAPBOX.getZoom());
+	const snap_px = SNAP_RADIUS_M / meters_per_pixel;
 
 	const pt = MAPBOX.project(ll);
-	const features = MAPBOX.queryRenderedFeatures([[pt.x - 10, pt.y - 10],
-		[pt.x + 10, pt.y + 10]]);
+	const features = MAPBOX.queryRenderedFeatures([[pt.x - snap_px, pt.y - snap_px],
+		[pt.x + snap_px, pt.y + snap_px]]);
 
-	const dotFeature = features.find(feat => feat && maybe(feat, 'geometry', 'type') === 'Point');
-	if (dotFeature) {
-		ll = dotFeature.geometry.coordinates;
+	let vector_match = null;
+	for (const d of STATE.datasets) {
+		if (!d.vectors || !maybe(d.config, 'attributes_map', 'length')) continue;
+
+		const match = closest_feature(features, ll, feat => feat.source === d.id);
+		if (match && (!vector_match || match.distance < vector_match.distance)) {
+			vector_match = { "dataset": d, "feature": match.feature, "distance": match.distance };
+		}
+	}
+
+	const dot = closest_feature(features, ll, feat => maybe(feat, 'geometry', 'type') === 'Point');
+	const snapped_ll = dot ? dot.feature.geometry.coordinates : ll;
+
+	const feature_name = vector_match
+		? null
+		: maybe(await coords_search_pois({ "coords": snapped_ll, "limit": 1, "radius": SNAP_RADIUS_M }), 0, 'name');
+
+	return { raster_pixel, vector_match, "ll": snapped_ll, feature_name };
+}
+
+export function show_location_info(ll, position, centerPointer = true) {
+	const token = ++popup_token;
+
+	resolve_click_selection(ll).then(({ raster_pixel, vector_match, ll, feature_name }) => {
+		if (token !== popup_token) return;
+
 		Object.assign(position, get_map_position(ll));
-	}
 
-	const [fields, props, raw] = context(raster_pixel, features);
+		const [fields, props, raw] = context(raster_pixel, vector_match);
 
-	const ac = coordinates_to_raster_pixel(ll, {
-		"data":   MAPBOX.getSource('output-source').raster,
-		"nodata": -1,
-	});
-
-	let analysis_value = null;
-	let analysis_name = null;
-	if (Number.isFinite(maybe(ac, 'value'))) {
-		analysis_value = ac.value;
-		analysis_name = EAE['indexes'][STATE.index]['name'];
-	}
-
-	coords_search_pois({ "coords": ll, "limit": 1 })
-		.then(r => {
-			const feature_name = maybe(r, 0, 'name');
-			const { drop } = pointer(position, { fields, props, ll, analysis_value, analysis_name, feature_name, raw, "raster_index": raster_pixel?.index });
-			current_map_info_drop = drop;
-
-			if (centerPointer && raster_pixel) ensure_map_info_visible();
+		const ac = coordinates_to_raster_pixel(ll, {
+			"data":   MAPBOX.getSource('output-source').raster,
+			"nodata": -1,
 		});
+
+		let analysis_value = null;
+		let analysis_name = null;
+		if (Number.isFinite(maybe(ac, 'value'))) {
+			analysis_value = ac.value;
+			analysis_name = EAE['indexes'][STATE.index]['name'];
+		}
+
+		const { drop } = pointer(position, { fields, props, ll, analysis_value, analysis_name, feature_name, raw, "raster_index": raster_pixel?.index });
+		current_map_info_drop = drop;
+
+		if (centerPointer && raster_pixel) ensure_map_info_visible();
+	});
 }
 
 function ensure_map_info_visible() {
@@ -586,6 +606,8 @@ function ensure_map_info_visible() {
 }
 
 export function show_admin_area_info(item, position, centerPointer = false) {
+	++popup_token;
+
 	const variant = STATE.variant;
 	const [fields, props, raw] = get_admin_area_layer_data(variant, item.id);
 

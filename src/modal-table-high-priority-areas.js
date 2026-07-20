@@ -33,6 +33,8 @@ export function show(results, opts = {}) {
 	}
 
 	const selected_indices = new Set();
+	const fixed_column_count = headers.filter(h => column_meta.get(h)?.locked).length;
+	const selectable_max = opts.max_columns && opts.max_columns - fixed_column_count;
 
 	function get_visible_headers() {
 		return headers.filter(h => column_meta.get(h).visible);
@@ -164,7 +166,7 @@ export function show(results, opts = {}) {
 
 	bind(content, {
 		"analysis-name":          analysis_name,
-		"column-limit-notice":    opts.max_columns ? `A maximum of ${opts.max_columns} columns can be exported. Uncheck one to select another.` : '',
+		"column-limit-notice":    selectable_max ? `A maximum of ${selectable_max} columns can be exported. Uncheck one to select another.` : '',
 		"toggle_column_selector": function() {
 			this.closest('.high-priority-areas-list-all-content').querySelector('.column-selector-panel').classList.toggle('hidden');
 		},

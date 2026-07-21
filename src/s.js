@@ -23,7 +23,7 @@ import {
 	qs,
 } from '../lib/helpers.js';
 
-import { t, translateNode, initLocalePicker } from './translate.js';
+import { t, translateNode, initLocalePicker, resolveLocale } from './translate.js';
 
 function preload_boundaries(id) {
 	return API.get('datasets', {
@@ -207,10 +207,7 @@ async function presets_init() {
 };
 
 export async function init() {
-	window.LOCALE = new URLSearchParams(location.search).get('lang')
-		?? localStorage.getItem('locale')
-		?? navigator.language.split('-')[0]
-		?? 'en';
+	window.LOCALE = resolveLocale();
 
 	translateNode(window.LOCALE, document);
 

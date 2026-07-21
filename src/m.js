@@ -19,7 +19,7 @@ import {
 	tmpl,
 } from '../lib/helpers.js';
 
-import { t, unesc, translateNode, initLocalePicker } from './translate.js';
+import { t, unesc, translateNode, initLocalePicker, resolveLocale } from './translate.js';
 
 const user_id = user_extract('id');
 
@@ -216,10 +216,7 @@ function draw_snapshots(snapshots, geographies, container, trees) {
 };
 
 export async function init() {
-	window.LOCALE = new URLSearchParams(location.search).get('lang')
-		?? localStorage.getItem('locale')
-		?? navigator.language.split('-')[0]
-		?? 'en';
+	window.LOCALE = resolveLocale();
 
 	translateNode(LOCALE, document);
 	initLocalePicker(LOCALE);

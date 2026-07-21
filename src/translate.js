@@ -66,6 +66,17 @@ const LOCALE_LABELS = {
 	"zh": "中文",
 };
 
+export function resolveLocale() {
+	const lang = new URLSearchParams(location.search).get('lang');
+	if (LOCALE_LABELS[lang]) localStorage.setItem('locale', lang);
+
+	return [
+		lang,
+		localStorage.getItem('locale'),
+		navigator.language.split('-')[0],
+	].find(l => LOCALE_LABELS[l]) ?? 'en';
+}
+
 const _uiUpdaters = new Set();
 
 export function registerUIUpdater(fn) {
@@ -110,6 +121,9 @@ export function initLocalePicker(locale) {
 	const nav = document.querySelector('nav');
 	if (!nav) return;
 
+	const show = new URLSearchParams(location.search).has('lang') || window.ENV.includes('protected') || localStorage.getItem('locale');
+	if (!show) return;
+
 	const picker = document.createElement('div');
 	picker.id = 'locale-picker';
 
@@ -121,6 +135,8 @@ export function initLocalePicker(locale) {
 	dropdown.id = 'locale-dropdown';
 
 	for (const [l, label] of Object.entries(LOCALE_LABELS)) {
+		if (['zh'].includes(l) && l !== locale) continue;
+
 		const item = document.createElement('a');
 		item.href = '#';
 		item.textContent = label;
@@ -290,4 +306,6 @@ export function translateNode(locale, node) {
 
 	for (const el of node.querySelectorAll('[data-t-html]'))
 		el.innerHTML = t(locale, el.dataset.tHtml);
+
+	if (node === document) document.documentElement.classList.add('i18n-ready');
 }

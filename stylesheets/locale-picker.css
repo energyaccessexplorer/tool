@@ -1,0 +1,34 @@
+nav #locale-picker {
+  position: relative;
+  cursor: pointer;
+}
+
+nav #locale-current {
+  font-size: 0.8em;
+  color: var(--the-white);
+}
+
+nav #locale-dropdown {
+  position: absolute;
+  display: none;
+  right: 0;
+  background-color: white;
+  box-shadow: 0px 1px 5px rgba(0,0,0,0.3);
+  min-width: 100%;
+  width: max-content;
+  text-align: center;
+  line-height: 3em;
+  font-weight: normal;
+  cursor: pointer;
+}
+
+nav #locale-dropdown a {
+  font-size: 0.9em;
+  color: black;
+  padding: 0 1em;
+  cursor: pointer;
+}
+
+nav #locale-picker:hover #locale-dropdown {
+  display: block;
+}

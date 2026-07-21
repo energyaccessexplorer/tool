@@ -85,6 +85,7 @@ build-m:
 		${CSS}/m.css \
 		${CSS}/buttons.css \
 		${CSS}/mobile.css \
+		${CSS}/locale-picker.css \
 		> ${DIST}/m/main.css
 
 build-p:
@@ -217,6 +218,7 @@ build-a:
 		${CSS}/control.css \
 		${CSS}/map-info.css \
 		${CSS}/panel-section.css \
+		${CSS}/locale-picker.css \
 		> ${DIST}/a/main.css
 
 build-s:
@@ -255,6 +257,7 @@ build-s:
 		${CSS}/ripple.css \
 		${CSS}/mobile.css \
 		${CSS}/map-info.css \
+		${CSS}/locale-picker.css \
 		> ${DIST}/s/main.css
 
 sync:

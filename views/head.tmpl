@@ -1,6 +1,9 @@
 {{define "head"}}
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
+<style>html:not(.i18n-ready) body { visibility: hidden; }</style>
+<script>addEventListener('DOMContentLoaded', function() { document.documentElement.classList.add('i18n-ready'); });</script>
+
 {{template "sentry" .}}
 
 {{template "hotjar" .}}

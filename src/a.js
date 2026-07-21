@@ -113,7 +113,7 @@ import admintiers from './admin-tiers.js';
 
 import bubblemessage from '../lib/bubblemessage.js';
 
-import { translateNode, initLocalePicker, t } from './translate.js';
+import { translateNode, initLocalePicker, resolveLocale, t } from './translate.js';
 
 export const STANDARD_TABS = new Set(['census', 'demand', 'supply', 'other']);
 
@@ -234,16 +234,13 @@ function state_set(conf, p, v) {
 };
 
 export function init() {
+	window.LOCALE = resolveLocale();
+	translateNode(LOCALE, document);
+
 	if (window.innerWidth <= 768) return;
 
 	sentry_setup_global_handlers(ENV[0]);
 
-	window.LOCALE = new URLSearchParams(location.search).get('lang')
-		?? localStorage.getItem('locale')
-		?? navigator.language.split('-')[0]
-		?? 'en';
-
-	translateNode(LOCALE, document);
 	initLocalePicker(LOCALE);
 
 	self();

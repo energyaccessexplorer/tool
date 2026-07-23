@@ -19,7 +19,11 @@
 
   window.BASE = "";
 
-  if (location.hostname.match(/^(test|dev)/))
-    window.BASE = location.pathname.split('/').splice(0,2).join('/');
+  if (location.hostname.match(/^(test|dev)/)) {
+    var prefix = location.pathname.split('/')[1];
+
+    if (prefix && prefix !== "tool" && prefix !== "admin")
+      window.BASE = "/" + prefix;
+  }
 </script>
 {{end}}

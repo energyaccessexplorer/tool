@@ -107,6 +107,7 @@ function edit_title(s, callback) {
 		"header":  t(window.LOCALE, 'modals.save_analysis.header'),
 		"content": f,
 		"footer":  x,
+		"destroy": true,
 	});
 
 	f.onsubmit = function(e) {

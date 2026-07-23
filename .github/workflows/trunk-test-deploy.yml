@@ -1,0 +1,55 @@
+name: TRUNK TEST DEPLOY
+
+on:
+  push:
+    branches: [ trunk ]
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get install -y bmake curl jq
+
+      - name: Build .env
+        run: |
+          printf '{{define "base"}}{{end}}' > views/base.tmpl
+
+          cat <<- EOF >.env
+          	DOMAIN = "${{ vars.DOMAIN }}"
+          	WORLD = "${{ vars.WORLD_URL }}"
+          	TITLE = "${{ vars.TITLE }}"
+          	API_URL = "${{ vars.API_URL }}"
+          	STORAGE_URL = "${{ vars.STORAGE_URL }}"
+          	MAPBOX_TOKEN = "${{ vars.MAPBOX_TOKEN }}"
+          	MAPBOX_THEME = "${{ vars.MAPBOX_THEME }}"
+          EOF
+
+      - name: Run make
+        run: |
+          bmake deps reconfig build env=test
+
+      - name: Make destination directory
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host:     ${{ secrets.PR_DEPLOY_HOST }}
+          username: ${{ secrets.PR_DEPLOY_USER }}
+          port:     ${{ secrets.PR_DEPLOY_PORT }}
+          key:      ${{ secrets.PR_DEPLOY_KEY }}
+          script:   |
+            mkdir -p ${{ secrets.PR_DEPLOY_PATH }}/trunk/tool
+
+      - name: Deploy the thing
+        uses: burnett01/rsync-deployments@7.1.0
+        with:
+          switches: --recursive --verbose
+          path: dist/
+          remote_path: ${{ secrets.PR_DEPLOY_PATH }}/trunk/tool/
+          remote_host: ${{ secrets.PR_DEPLOY_HOST }}
+          remote_port: ${{ secrets.PR_DEPLOY_PORT }}
+          remote_user: ${{ secrets.PR_DEPLOY_USER }}
+          remote_key:  ${{ secrets.PR_DEPLOY_KEY }}

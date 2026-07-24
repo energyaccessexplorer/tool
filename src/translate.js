@@ -215,6 +215,17 @@ export function translateDatasetAttribute(locale, dataset, attributeValue, field
 	const translated = getTranslation(dataset, fieldName, locale);
 	if (translated) return translated;
 
+	return attributeValue;
+}
+
+export function translateInheritableAttribute(locale, dataset, attributeValue, fieldName) {
+	if (!attributeValue) return '';
+
+	if (!fieldName) return attributeValue;
+
+	const translated = getTranslation(dataset, fieldName, locale);
+	if (translated) return translated;
+
 	const categoryTranslated = getTranslation(dataset?.category, fieldName, locale);
 	if (categoryTranslated) return categoryTranslated;
 

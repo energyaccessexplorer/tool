@@ -442,6 +442,8 @@ This is fatal. Thanks for all the fish.`;
 			.map(d => d.mutant_init()));
 
 	await load_datasets(conf.datasets);
+	load_inputs_param();
+
 	sentry_update_datasets(DST);
 };
 
@@ -901,4 +903,22 @@ function load_datasets(array) {
 
 		ds.turn(true);
 	}));
+};
+
+// Enables datasets named in the 'inputs' URL param (admin's deep-links).
+function load_inputs_param() {
+	const inputs = new URL(location).searchParams.get('inputs');
+
+	if (!inputs) return;
+
+	for (const name of inputs.split(',')) {
+		const ds = DST.get(name.trim());
+
+		if (!ds) {
+			console.warn("inputs param: No such dataset on this geography:", name);
+			continue;
+		}
+
+		if (!ds.on) ds.turn(true);
+	}
 };

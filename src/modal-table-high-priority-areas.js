@@ -6,6 +6,7 @@ import {
 	prepare_tabular_data,
 	generate_rows,
 	sort_results,
+	translate_header,
 } from './area-analysis.js';
 
 import modal from '../lib/modal.js';
@@ -17,7 +18,7 @@ import {
 
 import bind from '../lib/bind.js';
 
-import { t, translateNode } from './translate.js';
+import { t, translateNode, registerUIUpdater } from './translate.js';
 
 import bubblemessage from '../lib/bubblemessage.js';
 
@@ -103,7 +104,7 @@ export function show(results, opts = {}) {
 		for (const name of get_visible_headers()) {
 			const th = tmpl('#column-header-template');
 			bind(th, {
-				"name":       name,
+				"name":       translate_header(window.LOCALE, name),
 				"icon_class": get_icon_class(name),
 				"on_sort":    () => handle_sort(name),
 			});
@@ -119,7 +120,7 @@ export function show(results, opts = {}) {
 			const meta = column_meta.get(header);
 			const item = tmpl('#column-selector-item-template');
 			bind(item, {
-				"label":     meta.display || header,
+				"label":     meta.subordinate ? (meta.display || header) : translate_header(window.LOCALE, header),
 				"checked":   meta.visible ? '' : false,
 				"css_class": (meta.subordinate || indent) ? 'column-selector-item subordinate' : 'column-selector-item',
 				"on_toggle": function() {
@@ -138,7 +139,7 @@ export function show(results, opts = {}) {
 			if (group.synthetic) {
 				const label = document.createElement('span');
 				label.className = 'column-group-label';
-				label.textContent = group.header;
+				label.textContent = translate_header(window.LOCALE, group.header);
 				wrapper.append(label);
 				for (const child of group.children) wrapper.append(make_item(child, true));
 			} else {
@@ -203,6 +204,13 @@ export function show(results, opts = {}) {
 	column_selector_panel.append(column_selector_grid());
 	render_headers();
 	enforce_column_limit();
+
+	registerUIUpdater(() => {
+		if (!tbody.isConnected) return;
+		render_headers();
+		column_selector_panel.replaceChildren(column_selector_grid());
+		enforce_column_limit();
+	});
 
 	const footer = tmpl('#high-priority-areas-list-all-footer-template');
 	translateNode(window.LOCALE, footer);

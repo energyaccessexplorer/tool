@@ -83,6 +83,19 @@ export function registerUIUpdater(fn) {
 	_uiUpdaters.add(fn);
 }
 
+export function replayable(fn) {
+	let lastArgs = null;
+
+	function wrapped(...args) {
+		lastArgs = args;
+		return fn(...args);
+	}
+
+	registerUIUpdater(() => { if (lastArgs) fn(...lastArgs); });
+
+	return wrapped;
+}
+
 function updateDatasetTranslations() {
 	if (typeof DST === 'undefined') return;
 

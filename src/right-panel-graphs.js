@@ -1,4 +1,4 @@
-import { t, translateNode, registerUIUpdater, getScaleLabels, translateIndexName } from './translate.js';
+import { t, translateNode, replayable, registerUIUpdater, getScaleLabels, translateIndexName } from './translate.js';
 import { svg_pie } from './utils.js';
 import { analysis_colorscale } from './analysis.js';
 import { compute_share_amounts } from './summary.js';
@@ -78,7 +78,7 @@ export function setup_about_button(section, about) {
 	};
 }
 
-export function graphs(summary) {
+export const graphs = replayable(function graphs(summary) {
 	const locale = window.LOCALE;
 	const indexName = translateIndexName(locale, STATE.index).toLowerCase();
 
@@ -105,7 +105,7 @@ export function graphs(summary) {
 			"y": `${high.toLocaleString(window.LOCALE)} km²`,
 		}),
 	});
-};
+});
 
 function process_graph(analysis_summary, config) {
 	const data = maybe(analysis_summary, config.dataKey);

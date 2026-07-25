@@ -1,6 +1,6 @@
 import DS from './ds.js';
 
-import { t, translateDatasetName, translateDatasetAttribute, translateNode, registerUIUpdater } from './translate.js';
+import { t, translateDatasetName, translateDatasetAttribute, translateNode, translateUnit, getScaleLabels, registerUIUpdater } from './translate.js';
 
 import bind from '../lib/bind.js';
 
@@ -251,7 +251,7 @@ function weight_group() {
 	const el = ce('select', null, { "bind": 'weight' });
 
 	el.prepend(
-		...["Low", "Low-Medium", "Medium", "Medium-High", "High"]
+		...getScaleLabels(window.LOCALE)
 			.map((e,i) => ce('option', e, { "value": i + 1 }))
 			.reverse());
 
@@ -493,7 +493,7 @@ function ramp() {
 	if (!ds.domain) return "";
 
 	if (ds._domain_select) return bind(tmpl('#ramp'), {
-		"middle": coalesce(cat.controls.range_label, cat.unit),
+		"middle": coalesce(cat.controls.range_label, translateUnit(window.LOCALE, cat.unit)),
 	});
 
 	const {min,max} = ds.domain;
@@ -508,7 +508,7 @@ function ramp() {
 
 	return bind(tmpl('#ramp'), {
 		"left":   min.toFixed(i),
-		"middle": coalesce(cat.controls.range_label, cat.unit, 'range'),
+		"middle": coalesce(cat.controls.range_label, translateUnit(window.LOCALE, cat.unit), t(window.LOCALE, 'left_panel.cards.card.range')),
 		"right":  max.toFixed(i),
 	});
 };
@@ -667,7 +667,7 @@ export default class dscard extends HTMLElement {
 	bind() {
 		bind(this, Object.assign({}, this.ds, {
 			"name":              translateDatasetName(window.LOCALE, this.ds),
-			"unit-label":        coalesce(this.ds.category.controls.range_label, this.ds.category.unit, "Range"),
+			"unit-label":        coalesce(this.ds.category.controls.range_label, translateUnit(window.LOCALE, this.ds.category.unit), t(window.LOCALE, 'left_panel.cards.card.range')),
 			"range":             maybe(range.call(this), 'svg'),
 			"value-checkboxes":  value_checkboxes.call(this),
 			"pvna":              (this.ds.type === 'polygons-valued'),

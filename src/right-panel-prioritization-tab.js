@@ -13,7 +13,7 @@ import {
 	area_type,
 } from './utils.js';
 
-import { translateNode, t, translateIndexName, getScaleLabels } from './translate.js';
+import { translateNode, t, translateIndexName, getScaleLabels, replayable } from './translate.js';
 
 import {
 	make_title,
@@ -46,14 +46,14 @@ function admin_area_result(raster, admin_info) {
 	};
 }
 
-function render_title(admin_info = null, raster_index = null) {
+const render_title = replayable(function render_title(admin_info = null, raster_index = null) {
 	const el = qs('#tab-title');
 	if (!el) return;
 
 	const active = STATE.datasets.some(d => d.on && d.category.name !== 'boundaries' && d.category.name !== 'outline');
 
 	el.replaceChildren(...(active ? [make_title(admin_info, raster_index)] : []));
-}
+});
 
 export async function update(raster_index, admin_info, analysis_value) {
 	const container = qs('#index-priority-container');

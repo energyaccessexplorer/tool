@@ -19,9 +19,9 @@ import {
 	qs,
 } from '../lib/helpers.js';
 
-import { t as translate, translateIndexName } from './translate.js';
+import { t as translate, translateIndexName, registerUIUpdater } from './translate.js';
 
-let ul, resultscontainer, resultsinfo;
+let ul, resultscontainer, resultsinfo, input_el, last_results = null;
 
 function pointto(p, a = false) {
 	const dict = [[ "v", translateIndexName(window.LOCALE, STATE.index) ]];
@@ -60,6 +60,8 @@ async function trigger({ points = getpoints, n = 20 }) {
 	const results = await points(n);
 
 	const count = results.length;
+
+	last_results = { count, n };
 
 	resultsinfo.innerHTML = translate(window.LOCALE, 'left_panel.analysis_search.top_results', { count });
 
@@ -101,11 +103,11 @@ width: calc(${g}% - 1.5em);
 
 export function init() {
 	const panel = qs('#analysis.search-panel');
-	const input = ce('span', translate(window.LOCALE, 'left_panel.analysis_search.input_label'), { "id": 'analysis-search', "class": 'search-input' });
+	input_el = ce('span', translate(window.LOCALE, 'left_panel.analysis_search.input_label'), { "id": 'analysis-search', "class": 'search-input' });
 
 	panel.addEventListener('activate', trigger);
 
-	panel.prepend(input);
+	panel.prepend(input_el);
 
 	resultscontainer = qs('#analysis .search-results');
 	ul = ce('ul');
@@ -113,4 +115,18 @@ export function init() {
 
 	resultsinfo = ce('div', ce('b', translate(window.LOCALE, 'left_panel.analysis_search.coordinates_label')), { "class": 'search-results-info' });
 	resultscontainer.prepend(resultsinfo);
+
+	registerUIUpdater(() => {
+		if (input_el) input_el.textContent = translate(window.LOCALE, 'left_panel.analysis_search.input_label');
+
+		if (!resultsinfo) return;
+
+		if (!last_results) {
+			resultsinfo.replaceChildren(ce('b', translate(window.LOCALE, 'left_panel.analysis_search.coordinates_label')));
+		} else if (last_results.count > last_results.n) {
+			resultsinfo.innerHTML = translate(window.LOCALE, 'left_panel.analysis_search.overflow', { "n": last_results.n, "total": last_results.count });
+		} else {
+			resultsinfo.innerHTML = translate(window.LOCALE, 'left_panel.analysis_search.top_results', { "count": last_results.count });
+		}
+	});
 };

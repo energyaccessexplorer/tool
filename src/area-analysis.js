@@ -14,10 +14,12 @@ import {
 	maybe,
 } from '../lib/helpers.js';
 
-import { t, translateUnit, translateIndexName } from './translate.js';
+import { t, translateUnit, translateIndexName, translateDatasetName } from './translate.js';
 
 const row_cache = new Map();
 let feature_indexes = null;
+
+const header_specs = new Map();
 
 function item_key(item) {
 	return item.i !== undefined ? item.i : item.id;
@@ -25,7 +27,38 @@ function item_key(item) {
 
 export function clear_row_cache() {
 	row_cache.clear();
+	header_specs.clear();
 	feature_indexes = null;
+}
+
+function dataset_header(name, unit, dataset_id) {
+	const header = unit ? `${name} - ${unit}` : name;
+	if (dataset_id) header_specs.set(header, { dataset_id, unit });
+	return header;
+}
+
+const FIXED_HEADER_KEYS = {
+	"Priority score": 'map_popup.priority_score',
+	"Latitude":       'map_popup.latitude',
+	"Longitude":      'map_popup.longitude',
+	"Location":       'map_popup.location',
+};
+
+export function translate_header(locale, header) {
+	const spec = header_specs.get(header);
+	if (spec) {
+		const dataset = DST.get(spec.dataset_id);
+		const name = dataset ? translateDatasetName(locale, dataset) : header;
+		return spec.unit ? `${name} - ${translateUnit(locale, spec.unit)}` : name;
+	}
+
+	if (FIXED_HEADER_KEYS[header]) return t(locale, FIXED_HEADER_KEYS[header]);
+
+	const index_key = Object.keys(EAE['indexes'] || {})
+		.find(k => ['en', 'fr', 'zh'].some(l => translateIndexName(l, k) === header));
+	if (index_key) return translateIndexName(locale, index_key);
+
+	return header;
 }
 
 function get_feature_indexes() {
@@ -77,7 +110,7 @@ export function value_tree(raster_index) {
 			return {
 				"id":       dataset.id,
 				"name":     dataset.name,
-				"header":   `${dataset.name} - ${unit}`,
+				"header":   dataset_header(dataset.name, unit, dataset.id),
 				"value":    raw,
 				"children": maybe(dataset, 'config', 'attributes_map', 'length')
 					? Object.fromEntries(
@@ -213,7 +246,7 @@ function location_entry(fields, props) {
 	return { "key": "Location", "label": t(window.LOCALE, 'map_popup.location'), "value": values.join(', ') };
 }
 
-function format_detail(key, label, value, raw, subordinate) {
+function format_detail(key, label, value, raw, subordinate, dataset_id) {
 	const unit = raw.units[key];
 	const display_unit = unit === 'count' ? '' : translateUnit(window.LOCALE, unit || '');
 	const num = Number(value);
@@ -225,6 +258,7 @@ function format_detail(key, label, value, raw, subordinate) {
 		"unit":        unit,
 		"aggregation": raw.aggregations?.[key],
 		"subordinate": subordinate,
+		"dataset_id":  dataset_id,
 	};
 }
 
@@ -257,7 +291,7 @@ function layer_detail_entries(fields, props, raw) {
 		const [key, label] = layer_entries[layer_id];
 
 		if (layer_id !== clicked_layer_id) {
-			return [format_detail(key, label, raw.values[key], raw)];
+			return [format_detail(key, label, raw.values[key], raw, false, layer_id)];
 		}
 
 		const node = vtree?.find(n => n.id === layer_id);
@@ -272,7 +306,7 @@ function layer_detail_entries(fields, props, raw) {
 				.filter(Boolean);
 
 		return [
-			{ ...format_detail(key, label, raw.values[key], raw), ...(children.length ? { "has_subordinates": true } : {}) },
+			{ ...format_detail(key, label, raw.values[key], raw, false, layer_id), ...(children.length ? { "has_subordinates": true } : {}) },
 			...children,
 		];
 	});
@@ -438,7 +472,7 @@ function build_admin_row(item, analysis_name) {
 		...Object.fromEntries(
 			detailedData.map(data => {
 				const id = data.key || data.label;
-				const header = data.unit ? `${id} - ${data.unit}` : id;
+				const header = dataset_header(id, data.unit, data.dataset_id);
 				return [header, data.key === "Priority score" ? data.value : data.raw_value];
 			}),
 		),
@@ -488,7 +522,7 @@ export function get_property_tree() {
 			const unit = dataset_unit(dataset, 1);
 			return {
 				"id":       dataset.id,
-				"header":   unit ? `${dataset.name} - ${unit}` : dataset.name,
+				"header":   dataset_header(dataset.name, unit, dataset.id),
 				"children": maybe(dataset, 'config', 'attributes_map', 'length')
 					? dataset.config.attributes_map.map(attr => ({ "key": attr.dataset, "header": `${dataset.name}: ${attr.target}`, "display": attr.target }))
 					: [],

@@ -138,7 +138,7 @@ export function init() {
 
 	const file_input = qs('#points-file-input', panel);
 	const upload = qs('#points-upload', panel);
-	const upmsg = `
+	const upmsg = () => `
 <h1>${t(window.LOCALE, 'left_panel.points_loading.upload_message_title')}</h1>
 
 ${t(window.LOCALE, 'left_panel.points_loading.upload_message_intro')}
@@ -162,7 +162,7 @@ ${t(window.LOCALE, 'left_panel.points_loading.upload_message_intro')}
 	upload.onmouseenter = _ => {
 		upbubble = new bubblemessage({
 			"position": "S",
-			"message":  upmsg,
+			"message":  upmsg(),
 			"close":    false,
 		}, qs('i', upload));
 

@@ -45,7 +45,7 @@ import {
 } from '../lib/helpers.js';
 
 import bind from '../lib/bind.js';
-import { translateNode, t, translateIndexName } from './translate.js';
+import { translateNode, t, translateIndexName, replayable } from './translate.js';
 
 function view_all_locations() {
 	const area_type_str = area_type(STATE.variant);
@@ -221,7 +221,7 @@ function render_pagination() {
 	paginationDiv.append(nextBtn);
 }
 
-function render_page(page) {
+const render_page = replayable(function render_page(page) {
 	const section = qs('#right-panel #analysis-locations-section');
 	const resultscontainer = qs('.locations-paginated-list', section);
 	let ul = qs('.locations-list', resultscontainer);
@@ -276,7 +276,7 @@ function render_page(page) {
 	}
 
 	render_pagination();
-}
+});
 
 export async function update() {
 	if (_precompute_controller) _precompute_controller.abort();

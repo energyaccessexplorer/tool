@@ -15,24 +15,15 @@ func main() {
 		translationsPath = flag.String("translations", "locales/translations.csv", "Path to translations CSV")
 		unitsPath        = flag.String("units", "locales/units.csv", "Path to units CSV")
 		outputPath       = flag.String("output", "locales/translations.js.tmp", "Path to output JS file")
-		convert          = flag.Bool("convert", false, "Convert existing JSON files to CSV and exit")
 	)
 	flag.Parse()
 
-	if *convert {
-		if err := convertFromJSON("locales/translations.json", "locales/units.json"); err != nil {
-			log.Fatalf("Convert failed: %v", err)
-		}
-		fmt.Println("Wrote locales/translations.csv and locales/units.csv")
-		return
-	}
-
-	translations, err := readTranslations(*translationsPath)
+	translations, err := readLocaleCSV(*translationsPath)
 	if err != nil {
 		log.Fatalf("Failed to read translations: %v", err)
 	}
 
-	units, err := readUnits(*unitsPath)
+	units, err := readLocaleCSV(*unitsPath)
 	if err != nil {
 		log.Fatalf("Failed to read units: %v", err)
 	}
@@ -42,45 +33,38 @@ func main() {
 	}
 }
 
-func readTranslations(path string) (map[string]map[string]string, error) {
-	rows, err := readCSV(path)
+// readLocaleCSV reads a CSV whose first column is the key and whose remaining
+// columns are named by locale code in the header row (e.g. key,en,fr,zh).
+// Every non-empty cell becomes entry[locale]; empty cells are omitted.
+func readLocaleCSV(path string) (map[string]map[string]string, error) {
+	header, rows, err := readCSV(path)
 	if err != nil {
 		return nil, err
 	}
 	result := make(map[string]map[string]string, len(rows))
 	for _, row := range rows {
-		entry := map[string]string{"en": row[1], "fr": row[2]}
-		if len(row) > 3 && row[3] != "" {
-			entry["zh"] = row[3]
+		entry := make(map[string]string, len(header)-1)
+		for i, locale := range header[1:] {
+			if i+1 < len(row) && row[i+1] != "" {
+				entry[locale] = row[i+1]
+			}
 		}
 		result[row[0]] = entry
 	}
 	return result, nil
 }
 
-func readUnits(path string) (map[string]map[string]string, error) {
-	rows, err := readCSV(path)
-	if err != nil {
-		return nil, err
-	}
-	result := make(map[string]map[string]string, len(rows))
-	for _, row := range rows {
-		result[row[0]] = map[string]string{"fr": row[1]}
-	}
-	return result, nil
-}
-
-func readCSV(path string) ([][]string, error) {
+func readCSV(path string) ([]string, [][]string, error) {
 	f, err := os.Open(path)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	defer f.Close()
 
 	r := csv.NewReader(f)
-	// skip header
-	if _, err := r.Read(); err != nil {
-		return nil, fmt.Errorf("reading header: %w", err)
+	header, err := r.Read()
+	if err != nil {
+		return nil, nil, fmt.Errorf("reading header: %w", err)
 	}
 
 	var rows [][]string
@@ -90,11 +74,11 @@ func readCSV(path string) ([][]string, error) {
 			break
 		}
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		rows = append(rows, row)
 	}
-	return rows, nil
+	return header, rows, nil
 }
 
 func writeOutput(path string, translations, units map[string]map[string]string) error {
@@ -118,117 +102,3 @@ func writeOutput(path string, translations, units map[string]map[string]string) 
 
 	return nil
 }
-
-func convertFromJSON(translationsJSON, unitsJSON string) error {
-	if err := convertTranslations(translationsJSON, "locales/translations.csv"); err != nil {
-		return fmt.Errorf("translations: %w", err)
-	}
-	return convertUnits(unitsJSON, "locales/units.csv")
-}
-
-func convertTranslations(jsonPath, csvPath string) error {
-	data, err := os.ReadFile(jsonPath)
-	if err != nil {
-		return err
-	}
-
-	// Use ordered pairs to preserve source order in the CSV.
-	var ordered []struct {
-		Key string
-		Val map[string]string
-	}
-	// First pass: decode into a generic ordered structure via json.Decoder tokens.
-	dec := json.NewDecoder(
-		func() io.Reader { return jsonReader(data) }(),
-	)
-	// Decode as map to get all values, then re-read order via token stream.
-	var raw map[string]map[string]string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-
-	// Recover insertion order via the token stream.
-	dec2 := json.NewDecoder(jsonReader(data))
-	dec2.Token() // {
-	for dec2.More() {
-		tok, _ := dec2.Token()
-		key := tok.(string)
-		dec2.Token() // {
-		dec2.Token() // "en" or "fr"
-		dec2.Token() // value
-		dec2.Token() // "en" or "fr"
-		dec2.Token() // value
-		dec2.Token() // }
-		ordered = append(ordered, struct {
-			Key string
-			Val map[string]string
-		}{key, raw[key]})
-	}
-	_ = dec
-
-	f, err := os.Create(csvPath)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	w := csv.NewWriter(f)
-	w.Write([]string{"key", "en", "fr"})
-	for _, entry := range ordered {
-		w.Write([]string{entry.Key, entry.Val["en"], entry.Val["fr"]})
-	}
-	w.Flush()
-	return w.Error()
-}
-
-func convertUnits(jsonPath, csvPath string) error {
-	data, err := os.ReadFile(jsonPath)
-	if err != nil {
-		return err
-	}
-
-	var raw map[string]map[string]string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-
-	// Recover insertion order via token stream.
-	var keys []string
-	dec := json.NewDecoder(jsonReader(data))
-	dec.Token() // {
-	for dec.More() {
-		tok, _ := dec.Token()
-		keys = append(keys, tok.(string))
-		dec.Token() // {
-		dec.Token() // "fr"
-		dec.Token() // value
-		dec.Token() // }
-	}
-
-	f, err := os.Create(csvPath)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	w := csv.NewWriter(f)
-	w.Write([]string{"unit", "fr"})
-	for _, key := range keys {
-		w.Write([]string{key, raw[key]["fr"]})
-	}
-	w.Flush()
-	return w.Error()
-}
-
-type byteReader struct{ b []byte; pos int }
-
-func (r *byteReader) Read(p []byte) (int, error) {
-	if r.pos >= len(r.b) {
-		return 0, io.EOF
-	}
-	n := copy(p, r.b[r.pos:])
-	r.pos += n
-	return n, nil
-}
-
-func jsonReader(b []byte) io.Reader { return &byteReader{b: b} }

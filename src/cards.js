@@ -1,6 +1,6 @@
 import DS from './ds.js';
 
-import { t, translateDatasetName, translateDatasetAttribute, translateNode, translateUnit, getScaleLabels, registerUIUpdater } from './translate.js';
+import { t, translateDatasetName, translateDatasetAttribute, translateNode, translateUnit, translateIndexName, getScaleLabels, registerUIUpdater } from './translate.js';
 
 import bind from '../lib/bind.js';
 
@@ -672,7 +672,7 @@ export default class dscard extends HTMLElement {
 			"value-checkboxes":  value_checkboxes.call(this),
 			"pvna":              (this.ds.type === 'polygons-valued'),
 			"info":              this.ds.info_modal.bind(this.ds),
-			"index":             coalesce(this.ds.index, "Filter").replace(/(ani|eai)/, "Filter"),
+			"index":             (this.ds.index && !this.ds.index.match(/(ani|eai)/)) ? translateIndexName(window.LOCALE, this.ds.index) : t(window.LOCALE, 'left_panel.cards.card.filter'),
 			"specs":             specs.call(this),
 			"symbol":            symbol.call(this),
 			"colorscale":        colorscale.call(this),

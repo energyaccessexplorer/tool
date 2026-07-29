@@ -21,8 +21,9 @@ left_panel.cards.remove_all,Remove all layers,Supprimer toutes les couches,删�
 left_panel.cards.card.not_available,Not Available,Non disponible,不可用
 left_panel.cards.card.importance_label,Importance,Importance,重要性
 left_panel.cards.card.importance_hint,Change importance to provide different weightings for data in the analysis calculation.,Modifier le niveau d'importance afin d'attribuer des pondérations différentes aux données dans le calcul de l'analyse.,更改重要性以为分析计算中的数据提供不同的权重。
-left_panel.cards.card.range_hint,Analysis will restrict the dataset to the selected range.,L'analyse limitera l'ensemble de données à la plage sélectionnée.,分析将把数据集限制在所选范围内。
+left_panel.cards.card.range_hint,Analysis will restrict the dataset to the selected range.,L'analyse limitera le jeu de données à la plage sélectionnée.,分析将把数据集限制在所选范围内。
 left_panel.cards.card.range,Range,Plage,范围
+left_panel.cards.card.filter,Filter,Filtre,筛选
 left_panel.cards.card.show_layer,Show layer,Afficher la couche,显示图层
 left_panel.cards.card.opacity_label,Opacity,Opacité,不透明度
 left_panel.cards.card.about_button,About,À propos,关于
@@ -107,7 +108,7 @@ right_panel.prioritization.graphs.pop_desc,"Showing {{indexName}} for areas affe
 right_panel.prioritization.graphs.people_unit,people,personnes,人
 right_panel.prioritization.graphs.area_about,"Shows the 'Prioritization Index' results as area shares, based on your analysis criteria.",Affiche les résultats de l'indice de priorisation sous forme de parts de superficie.,根据您的分析条件，显示'优先级指数'结果作为面积份额。
 right_panel.prioritization.graphs.pop_about,"Shows the 'Prioritization Index' results as population shares, based on your analysis criteria.",Affiche les résultats de l'indice de priorisation sous forme de parts de population.,根据您的分析条件，显示'优先级指数'结果作为人口份额。
-right_panel.data.title,Analysing selected datasets in <strong>{{area}}</strong>.,Analyse des ensembles de données sélectionnés dans <strong>{{area}}</strong>.,分析在 <strong>{{area}}</strong> 中选定的数据集。
+right_panel.data.title,Analysing selected datasets in <strong>{{area}}</strong>.,Analyse des jeux de données sélectionnés dans <strong>{{area}}</strong>.,分析在 <strong>{{area}}</strong> 中选定的数据集。
 right_panel.data.subtitle,Click anywhere on the map to see data for that location.,Cliquez n'importe où sur la carte pour voir les données de cet emplacement.,单击地图上的任何位置以查看该位置的数据。
 right_panel.data.resolution_km,{{name}} at {{res}}km²,{{name}} à {{res}} km²,{{name}}（{{res}} 平方公里）
 right_panel.data.resolution_m,{{name}} at {{res}}m²,{{name}} à {{res}} m²,{{name}}（{{res}} 平方米）

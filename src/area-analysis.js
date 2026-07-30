@@ -419,7 +419,7 @@ export function division_names(raster_index) {
 			.map((division, i) => {
 				const raster_id = maybe(division, 'raster', 'data', raster_index);
 				const tier_id = raster_id ?? maybe(tier_row, `TIER${i + 1}`);
-				return [division.name, maybe(division, 'csv', 'table', tier_id)];
+				return [translateDivisionName(window.LOCALE, division.name), maybe(division, 'csv', 'table', tier_id)];
 			})
 			.filter(([, name]) => name),
 	);
@@ -456,7 +456,7 @@ function admin_tier_names(variant, id) {
 	for (let i = 1; i <= variant; i++) {
 		const division = GEOGRAPHY.divisions[i];
 		const name = maybe(division, 'csv', 'table', row[cols[i - 1]]);
-		if (division?.name && name) out[division.name] = name;
+		if (division?.name && name) out[translateDivisionName(window.LOCALE, division.name)] = name;
 	}
 	return out;
 }
@@ -568,7 +568,8 @@ export function prepare_tabular_data(results) {
 	}));
 
 	const admin_name_headers = GEOGRAPHY.divisions.slice(is_raster ? 1 : 0)
-		.filter(d => row.hasOwnProperty(d.name)).map(d => d.name);
+		.map(d => translateDivisionName(window.LOCALE, d.name))
+		.filter(n => row.hasOwnProperty(n));
 	const location_headers = ["Latitude", "Longitude", ...admin_name_headers].filter(h => headers.includes(h));
 	const location_set = new Set(location_headers);
 

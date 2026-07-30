@@ -135,7 +135,16 @@ export function initLocalePicker(locale) {
 	if (!nav) return;
 
 	const show = new URLSearchParams(location.search).has('lang') || window.ENV.includes('protected') || localStorage.getItem('locale');
-	if (!show) return;
+	if (!show) {
+		window.addEventListener('storage', function onStorage(e) {
+			if (e.key !== 'locale' || !LOCALE_LABELS[e.newValue]) return;
+			window.removeEventListener('storage', onStorage);
+			window.LOCALE = e.newValue;
+			initLocalePicker(e.newValue);
+			document.querySelector('#locale-dropdown a.active')?.click();
+		});
+		return;
+	}
 
 	const picker = document.createElement('div');
 	picker.id = 'locale-picker';

@@ -16,7 +16,7 @@ import bind from '../lib/bind.js';
 
 import modal from '../lib/modal.js';
 
-import { t, translateNode, translateIndexName, getScaleLabels } from './translate.js';
+import { t, translateNode, translateIndexName, translateDivisionName, getScaleLabels } from './translate.js';
 
 import { generate_summary_data, compute_share_amounts } from './summary.js';
 
@@ -185,7 +185,7 @@ async function export_all(results, visible_headers) {
 
 function location_columns() {
 	if (STATE.variant === 'raster') return new Set(["Latitude", "Longitude"]);
-	return new Set([GEOGRAPHY.divisions[STATE.variant].name]);
+	return new Set([translateDivisionName(window.LOCALE, GEOGRAPHY.divisions[STATE.variant].name)]);
 }
 
 function ppt_enabled_columns(total) {

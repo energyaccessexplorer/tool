@@ -281,6 +281,20 @@ function humanformat(s) {
 		.replace(/ ([a-z])/g, x => x.toUpperCase());
 }
 
+// Division tier labels ("District", "Ward", ...) are geography config, not DB
+// rows; translated via admin_areas.<slug> keys in the UI translations CSV.
+// Falls back to the raw name.
+export function translateDivisionName(locale, name) {
+	if (!name) return name;
+
+	const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+	const entry = window.EAE['translations']?.[`admin_areas.${slug}`];
+	if (entry && locale in entry) return entry[locale];
+
+	reportMissingPathOnce(`Missing admin_areas translation for division: "${name}"`);
+	return name;
+}
+
 export function translateUnit(locale, unit) {
 	if (!unit || locale === 'en') return unit;
 	const entry = window.EAE['units']?.[unit];

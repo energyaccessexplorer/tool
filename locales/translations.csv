@@ -381,3 +381,46 @@ help.step6,Click on the <strong>Supply</strong> data group.,Cliquez sur le group
 help.step7,Select data on <strong>Resources</strong> and <strong>Infrastructure</strong> to visualize current and/or potential energy supply.,Sélectionnez des données sur les <strong>ressources</strong> et les <strong>infrastructures</strong> pour visualiser l'offre énergétique actuelle et/ou potentielle.,选择<strong>资源</strong>和<strong>基础设施</strong>数据，以可视化当前和/或潜在的能源供应。
 help.step8,<strong>Visualize Underlying Data</strong> Click on the map to read location specific information of the top most layer.,<strong>Visualisez les données sous-jacentes</strong> Cliquez sur la carte pour lire les informations propres à un lieu de la couche supérieure.,<strong>可视化底层数据</strong> 点击地图以读取最上层图层的特定位置信息。
 help.step9,Analysis indicates low hanging fruits (energy access potential index) areas where demand or supply are likely to be higher (demand and supply index) and areas where finance assistance is needed the most,"L'analyse met en évidence les opportunités faciles (indice de potentiel d'accès à l'énergie), les zones où la demande ou l'offre sont susceptibles d'être plus élevées (indice de demande et d'offre) et les zones où l'aide financière est la plus nécessaire",分析可揭示容易实现的机会（能源获取潜力指数）、需求或供应可能较高的区域（需求与供应指数）以及最需要资金援助的区域
+admin_areas.arrondissements,Arrondissements,Arrondissements,区
+admin_areas.basin,Basin,Bassin,流域
+admin_areas.block,Block,Bloc,区块
+admin_areas.blocks,Blocks,Blocs,区块
+admin_areas.canton,Canton,Canton,县
+admin_areas.cantons,Cantons,Cantons,县
+admin_areas.communes,Communes,Communes,市镇
+admin_areas.council,Council,Conseil,议会
+admin_areas.county,County,Comté,县
+admin_areas.departments,Departments,Départements,省
+admin_areas.district,District,District,区
+admin_areas.districts,Districts,Districts,区
+admin_areas.districts_muderiah,Districts (Muderiah),Districts (muderiah),区（穆迪里耶）
+admin_areas.distrikt,Distrikt,District,区
+admin_areas.distrito,Distrito,District,区
+admin_areas.distrito_municipio,Distrito Municipio,District municipal,市政区
+admin_areas.estado,Estado,État,州
+admin_areas.governorates_muhafazah,Governorates (Muhafazah),Gouvernorats (muhafazah),省（穆哈法扎）
+admin_areas.gram_panchayat,Gram-panchayat,Gram-panchayat,村务委员会
+admin_areas.local_government_area,Local Government Area,Zone de gouvernement local,地方政府区
+admin_areas.municipality,Municipality,Municipalité,市
+admin_areas.municipio,Municipio,Municipalité,市
+admin_areas.outline,Outline,Contour,轮廓
+admin_areas.outlines,Outlines,Contours,轮廓
+admin_areas.parish,Parish,Paroisse,堂区
+admin_areas.prefectures,Prefectures,Préfectures,省
+admin_areas.province,Province,Province,省
+admin_areas.provinces,Provinces,Provinces,省
+admin_areas.provincia,Provincia,Province,省
+admin_areas.region,Region,Région,地区
+admin_areas.regions,Regions,Régions,地区
+admin_areas.ressort,Ressort,Ressort,辖区
+admin_areas.solarclusters,Solarclusters,Clusters solaires,太阳能集群
+admin_areas.state,State,État,州
+admin_areas.subcounty,Subcounty,Sous-comté,次县
+admin_areas.subregion,Subregion,Sous-région,次地区
+admin_areas.territories,Territories,Territoires,属地
+admin_areas.villages,Villages,Villages,村
+admin_areas.ward,Ward,Circonscription,选区
+admin_areas.wards,Wards,Circonscriptions,选区
+admin_areas.windclusters,Windclusters,Clusters éoliens,风电集群
+admin_areas.woreda,Woreda,Woreda,沃雷达
+admin_areas.zone,Zone,Zone,地带

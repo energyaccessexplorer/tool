@@ -112,9 +112,9 @@ function updateDatasetTranslations() {
 }
 
 function updateNavTranslations() {
-	const myEae = document.querySelector('#my-eae');
-	if (myEae && myEae.dataset.t) {
-		myEae.textContent = t(window.LOCALE, myEae.dataset.t);
+	const myEaeLabel = document.querySelector('#my-eae > [data-t]');
+	if (myEaeLabel) {
+		myEaeLabel.textContent = t(window.LOCALE, myEaeLabel.dataset.t);
 	}
 
 	const navItems = document.querySelectorAll('#my-eae-dropdown a[data-t]');

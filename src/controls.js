@@ -176,7 +176,8 @@ export default class dscontrols extends HTMLElement {
 	}
 
 	bind() {
-		const desc = this.ds.description || this.ds.category.description;
+		const descSource = this.ds.description ? this.ds : this.ds.category;
+		const desc = descSource.description;
 
 		bind(this, Object.assign({}, this.ds, {
 			"name":        translateDatasetName(window.LOCALE, this.ds),

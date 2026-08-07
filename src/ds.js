@@ -63,20 +63,15 @@ export const default_colorscale_svg = colorscale_svg(default_colorscale.stops);
 export default class DS {
 	visible = true;
 
-	constructor(o) {
-		this.id = o.name || o.category.name;
+	constructor(row) {
+		const { category_overrides, ...rest } = row;
+		Object.assign(this, rest);
 
-		this.dataset_id = o.id;
+		this.id = row.name || row.category.name;
 
-		this.category = o.category;
+		this.dataset_id = row.id;
 
-		this.type = o.type;
-
-		this.source_files = o.source_files;
-
-		this.processed_files = o.processed_files;
-
-		this.category_overrides(o.category_overrides);
+		this.category_overrides(category_overrides);
 
 		this.on = false;
 
@@ -94,25 +89,23 @@ export default class DS {
 
 		this.timeline = this.category.timeline;
 
-		this.name = coalesce(o.name_long,
-		                     o.name,
+		this.name = coalesce(row.name_long,
+		                     row.name,
 		                     this.category.name_long,
 		                     this.category.name);
-
-		this.metadata = o.metadata;
 
 		this.hosts = null;
 
 		this.config = {};
 
-		if (o.mutant_configuration)
-			this.config = o.mutant_configuration;
-		else if (o.vectors_configuration)
-			this.config = o.vectors_configuration;
+		if (row.mutant_configuration)
+			this.config = row.mutant_configuration;
+		else if (row.vectors_configuration)
+			this.config = row.vectors_configuration;
 
 		DST.set(this.id, this);
 
-		this.init(o);
+		this.init(row);
 	};
 
 	init(o) {

@@ -17,7 +17,7 @@ import {
 	tmpl,
 } from '../lib/helpers.js';
 
-import { t, translateNode, translateIndexName, registerUIUpdater } from './translate.js';
+import { t, translateNode, translateIndexName, translateDivisionName, registerUIUpdater } from './translate.js';
 
 export let opacity = 1;
 
@@ -36,7 +36,7 @@ function variants() {
 
 	GEOGRAPHY.divisions.forEach((d,i) => {
 		if (i === 0) return;
-		s.append(ce('option', d.name, { "value": i }));
+		s.append(ce('option', translateDivisionName(window.LOCALE, d.name), { "value": i }));
 	});
 
 	s.value = STATE.variant;
@@ -165,6 +165,12 @@ registerUIUpdater(() => {
 			r = r / 1000;
 		}
 		opt.textContent = `${t(window.LOCALE, 'left_panel.output.variant.prioritized_areas')} - ${r}${u}`;
+	}
+
+	for (const o of select.querySelectorAll('option')) {
+		if (o.value === 'raster') continue;
+		const d = GEOGRAPHY.divisions[+o.value];
+		if (d) o.textContent = translateDivisionName(window.LOCALE, d.name);
 	}
 
 	indexes();

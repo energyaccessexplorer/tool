@@ -14,7 +14,7 @@ import {
 	maybe,
 } from '../lib/helpers.js';
 
-import { t, translateUnit, translateIndexName, translateDatasetName } from './translate.js';
+import { t, translateUnit, translateIndexName, translateDatasetName, translateDivisionName } from './translate.js';
 
 const row_cache = new Map();
 let feature_indexes = null;
@@ -57,6 +57,9 @@ export function translate_header(locale, header) {
 	const index_key = Object.keys(EAE['indexes'] || {})
 		.find(k => ['en', 'fr', 'zh'].some(l => translateIndexName(l, k) === header));
 	if (index_key) return translateIndexName(locale, index_key);
+
+	if (GEOGRAPHY.divisions?.some(d => d?.name === header))
+		return translateDivisionName(locale, header);
 
 	return header;
 }
@@ -164,7 +167,7 @@ function resolve_feature(fields, props, feature_name, admin_info) {
 	if (admin_info) {
 		return {
 			"feature":      admin_info.name,
-			"feature_type": maybe(GEOGRAPHY, 'divisions', admin_info.variant, 'name') || null,
+			"feature_type": translateDivisionName(window.LOCALE, maybe(GEOGRAPHY, 'divisions', admin_info.variant, 'name')) || null,
 		};
 	}
 
@@ -213,14 +216,14 @@ export function admin_location_path(variant, id) {
 
 	if (raster_index < 0) {
 		const name = maybe(GEOGRAPHY, 'divisions', variant, 'csv', 'table', id);
-		if (name) tiers.push({ "label": maybe(GEOGRAPHY, 'divisions', variant, 'name'), "name": name });
+		if (name) tiers.push({ "label": translateDivisionName(window.LOCALE, maybe(GEOGRAPHY, 'divisions', variant, 'name')), "name": name });
 		return tiers;
 	}
 
 	for (let i = 1; i <= variant; i++) {
 		const area_id = maybe(GEOGRAPHY, 'divisions', i, 'raster', 'data', raster_index);
 		const name = maybe(GEOGRAPHY, 'divisions', i, 'csv', 'table', area_id);
-		if (name) tiers.push({ "label": maybe(GEOGRAPHY, 'divisions', i, 'name'), "name": name });
+		if (name) tiers.push({ "label": translateDivisionName(window.LOCALE, maybe(GEOGRAPHY, 'divisions', i, 'name')), "name": name });
 	}
 	return tiers;
 }
@@ -229,7 +232,7 @@ export function admin_location_name(variant, id) {
 	const path = admin_location_path(variant, id);
 	const names = path.length
 		? path.map(t => t.name).reverse()
-		: [maybe(GEOGRAPHY, 'divisions', variant, 'name')];
+		: [translateDivisionName(window.LOCALE, maybe(GEOGRAPHY, 'divisions', variant, 'name'))];
 
 	names.push(GEOGRAPHY.name);
 	return names.filter(Boolean).join(', ');

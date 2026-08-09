@@ -51,7 +51,7 @@ function mutant_options() {
 	const container = ce('div', null, { "class": 'control-option' });
 	const select = ce('select');
 
-	ds.hosts.forEach(d => select.append(ce('option', d.name, { "value": d.id })));
+	ds.hosts.forEach(d => select.append(ce('option', translateDatasetName(window.LOCALE, d), { "value": d.id })));
 
 	select.value = ds.host.id;
 

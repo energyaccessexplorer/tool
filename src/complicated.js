@@ -21,6 +21,8 @@ import {
 	maybe,
 } from '../lib/helpers.js';
 
+import { translateDatasetName } from './translate.js';
+
 export function context(raster_pixel, winner = null) {
 	const dict = [];
 	const props = {};
@@ -50,14 +52,14 @@ export function context(raster_pixel, winner = null) {
 		const v = resolve_raster_value(d, raw);
 
 		if (d.category.unit) {
-			dict.push([k, d.name]);
+			dict.push([k, translateDatasetName(window.LOCALE, d)]);
 			props[k] = `<code>${format_value_unit(v, d.category.unit)}</code>`;
 			values[k] = v;
 			units[k] = d.category.unit;
 		}
 
 		else if (and(Number.isFinite(v), d.vectors)) {
-			dict.push([k, d.name]);
+			dict.push([k, translateDatasetName(window.LOCALE, d)]);
 			props[k] = `<code>${v === 0 ? "< 1" : v} km (proximity to)</code>`;
 			values[k] = v;
 			units[k] = "km (proximity to)";
@@ -67,7 +69,7 @@ export function context(raster_pixel, winner = null) {
 			Object.assign(props, winner.feature.properties);
 
 			dict.unshift(
-				["_" + d.id, `<strong style="font-size: 1.1em;">${d.name.toUpperCase()}</strong>`],
+				["_" + d.id, `<strong style="font-size: 1.1em;">${translateDatasetName(window.LOCALE, d).toUpperCase()}</strong>`],
 				...d.config.attributes_map.map(e => [e.dataset, e.target]),
 			);
 

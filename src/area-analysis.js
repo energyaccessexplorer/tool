@@ -14,7 +14,7 @@ import {
 	maybe,
 } from '../lib/helpers.js';
 
-import { t, translateUnit, translateIndexName, translateDatasetName, translateDivisionName } from './translate.js';
+import { t, translateUnit, translateIndexName, translateDatasetName, translateDivisionName, getScaleLabels } from './translate.js';
 
 const row_cache = new Map();
 let feature_indexes = null;
@@ -152,7 +152,8 @@ export function get_admin_area_layer_data(variant, area_id) {
 				unit = resolve_unit(layer, DST.get(layer_id), value);
 			}
 
-			fields.push([layer_id, layer.name]);
+			const layer_ds = DST.get(layer_id);
+			fields.push([layer_id, layer_ds ? translateDatasetName(window.LOCALE, layer_ds) : layer.name]);
 			props[layer_id] = value;
 			raw.values[layer_id] = value;
 			raw.units[layer_id] = unit;
@@ -175,7 +176,7 @@ function resolve_feature(fields, props, feature_name, admin_info) {
 	if (!feature_entry) return { "feature": null, "feature_type": null };
 
 	const dataset = STATE.datasets.find(d => d.id === feature_entry[0].slice(1));
-	const category = dataset?.name?.toUpperCase() || '';
+	const category = dataset ? translateDatasetName(window.LOCALE, dataset).toUpperCase() : '';
 	const name_field = fields.find(field => field?.[1] && !field[0]?.startsWith('_') &&
 		['name', 'facility name', 'facility_name'].includes(field[1].toLowerCase()));
 	const name = props[name_field?.[0]] || feature_name;
@@ -186,6 +187,11 @@ function resolve_feature(fields, props, feature_name, admin_info) {
 	};
 }
 
+function translate_scale_label(label) {
+	const i = lowmedhigh_scale.range().indexOf(label);
+	return i === -1 ? label : getScaleLabels(window.LOCALE)[i];
+}
+
 function analysis_entries(analysis_value, analysis_name, admin_info) {
 	if (!Number.isFinite(analysis_value)) return [];
 
@@ -194,7 +200,7 @@ function analysis_entries(analysis_value, analysis_name, admin_info) {
 		: lowmedhigh_scale;
 
 	return [
-		...(analysis_name ? [{ "label": analysis_name, "value": scale(analysis_value), "raw_value": scale(analysis_value), "has_info_button": true }] : []),
+		...(analysis_name ? [{ "label": analysis_name, "value": translate_scale_label(scale(analysis_value)), "raw_value": scale(analysis_value), "has_info_button": true }] : []),
 		{ "key": "Priority score", "label": t(window.LOCALE, 'map_popup.priority_score'), "value": `${(analysis_value * 100).toFixed(1)}%`, "raw_value": analysis_value },
 	];
 }

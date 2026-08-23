@@ -67,7 +67,8 @@ export default class DS {
 		const { category_overrides, ...rest } = row;
 		Object.assign(this, rest);
 
-		this.id = row.name || row.category.name;
+		const fallback_id = row.name || row.category.name;
+		this.id = DST.has(fallback_id) ? `${fallback_id}-${row.id}` : fallback_id;
 
 		this.dataset_id = row.id;
 
@@ -221,7 +222,7 @@ export default class DS {
 
 		this.controls = new dscontrols(this);
 
-		if (this.id === 'admin-tiers') {
+		if (this.category.name === 'admin-tiers') {
 			this.controls.remove();
 			delete this.controls;
 		}

@@ -6,7 +6,6 @@ import {
 } from './utils.js';
 
 import {
-	ce,
 	delay,
 	fake_blob_download,
 	tmpl,

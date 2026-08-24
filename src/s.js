@@ -25,6 +25,32 @@ import {
 
 import { t, translateNode, initLocalePicker, resolveLocale } from './translate.js';
 
+// Local partners can link to EAE from their own site (e.g. a gov.in page)
+// expecting visitors to see only their own geography in the menu.
+const PARTNER_GEOGRAPHIES = [
+	{ "referrer": /(^|\.)gov\.in$/i, "geography": "India" },
+];
+
+function partner_geography_match() {
+	if (!document.referrer) return null;
+
+	let hostname;
+	try {
+		hostname = new URL(document.referrer).hostname;
+	} catch (_) {
+		return null;
+	}
+
+	const match = PARTNER_GEOGRAPHIES.find(p => p.referrer.test(hostname));
+	return match ? match.geography : null;
+};
+
+function find_geography_by_name(geographies, name) {
+	const lower = name.toLowerCase();
+	return geographies.find(g => g.name.toLowerCase() === lower)
+		|| geographies.find(g => g.name.toLowerCase().startsWith(lower + ' '));
+};
+
 function preload_boundaries(id) {
 	return API.get('datasets', {
 		"select":        ['processed_files'],
@@ -291,7 +317,15 @@ export async function init() {
 	}
 
 	API.get("geographies", params)
-		.then(r => list(r))
+		.then(r => {
+			const partnerGeography = partner_geography_match();
+			if (partnerGeography) {
+				const co = find_geography_by_name(r, partnerGeography);
+				if (co) r = [co];
+			}
+
+			list(r);
+		})
 		.catch(error => {
 			new Toast({ "label": t(window.LOCALE, 'toast.fetch_error.label'), "caption": String(error), "variant": 'error' }).show();
 

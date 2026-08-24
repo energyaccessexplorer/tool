@@ -21,6 +21,8 @@ let feature_indexes = null;
 
 const header_specs = new Map();
 
+const NAME_ATTRIBUTE_TARGETS = ['name', 'facility name', 'facility_name'];
+
 function item_key(item) {
 	return item.i !== undefined ? item.i : item.id;
 }
@@ -128,6 +130,21 @@ export function value_tree(raster_index) {
 }
 
 
+export function vector_feature_name(raster_index) {
+	for (const { index, dataset } of get_feature_indexes()) {
+		const props = index.get(raster_index);
+		if (!props) continue;
+
+		const name_attr = dataset.config.attributes_map.find(attr =>
+			NAME_ATTRIBUTE_TARGETS.includes(attr.target.toLowerCase()));
+
+		const value = name_attr && props[name_attr.dataset];
+		if (value) return value;
+	}
+
+	return null;
+}
+
 export function get_admin_area_layer_data(variant, area_id) {
 	const fields = [];
 	const props = {};
@@ -178,7 +195,7 @@ function resolve_feature(fields, props, feature_name, admin_info) {
 	const dataset = STATE.datasets.find(d => d.id === feature_entry[0].slice(1));
 	const category = dataset ? translateDatasetName(window.LOCALE, dataset).toUpperCase() : '';
 	const name_field = fields.find(field => field?.[1] && !field[0]?.startsWith('_') &&
-		['name', 'facility name', 'facility_name'].includes(field[1].toLowerCase()));
+		NAME_ATTRIBUTE_TARGETS.includes(field[1].toLowerCase()));
 	const name = props[name_field?.[0]] || feature_name;
 
 	return {

@@ -26,6 +26,7 @@ import {
 import {
 	precompute_rows,
 	clear_row_cache,
+	vector_feature_name,
 } from './area-analysis.js';
 
 import {
@@ -97,8 +98,14 @@ function raster_item(p) {
 	el.onclick = zoom.bind(null, p, () => show_location_info(p.c, get_map_position(p.c), true));
 
 	const locationName = qs('.location-name', el);
-	mapbox_coords_search_pois({ "coords": p.c, "limit": 1 })
-		.then(r => locationName.textContent = maybe(r, 0, 'name') || t(window.LOCALE, 'right_panel.high_priority.unknown_location'));
+	const vectorName = vector_feature_name(p.i);
+
+	if (vectorName) {
+		locationName.textContent = vectorName;
+	} else {
+		mapbox_coords_search_pois({ "coords": p.c, "limit": 1 })
+			.then(r => locationName.textContent = maybe(r, 0, 'name') || t(window.LOCALE, 'right_panel.high_priority.unknown_location'));
+	}
 
 	return template;
 };

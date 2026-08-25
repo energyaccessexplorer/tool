@@ -309,7 +309,7 @@ export function change_theme(theme) {
 		const c = MAPBOX.getStyle().layers.find(l => l.type === 'symbol');
 		MAPBOX.first_symbol = maybe(c, 'id');
 
-		await until(_ => MAPBOX.isStyleLoaded());
+		await until(_ => MAPBOX.isStyleLoaded(), Infinity);
 
 		worldview();
 	};
@@ -453,7 +453,7 @@ export async function sort() {
 
 	const layers = [].concat(...datasets.map(d => d._layers));
 
-	await Promise.all(layers.map(i => until(_ => MAPBOX.getLayer(i))));
+	await Promise.all(layers.map(i => until(_ => MAPBOX.getLayer(i), Infinity)));
 
 	for (let i = 0; i < layers.length; i++) {
 		MAPBOX.moveLayer(

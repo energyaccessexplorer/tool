@@ -2,6 +2,74 @@
 
 <html>
   <head>
+    <script>
+      // Hidden tabs throttle rAF/timers, stalling mapbox's render loop and its
+      // polling waits. Worker timers aren't throttled, so fall back to those
+      // while hidden. Must run before any other script.
+      (function() {
+        try {
+          var TICK_MS = 50;
+
+          var native = {
+            raf: window.requestAnimationFrame.bind(window),
+            caf: window.cancelAnimationFrame.bind(window),
+            st:  window.setTimeout.bind(window),
+            ct:  window.clearTimeout.bind(window),
+            si:  window.setInterval.bind(window),
+            ci:  window.clearInterval.bind(window),
+          };
+
+          var ticker = new Worker(URL.createObjectURL(new Blob(
+            ['setInterval(function() { postMessage(0); }, ' + TICK_MS + ')'],
+            { "type": 'text/javascript' }
+          )));
+
+          ticker.onerror = function(e) { console.error('background-timer patch: ticker worker error', e); };
+
+          // Negative ids, so they can't collide with native (always >= 0) ones.
+          var timers = new Map(), next_id = -1;
+          ticker.onmessage = function() {
+            timers.forEach(function(t, id) {
+              if (--t.remaining > 0) return;
+              if (t.type === 'interval') t.remaining = t.period; else timers.delete(id);
+              t.fn();
+            });
+          };
+
+          function schedule(type, fn, ms) {
+            var id = next_id--;
+            var period = Math.max(1, Math.ceil((ms || 0) / TICK_MS));
+            timers.set(id, { "type": type, "period": period, "remaining": period, "fn": fn });
+            return id;
+          }
+
+          function unschedule(nativeClear, id) {
+            if (id < 0) timers.delete(id); else nativeClear(id);
+          }
+
+          window.requestAnimationFrame = function(fn) {
+            if (!document.hidden) return native.raf(fn);
+            return schedule('timeout', function() { fn(performance.now()); }, TICK_MS);
+          };
+          window.cancelAnimationFrame = function(id) { unschedule(native.caf, id); };
+
+          window.setTimeout = function(fn, ms) {
+            if (!document.hidden) return native.st(fn, ms);
+            return schedule('timeout', fn, ms);
+          };
+          window.clearTimeout = function(id) { unschedule(native.ct, id); };
+
+          window.setInterval = function(fn, ms) {
+            if (!document.hidden) return native.si(fn, ms);
+            return schedule('interval', fn, ms);
+          };
+          window.clearInterval = function(id) { unschedule(native.ci, id); };
+        } catch (e) {
+          console.error('background-timer patch failed to install', e);
+        }
+      })();
+    </script>
+
     <meta charset="utf-8">
 
     <meta name="HandheldFriendly" content="true">

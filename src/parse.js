@@ -24,7 +24,7 @@ import {
 } from '../lib/helpers.js';
 
 async function fetchcheck(endpoint, format) {
-	await until(_ => MAPBOX.isStyleLoaded()); // <-- magic line. If you remove it, no more unicorns!
+	await until(_ => MAPBOX.isStyleLoaded(), Infinity); // <-- magic line. If you remove it, no more unicorns!
 
 	if (endpoint.match(/^(blob:)?http/)) ;
 	else endpoint = EAE['settings'].storage + endpoint;

@@ -2,7 +2,7 @@ name: PRODUCTION DEPLOY
 
 on:
   push:
-    branches: [ production ]
+    branches: [ main ]
 
 jobs:
   build-deploy:
@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          ref: production
+          ref: main
 
       - name: Install build dependencies
         run: |

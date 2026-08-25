@@ -165,6 +165,8 @@ build-a:
 		${SRC}/report.js \
 		${SRC}/summary.js \
 		${SRC}/timeline.js \
+		${SRC}/meiosis-stream.js \
+		${SRC}/timeline-state.js \
 		${SRC}/user.js \
 		${SRC}/help.js \
 		${SRC}/qa.js \

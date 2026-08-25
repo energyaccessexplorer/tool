@@ -115,6 +115,8 @@ import bubblemessage from '../lib/bubblemessage.js';
 
 import { translateNode, initLocalePicker, resolveLocale, t } from './translate.js';
 
+import { syncDatasets as timeline_sync_datasets } from './timeline-state.js';
+
 export const STANDARD_TABS = new Set(['census', 'demand', 'supply', 'other']);
 
 COMMIT = debounce(function() {
@@ -128,6 +130,8 @@ COMMIT = debounce(function() {
 	}
 
 	reload(...arguments);
+
+	timeline_sync_datasets(STATE.datasets);
 
 	window.dispatchEvent(new Event('resize'));
 }, 300);

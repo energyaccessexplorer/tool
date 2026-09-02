@@ -184,50 +184,50 @@ function platform_overview() {
 	title($, "Platform Overview");
 
 	$.addText(
-		"Energy Access Explorer is an online, open-source, interactive platform that uses mapping to visualize the state of energy access in unserved and underserved areas. It analyzes credible and public data to make the connection between the demand and supply of energy. Individuals can create custom analyses on Energy Access Explorer to identify and prioritize areas where energy markets can be expanded.",
-		{ color, x, "y": first_paragraph_y, "w": "90%", "h": 0.9, "fontSize": 12, bold },
+		"Energy Access Explorer is the first, open-source, online and interactive geospatial platform that enables energy planners, clean energy entrepreneurs, donors, and development institutions to identify high-priority areas for energy access interventions. EAE functions also as a dynamic information system, reducing software engineering and data transaction costs for both data providers and users and facilitating data management and governance.",
+		{ color, x, "y": 1.1, "w": "90%", "h": 1.3, "fontSize": 12, bold },
 	);
 
 	$.addText(
-		"The use of transparent data and analysis from Energy Access Explorer enables the following:",
-		{ color, x, "y": 3, "w": "90%", "h": 0.4, "fontSize": 12 },
+		"Who are the primary audiences of Energy Access Explorer?",
+		{ "color": green, x, "y": 2.7, "w": "90%", "h": 0.4, "fontSize": 12, bold },
 	);
 
-	$.addText(
+	const audiences = [
 		[
-			{
-				"text":    "Strategic Energy Planning. ",
-				"options": { bold },
-			}, {
-				"text": "Analysts and/or decision-makers within energy planning functions (a rural electrification agency, a planning unit of an energy ministry, etc.) can use the tool to improve linking electrification and socioeconomic development to meet people's needs. Energy Access Explorer complements the cost-optimization planning tools these agencies use and provides a bottom-up representation of aspects of affordability and demand. Further, it serves as a database that aggregates up-todate information. This reduces high transaction costs for data aggregation and sharing.",
-			},
+			"Energy planning agencies ",
+			"can use the platform to explore the potential for grid extension, off-grid systems, clean cooking technologies and renewables for energy access in their countries.",
+		], [
+			"Clean energy enterprises ",
+			"can use the platform to access demographic and socio-economic data, which indicate consumer ability to pay for energy services. This information can help identify gaps in market opportunities.",
+		], [
+			"Donors and Development Finance Institutions ",
+			"can use the platform to identify areas where grants and support will have the most impact.",
+		], [
+			"Service delivery institutions ",
+			"in the health, education, productive use of energy and agriculture sectors can use the platform to get a better understanding of energy needs associated to development services.",
+		], [
+			"Clean Cooking Sector ",
+			"organizations and agencies can use the platform to identify areas where the uptake of clean cooking technologies should be prioritized based on location specific data on demand, supply, and environment.",
 		],
-		textopts({ color, x, "y": 3.5, "w": "90%", "h": 1.2 }),
-	);
+	];
 
-	$.addText(
-		[
-			{
-				"text":    "Expansion of energy access markets. ",
-				"options": { bold },
-			}, {
-				"text": "Off-grid and mini-grid developers can use the tool to better assess the level of service needed. Understanding where their customers are likely to be located and where there is a concentration of demand will help clean energy entrepreneurs identify market opportunities.",
-			},
-		],
-		textopts({ color, x, "y": 5, "w": "90%", "h": 1.2 }),
-	);
+	let y = 3.25;
+	for (const [name, description] of audiences) {
+		$.addText(
+			[
+				{
+					"text":    name,
+					"options": { bold },
+				}, {
+					"text": description,
+				},
+			],
+			textopts({ color, x, y, "w": "90%", "h": 0.8, "fontSize": 10 }),
+		);
 
-	$.addText(
-		[
-			{
-				"text":    "Investment for impact. ",
-				"options": { bold },
-			}, {
-				"text": "Analysts and/or decisionmakers within development finance institutions and donors can understand better where to most effectively channel funds into electrification efforts to ensure that no one is left behind.",
-			},
-		],
-		textopts({ color, x, "y": 6, "w": "90%", "h": 1.2 }),
-	);
+		y += 0.82;
+	}
 
 	footer($);
 };
@@ -239,18 +239,114 @@ function how_it_works() {
 	title($, "How it Works");
 
 	$.addText(
-		"Energy Access Explorer (EAE) is an online, open-source, interactive, geospatial platform that enables clean energy entrepreneurs, energy planners, donors, and development-oriented institutions to identify high priority areas where energy access can be expanded. Using spatial data to link energy supply with growing or unmet demand is essential to gaining a better picture of energy access and expanding energy services to those who need it the most.",
-		{ color, x, "y": first_paragraph_y, "w": "90%", "h": 1.2, "fontSize": 12, bold },
+		"Energy Access Explorer synthesizes and analyzes more than 50 geographic data sets (per geography) on both energy supply and demand. It runs multi-criteria analysis that uses location-specific resource availability and infrastructure data to represent energy supply. It also incorporates demographic data and data on social and productive uses to visualize demand for energy services. Together, these supply and demand indicators enable more comprehensive energy planning. Spatial analysis tools, including multi-criteria analysis, overlays, filters and buffer zones, help users identify and prioritize areas where energy access can be expanded.",
+		{ color, x, "y": 1.1, "w": "90%", "h": 1.5, "fontSize": 12, bold },
 	);
 
 	$.addText(
-		"It is a multi-criteria analysis tool that uses location-specific resource availability and infrastructure data to represent energy supply. It also incorporates demographic data and data on social and productive uses to visualize demand for energy services. Together, these supply and demand indicators enable more comprehensive energy planning. Spatial analysis tools, including multi-criteria analysis, overlays, filters and buffer zones, help users identify and prioritize areas where energy access can be expanded.",
-		{ color, x, "y": 3.5, "w": "90%", "h": 1.2, "fontSize": 12 },
+		"The tool incorporates remote sensing data as well as data from global, national, sub-national and census databases that are either publicly available or provided by international partners and local stakeholders. It can host data available in various resolutions, scales and formats allowing for better or new datasets to be incorporated once available. The selection of data is based on literature review, a survey WRI conducts on the importance of certain datasets in geospatial energy access planning and user feedback. The list of essential data is reviewed by local stakeholders to ensure the platform is relevant and applicable in the local context.",
+		{ color, x, "y": 2.8, "w": "90%", "h": 1.5, "fontSize": 11 },
 	);
 
 	$.addText(
-		"The tool incorporates remote sensing data as well as data from global, national, sub-national and census databases that are either publicly available or provided by international partners and local stakeholders. It can host data available in various resolutions, scales and formats allowing for better or new datasets to be incorporated once available. The selection of data is based on a literature review and a survey WRI conducts on the importance of certain datasets in geospatial energy access planning. The list of essential data is reviewed by local stakeholders to ensure the platform is relevant and applicable in the local context.",
-		{ color, x, "y": 5, "w": "90%", "h": 1.5, "fontSize": 12 },
+		"Methodology",
+		{ "color": green, x, "y": 4.5, "w": "90%", "h": 0.4, "fontSize": 12, bold },
+	);
+
+	const demand_color = "#1B4B8F";
+
+	const stages = [
+		{
+			"name": "Datasets",
+			"sub": [
+				{ "label": "Demand", "desc": "demographics, social and productive uses", "color": demand_color },
+				{ "label": "Supply", "desc": "resources and infrastructure", "color": green },
+			],
+		}, {
+			"name": "User Interactions",
+			"desc": "Select and overlay data, apply buffer zones and filters, assign data importance.",
+		}, {
+			"name": "Multi-Criteria Analysis",
+			"desc": "Weighted comparison of demand against supply.",
+		}, {
+			"name": "Energy Access Maps",
+			"desc": "High-priority areas for energy access interventions.",
+		},
+	];
+
+	const box_w = 2.4;
+	const box_h = 1.5;
+	const gap = 0.35;
+	const box_y = 5.05;
+
+	stages.forEach((stage, i) => {
+		const box_x = x + (i * (box_w + gap));
+
+		$.addShape(
+			this.ShapeType.rect,
+			{ "x": box_x, "y": box_y, "w": box_w, "h": box_h, "fill": { "color": grey } },
+		);
+
+		const runs = [
+			{
+				"text":    stage.name,
+				"options": { bold, breakLine, "color": green, "fontSize": 11 },
+			},
+		];
+
+		if (stage.sub) {
+			for (const s of stage.sub) {
+				runs.push({
+					"text":    s.label + ": ",
+					"options": { bold, "color": s.color, "fontSize": 9 },
+				});
+				runs.push({
+					"text":    s.desc,
+					"options": { breakLine, "color": black, "fontSize": 9 },
+				});
+			}
+		} else {
+			runs.push({
+				"text":    stage.desc,
+				"options": { "color": black, "fontSize": 9 },
+			});
+		}
+
+		$.addText(
+			runs,
+			{ "x": box_x + 0.1, "y": box_y + 0.1, "w": box_w - 0.2, "h": box_h - 0.2, "valign": "top" },
+		);
+
+		if (i < stages.length - 1) {
+			$.addText(
+				"→",
+				{ "x": box_x + box_w, "y": box_y, "w": gap, "h": box_h, "color": green, "fontSize": 16, bold, "align": "center", "valign": "middle" },
+			);
+		}
+	});
+
+	footer($);
+};
+
+function open_data() {
+	const $ = this.addSlide();
+	const color = black;
+
+	title($, t(window.LOCALE, 'report.open_data.title'));
+
+	$.addText(
+		t(window.LOCALE, 'report.open_data.para1'),
+		{ color, x, "y": 1.1, "w": "90%", "h": 1.6, "fontSize": 12 },
+	);
+
+	$.addText(
+		t(window.LOCALE, 'report.open_data.para2'),
+		{ color, x, "y": 2.9, "w": "90%", "h": 2.2, "fontSize": 11 },
+	);
+
+	$.addText(
+		t(window.LOCALE, 'report.attribution'),
+		{ "color": green, x, "y": 5.4, "w": "90%", "h": 0.8, "fontSize": 10, bold },
 	);
 
 	footer($);
@@ -1016,6 +1112,7 @@ export async function pptx(opts = {}) {
 
 		platform_overview.call(p);
 		how_it_works.call(p);
+		open_data.call(p);
 		selected_datasets.call(p);
 		await selected_data.call(p);
 		geography_indexes.call(p);

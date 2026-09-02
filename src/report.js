@@ -390,7 +390,7 @@ function geography_indexes_right($) {
 	table('population-density', 5);
 };
 
-function analysis(index) {
+async function analysis(index) {
 	function row(d) {
 		return [
 			{
@@ -615,14 +615,54 @@ function analysis(index) {
 
 	const $ = this.addSlide();
 
-	analysis_left.call(this, $, index);
+	await analysis_left.call(this, $, index);
 
 	analysis_right.call(this, $, index, right_rows);
 
 	footer($);
 };
 
-function analysis_left($, index) {
+async function fetch_basemap(envelope) {
+	// Reuse the same token/theme the client map uses; never hardcode it.
+	const token = (EAE && EAE['settings'] && EAE['settings'].mapbox_token) || null;
+	if (!token) return null;
+
+	const [minLng, minLat, maxLng, maxLat] = envelope;
+	// Pad the bbox ~10% on each side so neighbouring context shows around the geography.
+	const padLng = (maxLng - minLng) * 0.1;
+	const padLat = (maxLat - minLat) * 0.1;
+	const bMinLng = minLng - padLng;
+	const bMinLat = minLat - padLat;
+	const bMaxLng = maxLng + padLng;
+	const bMaxLat = maxLat + padLat;
+
+	// The /static/[bbox]/ form fits the bbox into the requested pixels. Match the
+	// aspect ratio to the padded bbox to avoid letterboxing.
+	const W = 800;
+	const H = Math.min(1280, Math.round(W * (bMaxLat - bMinLat) / (bMaxLng - bMinLng)));
+
+	const url =
+		`https://api.mapbox.com/styles/v1/mapbox/light-v10/static/[${bMinLng},${bMinLat},${bMaxLng},${bMaxLat}]/${W}x${H}` +
+		`?access_token=${token}&logo=false&attribution=false`;
+
+	try {
+		const res = await fetch(url);
+		if (!res.ok) return null;
+		const blob = await res.blob();
+		const dataUrl = await new Promise((resolve, reject) => {
+			const reader = new FileReader();
+			reader.onload = () => resolve(reader.result);
+			reader.onerror = reject;
+			reader.readAsDataURL(blob);
+		});
+		return dataUrl;
+	} catch {
+		// Any failure (network, status, ...) falls back to the choropleth-only slide.
+		return null;
+	}
+};
+
+async function analysis_left($, index) {
 	title($, EAE['indexes'][index]['name']);
 
 	$.addText(
@@ -666,17 +706,63 @@ function analysis_left($, index) {
 	if (c.width > c.height) h = 3/r;
 	if (c.height > c.width) w = 3*r;
 
+	const [minLng, minLat, maxLng, maxLat] = GEOGRAPHY.envelope;
+
+	// Basic basemap underneath the choropleth (falls back to null on any failure,
+	// leaving the choropleth on the plain white background).
+	const basemap = await fetch_basemap(GEOGRAPHY.envelope);
+
+	// Choropleth placement and anchor points. Default to the original full
+	// placement so the plain fallback slide is untouched when there is no
+	// basemap; inset values are applied only when a basemap exists.
+	let chx = "10%";
+	let chy = 3.5;
+	let chw = w;
+	let chh = h;
+	let ox = a4(10, 'x');
+	let oy = 3.5 + h + 0.12;
+	let fw = 1;
+
+	if (basemap) {
+		$.addImage({
+			"x": "10%",
+			"y": 3.5,
+			w, h,
+			data: basemap,
+		});
+
+		// The choropleth canvas extent matches GEOGRAPHY.envelope; inset it within
+		// the basemap by the padding fractions used to build the basemap bbox.
+		const padLng = (maxLng - minLng) * 0.1;
+		const padLat = (maxLat - minLat) * 0.1;
+		const bMinLng = minLng - padLng;
+		const bMinLat = minLat - padLat;
+		const bMaxLng = maxLng + padLng;
+		const bMaxLat = maxLat + padLat;
+		const fx = (minLng - bMinLng) / (bMaxLng - bMinLng);
+		fw = (maxLng - minLng) / (bMaxLng - bMinLng);
+		const fy = (bMaxLat - maxLat) / (bMaxLat - bMinLat);
+		const fh = (maxLat - minLat) / (bMaxLat - bMinLat);
+
+		chx = a4(10, 'x') + fx * w;
+		chy = 3.5 + fy * h;
+		chw = fw * w;
+		chh = fh * h;
+		ox = a4(10, 'x') + fx * w;
+		oy = 3.5 + fh * h + 0.12;
+	}
+
 	$.addImage({
-		"x": "10%",
-		"y": 3.5,
-		w, h,
+		"x": chx,
+		"y": chy,
+		"w": chw,
+		"h": chh,
 		data,
 	});
 
-	const [minLng, minLat, maxLng, maxLat] = GEOGRAPHY.envelope;
 	const centerLat = (minLat + maxLat) / 2;
 	const totalKm   = (maxLng - minLng) * 111.32 * Math.cos(centerLat * Math.PI / 180);
-	const kmPerInch = totalKm / w;
+	const kmPerInch = totalKm / (fw * w);
 	const nice_vals = [0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000, 5000];
 	const target_km = kmPerInch * w * 0.3;
 	const niceKm    = nice_vals.reduce((p, c) => Math.abs(c - target_km) < Math.abs(p - target_km) ? c : p);
@@ -685,8 +771,6 @@ function analysis_left($, index) {
 	const kmLabel   = niceKm >= 1 ? `${niceKm} km` : `${Math.round(niceKm * 1000)} m`;
 	const miLabel   = niceMi >= 1 ? `${Math.round(niceMi)} mi` : `${Math.round(niceMi * 5280)} ft`;
 
-	const oy = 3.5 + h + 0.12;
-	const ox = a4(10, 'x');
 	// North arrow as SVG so N and needle are always aligned
 	const north_svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 26">
 		<text x="10" y="7" text-anchor="middle" font-family="sans-serif" font-size="8" font-weight="bold" fill="#333">N</text>
@@ -704,6 +788,10 @@ function analysis_left($, index) {
 	$.addShape(this.ShapeType.rect, { "x": bx + barW - 0.01,    "y": by - 0.02, "w": 0.01, "h": bh + 0.04, "fill": { "color": "333333" } });
 
 	$.addText(`${kmLabel} / ${miLabel}`, textopts({ "x": bx, "y": by + bh + 0.02, "w": barW, "h": 0.12, "fontSize": 6, "align": "center" }));
+
+	if (basemap) {
+		$.addText('© Mapbox', textopts({ "x": ox, "y": by + bh + 0.02 + 0.14, "w": 1, "h": 0.12, "fontSize": 6, "align": "left" }));
+	}
 };
 
 function analysis_right($, index, rows) {
@@ -801,10 +889,10 @@ export async function pptx(opts = {}) {
 	{
 		chapter.call(p, "" + (c++), "Analysis");
 
-		analysis.call(p, 'demand');
-		analysis.call(p, 'supply');
-		analysis.call(p, 'eai');
-		analysis.call(p, 'ani');
+		await analysis.call(p, 'demand');
+		await analysis.call(p, 'supply');
+		await analysis.call(p, 'eai');
+		await analysis.call(p, 'ani');
 	}
 
 	{

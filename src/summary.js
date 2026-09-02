@@ -13,6 +13,7 @@ import {
 
 import {
 	svg_pie,
+	svg_pie_labels,
 } from './utils.js';
 
 import {
@@ -96,6 +97,9 @@ export async function generate_summary_data() {
 
 		ppie.change(0);
 		apie.change(0);
+
+		svg_pie_labels(ppie.svg, SUMMARY[idxn]['population-density']['distribution'], 75);
+		svg_pie_labels(apie.svg, SUMMARY[idxn]['area']['distribution'], 75);
 
 		const c = qs('#canvas-' + idxn) || ce('canvas', null, { "id": 'canvas-' + idxn});
 		c.style.display = 'none';

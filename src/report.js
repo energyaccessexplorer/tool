@@ -39,6 +39,7 @@ import {
 	getScaleLabels,
 	t,
 	translateDatasetName,
+	translateIndexName,
 	unesc,
 } from './translate.js';
 
@@ -54,13 +55,6 @@ const bold = true;
 const breakLine = true;
 const x = 0.3;
 const first_paragraph_y = 2;
-
-const long_index_texts = {
-	"eai":    "The Energy Access Potential Index is the weighted sum of the Demand Index and Supply Index. It indicates areas where the population has an ability to pay for electricity and that are close to social and productive uses of energy, have potential for renewable energy, and have existing or planned infrastructure.",
-	"demand": "The Demand Index is the weighted sum of normalized demographic data and social and productive use data. The formula inverts the percentage of people who live below the poverty line to provide the number of people who live above the poverty line, which is used as a proxy for where people have an ability to pay for electricity.",
-	"supply": "The Supply Index is the weighted sum of normalized renewable energy resources potential and existing infrastructure. Solar and wind potential values are added together, and proximity to potential hydropower and geothermal sites are added to find areas with high renewable potential.",
-	"ani":    "The Need for Assistance Index is a weighted sum of certain demand and supply data and is used to indicate areas where financial assistance may be needed more.",
-};
 
 const tableborder = { "pt": "1", "color": "#ffffff" };
 
@@ -142,13 +136,13 @@ function front() {
 	$.addText(
 		[
 			{
-				"text":    "Energy Access Explorer Report",
+				"text":    t(window.LOCALE, 'report.front.title'),
 				"options": { "fontSize": 48, bold, breakLine },
 			}, {
 				"text":    GEOGRAPHY.name,
 				"options": { "fontSize": 48, bold, breakLine },
 			}, {
-				"text":    "A Data-driven, Integrated and Inclusive Approach to Achieving Universal Access to Energy for Equitable Development",
+				"text":    t(window.LOCALE, 'report.front.subtitle'),
 				"options": { "fontSize": 10 },
 			},
 		],
@@ -158,10 +152,10 @@ function front() {
 	$.addText(
 		[
 			{
-				"text":    "Prepared by Hordor",
+				"text":    t(window.LOCALE, 'report.front.prepared_by'),
 				"options": { bold, breakLine },
 			}, {
-				"text":    "The report has been developed using data available on the Energy Access Explorer",
+				"text":    t(window.LOCALE, 'report.front.developed_with'),
 				"options": { breakLine },
 			}, {
 				"text":    "https://www.energyaccessexplorer.org/",
@@ -181,46 +175,35 @@ function platform_overview() {
 	const $ = this.addSlide();
 	const color = black;
 
-	title($, "Platform Overview");
+	title($, t(window.LOCALE, 'report.overview.title'));
 
 	$.addText(
-		"Energy Access Explorer is the first, open-source, online and interactive geospatial platform that enables energy planners, clean energy entrepreneurs, donors, and development institutions to identify high-priority areas for energy access interventions. EAE functions also as a dynamic information system, reducing software engineering and data transaction costs for both data providers and users and facilitating data management and governance.",
+		t(window.LOCALE, 'report.overview.what_we_do'),
 		{ color, x, "y": 1.1, "w": "90%", "h": 1.3, "fontSize": 12, bold },
 	);
 
 	$.addText(
-		"Who are the primary audiences of Energy Access Explorer?",
+		t(window.LOCALE, 'report.overview.audiences_title'),
 		{ "color": green, x, "y": 2.7, "w": "90%", "h": 0.4, "fontSize": 12, bold },
 	);
 
 	const audiences = [
-		[
-			"Energy planning agencies ",
-			"can use the platform to explore the potential for grid extension, off-grid systems, clean cooking technologies and renewables for energy access in their countries.",
-		], [
-			"Clean energy enterprises ",
-			"can use the platform to access demographic and socio-economic data, which indicate consumer ability to pay for energy services. This information can help identify gaps in market opportunities.",
-		], [
-			"Donors and Development Finance Institutions ",
-			"can use the platform to identify areas where grants and support will have the most impact.",
-		], [
-			"Service delivery institutions ",
-			"in the health, education, productive use of energy and agriculture sectors can use the platform to get a better understanding of energy needs associated to development services.",
-		], [
-			"Clean Cooking Sector ",
-			"organizations and agencies can use the platform to identify areas where the uptake of clean cooking technologies should be prioritized based on location specific data on demand, supply, and environment.",
-		],
+		'planning',
+		'enterprise',
+		'donors',
+		'service',
+		'cooking',
 	];
 
 	let y = 3.25;
-	for (const [name, description] of audiences) {
+	for (const key of audiences) {
 		$.addText(
 			[
 				{
-					"text":    name,
+					"text":    t(window.LOCALE, `report.overview.audience.${key}.name`) + " ",
 					"options": { bold },
 				}, {
-					"text": description,
+					"text": t(window.LOCALE, `report.overview.audience.${key}.desc`),
 				},
 			],
 			textopts({ color, x, y, "w": "90%", "h": 0.8, "fontSize": 10 }),
@@ -236,20 +219,20 @@ function how_it_works() {
 	const $ = this.addSlide();
 	const color = black;
 
-	title($, "How it Works");
+	title($, t(window.LOCALE, 'report.how.title'));
 
 	$.addText(
-		"Energy Access Explorer synthesizes and analyzes more than 50 geographic data sets (per geography) on both energy supply and demand. It runs multi-criteria analysis that uses location-specific resource availability and infrastructure data to represent energy supply. It also incorporates demographic data and data on social and productive uses to visualize demand for energy services. Together, these supply and demand indicators enable more comprehensive energy planning. Spatial analysis tools, including multi-criteria analysis, overlays, filters and buffer zones, help users identify and prioritize areas where energy access can be expanded.",
+		t(window.LOCALE, 'report.how.para1'),
 		{ color, x, "y": 1.1, "w": "90%", "h": 1.5, "fontSize": 12, bold },
 	);
 
 	$.addText(
-		"The tool incorporates remote sensing data as well as data from global, national, sub-national and census databases that are either publicly available or provided by international partners and local stakeholders. It can host data available in various resolutions, scales and formats allowing for better or new datasets to be incorporated once available. The selection of data is based on literature review, a survey WRI conducts on the importance of certain datasets in geospatial energy access planning and user feedback. The list of essential data is reviewed by local stakeholders to ensure the platform is relevant and applicable in the local context.",
+		t(window.LOCALE, 'report.how.para2'),
 		{ color, x, "y": 2.8, "w": "90%", "h": 1.5, "fontSize": 11 },
 	);
 
 	$.addText(
-		"Methodology",
+		t(window.LOCALE, 'report.how.methodology'),
 		{ "color": green, x, "y": 4.5, "w": "90%", "h": 0.4, "fontSize": 12, bold },
 	);
 
@@ -257,20 +240,17 @@ function how_it_works() {
 
 	const stages = [
 		{
-			"name": "Datasets",
+			"key": "datasets",
 			"sub": [
-				{ "label": "Demand", "desc": "demographics, social and productive uses", "color": demand_color },
-				{ "label": "Supply", "desc": "resources and infrastructure", "color": green },
+				{ "key": "demand", "color": demand_color },
+				{ "key": "supply", "color": green },
 			],
 		}, {
-			"name": "User Interactions",
-			"desc": "Select and overlay data, apply buffer zones and filters, assign data importance.",
+			"key": "interactions",
 		}, {
-			"name": "Multi-Criteria Analysis",
-			"desc": "Weighted comparison of demand against supply.",
+			"key": "analysis",
 		}, {
-			"name": "Energy Access Maps",
-			"desc": "High-priority areas for energy access interventions.",
+			"key": "maps",
 		},
 	];
 
@@ -289,7 +269,7 @@ function how_it_works() {
 
 		const runs = [
 			{
-				"text":    stage.name,
+				"text":    t(window.LOCALE, `report.how.stage.${stage.key}.name`),
 				"options": { bold, breakLine, "color": green, "fontSize": 11 },
 			},
 		];
@@ -297,17 +277,17 @@ function how_it_works() {
 		if (stage.sub) {
 			for (const s of stage.sub) {
 				runs.push({
-					"text":    s.label + ": ",
+					"text":    t(window.LOCALE, `report.how.stage.${stage.key}.${s.key}`) + ": ",
 					"options": { bold, "color": s.color, "fontSize": 9 },
 				});
 				runs.push({
-					"text":    s.desc,
+					"text":    t(window.LOCALE, `report.how.stage.${stage.key}.${s.key}.desc`),
 					"options": { breakLine, "color": black, "fontSize": 9 },
 				});
 			}
 		} else {
 			runs.push({
-				"text":    stage.desc,
+				"text":    t(window.LOCALE, `report.how.stage.${stage.key}.desc`),
 				"options": { "color": black, "fontSize": 9 },
 			});
 		}
@@ -362,23 +342,23 @@ function selected_datasets() {
 };
 
 function selected_datasets_index($, index) {
-	title($, `Selected ${EAE['indexes'][index]['name']} Datasets`);
+	title($, t(window.LOCALE, 'report.datasets.title', { "index": translateIndexName(window.LOCALE, index) }));
 
 	const rows = [[
 		{
-			"text":    "Dataset",
+			"text":    t(window.LOCALE, 'report.datasets.col.dataset'),
 			"options": textopts({ "align": "center", bold }),
 		}, {
-			"text":    "Unit",
+			"text":    t(window.LOCALE, 'report.datasets.col.unit'),
 			"options": textopts({ "align": "center", bold }),
 		}, {
-			"text":    "Range",
+			"text":    t(window.LOCALE, 'report.datasets.col.range'),
 			"options": textopts({ "align": "center", bold }),
 		}, {
-			"text":    "Selected Range",
+			"text":    t(window.LOCALE, 'report.datasets.col.selected_range'),
 			"options": textopts({ "align": "center", bold }),
 		}, {
-			"text":    "Importance",
+			"text":    t(window.LOCALE, 'report.datasets.col.importance'),
 			"options": textopts({ "align": "center", bold }),
 		},
 	]];
@@ -392,7 +372,7 @@ function selected_datasets_index($, index) {
 				"text":    d.name,
 				"options": textopts({ "align": "left" }),
 			}, {
-				"text": d.unit ? d.unit.replace('<sup>2</sup>', '²') : "proximity in km",
+				"text": d.unit ? d.unit.replace('<sup>2</sup>', '²') : t(window.LOCALE, 'report.datasets.proximity'),
 			}, {
 				"text":    `min: ${d.domain.min}, max: ${d.domain.max}`,
 				"options": textopts(monospace),
@@ -518,21 +498,19 @@ function geography_indexes_left($) {
 	title($, GEOGRAPHY.name);
 
 	$.addText(
-		"Geospatial Analytical Outputs",
+		t(window.LOCALE, 'report.geography.outputs'),
 		textopts({ x, "y": 1, "w": "45%", "h": 0.4, bold }),
 	);
 
 	let y = 2;
 	for (const i of ['eai', 'demand', 'supply', 'ani']) {
-		const index = EAE['indexes'][i];
-
 		$.addText(
 			[
 				{
-					"text":    index['name'] + " ",
+					"text":    translateIndexName(window.LOCALE, i) + " ",
 					"options": { bold },
 				}, {
-					"text": index['explain'].replace(/\n/g, ' '),
+					"text": t(window.LOCALE, 'modal.eae_info.index.' + i + '.explain'),
 				},
 			],
 			textopts({ x, y, "w": "45%", "h": 1, "fontSize": 11 }),
@@ -570,7 +548,7 @@ function geography_indexes_right($) {
 		for (const k of Object.keys(SUMMARY)) {
 			const r = [];
 
-			r.push({ "text": EAE['indexes'][k]['name'], "options": { bold } });
+			r.push({ "text": translateIndexName(window.LOCALE, k), "options": { bold } });
 
 			const amounts = compute_share_amounts(SUMMARY[k][c]).amounts.slice().reverse();
 			r.push(...amounts.map(i => ({ "text": i.toLocaleString(window.LOCALE) })));
@@ -587,14 +565,14 @@ function geography_indexes_right($) {
 	);
 
 	$.addText(
-		`Share of area for each Index (${area_type(STATE.variant)})`,
+		t(window.LOCALE, 'report.geography.area_share', { "unit": area_type(STATE.variant) }),
 		textopts({ "x": "55%", "y": 1.5, "w": "40%", "h": 0.4, bold, "color": green }),
 	);
 
 	table('area', 2);
 
 	$.addText(
-		"Share of population for each Index (people)",
+		t(window.LOCALE, 'report.geography.pop_share'),
 		textopts({ "x": "55%", "y": 4.5, "w": "40%", "h": 0.4, bold, "color": green }),
 	);
 
@@ -609,12 +587,12 @@ function geography_indexes_right($) {
 		const area_unit = area_type(STATE.variant);
 
 		$.addText(
-			`Total: ${area_share.total.toLocaleString(window.LOCALE)} ${area_unit} — ${area_share.amounts[4].toLocaleString(window.LOCALE)} ${area_unit} in the high bucket`,
+			t(window.LOCALE, 'report.geography.total_area', { "total": area_share.total.toLocaleString(window.LOCALE), "high": area_share.amounts[4].toLocaleString(window.LOCALE), "unit": area_unit }),
 			textopts({ "x": "51%", "y": 4.1, "w": "45%", "h": 0.3, "fontSize": 9 }),
 		);
 
 		$.addText(
-			`Total: ${pop_share.total.toLocaleString(window.LOCALE)} people — ${pop_share.amounts[4].toLocaleString(window.LOCALE)} people in the high bucket`,
+			t(window.LOCALE, 'report.geography.total_pop', { "total": pop_share.total.toLocaleString(window.LOCALE), "high": pop_share.amounts[4].toLocaleString(window.LOCALE) }),
 			textopts({ "x": "51%", "y": 7.1, "w": "45%", "h": 0.3, "fontSize": 9 }),
 		);
 	}
@@ -626,7 +604,7 @@ async function analysis(index) {
 			{
 				"text": d.text,
 			}, {
-				"text":    (d.value).toLocaleString(),
+				"text":    (d.value).toLocaleString(window.LOCALE),
 				"options": { "color": green, "fontSize": 24, "align": "right", bold, "wrap": false },
 			},
 		];
@@ -650,7 +628,7 @@ async function analysis(index) {
 
 		right_rows = [
 			row({
-				"text":  "Population where demand is medium-high or high",
+				"text":  t(window.LOCALE, 'report.analysis.row.pop_demand'),
 				"value": Math.round(population_demand),
 			}),
 		];
@@ -659,7 +637,7 @@ async function analysis(index) {
 		if (health?.on) {
 			right_rows.push(
 				row({
-					"text":  "Number healthcare facilities, where demand is medium-high or high",
+					"text":  t(window.LOCALE, 'report.analysis.row.health'),
 					"value": medhigh_point_count(
 						health.raster.data,
 						summary_raster,
@@ -672,7 +650,7 @@ async function analysis(index) {
 		if (schools?.on) {
 			right_rows.push(
 				row({
-					"text":  "Number schools, where demand is medium-high or high",
+					"text":  t(window.LOCALE, 'report.analysis.row.schools'),
 					"value": medhigh_point_count(
 						schools.raster.data,
 						summary_raster,
@@ -719,7 +697,7 @@ async function analysis(index) {
 		if (points_count) {
 			right_rows.push(
 				row({
-					"text":  "Number of supply points e.g. transformers, power stations",
+					"text":  t(window.LOCALE, 'report.analysis.row.supply_points'),
 					"value": points_count,
 				}),
 			);
@@ -728,7 +706,7 @@ async function analysis(index) {
 		if (lines.length) {
 			right_rows.push(
 				row({
-					"text":  "Aproximate amount of people living with 1km of an electricity line",
+					"text":  t(window.LOCALE, 'report.analysis.row.pop_lines'),
 					"value": Math.round(population_lines),
 				}),
 			);
@@ -745,8 +723,8 @@ async function analysis(index) {
 
 			right_rows.push(
 				row({
-					"text":  "Average Global Horizontal Irradiation (kWh/m²)",
-					"value": Math.round(data.reduce((a,b) => a+b) / data.length).toLocaleString(),
+					"text":  t(window.LOCALE, 'report.analysis.row.ghi'),
+					"value": Math.round(data.reduce((a,b) => a+b) / data.length),
 				}),
 			);
 		}
@@ -762,7 +740,7 @@ async function analysis(index) {
 
 			right_rows.push(
 				row({
-					"text":  "Average Windspeed (m/s)",
+					"text":  t(window.LOCALE, 'report.analysis.row.wind'),
 					"value": (data.reduce((a,b) => a+b) / data.length).toFixed(2),
 				}),
 			);
@@ -812,7 +790,7 @@ async function analysis(index) {
 
 		right_rows = [
 			row({
-				"text":  "Aproximate amount of people living in the area covered by the analysis",
+				"text":  t(window.LOCALE, 'report.analysis.row.pop_covered'),
 				"value": Math.round(population_count),
 			}),
 		];
@@ -820,18 +798,21 @@ async function analysis(index) {
 		if (lines.length) {
 			right_rows.push(
 				row({
-					"text":  "Aproximate amount of people living with 1km of an electricity line",
+					"text":  t(window.LOCALE, 'report.analysis.row.pop_lines'),
 					"value": Math.round(population_lines),
 				}),
 			);
 		}
 
 		if (points.length) {
-			const x = [[schools?.on, "schools"], [health?.on, "healthcare facilities"]].filter(t => t[0]).map(t => t[1]).join(' and ');
+			const x = [
+				[schools?.on, t(window.LOCALE, 'report.analysis.points.schools')],
+				[health?.on, t(window.LOCALE, 'report.analysis.points.health')],
+			].filter(p => p[0]).map(p => p[1]).join(' and ');
 
 			right_rows.push(
 				row({
-					"text":  `Amounts on ${x} in the area covered by the analysis`,
+					"text":  t(window.LOCALE, 'report.analysis.row.points_amounts', { x }),
 					"value": points_count,
 				}),
 			);
@@ -893,10 +874,10 @@ async function fetch_basemap(envelope) {
 };
 
 async function analysis_left($, index) {
-	title($, EAE['indexes'][index]['name']);
+	title($, translateIndexName(window.LOCALE, index));
 
 	$.addText(
-		long_index_texts[index],
+		t(window.LOCALE, `report.analysis.long.${index}`),
 		textopts({ x, "y": 1, "w": "45%", "h": 1.5, bold }),
 	);
 
@@ -914,13 +895,13 @@ async function analysis_left($, index) {
 
 	$.addTable([[
 		{
-			"text":    "Low",
+			"text":    t(window.LOCALE, 'left_panel.output.ramp.low'),
 			"options": textopts({ "align": "left", valign }),
 		}, {
-			"text":    "Medium",
+			"text":    t(window.LOCALE, 'left_panel.output.ramp.medium'),
 			"options": textopts({ "align": "center", valign }),
 		}, {
-			"text":    "High",
+			"text":    t(window.LOCALE, 'left_panel.output.ramp.high'),
 			"options": textopts({ "align": "right", valign }),
 		},
 	]], textopts({ x, "y": 2.6, "w": "25%" }));
@@ -955,10 +936,10 @@ async function analysis_left($, index) {
 
 	if (basemap) {
 		$.addImage({
-			"x": "10%",
-			"y": 3.5,
+			"x":    "10%",
+			"y":    3.5,
 			w, h,
-			data: basemap,
+			"data": basemap,
 		});
 
 		// The choropleth canvas extent matches GEOGRAPHY.envelope; inset it within
@@ -1034,15 +1015,15 @@ function analysis_right($, index, rows) {
 
 	for (const k of ['population-density', 'area']) {
 		let x = "55%";
-		let t = "Population Share";
+		let label = t(window.LOCALE, 'report.analysis.pop_share');
 
 		if (k === "area") {
 			x = "80%";
-			t = "Area Share";
+			label = t(window.LOCALE, 'report.analysis.area_share');
 		}
 
 		$.addText(
-			t,
+			label,
 			textopts({ x, "y": 4, "w": 2, "h": 0.4, bold }),
 		);
 
@@ -1108,7 +1089,7 @@ export async function pptx(opts = {}) {
 	let c = 0;
 
 	{
-		chapter.call(p, "" + (c++), "Report Summary");
+		chapter.call(p, "" + (c++), t(window.LOCALE, 'report.chapter.summary'));
 
 		platform_overview.call(p);
 		how_it_works.call(p);
@@ -1119,7 +1100,7 @@ export async function pptx(opts = {}) {
 	}
 
 	{
-		chapter.call(p, "" + (c++), "Analysis");
+		chapter.call(p, "" + (c++), t(window.LOCALE, 'report.chapter.analysis'));
 
 		await analysis.call(p, 'demand');
 		await analysis.call(p, 'supply');
@@ -1130,7 +1111,7 @@ export async function pptx(opts = {}) {
 	{
 		const area_label = area_type(STATE.variant);
 		const is_admin = STATE.variant !== 'raster';
-		chapter.call(p, "" + (c++), is_admin ? `Top ${area_label}` : "Top Locations");
+		chapter.call(p, "" + (c++), is_admin ? t(window.LOCALE, 'report.toplocations.top_area', { "area": area_label }) : t(window.LOCALE, 'report.chapter.top_locations'));
 
 		const results = (opts.results || get_locations_results()).slice(0, N_POINTS);
 
@@ -1145,8 +1126,8 @@ export async function pptx(opts = {}) {
 			const columns = [...fixed_cols, ...extra_cols].slice(0, PPT_MAX_COLUMNS);
 
 			const slide_title = is_admin
-				? `${area_label} with highest ${STATE.index.toUpperCase()} Index`
-				: `Locations with highest ${STATE.index.toUpperCase()} Index`;
+				? t(window.LOCALE, 'report.toplocations.admin_title', { "area": area_label, "index": STATE.index.toUpperCase() })
+				: t(window.LOCALE, 'report.toplocations.raster_title', { "index": STATE.index.toUpperCase() });
 			toplocations_table.call(p, slide_title, columns, rows);
 		}
 	}

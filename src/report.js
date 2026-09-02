@@ -28,6 +28,10 @@ import {
 	or,
 } from '../lib/helpers.js';
 
+import {
+	getScaleLabels,
+} from './translate.js';
+
 const N_POINTS = 20;
 
 export const PPT_MAX_COLUMNS = 8;
@@ -345,15 +349,18 @@ function geography_indexes_right($) {
 	const cs = analysis_colorscale.stops;
 
 	function table(c, y) {
+		const labels = getScaleLabels(window.LOCALE);
+
+		const header_cells = labels.map((label, i) => ({
+			"text":    label,
+			"options": th(i === 4 ? { "fill": cs[4], "color": black } : { "fill": cs[i] }),
+		}));
+		header_cells.reverse();
+
 		const rows = [
 			[
 				{ "text": "" },
-				{ "text": "low", "options": th({ "fill": cs[0] }) },
-				{ "text": "low-med", "options": th({ "fill": cs[1] }) },
-				{ "text": "medium", "options": th({ "fill": cs[2] }) },
-				{ "text": "med-high", "options": th({ "fill": cs[3] }) },
-				{ "text": "high", "options": th({ "fill": cs[4], "color": black }) },
-				{ "text": "outside", "options": th({ "fill": OUTSIDE_COLOR, "color": black }) },
+				...header_cells,
 			],
 		];
 
@@ -362,7 +369,8 @@ function geography_indexes_right($) {
 
 			r.push({ "text": EAE['indexes'][k]['name'], "options": { bold } });
 
-			r.push(...compute_share_amounts(SUMMARY[k][c]).amounts.map(i => ({ "text": i.toLocaleString() })));
+			const amounts = compute_share_amounts(SUMMARY[k][c]).amounts.slice().reverse();
+			r.push(...amounts.map(i => ({ "text": i.toLocaleString(window.LOCALE) })));
 
 			rows.push(r);
 		}
@@ -383,11 +391,30 @@ function geography_indexes_right($) {
 	table('area', 2);
 
 	$.addText(
-		"Share of population for each Index",
+		"Share of population for each Index (people)",
 		textopts({ "x": "55%", "y": 4.5, "w": "40%", "h": 0.4, bold, "color": green }),
 	);
 
 	table('population-density', 5);
+
+	const summary = SUMMARY[STATE.index];
+
+	if (summary) {
+		const area_share = compute_share_amounts(summary['area']);
+		const pop_share = compute_share_amounts(summary['population-density']);
+
+		const area_unit = area_type(STATE.variant);
+
+		$.addText(
+			`Total: ${area_share.total.toLocaleString(window.LOCALE)} ${area_unit} — ${area_share.amounts[4].toLocaleString(window.LOCALE)} ${area_unit} in the high bucket`,
+			textopts({ "x": "51%", "y": 4.1, "w": "45%", "h": 0.3, "fontSize": 9 }),
+		);
+
+		$.addText(
+			`Total: ${pop_share.total.toLocaleString(window.LOCALE)} people — ${pop_share.amounts[4].toLocaleString(window.LOCALE)} people in the high bucket`,
+			textopts({ "x": "51%", "y": 7.1, "w": "45%", "h": 0.3, "fontSize": 9 }),
+		);
+	}
 };
 
 async function analysis(index) {

@@ -157,8 +157,6 @@ export function initLocalePicker(locale) {
 	dropdown.id = 'locale-dropdown';
 
 	for (const [l, label] of Object.entries(LOCALE_LABELS)) {
-		if (['zh'].includes(l) && l !== locale) continue;
-
 		const item = document.createElement('a');
 		item.href = '#';
 		item.textContent = label;

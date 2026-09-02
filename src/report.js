@@ -5,10 +5,17 @@ import '../lib/jszip.js';
 import '../lib/pptxgen.js';
 
 import {
+	aggregate_layer_values,
 	analysis_colorscale,
 	analysis_colorscale_svg,
 	medhigh_point_count,
 } from './analysis.js';
+
+import {
+	build_detailed_data,
+	compute_distribution,
+	describe,
+} from './right-panel-data-tab.js';
 
 import {
 	get_locations_results,
@@ -30,6 +37,9 @@ import {
 
 import {
 	getScaleLabels,
+	t,
+	translateDatasetName,
+	unesc,
 } from './translate.js';
 
 const N_POINTS = 20;
@@ -247,8 +257,12 @@ function how_it_works() {
 };
 
 function selected_datasets() {
-	selected_datasets_index(this.addSlide(), "demand", STATE.datasets);
-	selected_datasets_index(this.addSlide(), "supply", STATE.datasets);
+	for (const index of ['demand', 'supply']) {
+		if (!STATE.config.datasets.some(d => d.index === index))
+			continue;
+
+		selected_datasets_index(this.addSlide(), index);
+	}
 };
 
 function selected_datasets_index($, index) {
@@ -302,6 +316,99 @@ function selected_datasets_index($, index) {
 	footer($);
 };
 
+async function selected_data() {
+	const summary = SUMMARY[STATE.index];
+	if (!summary || !summary['raw_raster']) return;
+
+	let entries = [];
+
+	try {
+		const mask = { "raster": { "data": summary['raw_raster'].map(v => v === -1 ? -1 : 0) } };
+		const layer_data = await aggregate_layer_values(mask);
+		if (!layer_data) return;
+
+		entries = build_detailed_data(layer_data);
+	} catch {
+		return;
+	}
+
+	const cards = entries.filter(e => e.value != null && String(e.value).trim() !== '' && String(e.value) !== 'NaN');
+	if (!cards.length) return;
+
+	const per_slide = 4;
+	const card_h = 1.55;
+	const card_y0 = 1.0;
+
+	for (let i = 0; i < cards.length; i += per_slide) {
+		const chunk = cards.slice(i, i + per_slide);
+
+		const $ = this.addSlide();
+
+		title($, i === 0 ? t(window.LOCALE, 'report.data.title') : t(window.LOCALE, 'report.data.title_continued'));
+
+		chunk.forEach((e, j) => {
+			const card_y = card_y0 + (j * card_h);
+			const card_w = a4(100, 'x') - (x * 2);
+
+			$.addShape(
+				this.ShapeType.rect,
+				{ "x": x, "y": card_y, "w": card_w, "h": card_h - 0.2, "fill": { "color": grey } },
+			);
+
+			const ds = DST.get(e.id);
+			const label = ds ? translateDatasetName(window.LOCALE, ds) : e.label;
+
+			$.addText(
+				label,
+				textopts({ "color": green, "x": x + 0.15, "y": card_y + 0.08, "w": card_w - 0.3, "h": 0.35, bold, "fontSize": 12 }),
+			);
+
+			data_card_body($, e, ds, x + 0.15, card_y + 0.5, card_w - 0.3, card_h - 0.7);
+		});
+
+		footer($);
+	}
+};
+
+function data_card_body($, e, ds, tx, ty, tw, th) {
+	if (ds && (ds.type === 'raster-valued' || ds.type === 'raster-valued-mutant')) {
+		const distribution = compute_distribution(ds, null);
+		if (distribution?.length) {
+			const runs = [
+				{
+					"text":    t(window.LOCALE, 'right_panel.data.categorical_desc', { "name": translateDatasetName(window.LOCALE, ds) }),
+					"options": { "color": black, breakLine },
+				},
+			];
+
+			for (const c of distribution) {
+				runs.push({
+					"text":    `${c.name}: ${c.percentage.toFixed(1)}%`,
+					"options": { "color": black, breakLine, "fontSize": 10 },
+				});
+			}
+
+			$.addText(runs, textopts({ "x": tx, "y": ty, "w": tw, "h": th, "fontSize": 11 }));
+			return;
+		}
+	}
+
+	const name = ds ? translateDatasetName(window.LOCALE, ds) : e.label;
+	const description = unesc(describe(e.datatype, e.unit, name, e.value, e.aggregation)).replace(/<\/?strong>/g, '');
+
+	const runs = [];
+	if (e.value) {
+		const parts = description.split(e.value);
+		parts.forEach((part, i) => {
+			if (part)
+				runs.push({ "text": part, "options": { "color": black } });
+			if (i < parts.length - 1)
+				runs.push({ "text": e.value, "options": { "color": green, bold } });
+		});
+	}
+
+	$.addText(runs.length ? runs : description, textopts({ "x": tx, "y": ty, "w": tw, "h": th, "fontSize": 11 }));
+}
 function geography_indexes() {
 	const $ = this.addSlide();
 
@@ -910,6 +1017,7 @@ export async function pptx(opts = {}) {
 		platform_overview.call(p);
 		how_it_works.call(p);
 		selected_datasets.call(p);
+		await selected_data.call(p);
 		geography_indexes.call(p);
 	}
 

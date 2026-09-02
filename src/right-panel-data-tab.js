@@ -86,7 +86,7 @@ const RASTER_KEYS = {
 	'People per 100k population': 'right_panel.data.descriptions.raster.per100k',
 };
 
-function describe(datatype, unit, name, value, aggregation) {
+export function describe(datatype, unit, name, value, aggregation) {
 	const locale = window.LOCALE;
 	const vars = { "name": name.toLowerCase(), value };
 
@@ -142,7 +142,7 @@ function count_pixels(raster_data, nodata, mask_data, mask_nodata, mask_id, coun
 	return total;
 }
 
-function compute_distribution(ds, admin_info) {
+export function compute_distribution(ds, admin_info) {
 	if (!ds.csv?.data || !ds.raster?.data) return null;
 
 	const categories = ds.csv.data.map(x => ({
@@ -315,6 +315,41 @@ function resolve_admin_info(admin_info, raster_index) {
 	return { "variant": STATE.variant, "id": area_id };
 }
 
+export function build_detailed_data(layer_data) {
+	const detailedData = [];
+	for (const [id, layer] of Object.entries(layer_data)) {
+		const area_result = layer.areas?.[0]?.result;
+		if (!area_result) continue;
+
+		let value, unit;
+		if (area_result.type === 'points') {
+			value = area_result.value;
+			unit = 'count';
+		} else {
+			value = layer.aggregation === 'SUM'
+				? Math.round(area_result.value)
+				: parseFloat(area_result.value.toFixed(2));
+			unit = resolve_unit(layer, DST.get(id), value);
+		}
+
+		const num = Number(value);
+		const formatted = Number.isFinite(num) ? num.toLocaleString(window.LOCALE) : String(value);
+		const display_unit = unit === 'count' ? '' : translateUnit(window.LOCALE, unit);
+
+		detailedData.push({
+			"id":          id,
+			"label":       layer.name,
+			"value":       format_value_unit(formatted, display_unit),
+			"raw_value":   value,
+			"unit":        unit,
+			"datatype":    DST.get(id)?.category.datatype,
+			"aggregation": layer.aggregation,
+		});
+	}
+
+	return detailedData;
+}
+
 async function update_top_level_geography() {
 	const active = STATE.datasets.filter(
 		ds => ds.on && ds.category.name !== 'boundaries' && ds.category.name !== 'outline',
@@ -339,36 +374,7 @@ async function update_top_level_geography() {
 
 	if (!national_layer_data) { set_blank_state(true); return; }
 
-	const detailedData = [];
-	for (const [id, layer] of Object.entries(national_layer_data)) {
-		const area_result = layer.areas?.[0]?.result;
-		if (!area_result) continue;
-
-		let value, unit;
-		if (area_result.type === 'points') {
-			value = area_result.value;
-			unit = 'count';
-		} else {
-			value = layer.aggregation === 'SUM'
-				? Math.round(area_result.value)
-				: parseFloat(area_result.value.toFixed(2));
-			unit = resolve_unit(layer, DST.get(id), value);
-		}
-
-		const num = Number(value);
-		const formatted = Number.isFinite(num) ? num.toLocaleString(window.LOCALE) : String(value);
-		const display_unit = unit === 'count' ? '' : translateUnit(window.LOCALE, unit);
-
-		detailedData.push({
-			"label":       layer.name,
-			"value":       format_value_unit(formatted, display_unit),
-			"raw_value":   value,
-			"unit":        unit,
-			"aggregation": layer.aggregation,
-		});
-	}
-
-	update(detailedData);
+	update(build_detailed_data(national_layer_data));
 }
 
 export function update(detailedData, admin_info = null, raster_index = null) {

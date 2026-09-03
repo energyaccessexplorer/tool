@@ -37,7 +37,7 @@ function partner_geography_match() {
 	let hostname;
 	try {
 		hostname = new URL(document.referrer).hostname;
-	} catch (_) {
+	} catch {
 		return null;
 	}
 

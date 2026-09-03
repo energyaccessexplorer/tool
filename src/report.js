@@ -347,23 +347,23 @@ function selected_datasets_index($, index) {
 	const rows = [[
 		{
 			"text":    t(window.LOCALE, 'report.datasets.col.dataset'),
-			"options": textopts({ "align": "center", bold }),
+			"options": textopts({ "align": "left", bold }),
 		}, {
 			"text":    t(window.LOCALE, 'report.datasets.col.unit'),
-			"options": textopts({ "align": "center", bold }),
+			"options": textopts({ "align": "left", bold }),
 		}, {
 			"text":    t(window.LOCALE, 'report.datasets.col.range'),
-			"options": textopts({ "align": "center", bold }),
+			"options": textopts({ "align": "left", bold }),
 		}, {
 			"text":    t(window.LOCALE, 'report.datasets.col.selected_range'),
-			"options": textopts({ "align": "center", bold }),
+			"options": textopts({ "align": "left", bold }),
 		}, {
 			"text":    t(window.LOCALE, 'report.datasets.col.importance'),
-			"options": textopts({ "align": "center", bold }),
+			"options": textopts({ "align": "left", bold }),
 		},
 	]];
 
-	const monospace = { "align": "center", "valign": "middle", "fontFace": "monospace", "fontSize": 9 };
+	const monospace = { "align": "left", "valign": "middle", "fontFace": "monospace", "fontSize": 9 };
 
 	const selected = STATE.config.datasets
 		.filter(d => d.index === index)
@@ -385,7 +385,7 @@ function selected_datasets_index($, index) {
 			},
 		]));
 
-	const tabletextopts = Object.assign(textopts({ "fontSize": 10, "align": "right", "valign": "middle" }));
+	const tabletextopts = Object.assign(textopts({ "fontSize": 10, "align": "left", "valign": "middle" }));
 
 	$.addTable(rows.concat(selected), Object.assign(tabletextopts, { x, "y": first_paragraph_y, "w": "90%" }));
 
@@ -521,10 +521,10 @@ function geography_indexes_left($) {
 };
 
 function geography_indexes_right($) {
-	const tabletextopts = Object.assign(textopts({ "fontSize": 9, "align": "right", "valign": "middle" }));
+	const tabletextopts = Object.assign(textopts({ "fontSize": 9, "align": "left", "valign": "middle" }));
 
 	function th(o = {}) {
-		return Object.assign({}, tabletextopts, { bold, "color": white, "align": "center" }, o);
+		return Object.assign({}, tabletextopts, { bold, "color": white, "align": "left" }, o);
 	};
 
 	const cs = analysis_colorscale.stops;
@@ -605,7 +605,7 @@ async function analysis(index) {
 				"text": d.text,
 			}, {
 				"text":    (d.value).toLocaleString(window.LOCALE),
-				"options": { "color": green, "fontSize": 24, "align": "right", bold, "wrap": false },
+				"options": { "color": green, "fontSize": 24, "align": "left", bold, "wrap": false },
 			},
 		];
 	};
@@ -1049,22 +1049,22 @@ function toplocations_table(slide_title, columns, rows_data) {
 	const header = [
 		{
 			"text":    "#",
-			"options": textopts({ "align": "right", bold, "fontSize": 8 }),
+			"options": textopts({ "align": "left", bold, "fontSize": 8 }),
 		},
 		...columns.map(name => ({
 			"text":    name.replace(/\b\w/g, c => c.toUpperCase()),
-			"options": textopts({ "align": "center", bold, "fontSize": 8 }),
+			"options": textopts({ "align": "left", bold, "fontSize": 8 }),
 		})),
 	];
 
 	const rows = [header, ...rows_data.map((row, i) => [
 		{
 			"text":    i + 1,
-			"options": { "align": "right", "fontSize": 8, "fontFace": "monospace" },
+			"options": { "align": "left", "fontSize": 8, "fontFace": "monospace" },
 		},
 		...columns.map(col => ({
 			"text":    row[col] != null ? String(row[col]) : "",
-			"options": { "align": "center", "fontSize": 7 },
+			"options": { "align": "left", "fontSize": 7 },
 		})),
 	])];
 

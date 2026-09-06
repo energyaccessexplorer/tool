@@ -382,8 +382,6 @@ function renderFiltersToggle(state: TimelineState): void {
 	const container = qs('#timeline-filters-toggle-container') as HTMLElement | null;
 	if (!container) return;
 
-	container.style.display = state.active ? 'block' : 'none';
-
 	const checkbox = qs('#timeline-filters-toggle') as HTMLInputElement | null;
 	if (!checkbox) return;
 

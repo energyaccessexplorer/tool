@@ -26,6 +26,14 @@ VIEWS = ./views
 CSS = ./stylesheets
 LIB = ${DIST}/lib
 
+# TypeScript toolchain. tsc transpiles ./src (checked-in JS today, TS
+# later) into ./tsbuild; every screen build below copies modules from
+# ${JS} (the emitted tree) instead of ${SRC}. tsc itself comes from the
+# provided by the repo's nix flake (flake.nix), like eslint -- never npm.
+TSC = tsc
+TS = ./tsbuild
+JS = ${TS}/src
+
 TIMESTAMP != date -u +'%Y-%m-%d--%T'
 
 templates:
@@ -35,20 +43,36 @@ locales:
 	@ go build -o ${BIN}/locales ./locales
 
 clean:
-	@ rm -rf ${LIB} ${DIST} ${BIN}/templates ${BIN}/locales
+	@ rm -rf ${LIB} ${DIST} ${TS} ${BIN}/templates ${BIN}/locales
 
-build: deps templates locales build-translations build-a build-s build-m build-p
+build: deps templates locales build-translations ts build-a build-s build-m build-p
 	@ ${BIN}/templates -template=index -output=${DIST}/index.html -json='{"env":"${env}"}'
+
+ts:
+	@ ${TSC} -p .
+
+test: ts
+	@ ${BIN}/lint-ts ${SRC}
+	@ ${TSC} -p tsconfig.test.json --noEmit
+	@ node --experimental-strip-types --test test/*.test.ts
 
 lint:
 	@ ${BIN}/lint ${SRC}
+	@ ${BIN}/lint-ts ${SRC}
 
 deps:
 	@ mkdir -p ${LIB}/fonts
 	DEST=${LIB} ${BIN}/deps
 
-	@ sed -i.orig 's/var PptxGenJS=/window.PptxGenJS=/' ${LIB}/pptxgen.js
-	@ rm ${LIB}/pptxgen.js.orig
+	@ sed 's/var PptxGenJS=/window.PptxGenJS=/' ${LIB}/pptxgen.js > ${LIB}/pptxgen.js.$$$$ && mv ${LIB}/pptxgen.js.$$$$ ${LIB}/pptxgen.js
+
+	@ # pptxgen.js is legacy minified JS the TS parser rejects; the sibling
+	@ # .d.ts makes TS resolve the report.js import against a stub instead.
+	@ printf 'declare const PptxGenJS: any;\nexport default PptxGenJS;\n' > ${LIB}/pptxgen.d.ts
+
+	@ # tsc resolves the ../lib/* imports of ./src against ./lib; point it at
+	@ # the same fetched tree the browser will load from dist.
+	@ ln -sfn ${DIST}/lib lib
 
 build-m:
 	@ echo "Building my screen"
@@ -56,17 +80,16 @@ build-m:
 
 	@ ${BIN}/templates -template=m -output=${DIST}/m/index.html -json='{"env":"${env}"}'
 
-	@ sed -r -i.orig 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/m/index.html
-	@ rm ${DIST}/m/index.html.orig
+	@ sed 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/m/index.html > ${DIST}/m/index.html.$$$$ && mv ${DIST}/m/index.html.$$$$ ${DIST}/m/index.html
 
 	@ cp \
-		${SRC}/user.js \
-		${SRC}/utils.js \
-		${SRC}/sentry.js \
-		${SRC}/tabs.js \
-		${SRC}/translate.js \
-		${SRC}/toast.js \
-		${SRC}/m.js \
+		${JS}/user.js \
+		${JS}/utils.js \
+		${JS}/sentry.js \
+		${JS}/tabs.js \
+		${JS}/translate.js \
+		${JS}/toast.js \
+		${JS}/m.js \
 		${DIST}/m/
 
 	@ cat \
@@ -77,7 +100,7 @@ build-m:
 	@ echo "window.EAE = {};" | cat - \
 		settings.tmp.json \
 		locales/translations.js.tmp \
-		${SRC}/eae.part.js \
+		${JS}/eae.part.js \
 		> ${DIST}/m/main.js
 
 	@ cat \
@@ -94,13 +117,12 @@ build-p:
 
 	@ ${BIN}/templates -template=p -output=${DIST}/p/index.html -json='{"env":"${env}"}'
 
-	@ sed -r -i.orig 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/p/index.html
-	@ rm ${DIST}/p/index.html.orig
+	@ sed 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/p/index.html > ${DIST}/p/index.html.$$$$ && mv ${DIST}/p/index.html.$$$$ ${DIST}/p/index.html
 
 	@ cp \
-		${SRC}/user.js \
-		${SRC}/utils.js \
-		${SRC}/p.js \
+		${JS}/user.js \
+		${JS}/utils.js \
+		${JS}/p.js \
 		${DIST}/p/
 
 	@ cat \
@@ -110,7 +132,7 @@ build-p:
 	@ echo "window.EAE = {};" | cat - \
 		settings.tmp.json \
 		locales/translations.js.tmp \
-		${SRC}/eae.part.js \
+		${JS}/eae.part.js \
 		> ${DIST}/p/main.js
 
 	@ cat \
@@ -125,63 +147,63 @@ build-a:
 
 	@ ${BIN}/templates -template=a -output=${DIST}/a/index.html -json='{"env":"${env}"}'
 
-	@ sed -r -i.orig 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/a/index.html
-	@ rm ${DIST}/a/index.html.orig
+	@ sed 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/a/index.html > ${DIST}/a/index.html.$$$$ && mv ${DIST}/a/index.html.$$$$ ${DIST}/a/index.html
 
 	@ mkdir -p ${DIST}/a/components
 
 	@ cp \
-		${SRC}/utils.js \
-		${SRC}/admin-tiers.js \
-		${SRC}/browser.js \
-		${SRC}/session.js \
-		${SRC}/analysis.js \
-		${SRC}/cards.js \
-		${SRC}/config.js \
-		${SRC}/controls.js \
-		${SRC}/search.js \
-		${SRC}/controls-search.js \
-		${SRC}/symbols.js \
-		${SRC}/geographies-search.js \
-		${SRC}/vectors-search.js \
-		${SRC}/area-analysis.js \
-		${SRC}/analysis-search.js \
-		${SRC}/right-panel-high-priority-areas.js \
-		${SRC}/modal-table-high-priority-areas.js \
-		${SRC}/locations-search.js \
-		${SRC}/points-loading.js \
-		${SRC}/ds.js \
-		${SRC}/parse.js \
-		${SRC}/output-widget.js \
-		${SRC}/right-panel-graphs.js \
-		${SRC}/right-panel-tabs.js \
-		${SRC}/right-panel-data-tab.js \
-		${SRC}/right-panel-prioritization-tab.js \
-		${SRC}/right-panel-poi-card.js \
-		${SRC}/right-panel.js \
-		${SRC}/mapbox.js \
-		${SRC}/plot.js \
-		${SRC}/rasters.js \
-		${SRC}/report.js \
-		${SRC}/summary.js \
-		${SRC}/timeline.js \
-		${SRC}/meiosis-stream.js \
-		${SRC}/timeline-state.js \
-		${SRC}/user.js \
-		${SRC}/help.js \
-		${SRC}/qa.js \
-		${SRC}/complicated.js \
-		${SRC}/qa-controls.js \
-		${SRC}/qa-outputs.js \
-		${SRC}/qa-indexes.js \
-		${SRC}/map-info.js \
-		${SRC}/panel-section.js \
-		${SRC}/export.js \
-		${SRC}/sentry.js \
-		${SRC}/translate.js \
-		${SRC}/toast.js \
-		${SRC}/filtered.js \
-		${SRC}/a.js \
+		${JS}/utils.js \
+		${JS}/admin-tiers.js \
+		${JS}/browser.js \
+		${JS}/session.js \
+		${JS}/analysis.js \
+		${JS}/cards.js \
+		${JS}/config.js \
+		${JS}/controls.js \
+		${JS}/search.js \
+		${JS}/controls-search.js \
+		${JS}/symbols.js \
+		${JS}/geographies-search.js \
+		${JS}/vectors-search.js \
+		${JS}/area-analysis.js \
+		${JS}/analysis-search.js \
+		${JS}/right-panel-high-priority-areas.js \
+		${JS}/modal-table-high-priority-areas.js \
+		${JS}/locations-search.js \
+		${JS}/points-loading.js \
+		${JS}/ds.js \
+		${JS}/parse.js \
+		${JS}/output-widget.js \
+		${JS}/right-panel-graphs.js \
+		${JS}/right-panel-tabs.js \
+		${JS}/right-panel-data-tab.js \
+		${JS}/right-panel-data-state.js \
+		${JS}/right-panel-prioritization-tab.js \
+		${JS}/right-panel-poi-card.js \
+		${JS}/right-panel.js \
+		${JS}/mapbox.js \
+		${JS}/plot.js \
+		${JS}/rasters.js \
+		${JS}/report.js \
+		${JS}/summary.js \
+		${JS}/timeline.js \
+		${JS}/meiosis-stream.js \
+		${JS}/timeline-state.js \
+		${JS}/user.js \
+		${JS}/help.js \
+		${JS}/qa.js \
+		${JS}/complicated.js \
+		${JS}/qa-controls.js \
+		${JS}/qa-outputs.js \
+		${JS}/qa-indexes.js \
+		${JS}/map-info.js \
+		${JS}/panel-section.js \
+		${JS}/export.js \
+		${JS}/sentry.js \
+		${JS}/translate.js \
+		${JS}/toast.js \
+		${JS}/filtered.js \
+		${JS}/a.js \
 		${DIST}/a/
 
 	@ cat \
@@ -197,7 +219,7 @@ build-a:
 	@ echo "window.EAE = {};" | cat - \
 		settings.tmp.json \
 		locales/translations.js.tmp \
-		${SRC}/eae.part.js \
+		${JS}/eae.part.js \
 		> ${DIST}/a/main.js
 
 	@ cat \
@@ -228,17 +250,16 @@ build-s:
 
 	@ ${BIN}/templates -template=s -output=${DIST}/s/index.html -json='{"env":"${env}"}'
 
-	@ sed -r -i.orig 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/s/index.html
-	@ rm ${DIST}/s/index.html.orig
+	@ sed 's/--TIMESTAMP--/${TIMESTAMP}/' ${DIST}/s/index.html > ${DIST}/s/index.html.$$$$ && mv ${DIST}/s/index.html.$$$$ ${DIST}/s/index.html
 
 	@ cp \
-		${SRC}/utils.js \
-		${SRC}/browser.js \
-		${SRC}/user.js \
-		${SRC}/sentry.js \
-		${SRC}/toast.js \
-		${SRC}/s.js \
-		${SRC}/translate.js \
+		${JS}/utils.js \
+		${JS}/browser.js \
+		${JS}/user.js \
+		${JS}/sentry.js \
+		${JS}/toast.js \
+		${JS}/s.js \
+		${JS}/translate.js \
 		${DIST}/s/
 
 	@ cat \
@@ -320,9 +341,9 @@ build-translations: locales/translations.csv locales/units.csv
 reconfig:
 	@ echo "Building settings.tmp.json - ${env}"
 
-	@ printf "\n%s" "EAE['settings'] = " > settings.tmp.json
-
-	@ echo '{}' \
+	@ tmp="settings.tmp.json.$$$$" && \
+	printf "\n%s" "EAE['settings'] = " > "$$tmp" && \
+	echo '{}' \
 		| jq '.domain = ${DOMAIN}' \
 		| jq '.world = ${WORLD}' \
 		| jq '.title = ${TITLE}' \
@@ -330,9 +351,8 @@ reconfig:
 		| jq '.storage = ${STORAGE_URL}' \
 		| jq '.mapbox_token = ${MAPBOX_TOKEN}' \
 		| jq '.mapbox_theme = ${MAPBOX_THEME}' \
-		>> settings.tmp.json
+		>> "$$tmp" && \
+	printf ';\n' >> "$$tmp" && \
+	mv "$$tmp" settings.tmp.json
 
-	@ sed -i.orig -e '$$s/$$/;\n/' settings.tmp.json
-	@ rm settings.tmp.json.orig
-
-.PHONY: templates locales
+.PHONY: templates locales ts test

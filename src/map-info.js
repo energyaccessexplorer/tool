@@ -3,9 +3,9 @@ import {
 } from './area-analysis.js';
 
 import {
-	update as data_tab_update,
-	clear as data_tab_clear,
-} from './right-panel-data-tab.js';
+	cell as data_tab_cell,
+	actions as data_tab_actions,
+} from './right-panel-data-state.js';
 
 import {
 	update as prioritization_tab_update,
@@ -81,7 +81,7 @@ export default class mapinfo extends HTMLElement {
 		const { fields, props, ll, analysis_value, analysis_name, feature_name, "admin_info": info, raw, raster_index } = rawData;
 		const data = area_info(fields, props, ll, analysis_value, analysis_name, feature_name, info, raw);
 
-		data_tab_update(data.detailedData, info, raster_index);
+		data_tab_actions.locationSelected(data_tab_cell(), { "entries": data.detailedData, "admin": info, "rasterIndex": raster_index });
 		prioritization_tab_update(raster_index, info, analysis_value);
 		update_location_summary(data, info);
 		if (!info) poi_update(ll);
@@ -119,7 +119,7 @@ export default class mapinfo extends HTMLElement {
 
 		const closeButton = qs('.close-button', this);
 		closeButton.onclick = () => {
-			data_tab_clear();
+			data_tab_actions.backToNational(data_tab_cell());
 			prioritization_tab_clear();
 			clear_location_summary();
 			poi_clear();

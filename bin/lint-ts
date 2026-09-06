@@ -1,0 +1,23 @@
+#!/bin/sh
+# No weak types in TypeScript: reject explicit `any` tokens in *.ts files
+# under the given directory. tsc has no flag that bans `any`, so this gate
+# (wired into the makefile lint/test targets) keeps the TS surface at zero
+# explicit `any` — use `unknown`, union or real types instead.
+#
+# A token-level gate only: weak types inferred from untyped JS modules are
+# sealed at the typed assignments in the TS code itself (noImplicitAny on).
+
+if [ -z "$1" ] || [ ! -d "$1" ]; then
+	>&2 echo "usage: lint-ts <directory>"
+	exit 1
+fi
+
+matches=$(grep -rEn --include='*.ts' '\bany\b' "$1" || true)
+
+if [ -n "$matches" ]; then
+	echo "explicit 'any' found in TypeScript under $1 (use 'unknown' or a real type):"
+	echo "$matches"
+	exit 1
+fi
+
+exit 0

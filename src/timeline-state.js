@@ -53,14 +53,14 @@ export function service(deriveFn, run) {
 };
 
 export const actions = {
-	selectYear: (c, year) => c.update(s => ({ ...s, "year": { ...s.year, "selected": year } })),
+	"selectYear": (c, year) => c.update(s => ({ ...s, "year": { ...s.year, "selected": year } })),
 
-	dismissModal: c => {
+	"dismissModal": c => {
 		localStorage.setItem('timeline-modal-dismissed', '1');
 		c.update(s => ({ ...s, "modal": { ...s.modal, "dismissed": true } }));
 	},
 
-	setFilterEnabled: (c, enabled) => c.update(s => ({ ...s, "filters": { ...s.filters, enabled } })),
+	"setFilterEnabled": (c, enabled) => c.update(s => ({ ...s, "filters": { ...s.filters, enabled } })),
 };
 
 // Called from a.js's COMMIT (not reload()) whenever STATE.datasets changes.

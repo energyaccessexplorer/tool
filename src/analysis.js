@@ -303,6 +303,30 @@ export async function plot_active(type) {
 	return a;
 };
 
+// Which pixels satisfy every active dataset's own criteria.
+export function criteria_mask(type) {
+	const list = datasets(type);
+
+	const it = new Uint8Array(OUTLINE.raster.data.length).fill(1);
+	if (!list.length) return it;
+
+	const afns = list.map(d => d._afn(type));
+
+	for (let i = 0; i < it.length; i += 1) {
+		for (let j = 0; j < list.length; j += 1) {
+			const c = list[j];
+			const v = c.raster.data[i];
+
+			if (v === c.raster.nodata) { it[i] = 0; break; }
+
+			const sv = afns[j](v);
+			if (sv < 0 || sv > 1) { it[i] = 0; break; }
+		}
+	}
+
+	return it;
+};
+
 export async function analysis(type) {
 	const b = OUTLINE;
 	const env = GEOGRAPHY.envelope;

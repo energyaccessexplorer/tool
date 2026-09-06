@@ -26,9 +26,17 @@ declare const STATE: {
 
 declare const GEOGRAPHY: {
 	readonly divisions?: Record<string, {
+		readonly name?: string;
 		readonly raster?: RasterLike;
 		/** Per-division-id priority averages (analysis.js priority()). */
 		readonly priorityData?: Record<string, { readonly average?: number }>;
+		readonly vectors?: {
+			readonly data?: {
+				readonly features?: readonly { readonly id: string | number }[];
+			};
+		};
+		/** Area-id -> display name table. */
+		readonly csv?: { readonly table?: Record<string, string> };
 	} | undefined>;
 
 	/** ISO date strings for timeline-enabled geographies (EAE-297). */
@@ -48,6 +56,10 @@ declare const EAE: {
 interface Window {
 	LOCALE: string;
 }
+
+/** The debounced state-commit dispatcher (a.js); a writable window global
+ * (window.COMMIT in a.tmpl) — re-invokes reload() and the epic's syncs. */
+declare const COMMIT: (...args: unknown[]) => void;
 
 /**
  * Minimal d3 v5 (lib/d3.js) surface used by TS modules — only what the

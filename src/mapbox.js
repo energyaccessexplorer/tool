@@ -11,6 +11,7 @@ import {
 
 import {
 	get_admin_area_layer_data,
+	get_timeline_area_layer_data,
 } from './area-analysis.js';
 
 import {
@@ -687,11 +688,15 @@ function ensure_map_info_visible() {
 export function show_admin_area_info(item, position, centerPointer = false) {
 	++popup_token;
 
-	const variant = STATE.variant;
-	const [fields, props, raw] = get_admin_area_layer_data(variant, item.id);
+	const variant = item._variant ?? STATE.variant;
+	const [fields, props, raw] = item._variant !== undefined
+		? get_timeline_area_layer_data(variant, item.id)
+		: get_admin_area_layer_data(variant, item.id);
 
-	const info = { "variant": variant, "name": item.name, "id": item.id };
-	const analysis_name = translateIndexName(window.LOCALE, STATE.index);
+	const info = { "variant": variant, "name": item.name, "id": item.id, "_variant": item._variant };
+	const analysis_name = item._variant !== undefined
+		? t(window.LOCALE, 'timeline.filtered_geographies.title')
+		: translateIndexName(window.LOCALE, STATE.index);
 
 	const { drop } = pointer(position, {
 		fields,

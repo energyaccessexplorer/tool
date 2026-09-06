@@ -317,11 +317,6 @@
   flex-shrink: 0;
 }
 
-#data-blank-state,
-#timeline-blank-state {
-  padding-top: 12px;
-}
-
 #analysis-loading-state {
   display: none;
   align-items: center;
@@ -370,13 +365,16 @@
   gap: 12px;
 }
 
-#right-panel-tab-prioritization:not([hidden]) {
+#right-panel-tab-prioritization:not([hidden]),
+#right-panel-tab-data:not([hidden]),
+#right-panel-tab-timeline:not([hidden]) {
   display: flex;
   flex-direction: column;
   padding: 12px;
   gap: 12px;
 }
 
+#tab-title:empty,
 #index-priority-container:empty,
 #poi-card-container:empty {
   display: none;

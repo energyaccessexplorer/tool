@@ -513,6 +513,14 @@ left_panel.cards.card.timeline_footer_inactive,Not affected by timeline.,Non aff
 right_panel.tabs.timeline,Timeline,Chronologie,时间轴
 timeline.blank_state.title,Add a timeline dataset to see trends over time,Ajoutez une couche temporelle pour voir les tendances au fil du temps,添加时间轴数据集以查看随时间变化的趋势
 timeline.blank_state.subtitle,Select a dataset with historical data from the left panel to unlock trend lines and filtered geographies for this area.,Sélectionnez dans le panneau de gauche un jeu de données comportant des données historiques pour activer les lignes de tendance et les zones géographiques filtrées de cette zone.,从左侧面板中选择一个包含历史数据的数据集，即可为该区域启用趋势线和已筛选地理区域功能。
+timeline.filters.enabled_label,Only show areas that meet all data layer criteria,N'afficher que les zones répondant à tous les critères des couches de données,仅显示满足所有数据图层条件的区域
+timeline.filtered_geographies.title,Filtered geographies,Zones géographiques filtrées,已筛选地理区域
+timeline.filtered_geographies.title_with_name,Filtered {{name}},{{name}} filtrés,已筛选{{name}}
+timeline.filtered_geographies.subtitle,Showing areas covered by your active timeline datasets.,Affiche les zones couvertes par vos couches temporelles actives.,显示您活跃时间轴数据集所覆盖的区域。
+timeline.filtered_geographies.no_results,No areas have data in the active timeline datasets.,Aucune zone ne dispose de données dans les couches temporelles actives.,活跃时间轴数据集中没有任何区域含有数据。
 timeline.trend.title,Trend lines,Lignes de tendance,趋势线
 timeline.trend.subtitle,Showing trendlines for timeline data between {{from}} and {{to}}.,Affiche les lignes de tendance pour les données temporelles entre {{from}} et {{to}}.,显示 {{from}} 至 {{to}} 年间时间轴数据的趋势线。
+timeline.trend.subtitle_location,Showing trend for {{location}} between {{from}} and {{to}}.,Affiche la tendance pour {{location}} entre {{from}} et {{to}}.,显示 {{location}} 在 {{from}} 至 {{to}} 年间的趋势。
+timeline.trend.clear_location,Show all,Tout afficher,显示全部
 timeline.trend.about,"Trend lines show how each active timeline dataset's value has changed across the years available for this geography, averaged across the whole selected area.","Les lignes de tendance montrent l'évolution de la valeur de chaque couche temporelle active au fil des années disponibles pour cette zone géographique, moyennée sur l'ensemble de la zone sélectionnée.","趋势线显示每个活跃时间轴数据集在该地理区域可用年份间的变化情况，数值为所选整个区域的平均值。"
+timeline.filtered_geographies.about,"This list shows every area that has data in at least one active timeline dataset, for the year currently selected.","Cette liste montre chaque zone disposant de données dans au moins une couche temporelle active, pour l'année actuellement sélectionnée.",此列表显示在当前所选年份至少有一个活跃时间轴数据集含有数据的每个区域。

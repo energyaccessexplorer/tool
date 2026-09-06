@@ -3,6 +3,7 @@ import {
 	resolve_raster_value,
 	format_value_unit,
 	coordinates_to_raster_pixel,
+	raster_reverse_crosswalk,
 } from './utils.js';
 
 import {
@@ -26,7 +27,9 @@ const header_specs = new Map();
 const NAME_ATTRIBUTE_TARGETS = ['name', 'facility name', 'facility_name'];
 
 function item_key(item) {
-	return item.i !== undefined ? item.i : item.id;
+	if (item._variant !== undefined) return `t:${item._variant}:${item.i ?? item.id}`;
+	if (item.i !== undefined) return `r:${item.i}`;
+	return item.id;
 }
 
 export function clear_row_cache() {
@@ -616,6 +619,16 @@ export function get_timeline_raster_table_data(pixel_index) {
 }
 
 function build_raster_row(item, analysis_name, round) {
+	if (item._variant !== undefined) {
+		const [fields, props] = get_timeline_raster_table_data(item.i);
+		return {
+			"Longitude": item.c[0].toFixed(5),
+			"Latitude":  item.c[1].toFixed(5),
+			...Object.fromEntries(fields.map(([key, label]) => [label, props[key]])),
+			...division_names(item.i),
+		};
+	}
+
 	return {
 		"Longitude": item.c[0].toFixed(5),
 		"Latitude":  item.c[1].toFixed(5),
@@ -643,15 +656,27 @@ function admin_tier_names(variant, id) {
 }
 
 function build_admin_row(item, analysis_name) {
-	const info = { "variant": STATE.variant, "name": item.name };
-	const [fields, props, raw] = get_admin_area_layer_data(STATE.variant, item.id);
+	if (item._variant !== undefined) {
+		const tier = item._variant;
+		const [fields, props] = get_timeline_area_table_data(tier, item.id);
+
+		return {
+			[translateDivisionName(window.LOCALE, GEOGRAPHY.divisions[tier].name)]: item.name,
+			...admin_tier_names(tier, item.id),
+			...Object.fromEntries(fields.map(([key, label]) => [label, props[key]])),
+		};
+	}
+
+	const variant = STATE.variant;
+	const info = { "variant": variant, "name": item.name };
+	const [fields, props, raw] = get_admin_area_layer_data(variant, item.id);
 
 	const { feature, feature_type, detailedData } = area_info(
 		fields, props, null, item.priority, analysis_name, null, info, raw,
 	);
 
 	return {
-		...admin_tier_names(STATE.variant, item.id),
+		...admin_tier_names(variant, item.id),
 		...(feature && feature_type ? { [feature_type]: feature } : {}),
 		...Object.fromEntries(
 			detailedData.map(data => {
@@ -715,8 +740,10 @@ export function get_property_tree() {
 }
 
 export function prepare_tabular_data(results) {
-	const is_raster = STATE.variant === 'raster';
-	const analysis_name = translateIndexName(window.LOCALE, STATE.index);
+	const timeline_mode = results[0]?._variant !== undefined;
+	const variant = timeline_mode ? results[0]._variant : STATE.variant;
+	const is_raster = timeline_mode ? results[0]._variant === 'raster' : STATE.variant === 'raster';
+	const analysis_name = timeline_mode ? t(window.LOCALE, 'timeline.filtered_geographies.title') : translateIndexName(window.LOCALE, STATE.index);
 
 	const row = schema_row(results[0], is_raster, analysis_name);
 	const fixed_order = ["Priority score", analysis_name, "Latitude", "Longitude"];
@@ -762,7 +789,7 @@ export function prepare_tabular_data(results) {
 		? [{ "header": "Location", "synthetic": true, "children": location_headers }, ...data_groups]
 		: data_groups;
 
-	return { headers, "area_type": area_type(STATE.variant), analysis_name, is_raster, column_meta, selector_groups };
+	return { headers, "area_type": area_type(variant), analysis_name, is_raster, column_meta, selector_groups };
 }
 
 // `round = false` is the CSV export path: it writes the aggregation band's own

@@ -30,6 +30,7 @@ jobs:
         if: steps.ticket.outputs.matched == 'true'
         run: |
           sudo apt-get install -y bmake curl jq
+          sudo npm install -g typescript@5.9.3
 
       - name: Merge ${{ github.event.repository.default_branch }} before building
         if: steps.ticket.outputs.matched == 'true'

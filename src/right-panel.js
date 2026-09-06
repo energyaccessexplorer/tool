@@ -25,9 +25,12 @@ import summary_analyse from './summary.js';
 
 import {
 	init as data_tab_init,
-	clear as data_tab_clear,
-	set_analysis_layer_data,
 } from './right-panel-data-tab.js';
+
+import {
+	cell as data_tab_cell,
+	actions as data_tab_actions,
+} from './right-panel-data-state.js';
 
 import {
 	aggregate_layer_values,
@@ -59,7 +62,7 @@ export function loading_analysis(loading) {
 	qs('#analysis-sections-wrapper').style.display = 'none';
 	qs('#analysis-blank-state').style.display = 'none';
 	if (loading) {
-		data_tab_clear();
+		data_tab_actions.backToNational(data_tab_cell());
 		prioritization_tab_clear();
 		clear_location_summary();
 		poi_clear();
@@ -81,7 +84,7 @@ export function update_analysis(has_data) {
 	const blank_state = qs('#analysis-blank-state');
 	const sections_wrapper = qs('#analysis-sections-wrapper');
 
-	data_tab_clear();
+	data_tab_actions.backToNational(data_tab_cell());
 	prioritization_tab_clear();
 	clear_location_summary();
 	poi_clear();
@@ -106,7 +109,8 @@ export async function graphs(raster) {
 	const analysis_mask = {
 		"raster": { "data": raster.map((v, i) => (has_priority_score(v) && outline[i] !== outline_nodata) ? 0 : -1) },
 	};
-	set_analysis_layer_data(await aggregate_layer_values(analysis_mask));
+	const layer_data = await aggregate_layer_values(analysis_mask);
+	data_tab_actions.analysisCompleted(data_tab_cell(), layer_data);
 
 	// The summary keeps the analysis-window mask.
 	const summary = await summary_analyse(raster);

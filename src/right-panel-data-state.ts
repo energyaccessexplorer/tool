@@ -25,11 +25,13 @@
 
 import stream from './meiosis-stream.ts';
 
-/** An admin-division feature the user clicked (as produced by mapbox). */
-export interface AdminRef {
-	readonly variant: string;
-	readonly id: number;
-}
+import type {
+	AdminRef,
+} from './right-panel-shared.ts';
+
+export type {
+	AdminRef,
+} from './right-panel-shared.ts';
 
 /**
  * One layer's computed value for the current geography/location (the Data

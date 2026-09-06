@@ -19,7 +19,6 @@ import {
 	STANDARD_TABS,
 } from './a.js';
 
-import bind from '../lib/bind.js';
 import bubblemessage from '../lib/bubblemessage.js';
 import { t, translateUnit, translateDatasetName, registerUIUpdater } from './translate.js';
 
@@ -34,6 +33,10 @@ import {
 } from './utils.js';
 
 import {
+	activeDatasets,
+} from './right-panel-shared.ts';
+
+import {
 	actions,
 	cell,
 	subscribe,
@@ -44,38 +47,14 @@ import {
 
 import type {
 	AdminRef,
+	LegacyDataset,
+} from './right-panel-shared.ts';
+
+import type {
 	AggregatedLayerData,
 	DataState,
 	LayerEntry,
 } from './right-panel-data-state.ts';
-
-/**
- * Minimal structural type for the legacy dataset objects the view touches
- * (STATE.datasets entries). Full dataset typing is out of scope; grow as
- * more modules are ported.
- */
-interface LegacyDataset {
-	readonly id: string;
-	readonly name: string;
-	readonly on: boolean;
-	readonly type?: string;
-	// matches the legacy DS method name (ds.js) — not renamed
-	info_modal(): void;
-	readonly category?: {
-		readonly name: string;
-		readonly datatype?: string;
-		readonly unit?: string;
-		readonly analysis?: { readonly aggregation?: string };
-		readonly controls?: { readonly path?: readonly string[] };
-	};
-	readonly csv?: {
-		readonly data?: ReadonlyArray<Record<string, unknown>>;
-		readonly key?: string;
-		readonly column?: string;
-	};
-	readonly raster?: RasterLike;
-	readonly colorscale?: { readonly fn: (value: number) => string };
-}
 
 interface DistributionSlice {
 	readonly value: number;
@@ -156,13 +135,6 @@ export function describe(datatype: string | undefined, unit: string | undefined,
 	if (datatype === 'lines')
 		return t(locale, 'right_panel.data.descriptions.lines', vars);
 
-	if (datatype?.startsWith('raster')) {
-		const key = (aggregation === 'SUM' && unit ? RASTER_SUM_KEYS[unit] : null)
-			?? (unit ? RASTER_KEYS[unit] : null)
-			?? (aggregation === 'SUM' ? 'right_panel.data.descriptions.raster_sum.default' : 'right_panel.data.descriptions.raster.default');
-		return t(locale, key, vars);
-	}
-
 	if (datatype?.startsWith('polygons')) {
 		const key = unit
 			? 'right_panel.data.descriptions.polygons_sum'
@@ -170,6 +142,7 @@ export function describe(datatype: string | undefined, unit: string | undefined,
 		return t(locale, key, vars);
 	}
 
+	// raster-* datasets and the untyped fallback share the raster tables.
 	const key = (aggregation === 'SUM' && unit ? RASTER_SUM_KEYS[unit] : null)
 		?? (unit ? RASTER_KEYS[unit] : null)
 		?? (aggregation === 'SUM' ? 'right_panel.data.descriptions.raster_sum.default' : 'right_panel.data.descriptions.raster.default');
@@ -299,12 +272,13 @@ function makeBarChart(distribution: DistributionSlice[], activeName: string | nu
 
 function makeCard(ds: LegacyDataset, entry: LayerEntry, adminInfo: AdminRef | null): HTMLElement {
 	const card = ce('div', null, { "class": 'data-card' });
+	const name = translateDatasetName(window.LOCALE, ds);
 
 	const header = ce('div', null, { "class": 'data-card-header' });
 	const path0  = ds.category?.controls?.path?.[0];
 	const tabEl = path0 && !STANDARD_TABS.has(path0) ? qs('#controls-tab-' + path0) : null;
 	const tabLabel = tabEl?.textContent?.trim();
-	const title     = ce('span', tabLabel ? `${tabLabel} - ${translateDatasetName(window.LOCALE, ds)}` : translateDatasetName(window.LOCALE, ds), { "class": 'data-card-title' });
+	const title     = ce('span', tabLabel ? `${tabLabel} - ${name}` : name, { "class": 'data-card-title' });
 	const about  = ce('button', null, { "class": 'button-icon button-info button-about' });
 	about.innerHTML = `<span>${t(window.LOCALE, 'left_panel.cards.card.about_button')}</span><i class="bi bi-info-circle"></i>`;
 	header.append(title, about);
@@ -318,7 +292,7 @@ function makeCard(ds: LegacyDataset, entry: LayerEntry, adminInfo: AdminRef | nu
 			const n           = ds.csv?.data?.length ?? 0;
 			const activeName = typeof entry.rawValue === 'string' ? entry.rawValue : null;
 			const distDesc = ce('p', null, { "class": 'data-card-description' });
-			distDesc.innerHTML = t(window.LOCALE, 'right_panel.data.categorical_desc', { "name": translateDatasetName(window.LOCALE, ds) });
+			distDesc.innerHTML = t(window.LOCALE, 'right_panel.data.categorical_desc', { "name": name });
 			body.append(distDesc, n <= 5
 				? makeDonutChart(distribution, activeName)
 				: makeBarChart(distribution, activeName));
@@ -330,9 +304,9 @@ function makeCard(ds: LegacyDataset, entry: LayerEntry, adminInfo: AdminRef | nu
 
 	const desc = ce('p', null, { "class": 'data-card-description' });
 	if (entry.value != null) {
-		desc.innerHTML = describe(ds.category?.datatype, entry.unit || ds.category?.unit, translateDatasetName(window.LOCALE, ds), entry.value, entry.aggregation ?? ds.category?.analysis?.aggregation);
+		desc.innerHTML = describe(ds.category?.datatype, entry.unit || ds.category?.unit, name, entry.value, entry.aggregation ?? ds.category?.analysis?.aggregation);
 	} else {
-		desc.innerHTML = t(window.LOCALE, 'right_panel.data.no_data', { "name": translateDatasetName(window.LOCALE, ds) });
+		desc.innerHTML = t(window.LOCALE, 'right_panel.data.no_data', { "name": name });
 	}
 	body.append(desc);
 
@@ -343,29 +317,13 @@ function makeCard(ds: LegacyDataset, entry: LayerEntry, adminInfo: AdminRef | nu
 	return card;
 }
 
-function rebindBlank(): void {
-	const blank = qs('#data-blank-state');
-	if (!blank) return;
-
-	bind(blank, {
-		"title":    t(window.LOCALE, 'right_panel.prioritization.blank_state.title'),
-		"subtitle": t(window.LOCALE, 'right_panel.prioritization.blank_state.subtitle'),
-	}, { "final": false });
-}
-
+// Blank state retranslates itself on locale switch (data-t attributes,
+// see views/a.tmpl) — the view only toggles visibility.
 function setBlankState(visible: boolean): void {
 	const blank = qs('#data-blank-state');
 	if (!blank) return;
 
-	if (visible) rebindBlank();
-
 	blank.style.display = visible ? 'flex' : 'none';
-}
-
-function activeDatasets(): LegacyDataset[] {
-	return (STATE.datasets as LegacyDataset[]).filter(
-		ds => ds.on && ds.category?.name !== 'boundaries' && ds.category?.name !== 'outline',
-	);
 }
 
 /**
@@ -524,12 +482,8 @@ subscribe(s => {
 	if (s.view.kind === 'national' && s.view.entries === null) void computeNational();
 });
 
-// Legacy i18n bridge: on locale switch, rebind the blank state if it is
-// showing; otherwise rebuild the national overview (legacy behaviour
-// replaced the location cards with the national overview too — kept).
-registerUIUpdater(() => {
-	const blank = qs('#data-blank-state');
-	if (blank && blank.style.display !== 'none') { rebindBlank(); return; }
-
-	actions.backToNational(cell());
-});
+// Legacy i18n bridge: on locale switch, rebuild the national overview
+// (legacy behaviour replaced the location cards with the national overview
+// too — kept). The blank state needs no updater: its data-t attributes are
+// retranslated document-wide by translate.js.
+registerUIUpdater(() => actions.backToNational(cell()));

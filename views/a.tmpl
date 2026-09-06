@@ -323,26 +323,22 @@
 
               <panel-section class="timeline-filtered-geographies" collapsible>
                 <h2 slot="title" id="timeline-filtered-title" data-t="timeline.filtered_geographies.title">Filtered geographies</h2>
+                <p slot="description" data-t="timeline.filtered_geographies.subtitle"></p>
                 <div slot="actions">
                   <button type="button" class="button-icon button-info button-about">
                     <span data-t="left_panel.cards.card.about_button">About</span>
                     <i class="bi bi-info-circle"></i>
                   </button>
                 </div>
-                <div class="timeline-filtered-body">
-                  <p data-t="timeline.filtered_geographies.subtitle" class="data-card-description"></p>
-                  <div id="filtered-subgeographies">
-                    <p id="filtered-no-results" class="data-card-description" data-t="timeline.filtered_geographies.no_results" style="display: none;"></p>
-                    <div id="filtered-results">
-                      <div id="filtered-list" class="locations-paginated-list"></div>
-                      <footer class="locations-footer">
-                        <button type="button" id="filtered-view-all" class="button-icon button-icon-mid">
-                          <i class="bi bi-table"></i>
-                          <span data-t="right_panel.prioritization.high_priority.view_download">View or Download data</span>
-                        </button>
-                      </footer>
-                    </div>
-                  </div>
+                <p id="filtered-no-results" class="data-card-description" data-t="timeline.filtered_geographies.no_results" style="display: none;"></p>
+                <div id="filtered-results">
+                  <div id="filtered-list" class="locations-paginated-list"></div>
+                  <footer class="locations-footer">
+                    <button type="button" id="filtered-view-all" class="button-icon button-icon-mid">
+                      <i class="bi bi-table"></i>
+                      <span data-t="right_panel.prioritization.high_priority.view_download">View or Download data</span>
+                    </button>
+                  </footer>
                 </div>
               </panel-section>
             </div>

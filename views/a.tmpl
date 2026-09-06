@@ -116,6 +116,20 @@
             </button>
           </div>
 
+          <panel-section id="timeline-year-control-section" class="timeline-year-control" style="display: none;">
+            <h2 slot="title" data-t="timeline.year_control.title">Select year for timeline data</h2>
+            <div slot="actions">
+              <button type="button" class="button-icon button-info button-about">
+                <span data-t="left_panel.cards.card.about_button">About</span>
+                <i class="bi bi-info-circle"></i>
+              </button>
+            </div>
+            <div class="timeline-year-control-body">
+              <select id="timeline-year-select"></select>
+              <div id="timeline-year-slider"></div>
+            </div>
+          </panel-section>
+
           <div id="cards-list" class="search-results"></div>
         </div>
 
@@ -233,6 +247,11 @@
             <i class="bi bi-bar-chart-line-fill"></i>
             <span data-t="right_panel.tabs.data">Data</span>
           </button>
+
+          <button class="right-panel-tab" role="tab" data-tab="timeline" aria-selected="false">
+            <i class="bi bi-clock-history"></i>
+            <span data-t="right_panel.tabs.timeline">Timeline</span>
+          </button>
         </div>
 
         <svg style="display: none" xmlns="http://www.w3.org/2000/svg">
@@ -268,6 +287,32 @@
               {{template "blank-state" .}}
             </div>
             <div id="data-cards-container"></div>
+          </div>
+
+          <div id="right-panel-tab-timeline" class="right-panel-tab-panel" role="tabpanel" hidden>
+            <div id="timeline-blank-state">
+              <div class="blank-state-content">
+                <svg class="blank-state-icon" width="64" height="64"><use href="#blank-state-icon"/></svg>
+                <p class="blank-state-title" data-t="timeline.blank_state.title">Add a timeline dataset to see trends over time</p>
+                <p class="blank-state-subtitle" data-t="timeline.blank_state.subtitle">Select a dataset with historical data from the left panel to unlock trend lines and filtered geographies for this area.</p>
+              </div>
+            </div>
+            <div id="timeline-tab-container">
+              <panel-section class="timeline-trend-lines" collapsible>
+                <h2 slot="title" data-t="timeline.trend.title">Trend lines</h2>
+                <div slot="actions">
+                  <button type="button" class="button-icon button-info button-about">
+                    <span data-t="left_panel.cards.card.about_button">About</span>
+                    <i class="bi bi-info-circle"></i>
+                  </button>
+                </div>
+                <div class="timeline-trend-body">
+                  <p id="timeline-trend-subtitle" class="data-card-description"></p>
+                  <div id="timeline-trend-chart"></div>
+                  <div id="timeline-trend-legend"></div>
+                </div>
+              </panel-section>
+            </div>
           </div>
         </div>
 
@@ -338,6 +383,8 @@
 
             <div class="index"
                  bind="index"></div>
+
+            <span bind="timeline-badge"></span>
           </div>
 
           <div bind-tmpl="#card-header-buttons"></div>
@@ -368,6 +415,8 @@
         </span>
       </content>
     </main>
+
+    <footer bind="timeline-footer"></footer>
 
     <aside style="display: none;">
       <div class="group"
@@ -744,6 +793,16 @@
       </div>
       <div class="index-priority-values"></div>
     </panel-section>
+  </template>
+
+  <template id="timeline-first-add-modal">
+    <h4 data-t="timeline.modal.title">You've just added a timeline layer to this analysis</h4>
+    <p data-t="timeline.modal.body">When one or more timeline layers have been added, you can edit the time using the timeline section on the map, as well as view Filtered Areas to find common patterns.</p>
+    <label for="timeline-modal-dont-show" class="timeline-modal-checkbox-label">
+      <input type="checkbox" id="timeline-modal-dont-show">
+      <span data-t="timeline.modal.dont_show_again">Don't show this message again.</span>
+    </label>
+    <button type="button" class="primary-button" id="timeline-modal-close" data-t="timeline.modal.close">Close message</button>
   </template>
 
   <template id="analysis-locations-template">

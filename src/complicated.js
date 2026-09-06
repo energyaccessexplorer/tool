@@ -49,12 +49,23 @@ export function context(raster_pixel, winner = null) {
 
 		if (raw === d.raster.nodata) return;
 
-		const v = resolve_raster_value(d, raw);
+		// Polygon timelines: an empty cell means "no data", not 0% — render "-" instead.
+		let missing = false;
+		let v;
+		if (d.type === 'polygons-timeline') {
+			const row = d.csv?.data?.find(r => +r[d.csv.key] === +raw);
+			if (!row || row[STATE.timeline] === "" || row[STATE.timeline] == null) missing = true;
+		}
+
+		if (!missing) {
+			v = resolve_raster_value(d, raw);
+			if (v == null || (typeof v === 'number' && !Number.isFinite(v))) missing = true;
+		}
 
 		if (d.category.unit) {
 			dict.push([k, translateDatasetName(window.LOCALE, d)]);
-			props[k] = `<code>${format_value_unit(v, d.category.unit)}</code>`;
-			values[k] = v;
+			props[k] = `<code>${missing ? '-' : format_value_unit(v, d.category.unit)}</code>`;
+			values[k] = missing ? null : v;
 			units[k] = d.category.unit;
 		}
 

@@ -80,10 +80,6 @@ import {
 } from './cards.js';
 
 import {
-	init as timeline_init,
-} from './timeline.js';
-
-import {
 	run as qa_run,
 } from './qa.js';
 
@@ -117,6 +113,8 @@ import { translateNode, initLocalePicker, resolveLocale, t } from './translate.j
 
 import { syncDatasets as timeline_sync_datasets } from './timeline-state.js';
 
+import { init as timeline_view_init } from './timeline-view.js';
+
 export const STANDARD_TABS = new Set(['census', 'demand', 'supply', 'other']);
 
 COMMIT = debounce(function() {
@@ -131,7 +129,7 @@ COMMIT = debounce(function() {
 
 	reload(...arguments);
 
-	timeline_sync_datasets(STATE.datasets);
+	timeline_sync_datasets(STATE.datasets, GEOGRAPHY.timeline_dates);
 
 	window.dispatchEvent(new Event('resize'));
 }, 300);
@@ -294,6 +292,7 @@ async function init_1() {
 
 	drawer_init();
 	cards_init();
+	timeline_view_init();
 
 	loading(t(LOCALE, 'overlay.fetching_geography'));
 
@@ -460,7 +459,6 @@ async function init_3() {
 	vectorssearch_init();
 	locationssearch_init();
 	points_init();
-	timeline_init();
 	qa_run();
 };
 
@@ -509,8 +507,6 @@ async function reload(k,v) {
 	if (or(k === "subdiv", k === "divtier")) {
 		geographiessearch_load(STATE.divtier, STATE.subdiv);
 	}
-
-	const timeline = qs('#timeline');
 
 	const {index, variant} = STATE;
 
@@ -646,7 +642,7 @@ async function reload(k,v) {
 
 	indexes_list();
 
-	if (timeline) timeline_lines_update();
+	if (GEOGRAPHY.timeline) timeline_lines_update();
 
 	filtered_visibility('none');
 
@@ -670,8 +666,6 @@ async function reload(k,v) {
 	priority_visibility_pick();
 
 	output_visibility();
-
-	timeline_visibility();
 };
 
 export function clean() {
@@ -699,7 +693,6 @@ function layout() {
 	const n = qs('nav');
 	const p = qs('#playground');
 	const w = qs('#mobile-switcher');
-	const t = qs('#timeline');
 
 	function set_heights() {
 		p.style['height'] = window.innerHeight - n.clientHeight - (MOBILE ? w.clientHeight : 0) + "px";
@@ -708,10 +701,7 @@ function layout() {
 	if (GEOGRAPHY.timeline)
 		console.warn("TODO #timeline-graphs", qs('#timeline-graphs'));
 
-	document.body.onresize = function() {
-		set_heights();
-		if (t) t.dispatchEvent(new Event('resize'));
-	};
+	document.body.onresize = set_heights;
 
 	set_heights();
 };
@@ -800,11 +790,7 @@ export function left_panel(t) {
 	if (t) l.setAttribute('open', '');
 	else l.removeAttribute('open');
 
-	const rs = new Event('resize');
-	window.dispatchEvent(rs);
-
-	const tl = qs('#timeline');
-	if (tl) tl.dispatchEvent(rs);
+	window.dispatchEvent(new Event('resize'));
 };
 
 function drawer_init() {
@@ -862,21 +848,6 @@ function reset_features_visibility() {
 	const source = MAPBOX.getSource(this.id);
 	if (source) source.setData(fs);
 	else console.debug("reset_features_visibility: could not find source '%s'. First load? -> OK.", this.id);
-};
-
-function timeline_visibility() {
-	const timeline = qs('#timeline');
-
-	if (!timeline) return;
-
-	let v = '';
-
-	const d = qsa('ds-card', qs('#cards-list'), true).map(c => c.ds)[0];
-
-	if (maybe(d, 'timeline')) ;
-	else v = 'none';
-
-	timeline.style.display = v;
 };
 
 function load_datasets(array) {

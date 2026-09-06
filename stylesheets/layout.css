@@ -96,38 +96,6 @@ body {
   flex-grow: 1;
 }
 
-#timeline {
-  position: absolute;
-  bottom: 0;
-  text-align: center;
-  height: 128px;
-  padding: 1em 2em;
-  width: calc(100% - 4em);
-}
-
-#timeline svg {
-  order: 1;
-  margin: 2em auto 0 auto;
-}
-
-#timeline-number {
-  font-family: monospace;
-  fill: black;
-}
-
-#timeline-dates-container {
-  display: flex;
-  font-family: monospace;
-  justify-content: space-between;
-  margin-top: -10px;
-}
-
-#timeline-dates-container span {
-  background-color: white;
-  border-radius: 2px;
-  padding: 5px 7px;
-}
-
 [bind=help-message] {
   display: none;
 }

@@ -308,7 +308,8 @@
 }
 
 #analysis-blank-state,
-#data-blank-state {
+#data-blank-state,
+#timeline-blank-state {
   display: none;
   align-items: center;
   justify-content: center;
@@ -316,7 +317,8 @@
   flex-shrink: 0;
 }
 
-#data-blank-state {
+#data-blank-state,
+#timeline-blank-state {
   padding-top: 12px;
 }
 

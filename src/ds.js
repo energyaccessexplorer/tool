@@ -445,6 +445,9 @@ export default class DS {
 			else {
 				s = x => {
 					const t = this.csv.table[x];
+					// EAE-498: no data for this key is not a value of 0; null would
+					// coerce to 0 in the range check and could score as "in range".
+					if (t === null || t === undefined || t === '') return -1;
 					return and(t >= min, t <= max) ? 1 : -1;
 				};
 			}

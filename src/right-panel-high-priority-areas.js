@@ -50,11 +50,12 @@ import {
 
 import bind from '../lib/bind.js';
 import { translateNode, t, translateIndexName, replayable } from './translate.js';
+import { actions as timeline_actions, cell as timeline_cell } from './timeline-state.js';
 
 function view_all_locations() {
 	const area_type_str = area_type(STATE.variant);
 	const analysis_name = translateIndexName(window.LOCALE, STATE.index);
-	const results = paginationState.allResults;
+	const results = locations_list.getResults();
 
 	show_modal_table(results, {
 		"title":              `${t(window.LOCALE, 'modal.export.high_priority.title')} (${area_type_str})`,
@@ -78,12 +79,11 @@ function format_area_type(variant) {
 	}
 }
 
-let _precompute_controller = null;  
+let _precompute_controller = null;
 
-const paginationState = {
-	"allResults":   [],
-	"currentPage":  1,
-	"itemsPerPage": 10,
+function set_trend_location(location) {
+	timeline_actions.setTrendLocation(timeline_cell(), location);
+	qs('.timeline-trend-lines')?.scrollIntoView({ "behavior": "smooth", "block": "start" });
 };
 
 // The rows the CSV export covers: every area, not just the priority subset the
@@ -103,7 +103,10 @@ function raster_item(p) {
 	});
 
 	el.setAttribute('data-score', score);
-	el.onclick = zoom.bind(null, p, () => show_location_info(p.c, get_map_position(p.c), true));
+	el.onclick = () => {
+		if (p._variant !== undefined) set_trend_location({ "pixel": p.i, "label": `[${pi3.join(", ")}]` });
+		zoom(p, () => show_location_info(p.c, get_map_position(p.c), true));
+	};
 
 	const locationName = qs('.location-name', el);
 	const vectorName = vector_feature_name(p.i);
@@ -125,6 +128,8 @@ function get_admin_area_position(item) {
 }
 
 function show_admin_info_on_click(item) {
+	if (item._variant !== undefined) set_trend_location({ "tier": item._variant, "id": item.id, "label": item.name });
+
 	if (!item.feature) return;
 
 	mapbox_fit(geojsonExtent(item.feature), true);
@@ -150,6 +155,170 @@ function admin_area_item(item, rank) {
 	return template;
 };
 
+// Reused by Filtered geographies (filtered.js) for its own container —
+// each call owns its own paging state, nothing here is shared globally.
+export function create_paginated_list(container) {
+	const state = {
+		"allResults":   [],
+		"currentPage":  1,
+		"itemsPerPage": 10,
+	};
+
+	function render_pagination() {
+		let paginationContainer = qs('.pagination-container', container);
+
+		if (!paginationContainer) {
+			const template = tmpl('#pagination-template');
+			container.append(template);
+			paginationContainer = qs('.pagination-container', container);
+		}
+
+		const paginationInfo = qs('.pagination-info', paginationContainer);
+		const paginationDiv = qs('.pagination', paginationContainer);
+
+		if (paginationInfo) paginationInfo.textContent = '';
+		if (paginationDiv) paginationDiv.replaceChildren();
+
+		const totalPages = Math.ceil(state.allResults.length / state.itemsPerPage);
+		const totalCount = state.allResults.length;
+		const startIdx = (state.currentPage - 1) * state.itemsPerPage;
+		const endIdx = Math.min(startIdx + state.itemsPerPage, totalCount);
+
+		if (!paginationInfo || !paginationDiv) return;
+
+		if (totalPages <= 1 && totalCount > 0) {
+			paginationInfo.textContent = t(window.LOCALE, totalCount === 1 ? 'right_panel.high_priority.showing_count_one' : 'right_panel.high_priority.showing_count_other', { "count": totalCount.toLocaleString(window.LOCALE) });
+			return;
+		}
+
+		if (totalCount === 0) return;
+
+		paginationInfo.textContent = t(window.LOCALE, 'right_panel.high_priority.showing_range', { "start": (startIdx + 1).toLocaleString(window.LOCALE), "end": endIdx.toLocaleString(window.LOCALE), "total": totalCount.toLocaleString(window.LOCALE) });
+
+		const prevBtn = ce('button', null, { "class": 'pagination-btn chevron' });
+		prevBtn.innerHTML = '<i class="bi bi-chevron-left"></i>';
+		prevBtn.disabled = state.currentPage === 1;
+		prevBtn.onclick = () => {
+			if (state.currentPage > 1) {
+				state.currentPage--;
+				render_page(state.currentPage);
+			}
+		};
+		paginationDiv.append(prevBtn);
+
+		let startPage = Math.max(1, state.currentPage - 1);
+		const endPage = Math.min(totalPages, startPage + 2);
+
+		if (endPage - startPage < 2) {
+			startPage = Math.max(1, endPage - 2);
+		}
+
+		for (let i = startPage; i <= endPage; i++) {
+			const pageBtn = ce('button', String(i), { "class": 'pagination-btn page-number' });
+			if (i === state.currentPage) {
+				pageBtn.classList.add('active');
+			}
+			pageBtn.onclick = () => {
+				state.currentPage = i;
+				render_page(state.currentPage);
+			};
+			paginationDiv.append(pageBtn);
+		}
+
+		const nextBtn = ce('button', null, { "class": 'pagination-btn chevron' });
+		nextBtn.innerHTML = '<i class="bi bi-chevron-right"></i>';
+		nextBtn.disabled = state.currentPage === totalPages;
+		nextBtn.onclick = () => {
+			if (state.currentPage < totalPages) {
+				state.currentPage++;
+				render_page(state.currentPage);
+			}
+		};
+		paginationDiv.append(nextBtn);
+	}
+
+	const render_page = replayable(function render_page(page) {
+		let ul = qs('.locations-list', container);
+
+		if (!ul) {
+			ul = ce('ul', null, { "class": 'locations-list' });
+			container.append(ul);
+		} else {
+			ul.replaceChildren();
+		}
+
+		const isRaster = state.allResults.length > 0 && state.allResults[0].i !== undefined;
+		const isTimeline = state.allResults.length > 0 && state.allResults[0]._variant !== undefined;
+		const totalCount = state.allResults.length;
+		const startIdx = (page - 1) * state.itemsPerPage;
+		const endIdx = Math.min(startIdx + state.itemsPerPage, totalCount);
+
+		const pageResults = state.allResults.slice(startIdx, endIdx);
+
+		if (isRaster && isTimeline) {
+			// No priority score exists for timeline coverage -- flat list,
+			// same raster_item() rows, no score-grouping header.
+			pageResults.forEach(item => ul.append(raster_item(item)));
+		} else if (isRaster) {
+			const score_of = item => item.priority ? Math.round((item.priority).toFixed(2) * 100) : "";
+
+			const scoreCounts = {};
+			state.allResults.forEach(item => {
+				const score = score_of(item);
+				scoreCounts[score] = (scoreCounts[score] || 0) + 1;
+			});
+
+			const groups = pageResults.reduce((acc, item) => {
+				const score = score_of(item);
+				(acc[score] ??= []).push(item);
+				return acc;
+			}, {});
+
+			Object.entries(groups).sort(([a], [b]) => Number(b) - Number(a)).forEach(([score, items]) => {
+				const template = tmpl('#location-group-template');
+				const group = template.firstElementChild;
+				group.setAttribute('data-score', score);
+
+				const areaCount = t(window.LOCALE, scoreCounts[score] === 1 ? 'right_panel.high_priority.area_count_one' : 'right_panel.high_priority.area_count_other', { "count": scoreCounts[score] });
+				bind(template, {
+					"score-text": t(window.LOCALE, 'right_panel.high_priority.priority_score', { score }),
+					"area-count": areaCount,
+				});
+
+				const groupList = qs('.location-group-list', group);
+				items.forEach(item => groupList.append(raster_item(item)));
+
+				ul.append(template);
+			});
+		} else {
+			pageResults.forEach((item, i) => ul.append(admin_area_item(item, startIdx + i + 1)));
+		}
+
+		render_pagination();
+	});
+
+	return {
+		"setResults"(results) {
+			state.allResults = results;
+			state.currentPage = 1;
+		},
+		"render"() {
+			const ul = qs('.locations-list', container);
+			if (ul) ul.replaceChildren();
+
+			const paginationContainer = qs('.pagination-container', container);
+			if (paginationContainer) paginationContainer.remove();
+
+			render_page(state.currentPage);
+		},
+		"getResults"() {
+			return state.allResults;
+		},
+	};
+};
+
+let locations_list = null;
+
 function get_division_results(variant, { all = false } = {}) {
 	const division = GEOGRAPHY.divisions[variant];
 	if (!division || !division.priorityData) return [];
@@ -161,138 +330,6 @@ function get_division_results(variant, { all = false } = {}) {
 		.sort((a, b) => a.priority > b.priority ? -1 : 1);
 };
 
-function render_pagination() {
-	const section = qs('#right-panel #analysis-locations-section');
-	const resultscontainer = qs('.locations-paginated-list', section);
-	let paginationContainer = qs('.pagination-container', resultscontainer);
-
-	if (!paginationContainer) {
-		const template = tmpl('#pagination-template');
-		resultscontainer.append(template);
-		paginationContainer = qs('.pagination-container', resultscontainer);
-	}
-
-	const paginationInfo = qs('.pagination-info', paginationContainer);
-	const paginationDiv = qs('.pagination', paginationContainer);
-
-	if (paginationInfo) paginationInfo.textContent = '';
-	if (paginationDiv) paginationDiv.replaceChildren();
-
-	const totalPages = Math.ceil(paginationState.allResults.length / paginationState.itemsPerPage);
-	const totalCount = paginationState.allResults.length;
-	const startIdx = (paginationState.currentPage - 1) * paginationState.itemsPerPage;
-	const endIdx = Math.min(startIdx + paginationState.itemsPerPage, totalCount);
-
-	if (!paginationInfo || !paginationDiv) return;
-
-	if (totalPages <= 1 && totalCount > 0) {
-		paginationInfo.textContent = t(window.LOCALE, totalCount === 1 ? 'right_panel.high_priority.showing_count_one' : 'right_panel.high_priority.showing_count_other', { "count": totalCount.toLocaleString(window.LOCALE) });
-		return;
-	}
-
-	if (totalCount === 0) return;
-
-	paginationInfo.textContent = t(window.LOCALE, 'right_panel.high_priority.showing_range', { "start": (startIdx + 1).toLocaleString(window.LOCALE), "end": endIdx.toLocaleString(window.LOCALE), "total": totalCount.toLocaleString(window.LOCALE) });
-
-	const prevBtn = ce('button', null, { "class": 'pagination-btn chevron' });
-	prevBtn.innerHTML = '<i class="bi bi-chevron-left"></i>';
-	prevBtn.disabled = paginationState.currentPage === 1;
-	prevBtn.onclick = () => {
-		if (paginationState.currentPage > 1) {
-			paginationState.currentPage--;
-			render_page(paginationState.currentPage);
-		}
-	};
-	paginationDiv.append(prevBtn);
-
-	let startPage = Math.max(1, paginationState.currentPage - 1);
-	const endPage = Math.min(totalPages, startPage + 2);
-
-	if (endPage - startPage < 2) {
-		startPage = Math.max(1, endPage - 2);
-	}
-
-	for (let i = startPage; i <= endPage; i++) {
-		const pageBtn = ce('button', String(i), { "class": 'pagination-btn page-number' });
-		if (i === paginationState.currentPage) {
-			pageBtn.classList.add('active');
-		}
-		pageBtn.onclick = () => {
-			paginationState.currentPage = i;
-			render_page(paginationState.currentPage);
-		};
-		paginationDiv.append(pageBtn);
-	}
-
-	const nextBtn = ce('button', null, { "class": 'pagination-btn chevron' });
-	nextBtn.innerHTML = '<i class="bi bi-chevron-right"></i>';
-	nextBtn.disabled = paginationState.currentPage === totalPages;
-	nextBtn.onclick = () => {
-		if (paginationState.currentPage < totalPages) {
-			paginationState.currentPage++;
-			render_page(paginationState.currentPage);
-		}
-	};
-	paginationDiv.append(nextBtn);
-}
-
-const render_page = replayable(function render_page(page) {
-	const section = qs('#right-panel #analysis-locations-section');
-	const resultscontainer = qs('.locations-paginated-list', section);
-	let ul = qs('.locations-list', resultscontainer);
-
-	if (!ul) {
-		ul = ce('ul', null, { "class": 'locations-list' });
-		resultscontainer.append(ul);
-	} else {
-		ul.replaceChildren();
-	}
-
-	const isRaster = STATE.variant === 'raster';
-	const totalCount = paginationState.allResults.length;
-	const startIdx = (page - 1) * paginationState.itemsPerPage;
-	const endIdx = Math.min(startIdx + paginationState.itemsPerPage, totalCount);
-
-	const pageResults = paginationState.allResults.slice(startIdx, endIdx);
-
-	if (isRaster) {
-		const score_of = item => item.priority ? Math.round((item.priority).toFixed(2) * 100) : "";
-
-		const scoreCounts = {};
-		paginationState.allResults.forEach(item => {
-			const score = score_of(item);
-			scoreCounts[score] = (scoreCounts[score] || 0) + 1;
-		});
-
-		const groups = pageResults.reduce((acc, item) => {
-			const score = score_of(item);
-			(acc[score] ??= []).push(item);
-			return acc;
-		}, {});
-
-		Object.entries(groups).sort(([a], [b]) => Number(b) - Number(a)).forEach(([score, items]) => {
-			const template = tmpl('#location-group-template');
-			const group = template.firstElementChild;
-			group.setAttribute('data-score', score);
-
-			const areaCount = t(window.LOCALE, scoreCounts[score] === 1 ? 'right_panel.high_priority.area_count_one' : 'right_panel.high_priority.area_count_other', { "count": scoreCounts[score] });
-			bind(template, {
-				"score-text": t(window.LOCALE, 'right_panel.high_priority.priority_score', { score }),
-				"area-count": areaCount,
-			});
-
-			const groupList = qs('.location-group-list', group);
-			items.forEach(item => groupList.append(raster_item(item)));
-
-			ul.append(template);
-		});
-	} else {
-		pageResults.forEach((item, i) => ul.append(admin_area_item(item, startIdx + i + 1)));
-	}
-
-	render_pagination();
-});
-
 export async function update() {
 	if (_precompute_controller) _precompute_controller.abort();
 	clear_row_cache();
@@ -300,40 +337,31 @@ export async function update() {
 	const section = qs('#right-panel #analysis-locations-section');
 	if (!section) return;
 
-	const resultscontainer = qs('.locations-paginated-list', section);
-
-	const ul = qs('.locations-list', resultscontainer);
-	if (ul) ul.replaceChildren();
-
-	const paginationContainer = qs('.pagination-container', resultscontainer);
-	if (paginationContainer) paginationContainer.remove();
-
 	const isRaster = STATE.variant === 'raster';
 	const results = isRaster ? await all_points() : get_division_results(STATE.variant);
+	const sorted = results.sort((a, b) => a.priority > b.priority ? -1 : 1);
 
-	paginationState.allResults = results.sort((a, b) => a.priority > b.priority ? -1 : 1);
-	paginationState.currentPage = 1;
+	locations_list.setResults(sorted);
 
 	exportResults = isRaster
-		? all_areas_points(paginationState.allResults)
+		? all_areas_points(sorted)
 		: get_division_results(STATE.variant, { "all": true });
 
-	const count = paginationState.allResults.length;
-
-	if (count === 0) {
+	if (!sorted.length) {
 		section.setAttribute('collapsed', '');
+		locations_list.render();
 		return;
 	}
 
-	render_page(paginationState.currentPage);
+	locations_list.render();
 
 	_precompute_controller = new AbortController();
 	const analysis_name = translateIndexName(window.LOCALE, STATE.index);
-	precompute_rows(paginationState.allResults, isRaster, analysis_name, _precompute_controller.signal);
+	precompute_rows(sorted, isRaster, analysis_name, _precompute_controller.signal);
 };
 
 export function get_locations_results() {
-	return paginationState.allResults;
+	return locations_list ? locations_list.getResults() : [];
 }
 
 // The all-areas row set the CSV export downloads. The on-screen list and the
@@ -351,6 +379,7 @@ export function init() {
 	translateNode(window.LOCALE, section);
 	setup_about_button(section, () => t(window.LOCALE, 'right_panel.high_priority.about', { "area": format_area_type(STATE.variant) }));
 
+	locations_list = create_paginated_list(qs('.locations-paginated-list', section));
 };
 
 async function all_points() {

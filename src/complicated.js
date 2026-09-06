@@ -138,10 +138,12 @@ export function context(raster_pixel, winner = null) {
 export function analysis_dataset_intersect(raster) {
 	const { data, nodata } = raster;
 
-	if (this.type === 'raster') return;
+	if (['raster', 'raster-timeline'].includes(this.type)) return;
+
+	const vector_type = { "polygons": "polygons", "polygons-timeline": "polygons", "lines": "lines", "lines-timeline": "lines", "points": "points", "points-timeline": "points" }[this.type];
 
 	let fn;
-	switch (this.type) {
+	switch (vector_type) {
 	case 'polygons':
 		fn = p => extent_contained(p.properties['__extent'], raster);
 		break;

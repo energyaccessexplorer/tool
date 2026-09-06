@@ -136,8 +136,11 @@ async function computeEntries(): Promise<void> {
 
 	// Legacy update() returned early when there was nothing to extract from
 	// (no admin feature, no raster pixel): resolve empty so the view leaves
-	// the pending state but renders no card.
+	// the pending state but renders no card. Same for _variant-tagged admin
+	// refs (EAE-306 Filtered geographies clicks): no priority score exists
+	// for timeline coverage, so the per-index card is skipped.
 	const entries = (pending.admin == null && pending.rasterIndex == null)
+		|| pending.admin?._variant !== undefined
 		? {}
 		: await buildEntries(pending);
 

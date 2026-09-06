@@ -46,13 +46,12 @@ export interface TimelineState {
 		readonly perLayer: Readonly<Record<string, boolean>>;
 	};
 
-	/** EAE-306: filtered geographies widget. */
-	readonly filteredGeographies: {
-		readonly tier: number;
-		readonly page: number;
-		readonly pageSize: number;
-		readonly ids: readonly unknown[];
-	};
+	/**
+	 * EAE-306: Trend lines scoping — one clicked Filtered geographies
+	 * location (an admin-tier area or a raw raster pixel); null is the
+	 * whole-geography aggregate.
+	 */
+	readonly trendLocation: TrendLocation | null;
 }
 
 export type Patch = (state: TimelineState) => TimelineState;
@@ -70,6 +69,16 @@ export interface TrendSeries {
 	readonly unit: string;
 	readonly values: readonly number[];
 }
+
+/**
+ * One Filtered geographies selection: an admin-tier area ({tier, id}) or a
+ * raster-mode pixel ({pixel}); label is the display name. tier/id keep the
+ * legacy loose number|string typing — STATE.variant keys GEOGRAPHY.divisions
+ * (array-like) while dataset config's divisions_tier is JSON-typed.
+ */
+export type TrendLocation =
+	| { readonly tier: number | string; readonly id: number | string; readonly label: string }
+	| { readonly pixel: number; readonly label: string };
 
 /**
  * Producer payload: the timeline-relevant flags of a STATE.datasets entry.
@@ -111,12 +120,7 @@ const initial: TimelineState = {
 		"perLayer": {},
 	},
 
-	"filteredGeographies": {
-		"tier":     0,
-		"page":     1,
-		"pageSize": 10,
-		"ids":      [],
-	},
+	"trendLocation": null,
 };
 
 const update = stream<Patch>();
@@ -155,6 +159,10 @@ export const actions = {
 
 	setFilterEnabled(c: TimelineCell, enabled: boolean): void {
 		c.update(s => ({ ...s, "filters": { ...s.filters, enabled } }));
+	},
+
+	setTrendLocation(c: TimelineCell, location: TrendLocation | null): void {
+		c.update(s => ({ ...s, "trendLocation": location }));
 	},
 
 	/**

@@ -5,10 +5,14 @@
 // and filter the same dataset set. These are the pieces they share; when the
 // two atoms consolidate into one, this module is where the merge starts.
 
-/** An admin-division feature the user clicked (as produced by mapbox). */
+/** An admin-division feature the user clicked (as produced by mapbox).
+ * `_variant` tags items originating from a variant-tagged list (EAE-306
+ * Filtered geographies); the Prioritization tab skips per-index entries
+ * for those (no priority score exists for timeline coverage). */
 export interface AdminRef {
 	readonly variant: string;
 	readonly id: number;
+	readonly _variant?: string | number;
 }
 
 /**

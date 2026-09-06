@@ -464,6 +464,20 @@ function buildYearSlider(
 		.attr('cy', trackY)
 		.attr('r', 2.5);
 
+	// Invisible, larger per-year hit targets so clicking a year dot (or its
+	// neighborhood) snaps the handle to that year — the visible dots are only
+	// 2.5px, too small to click directly. Bound to the same index as the dot
+	// they sit over, so pick() is exact (no coordinate scaling math).
+	svg.append('g').selectAll('circle')
+		.data(d3.range(years.length))
+		.join('circle')
+		.attr('cx', d => x(d))
+		.attr('cy', trackY)
+		.attr('r', 11)
+		.attr('fill', 'transparent')
+		.style('cursor', 'pointer')
+		.on('click', d => pick(d));
+
 	const label = svg.append('text')
 		.attr('y', 9)
 		.attr('text-anchor', 'middle')

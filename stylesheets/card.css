@@ -138,36 +138,21 @@ ds-card .timeline-footer.active {
   padding: 0;
 }
 
-.timeline-trend-body,
-.timeline-filtered-body {
+.timeline-trend-body {
   padding: 0 16px 16px;
   background: #F6F6F6;
   width: 100%;
   box-sizing: border-box;
 }
 
+.timeline-filtered-geographies #filtered-results {
+  width: 100%;
+}
+
 .timeline-filtered-geographies .data-card-description {
   color: #999;
   font-size: 0.9em;
   margin: 0 0 0.5em 0;
-}
-
-#filtered-subgeographies details {
-  margin-bottom: 0.5em;
-}
-
-#filtered-subgeographies summary {
-  cursor: pointer;
-  font-weight: 600;
-}
-
-#filtered-subgeographies li {
-  padding: 0.25em 0;
-  list-style: none;
-}
-
-#filtered-subgeographies .colored-disc {
-  margin-right: 0.4em;
 }
 
 .timeline-trend-lines .data-card-description {

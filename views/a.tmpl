@@ -256,11 +256,7 @@
             <div id="index-priority-container"></div>
             <div id="poi-card-container"></div>
             <div id="analysis-blank-state">
-              <div class="blank-state-content">
-                <svg class="blank-state-icon" width="64" height="64"><use href="#blank-state-icon"/></svg>
-                <p class="blank-state-title" data-t="right_panel.prioritization.blank_state.title">Add data to prioritize analysis</p>
-                <p class="blank-state-subtitle" data-t="right_panel.prioritization.blank_state.subtitle">Select a dataset from the left panel to add it to the map and start your prioritization analysis.</p>
-              </div>
+              {{template "blank-state" .}}
             </div>
             <div id="analysis-sections-wrapper">
               <div id="analysis-locations"></div>
@@ -269,11 +265,7 @@
 
           <div id="right-panel-tab-data" class="right-panel-tab-panel" role="tabpanel" hidden>
             <div id="data-blank-state" style="display: flex">
-              <div class="blank-state-content">
-                <svg class="blank-state-icon" width="64" height="64"><use href="#blank-state-icon"/></svg>
-                <p class="blank-state-title" bind="title"></p>
-                <p class="blank-state-subtitle" bind="subtitle"></p>
-              </div>
+              {{template "blank-state" .}}
             </div>
             <div id="data-cards-container"></div>
           </div>

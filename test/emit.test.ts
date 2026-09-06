@@ -47,4 +47,26 @@ describe('emitted modules (tsbuild/src)', () => {
 		actions.analysisCompleted(cell(), { "solar": { "name": 'Solar' } });
 		assert.equal(state().analysisLayerData?.['solar']?.name, 'Solar');
 	});
+
+	it('right-panel-prioritization-state.js loads and dispatches actions', async () => {
+		const { cell, actions, toSummary } = await import('../tsbuild/src/right-panel-prioritization-state.js');
+
+		const state = () => cell().state;
+
+		actions.locationSelected(cell(), {
+			"rasterIndex":   3,
+			"analysisValue": 0.7,
+			"summary":       toSummary({ "basicData": [{ "key": 'Priority score', "value": '0.7' }] }, null),
+		});
+		assert.equal(state().view.kind, 'location');
+		assert.equal(state().summary?.priorityScore, '0.7');
+
+		actions.entriesComputed(cell(), { "eai": { "value": 0.7, "bucket": 'High' } });
+		const view = state().view;
+		if (view.kind === 'location') assert.equal(view.entries?.['eai']?.bucket, 'High');
+
+		actions.backToNational(cell());
+		assert.equal(state().view.kind, 'national');
+		assert.equal(state().summary, null);
+	});
 });

@@ -38,9 +38,13 @@ import {
 } from './analysis.js';
 
 import {
-	clear as prioritization_tab_clear,
-	clear_location_summary,
+	init as prioritization_tab_init,
 } from './right-panel-prioritization-tab.js';
+
+import {
+	cell as prioritization_cell,
+	actions as prioritization_actions,
+} from './right-panel-prioritization-state.js';
 
 import {
 	clear as poi_clear,
@@ -63,8 +67,7 @@ export function loading_analysis(loading) {
 	qs('#analysis-blank-state').style.display = 'none';
 	if (loading) {
 		data_tab_actions.backToNational(data_tab_cell());
-		prioritization_tab_clear();
-		clear_location_summary();
+		prioritization_actions.backToNational(prioritization_cell());
 		poi_clear();
 		document.querySelectorAll('.right-panel-tab-panel').forEach(p => { p.hidden = true; });
 	}
@@ -85,8 +88,7 @@ export function update_analysis(has_data) {
 	const sections_wrapper = qs('#analysis-sections-wrapper');
 
 	data_tab_actions.backToNational(data_tab_cell());
-	prioritization_tab_clear();
-	clear_location_summary();
+	prioritization_actions.backToNational(prioritization_cell());
 	poi_clear();
 	blank_state.style.display = has_data ? 'none' : 'flex';
 	sections_wrapper.style.display = has_data ? 'flex' : 'none';
@@ -193,6 +195,7 @@ export function init() {
 
 	analysis_locations_panel_init();
 	data_tab_init();
+	prioritization_tab_init();
 };
 
 function share_url() {

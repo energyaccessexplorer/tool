@@ -13,16 +13,27 @@ interface RasterLike {
 declare const STATE: {
 	readonly datasets: unknown[];
 	readonly variant: string;
+	/** Currently selected index id ('eai', 'demand', 'supply', 'ani', ...). */
+	readonly index: string;
 };
 
 declare const GEOGRAPHY: {
-	readonly divisions?: Record<string, { readonly raster?: RasterLike } | undefined>;
+	readonly divisions?: Record<string, {
+		readonly raster?: RasterLike;
+		/** Per-division-id priority averages (analysis.js priority()). */
+		readonly priorityData?: Record<string, { readonly average?: number }>;
+	} | undefined>;
 };
 
 declare const OUTLINE: { readonly raster?: RasterLike } | undefined;
 
 /** Dataset registry by id (analysis.js). */
 declare const DST: ReadonlyMap<string, unknown>;
+
+/** App configuration namespace (built into main.js at build time). */
+declare const EAE: {
+	readonly indexes: Record<string, { readonly compound?: readonly string[] } | undefined>;
+};
 
 interface Window {
 	LOCALE: string;

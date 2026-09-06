@@ -179,6 +179,8 @@ build-a:
 		${JS}/right-panel-data-tab.js \
 		${JS}/right-panel-data-state.js \
 		${JS}/right-panel-prioritization-tab.js \
+		${JS}/right-panel-prioritization-state.js \
+		${JS}/right-panel-shared.js \
 		${JS}/right-panel-poi-card.js \
 		${JS}/right-panel.js \
 		${JS}/mapbox.js \

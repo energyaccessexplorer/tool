@@ -106,11 +106,20 @@ export function value_tree(raster_index, round = true) {
 			|| dataset.category.name === 'outline'
 			|| !dataset.raster?.data) return [];
 
+		// Polygon timelines: an empty cell means "no data", not 0% — skip the node.
+		if (dataset.type === 'polygons-timeline') {
+			const area_id = dataset.raster.data[raster_index];
+			const row = dataset.csv?.data?.find(r => +r[dataset.csv.key] === +area_id);
+			if (!row || row[STATE.timeline] === "" || row[STATE.timeline] == null) return [];
+		}
+
 		const band = aggregation_band(dataset);
 		const value = band[raster_index];
 		if (value === dataset.raster.nodata) return [];
 
 		const raw = resolve_raster_value(dataset, value, round);
+		if (raw == null || (typeof raw === 'number' && !Number.isFinite(raw))) return [];
+
 		const unit = dataset_unit(dataset, raw);
 		if (!unit) return [];
 
@@ -279,12 +288,26 @@ function location_entry(fields, props) {
 function format_detail(key, label, value, raw, subordinate, dataset_id) {
 	const unit = raw.units[key];
 	const display_unit = unit === 'count' ? '' : translateUnit(window.LOCALE, unit || '');
+	const raw_value = raw.values[key];
+
+	if (raw_value === null || raw_value === undefined || (typeof raw_value === 'number' && !Number.isFinite(raw_value))) {
+		return {
+			"label":       label || key,
+			"value":       '-',
+			"raw_value":   raw_value,
+			"unit":        unit,
+			"aggregation": raw.aggregations?.[key],
+			"subordinate": subordinate,
+			"dataset_id":  dataset_id,
+		};
+	}
+
 	const num = Number(value);
 	const formatted = Number.isFinite(num) ? num.toLocaleString(window.LOCALE) : value;
 	return {
 		"label":       label || key,
 		"value":       format_value_unit(formatted, display_unit),
-		"raw_value":    raw.values[key],
+		"raw_value":   raw_value,
 		"unit":        unit,
 		"aggregation": raw.aggregations?.[key],
 		"subordinate": subordinate,
@@ -304,7 +327,7 @@ function layer_detail_entries(fields, props, raw) {
 				const [key] = field;
 				if (!key || key.startsWith('_') || key.includes('analysis')) return false;
 				if (['facility name', 'name', 'facility_name'].includes(key.toLowerCase())) return false;
-				if (props[key] == null) return false;
+				if (props[key] === undefined) return false;
 				return !subordinate_keys.has(key);
 			})
 			.map(([key, label]) => [key, [key, label]]),
@@ -484,6 +507,112 @@ function priority_entries(item, analysis_name) {
 			"Priority score": `${(item.priority * 100).toFixed(1)}%`,
 		}
 		: {};
+}
+
+// Map click popup only: current year, native tier, one value per dataset —
+// unlike the "View all" builders below, which need every year and tier.
+export function get_timeline_area_layer_data(tier, area_id) {
+	const fields = [];
+	const props = {};
+	const raw = { "values": {}, "units": {}, "aggregations": {} };
+
+	const datasets = STATE.datasets.filter(d => d.type === 'polygons-timeline'
+		&& d.on
+		&& maybe(d, 'config', 'divisions_tier') === tier
+		&& maybe(d, 'csv', 'data'));
+
+	for (const ds of datasets) {
+		const row = ds.csv.data.find(r => +r[ds.csv.key] === +area_id);
+		if (!row) continue;
+
+		const cell = row[STATE.timeline];
+		const missing = cell === "" || cell === null || cell === undefined;
+		const value = missing ? null : +cell;
+		if (!missing && isNaN(value)) continue;
+
+		fields.push([ds.id, translateDatasetName(window.LOCALE, ds)]);
+		props[ds.id] = value;
+		raw.values[ds.id] = value;
+		raw.units[ds.id] = ds.category.unit || '';
+	}
+
+	return [fields, props, raw];
+}
+
+// One column per (dataset, year), covering the whole timeline rather than
+// just the selected year. A target area spanning multiple source-tier areas
+// (via raster_reverse_crosswalk) lists each contributing area's raw value
+// rather than combining them.
+export function get_timeline_area_table_data(tier, area_id) {
+	const fields = [];
+	const props = {};
+
+	const dates = GEOGRAPHY.timeline_dates || [];
+	const datasets = STATE.datasets.filter(d => d.type === 'polygons-timeline' && d.on && maybe(d, 'csv', 'data'));
+
+	for (const ds of datasets) {
+		const source_tier = maybe(ds, 'config', 'divisions_tier');
+
+		const source_ids = source_tier === tier
+			? new Set([+area_id])
+			: (raster_reverse_crosswalk(source_tier, tier).get(+area_id) || new Set());
+
+		if (!source_ids.size) continue;
+
+		const rows = Array.from(source_ids)
+			.map(sid => ds.csv.data.find(r => +r[ds.csv.key] === sid))
+			.filter(Boolean);
+
+		if (!rows.length) continue;
+
+		for (const date of dates) {
+			const values = rows.map(r => {
+				const v = r[date];
+				return (v === "" || v === null || v === undefined) ? NaN : +v;
+			}).filter(v => !isNaN(v));
+			if (!values.length) continue;
+
+			const key = `${ds.id}:${date}`;
+			const label = `${translateDatasetName(window.LOCALE, ds)} - ${new Date(date).getUTCFullYear()}`;
+
+			fields.push([key, label]);
+			props[key] = values.length === 1 ? values[0] : values.join(', ');
+		}
+	}
+
+	return [fields, props];
+}
+
+// Raster-mode sibling of get_timeline_area_table_data(): a pixel belongs to
+// exactly one area per tier, so no multi-value joining is needed here.
+export function get_timeline_raster_table_data(pixel_index) {
+	const fields = [];
+	const props = {};
+
+	const dates = GEOGRAPHY.timeline_dates || [];
+	const datasets = STATE.datasets.filter(d => d.type === 'polygons-timeline' && d.on && maybe(d, 'csv', 'data'));
+
+	for (const ds of datasets) {
+		const tier = maybe(ds, 'config', 'divisions_tier');
+		const area_id = maybe(GEOGRAPHY, 'divisions', tier, 'raster', 'data', pixel_index);
+		if (area_id === undefined || area_id === -1) continue;
+
+		const row = ds.csv.data.find(r => +r[ds.csv.key] === area_id);
+		if (!row) continue;
+
+		for (const date of dates) {
+			const raw = row[date];
+			if (raw === "" || raw === null || raw === undefined) continue;
+			const value = +raw;
+			if (isNaN(value)) continue;
+
+			const key = `${ds.id}:${date}`;
+			fields.push([key, `${translateDatasetName(window.LOCALE, ds)} - ${new Date(date).getUTCFullYear()}`]);
+			props[key] = value;
+		}
+	}
+
+	return [fields, props];
 }
 
 function build_raster_row(item, analysis_name, round) {

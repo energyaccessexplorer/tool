@@ -24,6 +24,11 @@ import {
 } from './a.js';
 
 import {
+	cell as timeline_cell,
+	subscribe as timeline_subscribe,
+} from './timeline-state.js';
+
+import {
 	and,
 	ce,
 	coalesce,
@@ -329,6 +334,36 @@ function specs() {
 	});
 };
 
+function timeline_badge() {
+	const state = timeline_cell().state;
+	if (!state.active) return '';
+
+	if (!this.ds.timeline)
+		return ce('span', t(window.LOCALE, 'left_panel.cards.card.timeline_inactive'), { "class": "timeline-badge inactive" });
+
+	const year = state.year.selected ? new Date(state.year.selected).getFullYear() : '';
+
+	return ce('span', t(window.LOCALE, 'left_panel.cards.card.timeline_active', { year }), { "class": "timeline-badge active" });
+};
+
+function timeline_footer() {
+	const state = timeline_cell().state;
+	if (!state.active) return '';
+
+	if (!this.ds.timeline)
+		return ce('div', [
+			ce('i', null, { "class": "bi bi-clock" }),
+			ce('span', t(window.LOCALE, 'left_panel.cards.card.timeline_footer_inactive')),
+		], { "class": "timeline-footer inactive" });
+
+	const year = state.year.selected ? new Date(state.year.selected).getFullYear() : '';
+
+	return ce('div', [
+		ce('i', null, { "class": "bi bi-clock" }),
+		ce('span', t(window.LOCALE, 'left_panel.cards.card.timeline_footer_active', { year })),
+	], { "class": "timeline-footer active" });
+};
+
 function symbol() {
 	let e;
 	const ds = this.ds;
@@ -608,6 +643,10 @@ export function update() {
 	if (list.length) sortable(cards_list, 'enable');
 };
 
+timeline_subscribe(() => {
+	STATE.datasets.map(d => d.card).filter(Boolean).forEach(c => c.bind());
+});
+
 registerUIUpdater(() => {
 	const buttons = qs('#cards #cards-buttons');
 	if (!buttons) return;
@@ -672,6 +711,8 @@ export default class dscard extends HTMLElement {
 			"value-checkboxes":  value_checkboxes.call(this),
 			"pvna":              (this.ds.type === 'polygons-valued'),
 			"info":              this.ds.info_modal.bind(this.ds),
+			"timeline-badge":    timeline_badge.call(this),
+			"timeline-footer":   timeline_footer.call(this),
 			"index":             (this.ds.index && !this.ds.index.match(/(ani|eai)/)) ? translateIndexName(window.LOCALE, this.ds.index) : t(window.LOCALE, 'left_panel.cards.card.filter'),
 			"specs":             specs.call(this),
 			"symbol":            symbol.call(this),

@@ -191,6 +191,7 @@ build-a:
 		${JS}/timeline.js \
 		${JS}/meiosis-stream.js \
 		${JS}/timeline-state.js \
+		${JS}/timeline-view.js \
 		${JS}/user.js \
 		${JS}/help.js \
 		${JS}/qa.js \

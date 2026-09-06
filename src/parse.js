@@ -104,6 +104,11 @@ function table_setup() {
 	const arr = [];
 	for (const i in this.csv.table) arr[i] = this.csv.table[i];
 
+	// EAE-498: d3.min/max skip nulls, but if *every* cell for this column is
+	// missing there is no domain to speak of — leave it unset rather than
+	// { min: undefined, max: undefined }.
+	if (!arr.some(x => x !== null && x !== undefined)) return;
+
 	const min = d3.min(arr);
 	const max = d3.max(arr);
 
@@ -118,8 +123,15 @@ function table_refresh() {
 	const v = this.type.match(/-timeline/) ? STATE.timeline : this.csv.column;
 
 	for (const r of data) {
-		const n = +r[v];
-		table[r[k]] = isNaN(n) ? r[v] : n;
+		// EAE-498: an empty cell means "no data", not 0%. Store null so callers
+		// can tell missing apart from a real zero.
+		const raw = r[v];
+		if (raw === "" || raw === null || raw === undefined) {
+			table[r[k]] = null;
+			continue;
+		}
+		const n = +raw;
+		table[r[k]] = isNaN(n) ? raw : n;
 	}
 
 	return table;
@@ -547,9 +559,16 @@ export function vectors_csv() {
 };
 
 function vectors_timeline() {
-	const values = [].concat(...GEOGRAPHY.timeline_dates.map(d => this.csv.data.map(r => +r[d])));
+	// EAE-498: only real values contribute to the domain; empty cells parse to
+	// 0 with unary + and would wrongly drag the colour scale down.
+	const values = GEOGRAPHY.timeline_dates
+		.flatMap(d => this.csv.data
+			.map(r => r[d])
+			.filter(x => x !== "" && x !== null && x !== undefined)
+			.map(x => +x))
+		.filter(Number.isFinite);
 
-	if (or(this.type === 'polygons-timeline', !this.domain))
+	if (values.length && or(this.type === 'polygons-timeline', !this.domain))
 		this.domain = { "min": d3.min(values), "max": d3.max(values) };
 
 	this.csv.table = table_refresh.call(this);

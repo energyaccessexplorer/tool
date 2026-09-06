@@ -78,6 +78,131 @@ ds-card .index {
   margin: 0.5em 0;
 }
 
+ds-card .timeline-badge {
+  font-size: 0.9em;
+  color: #999;
+  margin: 0.5em 0;
+}
+
+ds-card .timeline-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.5em 1em;
+  font-size: 0.85em;
+  color: #666;
+  background-color: #f6f6f6;
+  border-top: 1px solid lightgray;
+}
+
+ds-card .timeline-footer.active {
+  color: var(--the-green);
+}
+
+.timeline-year-control-body {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px 16px;
+  background: #F6F6F6;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.timeline-year-control-body select {
+  background-color: white;
+  border: 1px solid lightgray;
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.timeline-year-control-body #timeline-year-slider {
+  flex: 1;
+  min-width: 0;
+}
+
+#timeline-filters-toggle-container {
+  margin-top: 0.75em;
+}
+
+.timeline-trend-clear-location {
+  margin-left: 0.5em;
+  border: none;
+  background: none;
+  color: #0059ff;
+  text-decoration: underline;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+}
+
+.timeline-trend-body,
+.timeline-filtered-body {
+  padding: 0 16px 16px;
+  background: #F6F6F6;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.timeline-filtered-geographies .data-card-description {
+  color: #999;
+  font-size: 0.9em;
+  margin: 0 0 0.5em 0;
+}
+
+#filtered-subgeographies details {
+  margin-bottom: 0.5em;
+}
+
+#filtered-subgeographies summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+#filtered-subgeographies li {
+  padding: 0.25em 0;
+  list-style: none;
+}
+
+#filtered-subgeographies .colored-disc {
+  margin-right: 0.4em;
+}
+
+.timeline-trend-lines .data-card-description {
+  color: #999;
+  font-size: 0.9em;
+  margin: 0 0 0.5em 0;
+}
+
+.timeline-trend-legend-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4em;
+  padding: 0.3em 0;
+  font-size: 0.9em;
+  cursor: pointer;
+}
+
+.timeline-trend-unit-label {
+  fill: #999;
+  font-size: 9px;
+}
+
+.timeline-trend-legend-minmax {
+  color: #999;
+  margin-left: auto;
+}
+
+.timeline-trend-lines [data-series-id] {
+  transition: opacity 0.15s ease;
+}
+
+.timeline-trend-lines [data-series-id].dimmed {
+  opacity: 0.15;
+}
+
 ds-card .range .svg-interval {
   margin-top: 0.1em;
 }

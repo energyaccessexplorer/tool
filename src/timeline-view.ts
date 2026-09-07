@@ -605,18 +605,22 @@ export function init(): void {
 		actions.hydrateModal(cell(), true);
 
 	// EAE-304 trend service: recompute the derived trend slice (series +
-	// available dates) when the mode flips or the clicked Filtered geographies
-	// location changes. Dataset toggles and CSV loads are handled by
-	// recomputeTrend() inside commitSync (called from every COMMIT and from
-	// ds.js once a timeline dataset's CSV finishes loading), so those don't
-	// need to be in this derive key. The location is stringified in the slice:
-	// dropRepeats' same() helper recurses into objects and can't diff null
-	// against an object (Object.keys(null) throws, killing the emission for
-	// every later subscriber).
+	// available dates) when the mode flips, the clicked Filtered geographies
+	// location changes, or the set of loaded timeline datasets changes. The
+	// `loaded` signature (ids of active polygons-timeline datasets whose CSV
+	// has resolved) is what makes ds.js's post-load notifyDataReady() bump
+	// actually trigger a recompute — dataset toggles are additionally served
+	// by recomputeTrend() inside commitSync. The location is stringified in
+	// the slice: dropRepeats' same() helper recurses into objects and can't
+	// diff null against an object (Object.keys(null) throws, killing the
+	// emission for every later subscriber).
 	service(
 		state => ({
 			"active":   state.active,
 			"location": state.trendLocation ? JSON.stringify(state.trendLocation) : null,
+			"loaded":   (STATE.datasets as readonly TrendDataset[])
+				.filter(d => Boolean(d.timeline) && Boolean(d.on) && d.type === 'polygons-timeline' && d.csv?.data !== undefined)
+				.map(d => d.id).sort().join(','),
 		}),
 		() => { recomputeTrend(); },
 	);

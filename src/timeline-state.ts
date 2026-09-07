@@ -33,11 +33,14 @@ export interface TimelineState {
 		readonly selected: string | null;
 	};
 
-	/** EAE-304: trend-lines widget series (see TrendSeries), recomputed by
-	 * the view module's trend service when the active timeline dataset set
-	 * or the geography's timeline_dates change. */
+	/** EAE-304: trend-lines widget. `series` is one TrendSeries per active
+	 * polygons-timeline dataset; `dates` is the subset of
+	 * GEOGRAPHY.timeline_dates that actually has data (see TrendSeries). Both
+	 * are recomputed together by the view module when the active dataset set,
+	 * the location, or the underlying CSV data changes. */
 	readonly trend: {
 		readonly series: readonly TrendSeries[];
+		readonly dates: readonly string[];
 	};
 
 	/** EAE-306: global "only areas passing all dataset filters" toggle. */
@@ -113,6 +116,7 @@ const initial: TimelineState = {
 
 	"trend": {
 		"series": [],
+		"dates":  [],
 	},
 
 	"filters": {
@@ -166,25 +170,49 @@ export const actions = {
 	},
 
 	/**
+	 * Replaces the derived trend slice atomically: `series` plus the
+	 * `dates` those series are indexed by (the subset of the geography's
+	 * timeline_dates that has data). When `dates` is non-empty it also
+	 * corrects `year.min/max/selected` so the year control never offers — or
+	 * defaults to — a year with no data.
+	 *
 	 * NaN-safe no-op guard: Object.is(NaN, NaN) is true, so series with
 	 * missing cells compare equal and don't trigger a pointless emission
 	 * (a same()-based guard would never fire once EAE-498 lets NaN in,
 	 * looping update -> render -> update).
 	 */
-	setTrendSeries(c: TimelineCell, series: readonly TrendSeries[]): void {
-		const prev = c.state.trend.series;
+	setTrend(c: TimelineCell, series: readonly TrendSeries[], dates: readonly string[]): void {
+		const prev = c.state.trend;
+		const prevYear = c.state.year;
 
-		const unchanged = prev.length === series.length && series.every((s, i) => {
-			const p = prev[i];
+		const seriesUnchanged = prev.series.length === series.length && series.every((s, i) => {
+			const p = prev.series[i];
 			return p !== undefined
 				&& p.id === s.id && p.label === s.label && p.color === s.color && p.unit === s.unit
 				&& p.values.length === s.values.length
 				&& s.values.every((v, j) => Object.is(v, p.values[j]));
 		});
+		const datesUnchanged = prev.dates.length === dates.length
+			&& dates.every((d, i) => d === prev.dates[i]);
 
-		if (unchanged) return;
+		let year = prevYear;
+		if (dates.length > 0) {
+			const min = dates[0] ?? null;
+			const max = dates[dates.length - 1] ?? null;
+			let selected = prevYear.selected;
+			if (selected === null || dates.indexOf(selected) === -1) selected = max;
 
-		c.update(s => ({ ...s, "trend": { ...s.trend, series } }));
+			if (prevYear.min !== min || prevYear.max !== max || prevYear.selected !== selected)
+				year = { min, max, selected };
+		}
+
+		if (seriesUnchanged && datesUnchanged && year === prevYear) return;
+
+		c.update(s => ({
+			...s,
+			"trend": { "series": series, "dates": dates },
+			"year":  year === prevYear ? s.year : year,
+		}));
 	},
 } as const;
 

@@ -9,7 +9,7 @@ import { subscribe, service, cell, actions } from './timeline-state.ts';
 
 import type { TimelineState, TrendSeries, TrendLocation } from './timeline-state.ts';
 
-import { ce, qs, tmpl } from '../lib/helpers.js';
+import { ce, qs, tmpl, same } from '../lib/helpers.js';
 
 import { t, translateNode, translateUnit } from './translate.js';
 
@@ -93,14 +93,27 @@ function rowsForLocation(ds: TrendDataset, location: TrendLocation): readonly Re
 };
 
 /** Average each active polygons-timeline dataset's CSV column per date,
- * optionally scoped to one Filtered geographies location's rows. */
-function computeTrendSeries(location: TrendLocation | null): TrendSeries[] {
+ * optionally scoped to one Filtered geographies location's rows. Also
+ * derives the `dates` the series are indexed by: the subset of the
+ * geography's timeline_dates that actually has a non-empty cell in at least
+ * one loaded dataset. While no CSV has loaded yet it falls back to the full
+ * configured range, so the year control doesn't flash empty mid-fetch. */
+function computeTrend(location: TrendLocation | null): { series: TrendSeries[]; dates: readonly string[] } {
 	const rawDates = GEOGRAPHY.timeline_dates ?? [];
 
-	const datasets = (STATE.datasets as readonly TrendDataset[]).filter(d =>
-		Boolean(d.timeline) && Boolean(d.on) && d.type === 'polygons-timeline' && d.csv?.data !== undefined);
+	const active = (STATE.datasets as readonly TrendDataset[]).filter(d =>
+		Boolean(d.timeline) && Boolean(d.on) && d.type === 'polygons-timeline');
 
-	return datasets.map((d, i) => {
+	const loaded = active.filter(d => d.csv?.data !== undefined);
+
+	const dates = loaded.length > 0
+		? rawDates.filter(date => loaded.some(d => (d.csv?.data ?? []).some(r => {
+				const v = r[date];
+				return v !== "" && v !== null && v !== undefined;
+			})))
+		: rawDates;
+
+	const series = loaded.map((d, i) => {
 		const rows = location ? rowsForLocation(d, location) : (d.csv?.data ?? []);
 
 		return {
@@ -110,7 +123,7 @@ function computeTrendSeries(location: TrendLocation | null): TrendSeries[] {
 				?? filteredColorsArray[(i + 1) % filteredColorsArray.length]
 				?? '#000000',
 			"unit":   d.category?.unit || '',
-			"values": rawDates.map(date => {
+			"values": dates.map(date => {
 				// Empty cells mean "no data for this year", not a zero reading: +""
 				// would coerce to 0 and drag the yearly average to the baseline,
 				// so years without reports would plot as fake 0% points (EAE-498).
@@ -122,12 +135,24 @@ function computeTrendSeries(location: TrendLocation | null): TrendSeries[] {
 			}),
 		};
 	});
+
+	return { series, dates };
 };
 
-function activeTimelineDatasetIds(): readonly string[] {
-	return (STATE.datasets as readonly TrendDataset[])
-		.filter(d => Boolean(d.timeline) && Boolean(d.on))
-		.map(d => d.id);
+/** Recompute the derived trend slice (series + available dates) from the
+ * current STATE.datasets, and dispatch it. The action's no-op guard means
+ * this is cheap to call on every COMMIT / data-load, which is what makes the
+ * widget truly reactive instead of only updating on the `active` flip. */
+function recomputeTrend(): void {
+	const c = cell();
+
+	if (!c.state.active) {
+		actions.setTrend(c, [], []);
+		return;
+	}
+
+	const { series, dates } = computeTrend(c.state.trendLocation);
+	actions.setTrend(c, series, dates);
 };
 
 /** Dim every trend-line element but the hovered one (shared data-series-id). */
@@ -241,9 +266,13 @@ function buildTrendChart(dates: readonly Date[], series: readonly TrendSeries[])
 
 	const x = d3.scaleUtc().domain(d3.extent(dates)).range([margin.left, width - margin.right]);
 
+	// Explicit tickValues at the data points: a default .ticks(n) aligns to
+	// "nice" Jan-1 year boundaries, which drops the first year when the
+	// domain starts later than Jan-1 (e.g. 2020-03-01) — so 2020 lost its
+	// label while 2021/2022/2023 kept theirs. Every year with data gets a label.
 	svg.append('g')
 		.attr('transform', `translate(0,${height - margin.bottom})`)
-		.call(d3.axisBottom(x).ticks(dates.length).tickFormat(d3.utcFormat('%Y')));
+		.call(d3.axisBottom(x).tickValues(dates).tickFormat(d3.utcFormat('%Y')));
 
 	const yAxis = svg.append('g').attr('transform', `translate(${margin.left},0)`);
 
@@ -323,15 +352,17 @@ function renderTrendLines(state: TimelineState): void {
 
 	const series = state.trend.series;
 
-	const rawDates = GEOGRAPHY.timeline_dates ?? [];
-	const dates = rawDates.map(parseTimelineDate);
+	// Dates come from the derived trend slice (available years), not the raw
+	// geography config, so a year with no data (e.g. 2023) never appears.
+	const dateStrings = state.trend.dates;
+	const dates = dateStrings.map(parseTimelineDate).filter(d => !isNaN(d.getTime()));
 
 	chartContainer.replaceChildren();
 	legendContainer.replaceChildren();
 
 	trendAxisUpdate = null;
 
-	if (!series.length) return;
+	if (!series.length || !dates.length) return;
 
 	const chart = buildTrendChart(dates, series);
 	if (chart) chartContainer.append(chart);
@@ -356,8 +387,8 @@ function renderTrendLines(state: TimelineState): void {
 	}));
 
 	const subtitle = qs('#timeline-trend-subtitle') as HTMLElement | null;
-	const first = rawDates[0];
-	const last = rawDates[rawDates.length - 1];
+	const first = dateStrings[0];
+	const last = dateStrings[dateStrings.length - 1];
 	if (!subtitle || first === undefined || last === undefined) return;
 
 	const from = new Date(first).getUTCFullYear();
@@ -533,10 +564,12 @@ function renderYearControl(state: TimelineState): void {
 	section.style.display = state.active ? '' : 'none';
 	if (!state.active) { yearControl = null; return; }
 
-	if (!yearControl) {
-		const dates = GEOGRAPHY.timeline_dates ?? [];
-		const years = dates.map(d => new Date(d).getUTCFullYear());
+	// Available years, falling back to the configured range while the first
+	// trend recompute is still pending (before any CSV has loaded).
+	const dates = state.trend.dates.length > 0 ? state.trend.dates : (GEOGRAPHY.timeline_dates ?? []);
+	const years = dates.map(d => new Date(d).getUTCFullYear());
 
+	if (!yearControl || !same(yearControl.dates, dates)) {
 		const select = qs('#timeline-year-select') as HTMLSelectElement;
 		select.replaceChildren(...years.map((y, i) => ce('option', y, { "value": i })));
 
@@ -571,20 +604,21 @@ export function init(): void {
 	if (localStorage.getItem('timeline-modal-dismissed') === '1')
 		actions.hydrateModal(cell(), true);
 
-	// EAE-304 trend service: recompute the derived trend.series slice when
-	// mode, the active timeline dataset set or the clicked Filtered
-	// geographies location change; dropRepeats keeps unrelated emissions
-	// (year selection, modal) from recomputing. The location is stringified
-	// in the slice: dropRepeats' same() helper recurses into objects and
-	// can't diff null against an object (Object.keys(null) throws, killing
-	// the emission for every later subscriber).
+	// EAE-304 trend service: recompute the derived trend slice (series +
+	// available dates) when the mode flips or the clicked Filtered geographies
+	// location changes. Dataset toggles and CSV loads are handled by
+	// recomputeTrend() inside commitSync (called from every COMMIT and from
+	// ds.js once a timeline dataset's CSV finishes loading), so those don't
+	// need to be in this derive key. The location is stringified in the slice:
+	// dropRepeats' same() helper recurses into objects and can't diff null
+	// against an object (Object.keys(null) throws, killing the emission for
+	// every later subscriber).
 	service(
 		state => ({
 			"active":   state.active,
-			"ids":      activeTimelineDatasetIds(),
 			"location": state.trendLocation ? JSON.stringify(state.trendLocation) : null,
 		}),
-		state => { actions.setTrendSeries(cell(), computeTrendSeries(state.trendLocation)); },
+		() => { recomputeTrend(); },
 	);
 
 	subscribe(state => {
@@ -613,7 +647,7 @@ export function init(): void {
 	// Late init (datasets already active): fill the series once, since the
 	// service only runs on emissions after registration.
 	if (cell().state.active) {
-		actions.setTrendSeries(cell(), computeTrendSeries(cell().state.trendLocation));
+		recomputeTrend();
 		renderTrendLines(cell().state);
 	}
 };
@@ -627,6 +661,10 @@ export function commitSync(): void {
 		lastVariant = STATE.variant;
 		if (cell().state.trendLocation) actions.setTrendLocation(cell(), null);
 	}
+
+	// Recomputed on every COMMIT so dataset toggles (and the post-CSV-load
+	// COMMIT from ds.js) refresh the trend even when `active` never flips.
+	recomputeTrend();
 
 	const state = cell().state;
 

@@ -165,6 +165,17 @@ export const actions = {
 		c.update(s => ({ ...s, "filters": { ...s.filters, enabled } }));
 	},
 
+	/**
+	 * Lightweight cell bump fired by ds.js once a timeline dataset's CSV has
+	 * finished loading. The trend service's derive key includes a data-readiness
+	 * signature, so this emission re-derives and recomputes the trend with the
+	 * newly-available data. Deliberately NOT COMMIT: COMMIT('datasets') re-activates
+	 * every dataset (a.js's datasets_visibility) and would loop back into loadall.
+	 */
+	notifyDataReady(c: TimelineCell): void {
+		c.update(s => ({ ...s }));
+	},
+
 	setTrendLocation(c: TimelineCell, location: TrendLocation | null): void {
 		c.update(s => ({ ...s, "trendLocation": location }));
 	},

@@ -18,6 +18,11 @@ import dscard from './cards.js';
 
 import dscontrols from './controls.js';
 
+import {
+	cell as timeline_cell,
+	actions as timeline_actions,
+} from './timeline-state.js';
+
 import { t, translateNode, translateDatasetName, translateDatasetAttribute } from './translate.js';
 
 import {
@@ -714,12 +719,12 @@ export default class DS {
 
 			await this.loadall();
 
-			// EAE-297: the CSV/raster data just became available asynchronously,
-			// after the COMMIT that `turn()` fired. Re-commit timeline datasets so
-			// the trend lines (which read this.csv.data) recompute now that the
-			// fetch has resolved — without this, a timeline dataset added while
-			// `active` was already true would never appear in the trend widget.
-			if (this.timeline) COMMIT('datasets');
+			// EAE-297: the CSV data just became available asynchronously, after
+			// the COMMIT that `turn()` fired. Bump the timeline cell so its trend
+			// service re-derives and recomputes now that the fetch has resolved.
+			// Deliberately NOT COMMIT: COMMIT('datasets') re-activates every
+			// dataset (a.js's datasets_visibility) and would loop back here.
+			if (this.timeline) timeline_actions.notifyDataReady(timeline_cell());
 
 			// make sure polygons-valued have decided their _domain
 			//

@@ -714,6 +714,13 @@ export default class DS {
 
 			await this.loadall();
 
+			// EAE-297: the CSV/raster data just became available asynchronously,
+			// after the COMMIT that `turn()` fired. Re-commit timeline datasets so
+			// the trend lines (which read this.csv.data) recompute now that the
+			// fetch has resolved — without this, a timeline dataset added while
+			// `active` was already true would never appear in the trend widget.
+			if (this.timeline) COMMIT('datasets');
+
 			// make sure polygons-valued have decided their _domain
 			//
 			if (maybe(this, '_domain', 'min') === undefined) {

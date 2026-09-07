@@ -105,7 +105,7 @@ interface D3ScaleLinear {
 
 interface D3Axis<V> {
 	ticks(count: number): D3Axis<V>;
-	tickValues(values: readonly number[]): D3Axis<V>;
+	tickValues(values: readonly V[]): D3Axis<V>;
 	tickFormat(fn: (value: V) => string): D3Axis<V>;
 }
 

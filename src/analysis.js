@@ -387,32 +387,69 @@ export async function priority(division, analysis, tier) {
 	}
 };
 
+function valid_layer_datasets() {
+	return STATE.datasets
+		.filter(d => d.raster?.data)
+		.filter(d => d.category.name !== 'boundaries' && d.category.name !== 'outline');
+}
+
+function dataset_layer_entry(dataset, areas, is_point_layer) {
+	return {
+		"name":           dataset.name,
+		"unit":           dataset.category.unit,
+		"is_point_layer": is_point_layer,
+		"aggregation":    is_point_layer ? 'SUM' : (dataset.category.analysis?.aggregation ?? 'AVG'),
+		areas,
+	};
+}
+
 export async function aggregate_layer_values(division) {
 	const divisions = division.raster.data;
 	const area_ids = [...new Set(divisions.filter(e => e !== -1))];
 
-	const valid_datasets = STATE.datasets
-		.filter(d => d.raster?.data)
-		.filter(d => d.category.name !== 'boundaries' && d.category.name !== 'outline');
-
 	const entries = await Promise.all(
-		valid_datasets.map(async dataset => {
+		valid_layer_datasets().map(async dataset => {
 			const is_point_layer = dataset.vectors?.shape_type === 'points';
 			const areas = is_point_layer
 				? aggregate_point_values(divisions, dataset, area_ids)
 				: aggregate_scalar_values(divisions, dataset, area_ids);
 
-			return [dataset.id, {
-				"name":           dataset.name,
-				"unit":           dataset.category.unit,
-				"is_point_layer": is_point_layer,
-				"aggregation":    is_point_layer ? 'SUM' : (dataset.category.analysis?.aggregation ?? 'AVG'),
-				areas,
-			}];
+			return [dataset.id, dataset_layer_entry(dataset, areas, is_point_layer)];
 		}),
 	);
 
 	return Object.fromEntries(entries);
+}
+
+// The summary aggregates over every analysis-valid pixel (v !== -1) while the
+// Data-tab cards aggregate over every positive-priority pixel (v > 0, the cell
+// set the "High priority areas" CSV lists). The cards set is a subset of the
+// summary set, so one pass over the raster can fill both buckets instead of
+// walking every pixel twice.
+export async function aggregate_layer_values_pair(raster) {
+	const entries = await Promise.all(
+		valid_layer_datasets().map(async dataset => {
+			const is_point_layer = dataset.vectors?.shape_type === 'points';
+			const { "analysis": analysis_areas, "cards": cards_areas } = is_point_layer
+				? aggregate_point_values_pair(raster, dataset)
+				: aggregate_scalar_values_pair(raster, dataset);
+
+			return [dataset.id, {
+				"analysis": dataset_layer_entry(dataset, analysis_areas, is_point_layer),
+				"cards":    dataset_layer_entry(dataset, cards_areas, is_point_layer),
+			}];
+		}),
+	);
+
+	const analysis = {};
+	const cards = {};
+
+	for (const [id, pair] of entries) {
+		analysis[id] = pair.analysis;
+		cards[id] = pair.cards;
+	}
+
+	return { analysis, cards };
 }
 
 function aggregate_point_values(division_raster, dataset, area_ids) {
@@ -438,6 +475,28 @@ function aggregate_point_values(division_raster, dataset, area_ids) {
 			"result": { "type": 'points', "value": counts[id] },
 		}]),
 	);
+}
+
+function aggregate_point_values_pair(raster, dataset) {
+	const features = maybe(dataset, 'vectors', 'data', 'features') || [];
+	const counts = { "analysis": 0, "cards": 0 };
+
+	for (const feature of features) {
+		const coords = maybe(feature, 'geometry', 'coordinates');
+		if (!coords) continue;
+
+		const pixel = coordinates_to_raster_pixel(coords, OUTLINE.raster);
+		if (!pixel) continue;
+
+		const p = raster[pixel.index];
+		if (p !== -1) counts.analysis++;
+		if (p > 0)   counts.cards++;
+	}
+
+	return {
+		"analysis": { "0": { "result": { "type": 'points', "value": counts.analysis } } },
+		"cards":    { "0": { "result": { "type": 'points', "value": counts.cards } } },
+	};
 }
 
 function aggregate(values, fn) {
@@ -507,6 +566,32 @@ function area_results(values_by_area, area_ids, dataset, agg_fn, has_csv_lookup)
 			}];
 		}),
 	);
+}
+
+// One walk over the band filling both the summary and the cards buckets, for
+// use with aggregate_layer_values_pair.
+function aggregate_scalar_values_pair(raster, dataset) {
+	const agg_fn = dataset.category.analysis?.aggregation ?? 'AVG';
+	const band = aggregation_band(dataset);
+	const nodata = dataset.raster.nodata;
+	const has_csv_lookup = dataset.csv?.key != null;
+
+	const values = { "analysis": [], "cards": [] };
+
+	for (let i = 0; i < raster.length; i++) {
+		const p = raster[i];
+		const v = band[i];
+		if (v === nodata) continue;
+		if (p !== -1) values.analysis.push(v);
+		if (p > 0)   values.cards.push(v);
+	}
+
+	const area_ids = [0];
+
+	return {
+		"analysis": area_results({ "0": values.analysis }, area_ids, dataset, agg_fn, has_csv_lookup),
+		"cards":    area_results({ "0": values.cards }, area_ids, dataset, agg_fn, has_csv_lookup),
+	};
 }
 
 export function dataset_feeds_index(d, index) {

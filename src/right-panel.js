@@ -30,7 +30,7 @@ import {
 } from './right-panel-data-tab.js';
 
 import {
-	aggregate_layer_values,
+	aggregate_layer_values_pair,
 } from './analysis.js';
 
 import {
@@ -98,17 +98,13 @@ export function update_analysis(has_data) {
 }
 
 export async function graphs(raster) {
-	// Layer aggregates for the summary are over all analysis-valid pixels.
-	const analysis_mask = { "raster": { "data": raster.map(v => v === -1 ? -1 : 0) } };
-	const layer_data = await aggregate_layer_values(analysis_mask);
-
-	// The Data-tab cards must match the "High priority areas" CSV, which
-	// lists every pixel with a positive priority score (v > 0).
-	const cards_mask = { "raster": { "data": raster.map(v => v > 0 ? 0 : -1) } };
-	const cards_layer_data = await aggregate_layer_values(cards_mask);
+	// Layer aggregates for the summary (all analysis-valid pixels) and the
+	// Data-tab cards (positive-priority pixels, matching the "High priority
+	// areas" CSV) are computed in a single pass.
+	const { "analysis": summary_layer_data, "cards": cards_layer_data } = await aggregate_layer_values_pair(raster);
 	set_analysis_layer_data(cards_layer_data);
 
-	const summary = await summary_analyse(raster, layer_data);
+	const summary = await summary_analyse(raster, summary_layer_data);
 
 	const has_population = maybe(summary, 'population-density', 'total') > 0;
 	const has_area = maybe(summary, 'area', 'total') > 0;

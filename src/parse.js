@@ -159,12 +159,12 @@ export function raster() {
 			const rasters = await image.readRasters();
 
 			// Multi-band contract: band 1 = near (display), band 2 = area-weighted
-			// sum, band 3 = area-weighted average. Legacy rasters are single-band;
-			// the aggregation bands then fall back to band 1.
-			this.raster.bands = rasters;
+			// sum, band 3 = area-weighted average. Legacy single-band rasters fall
+			// back to band 1 here, so downstream code can read any aggregation
+			// band unconditionally.
 			this.raster.data = rasters[0];
-			this.raster.sum = rasters[1] ?? null;
-			this.raster.average = rasters[2] ?? null;
+			this.raster.sum = rasters[1] ?? rasters[0];
+			this.raster.average = rasters[2] ?? rasters[0];
 			this.raster.width = image.getWidth();
 			this.raster.height = image.getHeight();
 			this.raster.nodata = parseFloat(image.fileDirectory.GDAL_NODATA);

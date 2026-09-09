@@ -100,36 +100,36 @@ export function value_tree(raster_index) {
 		get_feature_indexes().map(({ index, dataset }) => [dataset.id, index]),
 	);
 
-	return STATE.datasets
-		.filter(dataset => dataset.category.name !== 'boundaries'
-			&& dataset.category.name !== 'outline'
-			&& dataset.raster?.data)
-		.map(dataset => {
-			const band = aggregation_band(dataset);
-			if (band[raster_index] === dataset.raster.nodata) return null;
+	return STATE.datasets.flatMap(dataset => {
+		if (dataset.category.name === 'boundaries'
+			|| dataset.category.name === 'outline'
+			|| !dataset.raster?.data) return [];
 
-			const raw = resolve_raster_value(dataset, band[raster_index]);
-			const unit = dataset_unit(dataset, raw);
-			if (!unit) return null;
+		const band = aggregation_band(dataset);
+		const value = band[raster_index];
+		if (value === dataset.raster.nodata) return [];
 
-			const fi = indexes_by_id.get(dataset.id);
-			const props = fi?.get(raster_index);
+		const raw = resolve_raster_value(dataset, value);
+		const unit = dataset_unit(dataset, raw);
+		if (!unit) return [];
 
-			return {
-				"id":       dataset.id,
-				"name":     dataset.name,
-				"header":   dataset_header(dataset.name, unit, dataset.id),
-				"value":    raw,
-				"children": maybe(dataset, 'config', 'attributes_map', 'length')
-					? Object.fromEntries(
-						dataset.config.attributes_map.map(attr =>
-							[attr.target, props ? (props[attr.dataset] ?? '') : ''],
-						),
-					)
-					: {},
-			};
-		})
-		.filter(Boolean);
+		const fi = indexes_by_id.get(dataset.id);
+		const props = fi?.get(raster_index);
+
+		return [{
+			"id":       dataset.id,
+			"name":     dataset.name,
+			"header":   dataset_header(dataset.name, unit, dataset.id),
+			"value":    raw,
+			"children": maybe(dataset, 'config', 'attributes_map', 'length')
+				? Object.fromEntries(
+					dataset.config.attributes_map.map(attr =>
+						[attr.target, props ? (props[attr.dataset] ?? '') : ''],
+					),
+				)
+				: {},
+		}];
+	});
 }
 
 

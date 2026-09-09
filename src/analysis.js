@@ -400,7 +400,7 @@ export async function aggregate_layer_values(division) {
 			const is_point_layer = dataset.vectors?.shape_type === 'points';
 			const areas = is_point_layer
 				? aggregate_point_values(divisions, dataset, area_ids)
-				: await aggregate_scalar_values(divisions, dataset, area_ids);
+				: aggregate_scalar_values(divisions, dataset, area_ids);
 
 			return [dataset.id, {
 				"name":           dataset.name,
@@ -456,23 +456,42 @@ function aggregate(values, fn) {
 // The band used for a dataset's scalar aggregation. SUM reads the area-weighted
 // sum band, AVG reads the area-weighted average band, and categorical datasets
 // (csv lookup) keep the near band since their values are category codes.
-// Legacy single-band rasters fall back to band 1.
+// The parser has already folded legacy single-band rasters into every band.
 export function aggregation_band(dataset) {
 	const agg_fn = dataset.category.analysis?.aggregation ?? 'AVG';
 
 	if (dataset.csv?.key != null) return dataset.raster.data;
-	if (agg_fn === 'SUM') return dataset.raster.sum ?? dataset.raster.data;
-	return dataset.raster.average ?? dataset.raster.data;
+	if (agg_fn === 'SUM') return dataset.raster.sum;
+	return dataset.raster.average;
 }
 
-async function aggregate_scalar_values(division_raster, dataset, area_ids) {
+function aggregate_scalar_values(division_raster, dataset, area_ids) {
 	const agg_fn = dataset.category.analysis?.aggregation ?? 'AVG';
-	const band = aggregation_band(dataset);
-
-	const values_by_area = collect_values(band, dataset.raster.nodata, division_raster, area_ids);
+	const values_by_area = collect_values(dataset, division_raster, area_ids);
 
 	const has_csv_lookup = dataset.csv?.key != null;
 
+	return area_results(values_by_area, area_ids, dataset, agg_fn, has_csv_lookup);
+}
+
+// Collect the values of a dataset's aggregation band for each division area,
+// skipping nodata cells.
+function collect_values(dataset, division_raster, area_ids) {
+	const band = aggregation_band(dataset);
+	const nodata = dataset.raster.nodata;
+	const result = Object.fromEntries(area_ids.map(id => [id, []]));
+
+	division_raster.forEach((area_id, i) => {
+		if (area_id !== -1 && band[i] !== nodata && area_id in result)
+			result[area_id].push(band[i]);
+	});
+
+	return result;
+}
+
+// Turn per-area value lists into the aggregate result objects the layer-data
+// consumers expect, resolving csv lookups for categorical datasets.
+function area_results(values_by_area, area_ids, dataset, agg_fn, has_csv_lookup) {
 	return Object.fromEntries(
 		area_ids.map(id => {
 			let values = values_by_area[id];
@@ -488,18 +507,6 @@ async function aggregate_scalar_values(division_raster, dataset, area_ids) {
 			}];
 		}),
 	);
-}
-
-// Collect the values of a band for each division area, skipping nodata cells.
-function collect_values(band, nodata, division_raster, area_ids) {
-	const result = Object.fromEntries(area_ids.map(id => [id, []]));
-
-	division_raster.forEach((area_id, i) => {
-		if (area_id !== -1 && band[i] !== nodata && area_id in result)
-			result[area_id].push(band[i]);
-	});
-
-	return result;
 }
 
 export function dataset_feeds_index(d, index) {

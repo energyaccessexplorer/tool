@@ -8,6 +8,7 @@ import {
 import {
 	lowmedhigh_scale,
 	priority_scale,
+	aggregation_band,
 } from './analysis.js';
 
 import {
@@ -102,10 +103,12 @@ export function value_tree(raster_index) {
 	return STATE.datasets
 		.filter(dataset => dataset.category.name !== 'boundaries'
 			&& dataset.category.name !== 'outline'
-			&& dataset.raster?.data
-			&& dataset.raster.data[raster_index] !== dataset.raster.nodata)
+			&& dataset.raster?.data)
 		.map(dataset => {
-			const raw = resolve_raster_value(dataset, dataset.raster.data[raster_index]);
+			const band = aggregation_band(dataset);
+			if (band[raster_index] === dataset.raster.nodata) return null;
+
+			const raw = resolve_raster_value(dataset, band[raster_index]);
 			const unit = dataset_unit(dataset, raw);
 			if (!unit) return null;
 

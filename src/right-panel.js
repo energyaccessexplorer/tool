@@ -30,7 +30,7 @@ import {
 } from './right-panel-data-tab.js';
 
 import {
-	aggregate_layer_values_pair,
+	aggregate_layer_values,
 } from './analysis.js';
 
 import {
@@ -98,13 +98,13 @@ export function update_analysis(has_data) {
 }
 
 export async function graphs(raster) {
-	// Layer aggregates for the summary (all analysis-valid pixels) and the
-	// Data-tab cards (positive-priority pixels, matching the "High priority
-	// areas" CSV) are computed in a single pass.
-	const { "analysis": summary_layer_data, "cards": cards_layer_data } = await aggregate_layer_values_pair(raster);
-	set_analysis_layer_data(cards_layer_data);
+	// Cards aggregate every valid pixel of the geography outline — the same
+	// per-pixel definition a selected-area card uses at any level.
+	const outline_mask = { "raster": { "data": OUTLINE.raster.data.map(v => v === OUTLINE.raster.nodata ? -1 : 0) } };
+	set_analysis_layer_data(await aggregate_layer_values(outline_mask));
 
-	const summary = await summary_analyse(raster, summary_layer_data);
+	// The summary keeps the analysis-window mask.
+	const summary = await summary_analyse(raster);
 
 	const has_population = maybe(summary, 'population-density', 'total') > 0;
 	const has_area = maybe(summary, 'area', 'total') > 0;

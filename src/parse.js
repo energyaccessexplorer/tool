@@ -158,16 +158,23 @@ export function raster() {
 			const image = await tiff.getImage();
 			const rasters = await image.readRasters();
 
+			// Multi-band contract: band 1 = near (display), band 2 = area-weighted
+			// sum, band 3 = area-weighted average. Legacy single-band rasters fall
+			// back to band 1 here, so downstream code can read any aggregation
+			// band unconditionally.
 			this.raster.data = rasters[0];
+			this.raster.sum = rasters[1] ?? rasters[0];
+			this.raster.average = rasters[2] ?? rasters[0];
 			this.raster.width = image.getWidth();
 			this.raster.height = image.getHeight();
 			this.raster.nodata = parseFloat(image.fileDirectory.GDAL_NODATA);
 			this.raster.tiff = tiff;
 
 			if (Number.isNaN(this.raster.nodata)) this.raster.nodata = -Infinity;
-			const { "data": rdata, "nodata": rnodata } = this.raster;
-			for (let i = 0; i < rdata.length; i++) {
-				if (Number.isNaN(rdata[i])) rdata[i] = rnodata;
+			for (const band of rasters) {
+				for (let i = 0; i < band.length; i++) {
+					if (Number.isNaN(band[i])) band[i] = this.raster.nodata;
+				}
 			}
 
 			if (this.timeline)

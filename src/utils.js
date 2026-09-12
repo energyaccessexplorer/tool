@@ -648,9 +648,21 @@ export function area_type(variant) {
 	}
 }
 
-export function resolve_raster_value(dataset, raw) {
-	const rounded = String(raw).match(/[0-9]\.[0-9]{3}/) ? parseFloat(raw.toFixed(2)) : raw;
-	return maybe(dataset, 'csv', 'key') ? dataset.csv.table[rounded] : rounded;
+// Raster values are rounded to two decimals for display — popups and the
+// areas table. The CSV export opts out of that rounding (round=false): it sums
+// the same cells the Data-tab cards sum, and rounding every cell first makes
+// the column totals drift from the cards once the export spans the whole
+// geography (hundreds of thousands of cells).
+//
+// Categorical (csv-keyed) datasets always look their value up in the rounded
+// table, which is keyed by the displayed value.
+function display_round(raw) {
+	return String(raw).match(/[0-9]\.[0-9]{3}/) ? parseFloat(raw.toFixed(2)) : raw;
+}
+
+export function resolve_raster_value(dataset, raw, round = true) {
+	if (maybe(dataset, 'csv', 'key')) return dataset.csv.table[display_round(raw)];
+	return round ? display_round(raw) : raw;
 }
 
 export function format_value_unit(value, unit) {

@@ -11,8 +11,9 @@ jobs:
     steps:
       - name: Parse ticket tag from commit message
         id: ticket
+        env:
+          MSG: ${{ github.event.head_commit.message }}
         run: |
-          MSG=${{ toJSON(github.event.head_commit.message) }}
           if [[ "$MSG" =~ \[Tests\ ([A-Z]+-[0-9]+)\] ]]; then
             echo "id=${BASH_REMATCH[1]}" >> "$GITHUB_OUTPUT"
             echo "matched=true" >> "$GITHUB_OUTPUT"

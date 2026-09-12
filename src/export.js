@@ -15,9 +15,9 @@ import bind from '../lib/bind.js';
 
 import modal from '../lib/modal.js';
 
-import { t, translateNode, translateIndexName, translateDivisionName, getScaleLabels } from './translate.js';
+import { t, translateNode, translateIndexName, translateDivisionName } from './translate.js';
 
-import { generate_summary_data, compute_share_amounts } from './summary.js';
+import { generate_summary_data, compute_share_amounts, share_scale_labels } from './summary.js';
 
 import {
 	pptx,
@@ -93,7 +93,7 @@ export function export_filename(name, extension, { timestamp = true } = {}) {
 }
 
 export function generate_share_csv_content() {
-	const levels = getScaleLabels(window.LOCALE).map(l => l.toLowerCase());
+	const levels = share_scale_labels(window.LOCALE).map(l => l.toLowerCase());
 	const columns = [];
 	const data = [];
 

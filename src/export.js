@@ -15,9 +15,9 @@ import bind from '../lib/bind.js';
 
 import modal from '../lib/modal.js';
 
-import { t, translateNode, translateIndexName, translateDivisionName, getScaleLabels } from './translate.js';
+import { t, translateNode, translateIndexName, translateDivisionName } from './translate.js';
 
-import { generate_summary_data, compute_share_amounts } from './summary.js';
+import { generate_summary_data, compute_share_amounts, share_scale_labels } from './summary.js';
 
 import {
 	pptx,
@@ -30,6 +30,7 @@ import {
 
 import {
 	get_locations_results,
+	get_export_results,
 } from './right-panel-high-priority-areas.js';
 
 import {
@@ -57,7 +58,10 @@ async function build_csv_rows(results, { headers, is_raster, analysis_name, onPr
 	const rows = [];
 	let last_yield = performance.now();
 	let i = 0;
-	for (const row_data of generate_rows(results, is_raster, analysis_name)) {
+	// round = false: the CSV carries the aggregation band's own values, so its
+	// column sums match the Data-tab cards (EAE-501). The table keeps the rounded
+	// display values.
+	for (const row_data of generate_rows(results, is_raster, analysis_name, 0, results.length, false)) {
 		if (isCancelled && isCancelled()) return null;
 
 		rows.push(headers.map(h => escape_csv(row_data[h])).join(','));
@@ -89,7 +93,7 @@ export function export_filename(name, extension, { timestamp = true } = {}) {
 }
 
 export function generate_share_csv_content() {
-	const levels = getScaleLabels(window.LOCALE).map(l => l.toLowerCase());
+	const levels = share_scale_labels(window.LOCALE).map(l => l.toLowerCase());
 	const columns = [];
 	const data = [];
 
@@ -123,8 +127,13 @@ export function download_share_csv() {
 	fake_blob_download(blob, export_filename('population-area-share', 'csv'));
 }
 
-async function export_all(results, visible_headers) {
+async function export_all(results, visible_headers, all_areas) {
 	let cancelled = false;
+
+	// The footer hands over the selection when there is one and the all-areas
+	// row set otherwise. Only the CSV is all-areas: the report keeps the
+	// priority subset (a 20-point slice of 243k cells would be meaningless).
+	const report_results = results === all_areas ? get_locations_results() : results;
 
 	const update = (progress) => loading(t(window.LOCALE, 'modal.export.generating'), {
 		"progress": progress,
@@ -145,7 +154,7 @@ async function export_all(results, visible_headers) {
 	let pptx_blob, tiff_blob, high_priority_csv, share_csv;
 	try {
 		[pptx_blob, tiff_blob, high_priority_csv, share_csv] = await Promise.all([
-			pptx({ results, visible_headers }).then(p => p.write('blob')),
+			pptx({ "results": report_results, visible_headers }).then(p => p.write('blob')),
 			analysis(type).then(a => a.tiff),
 			generate_high_priority_areas_csv(results, {
 				visible_headers,
@@ -248,6 +257,7 @@ export function show_export_modal() {
 				"subtitle":           analysis_name,
 				"action_label":       t(window.LOCALE, 'modal.export.download_csv'),
 				"column_toggle_hint": t(window.LOCALE, 'modal.export.csv_hint'),
+				"download_results":   get_export_results(),
 				"enabled_columns":    new Set(),
 				on_download(results, visible_headers) {
 					download_high_priority_areas(results, { visible_headers });
@@ -266,16 +276,18 @@ export function show_export_modal() {
 	translateNode(window.LOCALE, footer);
 	bind(footer, {
 		"export_all": () => {
+			const all_areas = get_export_results();
 			document.querySelector('#export-options-modal')?.remove();
 			show_modal_table(get_locations_results(), {
 				"title":              t(window.LOCALE, 'modal.export.download_all'),
 				"subtitle":           t(window.LOCALE, 'modal.export.select_subtitle'),
 				"action_label":       t(window.LOCALE, 'modal.export.download_zip'),
 				"column_toggle_hint": t(window.LOCALE, 'modal.export.zip_hint'),
+				"download_results":    all_areas,
 				"enabled_columns":    ppt_enabled_columns(PPT_MAX_COLUMNS),
 				"max_columns":        PPT_MAX_COLUMNS,
 				on_download(results, visible_headers) {
-					export_all(results, visible_headers);
+					export_all(results, visible_headers, all_areas);
 				},
 			});
 		},

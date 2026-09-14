@@ -8,6 +8,7 @@ import {
 import {
 	lowmedhigh_scale,
 	priority_scale,
+	aggregation_band,
 } from './analysis.js';
 
 import {
@@ -94,39 +95,41 @@ function get_feature_indexes() {
 	return feature_indexes;
 }
 
-export function value_tree(raster_index) {
+export function value_tree(raster_index, round = true) {
 	const indexes_by_id = new Map(
 		get_feature_indexes().map(({ index, dataset }) => [dataset.id, index]),
 	);
 
-	return STATE.datasets
-		.filter(dataset => dataset.category.name !== 'boundaries'
-			&& dataset.category.name !== 'outline'
-			&& dataset.raster?.data
-			&& dataset.raster.data[raster_index] !== dataset.raster.nodata)
-		.map(dataset => {
-			const raw = resolve_raster_value(dataset, dataset.raster.data[raster_index]);
-			const unit = dataset_unit(dataset, raw);
-			if (!unit) return null;
+	return STATE.datasets.flatMap(dataset => {
+		if (dataset.category.name === 'boundaries'
+			|| dataset.category.name === 'outline'
+			|| !dataset.raster?.data) return [];
 
-			const fi = indexes_by_id.get(dataset.id);
-			const props = fi?.get(raster_index);
+		const band = aggregation_band(dataset);
+		const value = band[raster_index];
+		if (value === dataset.raster.nodata) return [];
 
-			return {
-				"id":       dataset.id,
-				"name":     dataset.name,
-				"header":   dataset_header(dataset.name, unit, dataset.id),
-				"value":    raw,
-				"children": maybe(dataset, 'config', 'attributes_map', 'length')
-					? Object.fromEntries(
-						dataset.config.attributes_map.map(attr =>
-							[attr.target, props ? (props[attr.dataset] ?? '') : ''],
-						),
-					)
-					: {},
-			};
-		})
-		.filter(Boolean);
+		const raw = resolve_raster_value(dataset, value, round);
+		const unit = dataset_unit(dataset, raw);
+		if (!unit) return [];
+
+		const fi = indexes_by_id.get(dataset.id);
+		const props = fi?.get(raster_index);
+
+		return [{
+			"id":       dataset.id,
+			"name":     dataset.name,
+			"header":   dataset_header(dataset.name, unit, dataset.id),
+			"value":    raw,
+			"children": maybe(dataset, 'config', 'attributes_map', 'length')
+				? Object.fromEntries(
+					dataset.config.attributes_map.map(attr =>
+						[attr.target, props ? (props[attr.dataset] ?? '') : ''],
+					),
+				)
+				: {},
+		}];
+	});
 }
 
 
@@ -384,13 +387,38 @@ export function area_info(fields, props, ll, analysis_value, analysis_name, feat
 	};
 }
 
-function get_row(item, is_raster, analysis_name) {
-	const key = item_key(item);
+// The first row of a result set is not necessarily a full-schema row: the
+// all-areas export can start on a cell with no priority score, and
+// priority_entries() returns {} for those — deriving the headers from it would
+// silently drop the "Priority score" and index columns from the whole file. A
+// cell can likewise lack a dataset's column when its band is nodata there. Seed
+// the fixed columns from the analysis and union in every dataset column from
+// the property tree, so the header set is the export's full schema.
+function schema_row(item, is_raster, analysis_name) {
+	const row = { ...get_row(item, is_raster, analysis_name) };
+	if (!is_raster) return row;
+
+	for (const header of ["Priority score", analysis_name]) {
+		if (!(header in row)) row[header] = undefined;
+	}
+
+	for (const node of get_property_tree()) {
+		if (!(node.header in row)) row[node.header] = undefined;
+		for (const child of node.children) {
+			if (!(child.header in row)) row[child.header] = undefined;
+		}
+	}
+
+	return row;
+}
+
+function get_row(item, is_raster, analysis_name, round = true) {
+	const key = (round ? '' : 'raw:') + item_key(item);
 	const cached = row_cache.get(key);
 	if (cached) return cached;
 
 	const row = is_raster
-		? build_raster_row(item, analysis_name)
+		? build_raster_row(item, analysis_name, round)
 		: build_admin_row(item, analysis_name);
 
 	row_cache.set(key, row);
@@ -457,12 +485,12 @@ function priority_entries(item, analysis_name) {
 		: {};
 }
 
-function build_raster_row(item, analysis_name) {
+function build_raster_row(item, analysis_name, round) {
 	return {
 		"Longitude": item.c[0].toFixed(5),
 		"Latitude":  item.c[1].toFixed(5),
 		...priority_entries(item, analysis_name),
-		...flatten_value_tree(value_tree(item.i)),
+		...flatten_value_tree(value_tree(item.i, round)),
 		...division_names(item.i),
 	};
 }
@@ -560,7 +588,7 @@ export function prepare_tabular_data(results) {
 	const is_raster = STATE.variant === 'raster';
 	const analysis_name = translateIndexName(window.LOCALE, STATE.index);
 
-	const row = get_row(results[0], is_raster, analysis_name);
+	const row = schema_row(results[0], is_raster, analysis_name);
 	const fixed_order = ["Priority score", analysis_name, "Latitude", "Longitude"];
 
 	const tree = is_raster ? get_property_tree() : [];
@@ -607,9 +635,12 @@ export function prepare_tabular_data(results) {
 	return { headers, "area_type": area_type(STATE.variant), analysis_name, is_raster, column_meta, selector_groups };
 }
 
-export function* generate_rows(results, is_raster, analysis_name, start = 0, count = results.length - start) {
+// `round = false` is the CSV export path: it writes the aggregation band's own
+// value so the column sums match the Data-tab cards. The table and the popups
+// keep the rounded display values.
+export function* generate_rows(results, is_raster, analysis_name, start = 0, count = results.length - start, round = true) {
 	for (const item of results.slice(start, start + count)) {
-		yield get_row(item, is_raster, analysis_name);
+		yield get_row(item, is_raster, analysis_name, round);
 	}
 }
 

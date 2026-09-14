@@ -1,4 +1,4 @@
-import { compute_share_amounts } from './summary.js';
+import { compute_share_amounts, OUTSIDE_COLOR } from './summary.js';
 
 import '../lib/jszip.js';
 
@@ -353,6 +353,7 @@ function geography_indexes_right($) {
 				{ "text": "medium", "options": th({ "fill": cs[2] }) },
 				{ "text": "med-high", "options": th({ "fill": cs[3] }) },
 				{ "text": "high", "options": th({ "fill": cs[4], "color": black }) },
+				{ "text": "outside", "options": th({ "fill": OUTSIDE_COLOR, "color": black }) },
 			],
 		];
 

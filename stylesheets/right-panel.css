@@ -559,7 +559,7 @@
   line-height: 24px;
   color: #1A1919;
   margin: 0;
-  height: 24px;
+  min-height: 24px;
 }
 
 .share-graph .scale-item-spacer {
@@ -585,7 +585,7 @@
   font-weight: 400;
   font-size: 12px;
   line-height: 16px;
-  height: 16px;
+  min-height: 16px;
   color: #5C5959;
   margin: 0 0 0 32px;
   padding: 0;

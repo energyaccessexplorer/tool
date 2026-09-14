@@ -158,16 +158,27 @@ export function raster() {
 			const image = await tiff.getImage();
 			const rasters = await image.readRasters();
 
+			// Multi-band contract: band 1 = near (display), band 2 = area-weighted
+			// sum, band 3 = area-weighted average. Only a file with three bands HAS
+			// aggregation bands: a two-band data+Alpha raster would otherwise hand
+			// its alpha channel to `sum`, and a SUM-aggregated dataset would then
+			// aggregate transparency as if it were the data. Everything else --
+			// legacy single-band included -- falls back to band 1, so downstream
+			// code can still read any aggregation band unconditionally.
+			const has_bands = rasters.length >= 3;
 			this.raster.data = rasters[0];
+			this.raster.sum = has_bands ? rasters[1] : rasters[0];
+			this.raster.average = has_bands ? rasters[2] : rasters[0];
 			this.raster.width = image.getWidth();
 			this.raster.height = image.getHeight();
 			this.raster.nodata = parseFloat(image.fileDirectory.GDAL_NODATA);
 			this.raster.tiff = tiff;
 
 			if (Number.isNaN(this.raster.nodata)) this.raster.nodata = -Infinity;
-			const { "data": rdata, "nodata": rnodata } = this.raster;
-			for (let i = 0; i < rdata.length; i++) {
-				if (Number.isNaN(rdata[i])) rdata[i] = rnodata;
+			for (const band of rasters) {
+				for (let i = 0; i < band.length; i++) {
+					if (Number.isNaN(band[i])) band[i] = this.raster.nodata;
+				}
 			}
 
 			if (this.timeline)

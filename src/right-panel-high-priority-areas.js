@@ -8,6 +8,7 @@ import {
 } from './mapbox.js';
 
 import {
+	aggregation_band,
 	plot_active,
 } from './analysis.js';
 
@@ -27,6 +28,7 @@ import {
 	precompute_rows,
 	clear_row_cache,
 	vector_feature_name,
+	dataset_unit,
 } from './area-analysis.js';
 
 import {
@@ -58,6 +60,7 @@ function view_all_locations() {
 		"subtitle":           analysis_name,
 		"action_label":       t(window.LOCALE, 'modal.export.download_csv'),
 		"column_toggle_hint": t(window.LOCALE, 'modal.export.csv_hint'),
+		"download_results":   get_export_results(),
 		on_download(results, visible_headers) {
 			download_high_priority_areas(results, { visible_headers });
 		},
@@ -81,6 +84,10 @@ const paginationState = {
 	"currentPage":  1,
 	"itemsPerPage": 10,
 };
+
+// The rows the CSV export covers: every area, not just the priority subset the
+// list paginates (EAE-501). Rebuilt with the list from the same analysis raster.
+let exportResults = [];
 
 function raster_item(p) {
 	const pi3 = (p.c).map(c => +c.toFixed(3));
@@ -142,12 +149,12 @@ function admin_area_item(item, rank) {
 	return template;
 };
 
-function get_division_results(variant) {
+function get_division_results(variant, { all = false } = {}) {
 	const division = GEOGRAPHY.divisions[variant];
 	if (!division || !division.priorityData) return [];
 
 	return Object.keys(division.priorityData)
-		.filter(id => division.priorityData[id].average > 0)
+		.filter(id => all || division.priorityData[id].average > 0)
 		.map(id => get_admin_area_item(variant, id))
 		.filter(item => item !== null)
 		.sort((a, b) => a.priority > b.priority ? -1 : 1);
@@ -306,6 +313,10 @@ export async function update() {
 	paginationState.allResults = results.sort((a, b) => a.priority > b.priority ? -1 : 1);
 	paginationState.currentPage = 1;
 
+	exportResults = isRaster
+		? all_areas_points(paginationState.allResults)
+		: get_division_results(STATE.variant, { "all": true });
+
 	const count = paginationState.allResults.length;
 
 	if (count === 0) {
@@ -322,6 +333,12 @@ export async function update() {
 
 export function get_locations_results() {
 	return paginationState.allResults;
+}
+
+// The all-areas row set the CSV export downloads. The on-screen list and the
+// PowerPoint report keep using get_locations_results().
+export function get_export_results() {
+	return exportResults;
 }
 
 export function init() {
@@ -350,3 +367,54 @@ async function all_points() {
 		.sort((a,b) => a.v > b.v ? -1 : 1)
 		.map(t => ({ "priority": t.v, "i": t.i, "c": raster_pixel_to_coordinates(t.i) }));
 };
+
+// One bit per outline cell: does any exported dataset carry a value there?
+// Mirrors what value_tree() emits, so a cell that has no data in any column
+// (and no priority score) can be skipped without changing a single sum.
+function dataset_coverage() {
+	const cells = new Uint8Array(OUTLINE.raster.data.length);
+
+	for (const dataset of STATE.datasets) {
+		if (dataset.category.name === 'boundaries' || dataset.category.name === 'outline') continue;
+		if (!dataset.raster?.data) continue;
+		if (!dataset_unit(dataset, 1)) continue;
+
+		const band = aggregation_band(dataset);
+		const nodata = dataset.raster.nodata;
+
+		for (let i = 0; i < band.length; i++) {
+			if (band[i] !== nodata) cells[i] = 1;
+		}
+	}
+
+	return cells;
+}
+
+// The export's row universe is the geography outline mask — the same mask the
+// Data-tab cards aggregate over — so summing an exported column matches the
+// card by construction. The priority cells lead (so the file opens on a
+// full-schema row), then every other valid outline cell that carries a value in
+// at least one exported column. Outline-external cells are never exported: the
+// analysis window is not clipped to the geography, so the priority cells alone
+// include data the cards do not count.
+function all_areas_points(priority_points) {
+	const outline = OUTLINE.raster.data;
+	const nodata = OUTLINE.raster.nodata;
+	const covered = dataset_coverage();
+
+	const rows = [];
+	const seen = new Set();
+
+	for (const point of priority_points) {
+		if (outline[point.i] === nodata) continue;
+		rows.push(point);
+		seen.add(point.i);
+	}
+
+	for (let i = 0; i < outline.length; i++) {
+		if (outline[i] === nodata || seen.has(i) || !covered[i]) continue;
+		rows.push({ "i": i, "c": raster_pixel_to_coordinates(i) });
+	}
+
+	return rows;
+}

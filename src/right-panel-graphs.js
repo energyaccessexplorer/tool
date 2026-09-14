@@ -1,7 +1,7 @@
-import { t, translateNode, replayable, registerUIUpdater, getScaleLabels, translateIndexName } from './translate.js';
+import { t, translateNode, replayable, registerUIUpdater, translateIndexName } from './translate.js';
 import { svg_pie } from './utils.js';
 import { analysis_colorscale } from './analysis.js';
-import { compute_share_amounts } from './summary.js';
+import { compute_share_amounts, share_scale_labels, share_scale_colors, OUTSIDE_BUCKET } from './summary.js';
 import bubblemessage from '../lib/bubblemessage.js';
 import bind from '../lib/bind.js';
 
@@ -17,19 +17,21 @@ const PIES = {};
 const bubble = (v,e) => new bubblemessage({ "message": v + "%", "position": "C", "close": false, "noevents": true }, e);
 
 function update_graph_section(section, amounts, unit, description) {
-	const labels = getScaleLabels(window.LOCALE);
+	const labels = share_scale_labels(window.LOCALE);
+	const colors = share_scale_colors();
+
+	// High down to Low, then the out-of-analysis residual — it is not part of the
+	// index scale, so it keeps its own neutral colour and sits last.
+	const order = [...analysis_colorscale.stops.keys()].reverse().concat([OUTSIDE_BUCKET]);
 
 	const scale = ce('dl', null, { "class": 'discrete-scale' });
 
-	analysis_colorscale.stops.slice().reverse().map((color, i) => {
-		const idx = analysis_colorscale.stops.length - 1 - i;
-		const value = `${amounts[idx].toLocaleString(window.LOCALE)} ${unit}`;
-
+	order.forEach(idx => {
 		const item = tmpl('#discrete-scale-item-template');
 		bind(item, {
-			"color": function(el) { el.style.backgroundColor = color; },
+			"color": function(el) { el.style.backgroundColor = colors[idx]; },
 			"label": labels[idx],
-			"value": value,
+			"value": `${amounts[idx].toLocaleString(window.LOCALE)} ${unit}`,
 		});
 
 		scale.append(item);
@@ -82,15 +84,20 @@ export const graphs = replayable(function graphs(summary) {
 	const locale = window.LOCALE;
 	const indexName = translateIndexName(locale, STATE.index).toLowerCase();
 
+	const people_unit = t(locale, 'right_panel.prioritization.graphs.people_unit');
+
 	process_graph(summary, {
 		"dataKey":     'population-density',
 		"pieKey":      'population',
 		"selector":    '#population-number',
-		"unit":        t(locale, 'right_panel.prioritization.graphs.people_unit'),
+		"unit":        people_unit,
 		"description": (total, high) => t(locale, 'right_panel.prioritization.graphs.pop_desc', {
 			indexName,
-			"x": total.toLocaleString(window.LOCALE),
-			"y": high.toLocaleString(window.LOCALE),
+			// The sentence counts people, but the unit only appeared on the discrete
+			// scale below it — spell it out here too, translated, the way area_desc
+			// does with km².
+			"x": `${total.toLocaleString(window.LOCALE)} ${people_unit}`,
+			"y": `${high.toLocaleString(window.LOCALE)} ${people_unit}`,
 		}),
 	});
 
@@ -134,8 +141,8 @@ function process_graph(analysis_summary, config) {
 }
 
 export function init() {
-	PIES["population"] = svg_pie([[0], [0], [0], [0], [0]], 70, 0, analysis_colorscale.stops, null, bubble);
-	PIES["area"]       = svg_pie([[0], [0], [0], [0], [0]], 70, 0, analysis_colorscale.stops, null, bubble);
+	PIES["population"] = svg_pie([[0], [0], [0], [0], [0], [0]], 70, 0, share_scale_colors(), null, bubble);
+	PIES["area"]       = svg_pie([[0], [0], [0], [0], [0], [0]], 70, 0, share_scale_colors(), null, bubble);
 
 	const area_section = create_graph_section('right_panel.prioritization.graphs.area_share_title', 'area', 'area-number', 'area-description');
 	const population_section = create_graph_section('right_panel.prioritization.graphs.pop_share_title', 'population', 'population-number', 'population-description');

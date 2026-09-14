@@ -24,6 +24,39 @@ import {
 	qs,
 } from '../lib/helpers.js';
 
+import { t, getScaleLabels } from './translate.js';
+
+// The share cards cover the whole geography, but the prioritization index only
+// exists inside the analysis window — run() fills the raster with -1 everywhere
+// else. Cells outside it cannot be placed in any of the five index buckets, so
+// they get a sixth of their own; without it the card's rows would not sum to
+// its total. Deliberately local to the share cards: the five-bucket
+// analysis_colorscale still drives the map legend, the dataset cards and the
+// plots, which have no notion of an unanalysed cell.
+export const OUTSIDE_BUCKET = 5;
+export const OUTSIDE_COLOR = '#cfcfcf';
+const OUTSIDE_LABEL = 'right_panel.prioritization.graphs.outside_label';
+
+export function share_scale_labels(locale) {
+	return [...getScaleLabels(locale), t(locale, OUTSIDE_LABEL)];
+}
+
+export function share_scale_colors() {
+	return [...analysis_colorscale.stops, OUTSIDE_COLOR];
+}
+
+// Index value -> bucket. x === -1 is "no analysis here", everything else maps to
+// Low..High exactly as the five-colour scale does.
+function bucket_index(x) {
+	if (x === -1) return OUTSIDE_BUCKET;
+	if (x >= 0   && x < 0.2) return 0;
+	if (x >= 0.2 && x < 0.4) return 1;
+	if (x >= 0.4 && x < 0.6) return 2;
+	if (x >= 0.6 && x < 0.8) return 3;
+	if (x >= 0.8 && x <= 1)  return 4;
+	return OUTSIDE_BUCKET;
+}
+
 function variant_raster(raster) {
 	const division = (STATE.variant !== "raster") ? GEOGRAPHY.divisions[STATE.variant] : null;
 	const areas = division?.raster?.data ? division_averages(raster, division.raster.data) : null;
@@ -58,8 +91,8 @@ export async function generate_summary_data() {
 		SUMMARY[idxn] = await analyse(raster);
 		SUMMARY[idxn]['raw_raster'] = raster;
 
-		const ppie = svg_pie(SUMMARY[idxn]['population-density']['distribution'].map(x => [x]), 75, 0, analysis_colorscale.stops, null, bubble);
-		const apie = svg_pie(SUMMARY[idxn]['area']['distribution'].map(x => [x]), 75, 0, analysis_colorscale.stops, null, bubble);
+		const ppie = svg_pie(SUMMARY[idxn]['population-density']['distribution'].map(x => [x]), 75, 0, share_scale_colors(), null, bubble);
+		const apie = svg_pie(SUMMARY[idxn]['area']['distribution'].map(x => [x]), 75, 0, share_scale_colors(), null, bubble);
 
 		ppie.change(0);
 		apie.change(0);
@@ -113,41 +146,41 @@ export default async function analyse(raster, layer_data = null) {
 		a[i] = (r === -1) ? -1 : fn(r);
 	}
 
-	const population_groups = [0, 0, 0, 0, 0];
-	const area_groups = [0, 0, 0, 0, 0];
-	let covered = 0;
+	const population_groups = new Array(OUTSIDE_BUCKET + 1).fill(0);
+	const area_groups = new Array(OUTSIDE_BUCKET + 1).fill(0);
+
+	// Both cards are scoped to the whole geography, the same universe the
+	// Data-tab cards aggregate over, so their totals agree with the cards. Every
+	// valid outline cell counts as area; only cells that carry population data
+	// contribute people.
+	const outline = OUTLINE.raster.data;
+	const onodata = OUTLINE.raster.nodata;
 
 	for (let i = 0; i < a.length; i += 1) {
-		const x = a[i];
+		if (outline[i] === onodata) continue;
+
+		const bucket = bucket_index(a[i]);
+		area_groups[bucket] += 1;
+
 		const v = p[i];
-		let t = 0;
-
-		if (v == nodata) continue;
-
-		if (x >= 0   && x < 0.2) t = 0;
-		else if (x >= 0.2 && x < 0.4) t = 1;
-		else if (x >= 0.4 && x < 0.6) t = 2;
-		else if (x >= 0.6 && x < 0.8) t = 3;
-		else if (x >= 0.8 && x <= 1)  t = 4;
-
-		if (x !== -1) {
-			covered += 1;
-			area_groups[t] += 1;
-			population_groups[t] += v;
-		}
+		if (v != nodata) population_groups[bucket] += v;
 	}
+
+	const covered = area_groups.reduce((x, y) => x + y, 0);
 
 	const c = OUTLINE.raster.data.filter(x => x !== OUTLINE.raster.nodata).length;
 
 	const raw_ptotal = population_groups.reduce((a,b) => a + b, 0);
 	const atotal = area_groups.reduce((a,b) => a + b, 0);
 
-	// Get the correct population total from layer_data aggregated over analysis-valid pixels
-	// (unscaled raster via aggregate_layer_values, avoids overcounting from oversampled display raster).
-	// When layer_data is not provided (e.g. PPTX summary data), compute it now from the analysis mask.
-	// Distribution proportions from the display raster above are still correct (overcounting cancels).
+	// Get the correct population total from layer_data aggregated over the same
+	// whole-geography mask the cards use (unscaled raster via
+	// aggregate_layer_values, avoids overcounting from the oversampled display
+	// raster). When layer_data is not provided (e.g. PPTX summary data), compute
+	// it now. Distribution proportions from the display raster above are still
+	// correct (overcounting cancels).
 	if (!layer_data) {
-		const mask = { "raster": { "data": raster.map(v => v === -1 ? -1 : 0) } };
+		const mask = { "raster": { "data": outline.map(v => v === onodata ? -1 : 0) } };
 		layer_data = await aggregate_layer_values(mask);
 	}
 	const pop_result = layer_data?.['population-density']?.areas?.[0]?.result;

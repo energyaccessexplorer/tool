@@ -98,13 +98,13 @@ export function update_analysis(has_data) {
 }
 
 export async function graphs(raster) {
-	// Single computation of layer aggregates for all analysis-valid pixels.
-	// Shared with both summary (for correct population total) and the Data tab.
-	const analysis_mask = { "raster": { "data": raster.map(v => v === -1 ? -1 : 0) } };
-	const layer_data = await aggregate_layer_values(analysis_mask);
-	set_analysis_layer_data(layer_data);
+	// Cards aggregate every valid pixel of the geography outline — the same
+	// per-pixel definition a selected-area card uses at any level.
+	const outline_mask = { "raster": { "data": OUTLINE.raster.data.map(v => v === OUTLINE.raster.nodata ? -1 : 0) } };
+	set_analysis_layer_data(await aggregate_layer_values(outline_mask));
 
-	const summary = await summary_analyse(raster, layer_data);
+	// The summary keeps the analysis-window mask.
+	const summary = await summary_analyse(raster);
 
 	const has_population = maybe(summary, 'population-density', 'total') > 0;
 	const has_area = maybe(summary, 'area', 'total') > 0;

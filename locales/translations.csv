@@ -92,7 +92,7 @@ right_panel.prioritization.loading.title,Loading data layers,Chargement des couc
 right_panel.prioritization.loading.subtitle,Please wait while datasets are being processed.,Veuillez patienter pendant le traitement des jeux de données.,请稍等，数据集正在处理中。
 right_panel.prioritization.blank_state.title,Add data to prioritize analysis,Ajouter des données pour prioriser l'analyse,添加数据以优先进行分析
 right_panel.prioritization.blank_state.subtitle,Select a dataset from the left panel to add it to the map and start your prioritization analysis.,Sélectionnez un jeu de données dans le panneau gauche pour l'ajouter à la carte et commencer votre analyse.,从左面板选择数据集将其添加到地图并开始优先级分析。
-right_panel.prioritization.high_priority.section_title,High priority areas,Zones hautement prioritaires,高优先级区域
+right_panel.prioritization.high_priority.section_title,Priority areas,Zones prioritaires,优先区域
 right_panel.prioritization.high_priority.about_text,Showing {{variant}} with the highest prioritization scores based on your analysis criteria.,Affichage de {{variant}} avec les scores de priorisation les plus élevés selon vos critères d'analyse.,显示根据您的分析条件得分最高的 {{variant}}。
 right_panel.prioritization.high_priority.unknown_location,Unknown location,Emplacement inconnu,未知位置
 right_panel.prioritization.high_priority.view_download,View or Download data,Voir ou télécharger les données,查看或下载数据
@@ -106,6 +106,7 @@ right_panel.prioritization.graphs.pop_share_title,Population share,Répartition 
 right_panel.prioritization.graphs.area_desc,"Showing {{indexName}} for areas spanning <strong>{{x}}</strong>, of which <strong>{{y}}</strong> has high {{indexName}}.","Affichage de {{indexName}} pour des zones couvrant <strong>{{x}}</strong>, dont <strong>{{y}}</strong> présentent un {{indexName}} élevé.",显示跨越 <strong>{{x}}</strong> 的区域的 {{indexName}}，其中 <strong>{{y}}</strong> 具有高 {{indexName}}。
 right_panel.prioritization.graphs.pop_desc,"Showing {{indexName}} for areas affecting <strong>{{x}}</strong>, of whom <strong>{{y}}</strong> are situated in areas of high {{indexName}}.","Affichage de {{indexName}} pour des zones affectant <strong>{{x}}</strong> personnes, dont <strong>{{y}}</strong> se trouvent dans des zones à {{indexName}} élevé.",显示影响 <strong>{{x}}</strong> 的区域的 {{indexName}}，其中 <strong>{{y}}</strong> 位于 {{indexName}} 高的区域。
 right_panel.prioritization.graphs.people_unit,people,personnes,人
+right_panel.prioritization.graphs.outside_label,Outside the analysis,Hors de l'analyse,分析范围之外
 right_panel.prioritization.graphs.area_about,"Shows the 'Prioritization Index' results as area shares, based on your analysis criteria.",Affiche les résultats de l'indice de priorisation sous forme de parts de superficie.,根据您的分析条件，显示'优先级指数'结果作为面积份额。
 right_panel.prioritization.graphs.pop_about,"Shows the 'Prioritization Index' results as population shares, based on your analysis criteria.",Affiche les résultats de l'indice de priorisation sous forme de parts de population.,根据您的分析条件，显示'优先级指数'结果作为人口份额。
 right_panel.data.title,Analysing selected datasets in <strong>{{area}}</strong>.,Analyse des jeux de données sélectionnés dans <strong>{{area}}</strong>.,分析在 <strong>{{area}}</strong> 中选定的数据集。
@@ -200,7 +201,7 @@ modal.export.summary_presentation.button,Download .ppt,Télécharger .ppt,下载
 modal.export.map_tiff.title,Map TIFF,Carte TIFF,地图 TIFF
 modal.export.map_tiff.desc,A TIFF file of the prioritization raster image generated from your analysis.,Un fichier TIFF de l'image raster de priorisation générée par votre analyse.,从您的分析生成的优先级光栅图像的 TIFF 文件。
 modal.export.map_tiff.button,Download .TIFF,Télécharger .TIFF,下载 .TIFF
-modal.export.high_priority.title,High priority areas,Zones hautement prioritaires,高优先级区域
+modal.export.high_priority.title,Priority areas,Zones prioritaires,优先区域
 modal.export.high_priority.desc,"A table of the highest priority <span bind=""area_type""></span> areas from your analysis.","Un tableau des zones <span bind=""area_type""></span> les plus prioritaires de votre analyse.","您分析中优先级最高的<span bind=""area_type""></span>区域表。"
 modal.export.high_priority.button,Download .csv,Télécharger .csv,下载 .csv
 modal.export.pop_area_share.title,Population and area share,Part de population et de superficie,人口和面积份额

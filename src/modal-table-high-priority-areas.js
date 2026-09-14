@@ -216,11 +216,21 @@ export function show(results, opts = {}) {
 	translateNode(window.LOCALE, footer);
 	bind(footer, {
 		"label":    opts.action_label,
-		"download": () => opts.on_download(get_selected() || state.results, get_visible_headers()),
+		// A selection still narrows the download; with none, the CSV modal
+		// downloads the all-areas row set (opts.download_results) rather than the
+		// priority subset the table shows.
+		"download": () => opts.on_download(get_selected() || opts.download_results || state.results, get_visible_headers()),
 	});
+
+	const download_label = qs('.modal-footer-bar button span', footer);
 
 	function update_selection_overlay() {
 		const count = selected_indices.size;
+		// The footer button keeps exporting the selection when there is one, so
+		// its label has to say so rather than promise "Download all".
+		download_label.textContent = count
+			? t(window.LOCALE, 'modal.high_priority_table.download_selected')
+			: opts.action_label;
 		if (count > 0) {
 			selection_overlay.classList.remove('hidden');
 			select_all_checkbox.classList.remove('hidden');

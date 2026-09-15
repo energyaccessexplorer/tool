@@ -178,6 +178,35 @@ export function init() {
 	MAPBOX.dragRotate.disable();
 	MAPBOX.touchZoomRotate.disableRotation();
 
+	// Mapbox's ScrollZoom only listens for wheel events on
+	// `.mapboxgl-canvas-container`, so a wheel over any overlay that is not one
+	// of its descendants (the scale bar, a map-info card, a control popup) never
+	// reaches it and the map won't zoom. Forward those wheel events straight to
+	// the scrollZoom handler so scroll zoom works over the whole map area.
+	qs('#maparea').addEventListener('wheel', e => {
+		// Mapbox already handles wheel events that start inside the canvas
+		// container — forwarding those would double-zoom.
+		if (e.target.closest('.mapboxgl-canvas-container')) return;
+
+		// If the wheel happens over a map-info card whose detailed-data
+		// section is actually scrollable, let the card scroll natively
+		// instead of zooming the map.
+		const card = e.target.closest('map-info');
+		if (card) {
+			const detailed = qs('.detailed-data', card);
+			if (detailed && detailed.scrollHeight > detailed.clientHeight) {
+				return;
+			}
+		}
+
+		MAPBOX.scrollZoom.wheel(e);
+	});
+
+	// The "Show Analysis Results" button floats over the map but lives outside
+	// `#maparea`, so its wheel events never reach the listener above.
+	const show = qs('#right-panel-show');
+	if (show) show.addEventListener('wheel', e => MAPBOX.scrollZoom.wheel(e));
+
 	MAPBOX.on('click', click);
 
 	MAPBOX.addControl((new MapboxThemeControl()), 'top-left');

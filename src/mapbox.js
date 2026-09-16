@@ -333,6 +333,50 @@ async function worldview() {
 	]);
 }
 
+// Adding sources and layers before mapbox's style has been applied throws
+// "Style is not done loading" (Style.addSource/addLayer call Style._checkLoaded).
+//
+// Wait for it on mapbox's own event rather than by polling isStyleLoaded() in a
+// timer loop. That distinction is the whole point when the tab is in the
+// background: browsers clamp timers in hidden tabs to roughly one tick per
+// second, so a poll turns into a clock the browser controls, and everything
+// queued behind it — including dataset downloads — waits on that clock. mapbox
+// fires style.load from its style fetch and parse completing, which is network
+// work, so this resolves while the tab is hidden.
+export function style_ready(timeout = 30000) {
+	if (!MAPBOX) return Promise.reject(new Error('style_ready: mapbox is not initialised'));
+	if (MAPBOX.isStyleLoaded()) return Promise.resolve();
+
+	return new Promise(resolve => {
+		let timer;
+
+		const done = () => {
+			clearTimeout(timer);
+			MAPBOX.off('style.load', done);
+			MAPBOX.off('styledata', done);
+			resolve();
+		};
+
+		// Both events, because they cover different paths: style.load fires when a
+		// style finishes loading (first load, or a full replacement), while
+		// styledata also fires for in-place style updates — setStyle with the same
+		// stylesheet, sprite/glyph changes — where style.load does not fire again.
+		// Waiting on one of them leaves a window where the style is usable but we
+		// are still waiting, which costs the whole timeout.
+		MAPBOX.once('style.load', done);
+		MAPBOX.once('styledata', done);
+
+		// Never hang the load on a style that is not going to arrive. If this
+		// fires, the add_source/add_layers that follows throws, and the dataset
+		// loaders catch that per dataset — so one dataset fails loudly instead
+		// of the app spinning forever.
+		timer = setTimeout(() => {
+			console.warn('style_ready: gave up waiting for the mapbox style');
+			done();
+		}, timeout);
+	});
+};
+
 export function change_theme(theme) {
 	async function go() {
 		const c = MAPBOX.getStyle().layers.find(l => l.type === 'symbol');

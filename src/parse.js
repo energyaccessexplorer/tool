@@ -12,6 +12,10 @@ import {
 } from './plot.js';
 
 import {
+	style_ready,
+} from './mapbox.js';
+
+import {
 	and,
 	ce,
 	has,
@@ -23,9 +27,12 @@ import {
 	Whatever,
 } from '../lib/helpers.js';
 
+// Fetching is deliberately not gated on mapbox's style. The style is only
+// needed to *apply* data (add_source/add_layers), so the parsers wait for it
+// there, where the requirement actually lives. Gating the fetch here put every
+// dataset download behind the style load — and behind a timer the browser
+// throttles while the tab is hidden.
 async function fetchcheck(endpoint, format) {
-	await until(_ => MAPBOX.isStyleLoaded(), Infinity); // <-- magic line. If you remove it, no more unicorns!
-
 	if (endpoint.match(/^(blob:)?http/)) ;
 	else endpoint = EAE['settings'].storage + endpoint;
 
@@ -210,7 +217,10 @@ OUTLINE: ${OUTLINE.raster.width} × ${OUTLINE.raster.height}`);
 
 		this.drawraster = draw;
 
-		if (this.type.match(/raster/)) draw.call(this);
+		if (this.type.match(/raster/)) {
+			await style_ready();
+			draw.call(this);
+		}
 	};
 
 	let t;
@@ -358,7 +368,9 @@ export function points() {
 				p.properties['__visible'] = !!rp;
 			}
 		})
-		.then(_ => {
+		.then(async _ => {
+			await style_ready();
+
 			this.criteria = specs_set.call(
 				this,
 				this.vectors.data.features,
@@ -431,7 +443,9 @@ export function lines() {
 				f.properties['__visible'] = true;
 			}
 		})
-		.then(_ => {
+		.then(async _ => {
+			await style_ready();
+
 			if (this.csv) vectors_csv.call(this);
 
 			this.criteria = specs_set.call(
@@ -471,7 +485,9 @@ export function polygons() {
 				p.properties['__visible'] = true;
 			}
 		})
-		.then(_ => {
+		.then(async _ => {
+			await style_ready();
+
 			this.criteria = specs_set.call(
 				this,
 				this.vectors.data.features,

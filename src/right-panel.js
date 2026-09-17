@@ -47,7 +47,6 @@ import bind from '../lib/bind.js';
 import modal from '../lib/modal.js';
 
 import {
-	maybe,
 	qs,
 	tmpl,
 } from '../lib/helpers.js';
@@ -106,9 +105,14 @@ export async function graphs(raster) {
 	// The summary keeps the analysis-window mask.
 	const summary = await summary_analyse(raster);
 
-	const has_population = maybe(summary, 'population-density', 'total') > 0;
-	const has_area = maybe(summary, 'area', 'total') > 0;
-	update_analysis(has_population || has_area);
+	// The blank state follows the analysis, not the cards. Since EAE-502 the
+	// summary covers the whole outline, so its area and population totals are
+	// non-zero with no layer added — gating on them left the share cards on
+	// screen for an analysis with nothing to prioritise. The analysis raster
+	// still answers the question the blank state asks: run() leaves it at -1
+	// wherever no layer feeds the index (and returns an all -1 raster for a
+	// filters-only analysis, deliberately).
+	update_analysis(raster.some(v => v !== -1));
 
 	render_graphs(summary);
 	analysis_locations_panel_update();

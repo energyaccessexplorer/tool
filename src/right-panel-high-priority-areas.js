@@ -9,6 +9,7 @@ import {
 
 import {
 	aggregation_band,
+	has_priority_score,
 	plot_active,
 } from './analysis.js';
 
@@ -154,7 +155,7 @@ function get_division_results(variant, { all = false } = {}) {
 	if (!division || !division.priorityData) return [];
 
 	return Object.keys(division.priorityData)
-		.filter(id => all || division.priorityData[id].average > 0)
+		.filter(id => all || has_priority_score(division.priorityData[id].average))
 		.map(id => get_admin_area_item(variant, id))
 		.filter(item => item !== null)
 		.sort((a, b) => a.priority > b.priority ? -1 : 1);
@@ -356,7 +357,7 @@ async function all_points() {
 	const a = await plot_active(STATE.index);
 
 	const points = a.raster.reduce((t,v,i) => {
-		if (v > 0) {
+		if (has_priority_score(v)) {
 			t.push({i,v});
 		}
 

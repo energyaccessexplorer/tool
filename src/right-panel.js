@@ -31,6 +31,7 @@ import {
 
 import {
 	aggregate_layer_values,
+	has_priority_score,
 } from './analysis.js';
 
 import {
@@ -98,10 +99,15 @@ export function update_analysis(has_data) {
 }
 
 export async function graphs(raster) {
-	// Cards aggregate every valid pixel of the geography outline — the same
-	// per-pixel definition a selected-area card uses at any level.
-	const outline_mask = { "raster": { "data": OUTLINE.raster.data.map(v => v === OUTLINE.raster.nodata ? -1 : 0) } };
-	set_analysis_layer_data(await aggregate_layer_values(outline_mask));
+	// Cards aggregate only the cells that have a priority score — the cells whose
+	// range and class selections the analysis kept — restricted to the geography
+	// outline. Same rule the export's priority columns use (has_priority_score()).
+	const outline = OUTLINE.raster.data;
+	const outline_nodata = OUTLINE.raster.nodata;
+	const analysis_mask = {
+		"raster": { "data": raster.map((v, i) => (has_priority_score(v) && outline[i] !== outline_nodata) ? 0 : -1) },
+	};
+	set_analysis_layer_data(await aggregate_layer_values(analysis_mask));
 
 	// The summary keeps the analysis-window mask.
 	const summary = await summary_analyse(raster);

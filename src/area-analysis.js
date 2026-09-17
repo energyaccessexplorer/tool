@@ -9,6 +9,7 @@ import {
 	lowmedhigh_scale,
 	priority_scale,
 	aggregation_band,
+	has_priority_score,
 } from './analysis.js';
 
 import {
@@ -477,7 +478,7 @@ export function division_names(raster_index) {
 }
 
 function priority_entries(item, analysis_name) {
-	return Number.isFinite(item.priority)
+	return has_priority_score(item.priority)
 		? {
 			[analysis_name]:    lowmedhigh_scale(item.priority),
 			"Priority score": `${(item.priority * 100).toFixed(1)}%`,

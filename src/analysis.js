@@ -381,7 +381,16 @@ export async function priority(division, analysis, tier) {
 		source.setData(json_clone(source._data));
 
 		division.priorityData = areas;
-		division.layerData = await aggregate_layer_values(division);
+
+		// The cards for a selected area aggregate the same cells as the
+		// country-level cards: cells that have a priority score, restricted to this
+		// area. priorityData above is untouched — it still drives the map colours
+		// and the Priority areas listing.
+		const analysis_raster = analysis.raster;
+		const analysis_mask = {
+			"raster": { "data": division.raster.data.map((v, i) => (v === -1 || !has_priority_score(analysis_raster[i])) ? -1 : v) },
+		};
+		division.layerData = await aggregate_layer_values(analysis_mask);
 	} else {
 		console.debug(`priority-source-${tier}: not yet...`);
 	}
@@ -457,6 +466,24 @@ function aggregate(values, fn) {
 	default:
 		return sum / values.length;
 	}
+}
+
+// A cell or area HAS A PRIORITY SCORE when the analysis gave it a positive
+// index. This is the single definition for every consumer:
+//   - the aggregation mask the Data-tab cards use (graphs() in right-panel.js
+//     and priority() below), so the cards average exactly the cells that carry
+//     a score;
+//   - the priority-cell list the CSV export is built from (all_points() in
+//     right-panel-high-priority-areas.js), which is what writes the
+//     "Priority score" / index columns;
+//   - the Priority areas listing and its pagination (get_division_results()).
+// Change the rule here and the cells the cards average over and the rows that
+// carry a priority score move together. Note the index is rescaled into a
+// Float32Array, so its minimum can land a hair below zero (≈ -1.6e-8); the
+// strict comparison keeps those bottom-band cells out, which is what the export
+// has always done.
+export function has_priority_score(value) {
+	return Number.isFinite(value) && value > 0;
 }
 
 // The band used for a dataset's scalar aggregation. SUM reads the area-weighted

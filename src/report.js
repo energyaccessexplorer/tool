@@ -1,4 +1,4 @@
-import { compute_share_amounts, OUTSIDE_COLOR } from './summary.js';
+import { compute_share_amounts, share_scale_colors, share_scale_labels, OUTSIDE_BUCKET } from './summary.js';
 
 import '../lib/jszip.js';
 
@@ -6,7 +6,6 @@ import '../lib/pptxgen.js';
 
 import {
 	aggregate_layer_values,
-	analysis_colorscale,
 	analysis_colorscale_svg,
 	medhigh_point_count,
 } from './analysis.js';
@@ -36,7 +35,6 @@ import {
 } from '../lib/helpers.js';
 
 import {
-	getScaleLabels,
 	t,
 	translateDatasetName,
 	translateIndexName,
@@ -527,16 +525,20 @@ function geography_indexes_right($) {
 		return Object.assign({}, tabletextopts, { bold, "color": white, "align": "left" }, o);
 	};
 
-	const cs = analysis_colorscale.stops;
+	const cs = share_scale_colors();
 
 	function table(c, y) {
-		const labels = getScaleLabels(window.LOCALE);
+		// The same six legend entries as the UI's Area/Population share cards, in the
+		// same order: High down to Low, then the out-of-analysis residual — it is not
+		// part of the five-colour index scale and keeps its own neutral fill. Only the
+		// two light fills (High and the residual) take dark text.
+		const order  = [4, 3, 2, 1, 0, OUTSIDE_BUCKET];
+		const labels = share_scale_labels(window.LOCALE);
 
-		const header_cells = labels.map((label, i) => ({
-			"text":    label,
-			"options": th(i === 4 ? { "fill": cs[4], "color": black } : { "fill": cs[i] }),
+		const header_cells = order.map(i => ({
+			"text":    labels[i],
+			"options": th(i >= 4 ? { "fill": cs[i], "color": black } : { "fill": cs[i] }),
 		}));
-		header_cells.reverse();
 
 		const rows = [
 			[
@@ -550,8 +552,8 @@ function geography_indexes_right($) {
 
 			r.push({ "text": translateIndexName(window.LOCALE, k), "options": { bold } });
 
-			const amounts = compute_share_amounts(SUMMARY[k][c]).amounts.slice().reverse();
-			r.push(...amounts.map(i => ({ "text": i.toLocaleString(window.LOCALE) })));
+			const amounts = compute_share_amounts(SUMMARY[k][c]).amounts;
+			r.push(...order.map(i => ({ "text": amounts[i].toLocaleString(window.LOCALE) })));
 
 			rows.push(r);
 		}

@@ -348,8 +348,6 @@ export function style_ready(timeout = 30000) {
 	if (MAPBOX.isStyleLoaded()) return Promise.resolve();
 
 	return new Promise(resolve => {
-		let timer;
-
 		const done = () => {
 			clearTimeout(timer);
 			MAPBOX.off('style.load', done);
@@ -370,7 +368,7 @@ export function style_ready(timeout = 30000) {
 		// fires, the add_source/add_layers that follows throws, and the dataset
 		// loaders catch that per dataset — so one dataset fails loudly instead
 		// of the app spinning forever.
-		timer = setTimeout(() => {
+		const timer = setTimeout(() => {
 			console.warn('style_ready: gave up waiting for the mapbox style');
 			done();
 		}, timeout);

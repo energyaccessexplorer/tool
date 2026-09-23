@@ -13,7 +13,7 @@ import { ce, qs, tmpl, same } from '../lib/helpers.js';
 
 import { t, translateNode, translateUnit } from './translate.js';
 
-import { format_value_unit as formatValueUnit, raster_reverse_crosswalk } from './utils.js';
+import { format_value_unit as formatValueUnit, raster_reverse_crosswalk, even_label_indices as axisLabelIndices } from './utils.js';
 
 import modal from '../lib/modal.js';
 
@@ -270,9 +270,11 @@ function buildTrendChart(dates: readonly Date[], series: readonly TrendSeries[])
 	// "nice" Jan-1 year boundaries, which drops the first year when the
 	// domain starts later than Jan-1 (e.g. 2020-03-01) — so 2020 lost its
 	// label while 2021/2022/2023 kept theirs. Every year with data gets a label.
+	const labeledDates = new Set(axisLabelIndices(dates.length).map(i => dates[i] ?? new Date(NaN)));
+
 	svg.append('g')
 		.attr('transform', `translate(0,${height - margin.bottom})`)
-		.call(d3.axisBottom(x).tickValues(dates).tickFormat(d3.utcFormat('%Y')));
+		.call(d3.axisBottom(x).tickValues(dates).tickFormat(d => labeledDates.has(d as Date) ? d3.utcFormat('%Y')(d as Date) : ''));
 
 	const yAxis = svg.append('g').attr('transform', `translate(${margin.left},0)`);
 

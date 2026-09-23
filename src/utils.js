@@ -177,6 +177,58 @@ export function svg_pie(data, outer, inner, colors, parse, bubble) {
 	};
 };
 
+export function svg_pie_labels(svg, distribution, outer) {
+	const slices = d3.pie()
+		.value(d => d)
+		.sort(null)(distribution);
+
+	const arc = d3.arc()
+		.innerRadius(0)
+		.outerRadius(outer - (outer / 15));
+
+	const g = d3.select(svg).select('g');
+
+	// Build the list of labelled slices up front so skipped slivers produce
+	// NO element at all (rather than an empty <text> from a data-join).
+	const labelled = [];
+	for (let i = 0; i < slices.length; i++) {
+		const pct = Math.round(distribution[i] * 100);
+		if (pct < 1) continue;
+		labelled.push({ "slice": slices[i], "pct": pct + "%" });
+	}
+
+	for (const { slice, pct } of labelled) {
+		const [x, y] = arc.centroid(slice);
+
+		// Portable halo idiom: a white stroked text underneath + the dark fill
+		// on top. `paint-order` is unsupported by PowerPoint/LibreOffice SVG,
+		// so the two-element stack is required to keep the stroke off the glyphs.
+		g.append("text")
+			.attr("x", x)
+			.attr("y", y)
+			.attr("dy", "0.35em")
+			.attr("text-anchor", "middle")
+			.attr("font-family", "sans-serif")
+			.attr("font-size", 13)
+			.attr("font-weight", "bold")
+			.attr("fill", "white")
+			.attr("stroke", "white")
+			.attr("stroke-width", 2.5)
+			.text(pct);
+
+		g.append("text")
+			.attr("x", x)
+			.attr("y", y)
+			.attr("dy", "0.35em")
+			.attr("text-anchor", "middle")
+			.attr("font-family", "sans-serif")
+			.attr("font-size", 13)
+			.attr("font-weight", "bold")
+			.attr("fill", "#393F44")
+			.text(pct);
+	}
+};
+
 export function svg_interval({radius = 12, width = 256, height = 10, sliders, colors, init, steps, callback1, callback2, end_callback}) {
 	const svgwidth = width;
 	const svgheight = Math.max((radius * 2) + 2, height + 2);

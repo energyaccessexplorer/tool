@@ -36,6 +36,31 @@ export function uniform_split(n) {
 	return d3.range(0, 1.000000001, 1 / (n - 1));
 };
 
+// EAE-497: which of n axis points get a label (index-only, so callers can
+// map to dates/numbers/categories); tries maxLabels down to minLabels and
+// keeps whichever spaces most evenly, ties favoring more labels.
+export function even_label_indices(n, maxLabels = 6, minLabels = 5) {
+	if (n <= 0) return [];
+	if (n <= maxLabels) return d3.range(n);
+
+	const lo = Math.max(2, Math.min(minLabels, maxLabels));
+	let best = [0, n - 1];
+	let bestSpread = Infinity;
+
+	for (let k = maxLabels; k >= lo; k--) {
+		const indices = d3.range(k).map(i => Math.round(i * (n - 1) / (k - 1)));
+		const gaps = indices.slice(1).map((v, i) => v - indices[i]);
+		const spread = Math.max(...gaps) - Math.min(...gaps);
+
+		if (spread < bestSpread) {
+			bestSpread = spread;
+			best = indices;
+		}
+	}
+
+	return best;
+};
+
 export function colorscale({intervals, stops, domain}) {
 	let s;
 

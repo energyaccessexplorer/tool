@@ -36,6 +36,31 @@ export function uniform_split(n) {
 	return d3.range(0, 1.000000001, 1 / (n - 1));
 };
 
+// EAE-497: which of n axis points get a label (index-only, so callers can
+// map to dates/numbers/categories); tries maxLabels down to minLabels and
+// keeps whichever spaces most evenly, ties favoring more labels.
+export function even_label_indices(n, maxLabels = 6, minLabels = 5) {
+	if (n <= 0) return [];
+	if (n <= maxLabels) return d3.range(n);
+
+	const lo = Math.max(2, Math.min(minLabels, maxLabels));
+	let best = [0, n - 1];
+	let bestSpread = Infinity;
+
+	for (let k = maxLabels; k >= lo; k--) {
+		const indices = d3.range(k).map(i => Math.round(i * (n - 1) / (k - 1)));
+		const gaps = indices.slice(1).map((v, i) => v - indices[i]);
+		const spread = Math.max(...gaps) - Math.min(...gaps);
+
+		if (spread < bestSpread) {
+			bestSpread = spread;
+			best = indices;
+		}
+	}
+
+	return best;
+};
+
 export function colorscale({intervals, stops, domain}) {
 	let s;
 
@@ -592,6 +617,67 @@ export function raster_pixel_to_coordinates(i) {
 	const s = GEOGRAPHY.resolution;
 
 	return merc.inverse([o[0] + (x * s), o[1] - (y * s)]);
+};
+
+const outlier_ids_cache = new Map();
+
+// An area covering most of its tier's raster footprint is bad source
+// geometry, not a real area (seen in production: a stray extra ring the
+// size of the whole country). Excluded from cross-tier translation only —
+// not from a tier's own direct listing.
+export function raster_outlier_ids(tier) {
+	if (outlier_ids_cache.has(tier)) return outlier_ids_cache.get(tier);
+
+	const raster = maybe(GEOGRAPHY, 'divisions', tier, 'raster', 'data');
+	if (!raster) {
+		outlier_ids_cache.set(tier, new Set());
+		return outlier_ids_cache.get(tier);
+	}
+
+	const counts = new Map();
+	let valid = 0;
+	for (let i = 0; i < raster.length; i++) {
+		const id = raster[i];
+		if (id === -1) continue;
+		valid++;
+		counts.set(id, (counts.get(id) || 0) + 1);
+	}
+
+	const out = new Set();
+	counts.forEach((count, id) => { if (count > valid * 0.5) out.add(id); });
+
+	outlier_ids_cache.set(tier, out);
+	return out;
+};
+
+const reverse_crosswalk_cache = new Map();
+
+// For every id of `target_tier`, which ids of `source_tier` share a raster
+// pixel with it. Cached per (source_tier, target_tier) pair.
+export function raster_reverse_crosswalk(source_tier, target_tier) {
+	const key = `${source_tier}:${target_tier}`;
+	if (reverse_crosswalk_cache.has(key)) return reverse_crosswalk_cache.get(key);
+
+	const source_raster = maybe(GEOGRAPHY, 'divisions', source_tier, 'raster', 'data');
+	const target_raster = maybe(GEOGRAPHY, 'divisions', target_tier, 'raster', 'data');
+	const map = new Map();
+
+	if (source_raster && target_raster) {
+		const excluded = raster_outlier_ids(source_tier);
+		for (let i = 0; i < target_raster.length; i++) {
+			const tid = target_raster[i];
+			if (tid === -1) continue;
+
+			const sid = source_raster[i];
+			if (sid === -1 || excluded.has(sid)) continue;
+
+			if (!map.has(tid)) map.set(tid, new Set());
+			map.get(tid).add(sid);
+		}
+	}
+
+	reverse_crosswalk_cache.set(key, map);
+	return map;
 };
 
 const GEOMETRY_VERTEX_DEPTH = {

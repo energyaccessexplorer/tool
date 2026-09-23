@@ -18,6 +18,11 @@ import dscard from './cards.js';
 
 import dscontrols from './controls.js';
 
+import {
+	cell as timeline_cell,
+	actions as timeline_actions,
+} from './timeline-state.js';
+
 import { t, translateNode, translateDatasetName, translateDatasetAttribute } from './translate.js';
 
 import {
@@ -445,6 +450,9 @@ export default class DS {
 			else {
 				s = x => {
 					const t = this.csv.table[x];
+					// EAE-498: no data for this key is not a value of 0; null would
+					// coerce to 0 in the range check and could score as "in range".
+					if (t === null || t === undefined || t === '') return -1;
 					return and(t >= min, t <= max) ? 1 : -1;
 				};
 			}
@@ -710,6 +718,13 @@ export default class DS {
 			loading_analysis(true);
 
 			await this.loadall();
+
+			// EAE-297: the CSV data just became available asynchronously, after
+			// the COMMIT that `turn()` fired. Bump the timeline cell so its trend
+			// service re-derives and recomputes now that the fetch has resolved.
+			// Deliberately NOT COMMIT: COMMIT('datasets') re-activates every
+			// dataset (a.js's datasets_visibility) and would loop back here.
+			if (this.timeline) timeline_actions.notifyDataReady(timeline_cell());
 
 			// make sure polygons-valued have decided their _domain
 			//

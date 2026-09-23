@@ -28,6 +28,7 @@ jobs:
         if: steps.ticket.outputs.matched == 'true'
         run: |
           sudo apt-get install -y bmake curl jq
+          sudo npm install -g typescript@5.9.3
 
       - name: Build .env
         if: steps.ticket.outputs.matched == 'true'

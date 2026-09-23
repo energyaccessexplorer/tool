@@ -16,6 +16,7 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get install -y bmake curl jq
+          sudo npm install -g typescript@5.9.3
 
       - name: Set up SSH
         run: |

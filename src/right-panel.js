@@ -25,9 +25,12 @@ import summary_analyse from './summary.js';
 
 import {
 	init as data_tab_init,
-	clear as data_tab_clear,
-	set_analysis_layer_data,
 } from './right-panel-data-tab.js';
+
+import {
+	cell as data_tab_cell,
+	actions as data_tab_actions,
+} from './right-panel-data-state.js';
 
 import {
 	aggregate_layer_values,
@@ -35,9 +38,13 @@ import {
 } from './analysis.js';
 
 import {
-	clear as prioritization_tab_clear,
-	clear_location_summary,
+	init as prioritization_tab_init,
 } from './right-panel-prioritization-tab.js';
+
+import {
+	cell as prioritization_cell,
+	actions as prioritization_actions,
+} from './right-panel-prioritization-state.js';
 
 import {
 	clear as poi_clear,
@@ -59,9 +66,8 @@ export function loading_analysis(loading) {
 	qs('#analysis-sections-wrapper').style.display = 'none';
 	qs('#analysis-blank-state').style.display = 'none';
 	if (loading) {
-		data_tab_clear();
-		prioritization_tab_clear();
-		clear_location_summary();
+		data_tab_actions.backToNational(data_tab_cell());
+		prioritization_actions.backToNational(prioritization_cell());
 		poi_clear();
 		document.querySelectorAll('.right-panel-tab-panel').forEach(p => { p.hidden = true; });
 	}
@@ -81,9 +87,8 @@ export function update_analysis(has_data) {
 	const blank_state = qs('#analysis-blank-state');
 	const sections_wrapper = qs('#analysis-sections-wrapper');
 
-	data_tab_clear();
-	prioritization_tab_clear();
-	clear_location_summary();
+	data_tab_actions.backToNational(data_tab_cell());
+	prioritization_actions.backToNational(prioritization_cell());
 	poi_clear();
 	blank_state.style.display = has_data ? 'none' : 'flex';
 	sections_wrapper.style.display = has_data ? 'flex' : 'none';
@@ -106,7 +111,8 @@ export async function graphs(raster) {
 	const analysis_mask = {
 		"raster": { "data": raster.map((v, i) => (has_priority_score(v) && outline[i] !== outline_nodata) ? 0 : -1) },
 	};
-	set_analysis_layer_data(await aggregate_layer_values(analysis_mask));
+	const layer_data = await aggregate_layer_values(analysis_mask);
+	data_tab_actions.analysisCompleted(data_tab_cell(), layer_data);
 
 	// The summary keeps the analysis-window mask.
 	const summary = await summary_analyse(raster);
@@ -189,6 +195,7 @@ export function init() {
 
 	analysis_locations_panel_init();
 	data_tab_init();
+	prioritization_tab_init();
 };
 
 function share_url() {

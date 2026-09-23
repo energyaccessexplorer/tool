@@ -57,6 +57,7 @@ import {
 import {
 	priority,
 	plot_active as analysis_plot_active,
+	criteria_mask,
 } from './analysis.js';
 
 import {
@@ -64,8 +65,12 @@ import {
 } from './timeline.js';
 
 import {
-	colors_array as filtered_colors_array,
+	compoundMask,
 } from './filtered.js';
+
+import {
+	drawcanvas as plot_drawcanvas,
+} from './plot.js';
 
 import {
 	init as mapbox_init,
@@ -78,10 +83,6 @@ import {
 	init as cards_init,
 	update as cards_update,
 } from './cards.js';
-
-import {
-	init as timeline_init,
-} from './timeline.js';
 
 import {
 	run as qa_run,
@@ -115,6 +116,10 @@ import bubblemessage from '../lib/bubblemessage.js';
 
 import { translateNode, initLocalePicker, resolveLocale, t } from './translate.js';
 
+import { syncDatasets as timeline_sync_datasets, cell as timeline_cell } from './timeline-state.js';
+
+import { init as timeline_view_init, commitSync as timeline_commit_sync } from './timeline-view.js';
+
 export const STANDARD_TABS = new Set(['census', 'demand', 'supply', 'other']);
 
 COMMIT = debounce(function() {
@@ -128,6 +133,9 @@ COMMIT = debounce(function() {
 	}
 
 	reload(...arguments);
+
+	timeline_sync_datasets(STATE.datasets, GEOGRAPHY.timeline_dates);
+	timeline_commit_sync();
 
 	window.dispatchEvent(new Event('resize'));
 }, 300);
@@ -290,6 +298,7 @@ async function init_1() {
 
 	drawer_init();
 	cards_init();
+	timeline_view_init();
 
 	loading(t(LOCALE, 'overlay.fetching_geography'));
 
@@ -456,7 +465,6 @@ async function init_3() {
 	vectorssearch_init();
 	locationssearch_init();
 	points_init();
-	timeline_init();
 	qa_run();
 };
 
@@ -506,8 +514,6 @@ async function reload(k,v) {
 		geographiessearch_load(STATE.divtier, STATE.subdiv);
 	}
 
-	const timeline = qs('#timeline');
-
 	const {index, variant} = STATE;
 
 	(function special_layers() {
@@ -538,29 +544,6 @@ async function reload(k,v) {
 			// Workaround a crash for Uganda
 			if (!d.vectors.data) return;
 
-			if (!MAPBOX.getSource(`filtered-source-${i}`)) {
-				MAPBOX.addSource(`filtered-source-${i}`, {
-					"type": 'geojson',
-					"data": d.vectors.data,
-				});
-			}
-
-			if (!MAPBOX.getLayer(`filtered-layer-${i}`)) {
-				MAPBOX.addLayer({
-					"id":     `filtered-layer-${i}`,
-					"source": `filtered-source-${i}`,
-					"type":   'fill',
-					"layout": {
-						"visibility": "none",
-					},
-					"paint": {
-						"fill-color":         filtered_colors_array[i],
-						"fill-outline-color": "black",
-						"fill-opacity":       [ "case", [ "boolean", [ "get", "__visible" ], true ], 0.5, 0 ],
-					},
-				}, MAPBOX.first_symbol);
-			}
-
 			if (!MAPBOX.getSource(`priority-source-${i}`)) {
 				if (i === 0) return;
 
@@ -589,17 +572,6 @@ async function reload(k,v) {
 			}
 		});
 	})();
-
-	function filtered_visibility(v) {
-		const a = STATE.datasets.map(d => maybe(d, 'config', 'divisions_tier'));
-
-		GEOGRAPHY.divisions.forEach((_,i) => {
-			const y = (a.indexOf(i) < 0) ? 'none' : v;
-
-			if (MAPBOX.getLayer(`filtered-layer-${i}`))
-				MAPBOX.setLayoutProperty(`filtered-layer-${i}`, 'visibility', y);
-		});
-	};
 
 	function output_visibility() {
 		if (!MAPBOX.getLayer('output-layer')) return;
@@ -642,9 +614,9 @@ async function reload(k,v) {
 
 	indexes_list();
 
-	if (timeline) timeline_lines_update();
+	if (GEOGRAPHY.timeline) timeline_lines_update();
 
-	filtered_visibility('none');
+	apply_criteria_mask();
 
 	if (k === "layers") {
 		await mapbox_sort();
@@ -666,8 +638,6 @@ async function reload(k,v) {
 	priority_visibility_pick();
 
 	output_visibility();
-
-	timeline_visibility();
 };
 
 export function clean() {
@@ -695,7 +665,6 @@ function layout() {
 	const n = qs('nav');
 	const p = qs('#playground');
 	const w = qs('#mobile-switcher');
-	const t = qs('#timeline');
 
 	function set_heights() {
 		p.style['height'] = window.innerHeight - n.clientHeight - (MOBILE ? w.clientHeight : 0) + "px";
@@ -704,10 +673,7 @@ function layout() {
 	if (GEOGRAPHY.timeline)
 		console.warn("TODO #timeline-graphs", qs('#timeline-graphs'));
 
-	document.body.onresize = function() {
-		set_heights();
-		if (t) t.dispatchEvent(new Event('resize'));
-	};
+	document.body.onresize = set_heights;
 
 	set_heights();
 };
@@ -796,11 +762,7 @@ export function left_panel(t) {
 	if (t) l.setAttribute('open', '');
 	else l.removeAttribute('open');
 
-	const rs = new Event('resize');
-	window.dispatchEvent(rs);
-
-	const tl = qs('#timeline');
-	if (tl) tl.dispatchEvent(rs);
+	window.dispatchEvent(new Event('resize'));
 };
 
 function drawer_init() {
@@ -860,19 +822,48 @@ function reset_features_visibility() {
 	else console.debug("reset_features_visibility: could not find source '%s'. First load? -> OK.", this.id);
 };
 
-function timeline_visibility() {
-	const timeline = qs('#timeline');
+function redraw_raster_canvas(d, mask) {
+	const { data, width, height, nodata, canvas } = d.raster;
 
-	if (!timeline) return;
+	const draw_data = mask ?
+		data.map((v,i) => (v === nodata || mask.data[i] === mask.nodata) ? nodata : v) :
+		data;
 
-	let v = '';
+	plot_drawcanvas({ canvas, "data": draw_data, width, height, nodata, "colorscale": d.colorscale });
 
-	const d = qsa('ds-card', qs('#cards-list'), true).map(c => c.ds)[0];
+	const source = MAPBOX.getSource(d.id);
+	if (source) { source.play(); source.pause(); }
+};
 
-	if (maybe(d, 'timeline')) ;
-	else v = 'none';
+// "Only show areas that meet all data layer criteria": clips every active
+// raster/vector layer's own presentation to the areas that satisfy every
+// active dataset's criteria, not just a highlight overlay.
+function apply_criteria_mask() {
+	const enabled = timeline_cell().state.filters.enabled;
 
-	timeline.style.display = v;
+	const relevant = STATE.datasets.filter(d =>
+		and(d.on, d.type !== 'polygons-boundaries', or(maybe(d.raster, 'canvas'), maybe(d.vectors, 'data'))));
+
+	if (!enabled) {
+		relevant.forEach(d => {
+			if (!d._masked) return;
+			d._masked = false;
+
+			if (maybe(d.raster, 'canvas')) redraw_raster_canvas(d, null);
+			else reset_features_visibility.call(d);
+		});
+
+		return;
+	}
+
+	const mask = compoundMask(criteria_mask(STATE.index));
+
+	relevant.forEach(d => {
+		d._masked = true;
+
+		if (maybe(d.raster, 'canvas')) redraw_raster_canvas(d, mask);
+		else analysis_dataset_intersect.call(d, mask);
+	});
 };
 
 function load_datasets(array) {

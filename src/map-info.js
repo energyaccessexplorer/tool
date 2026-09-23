@@ -3,16 +3,15 @@ import {
 } from './area-analysis.js';
 
 import {
-	update as data_tab_update,
-	clear as data_tab_clear,
-} from './right-panel-data-tab.js';
+	cell as data_tab_cell,
+	actions as data_tab_actions,
+} from './right-panel-data-state.js';
 
 import {
-	update as prioritization_tab_update,
-	clear as prioritization_tab_clear,
-	update_location_summary,
-	clear_location_summary,
-} from './right-panel-prioritization-tab.js';
+	cell as prioritization_cell,
+	actions as prioritization_actions,
+	toSummary,
+} from './right-panel-prioritization-state.js';
 
 import {
 	update as poi_update,
@@ -81,9 +80,8 @@ export default class mapinfo extends HTMLElement {
 		const { fields, props, ll, analysis_value, analysis_name, feature_name, "admin_info": info, raw, raster_index } = rawData;
 		const data = area_info(fields, props, ll, analysis_value, analysis_name, feature_name, info, raw);
 
-		data_tab_update(data.detailedData, info, raster_index);
-		prioritization_tab_update(raster_index, info, analysis_value);
-		update_location_summary(data, info);
+		data_tab_actions.locationSelected(data_tab_cell(), { "entries": data.detailedData, "admin": info, "rasterIndex": raster_index });
+		prioritization_actions.locationSelected(prioritization_cell(), { "admin": info, "rasterIndex": raster_index, "analysisValue": analysis_value, "summary": toSummary(data, info) });
 		if (!info) poi_update(ll);
 
 		const content = tmpl('#map-info-template');
@@ -119,9 +117,8 @@ export default class mapinfo extends HTMLElement {
 
 		const closeButton = qs('.close-button', this);
 		closeButton.onclick = () => {
-			data_tab_clear();
-			prioritization_tab_clear();
-			clear_location_summary();
+			data_tab_actions.backToNational(data_tab_cell());
+			prioritization_actions.backToNational(prioritization_cell());
 			poi_clear();
 			if (onClose) onClose();
 			else this.remove();

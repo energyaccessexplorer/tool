@@ -303,16 +303,31 @@ export async function plot_active(type) {
 	return a;
 };
 
-// Which pixels satisfy every active dataset's own criteria.
+// Which pixels satisfy every active dataset's own criteria, inside the
+// sub-geography selected with "Change geographies" (when there is one).
 export function criteria_mask(type) {
 	const list = datasets(type);
 
 	const it = new Uint8Array(OUTLINE.raster.data.length).fill(1);
+
+	// A sub-geography picked in "Change geography" scopes the filtered view to
+	// the same area run() clips the analysis raster to; without it the mask still
+	// covers the parent geography, so the layers stay painted over the parent.
+	const { "data": area_data, "nodata": area_nodata, "id": area_id } = active_area_mask();
+	const in_area = i => area_data[i] !== area_nodata && area_data[i] === area_id;
+
+	if (area_id !== undefined) {
+		for (let i = 0; i < it.length; i += 1)
+			if (!in_area(i)) it[i] = 0;
+	}
+
 	if (!list.length) return it;
 
 	const afns = list.map(d => d._afn(type));
 
 	for (let i = 0; i < it.length; i += 1) {
+		if (it[i] === 0) continue;
+
 		for (let j = 0; j < list.length; j += 1) {
 			const c = list[j];
 			const v = c.raster.data[i];

@@ -412,10 +412,15 @@ export function update(detailedData, admin_info = null, raster_index = null) {
 	// five-class GFSAD "Cropland Extent"), and a label-keyed map gave whichever
 	// entry won the collision to both cards — so one card silently reported the
 	// other layer's statistic.
+	//
+	// The two producers of these entries spell that id differently:
+	// build_detailed_data() (the aggregate path) writes `id`, format_detail()
+	// (the map-click path in area-analysis.js) writes `dataset_id`. Read
+	// whichever is present or the click path's cards lose their value.
 	const by_id = new Map(
 		detailedData
 			.filter(d => !d.subordinate && d.raw_value != null && d.raw_value !== 'Not aggregated')
-			.map(d => [d.id, d]),
+			.map(d => [d.id ?? d.dataset_id, d]),
 	);
 
 	const cards = STATE.datasets

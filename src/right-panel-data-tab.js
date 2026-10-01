@@ -86,9 +86,21 @@ const RASTER_KEYS = {
 	'People per 100k population': 'right_panel.data.descriptions.raster.per100k',
 };
 
-export function describe(datatype, unit, name, value, aggregation) {
+// A category can declare that its aggregate is an areal share, not the mean of a
+// physical quantity (categories.controls.presentation). Those cards report a
+// percentage of the analysed area instead of an "average": cropland's band 3 is
+// a 0..1 cropland fraction, so 0.7 is "70% of the area", not "average 0.7".
+const PRESENTATION_KEYS = {
+	'coverage_fraction': 'right_panel.data.descriptions.raster.coverage_pct',
+};
+
+export function describe(datatype, unit, name, value, aggregation, presentation) {
 	const locale = window.LOCALE;
 	const vars = { "name": name.toLowerCase(), value };
+
+	if (PRESENTATION_KEYS[presentation]) {
+		return t(locale, PRESENTATION_KEYS[presentation], vars);
+	}
 
 	if (datatype === 'points') {
 		const key = POINTS_KEYS[unit] ?? POINTS_KEYS['count'];
@@ -270,7 +282,7 @@ function make_card(ds, entry, admin_info) {
 
 	const desc = ce('p', null, { "class": 'data-card-description' });
 	if (entry.value != null) {
-		desc.innerHTML = describe(ds.category.datatype, entry.unit || ds.category.unit, translateDatasetName(window.LOCALE, ds), entry.value, entry.aggregation ?? ds.category.analysis?.aggregation);
+		desc.innerHTML = describe(ds.category.datatype, entry.unit || ds.category.unit, translateDatasetName(window.LOCALE, ds), entry.value, entry.aggregation ?? ds.category.analysis?.aggregation, entry.presentation);
 	} else {
 		desc.innerHTML = t(window.LOCALE, 'right_panel.data.no_data', { "name": translateDatasetName(window.LOCALE, ds) });
 	}
@@ -321,6 +333,9 @@ export function build_detailed_data(layer_data) {
 		const area_result = layer.areas?.[0]?.result;
 		if (!area_result) continue;
 
+		const ds = DST.get(id);
+		const presentation = ds?.category?.controls?.presentation;
+
 		let value, unit;
 		if (area_result.type === 'points') {
 			value = area_result.value;
@@ -329,7 +344,14 @@ export function build_detailed_data(layer_data) {
 			value = layer.aggregation === 'SUM'
 				? Math.round(area_result.value)
 				: parseFloat(area_result.value.toFixed(2));
-			unit = resolve_unit(layer, DST.get(id), value);
+			unit = resolve_unit(layer, ds, value);
+		}
+
+		// coverage_fraction: the aggregate is a 0..1 areal share, so present it as
+		// a percentage of area rather than in the layer's own (non-)unit.
+		if (presentation === 'coverage_fraction') {
+			value = parseFloat((value * 100).toFixed(1));
+			unit = '%';
 		}
 
 		const num = Number(value);
@@ -337,13 +359,14 @@ export function build_detailed_data(layer_data) {
 		const display_unit = unit === 'count' ? '' : translateUnit(window.LOCALE, unit);
 
 		detailedData.push({
-			"id":          id,
-			"label":       layer.name,
-			"value":       format_value_unit(formatted, display_unit),
-			"raw_value":   value,
-			"unit":        unit,
-			"datatype":    DST.get(id)?.category.datatype,
-			"aggregation": layer.aggregation,
+			"id":           id,
+			"label":        layer.name,
+			"value":        format_value_unit(formatted, display_unit),
+			"raw_value":    value,
+			"unit":         unit,
+			"datatype":     ds?.category.datatype,
+			"aggregation":  layer.aggregation,
+			"presentation": presentation,
 		});
 	}
 

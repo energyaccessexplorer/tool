@@ -407,10 +407,15 @@ export function update(detailedData, admin_info = null, raster_index = null) {
 
 	const effective_admin_info = resolve_admin_info(admin_info, raster_index);
 
-	const by_label = new Map(
+	// Keyed by dataset id, not by display label: two layers can legitimately
+	// share a name (Kenya carries both a binary AFCD "Cropland Extent" and a
+	// five-class GFSAD "Cropland Extent"), and a label-keyed map gave whichever
+	// entry won the collision to both cards — so one card silently reported the
+	// other layer's statistic.
+	const by_id = new Map(
 		detailedData
 			.filter(d => !d.subordinate && d.raw_value != null && d.raw_value !== 'Not aggregated')
-			.map(d => [d.label, d]),
+			.map(d => [d.id, d]),
 	);
 
 	const cards = STATE.datasets
@@ -421,7 +426,7 @@ export function update(detailedData, admin_info = null, raster_index = null) {
 		set_blank_state(false);
 		container.append(make_title(effective_admin_info, raster_index));
 		cards.forEach(ds => {
-			const entry = by_label.get(ds.name) ?? { "raw_value": null, "value": null, "label": ds.name };
+			const entry = by_id.get(ds.id) ?? { "raw_value": null, "value": null, "label": ds.name };
 			container.append(make_card(ds, entry, effective_admin_info));
 		});
 	} else {

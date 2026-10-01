@@ -93,6 +93,7 @@ const RASTER_KEYS = {
 // a 0..1 cropland fraction, so 0.7 is "70% of the area", not "average 0.7".
 const PRESENTATION_KEYS = {
 	'coverage_fraction': 'right_panel.data.descriptions.raster.coverage_pct',
+	'class_scale':        'right_panel.data.descriptions.raster.class_scale',
 };
 
 export function describe(datatype, unit, name, value, aggregation, presentation) {
@@ -352,13 +353,17 @@ export function build_detailed_data(layer_data) {
 		// a percentage of area rather than in the layer's own (non-)unit. One
 		// helper for every producer: the pixel and admin-area cards go through
 		// area-analysis.js format_detail() and must read the same.
-		const presented = apply_presentation(presentation, value, unit);
+		const presented = apply_presentation(presentation, value, unit, ds?.category?.domain);
 		value = presented.value;
 		unit = presented.unit;
 
 		const num = Number(value);
 		const formatted = Number.isFinite(num) ? num.toLocaleString(window.LOCALE) : String(value);
-		const display_unit = unit === 'count' ? '' : translateUnit(window.LOCALE, unit);
+		// A presentation-owned unit ('%', '(scale 1–5)') is final text, not a unit
+		// to look up in the locale tables.
+		const display_unit = unit === 'count' ? ''
+			: presentation ? unit
+				: translateUnit(window.LOCALE, unit);
 
 		detailedData.push({
 			"id":           id,

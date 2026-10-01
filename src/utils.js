@@ -722,21 +722,32 @@ export function format_value_unit(value, unit) {
 	return unit === '%' ? `${value}${unit}` : `${value} ${unit}`;
 }
 
-// A category may declare controls.presentation = "coverage_fraction": its
-// aggregate is a 0..1 areal share of the area rather than a measurement, and
-// the unit on such a category is a label ("Cropland"), not a unit. Present it
-// as a percentage with a "%" unit so every producer that renders a card — the
-// geography aggregate, an admin area and a clicked pixel alike — says the same
-// thing about the same layer.
-//
+// Three presentation contracts, so the same layer reads the same way on a
+// clicked pixel, an admin area and the whole geography:
+//   coverage_fraction — a 0..1 areal share, reported as a percentage of the
+//                       area (the category's unit is a label, not a unit);
+//   class_scale       — an average of ordinal class codes. The category's unit
+//                       ("Type") is its range label, so append the scale the
+//                       codes come from instead of a word that reads as a unit:
+//                       "… is 5 (scale 1–5)".
 // Rounding mirrors the aggregate path: to 2 decimals first, then scale, then 1
-// decimal, so "4 type" style producers and the geography agree on precision.
-export function apply_presentation(presentation, value, unit) {
-	if (presentation !== 'coverage_fraction') return { value, unit };
+// decimal, so every producer agrees on precision.
+export function apply_presentation(presentation, value, unit, domain) {
+	if (presentation === 'coverage_fraction') {
+		const v = Number(value);
+		if (!Number.isFinite(v)) return { value, unit };
 
-	const v = Number(value);
-	if (!Number.isFinite(v)) return { value, unit };
+		return { "value": parseFloat((parseFloat(v.toFixed(2)) * 100).toFixed(1)), "unit": '%' };
+	}
 
-	return { "value": parseFloat((parseFloat(v.toFixed(2)) * 100).toFixed(1)), "unit": '%' };
+	if (presentation === 'class_scale') {
+		const min = Number(domain?.min);
+		const max = Number(domain?.max);
+		if (!Number.isFinite(min) || !Number.isFinite(max)) return { value, unit };
+
+		return { value, "unit": `(scale ${min}–${max})` };
+	}
+
+	return { value, unit };
 }
 

@@ -282,13 +282,16 @@ function format_detail(key, label, value, raw, subordinate, dataset_id) {
 	// a coverage_fraction layer reports a 0..1 areal share, so the pixel and
 	// admin-area cards must read "70% of the analysed area …" and not
 	// "0.7 Cropland" — one copy across every level (EAE-513).
-	const presentation = dataset_id
-		? maybe(STATE.datasets.find(d => d.id === dataset_id), 'category', 'controls', 'presentation')
-		: null;
-	const presented = apply_presentation(presentation, value, raw.units[key]);
+	const ds = dataset_id ? STATE.datasets.find(d => d.id === dataset_id) : null;
+	const presentation = maybe(ds, 'category', 'controls', 'presentation');
+	const presented = apply_presentation(presentation, value, raw.units[key], maybe(ds, 'category', 'domain'));
 
 	const unit = presented.unit;
-	const display_unit = unit === 'count' ? '' : translateUnit(window.LOCALE, unit || '');
+	// A presentation-owned unit ('%', '(scale 1–5)') is final text, not a unit
+	// to look up in the locale tables.
+	const display_unit = unit === 'count' ? ''
+		: presentation ? unit
+			: translateUnit(window.LOCALE, unit || '');
 	const num = Number(presented.value);
 	const formatted = Number.isFinite(num) ? num.toLocaleString(window.LOCALE) : presented.value;
 	return {

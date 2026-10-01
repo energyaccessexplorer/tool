@@ -745,7 +745,10 @@ export function apply_presentation(presentation, value, unit, domain) {
 		const max = Number(domain?.max);
 		if (!Number.isFinite(min) || !Number.isFinite(max)) return { value, unit };
 
-		return { value, "unit": `(scale ${min}–${max})` };
+		// The range itself is locale-neutral (digits + dash); the words around it
+		// live in the description template, so fr/zh can have their own "échelle"/
+		// "量表" instead of a hardcoded English "scale".
+		return { value, "unit": '', "scale": `${min}–${max}` };
 	}
 
 	return { value, unit };

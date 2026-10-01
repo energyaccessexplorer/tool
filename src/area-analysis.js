@@ -295,14 +295,15 @@ function format_detail(key, label, value, raw, subordinate, dataset_id) {
 	const num = Number(presented.value);
 	const formatted = Number.isFinite(num) ? num.toLocaleString(window.LOCALE) : presented.value;
 	return {
-		"label":        label || key,
-		"value":        format_value_unit(formatted, display_unit),
-		"raw_value":    raw.values[key],
-		"unit":         unit,
-		"aggregation":  raw.aggregations?.[key],
-		"subordinate":  subordinate,
-		"dataset_id":   dataset_id,
-		"presentation": presentation,
+		"label":              label || key,
+		"value":              format_value_unit(formatted, display_unit),
+		"raw_value":          raw.values[key],
+		"unit":               unit,
+		"aggregation":        raw.aggregations?.[key],
+		"subordinate":        subordinate,
+		"dataset_id":         dataset_id,
+		"presentation":       presentation,
+		"presentation_scale": presented.scale,
 	};
 }
 

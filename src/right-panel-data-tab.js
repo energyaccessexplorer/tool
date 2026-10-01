@@ -96,9 +96,11 @@ const PRESENTATION_KEYS = {
 	'class_scale':        'right_panel.data.descriptions.raster.class_scale',
 };
 
-export function describe(datatype, unit, name, value, aggregation, presentation) {
+export function describe(datatype, unit, name, value, aggregation, presentation, scale) {
 	const locale = window.LOCALE;
-	const vars = { "name": name.toLowerCase(), value };
+	// `scale` is a class-coded layer's range ("1–5"); only the class_scale
+	// template interpolates it, every other template ignores the extra var.
+	const vars = { "name": name.toLowerCase(), value, scale };
 
 	if (PRESENTATION_KEYS[presentation]) {
 		return t(locale, PRESENTATION_KEYS[presentation], vars);
@@ -284,7 +286,7 @@ function make_card(ds, entry, admin_info) {
 
 	const desc = ce('p', null, { "class": 'data-card-description' });
 	if (entry.value != null) {
-		desc.innerHTML = describe(ds.category.datatype, entry.unit || ds.category.unit, translateDatasetName(window.LOCALE, ds), entry.value, entry.aggregation ?? ds.category.analysis?.aggregation, entry.presentation);
+		desc.innerHTML = describe(ds.category.datatype, entry.unit || ds.category.unit, translateDatasetName(window.LOCALE, ds), entry.value, entry.aggregation ?? ds.category.analysis?.aggregation, entry.presentation, entry.presentation_scale);
 	} else {
 		desc.innerHTML = t(window.LOCALE, 'right_panel.data.no_data', { "name": translateDatasetName(window.LOCALE, ds) });
 	}
@@ -356,6 +358,7 @@ export function build_detailed_data(layer_data) {
 		const presented = apply_presentation(presentation, value, unit, ds?.category?.domain);
 		value = presented.value;
 		unit = presented.unit;
+		const presentation_scale = presented.scale;
 
 		const num = Number(value);
 		const formatted = Number.isFinite(num) ? num.toLocaleString(window.LOCALE) : String(value);
@@ -366,14 +369,15 @@ export function build_detailed_data(layer_data) {
 				: translateUnit(window.LOCALE, unit);
 
 		detailedData.push({
-			"id":           id,
-			"label":        layer.name,
-			"value":        format_value_unit(formatted, display_unit),
-			"raw_value":    value,
-			"unit":         unit,
-			"datatype":     ds?.category.datatype,
-			"aggregation":  layer.aggregation,
-			"presentation": presentation,
+			"id":                 id,
+			"label":              layer.name,
+			"value":              format_value_unit(formatted, display_unit),
+			"raw_value":          value,
+			"unit":               unit,
+			"datatype":           ds?.category.datatype,
+			"aggregation":        layer.aggregation,
+			"presentation":       presentation,
+			"presentation_scale": presentation_scale,
 		});
 	}
 

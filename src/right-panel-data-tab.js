@@ -26,6 +26,7 @@ import {
 import {
 	svg_pie,
 	format_value_unit,
+	apply_presentation,
 } from './utils.js';
 
 const POINTS_KEYS = {
@@ -348,11 +349,12 @@ export function build_detailed_data(layer_data) {
 		}
 
 		// coverage_fraction: the aggregate is a 0..1 areal share, so present it as
-		// a percentage of area rather than in the layer's own (non-)unit.
-		if (presentation === 'coverage_fraction') {
-			value = parseFloat((value * 100).toFixed(1));
-			unit = '%';
-		}
+		// a percentage of area rather than in the layer's own (non-)unit. One
+		// helper for every producer: the pixel and admin-area cards go through
+		// area-analysis.js format_detail() and must read the same.
+		const presented = apply_presentation(presentation, value, unit);
+		value = presented.value;
+		unit = presented.unit;
 
 		const num = Number(value);
 		const formatted = Number.isFinite(num) ? num.toLocaleString(window.LOCALE) : String(value);

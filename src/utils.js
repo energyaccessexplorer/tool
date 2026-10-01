@@ -722,3 +722,21 @@ export function format_value_unit(value, unit) {
 	return unit === '%' ? `${value}${unit}` : `${value} ${unit}`;
 }
 
+// A category may declare controls.presentation = "coverage_fraction": its
+// aggregate is a 0..1 areal share of the area rather than a measurement, and
+// the unit on such a category is a label ("Cropland"), not a unit. Present it
+// as a percentage with a "%" unit so every producer that renders a card — the
+// geography aggregate, an admin area and a clicked pixel alike — says the same
+// thing about the same layer.
+//
+// Rounding mirrors the aggregate path: to 2 decimals first, then scale, then 1
+// decimal, so "4 type" style producers and the geography agree on precision.
+export function apply_presentation(presentation, value, unit) {
+	if (presentation !== 'coverage_fraction') return { value, unit };
+
+	const v = Number(value);
+	if (!Number.isFinite(v)) return { value, unit };
+
+	return { "value": parseFloat((parseFloat(v.toFixed(2)) * 100).toFixed(1)), "unit": '%' };
+}
+

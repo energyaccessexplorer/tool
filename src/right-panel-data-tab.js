@@ -26,6 +26,7 @@ import {
 import {
 	svg_pie,
 	format_value_unit,
+	apply_presentation,
 } from './utils.js';
 
 const POINTS_KEYS = {
@@ -86,9 +87,24 @@ const RASTER_KEYS = {
 	'People per 100k population': 'right_panel.data.descriptions.raster.per100k',
 };
 
-export function describe(datatype, unit, name, value, aggregation) {
+// A category can declare that its aggregate is an areal share, not the mean of a
+// physical quantity (categories.controls.presentation). Those cards report a
+// percentage of the analysed area instead of an "average": cropland's band 3 is
+// a 0..1 cropland fraction, so 0.7 is "70% of the area", not "average 0.7".
+const PRESENTATION_KEYS = {
+	'coverage_fraction': 'right_panel.data.descriptions.raster.coverage_pct',
+	'class_scale':        'right_panel.data.descriptions.raster.class_scale',
+};
+
+export function describe(datatype, unit, name, value, aggregation, presentation, scale) {
 	const locale = window.LOCALE;
-	const vars = { "name": name.toLowerCase(), value };
+	// `scale` is a class-coded layer's range ("1–5"); only the class_scale
+	// template interpolates it, every other template ignores the extra var.
+	const vars = { "name": name.toLowerCase(), value, scale };
+
+	if (PRESENTATION_KEYS[presentation]) {
+		return t(locale, PRESENTATION_KEYS[presentation], vars);
+	}
 
 	if (datatype === 'points') {
 		const key = POINTS_KEYS[unit] ?? POINTS_KEYS['count'];
@@ -270,7 +286,7 @@ function make_card(ds, entry, admin_info) {
 
 	const desc = ce('p', null, { "class": 'data-card-description' });
 	if (entry.value != null) {
-		desc.innerHTML = describe(ds.category.datatype, entry.unit || ds.category.unit, translateDatasetName(window.LOCALE, ds), entry.value, entry.aggregation ?? ds.category.analysis?.aggregation);
+		desc.innerHTML = describe(ds.category.datatype, entry.unit || ds.category.unit, translateDatasetName(window.LOCALE, ds), entry.value, entry.aggregation ?? ds.category.analysis?.aggregation, entry.presentation, entry.presentation_scale);
 	} else {
 		desc.innerHTML = t(window.LOCALE, 'right_panel.data.no_data', { "name": translateDatasetName(window.LOCALE, ds) });
 	}
@@ -321,6 +337,9 @@ export function build_detailed_data(layer_data) {
 		const area_result = layer.areas?.[0]?.result;
 		if (!area_result) continue;
 
+		const ds = DST.get(id);
+		const presentation = ds?.category?.controls?.presentation;
+
 		let value, unit;
 		if (area_result.type === 'points') {
 			value = area_result.value;
@@ -329,21 +348,36 @@ export function build_detailed_data(layer_data) {
 			value = layer.aggregation === 'SUM'
 				? Math.round(area_result.value)
 				: parseFloat(area_result.value.toFixed(2));
-			unit = resolve_unit(layer, DST.get(id), value);
+			unit = resolve_unit(layer, ds, value);
 		}
+
+		// coverage_fraction: the aggregate is a 0..1 areal share, so present it as
+		// a percentage of area rather than in the layer's own (non-)unit. One
+		// helper for every producer: the pixel and admin-area cards go through
+		// area-analysis.js format_detail() and must read the same.
+		const presented = apply_presentation(presentation, value, unit, ds?.category?.domain);
+		value = presented.value;
+		unit = presented.unit;
+		const presentation_scale = presented.scale;
 
 		const num = Number(value);
 		const formatted = Number.isFinite(num) ? num.toLocaleString(window.LOCALE) : String(value);
-		const display_unit = unit === 'count' ? '' : translateUnit(window.LOCALE, unit);
+		// A presentation-owned unit ('%', '(scale 1–5)') is final text, not a unit
+		// to look up in the locale tables.
+		const display_unit = unit === 'count' ? ''
+			: presentation ? unit
+				: translateUnit(window.LOCALE, unit);
 
 		detailedData.push({
-			"id":          id,
-			"label":       layer.name,
-			"value":       format_value_unit(formatted, display_unit),
-			"raw_value":   value,
-			"unit":        unit,
-			"datatype":    DST.get(id)?.category.datatype,
-			"aggregation": layer.aggregation,
+			"id":                 id,
+			"label":              layer.name,
+			"value":              format_value_unit(formatted, display_unit),
+			"raw_value":          value,
+			"unit":               unit,
+			"datatype":           ds?.category.datatype,
+			"aggregation":        layer.aggregation,
+			"presentation":       presentation,
+			"presentation_scale": presentation_scale,
 		});
 	}
 
@@ -384,10 +418,20 @@ export function update(detailedData, admin_info = null, raster_index = null) {
 
 	const effective_admin_info = resolve_admin_info(admin_info, raster_index);
 
-	const by_label = new Map(
+	// Keyed by dataset id, not by display label: two layers can legitimately
+	// share a name (Kenya carries both a binary AFCD "Cropland Extent" and a
+	// five-class GFSAD "Cropland Extent"), and a label-keyed map gave whichever
+	// entry won the collision to both cards — so one card silently reported the
+	// other layer's statistic.
+	//
+	// The two producers of these entries spell that id differently:
+	// build_detailed_data() (the aggregate path) writes `id`, format_detail()
+	// (the map-click path in area-analysis.js) writes `dataset_id`. Read
+	// whichever is present or the click path's cards lose their value.
+	const by_id = new Map(
 		detailedData
 			.filter(d => !d.subordinate && d.raw_value != null && d.raw_value !== 'Not aggregated')
-			.map(d => [d.label, d]),
+			.map(d => [d.id ?? d.dataset_id, d]),
 	);
 
 	const cards = STATE.datasets
@@ -398,7 +442,7 @@ export function update(detailedData, admin_info = null, raster_index = null) {
 		set_blank_state(false);
 		container.append(make_title(effective_admin_info, raster_index));
 		cards.forEach(ds => {
-			const entry = by_label.get(ds.name) ?? { "raw_value": null, "value": null, "label": ds.name };
+			const entry = by_id.get(ds.id) ?? { "raw_value": null, "value": null, "label": ds.name };
 			container.append(make_card(ds, entry, effective_admin_info));
 		});
 	} else {

@@ -722,3 +722,35 @@ export function format_value_unit(value, unit) {
 	return unit === '%' ? `${value}${unit}` : `${value} ${unit}`;
 }
 
+// Three presentation contracts, so the same layer reads the same way on a
+// clicked pixel, an admin area and the whole geography:
+//   coverage_fraction — a 0..1 areal share, reported as a percentage of the
+//                       area (the category's unit is a label, not a unit);
+//   class_scale       — an average of ordinal class codes. The category's unit
+//                       ("Type") is its range label, so append the scale the
+//                       codes come from instead of a word that reads as a unit:
+//                       "… is 5 (scale 1–5)".
+// Rounding mirrors the aggregate path: to 2 decimals first, then scale, then 1
+// decimal, so every producer agrees on precision.
+export function apply_presentation(presentation, value, unit, domain) {
+	if (presentation === 'coverage_fraction') {
+		const v = Number(value);
+		if (!Number.isFinite(v)) return { value, unit };
+
+		return { "value": parseFloat((parseFloat(v.toFixed(2)) * 100).toFixed(1)), "unit": '%' };
+	}
+
+	if (presentation === 'class_scale') {
+		const min = Number(domain?.min);
+		const max = Number(domain?.max);
+		if (!Number.isFinite(min) || !Number.isFinite(max)) return { value, unit };
+
+		// The range itself is locale-neutral (digits + dash); the words around it
+		// live in the description template, so fr/zh can have their own "échelle"/
+		// "量表" instead of a hardcoded English "scale".
+		return { value, "unit": '', "scale": `${min}–${max}` };
+	}
+
+	return { value, unit };
+}
+

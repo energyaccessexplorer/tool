@@ -468,7 +468,7 @@ function data_card_body($, e, ds, tx, ty, tw, th) {
 	}
 
 	const name = ds ? translateDatasetName(window.LOCALE, ds) : e.label;
-	const description = unesc(describe(e.datatype, e.unit, name, e.value, e.aggregation)).replace(/<\/?strong>/g, '');
+	const description = unesc(describe(e.datatype, e.unit, name, e.value, e.aggregation, e.presentation, e.presentation_scale)).replace(/<\/?strong>/g, '');
 
 	const runs = [];
 	if (e.value) {

@@ -2,6 +2,7 @@ import {
 	area_type,
 	resolve_raster_value,
 	format_value_unit,
+	apply_presentation,
 	coordinates_to_raster_pixel,
 } from './utils.js';
 
@@ -277,18 +278,32 @@ function location_entry(fields, props) {
 }
 
 function format_detail(key, label, value, raw, subordinate, dataset_id) {
-	const unit = raw.units[key];
-	const display_unit = unit === 'count' ? '' : translateUnit(window.LOCALE, unit || '');
-	const num = Number(value);
-	const formatted = Number.isFinite(num) ? num.toLocaleString(window.LOCALE) : value;
+	// Same conversion the geography aggregate uses (utils.apply_presentation):
+	// a coverage_fraction layer reports a 0..1 areal share, so the pixel and
+	// admin-area cards must read "70% of the analysed area …" and not
+	// "0.7 Cropland" — one copy across every level (EAE-513).
+	const ds = dataset_id ? STATE.datasets.find(d => d.id === dataset_id) : null;
+	const presentation = maybe(ds, 'category', 'controls', 'presentation');
+	const presented = apply_presentation(presentation, value, raw.units[key], maybe(ds, 'category', 'domain'));
+
+	const unit = presented.unit;
+	// A presentation-owned unit ('%', '(scale 1–5)') is final text, not a unit
+	// to look up in the locale tables.
+	const display_unit = unit === 'count' ? ''
+		: presentation ? unit
+			: translateUnit(window.LOCALE, unit || '');
+	const num = Number(presented.value);
+	const formatted = Number.isFinite(num) ? num.toLocaleString(window.LOCALE) : presented.value;
 	return {
-		"label":       label || key,
-		"value":       format_value_unit(formatted, display_unit),
-		"raw_value":    raw.values[key],
-		"unit":        unit,
-		"aggregation": raw.aggregations?.[key],
-		"subordinate": subordinate,
-		"dataset_id":  dataset_id,
+		"label":              label || key,
+		"value":              format_value_unit(formatted, display_unit),
+		"raw_value":          raw.values[key],
+		"unit":               unit,
+		"aggregation":        raw.aggregations?.[key],
+		"subordinate":        subordinate,
+		"dataset_id":         dataset_id,
+		"presentation":       presentation,
+		"presentation_scale": presented.scale,
 	};
 }
 

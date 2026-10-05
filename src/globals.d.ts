@@ -15,6 +15,10 @@ declare const STATE: {
 	readonly variant: string;
 	/** Currently selected index id ('eai', 'demand', 'supply', 'ani', ...). */
 	readonly index: string;
+	/** "Change geography" selection: division tier (0 = whole geography). */
+	readonly divtier?: number;
+	/** "Change geography" selection: area id within divisions[divtier]. */
+	readonly subdiv?: number;
 
 	/**
 	 * Legacy per-geography selected Date (timeline.js). The EAE-297 year
@@ -28,6 +32,9 @@ declare const GEOGRAPHY: {
 	/** Selected geography's display name (the Data tab's title and the
 	 * whole-geography clause of the card sentences name it). */
 	readonly name: string;
+
+	/** Geography id (uuid). */
+	readonly id?: string;
 
 	readonly divisions?: Record<string, {
 		readonly name?: string;

@@ -303,16 +303,34 @@ export async function plot_active(type) {
 	return a;
 };
 
-// Which pixels satisfy every active dataset's own criteria.
+// Which pixels satisfy every active dataset's own criteria, inside the
+// sub-geography selected with "Change geographies" (when there is one).
 export function criteria_mask(type) {
 	const list = datasets(type);
 
 	const it = new Uint8Array(OUTLINE.raster.data.length).fill(1);
+
+	// EAE-496: the filtered data view has to be masked to the sub-geography the
+	// user changed to, exactly like run() masks the analysis raster. Without
+	// this term the mask still covers the whole parent geography, so the active
+	// layers are painted over the parent instead of over the subnational
+	// boundary the user selected.
+	//
+	const sd = STATE.subdiv;
+	const divraster = STATE.divtier > 0 ? maybe(GEOGRAPHY.divisions, STATE.divtier, 'raster') : undefined;
+
+	if (and(typeof sd === 'number', divraster)) {
+		for (let i = 0; i < it.length; i += 1)
+			if (divraster.data[i] !== sd) it[i] = 0;
+	}
+
 	if (!list.length) return it;
 
 	const afns = list.map(d => d._afn(type));
 
 	for (let i = 0; i < it.length; i += 1) {
+		if (it[i] === 0) continue;
+
 		for (let j = 0; j < list.length; j += 1) {
 			const c = list[j];
 			const v = c.raster.data[i];

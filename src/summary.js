@@ -1,6 +1,7 @@
 import bubblemessage from '../lib/bubblemessage.js';
 
 import analysis_run, {
+	active_area_mask,
 	analysis_colorscale,
 	division_averages,
 	priority_scale,
@@ -27,7 +28,7 @@ import {
 
 import { t, getScaleLabels } from './translate.js';
 
-// The share cards cover the whole geography, but the prioritization index only
+// The share cards cover the selected area, but the prioritization index only
 // exists inside the analysis window — run() fills the raster with -1 everywhere
 // else. Cells outside it cannot be placed in any of the five index buckets, so
 // they get a sixth of their own; without it the card's rows would not sum to
@@ -153,15 +154,17 @@ export default async function analyse(raster, layer_data = null) {
 	const population_groups = new Array(OUTSIDE_BUCKET + 1).fill(0);
 	const area_groups = new Array(OUTSIDE_BUCKET + 1).fill(0);
 
-	// Both cards are scoped to the whole geography, the same universe the
-	// Data-tab cards aggregate over, so their totals agree with the cards. Every
-	// valid outline cell counts as area; only cells that carry population data
-	// contribute people.
-	const outline = OUTLINE.raster.data;
-	const onodata = OUTLINE.raster.nodata;
+	// Both cards are scoped to the selected area — the sub-geography picked in
+	// "Change geography", or the whole geography when none is picked. That is the
+	// same universe the Data-tab cards aggregate over, so their totals agree with
+	// the cards. Every valid cell of it counts as area; only cells that carry
+	// population data contribute people.
+	const { "data": area_data, "nodata": area_nodata, "id": area_id } = active_area_mask();
+	const in_area = i => area_data[i] !== area_nodata
+		&& (area_id === undefined || area_data[i] === area_id);
 
 	for (let i = 0; i < a.length; i += 1) {
-		if (outline[i] === onodata) continue;
+		if (!in_area(i)) continue;
 
 		const bucket = bucket_index(a[i]);
 		area_groups[bucket] += 1;
@@ -171,8 +174,6 @@ export default async function analyse(raster, layer_data = null) {
 	}
 
 	const covered = area_groups.reduce((x, y) => x + y, 0);
-
-	const c = OUTLINE.raster.data.filter(x => x !== OUTLINE.raster.nodata).length;
 
 	const raw_ptotal = population_groups.reduce((a,b) => a + b, 0);
 	const atotal = area_groups.reduce((a,b) => a + b, 0);
@@ -184,7 +185,7 @@ export default async function analyse(raster, layer_data = null) {
 	// it now. Distribution proportions from the display raster above are still
 	// correct (overcounting cancels).
 	if (!layer_data) {
-		const mask = { "raster": { "data": outline.map(v => v === onodata ? -1 : 0) } };
+		const mask = { "raster": { "data": Float32Array.from(a, (_, i) => in_area(i) ? 0 : -1) } };
 		layer_data = await aggregate_layer_values(mask);
 	}
 	const pop_result = layer_data?.['population-density']?.areas?.[0]?.result;
@@ -193,8 +194,8 @@ export default async function analyse(raster, layer_data = null) {
 	const s = STATE.divtier ?
 		x => x / pixels_per_km2 :
 		d3.scaleLinear()
-			.domain([0, c])
-			.range([0, (GEOGRAPHY.area || c/pixels_per_km2)])
+			.domain([0, covered])
+			.range([0, (GEOGRAPHY.area || covered/pixels_per_km2)])
 			.clamp(true);
 
 	const o = {};

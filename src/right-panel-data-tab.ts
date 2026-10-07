@@ -12,6 +12,7 @@ import {
 } from './right-panel-tabs.js';
 
 import {
+	active_area_mask,
 	aggregate_layer_values,
 } from './analysis.js';
 
@@ -174,18 +175,7 @@ function computeDistribution(ds: LegacyDataset, adminInfo: AdminRef | null): Dis
 	const colorFn = ds.colorscale?.fn;
 	if (!csv?.data || !csv.key || !csv.column || !colorFn || !ds.raster) return null;
 
-	const cacheKey = adminInfo ? `${ds.id}:${adminInfo.id}` : ds.id;
-	const hit = cache.geoDist.get(cacheKey);
-	if (hit) return hit;
-
-	const key = csv.key;
-	const column = csv.column;
-	const categories = csv.data.map(x => ({
-		"value": Number(x[key]),
-		"name":  String(x[column]),
-		"color": `rgba(${colorFn(Number(x[key]))})`,
-	}));
-
+	let cacheKey: string;
 	let maskData: ArrayLike<number>;
 	let maskNodata: number;
 	let maskId: number | undefined;
@@ -196,12 +186,31 @@ function computeDistribution(ds: LegacyDataset, adminInfo: AdminRef | null): Dis
 		maskData   = div.raster.data;
 		maskNodata = div.raster.nodata;
 		maskId     = adminInfo.id;
+		cacheKey   = `${ds.id}:${adminInfo.id}`;
 	} else {
-		const outline = OUTLINE?.raster;
-		if (!outline?.data) return null;
-		maskData   = outline.data;
-		maskNodata = outline.nodata;
+		// The selected area, not just the geography: "Change geography" picks a
+		// sub-geography and the percentages have to follow it (EAE-507). Without
+		// this the card showed the parent's distribution under every sub-geography.
+		const area = active_area_mask();
+		if (!area.data) return null;
+		maskData   = area.data;
+		maskNodata = area.nodata;
+		maskId     = area.id;
+		cacheKey   = area.id === undefined
+			? `${ds.id}:geo:${GEOGRAPHY.id}`
+			: `${ds.id}:${STATE.divtier}:${area.id}`;
 	}
+
+	const hit = cache.geoDist.get(cacheKey);
+	if (hit) return hit;
+
+	const key = csv.key;
+	const column = csv.column;
+	const categories = csv.data.map(x => ({
+		"value": Number(x[key]),
+		"name":  String(x[column]),
+		"color": `rgba(${colorFn(Number(x[key]))})`,
+	}));
 
 	const counts = new Map(categories.map(c => [c.value, 0]));
 	const total  = countPixels(ds.raster.data, ds.raster.nodata, maskData, maskNodata, maskId, counts);

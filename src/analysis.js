@@ -510,6 +510,29 @@ export function has_priority_score(value) {
 	return Number.isFinite(value) && value > 0;
 }
 
+// The area a card is scoped to — the sub-geography picked in "Change geography"
+// (STATE.divtier/STATE.subdiv), or the whole geography outline when none is
+// picked. Single definition of "the selected area" for every consumer:
+//   - the categorical distribution the raster-valued Data cards show
+//     (compute_distribution() in right-panel-data-tab.ts);
+//   - the universe the share cards total over (analyse() in summary.js).
+// Same rule run() clips the analysis raster with, so the cards stay in step with
+// the map. Returns the mask count_pixels() reads: a raster whose cells name an
+// area, the id to match (undefined = every non-nodata cell), and its nodata.
+export function active_area_mask() {
+	const outline = OUTLINE.raster.data;
+	const nodata = OUTLINE.raster.nodata;
+
+	const dt = STATE.divtier;
+	if (!(dt > 0 && typeof STATE.subdiv === 'number'))
+		return { "data": outline, nodata, "id": undefined };
+
+	const div = maybe(GEOGRAPHY.divisions, dt, 'raster');
+	if (!div?.data) return { "data": outline, nodata, "id": undefined };
+
+	return { "data": div.data, "nodata": div.nodata, "id": STATE.subdiv };
+}
+
 // The band used for a dataset's scalar aggregation. SUM reads the area-weighted
 // sum band, AVG reads the area-weighted average band, and categorical datasets
 // (csv lookup) keep the near band since their values are category codes.

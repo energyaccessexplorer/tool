@@ -150,3 +150,9 @@ declare const d3: {
 	/** d3 v5 global event, set while a drag gesture runs. */
 	event: { readonly x: number; readonly y: number };
 };
+
+type PCPair = [number, number];
+
+declare const polygonClipping: {
+	intersection(geomA: PCPair[][] | PCPair[][][], geomB: PCPair[][] | PCPair[][][]): PCPair[][][];
+};

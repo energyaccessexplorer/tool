@@ -37,12 +37,16 @@ export type {
  * One layer's computed value for the current geography/location (the Data
  * tab's camelCase domain shape). `value` is a producer-formatted display
  * string today; `rawValue` is the raw value and may carry the 'Not
- * aggregated' sentinel string.
+ * aggregated' sentinel string. `total` is the same layer's whole-geography
+ * figure, formatted with the same unit: the unfiltered number the cards
+ * compare the analysed-area value against (EAE-514). Absent for the location
+ * view, which has no such counterpart.
  */
 export interface LayerEntry {
 	readonly label: string;
 	readonly value: string | number | null;
 	readonly rawValue: string | number | null;
+	readonly total?: string | null;
 	readonly unit?: string | null;
 	readonly aggregation?: string | null;
 	readonly subordinate?: boolean;
@@ -60,6 +64,7 @@ export interface DetailedDatum {
 	readonly label: string;
 	readonly value: string | number | null;
 	readonly raw_value: string | number | null;
+	readonly total?: string | null;
 	readonly unit?: string | null;
 	readonly aggregation?: string | null;
 	readonly subordinate?: boolean;
@@ -73,6 +78,7 @@ export function toLayerEntries(rows: readonly DetailedDatum[]): LayerEntry[] {
 		"rawValue":    row.raw_value,
 		"unit":        row.unit ?? null,
 		"aggregation": row.aggregation ?? null,
+		...(row.total === undefined ? {} : { "total": row.total }),
 		...(row.subordinate === undefined ? {} : { "subordinate": row.subordinate }),
 	}));
 }
@@ -120,6 +126,13 @@ export interface DataState {
 	readonly view: DataView;
 	/** Aggregates clipped to the analysis mask; set by right-panel.js graphs(). */
 	readonly analysisLayerData: AggregatedLayerData | null;
+	/**
+	 * The same layers aggregated over the whole geography outline — the
+	 * unfiltered figures the cards compare the analysed-area values against
+	 * (EAE-514). Computed by the same graphs() pass as the summary and set
+	 * together with analysisLayerData, so the two can never drift.
+	 */
+	readonly nationalLayerData: AggregatedLayerData | null;
 }
 
 export type Patch = (state: DataState) => DataState;
@@ -132,8 +145,9 @@ export interface DataCell {
 }
 
 const initial: DataState = {
-	"view":             { "kind": 'blank' },
+	"view":              { "kind": 'blank' },
 	"analysisLayerData": null,
+	"nationalLayerData": null,
 };
 
 const update = stream<Patch>();
@@ -201,12 +215,17 @@ export const actions = {
 
 	/**
 	 * An analysis run finished: swap in the aggregates clipped to the
-	 * analysis mask. Does not itself change the view — the producer follows
+	 * analysis mask, and the whole-geography aggregates the cards compare
+	 * them against (EAE-514). Does not itself change the view — the producer follows
 	 * with backToNational (legacy order: set_analysis_layer_data then
 	 * update_analysis → clear).
 	 */
-	analysisCompleted(c: DataCell, layerData: AggregatedLayerData): void {
-		c.update(s => ({ ...s, "analysisLayerData": layerData }));
+	analysisCompleted(c: DataCell, layerData: AggregatedLayerData, nationalLayerData: AggregatedLayerData | null = null): void {
+		c.update(s => ({
+			...s,
+			"analysisLayerData": layerData,
+			"nationalLayerData": nationalLayerData,
+		}));
 	},
 } as const;
 

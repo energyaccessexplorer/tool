@@ -112,10 +112,20 @@ export async function graphs(raster) {
 		"raster": { "data": raster.map((v, i) => (has_priority_score(v) && outline[i] !== outline_nodata) ? 0 : -1) },
 	};
 	const layer_data = await aggregate_layer_values(analysis_mask);
-	data_tab_actions.analysisCompleted(data_tab_cell(), layer_data);
+
+	// The same layers over the whole geography, with no analysis mask: the
+	// unfiltered figures the Data cards compare the analysed-area values
+	// against (EAE-514). Computed here once and shared, because
+	// summary_analyse() used to derive the very same aggregate for itself.
+	const national_mask = {
+		"raster": { "data": outline.map(v => (v !== outline_nodata) ? 0 : -1) },
+	};
+	const national_layer_data = await aggregate_layer_values(national_mask);
+
+	data_tab_actions.analysisCompleted(data_tab_cell(), layer_data, national_layer_data);
 
 	// The summary keeps the analysis-window mask.
-	const summary = await summary_analyse(raster);
+	const summary = await summary_analyse(raster, national_layer_data);
 
 	// The blank state follows the analysis, not the cards. Since EAE-502 the
 	// summary covers the whole outline, so its area and population totals are

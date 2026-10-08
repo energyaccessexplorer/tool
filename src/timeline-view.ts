@@ -567,7 +567,7 @@ function renderYearControl(state: TimelineState): void {
 	if (!state.active) { yearControl = null; return; }
 
 	// Available years, falling back to the configured range while the first
-	// trend recompute is still pending (before any CSV has loaded).
+	// trend recompute is still pending (before a CSV has loaded).
 	const dates = state.trend.dates.length > 0 ? state.trend.dates : (GEOGRAPHY.timeline_dates ?? []);
 	const years = dates.map(d => new Date(d).getUTCFullYear());
 

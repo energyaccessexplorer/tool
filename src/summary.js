@@ -181,8 +181,10 @@ export default async function analyse(raster, layer_data = null) {
 	// whole-geography mask the cards use (unscaled raster via
 	// aggregate_layer_values, avoids overcounting from the oversampled display
 	// raster). When layer_data is not provided (e.g. PPTX summary data), compute
-	// it now. Distribution proportions from the display raster above are still
-	// correct (overcounting cancels).
+	// it now. The caller in right-panel.js hands in the aggregate it already
+	// computed for the Data cards' whole-geography figures (EAE-514), so this
+	// pass is only made when nobody else has. Distribution proportions from
+	// the display raster above are still correct (overcounting cancels).
 	if (!layer_data) {
 		const mask = { "raster": { "data": outline.map(v => v === onodata ? -1 : 0) } };
 		layer_data = await aggregate_layer_values(mask);

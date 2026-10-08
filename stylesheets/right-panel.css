@@ -89,6 +89,11 @@
   display: none;
 }
 
+/* EAE-518: hidden Timeline tab; .right-panel-tab sets display: flex. */
+.right-panel-tab[hidden] {
+  display: none;
+}
+
 #data-cards-container {
   display: flex;
   flex-direction: column;

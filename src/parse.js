@@ -27,11 +27,9 @@ import {
 	Whatever,
 } from '../lib/helpers.js';
 
-// Fetching is deliberately not gated on mapbox's style. The style is only
-// needed to *apply* data (add_source/add_layers), so the parsers wait for it
-// there, where the requirement actually lives. Gating the fetch here put every
-// dataset download behind the style load — and behind a timer the browser
-// throttles while the tab is hidden.
+// Parsers share their in-flight promise (fetch + parse) so a dataset activated
+// twice while loading is fetched once.
+
 async function fetchcheck(endpoint, format) {
 	if (endpoint.match(/^(blob:)?http/)) ;
 	else endpoint = EAE['settings'].storage + endpoint;
@@ -67,11 +65,13 @@ ${msg}`);
 
 export function csv() {
 	if (this.csv.data) return;
+	if (this.csv.loading) return this.csv.loading;
 
-	return fetchcheck.call(this, this.csv.endpoint, "CSV")
+	return this.csv.loading = fetchcheck.call(this, this.csv.endpoint, "CSV")
 		.then(d => d.text())
 		.then(r => this.csv.data = d3.csvParse(r, d3.autoType))
-		.then(table_setup.bind(this));
+		.then(table_setup.bind(this))
+		.finally(() => delete this.csv.loading);
 };
 
 function table_setup() {
@@ -237,16 +237,24 @@ OUTLINE: ${OUTLINE.raster.width} × ${OUTLINE.raster.height}`);
 
 	let t;
 	if (maybe(this.raster, 'data')) t = Whatever;
+	else if (this.raster.loading) return this.raster.loading;
 	else t = fetchcheck.call(this, this.raster.endpoint, "TIFF").then(r => r.blob());
 
-	return t.then(b => run_it.call(this, b));
+	t = t.then(b => run_it.call(this, b));
+
+	if (!maybe(this.raster, 'data'))
+		t = this.raster.loading = t.finally(() => delete this.raster.loading);
+
+	return t;
 };
 
 function geojson() {
 	if (this.vectors.data) return Whatever;
+	if (this.vectors.loading) return this.vectors.loading;
 
-	return fetchcheck.call(this, this.vectors.endpoint, "GEOJSON")
-		.then(async r => this.vectors.data = await r.json());
+	return this.vectors.loading = fetchcheck.call(this, this.vectors.endpoint, "GEOJSON")
+		.then(async r => this.vectors.data = await r.json())
+		.finally(() => delete this.vectors.loading);
 };
 
 export async function geojson_summary() {

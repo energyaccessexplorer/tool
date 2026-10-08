@@ -550,6 +550,21 @@ function buildYearSlider(
 	return { render };
 };
 
+/** EAE-518: the tab exists only while a timeline dataset is enabled. */
+function renderTimelineTab(state: TimelineState): void {
+	const tab = qs('#right-panel-tabs .right-panel-tab[data-tab="timeline"]') as HTMLElement | null;
+	if (!tab) return;
+
+	tab.hidden = !state.active;
+	if (state.active) return;
+
+	qs('#right-panel-tab-timeline').hidden = true;
+
+	// step off the tab we just hid, through the tab controller's own click
+	if (tab.classList.contains('active'))
+		(qs('#right-panel-tabs .right-panel-tab[data-tab="prioritization"]') as HTMLElement | null)?.click();
+};
+
 function renderTimelineBlankState(state: TimelineState): void {
 	const blank = qs('#timeline-blank-state') as HTMLElement | null;
 	const container = qs('#timeline-tab-container') as HTMLElement | null;
@@ -628,6 +643,7 @@ export function init(): void {
 	);
 
 	subscribe(state => {
+		renderTimelineTab(state);
 		renderYearControl(state);
 		renderTimelineBlankState(state);
 		renderFiltersToggle(state);
@@ -647,6 +663,7 @@ export function init(): void {
 	});
 
 	renderYearControl(cell().state);
+	renderTimelineTab(cell().state);
 	renderTimelineBlankState(cell().state);
 	renderFiltersToggle(cell().state);
 

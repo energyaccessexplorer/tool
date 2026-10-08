@@ -619,6 +619,64 @@ export function raster_pixel_to_coordinates(i) {
 	return merc.inverse([o[0] + (x * s), o[1] - (y * s)]);
 };
 
+/*
+ * mask_runs
+ *
+ * Vectorize a mask raster (Int8Array on the OUTLINE grid; nodata = filtered
+ * out) into disjoint rectangle polygons in lng/lat — maximal horizontal runs
+ * of passing cells. Rectangles never overlap, so holes in the mask need no
+ * representation: they are simply covered by no rectangle. polygonClipping
+ * consumes the list as a multipolygon.
+ *
+ * Each run carries its lng/lat bbox so callers can prefilter against a
+ * feature's extent before running the (expensive) boolean intersection.
+ *
+ * Cached on the raster object itself; mask rasters are rebuilt on every
+ * criteria apply, so the cache invalidates itself.
+ */
+
+export function mask_runs(raster) {
+	if (raster.__maskruns) return raster.__maskruns;
+
+	const { data, nodata } = raster;
+	const { width, height } = OUTLINE.raster;
+
+	const [ left, _bottom, _right, top ] = GEOGRAPHY.envelope;
+
+	const merc = new SphericalMercator({ "size": 1 });
+
+	const o = merc.forward([left, top]);
+
+	const s = GEOGRAPHY.resolution;
+
+	const corner = (gx, gy) => merc.inverse([o[0] + (gx * s), o[1] - (gy * s)]);
+
+	const runs = [];
+
+	for (let y = 0; y < height; y++) {
+		let x = 0;
+
+		while (x < width) {
+			if (data[(y * width) + x] === nodata) { x++; continue; }
+
+			let x1 = x;
+			while (x1 + 1 < width && data[(y * width) + x1 + 1] !== nodata) x1++;
+
+			const tl = corner(x, y);
+			const br = corner(x1 + 1, y + 1);
+
+			runs.push({
+				"bbox": [tl[0], br[1], br[0], tl[1]],
+				"poly": [[tl, [br[0], tl[1]], br, [tl[0], br[1]], tl]],
+			});
+
+			x = x1 + 1;
+		}
+	}
+
+	return raster.__maskruns = runs;
+};
+
 const outlier_ids_cache = new Map();
 
 // An area covering most of its tier's raster footprint is bad source
@@ -745,7 +803,7 @@ export function extent_contained(extent, raster) {
 	          f(left, bottom),
 	          f(right, top),
 	          f(right, bottom),
-	          f((right - left) / 2, (top - bottom) / 2));
+	          f((left + right) / 2, (bottom + top) / 2));
 };
 
 export function bi_icon(v) {

@@ -1,13 +1,10 @@
 import {
-	intersect,
-} from './rasters.js';
-
-import {
 	list as controls_list,
 } from './controls.js';
 
 import {
-	extent_contained,
+	mask_runs,
+	coordinates_to_raster_pixel,
 	resolve_raster_value,
 	format_value_unit,
 } from './utils.js';
@@ -135,23 +132,77 @@ export function context(raster_pixel, winner = null) {
 	return [dict, props, { values, units }];
 };
 
+// In-mask vertex runs as a MultiLineString, extended one vertex past each end.
+function masked_line_geometry(f, raster) {
+	const { data, nodata } = raster;
+
+	const parts = (f.geometry.type === 'LineString') ?
+		[f.geometry.coordinates] : f.geometry.coordinates;
+
+	const indexparts = maybe(f.properties, '__rasterindexparts') ||
+		parts.map(part => part.map(t => maybe(coordinates_to_raster_pixel(t), 'index')));
+
+	const lines = [];
+
+	for (let p = 0; p < parts.length; p++) {
+		const coords = parts[p];
+		const idxs = indexparts[p] || [];
+
+		const inside = i => (typeof idxs[i] === 'number') && (data[idxs[i]] !== nodata);
+
+		let start = -1;
+
+		const flush = end => {
+			const lo = Math.max(0, start - 1);
+			const hi = Math.min(coords.length - 1, end + 1);
+			if (hi > lo) lines.push(coords.slice(lo, hi + 1));
+		};
+
+		for (let i = 0; i < coords.length; i++) {
+			if (inside(i)) { if (start < 0) start = i; }
+			else if (start >= 0) { flush(i - 1); start = -1; }
+		}
+
+		if (start >= 0) flush(coords.length - 1);
+	}
+
+	return { "type": 'MultiLineString', "coordinates": lines };
+};
+
+// Intersect with the mask runs overlapping the feature's extent; on failure keep whole.
+function masked_polygon_geometry(f, runs) {
+	const geom = f.geometry;
+
+	const polys = (geom.type === 'Polygon') ? [geom.coordinates] : geom.coordinates;
+
+	const [left, bottom, right, top] = f.properties['__extent'];
+
+	const local = [];
+	for (const run of runs) {
+		const [rl, rb, rr, rt] = run.bbox;
+		if (rr < left || rl > right || rt < bottom || rb > top) continue;
+		local.push(run.poly);
+	}
+
+	if (!local.length) return { "type": 'MultiPolygon', "coordinates": [] };
+
+	try {
+		return { "type": 'MultiPolygon', "coordinates": polygonClipping.intersection(polys, local) };
+	} catch (err) {
+		console.warn("mask: polygon clip failed, keeping feature whole", err);
+		return geom;
+	}
+};
+
 export function analysis_dataset_intersect(raster) {
 	const { data, nodata } = raster;
 
 	if (['raster', 'raster-timeline'].includes(this.type)) return;
 
-	const vector_type = { "polygons": "polygons", "polygons-timeline": "polygons", "lines": "lines", "lines-timeline": "lines", "points": "points", "points-timeline": "points" }[this.type];
+	const vector_type = { "polygons": "polygons", "polygons-timeline": "polygons", "polygons-valued": "polygons", "lines": "lines", "lines-timeline": "lines", "points": "points", "points-timeline": "points" }[this.type];
 
 	let fn;
 	switch (vector_type) {
-	case 'polygons':
-		fn = p => extent_contained(p.properties['__extent'], raster);
-		break;
-
-	case 'lines':
-		fn = p => intersect(p.properties['__rasterindexes'], raster);
-		break;
-
 	case 'points':
 		fn = p => (data[p.properties['__rasterindex']] !== nodata);
 		break;
@@ -159,6 +210,45 @@ export function analysis_dataset_intersect(raster) {
 	default:
 		fn = _ => true;
 		break;
+	}
+
+	// Lines/polygons are clipped to the mask via a derived collection; vectors.data stays pristine.
+	if (vector_type === 'lines') {
+		let count = 0;
+
+		const features = this.vectors.data.features.map(f => {
+			const geometry = masked_line_geometry(f, raster);
+			const x = geometry.coordinates.length > 0;
+
+			f.properties['__visible'] = x;
+			if (x) count += 1;
+
+			return { "type": 'Feature', "properties": f.properties, geometry };
+		});
+
+		MAPBOX.getSource(this.id).setData({ "type": 'FeatureCollection', features });
+
+		return count;
+	}
+
+	if (vector_type === 'polygons') {
+		const runs = mask_runs(raster);
+
+		let count = 0;
+
+		const features = this.vectors.data.features.map(f => {
+			const geometry = masked_polygon_geometry(f, runs);
+			const x = geometry.coordinates.length > 0;
+
+			f.properties['__visible'] = x;
+			if (x) count += 1;
+
+			return { "type": 'Feature', "properties": f.properties, geometry };
+		});
+
+		MAPBOX.getSource(this.id).setData({ "type": 'FeatureCollection', features });
+
+		return count;
 	}
 
 	let count = 0;

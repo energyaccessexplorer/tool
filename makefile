@@ -215,6 +215,7 @@ build-a:
 		${LIB}/mapbox-gl.js \
 		${LIB}/geojson-extent.js \
 		${LIB}/sphericalmercator.js \
+		${LIB}/polygon-clipping.js \
 		${LIB}/html5sortable.js \
 		${LIB}/jwt-decode.js \
 		> ${DIST}/a/libs.js

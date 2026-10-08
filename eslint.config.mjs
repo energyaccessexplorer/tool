@@ -17,6 +17,7 @@ export default [
 				"PptxGenJS": "readonly",
 				"geojsonExtent": "readonly",
 				"SphericalMercator": "readonly",
+				"polygonClipping": "readonly",
 				"jwt_decode": "readonly",
 				"FLASH": "readonly",
 				"API": "readonly",

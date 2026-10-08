@@ -396,6 +396,11 @@ export function points() {
 				"clusterMaxZoom":   10,
 				"clusterMinPoints": 4,
 				"clusterRadius":    20,
+
+				// So clusters made only of filtered-out points can be hidden.
+				"clusterProperties": {
+					"__visible_count": ['+', ['case', ['boolean', ['get', '__visible'], false], 1, 0]],
+				},
 			});
 
 			this.add_layers({
@@ -414,13 +419,13 @@ export function points() {
 			}, {
 				"id":     `${this.id}-clusters`,
 				"type":   'circle',
-				"filter": ['has', 'point_count'],
+				"filter": ['all', ['has', 'point_count'], ['>', ['get', '__visible_count'], 0]],
 				"layout": {
 					"visibility": 'none',
 				},
 				"paint": {
 					"circle-radius": [
-						'step', ['get', 'point_count'],
+						'step', ['get', '__visible_count'],
 						2, 10,
 						5, 100,
 						7, 750,
@@ -439,18 +444,19 @@ export function lines() {
 	return geojson.call(this)
 		.then(_ => {
 			for (const f of this.vectors.data.features) {
-				if (f.geometry.type === "LineString") {
-					f.properties['__rasterindexes'] = f.geometry.coordinates.map(t => maybe(coordinates_to_raster_pixel(t), 'index')).sort();
-				} else {
-					const a = [];
+				const parts = (f.geometry.type === "LineString") ?
+					[f.geometry.coordinates] : f.geometry.coordinates;
 
-					f.geometry.coordinates.map(t => {
-						for (let i = 0; i < t.length; i++)
-							a[i] = maybe(coordinates_to_raster_pixel(t[i]), 'index');
-					});
+				// Per-part raster cell indexes aligned with each part's vertices.
+				const indexparts = parts.map(part =>
+					part.map(t => maybe(coordinates_to_raster_pixel(t), 'index')));
 
-					f.properties['__rasterindexes'] = a.sort();
-				}
+				f.properties['__rasterindexparts'] = indexparts;
+
+				// Kept flat for area-analysis' membership lookups. Out-of-geography
+				// vertices (undefined index) are dropped: they must not count as
+				// intersecting.
+				f.properties['__rasterindexes'] = indexparts.flat().filter(x => x !== undefined).sort();
 
 				f.properties['__visible'] = true;
 			}

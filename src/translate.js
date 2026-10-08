@@ -66,15 +66,46 @@ const LOCALE_LABELS = {
 	"zh": "中文",
 };
 
+// Which locales each environment offers (EAE-515/EAE-516): the French
+// translations go live in every environment, the Simplified Chinese ones only
+// in protected so far. `test` is the per-ticket preview host and `dev` the
+// local one, so both carry the full menu — a preview that cannot show the
+// locale under test is useless.
+const ENV_LOCALES = {
+	"public":    ["en", "fr"],
+	"protected": ["en", "fr", "zh"],
+	"training":  ["en", "fr"],
+	"test":      ["en", "fr", "zh"],
+	"dev":       ["en", "fr", "zh"],
+};
+
+// window.ENV is a list — ['public','test'] on test.* — so the available set is
+// the union over every environment this build is being served for.
+export function availableLocales() {
+	const allowed = new Set();
+
+	for (const e of window.ENV ?? [])
+		for (const l of ENV_LOCALES[e] ?? []) allowed.add(l);
+
+	// ?lang= stays an explicit escape hatch: translators and ticket previews use
+	// it on hosts where the locale is not deployed.
+	const override = new URLSearchParams(location.search).get('lang');
+	if (LOCALE_LABELS[override]) allowed.add(override);
+
+	return allowed;
+}
+
 export function resolveLocale() {
 	const lang = new URLSearchParams(location.search).get('lang');
 	if (LOCALE_LABELS[lang]) localStorage.setItem('locale', lang);
+
+	const allowed = availableLocales();
 
 	return [
 		lang,
 		localStorage.getItem('locale'),
 		navigator.language.split('-')[0],
-	].find(l => LOCALE_LABELS[l]) ?? 'en';
+	].find(l => allowed.has(l)) ?? 'en';
 }
 
 const _uiUpdaters = new Set();
@@ -134,10 +165,14 @@ export function initLocalePicker(locale) {
 	const nav = document.querySelector('nav');
 	if (!nav) return;
 
-	const show = new URLSearchParams(location.search).has('lang') || window.ENV.includes('protected') || localStorage.getItem('locale');
+	const allowed = availableLocales();
+
+	// The picker is worth showing wherever more than one locale is deployed,
+	// not just in protected.
+	const show = allowed.size > 1 || new URLSearchParams(location.search).has('lang');
 	if (!show) {
 		window.addEventListener('storage', function onStorage(e) {
-			if (e.key !== 'locale' || !LOCALE_LABELS[e.newValue]) return;
+			if (e.key !== 'locale' || !allowed.has(e.newValue)) return;
 			window.removeEventListener('storage', onStorage);
 			window.LOCALE = e.newValue;
 			initLocalePicker(e.newValue);
@@ -157,6 +192,8 @@ export function initLocalePicker(locale) {
 	dropdown.id = 'locale-dropdown';
 
 	for (const [l, label] of Object.entries(LOCALE_LABELS)) {
+		if (!allowed.has(l)) continue;
+
 		const item = document.createElement('a');
 		item.href = '#';
 		item.textContent = label;

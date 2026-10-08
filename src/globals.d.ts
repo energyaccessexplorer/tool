@@ -25,6 +25,10 @@ declare const STATE: {
 };
 
 declare const GEOGRAPHY: {
+	/** Selected geography's display name (the Data tab's title and the
+	 * whole-geography clause of the card sentences name it). */
+	readonly name: string;
+
 	readonly divisions?: Record<string, {
 		readonly name?: string;
 		readonly raster?: RasterLike;

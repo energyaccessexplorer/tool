@@ -42,6 +42,7 @@ describe('right-panel-data-state: atom', () => {
 	it('starts blank with no analysis data', () => {
 		assert.deepEqual(state().view, { "kind": 'blank' });
 		assert.equal(state().analysisLayerData, null);
+		assert.equal(state().nationalLayerData, null);
 	});
 
 	it('locationSelected switches to the location view and normalises undefined', () => {
@@ -142,10 +143,26 @@ describe('right-panel-data-state: atom', () => {
 	it('analysisCompleted does not change the current view', () => {
 		const c = cell();
 		actions.locationSelected(c, { "entries": [datum()] });
-		actions.analysisCompleted(c, { "x": { "name": 'X' } });
+		actions.analysisCompleted(c, { "x": { "name": 'X' } }, { "x": { "name": 'X' } });
 
 		assert.equal(state().view.kind, 'location');
 		assert.equal(state().analysisLayerData?.['x']?.name, 'X');
+		assert.equal(state().nationalLayerData?.['x']?.name, 'X');
+	});
+
+	// EAE-514: the cards append the whole-geography figure next to the
+	// analysed-area one, so the two aggregates must land in the same update —
+	// a stale pair would print a total belonging to another analysis.
+	it('analysisCompleted stores the clipped and whole-geography aggregates together', () => {
+		const c = cell();
+		actions.analysisCompleted(
+			c,
+			{ "a": { "name": 'A', "areas": [{ "result": { "type": 'scalar', "value": 1 } }] } },
+			{ "a": { "name": 'A', "areas": [{ "result": { "type": 'scalar', "value": 9 } }] } },
+		);
+
+		assert.equal(state().analysisLayerData?.['a']?.areas?.[0]?.result?.value, 1);
+		assert.equal(state().nationalLayerData?.['a']?.areas?.[0]?.result?.value, 9);
 	});
 
 	it('notifies subscribers on every action', () => {
@@ -178,6 +195,18 @@ describe('right-panel-data-state: toLayerEntries', () => {
 	it('omits optional fields that are absent on the source row', () => {
 		const [mapped] = toLayerEntries([{ "label": 'a', "value": 'A', "raw_value": 'x' }]);
 		assert.deepEqual(mapped, { "label": 'a', "value": 'A', "rawValue": 'x', "unit": null, "aggregation": null });
+	});
+
+	it('carries the whole-geography total when the row has one', () => {
+		const [withTotal, withoutTotal] = toLayerEntries([
+			{ "label": 'a', "value": '729 tons', "raw_value": 729, "total": '2,087,149 tons' },
+			{ "label": 'b', "value": '9 tons', "raw_value": 9 },
+		]);
+
+		assert.equal(withTotal?.total, '2,087,149 tons');
+		// Absent, not null: 'no counterpart figure' and 'the counterpart is
+		// null' stay distinguishable for the cards.
+		assert.equal('total' in (withoutTotal ?? {}), false);
 	});
 });
 

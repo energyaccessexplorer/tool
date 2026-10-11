@@ -472,17 +472,19 @@ async function init_3() {
 };
 
 async function init_4() {
-	left_panel("cards");
+	if (!window.EMBED) left_panel("cards");
 
 	output_widget_init();
 
 	await OUTLINE.active(true, true);
 	STATE.datasets = [...STATE.datasets, OUTLINE];
 
-	qs('#left-panel').style.display = '';
-	qs('#left-panel input[id="controls-search"]').focus();
+	if (!window.EMBED) {
+		qs('#left-panel').style.display = '';
+		qs('#left-panel input[id="controls-search"]').focus();
 
-	qs('#right-panel').style.display = '';
+		qs('#right-panel').style.display = '';
+	}
 
 	COMMIT("datasets");
 	delay(0.3).then(_ => mapbox_fit(GEOGRAPHY.envelope));
@@ -762,7 +764,10 @@ export function left_panel(t) {
 	}
 
 	const l = qs('#left-panel');
-	if (t) l.setAttribute('open', '');
+	if (t) {
+		l.style.display = '';
+		l.setAttribute('open', '');
+	}
 	else l.removeAttribute('open');
 
 	window.dispatchEvent(new Event('resize'));

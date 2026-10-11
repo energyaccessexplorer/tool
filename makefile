@@ -19,6 +19,8 @@ include .env
 #
 # STORAGE_URL = "https://bucket.s3.storage.com/path/"
 #
+# EMBED_ORIGINS = ""
+#
 DIST = ./dist
 SRC = ./src
 BIN = ./bin
@@ -206,6 +208,7 @@ build-a:
 		${JS}/translate.js \
 		${JS}/toast.js \
 		${JS}/filtered.js \
+		${JS}/embed.js \
 		${JS}/a.js \
 		${DIST}/a/
 
@@ -354,6 +357,7 @@ reconfig:
 		| jq '.storage = ${STORAGE_URL}' \
 		| jq '.mapbox_token = ${MAPBOX_TOKEN}' \
 		| jq '.mapbox_theme = ${MAPBOX_THEME}' \
+		| jq '.embed_origins = ${EMBED_ORIGINS}' \
 		>> "$$tmp" && \
 	printf ';\n' >> "$$tmp" && \
 	mv "$$tmp" settings.tmp.json

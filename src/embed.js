@@ -9,7 +9,9 @@ export function init() {
 	if (!origins.length) return;
 
 	let parent_origin = null;
-	if (document.referrer) {
+	if (typeof location !== 'undefined' && location.ancestorOrigins && location.ancestorOrigins.length) {
+		parent_origin = location.ancestorOrigins[0];
+	} else if (document.referrer) {
 		try {
 			parent_origin = new URL(document.referrer).origin;
 		} catch (_) {}

@@ -168,72 +168,78 @@ function state_get(conf, p) {
 	}
 };
 
-function state_set(conf, p, v) {
+export function validate_state_value(p, v) {
 	switch (p) {
 	case "tab": {
 		if (!['controls', 'cards', 'vectors', 'analysis', 'geographies', 'locations', 'points', 'config'].includes(v))
-			return false;
+			return null;
 
-		break;
+		return v;
 	}
 
 	case "subdiv": {
-		if (v >= 0) break;
-		return false;
+		if (v !== null && v !== '' && !isNaN(+v) && +v >= 0) return +v;
+		return null;
 	}
 
 	case "divtier": {
-		if (and(v >= 0, v < 10)) break;
-		return false;
+		if (v !== null && v !== '' && !isNaN(+v) && and(+v >= 0, +v < 10)) return +v;
+		return null;
 	}
 
 	case "variant": {
-		if (v === "raster") break;
-		if ([1, 2, 3, 4, 5, 6, 7, 8, 9].includes(+v)) {
-			v = +v;
-			break;
-		}
+		if (v === "raster") return v;
+		if ([1, 2, 3, 4, 5, 6, 7, 8, 9].includes(+v)) return +v;
 
-		return false;
+		return null;
 	}
 
 	case "index": {
-		if (['eai', 'ani', 'demand', 'supply'].includes(v)) break;
-		return false;
+		if (['eai', 'ani', 'demand', 'supply'].includes(v)) return v;
+		return null;
 	}
 
 	case "view": {
-		if (['data', 'filtered', 'analysis'].includes(v)) break;
-		return false;
+		if (['data', 'filtered', 'analysis'].includes(v)) return v;
+		return null;
 	}
 
 	case "datasets": {
-		if (v.every(d => d instanceof DS)) {
-			v = unique(v);
-			break;
+		if (Array.isArray(v) && v.every(d => d instanceof DS)) {
+			return unique(v);
 		}
-		return false;
+		return null;
 	}
 
 	case "zoom": {
-		if (and(v >= 0, v <= 20)) break;
-		return false;
+		if (v !== null && v !== '' && !isNaN(+v) && and(+v >= 0, +v <= 20)) return +v;
+		return null;
 	}
 
 	case "center": {
-		if (v.hasOwnProperty('lng') && v.hasOwnProperty('lat')) break;
-		return false;
+		if (v && typeof v === 'object' && v.hasOwnProperty('lng') && v.hasOwnProperty('lat')) {
+			const lng = +v.lng;
+			const lat = +v.lat;
+			if (!isNaN(lng) && !isNaN(lat)) return { lng, lat };
+		}
+		return null;
 	}
 
 	case "timeline": {
-		if (!isNaN(new Date(v))) break;
-		return false;
+		if (v && !isNaN(new Date(v))) return v;
+		return null;
 	}
 
 	default: {
 		throw new Error(`Unknown attribute '${p}'`);
 	}
 	}
+};
+
+function state_set(conf, p, v) {
+	const valid = validate_state_value(p, v);
+	if (valid === null) return false;
+	v = valid;
 
 	conf[p] = v;
 	COMMIT(p,v);
@@ -296,6 +302,39 @@ async function init_1() {
 		"tab":      "controls",
 		"datasets": [],
 	};
+
+	if (window.EMBED) {
+		const q_zoom = url.searchParams.get('zoom');
+		if (q_zoom !== null) {
+			const vz = validate_state_value('zoom', q_zoom);
+			if (vz !== null) conf.zoom = vz;
+		}
+
+		const q_lng = url.searchParams.get('lng');
+		const q_lat = url.searchParams.get('lat');
+		if (q_lng !== null && q_lat !== null) {
+			const vc = validate_state_value('center', { "lng": q_lng, "lat": q_lat });
+			if (vc !== null) conf.center = vc;
+		}
+
+		const q_divtier = url.searchParams.get('divtier');
+		if (q_divtier !== null) {
+			const vt = validate_state_value('divtier', q_divtier);
+			if (vt !== null) conf.divtier = vt;
+		}
+
+		const q_subdiv = url.searchParams.get('subdiv');
+		if (q_subdiv !== null) {
+			const vs = validate_state_value('subdiv', q_subdiv);
+			if (vs !== null) conf.subdiv = vs;
+		}
+
+		const q_view = url.searchParams.get('view');
+		if (q_view !== null) {
+			const vv = validate_state_value('view', q_view);
+			if (vv !== null) conf.view = vv;
+		}
+	}
 
 	STATE = new Proxy(conf, { "get": state_get, "set": state_set });
 
@@ -487,7 +526,17 @@ async function init_4() {
 	}
 
 	COMMIT("datasets");
-	delay(0.3).then(_ => mapbox_fit(GEOGRAPHY.envelope));
+	delay(0.3).then(async _ => {
+		if (STATE.subdiv !== undefined && STATE.divtier !== undefined) {
+			await geographiessearch_load(STATE.divtier, STATE.subdiv);
+		}
+
+		if (STATE.center) MAPBOX.setCenter(STATE.center, false);
+		if (STATE.zoom !== undefined) MAPBOX.setZoom(STATE.zoom, false);
+		if (!STATE.center && STATE.zoom === undefined && (STATE.subdiv === undefined || STATE.divtier === undefined)) {
+			mapbox_fit(GEOGRAPHY.envelope);
+		}
+	});
 
 	loading(false);
 };

@@ -961,7 +961,24 @@ function load_inputs_param() {
 	if (!inputs) return;
 
 	for (const name of inputs.split(',')) {
-		const ds = DST.get(name.trim());
+		const trimmed = name.trim();
+		if (!trimmed) continue;
+		let ds = DST.get(trimmed);
+		if (!ds) {
+			const lower = trimmed.toLowerCase();
+			for (const d of DST.values()) {
+				if (String(d.id).toLowerCase() === lower ||
+				    String(d.dataset_id) === lower ||
+				    (d.name && d.name.toLowerCase() === lower) ||
+				    (d.category && (
+				    	(d.category.name && d.category.name.toLowerCase() === lower) ||
+				    	(d.category.name_long && d.category.name_long.toLowerCase() === lower)
+				    ))) {
+					ds = d;
+					break;
+				}
+			}
+		}
 
 		if (!ds) {
 			console.warn("inputs param: No such dataset on this geography:", name);

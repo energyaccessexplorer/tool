@@ -57,5 +57,39 @@ export function init() {
 				STATE.view = data.view;
 			} catch (_) {}
 		}
+
+		if ('inputs' in data || 'layers' in data || 'datasets' in data) {
+			try {
+				const raw = data.inputs ?? data.layers ?? data.datasets;
+				const list = (Array.isArray(raw) ? raw : String(raw || '').split(','))
+					.map(s => String(s).trim())
+					.filter(Boolean);
+
+				if (window.DST) {
+					for (const ds of window.DST.values()) {
+						const shouldBeOn = list.some(target => {
+							const t = target.toLowerCase();
+							return (
+								String(ds.id).toLowerCase() === t ||
+								String(ds.dataset_id) === t ||
+								(ds.name && ds.name.toLowerCase() === t) ||
+								(ds.category && (
+									(ds.category.name && ds.category.name.toLowerCase() === t) ||
+									(ds.category.name_long && ds.category.name_long.toLowerCase() === t)
+								))
+							);
+						});
+
+						if (shouldBeOn && !ds.on) {
+							ds.turn(true);
+						} else if (!shouldBeOn && ds.on) {
+							ds.turn(false);
+						}
+					}
+				}
+			} catch (err) {
+				console.error('Error applying embed inputs:', err);
+			}
+		}
 	});
 }

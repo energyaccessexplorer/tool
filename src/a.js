@@ -242,6 +242,9 @@ function state_set(conf, p, v) {
 };
 
 export function init() {
+	window.EMBED = new URLSearchParams(location.search).get('embed') === '1';
+	if (window.EMBED) document.body.classList.add('embed');
+
 	window.LOCALE = resolveLocale();
 	translateNode(LOCALE, document);
 

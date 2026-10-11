@@ -248,7 +248,7 @@ export function init() {
 	window.LOCALE = resolveLocale();
 	translateNode(LOCALE, document);
 
-	if (window.innerWidth <= 768) return;
+	if (!window.EMBED && window.innerWidth <= 768) return;
 
 	sentry_setup_global_handlers(ENV[0]);
 
@@ -315,7 +315,7 @@ async function init_1() {
 		throw new Error(`Geography not found: ${id}`);
 	}
 
-	// MOBILE= screen.width < 1152;
+	if (window.EMBED && window.innerWidth <= 768) MOBILE = true;
 
 	GEOGRAPHY.timeline = maybe(GEOGRAPHY, 'configuration', 'timeline');
 	GEOGRAPHY.timeline_dates = maybe(GEOGRAPHY, 'configuration', 'timeline_dates');

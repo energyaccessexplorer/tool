@@ -302,38 +302,46 @@ async function init_1() {
 		"datasets": [],
 	};
 
-	if (window.EMBED) {
-		const q_zoom = url.searchParams.get('zoom');
-		if (q_zoom !== null) {
-			const vz = validate_state_value('zoom', q_zoom);
-			if (vz !== null) conf.zoom = vz;
-		}
+	let viewFromUrl = false;
 
-		const q_lng = url.searchParams.get('lng');
-		const q_lat = url.searchParams.get('lat');
-		if (q_lng !== null && q_lat !== null) {
-			const vc = validate_state_value('center', { "lng": q_lng, "lat": q_lat });
-			if (vc !== null) conf.center = vc;
-		}
-
-		const q_divtier = url.searchParams.get('divtier');
-		if (q_divtier !== null) {
-			const vt = validate_state_value('divtier', q_divtier);
-			if (vt !== null) conf.divtier = vt;
-		}
-
-		const q_subdiv = url.searchParams.get('subdiv');
-		if (q_subdiv !== null) {
-			const vs = validate_state_value('subdiv', q_subdiv);
-			if (vs !== null) conf.subdiv = vs;
-		}
-
-		const q_view = url.searchParams.get('view');
-		if (q_view !== null) {
-			const vv = validate_state_value('view', q_view);
-			if (vv !== null) conf.view = vv;
-		}
+	const q_zoom = url.searchParams.get('zoom');
+	if (q_zoom !== null) {
+		const vz = validate_state_value('zoom', q_zoom);
+		if (vz !== null) { conf.zoom = vz; viewFromUrl = true; }
 	}
+
+	const q_lng = url.searchParams.get('lng');
+	const q_lat = url.searchParams.get('lat');
+	if (q_lng !== null && q_lat !== null) {
+		const vc = validate_state_value('center', { "lng": q_lng, "lat": q_lat });
+		if (vc !== null) { conf.center = vc; viewFromUrl = true; }
+	}
+
+	const q_divtier = url.searchParams.get('divtier');
+	if (q_divtier !== null) {
+		const vt = validate_state_value('divtier', q_divtier);
+		if (vt !== null) { conf.divtier = vt; viewFromUrl = true; }
+	}
+
+	const q_subdiv = url.searchParams.get('subdiv');
+	if (q_subdiv !== null) {
+		const vs = validate_state_value('subdiv', q_subdiv);
+		if (vs !== null) { conf.subdiv = vs; viewFromUrl = true; }
+	}
+
+	const q_view = url.searchParams.get('view');
+	if (q_view !== null) {
+		const vv = validate_state_value('view', q_view);
+		if (vv !== null) { conf.view = vv; viewFromUrl = true; }
+	}
+
+	const q_criteria = url.searchParams.get('criteria');
+	if (q_criteria !== null) {
+		conf._criteria = (q_criteria === '1' || q_criteria === 'true');
+		viewFromUrl = true;
+	}
+
+	window.VIEW_FROM_URL = viewFromUrl;
 
 	STATE = new Proxy(conf, { "get": state_get, "set": state_set });
 

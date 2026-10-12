@@ -17,3 +17,7 @@ declare module 'node:assert/strict' {
 	const assert: Assert;
 	export default assert;
 }
+
+declare module 'node:module' {
+	export function createRequire(from: string): (specifier: string) => any;
+}

@@ -8,10 +8,17 @@ import {
 
 import {
 	lowmedhigh_scale,
-	priority_scale,
+} from './analysis.js';
+
+import {
 	aggregation_band,
 	has_priority_score,
-} from './analysis.js';
+} from './area-scores.ts';
+
+import {
+	cell,
+	resultKey,
+} from './analysis-state.ts';
 
 import {
 	maybe,
@@ -161,18 +168,61 @@ export function vector_feature_name(raster_index) {
 	return null;
 }
 
+// Synchronous read of the published analysis result for one division tier
+// (EAE-521). The analysis cell publishes its per-area scores synchronously
+// at publish time and the per-area aggregates in a second phase (§6.7) —
+// the same two windows the retired legacy bridges used to fill — so popup
+// handlers read both without awaiting. Entries are keyed (index, tier,
+// subdiv) like every result request; when the live key misses (the COMMIT
+// debounce can leave the cell keyed to the previous subdivision for
+// ~300ms), the newest entry for the same index and tier is returned: the
+// previous result. Deliberate — not a bridge-window leftover: it pins the
+// popup's stale-read window to exactly the pre-refactor behaviour, where
+// the last published numbers stayed visible until the next publish.
+export function published_analysis_result(variant) {
+	const results = cell().state.results;
+
+	const subdiv = (typeof STATE.subdiv === 'number') ? STATE.subdiv : null;
+	const exact = results[resultKey(STATE.index, variant, subdiv)];
+	if (exact) return exact.result;
+
+	let best = null;
+	for (const k in results) {
+		const entry = results[k];
+		if (!entry || entry.key.index !== STATE.index) continue;
+		if (String(entry.key.tier) !== String(variant)) continue;
+		if (!best || entry.revision > best.revision) best = entry;
+	}
+
+	return best ? best.result : null;
+}
+
+// The per-area layer values of one admin area (the map popup rows and the
+// admin export rows). The values come from the memoised analysis result (the
+// aggregate_layer_values fold compute_result_values publishes); the
+// per-layer metadata (aggregation/unit/name) is derived from the same
+// dataset entry dataset_layer_entry derived it from.
 export function get_admin_area_layer_data(variant, area_id) {
 	const fields = [];
 	const props = {};
 	const raw = { "values": {}, "units": {}, "aggregations": {} };
 
-	const layer_data = maybe(GEOGRAPHY, 'divisions', variant, 'layerData');
-	if (layer_data) {
-		for (const layer_id in layer_data) {
-			const layer = layer_data[layer_id];
-			const area_result = maybe(layer, 'areas', area_id, 'result');
+	const values = published_analysis_result(variant)?.areas?.[area_id]?.values;
+
+	if (values) {
+		for (const layer_id in values) {
+			const area_result = values[layer_id];
 
 			if (!area_result) continue;
+
+			const ds = STATE.datasets.find(d => d.id === layer_id);
+			const layer = {
+				"name":        ds?.name,
+				"unit":        ds?.category?.unit,
+				"aggregation": (ds?.vectors?.shape_type === 'points')
+					? 'SUM'
+					: (ds?.category?.analysis?.aggregation ?? 'AVG'),
+			};
 
 			let value, unit;
 			if (area_result.type === 'points') {
@@ -228,12 +278,18 @@ function translate_scale_label(label) {
 function analysis_entries(analysis_value, analysis_name, admin_info) {
 	if (!Number.isFinite(analysis_value)) return [];
 
-	const scale = admin_info
-		? priority_scale(GEOGRAPHY.divisions[admin_info.variant].priorityData, lowmedhigh_scale.range())
-		: lowmedhigh_scale;
+	// EAE-521: the area's Low..High label is the analysis result's own
+	// bucket — compute_result_scores derived it with the one area scale over
+	// the areas in view, the exact scale this used to rebuild from the
+	// published per-area averages on every popup. Raster popups keep the
+	// fixed-band lowmedhigh_scale applied to the value.
+	const label = admin_info
+		? (published_analysis_result(admin_info.variant)?.areas?.[admin_info.id]?.bucket
+			?? lowmedhigh_scale(analysis_value))
+		: lowmedhigh_scale(analysis_value);
 
 	return [
-		...(analysis_name ? [{ "label": analysis_name, "value": translate_scale_label(scale(analysis_value)), "raw_value": scale(analysis_value), "has_info_button": true }] : []),
+		...(analysis_name ? [{ "label": analysis_name, "value": translate_scale_label(label), "raw_value": label, "has_info_button": true }] : []),
 		{ "key": "Priority score", "label": t(window.LOCALE, 'map_popup.priority_score'), "value": `${(analysis_value * 100).toFixed(1)}%`, "raw_value": analysis_value },
 	];
 }
@@ -670,7 +726,7 @@ function build_admin_row(item, analysis_name) {
 	}
 
 	const variant = STATE.variant;
-	const info = { "variant": variant, "name": item.name };
+	const info = { "variant": variant, "name": item.name, "id": item.id };
 	const [fields, props, raw] = get_admin_area_layer_data(variant, item.id);
 
 	const { feature, feature_type, detailedData } = area_info(

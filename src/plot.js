@@ -1,6 +1,6 @@
 import {
 	analysis_colorscale,
-} from './analysis.js';
+} from './analysis.ts';
 
 import {
 	qs,

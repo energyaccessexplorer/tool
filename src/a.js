@@ -118,8 +118,10 @@ import { translateNode, initLocalePicker, resolveLocale, t } from './translate.j
 
 import { syncDatasets as timeline_sync_datasets, cell as timeline_cell } from './timeline-state.js';
 
-import { init as timeline_view_init, commitSync as timeline_commit_sync } from './timeline-view.js';
+import { init as timeline_view_init, commitSync as timeline_commit_sync, setCriteriaMask } from './timeline-view.js';
 import { init as embed_init } from './embed.js';
+
+window.setCriteriaMask = setCriteriaMask;
 
 export const STANDARD_TABS = new Set(['census', 'demand', 'supply', 'other']);
 
@@ -556,6 +558,10 @@ async function init_4() {
 	}
 
 	loading(false);
+
+	if (conf._criteria !== undefined) {
+		setCriteriaMask(conf._criteria);
+	}
 
 	if (window.EMBED) embed_init();
 };

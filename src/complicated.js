@@ -17,6 +17,10 @@ import {
 } from './area-analysis.js';
 
 import {
+	aggregation_band,
+} from './analysis.js';
+
+import {
 	and,
 	maybe,
 } from '../lib/helpers.js';
@@ -44,7 +48,7 @@ export function context(raster_pixel, winner = null) {
 			return;
 		}
 
-		const raw = d.raster.data[x];
+		const raw = aggregation_band(d)[x];
 		const k = d.id;
 
 		if (raw === d.raster.nodata) return;

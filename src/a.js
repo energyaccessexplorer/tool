@@ -122,6 +122,7 @@ import { init as timeline_view_init, commitSync as timeline_commit_sync, setCrit
 import { init as embed_init } from './embed.js';
 
 window.setCriteriaMask = setCriteriaMask;
+let criteriaFromUrl = undefined;
 
 export const STANDARD_TABS = new Set(['census', 'demand', 'supply', 'other']);
 
@@ -339,7 +340,8 @@ async function init_1() {
 
 	const q_criteria = url.searchParams.get('criteria');
 	if (q_criteria !== null) {
-		conf._criteria = (q_criteria === '1' || q_criteria === 'true');
+		criteriaFromUrl = (q_criteria === '1' || q_criteria === 'true');
+		conf._criteria = criteriaFromUrl;
 		viewFromUrl = true;
 	}
 
@@ -559,11 +561,17 @@ async function init_4() {
 
 	loading(false);
 
-	if (conf._criteria !== undefined) {
-		setCriteriaMask(conf._criteria);
+	if (criteriaFromUrl !== undefined) {
+		setCriteriaMask(criteriaFromUrl);
 	}
 
-	if (window.EMBED) embed_init();
+	if (window.EMBED) {
+		try {
+			embed_init();
+		} catch (e) {
+			console.error("embed_init failed:", e);
+		}
+	}
 };
 
 async function reload(k,v) {

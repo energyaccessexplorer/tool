@@ -7,41 +7,79 @@ function allowed_origins() {
 }
 
 function build_divisions_payload() {
-	if (!window.GEOGRAPHY?.divisions) return [];
-	const at = window.DST?.get('admin-tiers');
-	if (!at?.tree) return [];
+	try {
+		if (!window.GEOGRAPHY?.divisions) return [];
+		const divisions = window.GEOGRAPHY.divisions;
+		const at = window.DST?.get('admin-tiers');
+		const result = [];
 
-	const divisions = window.GEOGRAPHY.divisions;
-	const result = [];
+		let branchRoot = at?.tree;
+		// If current geography is a sub-region (e.g. Nagaland within India's admin-tiers tree)
+		if (branchRoot && window.GEOGRAPHY.adm && window.GEOGRAPHY.adm !== 0 && at && window.GEOGRAPHY.id != at.geography_id) {
+			try {
+				const featId = divisions[1]?.vectors?.data?.features?.[0]?.id;
+				if (featId !== undefined && at.csv?.data) {
+					const row = at.csv.data.find(x => x['TIER' + (window.GEOGRAPHY.adm + 1)] === featId);
+					if (row && row['TIER' + window.GEOGRAPHY.adm] !== undefined) {
+						branchRoot = branchRoot[row['TIER' + window.GEOGRAPHY.adm]] || branchRoot;
+					}
+				}
+			} catch (_) {}
+		}
 
-	function collect_leaves(branch, tier) {
-		if (!divisions[tier] || !divisions[tier].csv?.table) return;
-		const entries = [];
-		for (let i = 0; i < branch.length; i++) {
-			if (!branch[i]) continue;
-			if (branch[i] === 1) {
-				const name = divisions[tier].csv.table[i] || '';
-				entries.push({ id: Number(i), name: String(name).trim() });
+		function collect_leaves(branch, tier) {
+			if (!branch || !divisions[tier] || !divisions[tier].csv?.table) return;
+			const entries = [];
+			for (let i = 0; i < branch.length; i++) {
+				if (!branch[i]) continue;
+				if (branch[i] === 1) {
+					const name = divisions[tier].csv.table[i] || '';
+					entries.push({ id: Number(i), name: String(name).trim() });
+				}
+			}
+
+			if (entries.length > 0) {
+				result.push({
+					tier: Number(tier),
+					name: divisions[tier].name || ('Tier ' + tier),
+					entries: entries,
+				});
+			}
+
+			for (let i = 0; i < branch.length; i++) {
+				if (branch[i] && branch[i] !== 1 && Array.isArray(branch[i])) {
+					collect_leaves(branch[i], tier + 1);
+				}
 			}
 		}
 
-		if (entries.length > 0) {
-			result.push({
-				tier: Number(tier),
-				name: divisions[tier].name || ('Tier ' + tier),
-				entries: entries,
-			});
+		if (branchRoot) {
+			collect_leaves(branchRoot, 1);
 		}
 
-		for (let i = 0; i < branch.length; i++) {
-			if (branch[i] && branch[i] !== 1 && Array.isArray(branch[i])) {
-				collect_leaves(branch[i], tier + 1);
+		// Fallback: If admin-tiers tree didn't produce entries but divisions[1] has table, populate tier 1
+		if (result.length === 0 && divisions[1]?.csv?.table) {
+			const table = divisions[1].csv.table;
+			const entries = [];
+			for (const id in table) {
+				if (table[id]) {
+					entries.push({ id: Number(id), name: String(table[id]).trim() });
+				}
+			}
+			if (entries.length > 0) {
+				result.push({
+					tier: 1,
+					name: divisions[1].name || 'Tier 1',
+					entries: entries,
+				});
 			}
 		}
+
+		return result;
+	} catch (err) {
+		console.warn('build_divisions_payload error:', err);
+		return [];
 	}
-
-	collect_leaves(at.tree, 1);
-	return result;
 }
 
 export function init() {
@@ -57,26 +95,38 @@ export function init() {
 		} catch (_) {}
 	}
 
-	if (parent_origin && origins.includes(parent_origin)) {
-		window.parent.postMessage({
-			type: "eae:ready",
-			divisions: build_divisions_payload(),
-		}, parent_origin);
+	const targets = (parent_origin && origins.includes(parent_origin))
+		? [parent_origin]
+		: origins;
+
+	const payload = build_divisions_payload();
+	for (const target of targets) {
+		try {
+			window.parent.postMessage({
+				type: "eae:ready",
+				divisions: payload,
+			}, target);
+		} catch (_) {}
 	}
 
 	// T7: eae:view debounced message after moveend
-	if (window.EMBED && parent_origin && origins.includes(parent_origin) && window.MAPBOX) {
+	if (window.EMBED && window.MAPBOX) {
 		let moveTimer = null;
 		MAPBOX.on('moveend', () => {
 			if (moveTimer) clearTimeout(moveTimer);
 			moveTimer = setTimeout(() => {
 				const center = MAPBOX.getCenter();
 				const zoom = MAPBOX.getZoom();
-				window.parent.postMessage({
+				const msg = {
 					type: "eae:view",
 					zoom: +zoom.toFixed(2),
 					center: { lng: +center.lng.toFixed(4), lat: +center.lat.toFixed(4) },
-				}, parent_origin);
+				};
+				for (const target of targets) {
+					try {
+						window.parent.postMessage(msg, target);
+					} catch (_) {}
+				}
 			}, 500);
 		});
 	}

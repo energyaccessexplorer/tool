@@ -291,7 +291,9 @@ function location_entry(fields, props) {
 function format_detail(key, label, value, raw, subordinate, dataset_id) {
 	const unit = raw.units[key];
 	const display_unit = unit === 'count' ? '' : translateUnit(window.LOCALE, unit || '');
-	const raw_value = raw.values[key];
+	// attributes_map rows are keyed by their target, which raw.values never
+	// carries (it is keyed by dataset id) — those values come from the caller.
+	const raw_value = raw.values[key] ?? (value === '' ? undefined : value);
 
 	if (raw_value === null || raw_value === undefined || (typeof raw_value === 'number' && !Number.isFinite(raw_value))) {
 		return {

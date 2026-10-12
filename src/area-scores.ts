@@ -1,25 +1,12 @@
-// EAE-521: the pure core of the admin-area score computation
-// (notes/area-score-refactor.md §4-6). Typed arrays in, numbers out: every
-// function here is deterministic and reads no app state. Erasable-syntax
-// only (no namespace/enum).
-//
-// Extracted unchanged from tool/src/analysis.js in step 2 of the plan
-// (behaviour-pinned by tool/test/area-scores.test.ts):
-//
-//   - the per-area averages fold + the one quantile area scale + the
-//     area_score_table built from them (compute_result_scores' table)
-//   - has_priority_score (moved as-is, the ONE "has a score" rule)
-//   - aggregation_band / collect_values / aggregate / area_results /
-//     count_points       (analysis.js's aggregate_layer_values internals)
-//   - analysed_mask      (the pure loop of analysis.js's criteria_mask)
-//   - weights_for        (run()'s inline weight computation, so run() and
-//                         the future area_score_strategy share one source)
-//
-// The legacy alias exports were retired with the consumer migration: every
-// consumer reads the analysis result now.
+// The pure core of the admin-area score computation: typed arrays in, numbers
+// out, deterministic, no app state. Erasable syntax only (no namespace/enum).
+// Every score, bucket and weight rule the app shows is defined here — do not
+// fork one locally.
 
 import {
+	colorscale,
 	resolve_raster_value,
+	uniform_split,
 } from './utils.js';
 
 /** The dataset analysis scales that act as filters, not scores. */
@@ -42,17 +29,12 @@ export interface Weights {
 /*
  * weights_for
  *
- * The analysis weights run() combines cell scores with. Each dataset
- * accounts for a share of its index's total weight (`totals`); that share is
- * then split into equal proportions of the analysis across every
- * non-compound index that contributed a dataset. `ani` is the exception: it
- * splits every weight over the grand total of all indexes instead of
- * per-index totals. Filter datasets weigh nothing and never count towards
- * the totals. Note a dataset whose index total dropped to zero divides by
- * undefined and yields a NaN weight here — pinned behaviour, the zero-total
- * gate in run() treats it as 0.
- *
- * (Extracted from run()'s inline computation in analysis.js.)
+ * The analysis weights run() combines cell scores with. Each dataset takes a
+ * share of its index's total weight, split across every non-compound index
+ * that contributed a dataset; `ani` is the exception, splitting over the
+ * grand total of all indexes. Filter datasets weigh nothing and never count
+ * towards the totals. A dataset whose index total dropped to zero divides by
+ * undefined and yields NaN — pinned: run()'s zero-total gate reads it as 0.
  */
 export function weights_for(index: string, datasets: readonly WeightDataset[]): Weights {
 	// Add up how much non-compound indexes datasets will account for. Then, just
@@ -95,6 +77,53 @@ export function weights_for(index: string, datasets: readonly WeightDataset[]): 
 	return { weights, "totals": tots };
 }
 
+// The analysis output colour ramp: 5 magma stops, one per Low..High band,
+// starting at analysis_low (0.167) into the gradient. analysis.js re-exports
+// it for the plotting/legend consumers.
+const analysis_low = 0.167;
+
+export const analysis_colorscale = colorscale({
+	"stops":  uniform_split(5).map(x => d3.interpolateMagma(analysis_low + (x * (1 - analysis_low)))),
+	"domain": { "min": 0, "max": 1 },
+});
+
+/**
+ * THE one score -> {bucket, label, colour} scale: fixed absolute 20% bands
+ * over [0, 1], Low..High, with the exact boundary going to the upper band
+ * (floor(v * 5)) and out-of-range scores clamping into the outer bands. Null
+ * for a missing value, the -1 nodata marker or a non-finite value.
+ *
+ * Every percentage, Low..High label and bucket colour reads this mapping — do
+ * not add a second scale.
+ */
+export interface ScoreBucket {
+	/** 0..4: the slot in score_bands and analysis_colorscale.stops. */
+	readonly index: number;
+	/** The canonical English Low..High label (translate via getScaleLabels). */
+	readonly label: string;
+	/** The bucket's colour on the analysis output ramp. */
+	readonly colour: string;
+}
+
+/** The five Low..High band labels in bucket order. */
+export const score_bands: readonly string[] = ["Low", "Low-Medium", "Medium", "Medium-High", "High"];
+
+function bucket_of_index(index: number): ScoreBucket {
+	return {
+		index,
+		"label":  score_bands[index] as string,
+		"colour": analysis_colorscale.stops[index] as string,
+	};
+}
+
+export function score_bucket(value: number | null | undefined): ScoreBucket | null {
+	if (value === null || value === undefined) return null;
+	if (!Number.isFinite(value) || value === -1) return null;
+
+	const x = Math.min(1, Math.max(0, value));
+	return bucket_of_index(Math.min(score_bands.length - 1, Math.floor(x * score_bands.length)));
+}
+
 /** A division area's aggregate, keyed by stringified area id. */
 export interface AreaAverage {
 	readonly average: number;
@@ -133,85 +162,141 @@ export function aggregate_by_area(
 	);
 }
 
-/** A quantile scale over the areas' averages (a d3 v5 scaleQuantile). */
-export interface AreaScale<R> {
-	(value: number | null): R | undefined;
-}
-
-/*
- * area_scale
- *
- * Bucket the areas' average scores through a quantile scale whose domain is
- * [min, max] of the usable averages (-1 nodata and non-finite averages are
- * dropped first). Returns null when no area carries a usable average.
- */
-export function area_scale<R extends string | number>(
-	area_averages: AreaAverages,
-	range: readonly R[],
-): AreaScale<R> | null {
-	const averages = Object.values(area_averages)
-		.map(d => d.average)
-		.filter((v): v is number => v !== -1 && Number.isFinite(v));
-	if (averages.length === 0) return null;
-	return d3.scaleQuantile<R>()
-		.domain([Math.min(...averages), Math.max(...averages)])
-		.range(range);
-}
-
-/** One area's phase-1 entry: average score + Low..High bucket label. */
+/** One area's published score entry: the score + its ONE-scale bucket. */
 export interface AreaScore {
 	readonly score: number;
-	readonly bucket: string | null;
+	/** The bucket from score_bucket (index + label + colour); null is "no score". */
+	readonly bucket: ScoreBucket | null;
+}
+
+/**
+ * The score strategy knob. `total` ranks areas by the weighted sum of their
+ * layer aggregates (the overall value of their layers); `intensity` keeps
+ * the average-of-cell-scores ranking.
+ */
+export type ScoreMode = 'intensity' | 'total';
+
+export const SCORE_MODE: ScoreMode = 'total';
+
+/** One scoring dataset's slices for the strategy. */
+export interface ScoreDataset {
+	readonly id: string;
+	readonly weight: number;
+	readonly invert?: boolean;
+}
+
+/** Area -> dataset -> one aggregate. Aggregated entries are numeric; the
+ * 'Not aggregated' sentinel some display rows carry is a string and scores
+ * as 0. */
+export type ScoreValues = Readonly<Record<string,
+	Readonly<Record<string, { readonly value: number | string } | null | undefined>> | undefined>>;
+
+/*
+ * area_score_strategy
+ *
+ * One [0, 1] score per area, derived from the same aggregates the popup
+ * renders. `total`: per dataset, the area's aggregate as a share of the best
+ * area (flipped when the dataset says `invert`), weighted by weights_for and
+ * renormalised over the datasets carrying a positive total, then rescaled so
+ * the top area reads 1. `intensity`: the precomputed per-cell-score averages,
+ * unchanged.
+ */
+export function area_score_strategy(
+	mode: ScoreMode,
+	intensities: Readonly<Record<string, number>>,
+	values: ScoreValues,
+	datasets: readonly ScoreDataset[],
+): Record<string, number> {
+	if (mode === 'intensity') return { ...intensities };
+
+	const ids = new Set([...Object.keys(intensities), ...Object.keys(values)]);
+	const scores: Record<string, number> = {};
+	for (const id of ids) scores[id] = 0;
+
+	let weight_sum = 0;
+
+	for (const d of datasets) {
+		if (!(d.weight > 0)) continue;
+
+		const per_area: Record<string, number> = {};
+		let max = 0;
+
+		for (const id of ids) {
+			const raw = values[id]?.[d.id]?.value;
+			const v = (typeof raw === 'number' && Number.isFinite(raw)) ? raw : 0;
+			per_area[id] = v;
+			if (v > max) max = v;
+		}
+
+		if (max <= 0) continue;
+
+		weight_sum += d.weight;
+
+		for (const id of ids) {
+			const share = d.invert
+				? 1 - (per_area[id]! / max)
+				: per_area[id]! / max;
+			scores[id] = scores[id]! + d.weight * share;
+		}
+	}
+
+	let best = 0;
+	for (const id of ids) {
+		if (weight_sum > 0) scores[id] = scores[id]! / weight_sum;
+		if (scores[id]! > best) best = scores[id]!;
+	}
+
+	if (best > 0) for (const id of ids) scores[id] = scores[id]! / best;
+
+	return scores;
 }
 
 /*
  * area_score_table
  *
- * The per-area score table the analysis result publishes (phase 1): each
- * area's average analysis value plus its bucket from the ONE area scale over
- * the usable averages, with the (score === -1 || !scale) null rule. Wraps
- * aggregate_by_area + area_scale + the bucketing so the result pipeline and
- * the unit tests share one definition.
+ * The per-area {score, bucket} table the analysis result publishes: the
+ * strategy's score, bucketed by score_bucket.
  */
 export function area_score_table(
-	analysis_raster: ArrayLike<number>,
-	division_data: ArrayLike<number>,
-	range: readonly string[],
+	intensities: Readonly<Record<string, number>>,
+	values: ScoreValues,
+	datasets: readonly ScoreDataset[],
+	mode: ScoreMode = SCORE_MODE,
 ): Record<string, AreaScore> {
-	const areas = aggregate_by_area(analysis_raster, division_data);
-	const scale = area_scale(areas, range);
+	const scores = area_score_strategy(mode, intensities, values, datasets);
 
 	const out: Record<string, AreaScore> = {};
-	for (const id in areas) {
-		const score = areas[id]!.average;
-		out[id] = {
-			score,
-			"bucket": (score === -1 || !scale) ? null : (scale(score) as string),
-		};
-	}
+	for (const id in scores) out[id] = { "score": scores[id]!, "bucket": score_bucket(scores[id]!) };
 
 	return out;
 }
 
 // A cell or area HAS A PRIORITY SCORE when the analysis gave it a positive
-// index. This is the single definition for every consumer:
-//   - the aggregation mask the Data-tab cards use (graphs() in right-panel.js
-//     and priority() in analysis.js), so the cards average exactly the cells
-//     that carry a score;
-//   - the priority-cell list the CSV export is built from (all_points() in
-//     right-panel-high-priority-areas.js), which is what writes the
-//     "Priority score" / index columns;
-//   - the Priority areas listing and its pagination (get_division_results()).
-// Change the rule here and the cells the cards average over and the rows that
-// carry a priority score move together. Note the index is rescaled into a
-// Float32Array, so its minimum can land a hair below zero (≈ -1.6e-8); the
-// strict comparison keeps those bottom-band cells out, which is what the export
-// has always done.
+// index. This is the ONE "has a score" rule — the aggregation mask every
+// aggregate counts, the export's priority-cell list and the Priority areas
+// listing all read it, so changing it here moves them together. The index is
+// rescaled into a Float32Array, so its minimum can land a hair below zero; the
+// strict comparison keeps those bottom-band cells out.
 export function has_priority_score(value: number): boolean {
 	return Number.isFinite(value) && value > 0;
 }
 
-/** One dataset's contribution to the "analysed cells" mask. */
+/*
+ * analysed_mask
+ *
+ * The has_priority_score rule over a whole raster: 1 for every cell that
+ * carries a priority score, 0 otherwise. The analysis result publishes it as
+ * `mask`, and every aggregate counts exactly these cells. The rule inherits
+ * run()'s joint nodata drop — a cell with nodata in ANY active dataset is
+ * clipped to -1 and counts for no dataset at all.
+ */
+export function analysed_mask(cells: ArrayLike<number>): Uint8Array {
+	const out = new Uint8Array(cells.length);
+	for (let i = 0; i < out.length; i += 1) out[i] = has_priority_score(cells[i] as number) ? 1 : 0;
+	return out;
+}
+
+/** One dataset's contribution to the criteria display mask. */
 export interface MaskLayer {
 	readonly data: ArrayLike<number>;
 	readonly nodata: number;
@@ -220,13 +305,22 @@ export interface MaskLayer {
 }
 
 /*
- * analysed_mask
+ * criteria_pass_mask
  *
  * Which pixels satisfy every active dataset's own criteria: 1 where every
- * layer scores the cell within [0, 1], 0 where some layer clips it out (or
- * the cell is nodata for it). The pure loop of analysis.js's criteria_mask().
+ * layer scores the cell within [0, 1], 0 where some layer clips it out or
+ * the cell is nodata for it.
+ *
+ * Deliberately distinct from analysed_mask — this is the timeline-filters
+ * DISPLAY mask ("Only show areas that meet all data layer criteria"), which
+ * answers "does this cell pass every layer's own criteria?", not "did the
+ * combined index score it?". Do not wire the two together: a cell can pass
+ * every criterion yet carry no priority score (every layer scores it 0), sit
+ * in the index rescale's bottom band or fall outside STATE.subdiv —
+ * analysed_mask drops those, this mask keeps them, and folding them would
+ * change which cells grey out.
  */
-export function analysed_mask(cell_count: number, layers: readonly MaskLayer[]): Uint8Array {
+export function criteria_pass_mask(cell_count: number, layers: readonly MaskLayer[]): Uint8Array {
 	const it = new Uint8Array(cell_count).fill(1);
 	if (!layers.length) return it;
 

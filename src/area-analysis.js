@@ -7,12 +7,10 @@ import {
 } from './utils.js';
 
 import {
-	lowmedhigh_scale,
-} from './analysis.js';
-
-import {
 	aggregation_band,
 	has_priority_score,
+	score_bands,
+	score_bucket,
 } from './area-scores.ts';
 
 import {
@@ -168,17 +166,8 @@ export function vector_feature_name(raster_index) {
 	return null;
 }
 
-// Synchronous read of the published analysis result for one division tier
-// (EAE-521). The analysis cell publishes its per-area scores synchronously
-// at publish time and the per-area aggregates in a second phase (§6.7) —
-// the same two windows the retired legacy bridges used to fill — so popup
-// handlers read both without awaiting. Entries are keyed (index, tier,
-// subdiv) like every result request; when the live key misses (the COMMIT
-// debounce can leave the cell keyed to the previous subdivision for
-// ~300ms), the newest entry for the same index and tier is returned: the
-// previous result. Deliberate — not a bridge-window leftover: it pins the
-// popup's stale-read window to exactly the pre-refactor behaviour, where
-// the last published numbers stayed visible until the next publish.
+// Synchronous read of one tier's published result for popup handlers. A live-key
+// miss returns the newest entry for the same index and tier, deliberately.
 export function published_analysis_result(variant) {
 	const results = cell().state.results;
 
@@ -197,11 +186,8 @@ export function published_analysis_result(variant) {
 	return best ? best.result : null;
 }
 
-// The per-area layer values of one admin area (the map popup rows and the
-// admin export rows). The values come from the memoised analysis result (the
-// aggregate_layer_values fold compute_result_values publishes); the
-// per-layer metadata (aggregation/unit/name) is derived from the same
-// dataset entry dataset_layer_entry derived it from.
+// Layer metadata is re-derived from the dataset entry; only the values come
+// from the published result.
 export function get_admin_area_layer_data(variant, area_id) {
 	const fields = [];
 	const props = {};
@@ -271,22 +257,21 @@ function resolve_feature(fields, props, feature_name, admin_info) {
 }
 
 function translate_scale_label(label) {
-	const i = lowmedhigh_scale.range().indexOf(label);
+	const i = score_bands.indexOf(label);
 	return i === -1 ? label : getScaleLabels(window.LOCALE)[i];
 }
 
 function analysis_entries(analysis_value, analysis_name, admin_info) {
 	if (!Number.isFinite(analysis_value)) return [];
 
-	// EAE-521: the area's Low..High label is the analysis result's own
-	// bucket — compute_result_scores derived it with the one area scale over
-	// the areas in view, the exact scale this used to rebuild from the
-	// published per-area averages on every popup. Raster popups keep the
-	// fixed-band lowmedhigh_scale applied to the value.
-	const label = admin_info
+	// The published result's own bucket (the one score scale, area-scores.ts
+	// score_bucket) wins; score_bucket(analysis_value) covers the raster popup.
+	const bucket = admin_info
 		? (published_analysis_result(admin_info.variant)?.areas?.[admin_info.id]?.bucket
-			?? lowmedhigh_scale(analysis_value))
-		: lowmedhigh_scale(analysis_value);
+			?? score_bucket(analysis_value))
+		: score_bucket(analysis_value);
+
+	const label = bucket?.label ?? null;
 
 	return [
 		...(analysis_name ? [{ "label": analysis_name, "value": translate_scale_label(label), "raw_value": label, "has_info_button": true }] : []),
@@ -562,7 +547,8 @@ export function division_names(raster_index) {
 function priority_entries(item, analysis_name) {
 	return has_priority_score(item.priority)
 		? {
-			[analysis_name]:    lowmedhigh_scale(item.priority),
+			// Same scale as the popup's label row.
+			[analysis_name]:    score_bucket(item.priority)?.label,
 			"Priority score": `${(item.priority * 100).toFixed(1)}%`,
 		}
 		: {};

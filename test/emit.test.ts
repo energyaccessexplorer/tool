@@ -94,7 +94,6 @@ describe('emitted modules (tsbuild/src): analysis-state', () => {
 		assert.equal(applied, true);
 		assert.equal(state().results[resultKey('eai', 2, null)]?.result.areas['7']?.score, 0.5);
 
-		// Stale revision: discarded (the nationalComputed staleness guard).
 		const stale = state().revision;
 		actions.commit(cell(), {});
 		assert.equal(actions.computed(cell(), {

@@ -4,8 +4,7 @@
 // unchecked (checkJs is off). This file has no imports/exports on purpose:
 // it stays a global script so the declarations are ambient.
 
-/** Raster payload shape shared by OUTLINE, GEOGRAPHY.divisions[*] and datasets.
- * The concrete containers the folds walk (arrays or typed arrays). */
+/** The concrete raster containers the folds walk. */
 type RasterData = number[] | Float32Array | Int32Array;
 
 interface RasterLike {
@@ -20,12 +19,11 @@ declare const STATE: {
 	readonly variant: string;
 	/** Currently selected index id ('eai', 'demand', 'supply', 'ani', ...). */
 	readonly index: string;
-	/** "Change geography" division tier run() filters cells with (0 = whole
-	 * geography). */
+	/** "Change geography" division tier run() filters cells with (0 = whole geography). */
 	readonly divtier: number;
 
-	/** "Change geography" area id within divisions[divtier]; run() filters to
-	 * it when numeric. */
+	/** "Change geography" area id within divisions[divtier]; run() filters to it
+	 * when numeric. */
 	readonly subdiv: unknown;
 
 	/**
@@ -161,21 +159,13 @@ interface D3ScalePoint {
 	range(range: readonly number[]): D3ScalePoint;
 }
 
-/** v5 quantile scale (the area score banding): value -> band label. */
+/** v5 quantile scale (banding in ds.js, utils.js). */
 interface D3ScaleQuantile<R> {
 	(value: number | null): R | undefined;
 	domain(): number[];
 	domain(domain: readonly number[]): D3ScaleQuantile<R>;
 	range(): R[];
 	range(range: readonly R[]): D3ScaleQuantile<R>;
-}
-
-/** v5 quantize scale (the fixed-band labelling): value -> band label. */
-interface D3ScaleQuantize<R> {
-	(value: number): R;
-	domain(domain: readonly number[]): D3ScaleQuantize<R>;
-	range(): R[];
-	range(range: readonly R[]): D3ScaleQuantize<R>;
 }
 
 interface D3DragBehavior {
@@ -192,7 +182,6 @@ declare const d3: {
 	axisBottom(scale: D3ScaleTime): D3Axis<Date>;
 	axisLeft(scale: D3ScaleLinear): D3Axis<number>;
 	line<D>(): D3Line<D>;
-	scaleQuantize<R = string>(): D3ScaleQuantize<R>;
 	/** The magma colour interpolation (the analysis output ramp). */
 	interpolateMagma(t: number): string;
 	range(stop: number): number[];

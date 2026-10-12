@@ -327,10 +327,8 @@ async function get_division_results(variant, { all = false } = {}) {
 	const division = GEOGRAPHY.divisions[variant];
 	if (!division) return [];
 
-	// Read the per-area scores from the memoised analysis result (EAE-521)
-	// instead of rebuilding the listing from the retired per-division
-	// bridge: same numbers (that bridge published this very result),
-	// same has_priority_score rule (area-scores.ts, the single definition).
+	// Per-area scores from the memoised result; has_priority_score (area-scores.ts)
+	// is the one definition of the filter.
 	const result = await analysis_result(STATE.index, variant);
 	const areas = result.areas;
 
@@ -394,9 +392,7 @@ export function init() {
 };
 
 async function all_points() {
-	// The memoised run() cells (EAE-521) — the same raster plot_active paints
-	// and the result pipeline aggregates, computed once per reload. This is a
-	// read now: no re-run of run() and no canvas repaint from here.
+	// The memoised run() cells — a read, no re-run and no repaint.
 	const a = await analysis_cells(STATE.index);
 
 	const points = a.raster.reduce((t,v,i) => {

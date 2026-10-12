@@ -533,7 +533,7 @@ async function init_4() {
 	}
 
 	COMMIT("datasets");
-	delay(0.3).then(async _ => {
+	const applyInitialView = async () => {
 		if (STATE.subdiv !== undefined && STATE.divtier !== undefined) {
 			await geographiessearch_load(STATE.divtier, STATE.subdiv);
 		}
@@ -543,7 +543,17 @@ async function init_4() {
 		if (!STATE.center && STATE.zoom === undefined && (STATE.subdiv === undefined || STATE.divtier === undefined)) {
 			mapbox_fit(GEOGRAPHY.envelope);
 		}
-	});
+	};
+
+	if (window.VIEW_FROM_URL || window.EMBED) {
+		if (MAPBOX.loaded()) {
+			applyInitialView();
+		} else {
+			MAPBOX.once('idle', applyInitialView);
+		}
+	} else {
+		delay(0.3).then(_ => mapbox_fit(GEOGRAPHY.envelope));
+	}
 
 	loading(false);
 

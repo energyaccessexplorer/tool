@@ -1,16 +1,17 @@
 // Right-panel Prioritization tab view: renders the atom from
-// right-panel-prioritization-state.ts. Impure by design — DOM and i18n
-// live here. The per-index entries are READ from the memoised analysis
-// results (analysis_scores / analysis_cells, EAE-521) instead of being
-// recomputed per selection. Producers dispatch actions on the atom; the
-// subscription at the bottom re-renders and runs the entries service.
+// right-panel-prioritization-state.ts. Impure by design — DOM and i18n live
+// here; per-index entries come from memoised analysis results. Producers dispatch
+// actions on the atom; the subscription at the bottom runs the entries service.
 
 import {
 	analysis_cells,
 	analysis_scores,
 	dataset_feeds_index,
-	lowmedhigh_scale,
 } from './analysis.ts';
+
+import {
+	score_bucket,
+} from './area-scores.ts';
 
 import {
 	setup_about_button,
@@ -64,27 +65,16 @@ function hasDatasetsFor(key: string): boolean {
 		dataset_feeds_index(d, key) || compound.some(c => dataset_feeds_index(d, c)));
 }
 
-/**
- * Bucket a value through the applicable scale, or null when there is no
- * value or no scale (legacy make_row's (value != null && scale) guard).
- */
-function bucketOf(value: number | null, scale: ((v: number) => string) | null): string | null {
-	return value != null && scale ? scale(value) : null;
-}
-
 function pixelEntry(raster: ArrayLike<number>, rasterIndex: number): IndexEntry {
 	const v = raster[rasterIndex];
 	const value = v != null && v !== -1 ? v : null;
-	return { value, "bucket": bucketOf(value, lowmedhigh_scale) };
+	return { value, "bucket": score_bucket(value) };
 }
 
 /**
  * One index's entry for the selected admin area, read from that index's
- * memoised analysis result (EAE-521). The result's per-area score and
- * bucket are exactly what the deleted private copy rebuilt per selection
- * (legacy adminAreaEntry's own averages fold + area scale over the same
- * run() cells — the result's bucket is that single area scale's label for
- * that same score).
+ * memoised analysis result: the area's score and bucket, both from
+ * area-scores.ts's one scale.
  */
 function adminAreaEntry(result: AnalysisResult | undefined, admin: AdminRef): IndexEntry {
 	const area = result?.areas[String(admin.id)];
@@ -92,12 +82,9 @@ function adminAreaEntry(result: AnalysisResult | undefined, admin: AdminRef): In
 }
 
 /**
- * Legacy update(), minus the DOM and minus the per-selection computation:
- * every row for the selection is read from its index's memoised analysis
- * result — analysis_scores (phase 1: per-area score + bucket; the card
- * renders score buckets only, so the layer aggregates are never needed) for
- * an admin area, analysis_cells (the run() shared with the map painting, no
- * re-execution per selection) for a raster pixel.
+ * Every row for the selection is read from its index's memoised analysis
+ * result: analysis_scores (per-area score + bucket) for an admin area,
+ * analysis_cells for a raster pixel.
  */
 async function buildEntries(view: Extract<PriorityView, { readonly kind: 'location' }>): Promise<IndexEntries> {
 	const otherKeys = Object.keys(EAE['indexes'])
@@ -108,9 +95,7 @@ async function buildEntries(view: Extract<PriorityView, { readonly kind: 'locati
 	const empty: IndexEntry = { "value": null, "bucket": null };
 
 	if (admin) {
-		// One cached result per index at the selection's own division tier.
-		// The current-index column reads the CURRENT index's result (was: the
-		// legacy retired per-division bridge + a private area scale).
+		// One memoised result per index at the selection's own division tier.
 		const keys = hasDatasetsFor(STATE.index) ? [STATE.index, ...otherKeys] : otherKeys;
 		const results = await Promise.all(keys.map(key => analysis_scores(key, admin.variant)));
 		const entries = Object.fromEntries(keys.map((key, i): [string, IndexEntry] =>
@@ -121,11 +106,10 @@ async function buildEntries(view: Extract<PriorityView, { readonly kind: 'locati
 
 	const rasters = await Promise.all(otherKeys.map(key => analysis_cells(key)));
 
-	// Pixel variant, current column unchanged: the clicked cell's raw value
-	// as the open map-info carries it, on the absolute low/med/high scale
-	// (never a legacy bridge read).
+	// The current column is the clicked cell's raw value as the open map-info
+	// carries it, bucketed through the same one scale.
 	const current: IndexEntry = hasDatasetsFor(STATE.index)
-		? { "value": view.analysisValue, "bucket": bucketOf(view.analysisValue, lowmedhigh_scale) }
+		? { "value": view.analysisValue, "bucket": score_bucket(view.analysisValue) }
 		: empty;
 
 	return {
@@ -171,8 +155,7 @@ function renderTitle(view: PriorityView): void {
 
 function makeRow(key: string, entry: IndexEntry | undefined, subordinate = false): HTMLElement {
 	const bucket = entry?.bucket ?? null;
-	const rangeIndex = bucket == null ? -1 : lowmedhigh_scale.range().indexOf(bucket);
-	const formatted = (rangeIndex === -1 ? undefined : getScaleLabels(window.LOCALE)[rangeIndex]) ?? bucket ?? '—';
+	const formatted = (bucket ? getScaleLabels(window.LOCALE)[bucket.index] : undefined) ?? bucket?.label ?? '—';
 
 	const row = ce('div', null, { 'class': subordinate ? 'index-priority-row subordinate' : 'index-priority-row' });
 	const name = ce('span', null, { 'class': 'index-priority-name' });

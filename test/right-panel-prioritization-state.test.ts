@@ -17,8 +17,12 @@ import type {
 // after every action instead of holding on to a cell's `state` property.
 const state = (): PriorityState => cell().state;
 
+// A ScoreBucket stand-in: the atom carries the bucket opaque, and importing
+// area-scores.ts would need d3 for the colour ramp.
+const bucket = (label: string) => ({ "index": 2, "label": label, "colour": '#' + label });
+
 const entries = (over: Partial<IndexEntries> = {}): IndexEntries => ({
-	"eai":    { "value": 0.5, "bucket": 'Medium' },
+	"eai":    { "value": 0.5, "bucket": bucket('Medium') },
 	"demand": { "value": null, "bucket": null },
 	...over,
 });
@@ -72,7 +76,7 @@ describe('right-panel-prioritization-state: atom', () => {
 
 		const view = state().view;
 		if (view.kind !== 'location') return assert.fail('expected location view');
-		assert.equal(view.entries?.['eai']?.bucket, 'Medium');
+		assert.equal(view.entries?.['eai']?.bucket?.label, 'Medium');
 	});
 
 	it('entriesComputed is dropped when the view moved on (staleness guard)', () => {
@@ -89,12 +93,12 @@ describe('right-panel-prioritization-state: atom', () => {
 	it('entriesComputed does not overwrite already-computed entries', () => {
 		const c = cell();
 		actions.locationSelected(c, {});
-		actions.entriesComputed(c, entries({ "eai": { "value": 0.1, "bucket": 'Low' } }));
-		actions.entriesComputed(c, entries({ "eai": { "value": 0.9, "bucket": 'High' } }));
+		actions.entriesComputed(c, entries({ "eai": { "value": 0.1, "bucket": bucket('Low') } }));
+		actions.entriesComputed(c, entries({ "eai": { "value": 0.9, "bucket": bucket('High') } }));
 
 		const view = state().view;
 		if (view.kind !== 'location') return assert.fail('expected location view');
-		assert.equal(view.entries?.['eai']?.bucket, 'Low');
+		assert.equal(view.entries?.['eai']?.bucket?.label, 'Low');
 	});
 
 	it('backToNational returns to national and clears the summary', () => {

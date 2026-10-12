@@ -6,8 +6,11 @@ import {
 	analysis_cells,
 	analysis_colorscale,
 	analysis_result,
-	lowmedhigh_scale,
 } from './analysis.ts';
+
+import {
+	score_bucket,
+} from './area-scores.ts';
 
 import {
 	default_colorscale,
@@ -48,24 +51,9 @@ export function share_scale_colors() {
 	return [...analysis_colorscale.stops, OUTSIDE_COLOR];
 }
 
-// Index value -> bucket. x === -1 is "no analysis here", everything else maps to
-// Low..High exactly as the five-colour scale does.
-function bucket_index(x) {
-	if (x === -1) return OUTSIDE_BUCKET;
-	if (x >= 0   && x < 0.2) return 0;
-	if (x >= 0.2 && x < 0.4) return 1;
-	if (x >= 0.4 && x < 0.6) return 2;
-	if (x >= 0.6 && x < 0.8) return 3;
-	if (x >= 0.8 && x <= 1)  return 4;
-	return OUTSIDE_BUCKET;
-}
-
-// The tier the summary's analysis results hang off (notes §4: keyed
-// (index, tier, subdiv)). The natural key is the analysis level's own
-// division — variant_raster() paints exactly those areas — while at the
-// pixel level ('raster') there are no areas to paint and only the
-// tier-independent national entry is read, which just needs some result to
-// hang off: the first division carrying a raster stands in.
+// The tier the summary's analysis results hang off: the analysis level's own
+// division, which variant_raster() paints, or at the pixel level any division
+// that carries a raster, since only the tier-independent national entry is read.
 function summary_result_tier() {
 	const divisions = GEOGRAPHY.divisions || [];
 	const variant = STATE.variant;
@@ -78,26 +66,16 @@ function summary_result_tier() {
 	return null;
 }
 
-// Paint the deck's per-index choropleth FROM the analysis result (EAE-521):
-// this used to recompute the per-area averages and its
-// own copy of the area scale over the raster. The result's
-// bucket is that same one area scale's Low..High label, and the label's slot
-// in lowmedhigh_scale.range() is the same quantile slot the old positional
-// scale returned — slot / (n - 1) is exactly the position
-// analysis_colorscale.stops.map((_, i) => i / (n - 1)) passed as its range,
-// so every painted value is bit-identical to the legacy one.
+// Paint each area at its bucket's stop on the continuous analysis ramp
+// (bucket.index / (n - 1)), so the deck uses the map fills' colours.
 function variant_raster(raster, result) {
 	const division = (STATE.variant !== "raster") ? GEOGRAPHY.divisions[STATE.variant] : null;
 	if (!division?.raster?.data) return raster;
 
 	const areas = result.areas;
 	const n = analysis_colorscale.stops.length;
-	const range = lowmedhigh_scale.range();
 
-	// The old area scale returned null exactly when no area carries a usable
-	// average (every area in the record carries one — the fold averages
-	// scored cells only), and then the raw raster was painted. No
-	// bucket anywhere is the same case.
+	// No bucket anywhere (no scored areas): paint the raw raster unchanged.
 	let painted = false;
 	for (const id in areas) {
 		if (areas[id].bucket !== null) { painted = true; break; }
@@ -109,20 +87,16 @@ function variant_raster(raster, result) {
 		const area = (id !== -1) ? areas[id] : null;
 
 		if (area && area.bucket !== null) {
-			return range.indexOf(area.bucket) / (n - 1);
+			return area.bucket.index / (n - 1);
 		} else {
 			return -1;
 		}
 	});
 }
 
-// The whole-geography aggregate (EAE-514): the analysis result's first-class
-// national entry (notes §6.3) — { [dataset]: { type, value } }, aggregated
-// over the full outline with no analysis mask. Right-panel.js computes the
-// very same aggregate for the Data cards and still hands analyse() the
-// legacy aggregate_layer_values shape ({ [dataset]: { areas: { 0: { result
-// } } } }) while plan §5 step 4 migrates in parallel — both read here. The
-// fake "area 0" mask this module used to build for itself is gone.
+// The analysis result's whole-geography national entry, or the
+// AggregatedLayerData shape ({ [dataset]: { areas: { 0: { result } } } }) that
+// other callers pass.
 function national_value(national, dataset_id) {
 	const entry = national?.values?.[dataset_id] ?? national?.[dataset_id];
 	if (!entry) return null;
@@ -138,17 +112,13 @@ export async function generate_summary_data() {
 
 	const bubble = (v,e) => new bubblemessage({ "message": v + "%", "position": "C", "close": false, "noevents": true }, e);
 
-	// EAE-521: one memoised analysis result per index (plan §5 step 4)
-	// replaces this loop's private analysis_run() call — the cells it paints
-	// and stores, variant_raster()'s per-area scores and analyse()'s
-	// whole-geography aggregate all come from the same request.
+	// One memoised analysis result per index supplies the cells, the per-area
+	// scores variant_raster() paints and analyse()'s whole-geography aggregate.
 	const tier = summary_result_tier();
 
 	async function get_summary(idxn) {
-		// A geography without any division raster cannot publish a result at
-		// all (the score phase aggregates per division area); fall back to the
-		// memoised cells and no national entry (analyse() drops to its raw
-		// display-raster total).
+		// A geography with no division raster cannot publish a result (scores
+		// aggregate per division area): fall back to the cells, no national entry.
 		const result = (tier === null) ? null : await analysis_result(idxn, tier);
 		const raster = result ? result.cells : (await analysis_cells(idxn)).raster;
 
@@ -228,7 +198,11 @@ export default async function analyse(raster, national = null) {
 	for (let i = 0; i < a.length; i += 1) {
 		if (!in_area(i)) continue;
 
-		const bucket = bucket_index(a[i]);
+		// One scale for every card (area-scores.ts score_bucket); a cell with
+		// no analysis value falls outside every bucket.
+		const b = score_bucket(raster[i]);
+		const bucket = b ? b.index : OUTSIDE_BUCKET;
+
 		area_groups[bucket] += 1;
 
 		const v = p[i];
@@ -241,11 +215,8 @@ export default async function analyse(raster, national = null) {
 	const atotal = area_groups.reduce((a,b) => a + b, 0);
 
 	// The population total is the unscaled aggregate over the same area the
-	// counts above cover — not the display raster's sum, which is oversampled.
-	// With no sub-geography selected that aggregate is the analysis result's
-	// national entry (EAE-521; the pass this module used to make itself is
-	// gone), and with one selected the national entry is the parent's, so the
-	// area's own aggregate is computed instead.
+	// counts cover — never the oversampled display raster, nor the parent's
+	// national entry for a sub-geography.
 	let ptotal;
 	if (area_id === undefined) {
 		ptotal = national_value(national, 'population-density') ?? raw_ptotal;

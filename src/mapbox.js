@@ -34,10 +34,8 @@ export function get_admin_area_item(variant, id) {
 	const division = GEOGRAPHY.divisions[variant];
 	if (!division || !division.vectors) return null;
 
-	// EAE-521: the score is read from the analysis result's published
-	// per-area scores — phase 1 lands synchronously at publish time (§6.7),
-	// the same window the retired legacy bridge filled, so this stays
-	// synchronous for the popup event handlers.
+	// The score comes from the published per-area scores, which land
+	// synchronously at publish time, so this stays sync for popup handlers.
 	const area = published_analysis_result(variant)?.areas?.[id];
 	if (!area) return null;
 

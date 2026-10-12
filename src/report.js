@@ -5,8 +5,7 @@ import '../lib/jszip.js';
 import '../lib/pptxgen.js';
 
 import {
-	aggregate_layer_values,
-	analysis_cells,
+	analysis_result,
 	analysis_colorscale_svg,
 	medhigh_point_count,
 } from './analysis.ts';
@@ -15,6 +14,8 @@ import {
 	build_detailed_data,
 	compute_distribution,
 	describe,
+	layer_data_from_values,
+	OUTLINE_TIER,
 } from './right-panel-data-tab.js';
 
 import {
@@ -398,18 +399,11 @@ async function selected_data() {
 	let entries = [];
 
 	try {
-		// EAE-521: the cells come from the memoised analysis result (the same
-		// raster SUMMARY.raw_raster holds — one run() per reload now). This
-		// deck's own "analysed cells" rule — every cell the analysis scored,
-		// v !== -1 — is deliberately kept AS-IS: it is one of the three
-		// conflicting definitions (notes §6.6) — it keeps the bottom band
-		// has_priority_score() drops and is neither the result's per-area
-		// values mask nor its whole-outline national one — so its aggregate
-		// stays computed here until the mask unification lands (plan §5 step 5).
-		const raster = (await analysis_cells(STATE.index)).raster;
-		const mask = { "raster": { "data": raster.map(v => v === -1 ? -1 : 0) } };
-		const layer_data = await aggregate_layer_values(mask);
-		if (!layer_data) return;
+		// Same analysed-area bucket the on-screen Data cards render (OUTLINE_TIER
+		// area 0); the mask inherits run()'s joint nodata drop.
+		const result = await analysis_result(STATE.index, OUTLINE_TIER);
+		const layer_data = layer_data_from_values(result.areas['0']?.values ?? null);
+		if (!Object.keys(layer_data).length) return;
 
 		entries = build_detailed_data(layer_data);
 	} catch {

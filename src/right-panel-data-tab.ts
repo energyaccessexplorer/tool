@@ -233,8 +233,7 @@ function total_clause(datatype: string | undefined, unit: string | undefined, ag
 }
 
 // Module-level cache (kept out of the atom for now): geoDist memoises
-// categorical distributions per dataset+admin. The whole-outline aggregation
-// it used to carry is the analysis cell's national entry now (EAE-521).
+// categorical distributions per dataset+admin.
 const cache = {
 	"geoDist": new Map<string, DistributionSlice[]>(),
 };
@@ -558,23 +557,16 @@ export function compute_distribution(ds: LegacyDataset, adminInfo: AdminRef | nu
 }
 
 /**
- * The tier key of the Outline pseudo-division: a.js builds
- * GEOGRAPHY.divisions[0] from the outline dataset (init_2's outline() step),
- * whose raster burns area id 0 inside / -1 (nodata) outside. Its single
- * area 0 is the analysed-area bucket (cells that carry a priority score
- * inside the outline), so the masks the cards used to fabricate as "area 0"
- * are just its per-area values now (EAE-521).
+ * Tier of the Outline pseudo-division: GEOGRAPHY.divisions[0] comes from the
+ * outline dataset, its raster burning area id 0 inside and -1 (nodata)
+ * outside, so its single area 0 is the analysed-area bucket.
  */
 export const OUTLINE_TIER = 0;
 
 /**
- * Rebuild the legacy layer-data shape from the analysis cell's values
- * (EAE-521). The cell publishes one AggregateResult per dataset (an area's
- * `values`, or `national` for the whole geography), while build_detailed_data()
- * and report.js's deck still read one AggregatedLayer per dataset with its
- * result in a single area slot — the "fake area 0" slot the old masks
- * fabricated. The per-layer metadata comes from the same DST entries
- * aggregate_layer_values() read (name, unit and the SUM/AVG aggregation flag).
+ * Rebuild the flat AggregatedLayerData shape from the analysis cell's values:
+ * build_detailed_data() and report.js's deck read one AggregatedLayer per
+ * dataset with its result in area slot 0, metadata coming from the DST entries.
  */
 export function layer_data_from_values(values: AreaValues | null): AggregatedLayerData {
 	const out: Record<string, AggregatedLayer> = {};
@@ -595,10 +587,9 @@ export function layer_data_from_values(values: AreaValues | null): AggregatedLay
 }
 
 /**
- * The whole-geography aggregate from the analysis cell (EAE-521): what
- * outlineLayerData() used to hand-roll with a whole-outline "fake area 0"
- * mask. Only needed before the first analysis run lands: afterwards the atom
- * carries the aggregates graphs() computed in the same pass as the summary.
+ * The whole-geography aggregate from the analysis cell, needed only before the
+ * first analysis run lands: afterwards the atom carries the aggregates graphs()
+ * computed in the same pass as the summary.
  */
 async function nationalFromCell(): Promise<AggregatedLayerData> {
 	const result = await analysis_result(STATE.index, OUTLINE_TIER);

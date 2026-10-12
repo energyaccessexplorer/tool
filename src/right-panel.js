@@ -25,6 +25,8 @@ import summary_analyse from './summary.js';
 
 import {
 	init as data_tab_init,
+	layer_data_from_values,
+	OUTLINE_TIER,
 } from './right-panel-data-tab.js';
 
 import {
@@ -33,9 +35,8 @@ import {
 } from './right-panel-data-state.js';
 
 import {
-	aggregate_layer_values,
-	has_priority_score,
-} from './analysis.js';
+	analysis_result,
+} from './analysis.ts';
 
 import {
 	init as prioritization_tab_init,
@@ -103,29 +104,37 @@ export function update_analysis(has_data) {
 }
 
 export async function graphs(raster) {
-	// Cards aggregate only the cells that have a priority score — the cells whose
-	// range and class selections the analysis kept — restricted to the geography
-	// outline. Same rule the export's priority columns use (has_priority_score()).
-	const outline = OUTLINE.raster.data;
-	const outline_nodata = OUTLINE.raster.nodata;
-	const analysis_mask = {
-		"raster": { "data": raster.map((v, i) => (has_priority_score(v) && outline[i] !== outline_nodata) ? 0 : -1) },
-	};
-	const layer_data = await aggregate_layer_values(analysis_mask);
+	// The card aggregates come from the analysis cell (EAE-521) — the fake
+	// "area 0" masks and their aggregate_layer_values() calls are gone.
+	// OUTLINE_TIER is the Outline pseudo-division: its single area 0 is
+	// exactly the analysed-area bucket the old analysis_mask fabricated —
+	// only the cells that have a priority score (the cells whose range and
+	// class selections the analysis kept), restricted to the geography
+	// outline, same rule the export's priority columns use
+	// (has_priority_score()) — so result.analysed.values carries the cards'
+	// analysed-area figures. result.national.values is the same layers over
+	// the whole geography with no analysis mask: the unfiltered figures the
+	// Data cards compare the analysed-area values against (EAE-514). Both
+	// are computed once in the cell and shared, because summary_analyse()
+	// used to derive the very same aggregate for itself.
+	let summary;
+	try {
+		const result = await analysis_result(STATE.index, OUTLINE_TIER);
 
-	// The same layers over the whole geography, with no analysis mask: the
-	// unfiltered figures the Data cards compare the analysed-area values
-	// against (EAE-514). Computed here once and shared, because
-	// summary_analyse() used to derive the very same aggregate for itself.
-	const national_mask = {
-		"raster": { "data": outline.map(v => (v !== outline_nodata) ? 0 : -1) },
-	};
-	const national_layer_data = await aggregate_layer_values(national_mask);
+		const layer_data = layer_data_from_values(result.analysed.values);
+		const national_layer_data = layer_data_from_values(result.national.values);
 
-	data_tab_actions.analysisCompleted(data_tab_cell(), layer_data, national_layer_data);
+		data_tab_actions.analysisCompleted(data_tab_cell(), layer_data, national_layer_data);
 
-	// The summary keeps the analysis-window mask.
-	const summary = await summary_analyse(raster, national_layer_data);
+		// The summary keeps the analysis-window mask.
+		summary = await summary_analyse(raster, national_layer_data);
+	} catch (e) {
+		// loading_analysis(true) in ds.js active() must always balance: a
+		// rejected analysis must never strand the "Loading data layers"
+		// spinner. Hide the loader, then let the error surface.
+		update_analysis(false);
+		throw e;
+	}
 
 	// The blank state follows the analysis, not the cards. Since EAE-502 the
 	// summary covers the whole outline, so its area and population totals are

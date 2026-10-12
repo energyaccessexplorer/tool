@@ -1,12 +1,13 @@
 import bubblemessage from '../lib/bubblemessage.js';
 
-import analysis_run, {
+import {
 	active_area_mask,
-	analysis_colorscale,
-	division_averages,
-	priority_scale,
 	aggregate_layer_values,
-} from './analysis.js';
+	analysis_cells,
+	analysis_colorscale,
+	analysis_result,
+	lowmedhigh_scale,
+} from './analysis.ts';
 
 import {
 	default_colorscale,
@@ -59,24 +60,74 @@ function bucket_index(x) {
 	return OUTSIDE_BUCKET;
 }
 
-function variant_raster(raster) {
-	const division = (STATE.variant !== "raster") ? GEOGRAPHY.divisions[STATE.variant] : null;
-	const areas = division?.raster?.data ? division_averages(raster, division.raster.data) : null;
-	const n = analysis_colorscale.stops.length;
-	const scale = areas ? priority_scale(areas, analysis_colorscale.stops.map((_, i) => i / (n - 1))) : null;
+// The tier the summary's analysis results hang off (notes §4: keyed
+// (index, tier, subdiv)). The natural key is the analysis level's own
+// division — variant_raster() paints exactly those areas — while at the
+// pixel level ('raster') there are no areas to paint and only the
+// tier-independent national entry is read, which just needs some result to
+// hang off: the first division carrying a raster stands in.
+function summary_result_tier() {
+	const divisions = GEOGRAPHY.divisions || [];
+	const variant = STATE.variant;
 
-	if (scale) {
-		return Float32Array.from(raster, (_, i) => {
-			const id = division.raster.data[i];
-			if (id !== -1 && id in areas) {
-				return scale(areas[id].average);
-			} else {
-				return -1;
-			}
-		});
-	} else {
-		return raster;
+	if (variant !== 'raster' && divisions[variant]?.raster?.data) return variant;
+
+	for (let i = 0; i < divisions.length; i += 1)
+		if (divisions[i]?.raster?.data) return i;
+
+	return null;
+}
+
+// Paint the deck's per-index choropleth FROM the analysis result (EAE-521):
+// this used to recompute the per-area averages and its
+// own copy of the area scale over the raster. The result's
+// bucket is that same one area scale's Low..High label, and the label's slot
+// in lowmedhigh_scale.range() is the same quantile slot the old positional
+// scale returned — slot / (n - 1) is exactly the position
+// analysis_colorscale.stops.map((_, i) => i / (n - 1)) passed as its range,
+// so every painted value is bit-identical to the legacy one.
+function variant_raster(raster, result) {
+	const division = (STATE.variant !== "raster") ? GEOGRAPHY.divisions[STATE.variant] : null;
+	if (!division?.raster?.data) return raster;
+
+	const areas = result.areas;
+	const n = analysis_colorscale.stops.length;
+	const range = lowmedhigh_scale.range();
+
+	// The old area scale returned null exactly when no area carries a usable
+	// average (every area in the record carries one — the fold averages
+	// scored cells only), and then the raw raster was painted. No
+	// bucket anywhere is the same case.
+	let painted = false;
+	for (const id in areas) {
+		if (areas[id].bucket !== null) { painted = true; break; }
 	}
+	if (!painted) return raster;
+
+	return Float32Array.from(raster, (_, i) => {
+		const id = division.raster.data[i];
+		const area = (id !== -1) ? areas[id] : null;
+
+		if (area && area.bucket !== null) {
+			return range.indexOf(area.bucket) / (n - 1);
+		} else {
+			return -1;
+		}
+	});
+}
+
+// The whole-geography aggregate (EAE-514): the analysis result's first-class
+// national entry (notes §6.3) — { [dataset]: { type, value } }, aggregated
+// over the full outline with no analysis mask. Right-panel.js computes the
+// very same aggregate for the Data cards and still hands analyse() the
+// legacy aggregate_layer_values shape ({ [dataset]: { areas: { 0: { result
+// } } } }) while plan §5 step 4 migrates in parallel — both read here. The
+// fake "area 0" mask this module used to build for itself is gone.
+function national_value(national, dataset_id) {
+	const entry = national?.values?.[dataset_id] ?? national?.[dataset_id];
+	if (!entry) return null;
+
+	return entry.value ?? entry.areas?.['0']?.result?.value ?? null;
 }
 
 export async function generate_summary_data() {
@@ -87,10 +138,21 @@ export async function generate_summary_data() {
 
 	const bubble = (v,e) => new bubblemessage({ "message": v + "%", "position": "C", "close": false, "noevents": true }, e);
 
-	async function get_summary(idxn) {
-		const raster = (await analysis_run(idxn)).raster;
+	// EAE-521: one memoised analysis result per index (plan §5 step 4)
+	// replaces this loop's private analysis_run() call — the cells it paints
+	// and stores, variant_raster()'s per-area scores and analyse()'s
+	// whole-geography aggregate all come from the same request.
+	const tier = summary_result_tier();
 
-		SUMMARY[idxn] = await analyse(raster);
+	async function get_summary(idxn) {
+		// A geography without any division raster cannot publish a result at
+		// all (the score phase aggregates per division area); fall back to the
+		// memoised cells and no national entry (analyse() drops to its raw
+		// display-raster total).
+		const result = (tier === null) ? null : await analysis_result(idxn, tier);
+		const raster = result ? result.cells : (await analysis_cells(idxn)).raster;
+
+		SUMMARY[idxn] = await analyse(raster, result?.national.values ?? null);
 		SUMMARY[idxn]['raw_raster'] = raster;
 
 		const ppie = svg_pie(SUMMARY[idxn]['population-density']['distribution'].map(x => [x]), 75, 0, share_scale_colors(), null, bubble);
@@ -106,7 +168,7 @@ export async function generate_summary_data() {
 		c.style.display = 'none';
 		document.body.append(c);
 
-		plot_outputcanvas(variant_raster(raster), c);
+		plot_outputcanvas(variant_raster(raster, result), c);
 
 		SUMMARY[idxn]['canvas'] = c;
 		SUMMARY[idxn]['population-density']['pie'] = ppie;
@@ -126,7 +188,7 @@ export function compute_share_amounts(data) {
 	};
 }
 
-export default async function analyse(raster, layer_data = null) {
+export default async function analyse(raster, national = null) {
 	const pixels_per_km2 = (1000/GEOGRAPHY.resolution)**2;
 
 	let ds = DST.get('population-density');
@@ -178,20 +240,20 @@ export default async function analyse(raster, layer_data = null) {
 	const raw_ptotal = population_groups.reduce((a,b) => a + b, 0);
 	const atotal = area_groups.reduce((a,b) => a + b, 0);
 
-	// Get the correct population total from layer_data aggregated over the same
-	// whole-geography mask the cards use (unscaled raster via
-	// aggregate_layer_values, avoids overcounting from the oversampled display
-	// raster). When layer_data is not provided (e.g. PPTX summary data), compute
-	// it now. The caller in right-panel.js hands in the aggregate it already
-	// computed for the Data cards' whole-geography figures (EAE-514), so this
-	// pass is only made when nobody else has. Distribution proportions from
-	// the display raster above are still correct (overcounting cancels).
-	if (!layer_data) {
+	// The population total is the unscaled aggregate over the same area the
+	// counts above cover — not the display raster's sum, which is oversampled.
+	// With no sub-geography selected that aggregate is the analysis result's
+	// national entry (EAE-521; the pass this module used to make itself is
+	// gone), and with one selected the national entry is the parent's, so the
+	// area's own aggregate is computed instead.
+	let ptotal;
+	if (area_id === undefined) {
+		ptotal = national_value(national, 'population-density') ?? raw_ptotal;
+	} else {
 		const mask = { "raster": { "data": Float32Array.from(a, (_, i) => in_area(i) ? 0 : -1) } };
-		layer_data = await aggregate_layer_values(mask);
+		const area_layer_data = await aggregate_layer_values(mask);
+		ptotal = area_layer_data?.['population-density']?.areas?.[0]?.result?.value ?? raw_ptotal;
 	}
-	const pop_result = layer_data?.['population-density']?.areas?.[0]?.result;
-	const ptotal = pop_result?.value ?? raw_ptotal;
 
 	const s = STATE.divtier ?
 		x => x / pixels_per_km2 :

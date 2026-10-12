@@ -157,6 +157,8 @@ build-a:
 		${JS}/browser.js \
 		${JS}/session.js \
 		${JS}/analysis.js \
+		${JS}/analysis-state.js \
+		${JS}/area-scores.js \
 		${JS}/cards.js \
 		${JS}/config.js \
 		${JS}/controls.js \

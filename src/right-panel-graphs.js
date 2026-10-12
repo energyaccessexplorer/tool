@@ -1,6 +1,6 @@
 import { t, translateNode, replayable, registerUIUpdater, translateIndexName } from './translate.js';
 import { svg_pie } from './utils.js';
-import { analysis_colorscale } from './analysis.js';
+import { analysis_colorscale } from './analysis.ts';
 import { compute_share_amounts, share_scale_labels, share_scale_colors, OUTSIDE_BUCKET } from './summary.js';
 import bubblemessage from '../lib/bubblemessage.js';
 import bind from '../lib/bind.js';

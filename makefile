@@ -209,6 +209,7 @@ build-a:
 		${JS}/toast.js \
 		${JS}/filtered.js \
 		${JS}/embed.js \
+		${JS}/initial-view.js \
 		${JS}/a.js \
 		${DIST}/a/
 

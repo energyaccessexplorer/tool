@@ -1,5 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { initialViewStrategy } from '../src/initial-view.ts';
 
 function and(a, b) {
 	return Boolean(a && b);
@@ -43,6 +44,15 @@ function validate_state_value(p, v) {
 }
 
 describe('embed: validation and payload pure tests', () => {
+	it('uses saved camera state only when a camera URL parameter was applied', () => {
+		assert.equal(initialViewStrategy(true, true, true), 'apply-configured-view');
+		assert.equal(initialViewStrategy(true, false, true), 'fit-envelope-on-idle');
+		assert.equal(initialViewStrategy(false, true, true), 'apply-configured-view');
+		assert.equal(initialViewStrategy(false, false, true), 'apply-configured-view');
+		assert.equal(initialViewStrategy(true, false, false), 'fit-envelope-on-idle');
+		assert.equal(initialViewStrategy(false, false, false), 'fit-envelope-after-delay');
+	});
+
 	it('validates zoom, center, view, subdiv, divtier correctly', () => {
 		assert.equal(validate_state_value('zoom', '10'), 10);
 		assert.equal(validate_state_value('zoom', '-1'), null);

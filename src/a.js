@@ -120,6 +120,7 @@ import { syncDatasets as timeline_sync_datasets, cell as timeline_cell } from '.
 
 import { init as timeline_view_init, commitSync as timeline_commit_sync, setCriteriaMask } from './timeline-view.js';
 import { init as embed_init } from './embed.js';
+import { initialViewStrategy } from './initial-view.ts';
 
 window.setCriteriaMask = setCriteriaMask;
 let criteriaFromUrl = undefined;
@@ -306,46 +307,47 @@ async function init_1() {
 	};
 
 	let viewFromUrl = false;
+	let cameraFromUrl = false;
 
 	const q_zoom = url.searchParams.get('zoom');
 	if (q_zoom !== null) {
 		const vz = validate_state_value('zoom', q_zoom);
-		if (vz !== null) { conf.zoom = vz; viewFromUrl = true; }
+		if (vz !== null) { conf.zoom = vz; viewFromUrl = true; cameraFromUrl = true; }
 	}
 
 	const q_lng = url.searchParams.get('lng');
 	const q_lat = url.searchParams.get('lat');
 	if (q_lng !== null && q_lat !== null) {
 		const vc = validate_state_value('center', { "lng": q_lng, "lat": q_lat });
-		if (vc !== null) { conf.center = vc; viewFromUrl = true; }
+		if (vc !== null) { conf.center = vc; viewFromUrl = true; cameraFromUrl = true; }
 	}
 
 	const q_divtier = url.searchParams.get('divtier');
 	if (q_divtier !== null) {
 		const vt = validate_state_value('divtier', q_divtier);
-		if (vt !== null) { conf.divtier = vt; viewFromUrl = true; }
+		if (vt !== null) { conf.divtier = vt; viewFromUrl = true; cameraFromUrl = true; }
 	}
 
 	const q_subdiv = url.searchParams.get('subdiv');
 	if (q_subdiv !== null) {
 		const vs = validate_state_value('subdiv', q_subdiv);
-		if (vs !== null) { conf.subdiv = vs; viewFromUrl = true; }
+		if (vs !== null) { conf.subdiv = vs; viewFromUrl = true; cameraFromUrl = true; }
 	}
 
 	const q_view = url.searchParams.get('view');
 	if (q_view !== null) {
 		const vv = validate_state_value('view', q_view);
-		if (vv !== null) { conf.view = vv; viewFromUrl = true; }
+		if (vv !== null) conf.view = vv;
 	}
 
 	const q_criteria = url.searchParams.get('criteria');
 	if (q_criteria !== null) {
 		criteriaFromUrl = (q_criteria === '1' || q_criteria === 'true');
 		conf._criteria = criteriaFromUrl;
-		viewFromUrl = true;
 	}
 
-	window.VIEW_FROM_URL = viewFromUrl;
+	window.VIEW_FROM_URL = cameraFromUrl;
+	window.URL_STATE_FROM_URL = viewFromUrl;
 
 	STATE = new Proxy(conf, { "get": state_get, "set": state_set });
 
@@ -549,14 +551,19 @@ async function init_4() {
 		}
 	};
 
-	if (window.VIEW_FROM_URL || window.EMBED) {
-		if (MAPBOX.loaded()) {
-			applyInitialView();
-		} else {
-			MAPBOX.once('idle', applyInitialView);
-		}
-	} else {
+	const strategy = initialViewStrategy(window.EMBED, window.VIEW_FROM_URL, window.URL_STATE_FROM_URL);
+	if (strategy === 'fit-envelope-after-delay') {
 		delay(0.3).then(_ => mapbox_fit(GEOGRAPHY.envelope));
+	} else {
+		const applyView = strategy === 'apply-configured-view'
+			? applyInitialView
+			: () => mapbox_fit(GEOGRAPHY.envelope);
+
+		if (MAPBOX.loaded()) {
+			applyView();
+		} else {
+			MAPBOX.once('idle', applyView);
+		}
 	}
 
 	loading(false);

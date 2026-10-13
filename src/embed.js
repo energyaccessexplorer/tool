@@ -2,8 +2,18 @@ import { fit as mapbox_fit } from './mapbox.js';
 
 function allowed_origins() {
 	const raw = window.EAE?.['settings']?.embed_origins;
-	if (!raw || typeof raw !== 'string' || !raw.trim()) return [];
-	return raw.split(',').map(s => s.trim()).filter(Boolean);
+	const origins = new Set([
+		"http://localhost:3000",
+		"http://127.0.0.1:3000",
+		"http://localhost:8000",
+		"http://127.0.0.1:8000",
+	]);
+	if (raw && typeof raw === 'string' && raw.trim()) {
+		for (const s of raw.split(',').map(s => s.trim()).filter(Boolean)) {
+			origins.add(s);
+		}
+	}
+	return Array.from(origins);
 }
 
 function build_divisions_payload() {
@@ -134,7 +144,21 @@ export function init() {
 	window.addEventListener('message', (event) => {
 		const allowed = allowed_origins();
 		if (!allowed.includes(event.origin)) return;
-		if (!event.data || event.data.type !== 'eae:set') return;
+		if (!event.data || typeof event.data !== 'object') return;
+
+		// Respond immediately to eae:ping from parent
+		if (event.data.type === 'eae:ping') {
+			const payload = build_divisions_payload();
+			try {
+				event.source.postMessage({
+					type: "eae:ready",
+					divisions: payload,
+				}, event.origin);
+			} catch (_) {}
+			return;
+		}
+
+		if (event.data.type !== 'eae:set') return;
 
 		const data = event.data;
 

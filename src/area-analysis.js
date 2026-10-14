@@ -7,11 +7,16 @@ import {
 } from './utils.js';
 
 import {
-	lowmedhigh_scale,
-	priority_scale,
 	aggregation_band,
 	has_priority_score,
-} from './analysis.js';
+	score_bands,
+	score_bucket,
+} from './area-scores.ts';
+
+import {
+	cell,
+	resultKey,
+} from './analysis-state.ts';
 
 import {
 	maybe,
@@ -161,18 +166,49 @@ export function vector_feature_name(raster_index) {
 	return null;
 }
 
+// Synchronous read of one tier's published result for popup handlers. A live-key
+// miss returns the newest entry for the same index and tier, deliberately.
+export function published_analysis_result(variant) {
+	const results = cell().state.results;
+
+	const subdiv = (typeof STATE.subdiv === 'number') ? STATE.subdiv : null;
+	const exact = results[resultKey(STATE.index, variant, subdiv)];
+	if (exact) return exact.result;
+
+	let best = null;
+	for (const k in results) {
+		const entry = results[k];
+		if (!entry || entry.key.index !== STATE.index) continue;
+		if (String(entry.key.tier) !== String(variant)) continue;
+		if (!best || entry.revision > best.revision) best = entry;
+	}
+
+	return best ? best.result : null;
+}
+
+// Layer metadata is re-derived from the dataset entry; only the values come
+// from the published result.
 export function get_admin_area_layer_data(variant, area_id) {
 	const fields = [];
 	const props = {};
 	const raw = { "values": {}, "units": {}, "aggregations": {} };
 
-	const layer_data = maybe(GEOGRAPHY, 'divisions', variant, 'layerData');
-	if (layer_data) {
-		for (const layer_id in layer_data) {
-			const layer = layer_data[layer_id];
-			const area_result = maybe(layer, 'areas', area_id, 'result');
+	const values = published_analysis_result(variant)?.areas?.[area_id]?.values;
+
+	if (values) {
+		for (const layer_id in values) {
+			const area_result = values[layer_id];
 
 			if (!area_result) continue;
+
+			const ds = STATE.datasets.find(d => d.id === layer_id);
+			const layer = {
+				"name":        ds?.name,
+				"unit":        ds?.category?.unit,
+				"aggregation": (ds?.vectors?.shape_type === 'points')
+					? 'SUM'
+					: (ds?.category?.analysis?.aggregation ?? 'AVG'),
+			};
 
 			let value, unit;
 			if (area_result.type === 'points') {
@@ -221,19 +257,24 @@ function resolve_feature(fields, props, feature_name, admin_info) {
 }
 
 function translate_scale_label(label) {
-	const i = lowmedhigh_scale.range().indexOf(label);
+	const i = score_bands.indexOf(label);
 	return i === -1 ? label : getScaleLabels(window.LOCALE)[i];
 }
 
 function analysis_entries(analysis_value, analysis_name, admin_info) {
 	if (!Number.isFinite(analysis_value)) return [];
 
-	const scale = admin_info
-		? priority_scale(GEOGRAPHY.divisions[admin_info.variant].priorityData, lowmedhigh_scale.range())
-		: lowmedhigh_scale;
+	// The published result's own bucket (the one score scale, area-scores.ts
+	// score_bucket) wins; score_bucket(analysis_value) covers the raster popup.
+	const bucket = admin_info
+		? (published_analysis_result(admin_info.variant)?.areas?.[admin_info.id]?.bucket
+			?? score_bucket(analysis_value))
+		: score_bucket(analysis_value);
+
+	const label = bucket?.label ?? null;
 
 	return [
-		...(analysis_name ? [{ "label": analysis_name, "value": translate_scale_label(scale(analysis_value)), "raw_value": scale(analysis_value), "has_info_button": true }] : []),
+		...(analysis_name ? [{ "label": analysis_name, "value": translate_scale_label(label), "raw_value": label, "has_info_button": true }] : []),
 		{ "key": "Priority score", "label": t(window.LOCALE, 'map_popup.priority_score'), "value": `${(analysis_value * 100).toFixed(1)}%`, "raw_value": analysis_value },
 	];
 }
@@ -506,7 +547,8 @@ export function division_names(raster_index) {
 function priority_entries(item, analysis_name) {
 	return has_priority_score(item.priority)
 		? {
-			[analysis_name]:    lowmedhigh_scale(item.priority),
+			// Same scale as the popup's label row.
+			[analysis_name]:    score_bucket(item.priority)?.label,
 			"Priority score": `${(item.priority * 100).toFixed(1)}%`,
 		}
 		: {};
@@ -668,7 +710,7 @@ function build_admin_row(item, analysis_name) {
 	}
 
 	const variant = STATE.variant;
-	const info = { "variant": variant, "name": item.name };
+	const info = { "variant": variant, "name": item.name, "id": item.id };
 	const [fields, props, raw] = get_admin_area_layer_data(variant, item.id);
 
 	const { feature, feature_type, detailedData } = area_info(

@@ -70,3 +70,44 @@ describe('emitted modules (tsbuild/src)', () => {
 		assert.equal(state().summary, null);
 	});
 });
+
+describe('emitted modules (tsbuild/src): analysis-state', () => {
+	it('analysis-state.js loads, publishes and guards by revision', async () => {
+		const { actions, cell, createAnalysisService, resultKey } = await import('../tsbuild/src/analysis-state.js');
+
+		// cell() snapshots state at call time — re-read it after each action.
+		const state = () => cell().state;
+
+		actions.reset(cell());
+		const applied = actions.computed(cell(), {
+			"revision": state().revision,
+			"key":      { "index": 'eai', "tier": 2, "subdiv": null },
+			"inputs":   'f',
+			"result":   {
+				"cells":    new Float32Array([0.5]),
+				"mask":     new Uint8Array([1]),
+				"areas":    { "7": { "score": 0.5, "bucket": 'High', "values": null } },
+				"national": { "values": null },
+			},
+		});
+
+		assert.equal(applied, true);
+		assert.equal(state().results[resultKey('eai', 2, null)]?.result.areas['7']?.score, 0.5);
+
+		const stale = state().revision;
+		actions.commit(cell(), {});
+		assert.equal(actions.computed(cell(), {
+			"revision": stale,
+			"key":      { "index": 'eai', "tier": 2, "subdiv": null },
+			"inputs":   'f',
+			"result":   {
+				"cells":    new Float32Array([0.5]),
+				"mask":     new Uint8Array([1]),
+				"areas":    {},
+				"national": { "values": null },
+			},
+		}), false);
+
+		assert.equal(typeof createAnalysisService, 'function');
+	});
+});

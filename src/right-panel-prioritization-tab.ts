@@ -1,15 +1,17 @@
 // Right-panel Prioritization tab view: renders the atom from
-// right-panel-prioritization-state.ts. Impure by design — DOM, i18n, the
-// per-index analyses and division scales live here. Producers dispatch
-// actions on the atom; the subscription at the bottom re-renders and runs
-// the entries service.
+// right-panel-prioritization-state.ts. Impure by design — DOM and i18n live
+// here; per-index entries come from memoised analysis results. Producers dispatch
+// actions on the atom; the subscription at the bottom runs the entries service.
 
-import analysis_run, {
+import {
+	analysis_cells,
+	analysis_scores,
 	dataset_feeds_index,
-	division_averages,
-	lowmedhigh_scale,
-	priority_scale,
-} from './analysis.js';
+} from './analysis.ts';
+
+import {
+	score_bucket,
+} from './area-scores.ts';
 
 import {
 	setup_about_button,
@@ -42,6 +44,10 @@ import {
 } from './right-panel-prioritization-state.ts';
 
 import type {
+	AnalysisResult,
+} from './analysis-state.ts';
+
+import type {
 	AdminRef,
 } from './right-panel-shared.ts';
 
@@ -53,75 +59,63 @@ import type {
 	PriorityView,
 } from './right-panel-prioritization-state.ts';
 
-/** Division averages as keyed by division id (division_averages stringifies ids). */
-type DivisionAverages = Record<string, { readonly average: number }>;
-
 function hasDatasetsFor(key: string): boolean {
 	const compound = EAE['indexes'][key]?.compound ?? [];
 	return STATE.datasets.some(d =>
 		dataset_feeds_index(d, key) || compound.some(c => dataset_feeds_index(d, c)));
 }
 
-/**
- * Bucket a value through the applicable scale, or null when there is no
- * value or no scale (legacy make_row's (value != null && scale) guard).
- */
-function bucketOf(value: number | null, scale: ((v: number) => string) | null): string | null {
-	return value != null && scale ? scale(value) : null;
-}
-
 function pixelEntry(raster: ArrayLike<number>, rasterIndex: number): IndexEntry {
 	const v = raster[rasterIndex];
 	const value = v != null && v !== -1 ? v : null;
-	return { value, "bucket": bucketOf(value, lowmedhigh_scale) };
-}
-
-function adminAreaEntry(raster: ArrayLike<number>, admin: AdminRef): IndexEntry {
-	const division = GEOGRAPHY.divisions?.[admin.variant];
-	if (!division?.raster?.data) return { "value": null, "bucket": null };
-
-	const areas = division_averages(raster, division.raster.data) as DivisionAverages;
-	const value = areas[String(admin.id)]?.average ?? null;
-	const scale = priority_scale(areas, lowmedhigh_scale.range()) as ((v: number) => string) | null;
-
-	return { value, "bucket": bucketOf(value, scale) };
+	return { value, "bucket": score_bucket(value) };
 }
 
 /**
- * Legacy update(), minus the DOM: run the per-index analyses for every
- * index but the current one and bucket each result for the selection.
+ * One index's entry for the selected admin area, read from that index's
+ * memoised analysis result: the area's score and bucket, both from
+ * area-scores.ts's one scale.
+ */
+function adminAreaEntry(result: AnalysisResult | undefined, admin: AdminRef): IndexEntry {
+	const area = result?.areas[String(admin.id)];
+	return { "value": area?.score ?? null, "bucket": area?.bucket ?? null };
+}
+
+/**
+ * Every row for the selection is read from its index's memoised analysis
+ * result: analysis_scores (per-area score + bucket) for an admin area,
+ * analysis_cells for a raster pixel.
  */
 async function buildEntries(view: Extract<PriorityView, { readonly kind: 'location' }>): Promise<IndexEntries> {
 	const otherKeys = Object.keys(EAE['indexes'])
 		.filter(k => k !== STATE.index && hasDatasetsFor(k));
 
-	const results = await Promise.all(otherKeys.map(key => analysis_run(key)));
-
 	const admin = view.admin;
 	const rasterIndex = view.rasterIndex;
+	const empty: IndexEntry = { "value": null, "bucket": null };
 
-	const extract = admin
-		? (raster: ArrayLike<number>) => adminAreaEntry(raster, admin)
-		: (raster: ArrayLike<number>) => pixelEntry(raster, rasterIndex ?? 0);
-
-	let currentBucket: string | null = null;
 	if (admin) {
-		const priorityData = GEOGRAPHY.divisions?.[admin.variant]?.priorityData;
-		const scale = priorityData
-			? priority_scale(priorityData, lowmedhigh_scale.range()) as ((v: number) => string) | null
-			: null;
-		currentBucket = bucketOf(view.analysisValue, scale);
-	} else {
-		currentBucket = bucketOf(view.analysisValue, lowmedhigh_scale);
+		// One memoised result per index at the selection's own division tier.
+		const keys = hasDatasetsFor(STATE.index) ? [STATE.index, ...otherKeys] : otherKeys;
+		const results = await Promise.all(keys.map(key => analysis_scores(key, admin.variant)));
+		const entries = Object.fromEntries(keys.map((key, i): [string, IndexEntry] =>
+			[key, adminAreaEntry(results[i], admin)]));
+
+		return { ...entries, [STATE.index]: entries[STATE.index] ?? empty };
 	}
 
+	const rasters = await Promise.all(otherKeys.map(key => analysis_cells(key)));
+
+	// The current column is the clicked cell's raw value as the open map-info
+	// carries it, bucketed through the same one scale.
 	const current: IndexEntry = hasDatasetsFor(STATE.index)
-		? { "value": view.analysisValue, "bucket": currentBucket }
-		: { "value": null, "bucket": null };
+		? { "value": view.analysisValue, "bucket": score_bucket(view.analysisValue) }
+		: empty;
 
 	return {
 		[STATE.index]: current,
-		...Object.fromEntries(otherKeys.map((key, i) => [key, extract(results[i]?.raster ?? [])])),
+		...Object.fromEntries(otherKeys.map((key, i): [string, IndexEntry] =>
+			[key, pixelEntry(rasters[i]?.raster ?? [], rasterIndex ?? 0)])),
 	};
 }
 
@@ -161,8 +155,7 @@ function renderTitle(view: PriorityView): void {
 
 function makeRow(key: string, entry: IndexEntry | undefined, subordinate = false): HTMLElement {
 	const bucket = entry?.bucket ?? null;
-	const rangeIndex = bucket == null ? -1 : lowmedhigh_scale.range().indexOf(bucket);
-	const formatted = (rangeIndex === -1 ? undefined : getScaleLabels(window.LOCALE)[rangeIndex]) ?? bucket ?? '—';
+	const formatted = (bucket ? getScaleLabels(window.LOCALE)[bucket.index] : undefined) ?? bucket?.label ?? '—';
 
 	const row = ce('div', null, { 'class': subordinate ? 'index-priority-row subordinate' : 'index-priority-row' });
 	const name = ce('span', null, { 'class': 'index-priority-name' });

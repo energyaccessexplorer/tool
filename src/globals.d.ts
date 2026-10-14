@@ -4,10 +4,14 @@
 // unchecked (checkJs is off). This file has no imports/exports on purpose:
 // it stays a global script so the declarations are ambient.
 
-/** Raster payload shape shared by OUTLINE, GEOGRAPHY.divisions[*] and datasets. */
+/** The concrete raster containers the folds walk. */
+type RasterData = number[] | Float32Array | Int32Array;
+
 interface RasterLike {
-	readonly data: ArrayLike<number>;
+	readonly data: RasterData;
 	readonly nodata: number;
+	readonly width: number;
+	readonly height: number;
 }
 
 declare const STATE: {
@@ -15,10 +19,12 @@ declare const STATE: {
 	readonly variant: string;
 	/** Currently selected index id ('eai', 'demand', 'supply', 'ani', ...). */
 	readonly index: string;
-	/** "Change geography" selection: division tier (0 = whole geography). */
-	readonly divtier?: number;
-	/** "Change geography" selection: area id within divisions[divtier]. */
-	readonly subdiv?: number;
+	/** "Change geography" division tier run() filters cells with (0 = whole geography). */
+	readonly divtier: number;
+
+	/** "Change geography" area id within divisions[divtier]; run() filters to it
+	 * when numeric. */
+	readonly subdiv: unknown;
 
 	/**
 	 * Legacy per-geography selected Date (timeline.js). The EAE-297 year
@@ -33,14 +39,15 @@ declare const GEOGRAPHY: {
 	 * whole-geography clause of the card sentences name it). */
 	readonly name: string;
 
-	/** Geography id (uuid). */
+	/** [west, south, east, north] — the GeoTIFF metadata anchors on it. */
+	readonly envelope: readonly [number, number, number, number];
+
+	/** Geography id (uuid) — the result inputs fingerprint keys on it. */
 	readonly id?: string;
 
 	readonly divisions?: Record<string, {
 		readonly name?: string;
-		readonly raster?: RasterLike;
-		/** Per-division-id priority averages (analysis.js priority()). */
-		readonly priorityData?: Record<string, { readonly average?: number }>;
+		readonly raster: RasterLike;
 		readonly vectors?: {
 			readonly data?: {
 				readonly features?: readonly { readonly id: string | number }[];
@@ -54,14 +61,33 @@ declare const GEOGRAPHY: {
 	readonly timeline_dates?: readonly string[];
 };
 
-declare const OUTLINE: { readonly raster?: RasterLike } | undefined;
+declare const OUTLINE: { readonly raster: RasterLike } | undefined;
 
 /** Dataset registry by id (analysis.js). */
 declare const DST: ReadonlyMap<string, unknown>;
 
+/** The mapbox GL wrapper app code paints through (mapbox.js). */
+declare const MAPBOX: {
+	getSource(id: string): {
+		readonly _data?: {
+			features?: Array<{ id?: string | number; properties: Record<string, unknown> }>;
+		};
+		setData(data: unknown): void;
+		play: () => void;
+		pause: () => void;
+		raster?: unknown;
+	} | null;
+	getLayer?(id: string): unknown;
+};
+
+/** The GeoTIFF writer the report's analysis export uses (loaded as a lib). */
+declare const GeoTIFF: {
+	writeArrayBuffer(arr: Uint8Array, metadata: Record<string, unknown>): Promise<ArrayBuffer>;
+};
+
 /** App configuration namespace (built into main.js at build time). */
 declare const EAE: {
-	readonly indexes: Record<string, { readonly compound?: readonly string[] } | undefined>;
+	readonly indexes: Record<string, { readonly compound: readonly string[] } | undefined>;
 };
 
 interface Window {
@@ -133,6 +159,15 @@ interface D3ScalePoint {
 	range(range: readonly number[]): D3ScalePoint;
 }
 
+/** v5 quantile scale (banding in ds.js, utils.js). */
+interface D3ScaleQuantile<R> {
+	(value: number | null): R | undefined;
+	domain(): number[];
+	domain(domain: readonly number[]): D3ScaleQuantile<R>;
+	range(): R[];
+	range(range: readonly R[]): D3ScaleQuantile<R>;
+}
+
 interface D3DragBehavior {
 	on(event: string, fn: () => void): D3DragBehavior;
 }
@@ -141,11 +176,14 @@ declare const d3: {
 	create(tag: string): D3Selection;
 	select(node: Element): D3Selection;
 	scalePoint(): D3ScalePoint;
+	scaleQuantile<R>(): D3ScaleQuantile<R>;
 	scaleUtc(): D3ScaleTime;
 	scaleLinear(): D3ScaleLinear;
 	axisBottom(scale: D3ScaleTime): D3Axis<Date>;
 	axisLeft(scale: D3ScaleLinear): D3Axis<number>;
 	line<D>(): D3Line<D>;
+	/** The magma colour interpolation (the analysis output ramp). */
+	interpolateMagma(t: number): string;
 	range(stop: number): number[];
 	ticks(start: number, stop: number, count: number): number[];
 	extent(values: readonly Date[]): [Date, Date];

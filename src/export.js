@@ -26,7 +26,7 @@ import {
 
 import {
 	analysis,
-} from './analysis.js';
+} from './analysis.ts';
 
 import {
 	get_locations_results,

@@ -1,12 +1,16 @@
 import bubblemessage from '../lib/bubblemessage.js';
 
-import analysis_run, {
+import {
 	active_area_mask,
-	analysis_colorscale,
-	division_averages,
-	priority_scale,
 	aggregate_layer_values,
-} from './analysis.js';
+	analysis_cells,
+	analysis_colorscale,
+	analysis_result,
+} from './analysis.ts';
+
+import {
+	score_bucket,
+} from './area-scores.ts';
 
 import {
 	default_colorscale,
@@ -47,36 +51,57 @@ export function share_scale_colors() {
 	return [...analysis_colorscale.stops, OUTSIDE_COLOR];
 }
 
-// Index value -> bucket. x === -1 is "no analysis here", everything else maps to
-// Low..High exactly as the five-colour scale does.
-function bucket_index(x) {
-	if (x === -1) return OUTSIDE_BUCKET;
-	if (x >= 0   && x < 0.2) return 0;
-	if (x >= 0.2 && x < 0.4) return 1;
-	if (x >= 0.4 && x < 0.6) return 2;
-	if (x >= 0.6 && x < 0.8) return 3;
-	if (x >= 0.8 && x <= 1)  return 4;
-	return OUTSIDE_BUCKET;
+// The tier the summary's analysis results hang off: the analysis level's own
+// division, which variant_raster() paints, or at the pixel level any division
+// that carries a raster, since only the tier-independent national entry is read.
+function summary_result_tier() {
+	const divisions = GEOGRAPHY.divisions || [];
+	const variant = STATE.variant;
+
+	if (variant !== 'raster' && divisions[variant]?.raster?.data) return variant;
+
+	for (let i = 0; i < divisions.length; i += 1)
+		if (divisions[i]?.raster?.data) return i;
+
+	return null;
 }
 
-function variant_raster(raster) {
+// Paint each area at its bucket's stop on the continuous analysis ramp
+// (bucket.index / (n - 1)), so the deck uses the map fills' colours.
+function variant_raster(raster, result) {
 	const division = (STATE.variant !== "raster") ? GEOGRAPHY.divisions[STATE.variant] : null;
-	const areas = division?.raster?.data ? division_averages(raster, division.raster.data) : null;
-	const n = analysis_colorscale.stops.length;
-	const scale = areas ? priority_scale(areas, analysis_colorscale.stops.map((_, i) => i / (n - 1))) : null;
+	if (!division?.raster?.data) return raster;
 
-	if (scale) {
-		return Float32Array.from(raster, (_, i) => {
-			const id = division.raster.data[i];
-			if (id !== -1 && id in areas) {
-				return scale(areas[id].average);
-			} else {
-				return -1;
-			}
-		});
-	} else {
-		return raster;
+	const areas = result.areas;
+	const n = analysis_colorscale.stops.length;
+
+	// No bucket anywhere (no scored areas): paint the raw raster unchanged.
+	let painted = false;
+	for (const id in areas) {
+		if (areas[id].bucket !== null) { painted = true; break; }
 	}
+	if (!painted) return raster;
+
+	return Float32Array.from(raster, (_, i) => {
+		const id = division.raster.data[i];
+		const area = (id !== -1) ? areas[id] : null;
+
+		if (area && area.bucket !== null) {
+			return area.bucket.index / (n - 1);
+		} else {
+			return -1;
+		}
+	});
+}
+
+// The analysis result's whole-geography national entry, or the
+// AggregatedLayerData shape ({ [dataset]: { areas: { 0: { result } } } }) that
+// other callers pass.
+function national_value(national, dataset_id) {
+	const entry = national?.values?.[dataset_id] ?? national?.[dataset_id];
+	if (!entry) return null;
+
+	return entry.value ?? entry.areas?.['0']?.result?.value ?? null;
 }
 
 export async function generate_summary_data() {
@@ -87,10 +112,17 @@ export async function generate_summary_data() {
 
 	const bubble = (v,e) => new bubblemessage({ "message": v + "%", "position": "C", "close": false, "noevents": true }, e);
 
-	async function get_summary(idxn) {
-		const raster = (await analysis_run(idxn)).raster;
+	// One memoised analysis result per index supplies the cells, the per-area
+	// scores variant_raster() paints and analyse()'s whole-geography aggregate.
+	const tier = summary_result_tier();
 
-		SUMMARY[idxn] = await analyse(raster);
+	async function get_summary(idxn) {
+		// A geography with no division raster cannot publish a result (scores
+		// aggregate per division area): fall back to the cells, no national entry.
+		const result = (tier === null) ? null : await analysis_result(idxn, tier);
+		const raster = result ? result.cells : (await analysis_cells(idxn)).raster;
+
+		SUMMARY[idxn] = await analyse(raster, result?.national.values ?? null);
 		SUMMARY[idxn]['raw_raster'] = raster;
 
 		const ppie = svg_pie(SUMMARY[idxn]['population-density']['distribution'].map(x => [x]), 75, 0, share_scale_colors(), null, bubble);
@@ -106,7 +138,7 @@ export async function generate_summary_data() {
 		c.style.display = 'none';
 		document.body.append(c);
 
-		plot_outputcanvas(variant_raster(raster), c);
+		plot_outputcanvas(variant_raster(raster, result), c);
 
 		SUMMARY[idxn]['canvas'] = c;
 		SUMMARY[idxn]['population-density']['pie'] = ppie;
@@ -126,7 +158,7 @@ export function compute_share_amounts(data) {
 	};
 }
 
-export default async function analyse(raster, layer_data = null) {
+export default async function analyse(raster, national = null) {
 	const pixels_per_km2 = (1000/GEOGRAPHY.resolution)**2;
 
 	let ds = DST.get('population-density');
@@ -166,7 +198,11 @@ export default async function analyse(raster, layer_data = null) {
 	for (let i = 0; i < a.length; i += 1) {
 		if (!in_area(i)) continue;
 
-		const bucket = bucket_index(a[i]);
+		// One scale for every card (area-scores.ts score_bucket); a cell with
+		// no analysis value falls outside every bucket.
+		const b = score_bucket(raster[i]);
+		const bucket = b ? b.index : OUTSIDE_BUCKET;
+
 		area_groups[bucket] += 1;
 
 		const v = p[i];
@@ -178,20 +214,17 @@ export default async function analyse(raster, layer_data = null) {
 	const raw_ptotal = population_groups.reduce((a,b) => a + b, 0);
 	const atotal = area_groups.reduce((a,b) => a + b, 0);
 
-	// Get the correct population total from layer_data aggregated over the same
-	// whole-geography mask the cards use (unscaled raster via
-	// aggregate_layer_values, avoids overcounting from the oversampled display
-	// raster). When layer_data is not provided (e.g. PPTX summary data), compute
-	// it now. The caller in right-panel.js hands in the aggregate it already
-	// computed for the Data cards' whole-geography figures (EAE-514), so this
-	// pass is only made when nobody else has. Distribution proportions from
-	// the display raster above are still correct (overcounting cancels).
-	if (!layer_data) {
+	// The population total is the unscaled aggregate over the same area the
+	// counts cover — never the oversampled display raster, nor the parent's
+	// national entry for a sub-geography.
+	let ptotal;
+	if (area_id === undefined) {
+		ptotal = national_value(national, 'population-density') ?? raw_ptotal;
+	} else {
 		const mask = { "raster": { "data": Float32Array.from(a, (_, i) => in_area(i) ? 0 : -1) } };
-		layer_data = await aggregate_layer_values(mask);
+		const area_layer_data = await aggregate_layer_values(mask);
+		ptotal = area_layer_data?.['population-density']?.areas?.[0]?.result?.value ?? raw_ptotal;
 	}
-	const pop_result = layer_data?.['population-density']?.areas?.[0]?.result;
-	const ptotal = pop_result?.value ?? raw_ptotal;
 
 	const s = STATE.divtier ?
 		x => x / pixels_per_km2 :

@@ -5,7 +5,7 @@ import modal from '../lib/modal.js';
 import {
 	enough_datasets_for_index,
 	analysis_colorscale_svg,
-} from './analysis.js';
+} from './analysis.ts';
 
 import {
 	svg_interval,

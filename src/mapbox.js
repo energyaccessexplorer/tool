@@ -12,6 +12,7 @@ import {
 import {
 	get_admin_area_layer_data,
 	get_timeline_area_layer_data,
+	published_analysis_result,
 } from './area-analysis.js';
 
 import {
@@ -31,18 +32,22 @@ import { t, translateIndexName } from './translate.js';
 
 export function get_admin_area_item(variant, id) {
 	const division = GEOGRAPHY.divisions[variant];
-	if (!division || !division.priorityData || !division.vectors) return null;
+	if (!division || !division.vectors) return null;
+
+	// The score comes from the published per-area scores, which land
+	// synchronously at publish time, so this stays sync for popup handlers.
+	const area = published_analysis_result(variant)?.areas?.[id];
+	if (!area) return null;
 
 	const features = division.vectors.data.features;
-	const priorityData = division.priorityData;
 	const nameTable = maybe(division, 'csv', 'table') || {};
 
 	const feature = features.find(f => f.id === +id);
-	if (!feature || !priorityData[id]) return null;
+	if (!feature) return null;
 
 	return {
 		"id":       +id,
-		"priority": priorityData[id].average,
+		"priority": area.score,
 		"name":     nameTable[id] || `Area ${id}`,
 		"feature":  feature,
 	};

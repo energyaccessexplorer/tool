@@ -5,15 +5,17 @@ import '../lib/jszip.js';
 import '../lib/pptxgen.js';
 
 import {
-	aggregate_layer_values,
+	analysis_result,
 	analysis_colorscale_svg,
 	medhigh_point_count,
-} from './analysis.js';
+} from './analysis.ts';
 
 import {
 	build_detailed_data,
 	compute_distribution,
 	describe,
+	layer_data_from_values,
+	OUTLINE_TIER,
 } from './right-panel-data-tab.js';
 
 import {
@@ -397,9 +399,11 @@ async function selected_data() {
 	let entries = [];
 
 	try {
-		const mask = { "raster": { "data": summary['raw_raster'].map(v => v === -1 ? -1 : 0) } };
-		const layer_data = await aggregate_layer_values(mask);
-		if (!layer_data) return;
+		// Same analysed-area bucket the on-screen Data cards render (OUTLINE_TIER
+		// area 0); the mask inherits run()'s joint nodata drop.
+		const result = await analysis_result(STATE.index, OUTLINE_TIER);
+		const layer_data = layer_data_from_values(result.areas['0']?.values ?? null);
+		if (!Object.keys(layer_data).length) return;
 
 		entries = build_detailed_data(layer_data);
 	} catch {

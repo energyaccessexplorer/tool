@@ -5,8 +5,11 @@ import {
 import {
 	getpoints,
 	analysis_colorscale,
-	lowmedhigh_scale,
-} from './analysis.js';
+} from './analysis.ts';
+
+import {
+	score_bucket,
+} from './area-scores.ts';
 
 import {
 	pointto as search_pointto,
@@ -25,7 +28,7 @@ let ul, resultscontainer, resultsinfo, input_el, last_results = null;
 
 function pointto(p, a = false) {
 	const dict = [[ "v", translateIndexName(window.LOCALE, STATE.index) ]];
-	const props = { "v": lowmedhigh_scale(p.v) };
+	const props = { "v": score_bucket(p.v)?.label ?? null };
 
 	search_pointto(p.c, dict, props, a);
 };

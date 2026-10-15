@@ -56,9 +56,12 @@ import {
 
 import {
 	priority,
+	analysis_scores,
+	analysis_result,
+	analysis_state_sync,
 	plot_active as analysis_plot_active,
 	criteria_mask,
-} from './analysis.js';
+} from './analysis.ts';
 
 import {
 	lines_update as timeline_lines_update,
@@ -135,6 +138,9 @@ COMMIT = debounce(function() {
 	reload(...arguments);
 
 	timeline_sync_datasets(STATE.datasets, GEOGRAPHY.timeline_dates);
+	// COMMIT, not state_set: the 300ms debounce must coalesce range-slider
+	// drags into one revalidation.
+	analysis_state_sync();
 	timeline_commit_sync();
 
 	window.dispatchEvent(new Event('resize'));
@@ -607,7 +613,11 @@ async function reload(k,v) {
 	const a = await analysis_plot_active(index);
 
 	if (GEOGRAPHY.divisions[variant]) {
-		await priority(GEOGRAPHY.divisions[variant], a, variant);
+		// Scores publish synchronously and paint the fills; the layer aggregates
+		// land in a second phase, so graphs() must read them after this await.
+		const scores = await analysis_scores(index, variant);
+		priority(scores, variant);
+		await analysis_result(index, variant);
 	}
 
 	right_panel_graphs(a.raster);
@@ -856,6 +866,8 @@ function apply_criteria_mask() {
 		return;
 	}
 
+	// The timeline-filters DISPLAY mask, deliberately distinct from the
+	// analysed-cells mask: do not wire it to result.mask.
 	const mask = compoundMask(criteria_mask(STATE.index));
 
 	relevant.forEach(d => {

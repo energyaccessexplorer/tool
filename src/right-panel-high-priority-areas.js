@@ -8,10 +8,14 @@ import {
 } from './mapbox.js';
 
 import {
+	analysis_cells,
+	analysis_result,
+} from './analysis.ts';
+
+import {
 	aggregation_band,
 	has_priority_score,
-	plot_active,
-} from './analysis.js';
+} from './area-scores.ts';
 
 import {
 	zoom,
@@ -319,12 +323,17 @@ export function create_paginated_list(container) {
 
 let locations_list = null;
 
-function get_division_results(variant, { all = false } = {}) {
+async function get_division_results(variant, { all = false } = {}) {
 	const division = GEOGRAPHY.divisions[variant];
-	if (!division || !division.priorityData) return [];
+	if (!division) return [];
 
-	return Object.keys(division.priorityData)
-		.filter(id => all || has_priority_score(division.priorityData[id].average))
+	// Per-area scores from the memoised result; has_priority_score (area-scores.ts)
+	// is the one definition of the filter.
+	const result = await analysis_result(STATE.index, variant);
+	const areas = result.areas;
+
+	return Object.keys(areas)
+		.filter(id => all || has_priority_score(areas[id].score))
 		.map(id => get_admin_area_item(variant, id))
 		.filter(item => item !== null)
 		.sort((a, b) => a.priority > b.priority ? -1 : 1);
@@ -338,14 +347,14 @@ export async function update() {
 	if (!section) return;
 
 	const isRaster = STATE.variant === 'raster';
-	const results = isRaster ? await all_points() : get_division_results(STATE.variant);
+	const results = isRaster ? await all_points() : await get_division_results(STATE.variant);
 	const sorted = results.sort((a, b) => a.priority > b.priority ? -1 : 1);
 
 	locations_list.setResults(sorted);
 
 	exportResults = isRaster
 		? all_areas_points(sorted)
-		: get_division_results(STATE.variant, { "all": true });
+		: await get_division_results(STATE.variant, { "all": true });
 
 	if (!sorted.length) {
 		section.setAttribute('collapsed', '');
@@ -383,7 +392,8 @@ export function init() {
 };
 
 async function all_points() {
-	const a = await plot_active(STATE.index);
+	// The memoised run() cells — a read, no re-run and no repaint.
+	const a = await analysis_cells(STATE.index);
 
 	const points = a.raster.reduce((t,v,i) => {
 		if (has_priority_score(v)) {

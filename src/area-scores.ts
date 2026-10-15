@@ -181,15 +181,18 @@ export type ScoreMode = 'cell_mean' | 'pixel_sum';
 
 export const SCORE_MODE: ScoreMode = 'cell_mean';
 
+/** The score the lowest-ranked area reads (1%): it was analysed, so it keeps a priority score. */
+export const AREA_SCORE_FLOOR = 0.01;
+
 /*
  * area_score_strategy
  *
- * One [0, 1] score per area, read off the cell scores the map paints.
- * `cell_mean`: the area's cells averaged, on the raster's own scale — the
- * division map is the km² map at a coarser resolution, so an area reads the
- * colour its cells average to. `pixel_sum`: the area's cell scores added up,
- * as a share of the highest-summing area — size counts, and the top area
- * reads 1.
+ * One score per area, read off the cell scores the map paints and stretched
+ * over the areas present: the top area reads 1, the lowest AREA_SCORE_FLOOR,
+ * the rest linearly between — the same min-max stretch run() gives the cells.
+ * `cell_mean` ranks by the area's cells averaged, so the division map is the
+ * km² map at a coarser resolution. `pixel_sum` ranks by the cell scores
+ * added up, so size counts. Equal raw scores all read 1.
  *
  * Scoring the raster rather than re-deriving an area value from the layer
  * aggregates is what keeps ONE direction rule in the app: every dataset's
@@ -201,21 +204,22 @@ export function area_score_strategy(
 	mode: ScoreMode,
 	areas: AreaCellScores,
 ): Record<string, number> {
-	const scores: Record<string, number> = {};
-	let best = 0;
+	const raw: Record<string, number> = {};
+	let min = Infinity;
+	let max = -Infinity;
 
 	for (const id in areas) {
 		const a = areas[id]!;
-		// Cell scores are non-negative by construction; the rescale's Float32
-		// bottom band can still leave an aggregate a hair below zero, so the
-		// score floors at 0 rather than printing a negative percentage.
-		const v = Math.max(0, (mode === 'cell_mean') ? a.average : a.sum);
-		scores[id] = v;
-		if (v > best) best = v;
+		const v = (mode === 'cell_mean') ? a.average : a.sum;
+		raw[id] = v;
+		if (v < min) min = v;
+		if (v > max) max = v;
 	}
 
-	// An all-zero field keeps its zeros rather than dividing by zero.
-	if (mode === 'pixel_sum' && best > 0) for (const id in scores) scores[id] = scores[id]! / best;
+	const span = max - min;
+	const scores: Record<string, number> = {};
+	for (const id in raw)
+		scores[id] = (span > 0) ? AREA_SCORE_FLOOR + ((1 - AREA_SCORE_FLOOR) * (raw[id]! - min) / span) : 1;
 
 	return scores;
 }

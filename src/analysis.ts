@@ -606,7 +606,7 @@ async function compute_result_scores(key: ResultKey): Promise<ScoresPayload> {
 
 	// The per-area {score, bucket} table; area_score_table is the scoring
 	// strategy knob, currently 'cell_mean' — the map's own cell scores
-	// averaged per area, on the raster's scale.
+	// averaged per area, stretched so the areas span 1..100%.
 	const areas = area_score_table(aggregate_by_area(cells, division.raster.data));
 
 	const scores = { cells, mask, areas };

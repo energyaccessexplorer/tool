@@ -44,6 +44,7 @@ const score_bucket: any        = scores.score_bucket;
 const score_bands: any         = scores.score_bands;
 const area_score_table: any    = scores.area_score_table;
 const area_score_strategy: any = scores.area_score_strategy;
+const AREA_SCORE_FLOOR: number = scores.AREA_SCORE_FLOOR;
 const has_priority_score: any  = scores.has_priority_score;
 const analysed_mask: any       = scores.analysed_mask;
 const criteria_pass_mask: any  = scores.criteria_pass_mask;
@@ -200,63 +201,48 @@ describe('score_bucket', () => {
 
 // ----------------------------------------------------- area_score_strategy
 
-describe('area_score_strategy — cell_mean vs pixel_sum', () => {
+describe('area_score_strategy — stretched to 1..100 over the areas present', () => {
 	// The strategy's input: the cell-score aggregate per area.
 	const area = (sum: number, average = sum) => ({ sum, average });
 
-	it('pixel_sum: half the score mass reads half the score', () => {
-		const out = area_score_strategy('pixel_sum', { "a": area(200), "b": area(100), "c": area(50) });
+	it('the top area reads 1, the lowest the floor, the rest linearly between', () => {
+		const out = area_score_strategy('cell_mean', { "a": area(9, 0.4), "b": area(9, 0.3), "c": area(9, 0.2) });
 
 		assert.equal(out['a'], 1);
-		assert.equal(out['b'], 0.5);
-		assert.equal(out['c'], 0.25);
+		assert.equal(out['c'], AREA_SCORE_FLOOR);
+		near(out['b']!, AREA_SCORE_FLOOR + ((1 - AREA_SCORE_FLOOR) / 2));
 	});
 
-	it('pixel_sum: the same cell score over more cells ranks higher (size counts)', () => {
-		// 'wide' holds 3 cells averaging 0.4 -> mass 1.2; 'dense' one cell at 0.9.
-		const masses = { "wide": area(1.2, 0.4), "dense": area(0.9, 0.9) };
-		const out = area_score_strategy('pixel_sum', masses);
+	it('the lowest area keeps a priority score (1%), so the listing keeps it', () => {
+		const out = area_score_strategy('cell_mean', { "a": area(1, 0.9), "b": area(1, 0) });
 
-		assert.equal(out['wide'], 1);
-		near(out['dense']!, 0.9 / 1.2);
+		assert.equal(out['b'], 0.01);
+		assert.equal(has_priority_score(out['b']), true);
 	});
 
-	it('pixel_sum: additive — a merged area holds the two masses added up', () => {
-		const out = area_score_strategy('pixel_sum', { "ab": area(0.4 + 0.6), "a": area(0.4), "b": area(0.6) });
-
-		assert.equal(out['ab'], 1);
-		assert.equal(out['a'], 0.4);
-		assert.equal(out['b'], 0.6);
-	});
-
-	it('cell_mean: the same cells averaged, so size drops out', () => {
+	it('cell_mean ranks by the average, so size drops out', () => {
 		const out = area_score_strategy('cell_mean', { "wide": area(1.2, 0.4), "dense": area(0.9, 0.9) });
 
-		assert.equal(out['dense'], 0.9);
-		assert.equal(out['wide'], 0.4);
+		assert.equal(out['dense'], 1);
+		assert.equal(out['wide'], AREA_SCORE_FLOOR);
 	});
 
-	it('cell_mean: stays on the raster scale — the best area is not stretched to 1', () => {
-		const out = area_score_strategy('cell_mean', { "a": area(9, 0.3), "b": area(2, 0.2) });
+	it('pixel_sum ranks by the score mass, so size counts', () => {
+		const out = area_score_strategy('pixel_sum', { "wide": area(1.2, 0.4), "dense": area(0.9, 0.9) });
 
-		assert.equal(out['a'], 0.3);
-		assert.equal(out['b'], 0.2);
+		assert.equal(out['wide'], 1);
+		assert.equal(out['dense'], AREA_SCORE_FLOOR);
 	});
 
-	it('an all-zero field stays at zero instead of dividing by zero', () => {
-		assert.deepEqual(area_score_strategy('pixel_sum', { "a": area(0, 0), "b": area(0, 0) }), { "a": 0, "b": 0 });
+	it('equal raw scores all read 1 instead of dividing by zero', () => {
+		assert.deepEqual(area_score_strategy('cell_mean', { "a": area(0, 0), "b": area(0, 0) }), { "a": 1, "b": 1 });
+		assert.deepEqual(area_score_strategy('cell_mean', { "a": area(5, 0.3) }), { "a": 1 });
 	});
 
-	it('floors the Float32 bottom band, so no area can score below 0', () => {
-		const out = area_score_strategy('pixel_sum', { "a": area(TINY_NEG), "b": area(TINY_NEG * 3) });
+	it('a Float32 bottom-band aggregate still reads the floor, never below it', () => {
+		const out = area_score_strategy('cell_mean', { "a": area(TINY_NEG), "b": area(0.5) });
 
-		assert.deepEqual(out, { "a": 0, "b": 0 });
-	});
-
-	it('ties share the top score', () => {
-		const out = area_score_strategy('pixel_sum', { "a": area(8), "b": area(8) });
-
-		assert.equal(out['a'], 1);
+		assert.equal(out['a'], AREA_SCORE_FLOOR);
 		assert.equal(out['b'], 1);
 	});
 });
@@ -265,29 +251,22 @@ describe('area_score_table', () => {
 	const area = (sum: number, average = sum) => ({ sum, average });
 
 	it("publishes the strategy's score and its ONE-scale bucket", () => {
-		const table = area_score_table({ "7": area(5), "9": area(10) }, 'pixel_sum');
+		const table = area_score_table({ "7": area(1, 0.2), "9": area(1, 0.9), "4": area(1, 0.55) });
 
-		// 10 is the top mass -> 1; 5 is half of it, landing exactly on the
-		// Medium boundary, which must stay Medium, not Low-Medium.
 		assert.equal(table['9']?.score, 1);
 		assert.equal(table['9']?.bucket?.label, 'High');
-		assert.equal(table['7']?.score, 0.5);
-		assert.equal(table['7']?.bucket?.label, 'Medium');
+		assert.equal(table['7']?.score, AREA_SCORE_FLOOR);
+		assert.equal(table['7']?.bucket?.label, 'Low');
+		near(table['4']!.score, AREA_SCORE_FLOOR + ((1 - AREA_SCORE_FLOOR) / 2));
+		assert.equal(table['4']?.bucket?.label, 'Medium');
 	});
 
-	it('empty input is an empty table; cell_mean is the default and keeps the cell scale', () => {
+	it('empty input is an empty table; cell_mean is the default', () => {
 		assert.deepEqual(area_score_table({}), {});
-		assert.deepEqual(area_score_table({ "1": area(3, 0.5) }), {
-			"1": { "score": 0.5, "bucket": score_bucket(0.5) },
-		});
-	});
 
-	it('buckets every score on the fixed 20% bands (incl. the floored bottom band)', () => {
-		const table = area_score_table({ "7": area(0.2), "9": area(0.9), "4": area(TINY_NEG) }, 'pixel_sum');
-
-		assert.equal(table['7']?.bucket?.label, 'Low-Medium');  // 0.2/0.9
-		assert.equal(table['9']?.bucket?.label, 'High');
-		assert.equal(table['4']?.bucket?.label, 'Low');         // floored to 0
+		const table = area_score_table({ "1": area(100, 0.2), "2": area(1, 0.8) });
+		assert.equal(table['2']?.score, 1);
+		assert.equal(table['1']?.score, AREA_SCORE_FLOOR);
 	});
 });
 

@@ -12,6 +12,10 @@ import {
 } from './plot.js';
 
 import {
+	aggregation_band,
+} from './analysis.js';
+
+import {
 	style_ready,
 } from './mapbox.js';
 
@@ -145,7 +149,7 @@ export function raster() {
 			if (!r.canvas) {
 				r.canvas = plot_drawcanvas({
 					"canvas":     ce('canvas'),
-					"data":       r.data,
+					"data":       aggregation_band(this),
 					"width":      r.width,
 					"height":     r.height,
 					"nodata":     r.nodata,
@@ -205,7 +209,7 @@ export function raster() {
 
 			if (this.type.match(/raster(-timeline)?/) && !this.domain) {
 				let min, max; min = max = this.raster.nodata;
-				for (const v of this.raster.data) {
+				for (const v of aggregation_band(this)) {
 					if (v === this.raster.nodata) continue;
 					if (min === this.raster.nodata) min = v;
 					if (max === this.raster.nodata) max = v;

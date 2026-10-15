@@ -551,9 +551,12 @@ export function active_area_mask() {
 	return { "data": div.data, "nodata": div.nodata, "id": STATE.subdiv };
 }
 
-// The band used for a dataset's scalar aggregation. SUM reads the area-weighted
-// sum band, AVG reads the area-weighted average band, and categorical datasets
-// (csv lookup) keep the near band since their values are category codes.
+// The band holding a dataset's per-cell values. SUM reads the area-weighted sum
+// band, AVG reads the area-weighted average band, and categorical datasets (csv
+// lookup) keep the near band since their values are category codes. Every
+// surface that reports a cell's value reads through it -- the raster the map
+// renders and its legend, the popup, the area table and the CSV export -- so
+// they can only disagree if they read different bands.
 // The parser has already folded legacy single-band rasters into every band.
 export function aggregation_band(dataset) {
 	const agg_fn = dataset.category.analysis?.aggregation ?? 'AVG';

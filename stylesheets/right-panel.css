@@ -295,7 +295,7 @@
 
 .data-card-bar-fill {
   height: 20px;
-  background: #078456;
+  background: var(--data-card-bar-color, #078456);
 }
 
 .data-card-bar-row.active .data-card-bar-label {
@@ -309,7 +309,8 @@
 }
 
 .data-card-bar-row.active .data-card-bar-fill {
-  background: #006640;
+  background: var(--data-card-bar-color, #006640);
+  filter: brightness(0.72);
 }
 
 #analysis-blank-state,

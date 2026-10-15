@@ -339,6 +339,9 @@ function makeBarChart(distribution: DistributionSlice[], activeName: string | nu
 	for (const c of sorted) {
 		const active  = activeName && c.name === activeName;
 		const row     = ce('div', null, { "class": `data-card-bar-row${active ? ' active' : ''}` });
+		// The colour rides on the row rather than the fill so the active-row rule
+		// can still darken it.
+		row.style.setProperty('--data-card-bar-color', c.color);
 		const content = ce('div', null, { "class": 'data-card-bar-content' });
 		const copy    = ce('div', null, { "class": 'data-card-bar-copy' });
 		const label   = ce('span', c.name, { "class": 'data-card-bar-label' });

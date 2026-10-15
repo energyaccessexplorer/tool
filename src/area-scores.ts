@@ -187,19 +187,27 @@ export interface ScoreDataset {
 
 /** Area -> dataset -> one aggregate. Aggregated entries are numeric; the
  * 'Not aggregated' sentinel some display rows carry is a string and scores
- * as 0. */
+ * as 0. `type` is the aggregate's shape — 'points' marks a feature count. */
 export type ScoreValues = Readonly<Record<string,
-	Readonly<Record<string, { readonly value: number | string } | null | undefined>> | undefined>>;
+	Readonly<Record<string, { readonly type?: string; readonly value: number | string } | null | undefined>> | undefined>>;
 
 /*
  * area_score_strategy
  *
  * One [0, 1] score per area, derived from the same aggregates the popup
  * renders. `total`: per dataset, the area's aggregate as a share of the best
- * area (flipped when the dataset says `invert`), weighted by weights_for and
- * renormalised over the datasets carrying a positive total, then rescaled so
- * the top area reads 1. `intensity`: the precomputed per-cell-score averages,
- * unchanged.
+ * area, weighted by weights_for and renormalised over the datasets carrying
+ * a positive total, then rescaled so the top area reads 1. `intensity`: the
+ * precomputed per-cell-score averages, unchanged.
+ *
+ * Two rules bound that share to [0, 1] without losing the ranking:
+ *
+ * - the normalisation floor is 0 and only a NEGATIVE aggregate lowers it
+ *   (RWI and other signed layers span below zero), so no area can score
+ *   below 0; with non-negative data it degenerates to share-of-max.
+ * - `invert` speaks for the raster the CELLS are scored from (proximity:
+ *   closer is better), so it never flips an aggregate that counts features
+ *   — a point layer's districts rank by count, more first.
  */
 export function area_score_strategy(
 	mode: ScoreMode,
@@ -220,22 +228,30 @@ export function area_score_strategy(
 
 		const per_area: Record<string, number> = {};
 		let max = 0;
+		let min = 0;
+		let counts_features = false;
 
 		for (const id of ids) {
-			const raw = values[id]?.[d.id]?.value;
+			const entry = values[id]?.[d.id];
+			const raw = entry?.value;
 			const v = (typeof raw === 'number' && Number.isFinite(raw)) ? raw : 0;
 			per_area[id] = v;
 			if (v > max) max = v;
+			if (v < min) min = v;
+			if (entry?.type === 'points') counts_features = true;
 		}
 
 		if (max <= 0) continue;
 
+		// max > 0 and min <= 0, so the span is never zero.
+		const span = max - min;
+		const flip = !!d.invert && !counts_features;
+
 		weight_sum += d.weight;
 
 		for (const id of ids) {
-			const share = d.invert
-				? 1 - (per_area[id]! / max)
-				: per_area[id]! / max;
+			const v = per_area[id]!;
+			const share = flip ? (max - v) / span : (v - min) / span;
 			scores[id] = scores[id]! + d.weight * share;
 		}
 	}

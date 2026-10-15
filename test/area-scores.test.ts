@@ -249,6 +249,32 @@ describe('area_score_strategy — total vs intensity', () => {
 		assert.equal(out['a'], 1);
 	});
 
+	it("total: a signed layer never scores below 0 and keeps its ranking (the RWI -22%)", () => {
+		const values = {
+			"richest":  { "rwi": { "type": 'scalar', "value": 1.31 } },
+			"nakaseke": { "rwi": { "type": 'scalar', "value": -0.29 } },
+			"poorest":  { "rwi": { "type": 'scalar', "value": -1 } },
+		};
+		const out = area_score_strategy('total', {}, values, [ds('rwi')]);
+
+		assert.equal(out['richest'], 1);
+		assert.ok(out['poorest']! >= 0);
+		assert.ok(out['nakaseke']! > out['poorest']!);
+	});
+
+	it("total: a point layer counts up — the proximity raster's invert never flips it", () => {
+		const values = {
+			"kampala":   { "health": { "type": 'points', "value": 381 } },
+			"karenga":   { "health": { "type": 'points', "value": 9 } },
+			"nabilatuk": { "health": { "type": 'points', "value": 6 } },
+		};
+		const out = area_score_strategy('total', {}, values, [ds('health', 1, true)]);
+
+		assert.equal(out['kampala'], 1);
+		assert.ok(out['karenga']! > out['nabilatuk']!);
+		assert.ok(out['nabilatuk']! > 0);
+	});
+
 	it("total: a dataset with no positive total is dropped and the rest renormalise", () => {
 		const values = {
 			"a": { "prod": { "type": 'scalar', "value": 2 }, "flat": { "type": 'scalar', "value": 0 } },

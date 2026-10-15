@@ -1,5 +1,5 @@
 // EAE-306: "Filtered geographies" widget (Timeline tab) and the global
-// "only areas that meet all data layer criteria" mask extension.
+// "show input data layers that meet all filter criteria" mask extension.
 //
 // The widget reuses Prioritization's real "High priority areas"
 // list/pagination/table/CSV components (create_paginated_list() factory,

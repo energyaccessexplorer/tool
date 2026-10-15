@@ -47,6 +47,11 @@ export function share_scale_colors() {
 	return [...analysis_colorscale.stops, OUTSIDE_COLOR];
 }
 
+// The legend's reading order: High down to Low, then the out-of-analysis residual.
+export function share_scale_order() {
+	return [...analysis_colorscale.stops.keys()].reverse().concat([OUTSIDE_BUCKET]);
+}
+
 // Index value -> bucket. x === -1 is "no analysis here", everything else maps to
 // Low..High exactly as the five-colour scale does.
 function bucket_index(x) {
@@ -93,14 +98,20 @@ export async function generate_summary_data() {
 		SUMMARY[idxn] = await analyse(raster);
 		SUMMARY[idxn]['raw_raster'] = raster;
 
-		const ppie = svg_pie(SUMMARY[idxn]['population-density']['distribution'].map(x => [x]), 75, 0, share_scale_colors(), null, bubble);
-		const apie = svg_pie(SUMMARY[idxn]['area']['distribution'].map(x => [x]), 75, 0, share_scale_colors(), null, bubble);
+		const order = share_scale_order();
+		const colors = share_scale_colors();
+
+		const pshare = order.map(i => SUMMARY[idxn]['population-density']['distribution'][i]);
+		const ashare = order.map(i => SUMMARY[idxn]['area']['distribution'][i]);
+
+		const ppie = svg_pie(pshare.map(x => [x]), 75, 0, order.map(i => colors[i]), null, bubble);
+		const apie = svg_pie(ashare.map(x => [x]), 75, 0, order.map(i => colors[i]), null, bubble);
 
 		ppie.change(0);
 		apie.change(0);
 
-		svg_pie_labels(ppie.svg, SUMMARY[idxn]['population-density']['distribution'], 75);
-		svg_pie_labels(apie.svg, SUMMARY[idxn]['area']['distribution'], 75);
+		svg_pie_labels(ppie.svg, pshare, 75);
+		svg_pie_labels(apie.svg, ashare, 75);
 
 		const c = qs('#canvas-' + idxn) || ce('canvas', null, { "id": 'canvas-' + idxn});
 		c.style.display = 'none';

@@ -1,7 +1,6 @@
 import { t, translateNode, replayable, registerUIUpdater, translateIndexName } from './translate.js';
 import { svg_pie } from './utils.js';
-import { analysis_colorscale } from './analysis.js';
-import { compute_share_amounts, share_scale_labels, share_scale_colors, OUTSIDE_BUCKET } from './summary.js';
+import { compute_share_amounts, share_scale_labels, share_scale_colors, share_scale_order } from './summary.js';
 import bubblemessage from '../lib/bubblemessage.js';
 import bind from '../lib/bind.js';
 
@@ -20,9 +19,7 @@ function update_graph_section(section, amounts, unit, description) {
 	const labels = share_scale_labels(window.LOCALE);
 	const colors = share_scale_colors();
 
-	// High down to Low, then the out-of-analysis residual — it is not part of the
-	// index scale, so it keeps its own neutral colour and sits last.
-	const order = [...analysis_colorscale.stops.keys()].reverse().concat([OUTSIDE_BUCKET]);
+	const order = share_scale_order();
 
 	const scale = ce('dl', null, { "class": 'discrete-scale' });
 
@@ -126,7 +123,8 @@ function process_graph(analysis_summary, config) {
 	const { total, amounts } = compute_share_amounts(data);
 	if (isNaN(total) || total <= 0) return false;
 
-	data['distribution'].forEach((x, i) => PIES[config.pieKey]['data'][i].push(x));
+	const order = share_scale_order();
+	order.forEach((idx, i) => PIES[config.pieKey]['data'][i].push(data['distribution'][idx]));
 	PIES[config.pieKey].change(1);
 
 	const high = amounts[4];
@@ -135,14 +133,22 @@ function process_graph(analysis_summary, config) {
 	const section = qs(config.selector).closest('.index-graphs-section');
 	update_graph_section(section, amounts, config.unit, description);
 
-	data['distribution'].forEach((_, i) => PIES[config.pieKey]['data'][i].shift());
+	order.forEach((_, i) => PIES[config.pieKey]['data'][i].shift());
 
 	return true;
 }
 
 export function init() {
-	PIES["population"] = svg_pie([[0], [0], [0], [0], [0], [0]], 70, 0, share_scale_colors(), null, bubble);
-	PIES["area"]       = svg_pie([[0], [0], [0], [0], [0], [0]], 70, 0, share_scale_colors(), null, bubble);
+	const order = share_scale_order();
+	const colors = share_scale_colors();
+
+	// Marks are drawn in the legend's order and with the legend's colours: mark j
+	// is row j.
+	const marks = () => order.map(() => [0]);
+	const mark_colors = order.map(idx => colors[idx]);
+
+	PIES["population"] = svg_pie(marks(), 70, 0, mark_colors, null, bubble);
+	PIES["area"]       = svg_pie(marks(), 70, 0, mark_colors, null, bubble);
 
 	const area_section = create_graph_section('right_panel.prioritization.graphs.area_share_title', 'area', 'area-number', 'area-description');
 	const population_section = create_graph_section('right_panel.prioritization.graphs.pop_share_title', 'population', 'population-number', 'population-description');

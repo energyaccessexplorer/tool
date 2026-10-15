@@ -516,7 +516,7 @@ left_panel.cards.card.timeline_footer_inactive,Not affected by timeline.,Non aff
 right_panel.tabs.timeline,Timeline,Chronologie,时间轴
 timeline.blank_state.title,Add a timeline dataset to see trends over time,Ajoutez une couche temporelle pour voir les tendances au fil du temps,添加时间轴数据集以查看随时间变化的趋势
 timeline.blank_state.subtitle,Select a dataset with historical data from the left panel to unlock trend lines and filtered geographies for this area.,Sélectionnez dans le panneau de gauche un jeu de données comportant des données historiques pour activer les lignes de tendance et les zones géographiques filtrées de cette zone.,从左侧面板中选择一个包含历史数据的数据集，即可为该区域启用趋势线和已筛选地理区域功能。
-timeline.filters.enabled_label,Only show areas that meet all data layer criteria,N'afficher que les zones répondant à tous les critères des couches de données,仅显示满足所有数据图层条件的区域
+timeline.filters.enabled_label,Show input data layers that meet all filter criteria.,Afficher les couches de données d'entrée répondant à tous les critères de filtre.,显示满足所有筛选条件的输入数据图层。
 timeline.filtered_geographies.title,Filtered geographies,Zones géographiques filtrées,已筛选地理区域
 timeline.filtered_geographies.title_with_name,Filtered {{name}},{{name}} filtrés,已筛选{{name}}
 timeline.filtered_geographies.subtitle,Showing areas covered by your active timeline datasets.,Affiche les zones couvertes par vos couches temporelles actives.,显示您活跃时间轴数据集所覆盖的区域。

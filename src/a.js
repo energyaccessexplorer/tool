@@ -835,7 +835,7 @@ function redraw_raster_canvas(d, mask) {
 	if (source) { source.play(); source.pause(); }
 };
 
-// "Only show areas that meet all data layer criteria": clips every active
+// "Show input data layers that meet all filter criteria": clips every active
 // raster/vector layer's own presentation to the areas that satisfy every
 // active dataset's criteria, not just a highlight overlay.
 function apply_criteria_mask() {

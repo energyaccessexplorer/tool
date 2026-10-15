@@ -88,10 +88,11 @@ g['MAPBOX'] = { "getSource": (id: string) => (id === 'priority-source-2' ? sourc
 
 const div_data = [7, 7, 9, 9];
 
-// Reshapes phase-1 scores to aggregate_by_area's {id: {average}} shape,
-// the record the pinned numbers are compared in.
-const averages_of = (areas: Record<string, { readonly score: number }>) =>
-	Object.fromEntries(Object.entries(areas).map(([id, a]) => [id, { "average": a.score }]));
+// Reshapes phase-1 scores to by_area's {id: {sum}} shape, the record the
+// pinned numbers are compared in (the published score is each area's mass as
+// a share of the best area's).
+const sums_of = (areas: Record<string, { readonly score: number }>) =>
+	Object.fromEntries(Object.entries(areas).map(([id, a]) => [id, { "sum": a.score }]));
 
 // Installs STATE/OUTLINE/GEOGRAPHY and runs the COMMIT hook: each dataset's
 // fresh identity drops the previous test's entries, the way a data change
@@ -123,13 +124,14 @@ describe('analysis.js producer: priority() paints fills from the result', () => 
 		// band = floor(clamp(v, 0, 1) * 5), the fill being that band's stop on
 		// the analysis ramp. Plain arithmetic on purpose, so the fill path and
 		// the scale cannot drift together unnoticed. On this [0, 1] grid area
-		// 7 averages 1 -> top band, area 9 averages 0 -> Low.
+		// 7 holds 2 cells of 1 -> the top band, area 9 holds 0 -> Low.
 		const band_of = (v: number) => Math.min(4, Math.max(0, Math.floor(Math.min(1, Math.max(0, v)) * 5)));
 		const legacy = scores.aggregate_by_area(result.cells, div_data);
+		const best = Math.max(...Object.values(legacy as Record<string, { sum: number }>).map(a => a.sum));
 
 		for (const f of features) {
 			const expected = legacy[f.id]
-				? analysis.analysis_colorscale.stops[band_of(legacy[f.id].average)]
+				? analysis.analysis_colorscale.stops[band_of(legacy[f.id].sum / best)]
 				: 'transparent';
 
 			assert.equal(f.properties['__fill'], expected, `fill of area ${f.id}`);
@@ -164,12 +166,13 @@ describe('analysis.js producer: two-phase publish (scores before aggregates)', (
 
 		const scoresResult = await analysis.analysis_scores('solar', 2);
 
-		// Phase 1: scores readable and matching the legacy averages;
-		// aggregates not yet.
+		// Phase 1: scores readable and matching the cell-score masses (each as a
+		// share of the best area); aggregates not yet.
 		assert.equal(scoresResult.areas['7'].values, null);
 		assert.equal(scoresResult.national.values, null);
-		assert.deepEqual(averages_of(scoresResult.areas), scores.aggregate_by_area(scoresResult.cells, div_data));
-		assert.deepEqual(averages_of(scoresResult.areas), { "7": { "average": 1 }, "9": { "average": 0 } });
+		assert.deepEqual(sums_of(scoresResult.areas), { "7": { "sum": 1 }, "9": { "sum": 0 } });
+		assert.deepEqual(scores.aggregate_by_area(scoresResult.cells, div_data),
+		                 { "7": { "sum": 2, "average": 1 }, "9": { "sum": 0, "average": 0 } });
 
 		const complete = await analysis.analysis_result('solar', 2);
 
@@ -235,13 +238,16 @@ describe('analysis.js producer: analysis_state_sync (the COMMIT hook)', () => {
 describe('analysis.js producer: stabilisation regressions (stale cache, stale resolve, bridges)', () => {
 	const prechange_ds = () => {
 		const ds = make_ds();
-		// Totals 3 and 4 give the pre-change share-of-max split 0.75 / 1 —
-		// the stale-vs-fresh discriminator these regressions need; the
-		// post-change fixture reads 1 / 18 t.
+		// Cells whose mass sits with area 9 pre-change (its 1.0 rescales to the
+		// top of the grid, so area 7 is not the best area) and with area 7 after
+		// land_change(): the stale-vs-fresh discriminator these regressions
+		// need, in the score as well as the totals. Both of area 7's cells stay
+		// above the observed minimum, so both keep their totals under the
+		// analysed mask; area 9's 0.3 falls to the floor and drops out.
 		ds.raster = {
 			...ds.raster,
-			"data": new Float32Array([0.5, 0.375, 0.3, 0.25]),
-			"sum":  new Float32Array([1.5, 1.5, 4, 2]),
+			"data": new Float32Array([0.5, 0.375, 0.3, 1]),
+			"sum":  new Float32Array([1.5, 1.5, 2, 4]),
 		};
 		return ds;
 	};
@@ -263,7 +269,8 @@ describe('analysis.js producer: stabilisation regressions (stale cache, stale re
 		set_state([prechange_ds()]);
 
 		const first = await analysis.analysis_result('solar', 2);
-		assert.equal(first.areas['7'].score, 0.75);
+		assert.ok(first.areas['7'].score > 0 && first.areas['7'].score < 1,
+		          'the pre-change mass sits with area 9, so the score tells stale from fresh');
 		assert.deepEqual(first.areas['7'].values, { "maize": { "type": 'scalar', "value": 3 } });
 		assert.deepEqual(first.areas['9'].values, { "maize": { "type": 'scalar', "value": 4 } });
 
@@ -289,7 +296,7 @@ describe('analysis.js producer: stabilisation regressions (stale cache, stale re
 		// proves the fresh cells.
 		assert.equal(result.areas['9'].score, 0);
 
-		assert.deepEqual(averages_of(result.areas), { "7": { "average": 1 }, "9": { "average": 0 } });
+		assert.deepEqual(sums_of(result.areas), { "7": { "sum": 1 }, "9": { "sum": 0 } });
 	});
 
 	it('analysis_result() never resolves a result whose publish was discarded as stale', async () => {
@@ -309,7 +316,7 @@ describe('analysis.js producer: stabilisation regressions (stale cache, stale re
 		// What resolved is exactly what the atom holds.
 		assert.equal(analysis_state_cell().state.results[resultKey('solar', 2, null)]?.result, result);
 
-		assert.deepEqual(averages_of(result.areas), { "7": { "average": 1 }, "9": { "average": 0 } });
+		assert.deepEqual(sums_of(result.areas), { "7": { "sum": 1 }, "9": { "sum": 0 } });
 	});
 
 	it('other-index publishes leave the current index entry untouched (index-blind bridge)', async () => {
@@ -319,7 +326,7 @@ describe('analysis.js producer: stabilisation regressions (stale cache, stale re
 
 		await analysis.analysis_scores('solar', 2);
 		const solarResult = await analysis.analysis_result('solar', 2);
-		assert.deepEqual(averages_of(solarResult.areas), { "7": { "average": 1 }, "9": { "average": 0 } });
+		assert.deepEqual(sums_of(solarResult.areas), { "7": { "sum": 1 }, "9": { "sum": 0 } });
 
 		// The Prioritization tab publishes 'wind' results, whose per-index _afn
 		// inverts the cells (areas 7/9 read 0/1): they must not reach the
@@ -328,6 +335,6 @@ describe('analysis.js producer: stabilisation regressions (stale cache, stale re
 		await analysis.analysis_result('wind', 2);
 
 		assert.equal(analysis_state_cell().state.results[resultKey('solar', 2, null)]?.result, solarResult);
-		assert.deepEqual(averages_of(solarResult.areas), { "7": { "average": 1 }, "9": { "average": 0 } });
+		assert.deepEqual(sums_of(solarResult.areas), { "7": { "sum": 1 }, "9": { "sum": 0 } });
 	});
 });

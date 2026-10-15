@@ -39,7 +39,7 @@ const analysis: any = await import('../src/analysis.ts');
 const scores: any   = await import('../src/area-scores.ts');
 
 const run: any                 = analysis.default;
-const division_averages: any   = scores.aggregate_by_area;
+const by_area: any             = scores.aggregate_by_area;
 const score_bucket: any        = scores.score_bucket;
 const score_bands: any         = scores.score_bands;
 const area_score_table: any    = scores.area_score_table;
@@ -94,41 +94,42 @@ g['EAE'] = { "indexes": {
 }};
 g['GEOGRAPHY'] = { "divisions": {} };
 
-// ------------------------------------------------------- division_averages
+// --------------------------------------------------------------- by_area
 
-describe('division_averages', () => {
-	it('averages each area over its own cells (sum / count), ids stringified', () => {
-		const out = division_averages([0.25, 0.75, 0.5, 0.25, 0.5], [7, 7, 7, 9, 9]);
+describe('by_area', () => {
+	it('sums and averages each area over its own cells, ids stringified', () => {
+		const out = by_area([0.25, 0.75, 0.5, 0.25, 0.5], [7, 7, 7, 9, 9]);
 
 		assert.deepEqual(Object.keys(out), ['7', '9']);
-		assert.deepEqual(out['7'], { "average": 0.5 });    // (0.25+0.75+0.5)/3
-		assert.deepEqual(out['9'], { "average": 0.375 });  // (0.25+0.5)/2
+		assert.deepEqual(out['7'], { "sum": 1.5, "average": 0.5 });    // 0.25+0.75+0.5
+		assert.deepEqual(out['9'], { "sum": 0.75, "average": 0.375 }); // 0.25+0.5
 	});
 
 	it('skips cells with no division (-1) and cells the analysis clipped (-1)', () => {
 		assert.deepEqual(
-			division_averages([0.5, 0.75, 0.25], [1, -1, 1]),
-			{ "1": { "average": 0.375 } },  // (0.5+0.25)/2
+			by_area([0.5, 0.75, 0.25], [1, -1, 1]),
+			{ "1": { "sum": 0.75, "average": 0.375 } },
 		);
 
 		assert.deepEqual(
-			division_averages([0.5, -1, 0.25], [1, 1, 1]),
-			{ "1": { "average": 0.375 } },
+			by_area([0.5, -1, 0.25], [1, 1, 1]),
+			{ "1": { "sum": 0.75, "average": 0.375 } },
 		);
 
 		// An area with only skipped cells is omitted entirely.
-		assert.deepEqual(division_averages([-1, -1], [2, 2]), {});
+		assert.deepEqual(by_area([-1, -1], [2, 2]), {});
 	});
 
-	it('keeps tiny-negative rescale artefacts in the average, though has_priority_score rejects them', () => {
-		const lone = division_averages([TINY_NEG], [4]);
+	it('keeps tiny-negative rescale artefacts, though has_priority_score rejects them', () => {
+		const lone = by_area([TINY_NEG], [4]);
+		assert.equal(lone['4'].sum, TINY_NEG);
 		assert.equal(lone['4'].average, TINY_NEG);
 
-		const mixed = division_averages([TINY_NEG, 0.5], [4, 4]);
+		const mixed = by_area([TINY_NEG, 0.5], [4, 4]);
+		near(mixed['4'].sum, 0.499999984);      // 0.5 - 1.6e-8
 		near(mixed['4'].average, 0.249999992);  // (0.5 - 1.6e-8) / 2
 
 		assert.equal(has_priority_score(TINY_NEG), false);
-		assert.equal(has_priority_score(lone['4'].average), false);
 	});
 });
 
@@ -199,118 +200,61 @@ describe('score_bucket', () => {
 
 // ----------------------------------------------------- area_score_strategy
 
-describe('area_score_strategy — total vs intensity', () => {
-	const ds = (id: string, weight = 1, invert = false) => ({ id, weight, invert });
+describe('area_score_strategy — cell_mean vs pixel_sum', () => {
+	// The strategy's input: the cell-score aggregate per area.
+	const area = (sum: number, average = sum) => ({ sum, average });
 
-	it("intensity mode returns the per-area cell averages unchanged (the flip back)", () => {
-		const out = area_score_strategy('intensity', { "7": 0.2, "9": 0.9 }, {}, [ds('maize')]);
-		assert.deepEqual(out, { "7": 0.2, "9": 0.9 });
-	});
+	it('pixel_sum: half the score mass reads half the score', () => {
+		const out = area_score_strategy('pixel_sum', { "a": area(200), "b": area(100), "c": area(50) });
 
-	it("total: one SUM layer scores share-of-max — the report's own figures", () => {
-		// Real district maize totals (t): the top district reads 100%,
-		// Kamuli 41.8%, Namisindwa 20.9%.
-		const values = {
-			"nakaseke":   { "maize": { "type": 'scalar', "value": 123192 } },
-			"kamuli":     { "maize": { "type": 'scalar', "value": 51552 } },
-			"namisindwa": { "maize": { "type": 'scalar', "value": 25734 } },
-		};
-		const out = area_score_strategy('total', {}, values, [ds('maize')]);
-
-		assert.equal(out['nakaseke'], 1);
-		assert.ok(Math.abs(out['kamuli']! - 51552 / 123192) < 1e-12);
-		assert.ok(Math.abs(out['namisindwa']! - 25734 / 123192) < 1e-12);
-		assert.ok(out['kamuli']! > out['namisindwa']!);
-	});
-
-	it("total: mixes SUM and AVG layers through the shared weights", () => {
-		// Two datasets, one peaking in area a, the other in b: each
-		// normalised, weighted 3:1, then share-of-max.
-		const values = {
-			"a": { "prod": { "type": 'scalar', "value": 90 }, "ghi": { "type": 'scalar', "value": 4 } },
-			"b": { "prod": { "type": 'scalar', "value": 30 }, "ghi": { "type": 'scalar', "value": 8 } },
-		};
-		const out = area_score_strategy('total', {}, values, [ds('prod', 3), ds('ghi', 1)]);
-
-		// a: 3*(90/90) + 1*(4/8) = 3.5; b: 3*(30/90) + 1*(8/8) = 2; best 3.5.
-		assert.ok(Math.abs(out['a']! - 1) < 1e-12);
-		assert.ok(Math.abs(out['b']! - 2 / 3.5) < 1e-12);
-	});
-
-	it("total: honouring invert flips the dataset's ranking", () => {
-		const values = {
-			"a": { "cost": { "type": 'scalar', "value": 10 } },
-			"b": { "cost": { "type": 'scalar', "value": 30 } },
-		};
-		const out = area_score_strategy('total', {}, values, [ds('cost', 1, true)]);
-
-		// shares: a = 1 - 10/30, b = 0; rescale by best.
-		assert.equal(out['b'], 0);
-		assert.equal(out['a'], 1);
-	});
-
-	it("total: a signed layer never scores below 0 and keeps its ranking (the RWI -22%)", () => {
-		const values = {
-			"richest":  { "rwi": { "type": 'scalar', "value": 1.31 } },
-			"nakaseke": { "rwi": { "type": 'scalar', "value": -0.29 } },
-			"poorest":  { "rwi": { "type": 'scalar', "value": -1 } },
-		};
-		const out = area_score_strategy('total', {}, values, [ds('rwi')]);
-
-		assert.equal(out['richest'], 1);
-		assert.ok(out['poorest']! >= 0);
-		assert.ok(out['nakaseke']! > out['poorest']!);
-	});
-
-	it("total: a point layer counts up — the proximity raster's invert never flips it", () => {
-		const values = {
-			"kampala":   { "health": { "type": 'points', "value": 381 } },
-			"karenga":   { "health": { "type": 'points', "value": 9 } },
-			"nabilatuk": { "health": { "type": 'points', "value": 6 } },
-		};
-		const out = area_score_strategy('total', {}, values, [ds('health', 1, true)]);
-
-		assert.equal(out['kampala'], 1);
-		assert.ok(out['karenga']! > out['nabilatuk']!);
-		assert.ok(out['nabilatuk']! > 0);
-	});
-
-	it("total: a dataset with no positive total is dropped and the rest renormalise", () => {
-		const values = {
-			"a": { "prod": { "type": 'scalar', "value": 2 }, "flat": { "type": 'scalar', "value": 0 } },
-			"b": { "prod": { "type": 'scalar', "value": 1 }, "flat": { "type": 'scalar', "value": 0 } },
-		};
-		const out = area_score_strategy('total', {}, values, [ds('prod', 1), ds('flat', 3)]);
-
-		// 'flat' carries no signal: 'prod' alone decides, share-of-max.
 		assert.equal(out['a'], 1);
 		assert.equal(out['b'], 0.5);
+		assert.equal(out['c'], 0.25);
 	});
 
-	it("total: missing values count as 0; absent datasets and weights are safe", () => {
-		const values = { "a": { "prod": { "type": 'scalar', "value": 4 } }, "b": {} };
-		const out = area_score_strategy('total', {}, values, [
-			ds('prod', 1), ds('ghost', 1), { "id": 'nan', "weight": NaN },
-		]);
+	it('pixel_sum: the same cell score over more cells ranks higher (size counts)', () => {
+		// 'wide' holds 3 cells averaging 0.4 -> mass 1.2; 'dense' one cell at 0.9.
+		const masses = { "wide": area(1.2, 0.4), "dense": area(0.9, 0.9) };
+		const out = area_score_strategy('pixel_sum', masses);
 
-		assert.equal(out['a'], 1);
-		assert.equal(out['b'], 0);
+		assert.equal(out['wide'], 1);
+		near(out['dense']!, 0.9 / 1.2);
 	});
 
-	it("total: an area known only from intensities still scores (0 when it has no values)", () => {
-		const out = area_score_strategy('total', { "7": 0.5, "9": 0.5 }, {
-			"7": { "maize": { "type": 'scalar', "value": 5 } },
-		}, [ds('maize')]);
+	it('pixel_sum: additive — a merged area holds the two masses added up', () => {
+		const out = area_score_strategy('pixel_sum', { "ab": area(0.4 + 0.6), "a": area(0.4), "b": area(0.6) });
 
-		assert.equal(out['7'], 1);
-		assert.equal(out['9'], 0);
+		assert.equal(out['ab'], 1);
+		assert.equal(out['a'], 0.4);
+		assert.equal(out['b'], 0.6);
 	});
 
-	it("total: ties share the top score; a flat field of real values does not collapse bands", () => {
-		const out = area_score_strategy('total', {}, {
-			"a": { "maize": { "type": 'scalar', "value": 8 } },
-			"b": { "maize": { "type": 'scalar', "value": 8 } },
-		}, [ds('maize')]);
+	it('cell_mean: the same cells averaged, so size drops out', () => {
+		const out = area_score_strategy('cell_mean', { "wide": area(1.2, 0.4), "dense": area(0.9, 0.9) });
+
+		assert.equal(out['dense'], 0.9);
+		assert.equal(out['wide'], 0.4);
+	});
+
+	it('cell_mean: stays on the raster scale — the best area is not stretched to 1', () => {
+		const out = area_score_strategy('cell_mean', { "a": area(9, 0.3), "b": area(2, 0.2) });
+
+		assert.equal(out['a'], 0.3);
+		assert.equal(out['b'], 0.2);
+	});
+
+	it('an all-zero field stays at zero instead of dividing by zero', () => {
+		assert.deepEqual(area_score_strategy('pixel_sum', { "a": area(0, 0), "b": area(0, 0) }), { "a": 0, "b": 0 });
+	});
+
+	it('floors the Float32 bottom band, so no area can score below 0', () => {
+		const out = area_score_strategy('pixel_sum', { "a": area(TINY_NEG), "b": area(TINY_NEG * 3) });
+
+		assert.deepEqual(out, { "a": 0, "b": 0 });
+	});
+
+	it('ties share the top score', () => {
+		const out = area_score_strategy('pixel_sum', { "a": area(8), "b": area(8) });
 
 		assert.equal(out['a'], 1);
 		assert.equal(out['b'], 1);
@@ -318,37 +262,32 @@ describe('area_score_strategy — total vs intensity', () => {
 });
 
 describe('area_score_table', () => {
-	it("publishes the strategy's score and its ONE-scale bucket (total by default)", () => {
-		const table = area_score_table(
-			{ "7": 0.2, "9": 0.9 },
-			{
-				"7": { "maize": { "type": 'scalar', "value": 5 } },
-				"9": { "maize": { "type": 'scalar', "value": 10 } },
-			},
-			[{ "id": 'maize', "weight": 1 }],
-		);
+	const area = (sum: number, average = sum) => ({ sum, average });
 
-		// 10/10 -> High; 0.5 lands exactly on the Medium boundary and must
-		// stay Medium, not Low-Medium.
+	it("publishes the strategy's score and its ONE-scale bucket", () => {
+		const table = area_score_table({ "7": area(5), "9": area(10) }, 'pixel_sum');
+
+		// 10 is the top mass -> 1; 5 is half of it, landing exactly on the
+		// Medium boundary, which must stay Medium, not Low-Medium.
 		assert.equal(table['9']?.score, 1);
 		assert.equal(table['9']?.bucket?.label, 'High');
 		assert.equal(table['7']?.score, 0.5);
 		assert.equal(table['7']?.bucket?.label, 'Medium');
 	});
 
-	it("keeps the legacy empty-table case and the score_bucket null rule", () => {
-		assert.deepEqual(area_score_table({}, {}, []), {});
-		assert.deepEqual(area_score_table({ "1": 0.5 }, {}, [], 'intensity' as never), {
+	it('empty input is an empty table; cell_mean is the default and keeps the cell scale', () => {
+		assert.deepEqual(area_score_table({}), {});
+		assert.deepEqual(area_score_table({ "1": area(3, 0.5) }), {
 			"1": { "score": 0.5, "bucket": score_bucket(0.5) },
 		});
 	});
 
-	it("intensity mode buckets the per-area averages (including the Float32 bottom band)", () => {
-		const table = area_score_table({ "7": 0.2, "9": 0.9, "4": TINY_NEG }, {}, [], 'intensity');
+	it('buckets every score on the fixed 20% bands (incl. the floored bottom band)', () => {
+		const table = area_score_table({ "7": area(0.2), "9": area(0.9), "4": area(TINY_NEG) }, 'pixel_sum');
 
-		assert.equal(table['7']?.bucket?.label, 'Low-Medium');
+		assert.equal(table['7']?.bucket?.label, 'Low-Medium');  // 0.2/0.9
 		assert.equal(table['9']?.bucket?.label, 'High');
-		assert.equal(table['4']?.bucket?.label, 'Low');
+		assert.equal(table['4']?.bucket?.label, 'Low');         // floored to 0
 	});
 });
 

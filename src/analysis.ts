@@ -562,19 +562,6 @@ function result_inputs(index: string, subdiv: unknown) {
 	return JSON.stringify(parts);
 }
 
-// The scoring dataset slices: run()'s weights (weights_for) and each dataset's
-// per-index `invert` direction (ds.js analysis_fn's range flip).
-function score_datasets(index: string) {
-	const list = datasets(index);
-	const { weights } = weights_for(index, list);
-
-	return list.map(d => ({
-		"id":     d.id,
-		"weight": weights[d.id] || 0,
-		"invert": !!d.analysis?.indexes?.find(i => i.index === index)?.invert,
-	}));
-}
-
 // The aggregates the scores were derived from, stashed against the phase-1
 // payload so the values phase folds them instead of recomputing.
 const values_stash = new WeakMap<ScoresPayload, ValuesPayload & { layer_aggregates: Record<string, unknown> }>();
@@ -618,12 +605,9 @@ async function compute_result_scores(key: ResultKey): Promise<ScoresPayload> {
 	const values = foldValues(layer_aggregates);
 
 	// The per-area {score, bucket} table; area_score_table is the scoring
-	// strategy knob, currently 'total'.
-	const intensities = Object.fromEntries(
-		Object.entries(aggregate_by_area(cells, division.raster.data))
-			.map(([id, a]): [string, number] => [id, a.average]),
-	);
-	const areas = area_score_table(intensities, values, score_datasets(key.index));
+	// strategy knob, currently 'cell_mean' — the map's own cell scores
+	// averaged per area, on the raster's scale.
+	const areas = area_score_table(aggregate_by_area(cells, division.raster.data));
 
 	const scores = { cells, mask, areas };
 	values_stash.set(scores, {

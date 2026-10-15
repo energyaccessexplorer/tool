@@ -124,24 +124,28 @@ export function score_bucket(value: number | null | undefined): ScoreBucket | nu
 	return bucket_of_index(Math.min(score_bands.length - 1, Math.floor(x * score_bands.length)));
 }
 
-/** A division area's aggregate, keyed by stringified area id. */
-export interface AreaAverage {
+/** A division area's cell-score aggregate, keyed by stringified area id. */
+export interface AreaCellScore {
+	/** The area's cell scores added up — the score mass it holds. */
+	readonly sum: number;
+	/** The same mass averaged over its cells: the size-neutral sibling. */
 	readonly average: number;
 }
 
-/** A per-area averages record ({ [area_id]: { average } }). */
-export type AreaAverages = Readonly<Record<string, AreaAverage>>;
+/** A per-area record ({ [area_id]: { sum, average } }). */
+export type AreaCellScores = Readonly<Record<string, AreaCellScore>>;
 
 /*
  * aggregate_by_area
  *
- * Compute the average analysis value per division area.
- * Returns { [area_id]: { average } }
+ * Sum and average the analysis raster over each division area. Returns
+ * { [area_id]: { sum, average } }: `sum` is the score mass the area holds (the
+ * pixel_sum strategy's input), `average` the same mass per cell.
  */
 export function aggregate_by_area(
 	analysis_raster: ArrayLike<number>,
 	division_data: ArrayLike<number>,
-): Record<string, AreaAverage> {
+): Record<string, AreaCellScore> {
 	return Object.fromEntries(
 		Object.entries(
 			Array.from(analysis_raster).reduce((acc, value, i) => {
@@ -158,7 +162,7 @@ export function aggregate_by_area(
 					});
 				}
 			}, {} as Record<string, { "sum": number; "count": number }>),
-		).map(([id, { sum, count }]): [string, AreaAverage] => [id, { "average": sum / count }]),
+		).map(([id, { sum, count }]): [string, AreaCellScore] => [id, { sum, "average": sum / count }]),
 	);
 }
 
@@ -170,99 +174,48 @@ export interface AreaScore {
 }
 
 /**
- * The score strategy knob. `total` ranks areas by the weighted sum of their
- * layer aggregates (the overall value of their layers); `intensity` keeps
- * the average-of-cell-scores ranking.
+ * The score strategy knob. `cell_mean` scores an area by its cells' average;
+ * `pixel_sum` by the score mass its cells hold.
  */
-export type ScoreMode = 'intensity' | 'total';
+export type ScoreMode = 'cell_mean' | 'pixel_sum';
 
-export const SCORE_MODE: ScoreMode = 'total';
-
-/** One scoring dataset's slices for the strategy. */
-export interface ScoreDataset {
-	readonly id: string;
-	readonly weight: number;
-	readonly invert?: boolean;
-}
-
-/** Area -> dataset -> one aggregate. Aggregated entries are numeric; the
- * 'Not aggregated' sentinel some display rows carry is a string and scores
- * as 0. `type` is the aggregate's shape — 'points' marks a feature count. */
-export type ScoreValues = Readonly<Record<string,
-	Readonly<Record<string, { readonly type?: string; readonly value: number | string } | null | undefined>> | undefined>>;
+export const SCORE_MODE: ScoreMode = 'cell_mean';
 
 /*
  * area_score_strategy
  *
- * One [0, 1] score per area, derived from the same aggregates the popup
- * renders. `total`: per dataset, the area's aggregate as a share of the best
- * area, weighted by weights_for and renormalised over the datasets carrying
- * a positive total, then rescaled so the top area reads 1. `intensity`: the
- * precomputed per-cell-score averages, unchanged.
+ * One [0, 1] score per area, read off the cell scores the map paints.
+ * `cell_mean`: the area's cells averaged, on the raster's own scale — the
+ * division map is the km² map at a coarser resolution, so an area reads the
+ * colour its cells average to. `pixel_sum`: the area's cell scores added up,
+ * as a share of the highest-summing area — size counts, and the top area
+ * reads 1.
  *
- * Two rules bound that share to [0, 1] without losing the ranking:
- *
- * - the normalisation floor is 0 and only a NEGATIVE aggregate lowers it
- *   (RWI and other signed layers span below zero), so no area can score
- *   below 0; with non-negative data it degenerates to share-of-max.
- * - `invert` speaks for the raster the CELLS are scored from (proximity:
- *   closer is better), so it never flips an aggregate that counts features
- *   — a point layer's districts rank by count, more first.
+ * Scoring the raster rather than re-deriving an area value from the layer
+ * aggregates is what keeps ONE direction rule in the app: every dataset's
+ * scaling and `invert` are applied once, per cell, in run(). No area-level
+ * aggregate can disagree with the map, and a sum of the non-negative cell
+ * scores run() leaves behind cannot be negative.
  */
 export function area_score_strategy(
 	mode: ScoreMode,
-	intensities: Readonly<Record<string, number>>,
-	values: ScoreValues,
-	datasets: readonly ScoreDataset[],
+	areas: AreaCellScores,
 ): Record<string, number> {
-	if (mode === 'intensity') return { ...intensities };
-
-	const ids = new Set([...Object.keys(intensities), ...Object.keys(values)]);
 	const scores: Record<string, number> = {};
-	for (const id of ids) scores[id] = 0;
-
-	let weight_sum = 0;
-
-	for (const d of datasets) {
-		if (!(d.weight > 0)) continue;
-
-		const per_area: Record<string, number> = {};
-		let max = 0;
-		let min = 0;
-		let counts_features = false;
-
-		for (const id of ids) {
-			const entry = values[id]?.[d.id];
-			const raw = entry?.value;
-			const v = (typeof raw === 'number' && Number.isFinite(raw)) ? raw : 0;
-			per_area[id] = v;
-			if (v > max) max = v;
-			if (v < min) min = v;
-			if (entry?.type === 'points') counts_features = true;
-		}
-
-		if (max <= 0) continue;
-
-		// max > 0 and min <= 0, so the span is never zero.
-		const span = max - min;
-		const flip = !!d.invert && !counts_features;
-
-		weight_sum += d.weight;
-
-		for (const id of ids) {
-			const v = per_area[id]!;
-			const share = flip ? (max - v) / span : (v - min) / span;
-			scores[id] = scores[id]! + d.weight * share;
-		}
-	}
-
 	let best = 0;
-	for (const id of ids) {
-		if (weight_sum > 0) scores[id] = scores[id]! / weight_sum;
-		if (scores[id]! > best) best = scores[id]!;
+
+	for (const id in areas) {
+		const a = areas[id]!;
+		// Cell scores are non-negative by construction; the rescale's Float32
+		// bottom band can still leave an aggregate a hair below zero, so the
+		// score floors at 0 rather than printing a negative percentage.
+		const v = Math.max(0, (mode === 'cell_mean') ? a.average : a.sum);
+		scores[id] = v;
+		if (v > best) best = v;
 	}
 
-	if (best > 0) for (const id of ids) scores[id] = scores[id]! / best;
+	// An all-zero field keeps its zeros rather than dividing by zero.
+	if (mode === 'pixel_sum' && best > 0) for (const id in scores) scores[id] = scores[id]! / best;
 
 	return scores;
 }
@@ -274,12 +227,10 @@ export function area_score_strategy(
  * strategy's score, bucketed by score_bucket.
  */
 export function area_score_table(
-	intensities: Readonly<Record<string, number>>,
-	values: ScoreValues,
-	datasets: readonly ScoreDataset[],
+	areas: AreaCellScores,
 	mode: ScoreMode = SCORE_MODE,
 ): Record<string, AreaScore> {
-	const scores = area_score_strategy(mode, intensities, values, datasets);
+	const scores = area_score_strategy(mode, areas);
 
 	const out: Record<string, AreaScore> = {};
 	for (const id in scores) out[id] = { "score": scores[id]!, "bucket": score_bucket(scores[id]!) };

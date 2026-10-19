@@ -394,8 +394,8 @@ export function points() {
 				"data":             this.vectors.data,
 				"cluster":          true,
 				"clusterMaxZoom":   10,
-				"clusterMinPoints": 4,
-				"clusterRadius":    20,
+				"clusterMinPoints": 2,
+				"clusterRadius":    50,
 
 				// So clusters made only of filtered-out points can be hidden.
 				"clusterProperties": {
@@ -412,7 +412,7 @@ export function points() {
 				"paint": {
 					"circle-stroke-color": ['get', '__stroke'],
 					"circle-stroke-width": ['get', '__stroke-width'],
-					"circle-radius":       ['get', '__radius'],
+					"circle-radius":       ['min', 3, ['*', 0.6, ['get', '__radius']]],
 					"circle-opacity":      this.vectors.opacity,
 					"circle-color":        this.vectors.fill,
 				},
@@ -426,15 +426,46 @@ export function points() {
 				"paint": {
 					"circle-radius": [
 						'step', ['get', '__visible_count'],
-						2, 10,
-						5, 100,
-						7, 750,
-						10,
+						7, 5,
+						9, 10,
+						11, 25,
+						14, 100,
+						17, 500,
+						20, 2000,
+						24,
 					],
 					"circle-opacity":      this.vectors.opacity,
 					"circle-color":        this.vectors.fill,
 					"circle-stroke-width": this.vectors['stroke-width'],
 					"circle-stroke-color": this.vectors['stroke'],
+				},
+			}, {
+				"id":     `${this.id}-clusters-count`,
+				"type":   'symbol',
+				"filter": ['all', ['has', 'point_count'], ['>', ['get', '__visible_count'], 0]],
+				"layout": {
+					"visibility":  'none',
+					"text-field":  ['to-string', ['get', '__visible_count']],
+					"text-font":   ["DIN Offc Pro Medium", "Arial Unicode MS Regular"],
+					"text-size":   11,
+					"text-anchor": 'left',
+					"text-offset": ['step', ['get', '__visible_count'],
+						['literal', [1.00, 0]], 5,
+						['literal', [1.18, 0]], 10,
+						['literal', [1.36, 0]], 25,
+						['literal', [1.64, 0]], 100,
+						['literal', [1.91, 0]], 500,
+						['literal', [2.18, 0]], 2000,
+						['literal', [2.55, 0]],
+					],
+
+					"text-allow-overlap":    true,
+					"text-ignore-placement": true,
+				},
+				"paint": {
+					"text-color":      '#ffffff',
+					"text-halo-color": 'rgba(0, 0, 0, 0.75)',
+					"text-halo-width": 1.5,
 				},
 			});
 		});

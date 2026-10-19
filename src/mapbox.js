@@ -225,6 +225,8 @@ export function init() {
 	MAPBOX.addControl(new mapboxgl.ScaleControl({ "maxWidth": 150, "unit": "imperial" }), 'bottom-left');
 
 	MAPBOX.coords = fit(GEOGRAPHY.envelope);
+	MAPBOX.setMinZoom(Math.max(MAPBOX.getMinZoom(), MAPBOX.getZoom() - 2));
+
 	change_theme(EAE['settings'].mapbox_theme);
 };
 
@@ -300,6 +302,7 @@ function theme_pick(theme) {
 	return (t ? `mapbox://styles/${t}` : {
 		"version": 8,
 		"sources": {},
+		"glyphs":  'mapbox://fonts/mapbox/{fontstack}/{range}.pbf',
 		"layers":  [{
 			"id":    'background',
 			"type":  'background',
@@ -532,12 +535,18 @@ export async function sort() {
 
 	const layers = [].concat(...datasets.map(d => d._layers));
 
-	await Promise.all(layers.map(i => until(_ => MAPBOX.getLayer(i), Infinity)));
+	// Counts on top so nothing paints over a number.
+	const ordered = [
+		...layers.filter(id => /-clusters-count$/.test(id)),
+		...layers.filter(id => !/-clusters-count$/.test(id)),
+	];
 
-	for (let i = 0; i < layers.length; i++) {
+	await Promise.all(ordered.map(i => until(_ => MAPBOX.getLayer(i), Infinity)));
+
+	for (let i = 0; i < ordered.length; i++) {
 		MAPBOX.moveLayer(
-			layers[i],
-			(i === 0) ? MAPBOX.first_symbol : layers[i-1],
+			ordered[i],
+			(i === 0) ? MAPBOX.first_symbol : ordered[i-1],
 		);
 	}
 };

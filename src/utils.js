@@ -61,6 +61,14 @@ export function even_label_indices(n, maxLabels = 6, minLabels = 5) {
 	return best;
 };
 
+/**
+ * `intervals` is optional: with it the scale is a quantile over the given
+ * interval domain, without it a clamped linear ramp over domain.min..max.
+ * (Typed here so TS callers see the optionality; the destructuring alone
+ * would infer every key as required.)
+ *
+ * @param {{ intervals?: any, stops: any, domain: any }} spec
+ */
 export function colorscale({intervals, stops, domain}) {
 	let s;
 

@@ -12,7 +12,7 @@ import {
 
 import {
 	enough_datasets_for_index,
-} from './analysis.js';
+} from './analysis.ts';
 
 import bind from '../lib/bind.js';
 

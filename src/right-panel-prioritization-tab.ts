@@ -1,15 +1,16 @@
 // Right-panel Prioritization tab view: renders the atom from
-// right-panel-prioritization-state.ts. Impure by design — DOM, i18n, the
-// per-index analyses and division scales live here. Producers dispatch
-// actions on the atom; the subscription at the bottom re-renders and runs
-// the entries service.
+// right-panel-prioritization-state.ts. Impure by design — DOM and i18n
+// live here. The per-index entries are READ from the memoised analysis
+// results (analysis_scores / analysis_cells, EAE-521) instead of being
+// recomputed per selection. Producers dispatch actions on the atom; the
+// subscription at the bottom re-renders and runs the entries service.
 
-import analysis_run, {
+import {
+	analysis_cells,
+	analysis_scores,
 	dataset_feeds_index,
-	division_averages,
 	lowmedhigh_scale,
-	priority_scale,
-} from './analysis.js';
+} from './analysis.ts';
 
 import {
 	setup_about_button,
@@ -42,6 +43,10 @@ import {
 } from './right-panel-prioritization-state.ts';
 
 import type {
+	AnalysisResult,
+} from './analysis-state.ts';
+
+import type {
 	AdminRef,
 } from './right-panel-shared.ts';
 
@@ -52,9 +57,6 @@ import type {
 	PriorityState,
 	PriorityView,
 } from './right-panel-prioritization-state.ts';
-
-/** Division averages as keyed by division id (division_averages stringifies ids). */
-type DivisionAverages = Record<string, { readonly average: number }>;
 
 function hasDatasetsFor(key: string): boolean {
 	const compound = EAE['indexes'][key]?.compound ?? [];
@@ -76,52 +78,60 @@ function pixelEntry(raster: ArrayLike<number>, rasterIndex: number): IndexEntry 
 	return { value, "bucket": bucketOf(value, lowmedhigh_scale) };
 }
 
-function adminAreaEntry(raster: ArrayLike<number>, admin: AdminRef): IndexEntry {
-	const division = GEOGRAPHY.divisions?.[admin.variant];
-	if (!division?.raster?.data) return { "value": null, "bucket": null };
-
-	const areas = division_averages(raster, division.raster.data) as DivisionAverages;
-	const value = areas[String(admin.id)]?.average ?? null;
-	const scale = priority_scale(areas, lowmedhigh_scale.range()) as ((v: number) => string) | null;
-
-	return { value, "bucket": bucketOf(value, scale) };
+/**
+ * One index's entry for the selected admin area, read from that index's
+ * memoised analysis result (EAE-521). The result's per-area score and
+ * bucket are exactly what the deleted private copy rebuilt per selection
+ * (legacy adminAreaEntry's own averages fold + area scale over the same
+ * run() cells — the result's bucket is that single area scale's label for
+ * that same score).
+ */
+function adminAreaEntry(result: AnalysisResult | undefined, admin: AdminRef): IndexEntry {
+	const area = result?.areas[String(admin.id)];
+	return { "value": area?.score ?? null, "bucket": area?.bucket ?? null };
 }
 
 /**
- * Legacy update(), minus the DOM: run the per-index analyses for every
- * index but the current one and bucket each result for the selection.
+ * Legacy update(), minus the DOM and minus the per-selection computation:
+ * every row for the selection is read from its index's memoised analysis
+ * result — analysis_scores (phase 1: per-area score + bucket; the card
+ * renders score buckets only, so the layer aggregates are never needed) for
+ * an admin area, analysis_cells (the run() shared with the map painting, no
+ * re-execution per selection) for a raster pixel.
  */
 async function buildEntries(view: Extract<PriorityView, { readonly kind: 'location' }>): Promise<IndexEntries> {
 	const otherKeys = Object.keys(EAE['indexes'])
 		.filter(k => k !== STATE.index && hasDatasetsFor(k));
 
-	const results = await Promise.all(otherKeys.map(key => analysis_run(key)));
-
 	const admin = view.admin;
 	const rasterIndex = view.rasterIndex;
+	const empty: IndexEntry = { "value": null, "bucket": null };
 
-	const extract = admin
-		? (raster: ArrayLike<number>) => adminAreaEntry(raster, admin)
-		: (raster: ArrayLike<number>) => pixelEntry(raster, rasterIndex ?? 0);
-
-	let currentBucket: string | null = null;
 	if (admin) {
-		const priorityData = GEOGRAPHY.divisions?.[admin.variant]?.priorityData;
-		const scale = priorityData
-			? priority_scale(priorityData, lowmedhigh_scale.range()) as ((v: number) => string) | null
-			: null;
-		currentBucket = bucketOf(view.analysisValue, scale);
-	} else {
-		currentBucket = bucketOf(view.analysisValue, lowmedhigh_scale);
+		// One cached result per index at the selection's own division tier.
+		// The current-index column reads the CURRENT index's result (was: the
+		// legacy retired per-division bridge + a private area scale).
+		const keys = hasDatasetsFor(STATE.index) ? [STATE.index, ...otherKeys] : otherKeys;
+		const results = await Promise.all(keys.map(key => analysis_scores(key, admin.variant)));
+		const entries = Object.fromEntries(keys.map((key, i): [string, IndexEntry] =>
+			[key, adminAreaEntry(results[i], admin)]));
+
+		return { ...entries, [STATE.index]: entries[STATE.index] ?? empty };
 	}
 
+	const rasters = await Promise.all(otherKeys.map(key => analysis_cells(key)));
+
+	// Pixel variant, current column unchanged: the clicked cell's raw value
+	// as the open map-info carries it, on the absolute low/med/high scale
+	// (never a legacy bridge read).
 	const current: IndexEntry = hasDatasetsFor(STATE.index)
-		? { "value": view.analysisValue, "bucket": currentBucket }
-		: { "value": null, "bucket": null };
+		? { "value": view.analysisValue, "bucket": bucketOf(view.analysisValue, lowmedhigh_scale) }
+		: empty;
 
 	return {
 		[STATE.index]: current,
-		...Object.fromEntries(otherKeys.map((key, i) => [key, extract(results[i]?.raster ?? [])])),
+		...Object.fromEntries(otherKeys.map((key, i): [string, IndexEntry] =>
+			[key, pixelEntry(rasters[i]?.raster ?? [], rasterIndex ?? 0)])),
 	};
 }
 

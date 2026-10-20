@@ -1,7 +1,7 @@
 // Right-panel Data tab view: renders the atom from right-panel-data-state.ts.
-// Impure by design — DOM, i18n/formatting, the national aggregation and the
-// module-level caches live here. Producers dispatch actions on the atom; the
-// subscription at the bottom re-renders and runs the national service.
+// Impure by design — DOM, i18n/formatting and the module-level cache live
+// here. Producers dispatch actions on the atom; the subscription at the
+// bottom re-renders and runs the national service.
 
 import {
 	resolve_unit,
@@ -13,8 +13,8 @@ import {
 
 import {
 	active_area_mask,
-	aggregate_layer_values,
-} from './analysis.js';
+	analysis_result,
+} from './analysis.ts';
 
 import {
 	STANDARD_TABS,
@@ -50,6 +50,10 @@ import type {
 	AdminRef,
 	LegacyDataset,
 } from './right-panel-shared.ts';
+
+import type {
+	AreaValues,
+} from './analysis-state.ts';
 
 import type {
 	AggregatedLayer,
@@ -228,12 +232,11 @@ function total_clause(datatype: string | undefined, unit: string | undefined, ag
 	return t(window.LOCALE, TOTAL_CLAUSE_KEYS[family], { total, "geography": GEOGRAPHY.name });
 }
 
-// Module-level caches (kept out of the atom for now). geoDist memoises
-// categorical distributions per dataset+admin; nationalLayerData memoises
-// the whole-outline aggregation.
+// Module-level cache (kept out of the atom for now): geoDist memoises
+// categorical distributions per dataset+admin. The whole-outline aggregation
+// it used to carry is the analysis cell's national entry now (EAE-521).
 const cache = {
-	"geoDist":            new Map<string, DistributionSlice[]>(),
-	"nationalLayerData": null as AggregatedLayerData | null,
+	"geoDist": new Map<string, DistributionSlice[]>(),
 };
 
 function countPixels(rasterData: ArrayLike<number>, nodata: number, maskData: ArrayLike<number>, maskNodata: number, maskId: number | undefined, counts: Map<number, number>): number {
@@ -558,24 +561,57 @@ export function compute_distribution(ds: LegacyDataset, adminInfo: AdminRef | nu
 }
 
 /**
- * The whole-outline aggregation, cached for the recompute cycle. Only needed
- * before the first analysis run lands: afterwards the atom carries the
- * aggregates graphs() computed in the same pass as the summary.
+ * The tier key of the Outline pseudo-division: a.js builds
+ * GEOGRAPHY.divisions[0] from the outline dataset (init_2's outline() step),
+ * whose raster burns area id 0 inside / -1 (nodata) outside. Its single
+ * area 0 is the analysed-area bucket (cells that carry a priority score
+ * inside the outline), so the masks the cards used to fabricate as "area 0"
+ * are just its per-area values now (EAE-521).
  */
-async function outlineLayerData(): Promise<AggregatedLayerData | null> {
-	if (cache.nationalLayerData) return cache.nationalLayerData;
+export const OUTLINE_TIER = 0;
 
-	const outline = OUTLINE?.raster;
-	if (!outline?.data) return null;
+/**
+ * Rebuild the legacy layer-data shape from the analysis cell's values
+ * (EAE-521). The cell publishes one AggregateResult per dataset (an area's
+ * `values`, or `national` for the whole geography), while build_detailed_data()
+ * and report.js's deck still read one AggregatedLayer per dataset with its
+ * result in a single area slot — the "fake area 0" slot the old masks
+ * fabricated. The per-layer metadata comes from the same DST entries
+ * aggregate_layer_values() read (name, unit and the SUM/AVG aggregation flag).
+ */
+export function layer_data_from_values(values: AreaValues | null): AggregatedLayerData {
+	const out: Record<string, AggregatedLayer> = {};
 
-	const nationalRaster = Array.from(outline.data, v => (v === outline.nodata ? -1 : 0));
-	return (cache.nationalLayerData = await aggregate_layer_values({ "raster": { "data": nationalRaster } }));
+	for (const [id, result] of Object.entries(values ?? {})) {
+		const ds = DST.get(id) as (LegacyDataset & { readonly vectors?: { readonly shape_type?: string } }) | undefined;
+		const is_point_layer = ds?.vectors?.shape_type === 'points';
+
+		out[id] = {
+			"name":        ds?.name ?? id,
+			"unit":        ds?.category?.unit ?? null,
+			"aggregation": is_point_layer ? 'SUM' : (ds?.category?.analysis?.aggregation ?? 'AVG'),
+			"areas":       [{ result }],
+		};
+	}
+
+	return out;
+}
+
+/**
+ * The whole-geography aggregate from the analysis cell (EAE-521): what
+ * outlineLayerData() used to hand-roll with a whole-outline "fake area 0"
+ * mask. Only needed before the first analysis run lands: afterwards the atom
+ * carries the aggregates graphs() computed in the same pass as the summary.
+ */
+async function nationalFromCell(): Promise<AggregatedLayerData> {
+	const result = await analysis_result(STATE.index, OUTLINE_TIER);
+	return layer_data_from_values(result.national.values);
 }
 
 /**
  * Legacy update_top_level_geography(), minus the DOM: prefers the
  * analysis-clipped aggregates from the last analysis run, falling back to the
- * whole-outline aggregation (cached per recompute cycle).
+ * whole-outline aggregation (from the analysis cell).
  *
  * Each entry also carries its whole-geography figure — but only when another
  * layer can have narrowed the analysis area, and only while the clipped
@@ -587,7 +623,7 @@ async function outlineLayerData(): Promise<AggregatedLayerData | null> {
  */
 async function buildNationalEntries(): Promise<LayerEntry[] | null> {
 	const clipped = cell().state.analysisLayerData;
-	const totals = cell().state.nationalLayerData ?? await outlineLayerData();
+	const totals = cell().state.nationalLayerData ?? await nationalFromCell();
 
 	const layerData = clipped ?? totals;
 	if (!layerData) return null;
@@ -609,7 +645,6 @@ async function computeNational(): Promise<void> {
 	if (pending.kind !== 'national' || pending.entries !== null) return;
 
 	cache.geoDist.clear();
-	cache.nationalLayerData = null;
 
 	const entries = activeDatasets().length ? await buildNationalEntries() : null;
 

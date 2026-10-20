@@ -9,8 +9,8 @@
 //
 // Cross-tier coverage (e.g. which Counties a Wind Cluster dataset touches)
 // resolves through the app's existing pixel->area-id raster crosswalk
-// (GEOGRAPHY.divisions[tier].raster.data, the same structure analysis.js's
-// division_averages() reduces over), which naturally extends to raster
+// (GEOGRAPHY.divisions[tier].raster.data, the same structure the per-area
+// score fold reduces over), which naturally extends to raster
 // ("Prioritized Areas") mode too.
 //
 // This module is view-side: it reads the app globals (STATE/GEOGRAPHY) and

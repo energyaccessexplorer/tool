@@ -6,7 +6,7 @@ import {
 	getpoints,
 	analysis_colorscale,
 	lowmedhigh_scale,
-} from './analysis.js';
+} from './analysis.ts';
 
 import {
 	pointto as search_pointto,

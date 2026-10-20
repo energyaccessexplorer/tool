@@ -8,6 +8,39 @@ canvas.mapboxgl-canvas {
   cursor: auto;
 }
 
+/* Analysis pulse: above the canvas (z-index 1), below the controls (2). */
+#map-pulse {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  contain: paint;
+  pointer-events: none;
+  z-index: 1;
+  display: none;
+}
+
+#map-pulse-defs {
+  position: absolute;
+}
+
+#map-pulse-wash {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.04);
+  opacity: 0;
+  will-change: opacity;
+}
+
+#map-pulse-wave {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  background-repeat: repeat-x;
+  will-change: transform;
+}
+
 .mapboxgl-ctrl button {
   font-size: 1.6em;
   color: var(--the-color);

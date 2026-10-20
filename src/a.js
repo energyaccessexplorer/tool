@@ -511,7 +511,7 @@ async function reload(k,v) {
 	}
 
 	drop_map_info();
-	right_panel_update_analysis(false);
+	right_panel_update_analysis(false, true);
 
 	if (k === "datasets") {
 		controls_recount();

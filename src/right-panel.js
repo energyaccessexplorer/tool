@@ -51,6 +51,11 @@ import {
 	clear as poi_clear,
 } from './right-panel-poi-card.js';
 
+import {
+	start as pulse_start,
+	stop as pulse_stop,
+} from './map-pulse.js';
+
 import bind from '../lib/bind.js';
 
 import modal from '../lib/modal.js';
@@ -67,6 +72,7 @@ export function loading_analysis(loading) {
 	qs('#analysis-sections-wrapper').style.display = 'none';
 	qs('#analysis-blank-state').style.display = 'none';
 	if (loading) {
+		pulse_start();
 		data_tab_actions.backToNational(data_tab_cell());
 		prioritization_actions.backToNational(prioritization_cell());
 		poi_clear();
@@ -74,7 +80,9 @@ export function loading_analysis(loading) {
 	}
 }
 
-export function update_analysis(has_data) {
+// `busy`: the results are stale but the recompute is still running, so the
+// map pulse (unlike the spinner) must outlive this reset.
+export function update_analysis(has_data, busy = false) {
 	const save_button = qs('#save-snapshot-button');
 	const share_button = qs('#share-snapshot-button');
 	const download_button = qs('#export-button');
@@ -84,6 +92,8 @@ export function update_analysis(has_data) {
 	if (download_button) download_button.disabled = !has_data;
 
 	qs('#analysis-loading-state').style.display = 'none';
+
+	if (!busy) pulse_stop();
 
 	const blank_state = qs('#analysis-blank-state');
 	const sections_wrapper = qs('#analysis-sections-wrapper');

@@ -186,6 +186,7 @@ build-a:
 		${JS}/right-panel-poi-card.js \
 		${JS}/right-panel.js \
 		${JS}/mapbox.js \
+		${JS}/map-pulse.js \
 		${JS}/plot.js \
 		${JS}/rasters.js \
 		${JS}/report.js \

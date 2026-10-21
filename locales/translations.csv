@@ -431,7 +431,7 @@ admin_areas.woreda,Woreda,Woreda,沃雷达
 admin_areas.zone,Zone,Zone,地带
 report.front.title,Energy Access Explorer Report,Rapport Energy Access Explorer,Energy Access Explorer 报告
 report.front.subtitle,"A Data-driven, Integrated and Inclusive Approach to Achieving Universal Access to Energy for Equitable Development","Une approche fondée sur les données, intégrée et inclusive pour parvenir à l'accès universel à l'énergie au service d'un développement équitable",以数据为驱动的综合且包容的方法，实现普遍能源获取以促进公平发展。
-report.front.prepared_by,Prepared by Hordor,Préparé par Hordor,由 Hordor 编制
+report.front.prepared_by,Prepared by {{name}},Préparé par {{name}},由 {{name}} 编制
 report.front.developed_with,The report has been developed using data available on the Energy Access Explorer,Ce rapport a été élaboré à partir des données disponibles sur Energy Access Explorer,本报告基于 Energy Access Explorer 上提供的数据编制
 report.chapter.summary,Report Summary,Résumé du rapport,报告摘要
 report.chapter.analysis,Analysis,Analyse,分析

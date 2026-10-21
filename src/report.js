@@ -27,6 +27,7 @@ import {
 
 import {
 	area_type,
+	self as load_self,
 	svg_pie,
 } from './utils.js';
 
@@ -253,6 +254,16 @@ function title($, text) {
 	);
 };
 
+function preparer_name() {
+	const about = SELF?.about ?? {};
+	const name = [about['first_name'], about['last_name']]
+		.map(s => (s ?? '').trim())
+		.filter(Boolean)
+		.join(' ');
+
+	return name || SELF?.email || '';
+};
+
 async function front() {
 	const $ = this.addSlide();
 	const color = white;
@@ -287,7 +298,7 @@ async function front() {
 	$.addText(
 		[
 			{
-				"text":    t(window.LOCALE, 'report.front.prepared_by'),
+				"text":    unesc(t(window.LOCALE, 'report.front.prepared_by', { "name": preparer_name() })),
 				"options": { bold, breakLine },
 			}, {
 				"text":    t(window.LOCALE, 'report.front.developed_with'),
@@ -1440,6 +1451,8 @@ function toplocations_table(slide_title, columns, rows_data) {
 };
 
 export async function pptx(opts = {}) {
+	if (!SELF?.id) await load_self();
+
 	const p = new PptxGenJS();
 
 	p.defineLayout({ "name": "A4", "width": a4(100, 'x'), "height": a4(100, 'y') });

@@ -68,6 +68,14 @@ declare const OUTLINE: { readonly raster: RasterLike } | undefined;
 /** Dataset registry by id (analysis.js). */
 declare const DST: ReadonlyMap<string, unknown>;
 
+/** Geographic extent of the map viewport (mapbox.js's LngLatBounds). */
+interface MapBoundsLike {
+	getNorth(): number;
+	getSouth(): number;
+	getEast(): number;
+	getWest(): number;
+}
+
 /** The mapbox GL wrapper app code paints through (mapbox.js). */
 declare const MAPBOX: {
 	getSource(id: string): {
@@ -80,6 +88,13 @@ declare const MAPBOX: {
 		raster?: unknown;
 	} | null;
 	getLayer?(id: string): unknown;
+
+	/** The composed view the static map export captures, and the extent and
+	 * load events it measures and waits for. */
+	getCanvas(): HTMLCanvasElement;
+	getBounds(): MapBoundsLike;
+	on(event: string, listener: () => void): void;
+	off(event: string, listener: () => void): void;
 };
 
 /** The GeoTIFF writer the report's analysis export uses (loaded as a lib). */

@@ -23,8 +23,9 @@ export let opacity = 1;
 
 export let shown = true;
 
-function variants() {
-	const s = qs('#output-variant-select');
+// The Analysis Area select's current label: either an admin level or, for the
+// raster variant, the prioritized-areas cell size.
+export function variant_label() {
 	let u = "m²";
 	let r = GEOGRAPHY.resolution;
 
@@ -32,7 +33,17 @@ function variants() {
 		u = "km²";
 		r = r / 1000;
 	}
-	s.append(ce('option', `${t(window.LOCALE, 'left_panel.output.variant.prioritized_areas')} - ${r}${u}`, { "value": "raster" }));
+
+	if (String(STATE.variant) === 'raster')
+		return `${t(window.LOCALE, 'left_panel.output.variant.prioritized_areas')} - ${r}${u}`;
+
+	return translateDivisionName(window.LOCALE, GEOGRAPHY.divisions[+STATE.variant]?.name);
+};
+
+function variants() {
+	const s = qs('#output-variant-select');
+
+	s.append(ce('option', variant_label(), { "value": "raster" }));
 
 	GEOGRAPHY.divisions.forEach((d,i) => {
 		if (i === 0) return;
@@ -157,15 +168,7 @@ export function init() {
 registerUIUpdater(() => {
 	const select = qs('#output-variant-select');
 	const opt = select.querySelector('option[value="raster"]');
-	if (opt) {
-		let u = "m²";
-		let r = GEOGRAPHY.resolution;
-		if ((r % 1000) === 0) {
-			u = "km²";
-			r = r / 1000;
-		}
-		opt.textContent = `${t(window.LOCALE, 'left_panel.output.variant.prioritized_areas')} - ${r}${u}`;
-	}
+	if (opt) opt.textContent = variant_label();
 
 	for (const o of select.querySelectorAll('option')) {
 		if (o.value === 'raster') continue;

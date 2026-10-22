@@ -1,6 +1,7 @@
 {{define "hotjar"}}
 <script>
   (function(h,o,t,j,a,r){
+    if (new URLSearchParams(location.search).get('embed') === '1') return;
     if (location.hostname.match(/(localhost|linux)/)) return;
 
     h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};

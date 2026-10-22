@@ -121,7 +121,12 @@ import { translateNode, initLocalePicker, resolveLocale, t } from './translate.j
 
 import { syncDatasets as timeline_sync_datasets, cell as timeline_cell } from './timeline-state.js';
 
-import { init as timeline_view_init, commitSync as timeline_commit_sync } from './timeline-view.js';
+import { init as timeline_view_init, commitSync as timeline_commit_sync, setCriteriaMask } from './timeline-view.js';
+import { init as embed_init } from './embed.js';
+import { initialViewStrategy } from './initial-view.ts';
+
+window.setCriteriaMask = setCriteriaMask;
+let criteriaFromUrl = undefined;
 
 export const STANDARD_TABS = new Set(['census', 'demand', 'supply', 'other']);
 
@@ -175,72 +180,78 @@ function state_get(conf, p) {
 	}
 };
 
-function state_set(conf, p, v) {
+export function validate_state_value(p, v) {
 	switch (p) {
 	case "tab": {
 		if (!['controls', 'cards', 'vectors', 'analysis', 'geographies', 'locations', 'points', 'config'].includes(v))
-			return false;
+			return null;
 
-		break;
+		return v;
 	}
 
 	case "subdiv": {
-		if (v >= 0) break;
-		return false;
+		if (v !== null && v !== '' && !isNaN(+v) && +v >= 0) return +v;
+		return null;
 	}
 
 	case "divtier": {
-		if (and(v >= 0, v < 10)) break;
-		return false;
+		if (v !== null && v !== '' && !isNaN(+v) && and(+v >= 0, +v < 10)) return +v;
+		return null;
 	}
 
 	case "variant": {
-		if (v === "raster") break;
-		if ([1, 2, 3, 4, 5, 6, 7, 8, 9].includes(+v)) {
-			v = +v;
-			break;
-		}
+		if (v === "raster") return v;
+		if ([1, 2, 3, 4, 5, 6, 7, 8, 9].includes(+v)) return +v;
 
-		return false;
+		return null;
 	}
 
 	case "index": {
-		if (['eai', 'ani', 'demand', 'supply'].includes(v)) break;
-		return false;
+		if (['eai', 'ani', 'demand', 'supply'].includes(v)) return v;
+		return null;
 	}
 
 	case "view": {
-		if (['data', 'filtered', 'analysis'].includes(v)) break;
-		return false;
+		if (['data', 'filtered', 'analysis'].includes(v)) return v;
+		return null;
 	}
 
 	case "datasets": {
-		if (v.every(d => d instanceof DS)) {
-			v = unique(v);
-			break;
+		if (Array.isArray(v) && v.every(d => d instanceof DS)) {
+			return unique(v);
 		}
-		return false;
+		return null;
 	}
 
 	case "zoom": {
-		if (and(v >= 0, v <= 20)) break;
-		return false;
+		if (v !== null && v !== '' && !isNaN(+v) && and(+v >= 0, +v <= 20)) return +v;
+		return null;
 	}
 
 	case "center": {
-		if (v.hasOwnProperty('lng') && v.hasOwnProperty('lat')) break;
-		return false;
+		if (v && typeof v === 'object' && v.hasOwnProperty('lng') && v.hasOwnProperty('lat')) {
+			const lng = +v.lng;
+			const lat = +v.lat;
+			if (!isNaN(lng) && !isNaN(lat)) return { lng, lat };
+		}
+		return null;
 	}
 
 	case "timeline": {
-		if (!isNaN(new Date(v))) break;
-		return false;
+		if (v && !isNaN(new Date(v))) return v;
+		return null;
 	}
 
 	default: {
 		throw new Error(`Unknown attribute '${p}'`);
 	}
 	}
+};
+
+function state_set(conf, p, v) {
+	const valid = validate_state_value(p, v);
+	if (valid === null) return false;
+	v = valid;
 
 	conf[p] = v;
 	COMMIT(p,v);
@@ -249,10 +260,11 @@ function state_set(conf, p, v) {
 };
 
 export function init() {
+	window.EMBED = new URLSearchParams(location.search).get('embed') === '1';
+	if (window.EMBED) document.body.classList.add('embed');
+
 	window.LOCALE = resolveLocale();
 	translateNode(LOCALE, document);
-
-	if (window.innerWidth <= 768) return;
 
 	sentry_setup_global_handlers(ENV[0]);
 
@@ -301,6 +313,49 @@ async function init_1() {
 		"datasets": [],
 	};
 
+	let viewFromUrl = false;
+	let cameraFromUrl = false;
+
+	const q_zoom = url.searchParams.get('zoom');
+	if (q_zoom !== null) {
+		const vz = validate_state_value('zoom', q_zoom);
+		if (vz !== null) { conf.zoom = vz; viewFromUrl = true; cameraFromUrl = true; }
+	}
+
+	const q_lng = url.searchParams.get('lng');
+	const q_lat = url.searchParams.get('lat');
+	if (q_lng !== null && q_lat !== null) {
+		const vc = validate_state_value('center', { "lng": q_lng, "lat": q_lat });
+		if (vc !== null) { conf.center = vc; viewFromUrl = true; cameraFromUrl = true; }
+	}
+
+	const q_divtier = url.searchParams.get('divtier');
+	if (q_divtier !== null) {
+		const vt = validate_state_value('divtier', q_divtier);
+		if (vt !== null) { conf.divtier = vt; viewFromUrl = true; cameraFromUrl = true; }
+	}
+
+	const q_subdiv = url.searchParams.get('subdiv');
+	if (q_subdiv !== null) {
+		const vs = validate_state_value('subdiv', q_subdiv);
+		if (vs !== null) { conf.subdiv = vs; viewFromUrl = true; cameraFromUrl = true; }
+	}
+
+	const q_view = url.searchParams.get('view');
+	if (q_view !== null) {
+		const vv = validate_state_value('view', q_view);
+		if (vv !== null) conf.view = vv;
+	}
+
+	const q_criteria = url.searchParams.get('criteria');
+	if (q_criteria !== null) {
+		criteriaFromUrl = (q_criteria === '1' || q_criteria === 'true');
+		conf._criteria = criteriaFromUrl;
+	}
+
+	window.VIEW_FROM_URL = cameraFromUrl;
+	window.URL_STATE_FROM_URL = viewFromUrl;
+
 	STATE = new Proxy(conf, { "get": state_get, "set": state_set });
 
 	drawer_init();
@@ -319,7 +374,7 @@ async function init_1() {
 		throw new Error(`Geography not found: ${id}`);
 	}
 
-	// MOBILE= screen.width < 1152;
+	if (window.innerWidth <= 768) MOBILE = true;
 
 	GEOGRAPHY.timeline = maybe(GEOGRAPHY, 'configuration', 'timeline');
 	GEOGRAPHY.timeline_dates = maybe(GEOGRAPHY, 'configuration', 'timeline_dates');
@@ -476,22 +531,61 @@ async function init_3() {
 };
 
 async function init_4() {
-	left_panel("cards");
+	if (!window.EMBED) left_panel("cards");
 
 	output_widget_init();
 
 	await OUTLINE.active(true, true);
 	STATE.datasets = [...STATE.datasets, OUTLINE];
 
-	qs('#left-panel').style.display = '';
-	qs('#left-panel input[id="controls-search"]').focus();
+	if (!window.EMBED) {
+		qs('#left-panel').style.display = '';
+		qs('#left-panel input[id="controls-search"]').focus();
 
-	qs('#right-panel').style.display = '';
+		qs('#right-panel').style.display = '';
+	}
 
 	COMMIT("datasets");
-	delay(0.3).then(_ => mapbox_fit(GEOGRAPHY.envelope));
+	const applyInitialView = async () => {
+		if (STATE.subdiv !== undefined && STATE.divtier !== undefined) {
+			await geographiessearch_load(STATE.divtier, STATE.subdiv);
+		}
+
+		if (STATE.center) MAPBOX.setCenter(STATE.center, false);
+		if (STATE.zoom !== undefined) MAPBOX.setZoom(STATE.zoom, false);
+		if (!STATE.center && STATE.zoom === undefined && (STATE.subdiv === undefined || STATE.divtier === undefined)) {
+			mapbox_fit(GEOGRAPHY.envelope);
+		}
+	};
+
+	const strategy = initialViewStrategy(window.EMBED, window.VIEW_FROM_URL, window.URL_STATE_FROM_URL);
+	if (strategy === 'fit-envelope-after-delay') {
+		delay(0.3).then(_ => mapbox_fit(GEOGRAPHY.envelope));
+	} else {
+		const applyView = strategy === 'apply-configured-view'
+			? applyInitialView
+			: () => mapbox_fit(GEOGRAPHY.envelope);
+
+		if (MAPBOX.loaded()) {
+			applyView();
+		} else {
+			MAPBOX.once('idle', applyView);
+		}
+	}
 
 	loading(false);
+
+	if (criteriaFromUrl !== undefined) {
+		setCriteriaMask(criteriaFromUrl);
+	}
+
+	if (window.EMBED) {
+		try {
+			embed_init();
+		} catch (e) {
+			console.error("embed_init failed:", e);
+		}
+	}
 };
 
 async function reload(k,v) {
@@ -771,7 +865,10 @@ export function left_panel(t) {
 	}
 
 	const l = qs('#left-panel');
-	if (t) l.setAttribute('open', '');
+	if (t) {
+		l.style.display = '';
+		l.setAttribute('open', '');
+	}
 	else l.removeAttribute('open');
 
 	window.dispatchEvent(new Event('resize'));
@@ -922,7 +1019,24 @@ function load_inputs_param() {
 	if (!inputs) return;
 
 	for (const name of inputs.split(',')) {
-		const ds = DST.get(name.trim());
+		const trimmed = name.trim();
+		if (!trimmed) continue;
+		let ds = DST.get(trimmed);
+		if (!ds) {
+			const lower = trimmed.toLowerCase();
+			for (const d of DST.values()) {
+				if (String(d.id).toLowerCase() === lower ||
+				    String(d.dataset_id) === lower ||
+				    (d.name && d.name.toLowerCase() === lower) ||
+				    (d.category && (
+				    	(d.category.name && d.category.name.toLowerCase() === lower) ||
+				    	(d.category.name_long && d.category.name_long.toLowerCase() === lower)
+				    ))) {
+					ds = d;
+					break;
+				}
+			}
+		}
 
 		if (!ds) {
 			console.warn("inputs param: No such dataset on this geography:", name);

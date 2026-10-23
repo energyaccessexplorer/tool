@@ -2,20 +2,17 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 
-// Characterisation tests for the pure pieces of tool/src/analysis.js, written
-// BEFORE the area-score refactor (notes/area-score-refactor.md). They pin
-// current behaviour — every number asserted here is a guarantee that step 2
-// (extraction into tool/src/area-scores.ts) must not change. Do not "fix"
-// these expectations; if they fail after a refactor, the refactor changed
-// behaviour.
+// Characterisation tests for the pure pieces of tool/src/analysis.js: every
+// number here pins behaviour, so a failure means behaviour changed — do not
+// "fix" the expectation.
 //
 // analysis.js is browser code, so the shims below stand in for what the app
 // provides globally:
 //   - STATE / OUTLINE / EAE / GEOGRAPHY: free variables read by run() and
 //     aggregate_layer_values();
-//   - d3: the very d3 v5 bundle the app ships (tool/lib/d3.js), loaded as
-//     UMD/CommonJS and installed as a global (priority_scale and run() call
-//     d3.scaleQuantile / d3.scaleLinear);
+//   - d3: the d3 v5 bundle the app ships (tool/lib/d3.js), installed as a
+//     global (run() calls d3.scaleLinear, and area-scores.ts builds its
+//     colour ramp with d3.interpolateMagma);
 //   - HTMLElement / customElements: needed at import time by utils.js ->
 //     toast.js;
 //   - d3.create(): colorscale_svg() builds the legend SVG at module scope;
@@ -42,10 +39,16 @@ const analysis: any = await import('../src/analysis.ts');
 const scores: any   = await import('../src/area-scores.ts');
 
 const run: any                 = analysis.default;
-const division_averages: any   = scores.aggregate_by_area;
-const priority_scale: any      = scores.area_scale;
+const by_area: any             = scores.aggregate_by_area;
+const area_score_table: any    = scores.area_score_table;
+const area_score_strategy: any = scores.area_score_strategy;
+const AREA_SCORE_FLOOR: number = scores.AREA_SCORE_FLOOR;
 const has_priority_score: any  = scores.has_priority_score;
+const analysed_mask: any       = scores.analysed_mask;
+const criteria_pass_mask: any  = scores.criteria_pass_mask;
 const aggregation_band: any    = scores.aggregation_band;
+const jenks_breaks: any        = scores.jenks_breaks;
+const bucket_in_edges: any     = scores.bucket_in_edges;
 const aggregate_layer_values: any = analysis.aggregate_layer_values;
 
 // ---------------------------------------------------------------- helpers
@@ -54,17 +57,14 @@ const near = (actual: number, expected: number, message?: string) =>
 	assert.ok(Math.abs(actual - expected) < 1e-12,
 	          message ?? `expected ${expected}, got ${actual}`);
 
-// Raster nodata marker used by the synthetic datasets below.
+// The app's raster nodata marker.
 const NO = -9999;
 
-// The bottom-band artefact of rescaling the analysis into a Float32Array:
-// the minimum can land a hair below zero (see has_priority_score's comment
-// in analysis.js).
+// Rescaling into a Float32Array can leave the minimum a hair below zero.
 const TINY_NEG = -1.6e-8;
 
-// A dataset as run()'s datasets() sees it. `analysis_fn(type)` returns the
-// per-cell scaling function (the "clamp" case: values outside [0, 1] are
-// clipped by run(), not clamped here).
+// A dataset as run()'s datasets() sees it. Values outside [0, 1] are
+// clipped by run(), not clamped.
 const ds = (over: any = {}): any => ({
 	"id":             'x',
 	"index":          'solar',
@@ -85,8 +85,8 @@ const set_state = (datasets: any[], cell_count = 4) => {
 	g['OUTLINE'] = { "raster": { "data": new Float32Array(cell_count) } };
 };
 
-// Non-compound indexes become "singles" in run()'s weight split. eai is
-// compound (>= 2 components) and must never appear in totals or singles.
+// Non-compound indexes are run()'s "singles"; eai is compound and must
+// never appear in totals or singles.
 g['EAE'] = { "indexes": {
 	"solar": { "compound": [] },
 	"wind":  { "compound": [] },
@@ -95,149 +95,255 @@ g['EAE'] = { "indexes": {
 }};
 g['GEOGRAPHY'] = { "divisions": {} };
 
-// ------------------------------------------------------- division_averages
+// --------------------------------------------------------------- by_area
 
-describe('division_averages', () => {
-	it('averages each area over its own cells (sum / count), ids stringified', () => {
-		const out = division_averages([0.25, 0.75, 0.5, 0.25, 0.5], [7, 7, 7, 9, 9]);
+describe('by_area', () => {
+	it('sums and averages each area over its own cells, ids stringified', () => {
+		const out = by_area([0.25, 0.75, 0.5, 0.25, 0.5], [7, 7, 7, 9, 9]);
 
-		// Object keys stringify the numeric division ids.
 		assert.deepEqual(Object.keys(out), ['7', '9']);
-		assert.deepEqual(out['7'], { "average": 0.5 });    // (0.25+0.75+0.5)/3
-		assert.deepEqual(out['9'], { "average": 0.375 });  // (0.25+0.5)/2
+		assert.deepEqual(out['7'], { "sum": 1.5, "average": 0.5 });    // 0.25+0.75+0.5
+		assert.deepEqual(out['9'], { "sum": 0.75, "average": 0.375 }); // 0.25+0.5
 	});
 
 	it('skips cells with no division (-1) and cells the analysis clipped (-1)', () => {
-		// -1 division cell: its analysis value must not leak anywhere.
 		assert.deepEqual(
-			division_averages([0.5, 0.75, 0.25], [1, -1, 1]),
-			{ "1": { "average": 0.375 } },  // (0.5+0.25)/2
+			by_area([0.5, 0.75, 0.25], [1, -1, 1]),
+			{ "1": { "sum": 0.75, "average": 0.375 } },
 		);
 
-		// -1 analysis cell inside an area: skipped for that area's average.
 		assert.deepEqual(
-			division_averages([0.5, -1, 0.25], [1, 1, 1]),
-			{ "1": { "average": 0.375 } },
+			by_area([0.5, -1, 0.25], [1, 1, 1]),
+			{ "1": { "sum": 0.75, "average": 0.375 } },
 		);
 
-		// An area whose cells are all skipped does not appear at all (its id
-		// is never even inserted into the accumulator).
-		assert.deepEqual(division_averages([-1, -1], [2, 2]), {});
+		// An area with only skipped cells is omitted entirely.
+		assert.deepEqual(by_area([-1, -1], [2, 2]), {});
 	});
 
-	it('keeps tiny-negative rescale artefacts in the average, though has_priority_score rejects them', () => {
-		// A lone bottom-band cell averages to itself: it IS a scored cell for
-		// division_averages / priority_scale purposes.
-		const lone = division_averages([TINY_NEG], [4]);
+	it('keeps tiny-negative rescale artefacts, though has_priority_score rejects them', () => {
+		const lone = by_area([TINY_NEG], [4]);
+		assert.equal(lone['4'].sum, TINY_NEG);
 		assert.equal(lone['4'].average, TINY_NEG);
 
-		// It drags the area average along with it...
-		const mixed = division_averages([TINY_NEG, 0.5], [4, 4]);
+		const mixed = by_area([TINY_NEG, 0.5], [4, 4]);
+		near(mixed['4'].sum, 0.499999984);      // 0.5 - 1.6e-8
 		near(mixed['4'].average, 0.249999992);  // (0.5 - 1.6e-8) / 2
 
-		// ...but it is NOT a "priority score" cell for the masks/cards/export.
 		assert.equal(has_priority_score(TINY_NEG), false);
-		assert.equal(has_priority_score(lone['4'].average), false);
 	});
 });
 
-// ------------------------------------------------------------ priority_scale
+// ------------------------------------------------------------------ jenks
 
-describe('priority_scale', () => {
-	const bands = ['r0', 'r1', 'r2', 'r3', 'r4'];
+// Natural breaks: the edges a tier's own score distribution yields, and the
+// bucket lookup into them.
+describe('jenks_breaks / bucket_in_edges', () => {
+	it('edges run from the minimum to the maximum, non-decreasing', () => {
+		const edges = jenks_breaks([0.05, 0.1, 0.12, 0.3, 0.31, 0.6, 1], 5);
 
-	it('returns null when no area carries a usable average', () => {
-		assert.equal(priority_scale({}, bands), null);
+		assert.equal(edges.length, 6);
+		near(edges[0], 0.05);
+		near(edges[5], 1);
 
-		// -1 (nodata) and non-finite averages are all filtered out first.
-		assert.equal(priority_scale({
-			"1": { "average": -1 },
-			"2": { "average": NaN },
-			"3": { "average": Infinity },
-			"4": { "average": -Infinity },
-		}, bands), null);
+		for (let e = 1; e < edges.length; e++) assert.ok(edges[e] >= edges[e - 1]);
 	});
 
-	it('drops -1/NaN/Infinity averages from the quantile domain', () => {
-		const scale = priority_scale({
-			"1": { "average": -1 },
-			"2": { "average": 0.25 },
-			"3": { "average": NaN },
-			"4": { "average": 0.75 },
-		}, bands);
+	it('reaches High when the top class holds one value', () => {
+		// The score stretch pins the top area at exactly 1, and a long tail
+		// leaves it alone in the last class: that class's lower edge IS the
+		// maximum, so nothing lower than it is High and nothing else is either.
+		const values = [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 1];
+		const edges = jenks_breaks(values, 5);
 
-		// Domain is [min, max] of the surviving averages = [0.25, 0.75];
-		// equal-width bands on that span (see next test).
-		assert.equal(scale(0.25), 'r0');
-		assert.equal(scale(0.4), 'r1');
-		assert.equal(scale(0.5), 'r2');
-		assert.equal(scale(0.6), 'r3');
-		assert.equal(scale(0.75), 'r4');
+		near(edges[4], 1);
+		assert.equal(bucket_in_edges(1, edges)?.label, 'High');
+		assert.equal(bucket_in_edges(0.1, edges)?.label, 'Medium-High');
+		assert.equal(bucket_in_edges(0.01, edges)?.label, 'Low');
 	});
 
-	it('a 2-element [min, max] domain degenerates into equal-width bands', () => {
-		// priority_scale feeds d3.scaleQuantile just the two numbers
-		// [min, max] instead of the full sample, so its "quantiles" are
-		// linearly interpolated between them: the bands come out EQUAL-WIDTH
-		// (k/5 of the span each), not quantile-sized. Band k covers
-		// [min + k/5*(max-min), min + (k+1)/5*(max-min)) with the exact
-		// boundary going to the upper band (d3.bisectRight), and the outer
-		// bands unbounded.
-		const scale = priority_scale({
-			"1": { "average": 0 },
-			"2": { "average": 1 },
-		}, bands);
+	it('a value on an interior edge joins the class above it', () => {
+		const edges = jenks_breaks([0.05, 0.1, 0.12, 0.3, 0.31, 0.6, 1], 5);
 
-		assert.equal(scale(-5), 'r0');     // unbounded below
-		assert.equal(scale(0), 'r0');
-		assert.equal(scale(0.19), 'r0');
-		assert.equal(scale(0.2), 'r1');    // exact boundary -> upper band
-		assert.equal(scale(0.39), 'r1');
-		assert.equal(scale(0.4), 'r2');
-		assert.equal(scale(0.59), 'r2');
-		assert.equal(scale(0.6), 'r3');
-		assert.equal(scale(0.79), 'r3');
-		assert.equal(scale(0.8), 'r4');
-		assert.equal(scale(1), 'r4');
-		assert.equal(scale(2), 'r4');      // unbounded above
-
-		// d3 quantile scales coerce null to 0 and map NaN outside the range.
-		assert.equal(scale(null), 'r0');
-		assert.equal(scale(NaN), undefined);
-
-		// Same degeneration on a non-[0, 1] span: thresholds at 12/14/16/18.
-		const span = priority_scale({
-			"1": { "average": 10 },
-			"2": { "average": 20 },
-		}, bands);
-		assert.equal(span(11.9), 'r0');
-		assert.equal(span(12), 'r1');
-		assert.equal(span(13.9), 'r1');
-		assert.equal(span(14), 'r2');
-		assert.equal(span(18), 'r4');
-		assert.equal(span(20), 'r4');
+		assert.equal(bucket_in_edges(0.05, edges)?.label, 'Low');
+		assert.equal(bucket_in_edges(0.1, edges)?.label, 'Low-Medium');
+		assert.equal(bucket_in_edges(0.3, edges)?.label, 'Medium');
+		assert.equal(bucket_in_edges(0.6, edges)?.label, 'Medium-High');
+		assert.equal(bucket_in_edges(1, edges)?.label, 'High');
 	});
 
-	it('a min === max domain collapses: the value itself maps to the LAST band', () => {
-		// Single-area (or all-equal) case: every quantile threshold equals
-		// the value, and d3.bisectRight pushes the exact value past all of
-		// them — so the area reads as the top band.
-		const scale = priority_scale({ "1": { "average": 5 } }, ['r0', 'r1', 'r2']);
+	it('reads nothing from a missing or nodata value', () => {
+		const edges = [0, 0.5, 1];
 
-		assert.equal(scale(5), 'r2');
-		assert.equal(scale(4.9), 'r0');
-		assert.equal(scale(5.1), 'r2');
+		assert.equal(bucket_in_edges(null, edges), null);
+		assert.equal(bucket_in_edges(undefined, edges), null);
+		assert.equal(bucket_in_edges(-1, edges), null);
+	});
+});
+
+// ---------------------------------------------------------- area_score_table
+
+// ----------------------------------------------------- area_score_strategy
+
+describe('area_score_strategy — stretched to 1..100 over the areas present', () => {
+	// The strategy's input: the cell-score aggregate per area.
+	const area = (sum: number, average = sum) => ({ sum, average });
+
+	it('the top area reads 1, the lowest the floor, the rest linearly between', () => {
+		const out = area_score_strategy('cell_mean', { "a": area(9, 0.4), "b": area(9, 0.3), "c": area(9, 0.2) });
+
+		assert.equal(out['a'], 1);
+		assert.equal(out['c'], AREA_SCORE_FLOOR);
+		near(out['b']!, AREA_SCORE_FLOOR + ((1 - AREA_SCORE_FLOOR) / 2));
 	});
 
-	it('bands tiny-negative averages like any other value (unlike has_priority_score)', () => {
-		const scale = priority_scale({
-			"1": { "average": TINY_NEG },
-			"2": { "average": 0.5 },
-		}, bands);
+	it('the lowest area keeps a priority score (1%), so the listing keeps it', () => {
+		const out = area_score_strategy('cell_mean', { "a": area(1, 0.9), "b": area(1, 0) });
 
-		assert.equal(scale(TINY_NEG), 'r0');
-		assert.equal(scale(0.5), 'r4');
-		assert.equal(has_priority_score(TINY_NEG), false);
+		assert.equal(out['b'], 0.01);
+		assert.equal(has_priority_score(out['b']), true);
+	});
+
+	it('cell_mean ranks by the average, so size drops out', () => {
+		const out = area_score_strategy('cell_mean', { "wide": area(1.2, 0.4), "dense": area(0.9, 0.9) });
+
+		assert.equal(out['dense'], 1);
+		assert.equal(out['wide'], AREA_SCORE_FLOOR);
+	});
+
+	it('pixel_sum ranks by the score mass, so size counts', () => {
+		const out = area_score_strategy('pixel_sum', { "wide": area(1.2, 0.4), "dense": area(0.9, 0.9) });
+
+		assert.equal(out['wide'], 1);
+		assert.equal(out['dense'], AREA_SCORE_FLOOR);
+	});
+
+	it('equal raw scores all read 1 instead of dividing by zero', () => {
+		assert.deepEqual(area_score_strategy('cell_mean', { "a": area(0, 0), "b": area(0, 0) }), { "a": 1, "b": 1 });
+		assert.deepEqual(area_score_strategy('cell_mean', { "a": area(5, 0.3) }), { "a": 1 });
+	});
+
+	it('a Float32 bottom-band aggregate still reads the floor, never below it', () => {
+		const out = area_score_strategy('cell_mean', { "a": area(TINY_NEG), "b": area(0.5) });
+
+		assert.equal(out['a'], AREA_SCORE_FLOOR);
+		assert.equal(out['b'], 1);
+	});
+});
+
+describe('area_score_strategy — layer_totals (aggregate first, normalise after)', () => {
+	const cells = (...ids: string[]) => Object.fromEntries(ids.map(id => [id, { "sum": 0, "average": 0 }]));
+	const scalar = (value: number) => ({ "type": 'scalar', value });
+	const pop = { "id": 'pop', "weight": 1, "invert": false };
+
+	it('min-max normalises the layer totals: lowest at the floor, highest at 1', () => {
+		// The PO's QGIS norm_sum: (total - lowest) / (highest - lowest).
+		const totals = {
+			"kampala":  { "pop": scalar(6037274) },
+			"busoga":   { "pop": scalar(4660650) },
+			"karamoja": { "pop": scalar(1272357) },
+		};
+		const out = area_score_strategy('layer_totals', cells('kampala', 'busoga', 'karamoja'), totals, [pop]);
+
+		assert.equal(out['kampala'], 1);
+		assert.equal(out['karamoja'], AREA_SCORE_FLOOR);
+		assert.ok(Math.abs(out['busoga']! - (AREA_SCORE_FLOOR + ((1 - AREA_SCORE_FLOOR) * 0.711))) < 1e-3);
+	});
+
+	it('the total outranks density: a big populous area beats a small dense one', () => {
+		const totals = { "big": { "pop": scalar(6) }, "dense": { "pop": scalar(2.5) } };
+		const dense_cells = { "big": { "sum": 1, "average": 0.4 }, "dense": { "sum": 1, "average": 0.9 } };
+		const out = area_score_strategy('layer_totals', dense_cells, totals, [pop]);
+
+		assert.equal(out['big'], 1);
+		assert.equal(out['dense'], AREA_SCORE_FLOOR);
+	});
+
+	it('weighs each layer\'s normalised share, flipping invert layers', () => {
+		const totals = {
+			"a": { "pop": scalar(10), "dist": scalar(5) },
+			"b": { "pop": scalar(0),  "dist": scalar(1) },
+			"c": { "pop": scalar(5),  "dist": scalar(3) },
+		};
+		const dist = { "id": 'dist', "weight": 3, "invert": true };
+		const out = area_score_strategy('layer_totals', cells('a', 'b', 'c'), totals, [pop, dist]);
+
+		// a: pop 1, dist flipped 0 -> 1/4; b: pop 0, dist flipped 1 -> 3/4;
+		// c: 0.5 and 0.5 -> 1/2. Stretched: b top, a floor, c halfway.
+		assert.equal(out['b'], 1);
+		assert.equal(out['a'], AREA_SCORE_FLOOR);
+		near(out['c']!, AREA_SCORE_FLOOR + ((1 - AREA_SCORE_FLOOR) / 2));
+	});
+
+	it('never flips a feature count, even on an invert layer', () => {
+		const totals = { "a": { "hf": { "type": 'points', "value": 368 } }, "b": { "hf": { "type": 'points', "value": 3 } } };
+		const out = area_score_strategy('layer_totals', cells('a', 'b'), totals, [{ "id": 'hf', "weight": 1, "invert": true }]);
+
+		assert.equal(out['a'], 1);
+		assert.equal(out['b'], AREA_SCORE_FLOOR);
+	});
+
+	it('a signed layer normalises from its observed minimum, never below the floor', () => {
+		const totals = { "a": { "rwi": scalar(-0.8) }, "b": { "rwi": scalar(0.4) }, "c": { "rwi": scalar(-0.2) } };
+		const out = area_score_strategy('layer_totals', cells('a', 'b', 'c'), totals, [{ "id": 'rwi', "weight": 1, "invert": false }]);
+
+		assert.equal(out['b'], 1);
+		assert.equal(out['a'], AREA_SCORE_FLOOR);
+		near(out['c']!, AREA_SCORE_FLOOR + ((1 - AREA_SCORE_FLOOR) / 2));
+	});
+
+	it('skips weightless and flat layers, and non-numeric aggregates', () => {
+		const totals = {
+			"a": { "pop": scalar(4), "flat": scalar(7), "off": scalar(100), "na": { "value": 'Not aggregated' } },
+			"b": { "pop": scalar(2), "flat": scalar(7), "off": scalar(0),   "na": { "value": 'Not aggregated' } },
+		};
+		const layers = [pop, { "id": 'flat', "weight": 5, "invert": false }, { "id": 'off', "weight": 0, "invert": false }, { "id": 'na', "weight": 1, "invert": false }];
+		const out = area_score_strategy('layer_totals', cells('a', 'b'), totals, layers);
+
+		assert.equal(out['a'], 1);
+		assert.equal(out['b'], AREA_SCORE_FLOOR);
+	});
+
+	it('an area without analysed cells reads the floor and does not move the stretch', () => {
+		const totals = { "a": { "pop": scalar(10) }, "b": { "pop": scalar(5) }, "c": { "pop": scalar(0) } };
+		const out = area_score_strategy('layer_totals', cells('a', 'b', 'c', 'empty'), totals, [pop]);
+
+		assert.equal(out['empty'], AREA_SCORE_FLOOR);
+		near(out['b']!, AREA_SCORE_FLOOR + ((1 - AREA_SCORE_FLOOR) / 2));
+	});
+
+	it('one analysed area reads 1, the unanalysed ones the floor', () => {
+		const out = area_score_strategy('layer_totals', cells('a', 'b'), { "a": { "pop": scalar(3) } }, [pop]);
+
+		assert.deepEqual(out, { "a": 1, "b": AREA_SCORE_FLOOR });
+	});
+});
+
+describe('area_score_table', () => {
+	const area = (sum: number, average = sum) => ({ sum, average });
+
+	it("publishes the strategy's score and its ONE-scale bucket", () => {
+		const table = area_score_table({ "7": area(1, 0.2), "9": area(1, 0.9), "4": area(1, 0.55) }, {}, [], 'cell_mean');
+
+		assert.equal(table['9']?.score, 1);
+		assert.equal(table['9']?.bucket?.label, 'High');
+		assert.equal(table['7']?.score, AREA_SCORE_FLOOR);
+		assert.equal(table['7']?.bucket?.label, 'Low');
+		near(table['4']!.score, AREA_SCORE_FLOOR + ((1 - AREA_SCORE_FLOOR) / 2));
+		assert.equal(table['4']?.bucket?.label, 'Medium');
+	});
+
+	it('empty input is an empty table; layer_totals is the default', () => {
+		assert.deepEqual(area_score_table({}), {});
+
+		const pop = { "id": 'pop', "weight": 1, "invert": false };
+		const table = area_score_table(
+			{ "1": area(100, 0.9), "2": area(1, 0.1) },
+			{ "1": { "pop": { "type": 'scalar', "value": 2 } }, "2": { "pop": { "type": 'scalar', "value": 8 } } },
+			[pop],
+		);
+		assert.equal(table['2']?.score, 1);
+		assert.equal(table['1']?.score, AREA_SCORE_FLOOR);
 	});
 });
 
@@ -261,6 +367,63 @@ describe('has_priority_score', () => {
 	});
 });
 
+// ------------------------------------------- analysed_mask / criteria_pass_mask
+
+// The one "analysed cells" rule every card aggregates with: the
+// has_priority_score rule applied over a whole raster.
+describe('analysed_mask', () => {
+	it('is the ONE "analysed cells" rule: exactly the has_priority_score cells', () => {
+		const out = analysed_mask([0.5, 0, -1, TINY_NEG, 1]);
+
+		assert.deepEqual([...out], [1, 0, 0, 0, 1]);
+	});
+
+	it('drops exact zeros and the Float32 bottom band (the deck rule kept both)', () => {
+		// Zeros and the bottom-band artefact are dropped deliberately, so
+		// every card aggregates the same cells.
+		assert.deepEqual([...analysed_mask([0, TINY_NEG])], [0, 0]);
+	});
+
+	it('counts every positive cell, including the clipped marker boundary', () => {
+		assert.deepEqual([...analysed_mask([-1, -1, Number.MIN_VALUE, 0.4])], [0, 0, 1, 1]);
+	});
+
+	it('is all zeros for a filters-only (all -1) raster', () => {
+		assert.deepEqual([...analysed_mask([-1, -1, -1, -1])], [0, 0, 0, 0]);
+	});
+});
+
+describe('criteria_pass_mask', () => {
+	// Identity score: the clip gate (sv < 0 || sv > 1) is the whole
+	// criterion, so only cells in [0, 1] pass.
+	const layer = (data: number[]): any => ({
+		"data":   data,
+		"nodata": NO,
+		"score":  (x: number) => x,
+	});
+
+	it('keeps every cell that passes every layer criterion (pure loop of criteria_mask)', () => {
+		const out = criteria_pass_mask(4, [layer([0.5, -0.3, 1.2, 0.5])]);
+
+		assert.deepEqual([...out], [1, 0, 0, 1]);
+	});
+
+	it('is DELIBERATELY not analysed_mask: a zero-scoring passing cell stays visible', () => {
+		// Cell 0 passes the criterion but scores 0: the display mask keeps
+		// it, analysed_mask drops it — folding the two would change which
+		// cells grey out.
+		const cells = [0, 0.5];
+		const criteria = criteria_pass_mask(2, [layer([0, 0.5])]);
+
+		assert.deepEqual([...criteria], [1, 1]);
+		assert.deepEqual([...analysed_mask(cells)], [0, 1]);
+	});
+
+	it('drops cells that are nodata for any layer', () => {
+		assert.deepEqual([...criteria_pass_mask(3, [layer([0.5, NO, 0.5])])], [1, 0, 1]);
+	});
+});
+
 // ---------------------------------------------------------- aggregation_band
 
 describe('aggregation_band', () => {
@@ -280,7 +443,6 @@ describe('aggregation_band', () => {
 	it('defaults to the average band when no aggregation is configured', () => {
 		assert.equal(aggregation_band(layer({ "name": 'c' })), 'AVG_BAND');
 		assert.equal(aggregation_band(layer({ "name": 'c', "analysis": {} })), 'AVG_BAND');
-		// Unknown aggregation functions also fall back to AVG.
 		assert.equal(aggregation_band(layer({ "name": 'c', "analysis": { "aggregation": 'MEDIAN' } })), 'AVG_BAND');
 	});
 
@@ -299,9 +461,9 @@ describe('aggregation_band', () => {
 });
 
 // ---------------------------------------------------- aggregate / collect_values
-// aggregate(), collect_values() and area_results() are module-private; they
-// are exercised here through their only caller, aggregate_layer_values(),
-// which is the exact path the Data-tab cards and popup use.
+// aggregate(), collect_values() and area_results() are module-private:
+// exercised through their only caller, aggregate_layer_values() — the path
+// the Data-tab cards and popup use.
 
 describe('aggregate_layer_values (aggregate, collect_values)', () => {
 	// A raster layer with per-band values per cell.
@@ -334,8 +496,8 @@ describe('aggregate_layer_values (aggregate, collect_values)', () => {
 	const division = (data: number[]) => ({ "raster": { "data": data } });
 
 	it('SUM adds up the collected cells of each area, AVG averages them (band selection end to end)', async () => {
-		// SUM datasets read the `sum` band, AVG datasets the `average` band:
-		// give the two bands different numbers so the choice is visible.
+		// SUM reads the `sum` band, AVG the `average` band; different numbers
+		// make the choice visible.
 		set_state([
 			layer({ "id": 'sum', "agg": 'SUM', "sum_values": [1, 2, 3, 4] }),
 			layer({ "id": 'avg', "agg": 'AVG', "values": [0.5, 0.25, 0.75, 0.5] }),
@@ -360,7 +522,6 @@ describe('aggregate_layer_values (aggregate, collect_values)', () => {
 	});
 
 	it('collect_values skips nodata cells and cells outside every area', async () => {
-		// Nodata cells never reach the aggregate.
 		set_state([layer({ "id": 'l', "agg": 'SUM', "values": [0.5, NO, 0.25, 0.75] })]);
 		let out = await aggregate_layer_values(division([1, 1, 1, 2]));
 		assert.deepEqual(out['l'].areas, {
@@ -368,8 +529,8 @@ describe('aggregate_layer_values (aggregate, collect_values)', () => {
 			"2": { "result": { "type": 'scalar', "value": 0.75 } },
 		});
 
-		// Cells with division id -1 are not collected either (note id 0 is a
-		// legitimate area id and must be collected).
+		// Cells with division id -1 are not collected; id 0 is a legitimate
+		// area id and is.
 		set_state([layer({ "id": 'l', "agg": 'AVG', "values": [0.5, 0.9, 0.25, 0.9, 0.75] })]);
 		out = await aggregate_layer_values(division([1, -1, 1, -1, 0]));
 		assert.deepEqual(out['l'].areas, {
@@ -411,9 +572,9 @@ describe('aggregate_layer_values (aggregate, collect_values)', () => {
 	});
 
 	it('csv lookup resolves category codes and drops non-numeric results before aggregating', async () => {
-		// Categorical datasets aggregate the near band (their values are
-		// category codes), then resolve each code through the csv table.
-		// Declared SUM proves the aggregation still applies after lookup.
+		// Categorical datasets aggregate the near band (category codes), then
+		// resolve each code through the csv table — SUM still applies after
+		// the lookup.
 		set_state([layer({
 			"id":  'csv',
 			"agg": 'SUM',
@@ -424,8 +585,8 @@ describe('aggregate_layer_values (aggregate, collect_values)', () => {
 
 		const out = await aggregate_layer_values(division([5, 5, 5, 5]));
 
-		// Codes 2 (non-numeric table value) and 9 (missing from the table)
-		// are filtered out; 1 and 3 resolve to 10 and 30.
+		// Codes 2 (non-numeric table value) and 9 (missing) are filtered out;
+		// 1 and 3 resolve to 10 and 30.
 		assert.equal(out['csv'].aggregation, 'SUM');
 		assert.deepEqual(out['csv'].areas, {
 			"5": { "result": { "type": 'scalar', "value": 40 } },
@@ -446,12 +607,12 @@ describe('run(): weight computation and clipping gate', () => {
 
 		const r = await run('solar');
 
-		// tots: per-index weight sums (filters excluded). 'geo' has no
-		// dataset and 'eai' is compound: neither shows up in totals.
+		// Totals are per-index weight sums (filters excluded): 'geo' has no
+		// dataset and 'eai' is compound, so neither appears.
 		assert.deepEqual(r['totals'], { "solar": 5, "wind": 1 });
 
-		// weight = d.weight / (tots[d.index] * contributing_singles) with
-		// contributing_singles = 2 (solar, wind — not geo/eai).
+		// weight = d.weight / (tots[d.index] * contributing_singles), with
+		// contributing_singles = 2 (solar and wind, not geo/eai).
 		assert.deepEqual(r['weights'], {
 			"a": 2 / (5 * 2),   // 0.2
 			"b": 3 / (5 * 2),   // 0.3
@@ -459,7 +620,6 @@ describe('run(): weight computation and clipping gate', () => {
 			"d": 0,
 		});
 
-		// Sanity: weights sum to 1 here, cells rescaled over [min, max].
 		assert.deepEqual(Array.from(r['raster']), [1, 1, 0, 0]);
 		assert.equal(r['min'], 0.25);
 		assert.equal(r['max'], 0.5);
@@ -501,9 +661,9 @@ describe('run(): weight computation and clipping gate', () => {
 	});
 
 	it('tots/singles splitting: zero-total single indexes drop out of the denominator', async () => {
-		// 'geo' is a non-compound index whose only dataset has weight 0:
-		// its total is 0, so it is deleted from singles/tots before the
-		// denominator Object.keys(singles).length is taken (2, not 3).
+		// 'geo' is non-compound with a single zero-weight dataset, so its
+		// total is 0 and it is deleted before the denominator
+		// Object.keys(singles).length is taken (2, not 3).
 		set_state([
 			ds({ "id": 'a', "index": 'solar', "weight": 2 }),
 			ds({ "id": 'b', "index": 'solar', "weight": 3 }),
@@ -518,16 +678,15 @@ describe('run(): weight computation and clipping gate', () => {
 		assert.equal(r['weights']['b'], 3 / (5 * 2));
 		assert.equal(r['weights']['c'], 1 / (1 * 2));
 
-		// Characterisation of a quirk: the zero-weight dataset's own weight
-		// resolves against its deleted totals entry (0 / undefined) -> NaN,
-		// which the zero-total gate treats as 0. Pinned as-is.
+		// Quirk, pinned as-is: the zero-weight dataset's own weight is
+		// 0 / undefined -> NaN, which the zero-total gate treats as 0.
 		assert.ok(Number.isNaN(r['weights']['e']));
 	});
 
 	it('clipping gate: scaled values outside [0, 1] and nodata cells annihilate to -1', async () => {
-		// analysis_fn x => x/4 scales cells 1, 2, 10 to 0.25, 0.5, 2.5:
-		// 2.5 is outside the analysis domain and gets CLIPPED (not clamped).
-		// Cell 3 is nodata. Both end up -1 and drop out of min/max/avg.
+		// x => x/4 scales cells 1, 2, 10 to 0.25, 0.5, 2.5: 2.5 is outside
+		// [0, 1] and gets CLIPPED (not clamped), cell 3 is nodata, and both
+		// end up -1 and drop out of min/max/avg.
 		set_state([ds({
 			"id":          'a',
 			"index":       'solar',
@@ -543,13 +702,12 @@ describe('run(): weight computation and clipping gate', () => {
 		assert.equal(r['max'], 0.5);
 		assert.equal(r['avg'], 0.375);
 
-		// Surviving cells are rescaled over [min, max] into [0, 1].
 		assert.deepEqual(Array.from(r['raster']), [0, 1, -1, -1]);
 	});
 
 	it('a clipped cell stays -1 even when the other datasets score it', async () => {
 		// Dataset 'a' clips cell 2 (0.75 * 2 = 1.5 > 1); dataset 'b' would
-		// happily score it — once a cell is -1 the loop skips the rest.
+		// score it, but once a cell is -1 the loop skips the rest.
 		set_state([
 			ds({
 				"id":          'a',
@@ -577,21 +735,18 @@ describe('run(): weight computation and clipping gate', () => {
 	});
 
 	it('gates: only filters / empty list / zero total weight return a bare -1 raster', async () => {
-		// Nothing but filters: a filter-only "analysis" would be a silly
-		// single-valued plot, so run() bails out with just the transparent
-		// raster (no weights/totals/min/max/avg keys at all).
+		// A filter-only analysis would be a single-valued plot, so run() bails
+		// out with just the raster (no weights/totals/min/max/avg).
 		set_state([ds({ "id": 'd', "analysis_scale": () => 'exclusion-buffer' })]);
 		let r: any = await run('solar');
 		assert.deepEqual(Object.keys(r), ['raster']);
 		assert.deepEqual(Array.from(r['raster']), [-1, -1, -1, -1]);
 
-		// No eligible datasets at all takes the same path.
 		set_state([]);
 		r = await run('solar');
 		assert.deepEqual(Object.keys(r), ['raster']);
 		assert.deepEqual(Array.from(r['raster']), [-1, -1, -1, -1]);
 
-		// Total weight 0 (a dataset that feeds no index): "ciao".
 		set_state([ds({ "id": 'z', "index": null, "weight": 3 })]);
 		r = await run('solar');
 		assert.deepEqual(Object.keys(r), ['raster']);

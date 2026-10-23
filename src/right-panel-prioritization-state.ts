@@ -27,6 +27,10 @@
 import stream from './meiosis-stream.ts';
 
 import type {
+	ScoreBucket,
+} from './area-scores.ts';
+
+import type {
 	AdminRef,
 } from './right-panel-shared.ts';
 
@@ -37,13 +41,13 @@ export type {
 /**
  * One index's priority result for the current selection. `value` is the raw
  * index value (null when the pixel/area has none); `bucket` is the value
- * mapped through the applicable scale (low/med/high for pixels, the
- * division quantile scale for admin areas) — the label the row displays,
- * resolved to a locale label at render time.
+ * mapped through area-scores.ts's one score->{bucket, label, colour} scale
+ * (fixed 20% bands for both admin areas and pixels), its `index` resolving to
+ * a locale label at render time.
  */
 export interface IndexEntry {
 	readonly value: number | null;
-	readonly bucket: string | null;
+	readonly bucket: ScoreBucket | null;
 }
 
 /** Keyed by index id ('eai', 'demand', 'supply', 'ani', ...). */

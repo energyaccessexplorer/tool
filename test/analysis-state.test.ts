@@ -22,8 +22,8 @@ import type {
 	ValuesPayload,
 } from '../src/analysis-state.ts';
 
-// cell() snapshots state at call time (timeline-state convention): re-read
-// after every action instead of holding on to a cell's `state` property.
+// cell() snapshots state at call time: re-read it after every action
+// instead of holding on to a cell's `state` property.
 const state = () => cell().state;
 
 const key = (over: Partial<ResultKey> = {}): ResultKey => ({
@@ -33,11 +33,15 @@ const key = (over: Partial<ResultKey> = {}): ResultKey => ({
 	...over,
 });
 
+// A ScoreBucket stand-in: the plumbing carries the bucket opaque, and
+// importing area-scores.ts would need d3 for the colour ramp.
+const bucket = (label: string) => ({ "index": 4, "label": label, "colour": '#' + label });
+
 const scoresPayload = (score = 0.5): ScoresPayload => ({
 	"cells": new Float32Array([score, -1]),
 	"mask":  new Uint8Array([1, 0]),
 	"areas": {
-		"7": { "score": score, "bucket": 'High' },
+		"7": { "score": score, "bucket": bucket('High') },
 		"8": { "score": -1, "bucket": null },
 	},
 });
@@ -49,8 +53,8 @@ const valuesPayload = (value = 3): ValuesPayload => ({
 });
 
 /**
- * Fake producer inputs: every dataset's `_afn` fingerprint (range sliders
- * rewrite _domain -> _afn) plus which datasets each index's computation
+ * Fake producer inputs: each dataset's `_afn` fingerprint (range sliders
+ * rewrite _domain -> _afn), which datasets each index's computation
  * consumes, the live subdiv and the geography.
  */
 interface FakeInputs {
@@ -254,7 +258,7 @@ describe('analysis-state: pure result assembly', () => {
 	it('withScores makes scores readable with values pending', () => {
 		const result = withScores(scoresPayload(0.5));
 		assert.equal(result.areas['7']?.score, 0.5);
-		assert.equal(result.areas['7']?.bucket, 'High');
+		assert.equal(result.areas['7']?.bucket?.label, 'High');
 		assert.equal(result.areas['8']?.bucket, null);
 		assert.equal(result.areas['7']?.values, null);
 		assert.equal(result.national.values, null);
@@ -266,7 +270,6 @@ describe('analysis-state: pure result assembly', () => {
 		assert.deepEqual(complete.areas['7']?.values, { "solar": { "type": 'scalar', "value": 3 } });
 		assert.deepEqual(complete.national.values, { "solar": { "type": 'scalar', "value": 30 } });
 		assert.deepEqual(complete.analysed.values, { "solar": { "type": 'scalar', "value": 6 } });
-		// scores untouched
 		assert.equal(complete.areas['7']?.score, 0.5);
 	});
 
@@ -293,7 +296,7 @@ describe('analysis-state: producer service', () => {
 		const fake = freshFake();
 		const pending = deferred<ValuesPayload>();
 
-		// The popup handler: reads scores SYNCHRONOUSLY from the atom.
+		// The popup handler reads scores synchronously from the atom.
 		let scoreAtPublish: number | undefined;
 		let valuesAtPublish: unknown = 'unset';
 		const off = subscribe(s => {
@@ -310,8 +313,8 @@ describe('analysis-state: producer service', () => {
 		const done = service.result('eai', 2);
 		const partial = await service.scores('eai', 2);
 
-		// Phase 1 is published and synchronously readable while the layer
-		// aggregates are still in flight (analysis.js:407 vs :417 ordering).
+		// Phase 1 is readable synchronously while the aggregates are still in
+		// flight.
 		assert.equal(scoreAtPublish, 0.5);
 		assert.equal(valuesAtPublish, null);
 		assert.equal(partial.areas['7']?.score, 0.5);
@@ -365,10 +368,10 @@ describe('analysis-state: producer service', () => {
 		const first = await service.result('eai', 2);
 		assert.equal(calls.scores, 1);
 
-		// A change lands but the 300ms COMMIT debounce has not fired yet —
-		// no sync(), so the revision and the cache key are unchanged. The
-		// hit must re-verify the captured fingerprint and miss instead of
-		// serving the pre-change entry.
+		// A change lands before the 300ms COMMIT debounce fires, so the
+		// revision and cache key are unchanged: the hit must re-verify the
+		// captured fingerprint and miss rather than serve the pre-change
+		// entry.
 		fake.datasets['maize'] = '[0,50]';
 
 		const fresh = await service.result('eai', 2);
@@ -399,7 +402,6 @@ describe('analysis-state: producer service', () => {
 		await service.result('eai', 2);
 		assert.equal(calls.scores, 1);
 
-		// Hit while the subdivision is unchanged: served from the cache.
 		await service.result('eai', 2);
 		assert.equal(calls.scores, 1);
 
@@ -440,10 +442,10 @@ describe('analysis-state: producer service', () => {
 		fake.datasets['maize'] = '[0,50]';
 		service.sync();
 
-		await service.result('demand', 2); // unaffected: served from the cache
+		await service.result('demand', 2);
 		assert.equal(calls.scores, 2);
 
-		await service.result('eai', 2); // affected: recomputed
+		await service.result('eai', 2);
 		assert.equal(calls.scores, 3);
 	});
 
@@ -491,16 +493,15 @@ describe('analysis-state: producer service', () => {
 		fake.datasets['maize'] = '[0,50]'; // range slider moved mid-flight
 		service.sync();
 
-		// The stale computation is discarded and the request RETRIED against
-		// the new inputs (the caller asked for the result for the current
-		// inputs): the caller still resolves (reload keeps going)...
+		// The stale computation is discarded and the request retried against
+		// the new inputs, so the caller still resolves (reload keeps going)...
 		pending.resolve(scoresPayload());
 		const result = await done;
 		assert.equal(result.areas['7']?.score, 0.5);
 		assert.equal(calls.scores, 2);
 
-		// ...and what got published is the recomputed result, never the
-		// stale computation's.
+		// What got published is the recomputed result, never the stale
+		// computation's.
 		await tick();
 		assert.equal(state().results[resultKey('eai', 2, null)]?.result.areas['7']?.score, 0.5);
 	});
@@ -512,8 +513,8 @@ describe('analysis-state: producer service', () => {
 		const { service, calls } = makeService(fake, {
 			"computeScores": () => {
 				calls.scores += 1;
-				// The retry computes against the NEW inputs and must produce a
-				// different payload than the discarded first computation.
+				// The retry computes against the new inputs, producing a different
+				// payload than the discarded first computation.
 				return calls.scores === 1 ? pending.promise : scoresPayload(0.8);
 			},
 		});
@@ -527,13 +528,13 @@ describe('analysis-state: producer service', () => {
 
 		const result = await done;
 
-		// The caller asked for the result for the CURRENT inputs: it
-		// resolves with the recomputed one (0.8), never with the stale
-		// un-published computation (0.5)...
+		// The caller asked for the current inputs' result: it resolves with
+		// the recomputed one (0.8), never the stale un-published computation
+		// (0.5)...
 		assert.equal(result.areas['7']?.score, 0.8);
 		assert.equal(calls.scores, 2);
 
-		// ...and what resolved is exactly what the atom holds.
+		// What resolved is exactly what the atom holds.
 		await tick();
 		assert.equal(state().results[resultKey('eai', 2, null)]?.result, result);
 	});
@@ -585,7 +586,7 @@ describe('analysis-state: result shape', () => {
 		assert.deepEqual([...result.mask], [1, 0]);
 		assert.deepEqual(result.areas['7'], {
 			"score":   0.5,
-			"bucket": 'High',
+			"bucket":  bucket('High'),
 			"values": { "solar": { "type": 'scalar', "value": 3 } },
 		});
 		assert.deepEqual(result.areas['8'], { "score": -1, "bucket": null, "values": null });

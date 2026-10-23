@@ -114,19 +114,9 @@ export function update_analysis(has_data, busy = false) {
 }
 
 export async function graphs(raster) {
-	// The card aggregates come from the analysis cell (EAE-521) — the fake
-	// "area 0" masks and their aggregate_layer_values() calls are gone.
-	// OUTLINE_TIER is the Outline pseudo-division: its single area 0 is
-	// exactly the analysed-area bucket the old analysis_mask fabricated —
-	// only the cells that have a priority score (the cells whose range and
-	// class selections the analysis kept), restricted to the geography
-	// outline, same rule the export's priority columns use
-	// (has_priority_score()) — so result.analysed.values carries the cards'
-	// analysed-area figures. result.national.values is the same layers over
-	// the whole geography with no analysis mask: the unfiltered figures the
-	// Data cards compare the analysed-area values against (EAE-514). Both
-	// are computed once in the cell and shared, because summary_analyse()
-	// used to derive the very same aggregate for itself.
+	// Card aggregates come from the analysis cell: OUTLINE_TIER's area 0 is the
+	// has_priority_score() analysed-area bucket, result.national.values the same
+	// layers over the whole geography with no analysis mask.
 	let summary;
 	try {
 		const result = await analysis_result(STATE.index, OUTLINE_TIER);
@@ -139,9 +129,8 @@ export async function graphs(raster) {
 		// The summary keeps the analysis-window mask.
 		summary = await summary_analyse(raster, national_layer_data);
 	} catch (e) {
-		// loading_analysis(true) in ds.js active() must always balance: a
-		// rejected analysis must never strand the "Loading data layers"
-		// spinner. Hide the loader, then let the error surface.
+		// loading_analysis(true) in ds.js active() must always balance: never
+		// strand the "Loading data layers" spinner.
 		update_analysis(false);
 		throw e;
 	}

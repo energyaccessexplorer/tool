@@ -7,7 +7,6 @@ import '../lib/pptxgen.js';
 import {
 	aggregate_layer_values,
 	analysis_cells,
-	analysis_colorscale_svg,
 	medhigh_point_count,
 } from './analysis.ts';
 
@@ -28,6 +27,8 @@ import {
 
 import {
 	area_type,
+	self as load_self,
+	svg_pie,
 } from './utils.js';
 
 import {
@@ -48,6 +49,8 @@ export const PPT_MAX_COLUMNS = 8;
 
 const green = "#00794C";
 const white = "#ffffff";
+const EMAIL = 'energyaccessexplorer@wri.org';
+const ATTRIBUTION_URL = 'https://www.energyaccessexplorer.org/attribution/';
 const black = "#393F44";
 const grey = "#F9F8F8";
 const bold = true;
@@ -57,6 +60,10 @@ const first_paragraph_y = 2;
 
 const tableborder = { "pt": "1", "color": "#ffffff" };
 
+// High down to Low, then the out-of-analysis residual. Same order as the tool's
+// Area/Population share cards, whose discrete scale the report repeats.
+const SHARE_ORDER = [4, 3, 2, 1, 0, OUTSIDE_BUCKET];
+
 function a4(t, c) {
 	if (c === 'x')
 		return 11.69 * (t/100);
@@ -65,8 +72,144 @@ function a4(t, c) {
 		return 8.26 * (t/100);
 }
 
+// The analysis domain is rescaled to the selection, so its bounds arrive as float
+// noise — 45000 shows up as 44999.999999999985. Print the value the tool shows.
+function range_text(domain) {
+	const bound = v => Number.isFinite(Number(v)) ? parseFloat(Number(v).toFixed(2)) : v;
+
+	return `min: ${bound(domain.min)}, max: ${bound(domain.max)}`;
+};
+
+// The deck carries no SVG pictures: PowerPoint sizes an SVG with a viewBox to the
+// viewBox rather than its frame, and some builds drop or misplace SVG-backed pictures.
+async function svg_bitmap(svg, w, h) {
+	const url = URL.createObjectURL(new Blob([svg], { "type": 'image/svg+xml' }));
+
+	try {
+		const img = new Image();
+		img.src = url;
+		await img.decode();
+
+		// ~600ppi at the placed size, so it stays sharp if it is scaled up.
+		const c = document.createElement('canvas');
+		c.width  = Math.round(w * 600);
+		c.height = Math.round(h * 600);
+
+		c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+
+		return c.toDataURL('image/png');
+	} finally {
+		URL.revokeObjectURL(url);
+	}
+};
+
+async function logo_bitmap(path, w, h) {
+	return svg_bitmap(await (await fetch(path)).text(), w, h);
+};
+
+function load_image(src) {
+	const img = new Image();
+	img.src = src;
+
+	return img.decode().then(() => img);
+};
+
+// The basemap and the inset choropleth go in as one flattened picture: stacked, the
+// PowerPoint can draw the wrong image for one of two pictures stacked in a frame.
+async function compose_map(basemap, choropleth, w, h, fx, fy, fw, fh, overlay) {
+	const base = await load_image(basemap);
+	const over = await load_image(choropleth);
+
+	// Compose at the basemap's own resolution, which is already the ~150ppi the map is
+	// placed at, so neither layer is upsampled.
+	const c = document.createElement('canvas');
+	c.width  = base.naturalWidth  || Math.round(w * 150);
+	c.height = base.naturalHeight || Math.round(h * 150);
+
+	const ctx = c.getContext('2d');
+	ctx.drawImage(base, 0, 0, c.width, c.height);
+	ctx.drawImage(over, fx * c.width, fy * c.height, fw * c.width, fh * c.height);
+	if (overlay)
+		ctx.drawImage(overlay, fx * c.width, fy * c.height, fw * c.width, fh * c.height);
+
+	// Opaque and photographic: JPEG is a fifth of the PNG's size, and PowerPoint
+	// mishandles some canvas-encoded PNGs.
+	return c.toDataURL('image/jpeg', 0.92);
+};
+
+// The administrative subdivisions the choropleth averages over, drawn as boundary
+// lines: the basemap shows country borders only, so without these the units are
+// blobs with no delineation.
+function division_boundaries(division) {
+	const data = division.raster.data;
+	const W = division.raster.width;
+	const H = division.raster.height;
+	const nodata = division.raster.nodata;
+
+	const c = document.createElement('canvas');
+	c.width = W;
+	c.height = H;
+
+	const ctx = c.getContext('2d');
+	const img = ctx.createImageData(W, H);
+	const px = img.data;
+
+	const line = x => x !== -1 && x !== nodata;
+
+	for (let yy = 0; yy < H; yy++)
+		for (let xx = 0; xx < W; xx++) {
+			const i = yy * W + xx;
+			const v = data[i];
+			if (!line(v)) continue;
+			if ((xx < W - 1 && line(data[i + 1]) && data[i + 1] !== v) ||
+			    (yy < H - 1 && line(data[i + W]) && data[i + W] !== v)) {
+				const o = i * 4;
+				px[o] = 80; px[o + 1] = 80; px[o + 2] = 80; px[o + 3] = 230;
+			}
+		}
+
+	ctx.putImageData(img, 0, 0);
+	return c;
+};
+
+// Set once per export (see pptx): the footer logo, sized for its frame.
+let FOOTER_LOGO = null;
+
 function textopts($) {
 	return Object.assign({ "color": black, "fontSize": 12, "valign": "top" }, $);
+};
+
+// pptxgenjs fills take rrggbb; the colourscales carry css rgb()/rgba() strings.
+function fill_color(color) {
+	const m = /rgba?\(([0-9]{1,3}), ?([0-9]{1,3}), ?([0-9]{1,3})/.exec(color || '');
+
+	if (m) return m.slice(1, 4).map(v => Number(v).toString(16).padStart(2, '0')).join('');
+
+	return (color || 'cccccc').replace(/^#/, '');
+};
+
+// The tool's Data card picks a donut for a small distribution and bars for a large
+// one (right-panel-data-tab.ts); the report mirrors that so the two read alike.
+const DONUT_MAX = 5;
+const card_top_h = 0.5;
+const chart_head_h = 0.3;
+
+function is_categorical(ds) {
+	return !!ds && (ds.type === 'raster-valued' || ds.type === 'raster-valued-mutant');
+};
+
+function card_height(ds) {
+	if (!is_categorical(ds)) return 1.55;
+
+	const distribution = compute_distribution(ds, null);
+	if (!distribution?.length) return 1.55;
+
+	const chart_h = distribution.length <= DONUT_MAX
+		? 1
+		: Math.max(1, distribution.length * 0.135);
+
+	// 0.35 leaves the gap the grey panel keeps under each card.
+	return card_top_h + chart_head_h + chart_h + 0.35;
 };
 
 function footer($) {
@@ -77,14 +220,10 @@ function footer($) {
 		{ "x": 0, "y": a4(100, 'y') - 0.5, "w": a4(100, 'x'), h, "fill": { "color": green } },
 	);
 
-	$.addImage(
-		{ "path": `${window.BASE}/images/wri-hbox-white-on-yellow.jpg`, "x": 0.5, "y": (a4(100, 'y') - h) + 0.125, "w": (h*3), "h": h/2 },
-	);
-
-	$.addText(
-		"ENERGY ACCESS EXPLORER",
-		textopts({ "x": "60%", "y": a4(100, 'y') - h, "w": "38%", "h": h, "color": white, "valign": "middle" }),
-	);
+	$.addImage(Object.assign(
+		{ "x": 0.5, "y": (a4(100, 'y') - h) + 0.075, "w": 0.62, "h": 0.35 },
+		FOOTER_LOGO ? { "data": FOOTER_LOGO } : { "path": `${window.BASE}/images/EAE%20Logo_Compact%20White.svg` },
+	));
 };
 
 function chapter(number, name) {
@@ -115,22 +254,30 @@ function title($, text) {
 	);
 };
 
-function front() {
+function preparer_name() {
+	const about = SELF?.about ?? {};
+	const name = [about['first_name'], about['last_name']]
+		.map(s => (s ?? '').trim())
+		.filter(Boolean)
+		.join(' ');
+
+	return name || SELF?.email || '';
+};
+
+async function front() {
 	const $ = this.addSlide();
 	const color = white;
 
 	$.background = { "color": green };
 	$.color = color;
 
-	const h = 1;
-	$.addImage(
-		{ "path": `${window.BASE}/images/wri-box-white-on-yellow.jpg`, "x": 0.5, "y": 0.5, "w": (h*2.12), h },
-	);
-
-	$.addText(
-		"ENERGY ACCESS EXPLORER",
-		{ color, "x": "50%", "y": 0.5, "w": "45%", "h": 0.4, bold },
-	);
+	$.addImage({
+		"x":    0.5,
+		"y":    0.5,
+		"w":    3.2,
+		"h":    0.75,
+		"data": await logo_bitmap(`${window.BASE}/images/EAE%20Logo_Horizontal%20White.svg`, 3.2, 0.75),
+	});
 
 	$.addText(
 		[
@@ -151,7 +298,7 @@ function front() {
 	$.addText(
 		[
 			{
-				"text":    t(window.LOCALE, 'report.front.prepared_by'),
+				"text":    unesc(t(window.LOCALE, 'report.front.prepared_by', { "name": preparer_name() })),
 				"options": { bold, breakLine },
 			}, {
 				"text":    t(window.LOCALE, 'report.front.developed_with'),
@@ -297,10 +444,30 @@ function how_it_works() {
 		);
 
 		if (i < stages.length - 1) {
-			$.addText(
-				"→",
-				{ "x": box_x + box_w, "y": box_y, "w": gap, "h": box_h, "color": green, "fontSize": 16, bold, "align": "center", "valign": "middle" },
-			);
+			// Drawn, not typed: the width of the "→" glyph follows whichever font the
+			// reader substitutes. A shaft plus a head, as a connector needs a zero-height
+			// <a:ext>.
+			const ay = box_y + (box_h / 2);
+			const ax = box_x + box_w + 0.055;
+
+			$.addShape(this.ShapeType.rect, {
+				"x":    ax,
+				"y":    ay - 0.014,
+				"w":    0.175,
+				"h":    0.028,
+				"fill": { "color": green },
+				"line": { "color": green, "width": 0 },
+			});
+
+			$.addShape(this.ShapeType.triangle, {
+				"x":      ax + 0.165,
+				"y":      ay - 0.0375,
+				"w":      0.075,
+				"h":      0.075,
+				"rotate": 90,
+				"fill":   { "color": green },
+				"line":   { "color": green, "width": 0 },
+			});
 		}
 	});
 
@@ -313,8 +480,20 @@ function open_data() {
 
 	title($, t(window.LOCALE, 'report.open_data.title'));
 
+	const para1_runs = [];
+	t(window.LOCALE, 'report.open_data.para1').split(EMAIL).forEach((part, i, parts) => {
+		if (part) para1_runs.push({ "text": part, "options": { color } });
+
+		if (i < parts.length - 1) {
+			para1_runs.push({
+				"text":    EMAIL,
+				"options": { "color": green, "underline": true, "hyperlink": { "url": `mailto:${EMAIL}` } },
+			});
+		}
+	});
+
 	$.addText(
-		t(window.LOCALE, 'report.open_data.para1'),
+		para1_runs,
 		{ color, x, "y": 1.1, "w": "90%", "h": 1.6, "fontSize": 12 },
 	);
 
@@ -324,8 +503,11 @@ function open_data() {
 	);
 
 	$.addText(
-		t(window.LOCALE, 'report.attribution'),
-		{ "color": green, x, "y": 5.4, "w": "90%", "h": 0.8, "fontSize": 10, bold },
+		[{
+			"text":    t(window.LOCALE, 'report.attribution'),
+			"options": { "color": green, "underline": true, "hyperlink": { "url": ATTRIBUTION_URL } },
+		}],
+		{ x, "y": 5.4, "w": "90%", "h": 0.8, "fontSize": 10, bold },
 	);
 
 	footer($);
@@ -373,10 +555,10 @@ function selected_datasets_index($, index) {
 			}, {
 				"text": d.unit ? d.unit.replace('<sup>2</sup>', '²') : t(window.LOCALE, 'report.datasets.proximity'),
 			}, {
-				"text":    `min: ${d.domain.min}, max: ${d.domain.max}`,
+				"text":    range_text(d.domain),
 				"options": textopts(monospace),
 			}, {
-				"text":    `min: ${d._domain.min}, max: ${d._domain.max}`,
+				"text":    range_text(d._domain),
 				"options": textopts(monospace),
 			}, {
 				"text":    d.weight,
@@ -416,65 +598,148 @@ async function selected_data() {
 		return;
 	}
 
-	const cards = entries.filter(e => e.value != null && String(e.value).trim() !== '' && String(e.value) !== 'NaN');
+	// Raster-valued data (OnStove technology mix, OnSSET LULC, ...) has no single
+	// display value: it never reaches the aggregate below, so it is taken straight
+	// from the active datasets and reported as a distribution (see data_card_body).
+	const cards = entries.filter(e => {
+		const ds = DST.get(e.id);
+		if (is_categorical(ds)) return false;
+
+		return e.value != null && String(e.value).trim() !== '' && String(e.value) !== 'NaN';
+	});
+
+	for (const ds of STATE.datasets) {
+		if (!is_categorical(ds)) continue;
+		if (compute_distribution(ds, null)?.length) cards.push({ "id": ds.id, "label": ds.name });
+	}
+
 	if (!cards.length) return;
 
-	const per_slide = 4;
-	const card_h = 1.55;
-	const card_y0 = 1.0;
+	// Cards size themselves to their distribution, so they run down the slide until
+	// the next one would cross the footer band and then start a new slide.
+	const top_y = 1.0;
+	const bottom_y = a4(100, 'y') - 0.65;
+	const card_w = a4(100, 'x') - (x * 2);
 
-	for (let i = 0; i < cards.length; i += per_slide) {
-		const chunk = cards.slice(i, i + per_slide);
+	const pages = [];
+	let page = null;
+	let card_y = top_y;
 
-		const $ = this.addSlide();
+	for (const e of cards) {
+		const ds = DST.get(e.id);
+		const card_h = card_height(ds);
 
-		title($, i === 0 ? t(window.LOCALE, 'report.data.title') : t(window.LOCALE, 'report.data.title_continued'));
+		if (!page || card_y + card_h > bottom_y) {
+			page = this.addSlide();
+			pages.push(page);
 
-		chunk.forEach((e, j) => {
-			const card_y = card_y0 + (j * card_h);
-			const card_w = a4(100, 'x') - (x * 2);
+			title(page, pages.length === 1 ? t(window.LOCALE, 'report.data.title') : t(window.LOCALE, 'report.data.title_continued'));
+			card_y = top_y;
+		}
 
-			$.addShape(
-				this.ShapeType.rect,
-				{ "x": x, "y": card_y, "w": card_w, "h": card_h - 0.2, "fill": { "color": grey } },
-			);
+		page.addShape(
+			this.ShapeType.rect,
+			{ "x": x, "y": card_y, "w": card_w, "h": card_h - 0.2, "fill": { "color": grey } },
+		);
 
-			const ds = DST.get(e.id);
-			const label = ds ? translateDatasetName(window.LOCALE, ds) : e.label;
+		const label = ds ? translateDatasetName(window.LOCALE, ds) : e.label;
 
-			$.addText(
-				label,
-				textopts({ "color": green, "x": x + 0.15, "y": card_y + 0.08, "w": card_w - 0.3, "h": 0.35, bold, "fontSize": 12 }),
-			);
+		page.addText(
+			label,
+			textopts({ "color": green, "x": x + 0.15, "y": card_y + 0.08, "w": card_w - 0.3, "h": 0.35, bold, "fontSize": 12 }),
+		);
 
-			data_card_body($, e, ds, x + 0.15, card_y + 0.5, card_w - 0.3, card_h - 0.7);
-		});
+		await data_card_body(page, e, ds, x + 0.15, card_y + card_top_h, card_w - 0.3, card_h - 0.7);
 
-		footer($);
+		card_y += card_h;
 	}
+
+	for (const p of pages) footer(p);
 };
 
-function data_card_body($, e, ds, tx, ty, tw, th) {
-	if (ds && (ds.type === 'raster-valued' || ds.type === 'raster-valued-mutant')) {
-		const distribution = compute_distribution(ds, null);
-		if (distribution?.length) {
-			const runs = [
-				{
-					"text":    t(window.LOCALE, 'right_panel.data.categorical_desc', { "name": translateDatasetName(window.LOCALE, ds) }),
-					"options": { "color": black, breakLine },
-				},
-			];
+async function data_card_body($, e, ds, tx, ty, tw, th) {
+	const distribution = is_categorical(ds) ? compute_distribution(ds, null) : null;
+
+	if (distribution?.length) {
+		$.addText(
+			t(window.LOCALE, 'right_panel.data.categorical_desc', { "name": translateDatasetName(window.LOCALE, ds) }).replace(/<\/?strong>/g, ''),
+			textopts({ "x": tx, "y": ty, "w": tw, "h": chart_head_h, "color": black, "fontSize": 11 }),
+		);
+
+		const chart_y = ty + chart_head_h;
+
+		if (distribution.length <= DONUT_MAX) {
+			const s = 1;
+
+			const donut = svg_pie(
+				distribution.map(c => [c.percentage]),
+				66,
+				33,
+				distribution.map(c => c.color),
+				v => `${v.toFixed(1)}%`,
+			);
+
+			$.addImage({
+				"x":    tx + tw - s,
+				"y":    chart_y,
+				"w":    s,
+				"h":    s,
+				"data": await svg_bitmap(donut.svg.outerHTML, s, s),
+			});
+
+			// Every slice is named and quantified in the scale beside the donut: a
+			// printed slide has no hover bubble to read the shares off.
+			let ly = chart_y + 0.02;
 
 			for (const c of distribution) {
-				runs.push({
-					"text":    `${c.name}: ${c.percentage.toFixed(1)}%`,
-					"options": { "color": black, breakLine, "fontSize": 10 },
-				});
+				$.addShape('rect', { "x": tx, "y": ly + 0.035, "w": 0.09, "h": 0.07, "fill": { "color": fill_color(c.color) } });
+
+				$.addText(
+					c.name,
+					textopts({ "x": tx + 0.14, "y": ly, "w": 1.6, "h": 0.17, "fontSize": 9 }),
+				);
+
+				$.addText(
+					`${c.percentage.toFixed(1)}%`,
+					textopts({ "x": tx + 1.7, "y": ly, "w": 0.6, "h": 0.17, "fontSize": 9, "align": "right" }),
+				);
+
+				ly += 0.17;
 			}
 
-			$.addText(runs, textopts({ "x": tx, "y": ty, "w": tw, "h": th, "fontSize": 11 }));
 			return;
 		}
+
+		const sorted  = [...distribution].sort((a, b) => b.percentage - a.percentage);
+		const max_pct = sorted[0].percentage || 1;
+		const row_h   = 0.135;
+		const name_w  = 2.4;
+		const value_w = 0.7;
+		const bar_w   = tw - name_w - value_w - 0.3;
+
+		sorted.forEach((c, i) => {
+			const ly = chart_y + (i * row_h);
+
+			$.addText(
+				c.name,
+				textopts({ "x": tx, "y": ly, "w": name_w, "h": row_h, "fontSize": 9, "valign": "middle" }),
+			);
+
+			$.addShape('rect', {
+				"x":    tx + name_w,
+				"y":    ly + 0.035,
+				"w":    bar_w * (c.percentage / max_pct),
+				"h":    row_h - 0.07,
+				"fill": { "color": fill_color(c.color) },
+			});
+
+			$.addText(
+				`${c.percentage.toFixed(1)}%`,
+				textopts({ "x": tx + name_w + bar_w + 0.1, "y": ly, "w": value_w, "h": row_h, "fontSize": 9, "align": "right", "valign": "middle" }),
+			);
+		});
+
+		return;
 	}
 
 	const name = ds ? translateDatasetName(window.LOCALE, ds) : e.label;
@@ -529,7 +794,7 @@ function geography_indexes_left($) {
 };
 
 function geography_indexes_right($) {
-	const tabletextopts = Object.assign(textopts({ "fontSize": 9, "align": "left", "valign": "middle" }));
+	const tabletextopts = Object.assign(textopts({ "fontSize": 7, "align": "left", "valign": "middle", "margin": 0 }));
 
 	function th(o = {}) {
 		return Object.assign({}, tabletextopts, { bold, "color": white, "align": "left" }, o);
@@ -537,17 +802,21 @@ function geography_indexes_right($) {
 
 	const cs = share_scale_colors();
 
+	// Row heights are fixed and every cell is sized to stay on its own line, so the
+	// height the table actually takes is known: the totals below are positioned from
+	// it and can never land on the last row.
+	const header_h = 0.5;
+	const row_h = 0.34;
+
 	function table(c, y) {
 		// The same six legend entries as the UI's Area/Population share cards, in the
-		// same order: High down to Low, then the out-of-analysis residual — it is not
-		// part of the five-colour index scale and keeps its own neutral fill. Only the
-		// two light fills (High and the residual) take dark text.
-		const order  = [4, 3, 2, 1, 0, OUTSIDE_BUCKET];
+		// same order. Only the two light fills (High and the residual) take dark text.
+		const order  = SHARE_ORDER;
 		const labels = share_scale_labels(window.LOCALE);
 
 		const header_cells = order.map(i => ({
 			"text":    labels[i],
-			"options": th(i >= 4 ? { "fill": cs[i], "color": black } : { "fill": cs[i] }),
+			"options": th(i >= 4 ? { "fill": fill_color(cs[i]), "color": black, "margin": 0.02 } : { "fill": fill_color(cs[i]), "margin": 0.02 }),
 		}));
 
 		const rows = [
@@ -560,15 +829,23 @@ function geography_indexes_right($) {
 		for (const k of Object.keys(SUMMARY)) {
 			const r = [];
 
-			r.push({ "text": translateIndexName(window.LOCALE, k), "options": { bold } });
+			r.push({ "text": translateIndexName(window.LOCALE, k), "options": Object.assign({ bold }, tabletextopts) });
 
 			const amounts = compute_share_amounts(SUMMARY[k][c]).amounts;
-			r.push(...order.map(i => ({ "text": amounts[i].toLocaleString(window.LOCALE) })));
+			r.push(...order.map(i => ({ "text": amounts[i].toLocaleString(window.LOCALE), "options": tabletextopts })));
 
 			rows.push(r);
 		}
 
-		$.addTable(rows, Object.assign({ "x": "51%", y, "w": "45%" }, tabletextopts));
+		$.addTable(
+			rows,
+			Object.assign(
+				{ "x": "51%", y, "w": "45%", "rowH": rows.map((_, i) => i === 0 ? header_h : row_h), "colW": [1.45, 0.635, 0.635, 0.635, 0.635, 0.635, 0.635] },
+				tabletextopts,
+			),
+		);
+
+		return header_h + ((rows.length - 1) * row_h);
 	};
 
 	$.addShape(
@@ -576,19 +853,25 @@ function geography_indexes_right($) {
 		{ "x": "50%", "y": 0, "w": "50%", "h": "100%", "fill": { "color": grey } },
 	);
 
+	const area_title_y = 1.5;
+	const area_table_y = 1.95;
+
 	$.addText(
 		t(window.LOCALE, 'report.geography.area_share', { "unit": area_type(STATE.variant) }),
-		textopts({ "x": "55%", "y": 1.5, "w": "40%", "h": 0.4, bold, "color": green }),
+		textopts({ "x": "55%", "y": area_title_y, "w": "40%", "h": 0.4, bold, "color": green }),
 	);
 
-	table('area', 2);
+	const area_total_y = area_table_y + table('area', area_table_y) + 0.05;
+
+	const pop_title_y = area_total_y + 0.59;
+	const pop_table_y = pop_title_y + 0.45;
 
 	$.addText(
 		t(window.LOCALE, 'report.geography.pop_share'),
-		textopts({ "x": "55%", "y": 4.5, "w": "40%", "h": 0.4, bold, "color": green }),
+		textopts({ "x": "55%", "y": pop_title_y, "w": "40%", "h": 0.4, bold, "color": green }),
 	);
 
-	table('population-density', 5);
+	const pop_total_y = pop_table_y + table('population-density', pop_table_y) + 0.05;
 
 	const summary = SUMMARY[STATE.index];
 
@@ -600,12 +883,12 @@ function geography_indexes_right($) {
 
 		$.addText(
 			t(window.LOCALE, 'report.geography.total_area', { "total": area_share.total.toLocaleString(window.LOCALE), "high": area_share.amounts[4].toLocaleString(window.LOCALE), "unit": area_unit }),
-			textopts({ "x": "51%", "y": 4.1, "w": "45%", "h": 0.3, "fontSize": 9 }),
+			textopts({ "x": "51%", "y": area_total_y, "w": "45%", "h": 0.3, "fontSize": 9 }),
 		);
 
 		$.addText(
 			t(window.LOCALE, 'report.geography.total_pop', { "total": pop_share.total.toLocaleString(window.LOCALE), "high": pop_share.amounts[4].toLocaleString(window.LOCALE) }),
-			textopts({ "x": "51%", "y": 7.1, "w": "45%", "h": 0.3, "fontSize": 9 }),
+			textopts({ "x": "51%", "y": pop_total_y, "w": "45%", "h": 0.3, "fontSize": 9 }),
 		);
 	}
 };
@@ -840,12 +1123,12 @@ async function analysis(index) {
 
 	await analysis_left.call(this, $, index);
 
-	analysis_right.call(this, $, index, right_rows);
+	await analysis_right.call(this, $, index, right_rows);
 
 	footer($);
 };
 
-async function fetch_basemap(envelope) {
+async function fetch_basemap(envelope, width_in) {
 	// Reuse the same token/theme the client map uses; never hardcode it.
 	const token = (EAE && EAE['settings'] && EAE['settings'].mapbox_token) || null;
 	if (!token) return null;
@@ -860,8 +1143,9 @@ async function fetch_basemap(envelope) {
 	const bMaxLat = maxLat + padLat;
 
 	// The /static/[bbox]/ form fits the bbox into the requested pixels. Match the
-	// aspect ratio to the padded bbox to avoid letterboxing.
-	const W = 800;
+	// aspect ratio to the padded bbox to avoid letterboxing, and ask for ~150ppi at
+	// the size the map is placed so the reader can scale it up without it going soft.
+	const W = Math.min(1280, Math.max(400, Math.round(width_in * 150)));
 	const H = Math.min(1280, Math.round(W * (bMaxLat - bMinLat) / (bMaxLng - bMinLng)));
 
 	const url =
@@ -889,18 +1173,32 @@ async function analysis_left($, index) {
 	title($, translateIndexName(window.LOCALE, index));
 
 	$.addText(
-		t(window.LOCALE, `report.analysis.long.${index}`),
-		textopts({ x, "y": 1, "w": "45%", "h": 1.5, bold }),
+		[
+			{
+				"text":    translateIndexName(window.LOCALE, index) + " ",
+				"options": { bold },
+			}, {
+				"text": t(window.LOCALE, 'modal.eae_info.index.' + index + '.explain'),
+			},
+		],
+		textopts({ x, "y": 1, "w": "45%", "h": 1.6, "shrinkText": true }),
 	);
 
-	const s = btoa(new XMLSerializer().serializeToString(analysis_colorscale_svg));
+	// Five flat bands as shapes: the ramp needs no picture at all (see svg_bitmap).
+	const ramp = share_scale_colors().slice(0, 5);
+	const ramp_w = a4(25, 'x');
+	const ramp_y = 2.5;
+	const ramp_h = 0.1;
 
-	$.addImage({
-		x,
-		"y":    2.5,
-		"w":    "25%",
-		"h":    0.1,
-		"data": `data:image/svg+xml;base64,${s}`,
+	ramp.forEach((color, i) => {
+		$.addShape(this.ShapeType.rect, {
+			"x":    x + (i * ramp_w / ramp.length),
+			"y":    ramp_y,
+			"w":    ramp_w / ramp.length,
+			"h":    ramp_h,
+			"fill": { "color": fill_color(color) },
+			"line": { "color": fill_color(color), "width": 0 },
+		});
 	});
 
 	const valign = "top";
@@ -919,43 +1217,52 @@ async function analysis_left($, index) {
 	]], textopts({ x, "y": 2.6, "w": "25%" }));
 
 	const c = SUMMARY[index]['canvas'];
-	const data = c.toDataURL('image/png');
+	let data = c.toDataURL('image/png');
 
 	const r = c.width / c.height;
 
-	let w = 3;
-	let h = 3;
-
-	if (c.width > c.height) h = 3/r;
-	if (c.height > c.width) w = 3*r;
-
-	const [minLng, minLat, maxLng, maxLat] = GEOGRAPHY.envelope;
+	// The map fills the left section: the whole column width, from under the colour
+	// ramp down to the footer band.
+	const map_x0 = x;
+	const map_x1 = a4(50, 'x') - 0.2;
+	const map_y0 = 2.85;
+	const map_y1 = a4(100, 'y') - 0.65;
 
 	// Basic basemap underneath the choropleth (falls back to null on any failure,
 	// leaving the choropleth on the plain white background).
-	const basemap = await fetch_basemap(GEOGRAPHY.envelope);
+	const basemap = await fetch_basemap(GEOGRAPHY.envelope, map_x1 - map_x0);
 
-	// Choropleth placement and anchor points. Default to the original full
-	// placement so the plain fallback slide is untouched when there is no
-	// basemap; inset values are applied only when a basemap exists.
-	let chx = "10%";
-	let chy = 3.5;
-	let chw = w;
-	let chh = h;
-	let ox = a4(10, 'x');
-	let oy = 3.5 + h + 0.12;
+	// Over a basemap the scale bar and north arrow sit in its bottom padding; without
+	// one they go under the map, which gives up a strip of the section to them.
+	const strip = basemap ? 0 : 0.5;
+
+	const max_w = map_x1 - map_x0;
+	const max_h = map_y1 - map_y0 - strip;
+
+	let w = max_w;
+	let h = w / r;
+
+	if (h > max_h) {
+		h = max_h;
+		w = h * r;
+	}
+
+	const map_x = map_x0 + ((max_w - w) / 2);
+	const map_y = map_y0 + ((max_h - h) / 2);
+
+	const [minLng, minLat, maxLng, maxLat] = GEOGRAPHY.envelope;
+
+	// Choropleth placement. Without a basemap the map is the choropleth alone; over a
+	// basemap the two layers are composed, so the slide carries one map picture either
+	// way. The scale bar and north arrow sit in the basemap's bottom padding, or under
+	// the map when there is no basemap.
+	let ox = map_x;
+	let oy = map_y + h + 0.12;
 	let fw = 1;
 
 	if (basemap) {
-		$.addImage({
-			"x":    "10%",
-			"y":    3.5,
-			w, h,
-			"data": basemap,
-		});
-
-		// The choropleth canvas extent matches GEOGRAPHY.envelope; inset it within
-		// the basemap by the padding fractions used to build the basemap bbox.
+		// The choropleth canvas extent matches GEOGRAPHY.envelope; place it within the
+		// basemap by the padding fractions used to build the basemap bbox.
 		const padLng = (maxLng - minLng) * 0.1;
 		const padLat = (maxLat - minLat) * 0.1;
 		const bMinLng = minLng - padLng;
@@ -967,19 +1274,20 @@ async function analysis_left($, index) {
 		const fy = (bMaxLat - maxLat) / (bMaxLat - bMinLat);
 		const fh = (maxLat - minLat) / (bMaxLat - bMinLat);
 
-		chx = a4(10, 'x') + fx * w;
-		chy = 3.5 + fy * h;
-		chw = fw * w;
-		chh = fh * h;
-		ox = a4(10, 'x') + fx * w;
-		oy = 3.5 + fh * h + 0.12;
+		const division = STATE.variant !== 'raster' ? GEOGRAPHY.divisions[STATE.variant] : null;
+		const overlay = division?.raster?.data ? division_boundaries(division) : null;
+
+		data = await compose_map(basemap, data, w, h, fx, fy, fw, fh, overlay);
+
+		ox = map_x + fx * w;
+		oy = map_y + h - 0.36;
 	}
 
 	$.addImage({
-		"x": chx,
-		"y": chy,
-		"w": chw,
-		"h": chh,
+		"x": map_x,
+		"y": map_y,
+		w,
+		h,
 		data,
 	});
 
@@ -999,7 +1307,7 @@ async function analysis_left($, index) {
 		<text x="10" y="7" text-anchor="middle" font-family="sans-serif" font-size="8" font-weight="bold" fill="#333">N</text>
 		<polygon points="10,9 14,19 10,17 6,19" fill="#333"/>
 	</svg>`;
-	$.addImage({ "x": ox, "y": oy, "w": 0.26, "h": 0.34, "data": `data:image/svg+xml;base64,${btoa(north_svg)}` });
+	$.addImage({ "x": ox, "y": oy, "w": 0.26, "h": 0.34, "data": await svg_bitmap(north_svg, 0.26, 0.34) });
 
 	// Scale bar
 	const bx = ox + 0.26 + 0.12;
@@ -1013,11 +1321,11 @@ async function analysis_left($, index) {
 	$.addText(`${kmLabel} / ${miLabel}`, textopts({ "x": bx, "y": by + bh + 0.02, "w": barW, "h": 0.12, "fontSize": 6, "align": "center" }));
 
 	if (basemap) {
-		$.addText('© Mapbox', textopts({ "x": ox, "y": by + bh + 0.02 + 0.14, "w": 1, "h": 0.12, "fontSize": 6, "align": "left" }));
+		$.addText('© Mapbox', textopts({ "x": map_x + w - 1.1, "y": map_y + h - 0.2, "w": 1, "h": 0.12, "fontSize": 6, "align": "right" }));
 	}
 };
 
-function analysis_right($, index, rows) {
+async function analysis_right($, index, rows) {
 	$.addShape(
 		this.ShapeType.rect,
 		{ "x": "50%", "y": 0, "w": "50%", "h": "100%", "fill": { "color": grey } },
@@ -1025,29 +1333,81 @@ function analysis_right($, index, rows) {
 
 	$.addTable(rows, textopts({ "x": "52%", "y": 1, "w": "46%", "colW": [3.2, 2] }));
 
-	for (const k of ['population-density', 'area']) {
-		let x = "55%";
-		let label = t(window.LOCALE, 'report.analysis.pop_share');
+	const index_name = translateIndexName(window.LOCALE, index).toLowerCase();
+	const people_unit = t(window.LOCALE, 'right_panel.prioritization.graphs.people_unit');
+	const labels = share_scale_labels(window.LOCALE);
+	const colors = share_scale_colors();
 
-		if (k === "area") {
-			x = "80%";
-			label = t(window.LOCALE, 'report.analysis.area_share');
-		}
+	// The pies and their breakdown sit side by side across the panel; two and a half
+	// inches each keeps every bucket label and value on one line. The row pitch leaves
+	// room for the font PowerPoint substitutes, whose 8pt serif is taller than the
+	// browser's sans.
+	const col_x  = [a4(52, 'x'), a4(76, 'x')];
+	const col_w  = 2.5;
+	const caption_y = 3.8;
+	const pie_y     = 4.1;
+	const pie_s     = 1.05;
+	const legend_y  = pie_y + pie_s + 0.05;
+	const legend_dy = 0.17;
+	const desc_y    = legend_y + (legend_dy * SHARE_ORDER.length) + 0.07;
+
+	for (const k of ['population-density', 'area']) {
+		const is_area = k === 'area';
+		const x = col_x[is_area ? 1 : 0];
+		const label = t(window.LOCALE, is_area ? 'report.analysis.area_share' : 'report.analysis.pop_share');
+		const unit = is_area ? 'km²' : people_unit;
+		const desc_key = is_area ? 'right_panel.prioritization.graphs.area_desc' : 'right_panel.prioritization.graphs.pop_desc';
 
 		$.addText(
-			label,
-			textopts({ x, "y": 4, "w": 2, "h": 0.4, bold }),
+			`${label} (${unit})`,
+			textopts({ x, "y": caption_y, "w": col_w, "h": 0.3, bold, "fontSize": 11 }),
 		);
-
-		const s = btoa(SUMMARY[index][k]['pie'].svg.outerHTML);
 
 		$.addImage({
 			x,
-			"y":    4.3,
-			"w":    1.5,
-			"h":    1.5,
-			"data": `data:image/svg+xml;base64,${s}`,
+			"y":    pie_y,
+			"w":    pie_s,
+			"h":    pie_s,
+			"data": await svg_bitmap(SUMMARY[index][k]['pie'].svg.outerHTML, pie_s, pie_s),
 		});
+
+		const amounts = compute_share_amounts(SUMMARY[index][k]);
+
+		// The percentages on the pie alone leave out how much each bucket is worth;
+		// repeat the share cards' discrete scale (same words, same numbers) beside it.
+		let ly = legend_y;
+
+		for (const i of SHARE_ORDER) {
+			$.addShape(
+				this.ShapeType.rect,
+				{ "x": x, "y": ly + 0.035, "w": 0.09, "h": 0.07, "fill": { "color": fill_color(colors[i]) } },
+			);
+
+			// The unit lives in the caption: a value followed by " people" does not fit
+			// on one row.
+			$.addText(
+				labels[i],
+				textopts({ "x": x + 0.14, "y": ly, "w": 1.3, "h": legend_dy, "fontSize": 8, "shrinkText": true }),
+			);
+
+			$.addText(
+				amounts.amounts[i].toLocaleString(window.LOCALE),
+				textopts({ "x": x + 1.5, "y": ly, "w": 0.96, "h": legend_dy, "fontSize": 8, "align": "right", "shrinkText": true }),
+			);
+
+			ly += legend_dy;
+		}
+
+		const description = t(window.LOCALE, desc_key, {
+			"indexName": index_name,
+			"x":         `${amounts.total.toLocaleString(window.LOCALE)} ${unit}`,
+			"y":         `${amounts.amounts[4].toLocaleString(window.LOCALE)} ${unit}`,
+		}).replace(/<\/?strong>/g, '');
+
+		$.addText(
+			description,
+			textopts({ x, "y": desc_y, "w": col_w, "h": 1.45, "fontSize": 8 }),
+		);
 	}
 };
 
@@ -1091,12 +1451,16 @@ function toplocations_table(slide_title, columns, rows_data) {
 };
 
 export async function pptx(opts = {}) {
+	if (!SELF?.id) await load_self();
+
 	const p = new PptxGenJS();
 
 	p.defineLayout({ "name": "A4", "width": a4(100, 'x'), "height": a4(100, 'y') });
 	p.layout = 'A4';
 
-	front.call(p);
+	FOOTER_LOGO = await logo_bitmap(`${window.BASE}/images/EAE%20Logo_Compact%20White.svg`, 0.62, 0.35);
+
+	await front.call(p);
 
 	let c = 0;
 

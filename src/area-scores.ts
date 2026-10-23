@@ -197,7 +197,7 @@ export function jenks_breaks(values: readonly number[], n_classes: number): numb
  * bound, so a value sitting exactly on one belongs to the class above it —
  * score_bucket's boundary rule, and QGIS's. The last edge is the data's
  * maximum, so a top class holding a single distinct value needs that
- * inclusive comparison to have any member at all. Null for a missing/nodata
+ * inclusive comparison to have a member at all. Null for a missing/nodata
  * value, as score_bucket.
  */
 export function bucket_in_edges(value: number | null | undefined, edges: readonly number[]): ScoreBucket | null {

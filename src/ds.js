@@ -470,14 +470,30 @@ export default class DS {
 		}
 
 		case 'intervals': {
-			if (this.analysis.intervals != default_colorscale.stops.length)
-				console.warn(this.id, "analysis intervals has wrong length!");
-
+			// A value scores its class's step, plus at most `nudge` for its
+			// position inside the class: values order within a class, and the
+			// nudge is too small to move a cell, alone or summed with other
+			// layers, into another band.
+			const nudge = 1e-3;
+			const breaks = this.analysis.intervals;
 			const q = d3.scaleQuantile()
-				.domain(this.analysis.intervals)
+				.domain(breaks)
 				.range(default_colorscale.intervals);
 
-			s = x => and(x >= min, x <= max) ? q(x) : -1;
+			const steps = q.range();
+			const thresholds = q.quantiles();
+			const edges = [d3.min(breaks), ...thresholds, d3.max(breaks)];
+			const top = steps[steps.length - 1] + nudge;
+
+			s = x => {
+				if (!and(x >= min, x <= max)) return -1;
+
+				const k = d3.bisectRight(thresholds, x);
+				const lo = edges[k], hi = edges[k + 1];
+				const pos = (hi > lo) ? Math.min(1, Math.max(0, (x - lo) / (hi - lo))) : 0;
+
+				return (steps[k] + nudge * pos) / top;
+			};
 
 			break;
 		}

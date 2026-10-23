@@ -138,9 +138,8 @@ COMMIT = debounce(function() {
 	reload(...arguments);
 
 	timeline_sync_datasets(STATE.datasets, GEOGRAPHY.timeline_dates);
-	// EAE-521: bump the analysis revision + selectively invalidate its
-	// memoised results. COMMIT (not state_set) keeps the 300ms debounce
-	// coalescing range-slider drags into one revalidation.
+	// COMMIT, not state_set: the 300ms debounce must coalesce range-slider
+	// drags into one revalidation.
 	analysis_state_sync();
 	timeline_commit_sync();
 
@@ -614,9 +613,8 @@ async function reload(k,v) {
 	const a = await analysis_plot_active(index);
 
 	if (GEOGRAPHY.divisions[variant]) {
-		// EAE-521: per-area scores publish first and paint the fills
-		// synchronously; the layer aggregates land in a second phase (the
-		// await keeps the legacy ordering — values before graphs()).
+		// Scores publish synchronously and paint the fills; the layer aggregates
+		// land in a second phase, so graphs() must read them after this await.
 		const scores = await analysis_scores(index, variant);
 		priority(scores, variant);
 		await analysis_result(index, variant);
@@ -868,13 +866,8 @@ function apply_criteria_mask() {
 		return;
 	}
 
-	// TODO(#13): this is the THIRD "analysed cells" definition — the pixels
-	// where every active dataset's own criteria hold (criteria_mask) — and
-	// it is NOT the analysis result's single mask (has_priority_score over
-	// the rescaled cells: the bottom band, exact zeros and the subdiv filter
-	// make the two differ). Keep this computation until #13 unifies the
-	// three definitions; do NOT wire it to result.mask (that would be a
-	// number change).
+	// The timeline-filters DISPLAY mask, deliberately distinct from the
+	// analysed-cells mask: do not wire it to result.mask.
 	const mask = compoundMask(criteria_mask(STATE.index));
 
 	relevant.forEach(d => {

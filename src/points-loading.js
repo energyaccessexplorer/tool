@@ -13,8 +13,11 @@ import {
 import {
 	analysis_cells,
 	analysis_colorscale,
-	lowmedhigh_scale,
 } from './analysis.ts';
+
+import {
+	score_bucket,
+} from './area-scores.ts';
 
 import {
 	pointto as search_pointto,
@@ -35,7 +38,7 @@ let ul, resultscontainer, resultsinfo;
 
 function pointto(p, centerPointer = false) {
 	const dict = [[ "v", translateIndexName(window.LOCALE, STATE.index) ]];
-	const props = { "v": lowmedhigh_scale(p.v) };
+	const props = { "v": score_bucket(p.v)?.label ?? null };
 
 	search_pointto(p.c, dict, props, centerPointer);
 };
@@ -102,7 +105,7 @@ width: calc(${g}% - 1.5em);
 };
 
 async function fileload(data) {
-	// The memoised run() cells (EAE-521): a read, not a re-run of run().
+	// The memoised run() cells: a read, not a re-run.
 	const a = await analysis_cells(STATE.index);
 
 	COORDINATES = d3.csvParseRows(data, d => {
@@ -120,7 +123,7 @@ async function fileload(data) {
 };
 
 async function reload() {
-	// The memoised run() cells (EAE-521): a read, not a re-run of run().
+	// The memoised run() cells: a read, not a re-run.
 	const a = await analysis_cells(STATE.index);
 
 	COORDINATES = COORDINATES.map(c => {

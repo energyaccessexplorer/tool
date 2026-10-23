@@ -1,20 +1,22 @@
 import {
-	uniform_split,
-	colorscale,
 	colorscale_svg,
 	coordinates_to_raster_pixel,
 	raster_pixel_to_coordinates,
 } from './utils.js';
 
 import {
+	analysis_colorscale,
 	area_results,
+	aggregate_by_area,
 	area_score_table,
 	analysed_mask,
 	collect_values,
 	count_points,
+	criteria_pass_mask,
 	filter_types,
-	has_priority_score,
 	type AggregationDataset,
+	type ScoreBucket,
+	type ScoreLayer,
 	weights_for,
 } from './area-scores.ts';
 
@@ -24,6 +26,7 @@ import {
 	foldValues,
 	type ResultKey,
 	type ScoresPayload,
+	type ValuesPayload,
 } from './analysis-state.ts';
 
 import {
@@ -39,10 +42,8 @@ import {
 
 const inclusion_filters = ["key-delta", "inclusion-buffer"];
 
-// The dataset rows run() and the aggregation code read: the DS registry's
-// legacy shape (ds.js), narrowed to what this module touches. The boundary
-// cast lives in datasets()/valid_layer_datasets(); everything below works
-// against this interface.
+// The DS registry's legacy row shape (ds.js), narrowed to what this module
+// reads; the boundary cast lives in datasets()/valid_layer_datasets().
 interface AnalysisDataset {
 	readonly id: string;
 	readonly name?: string;
@@ -80,18 +81,12 @@ interface AnalysisDataset {
 	_afn?: (type: string) => (x: number) => number;
 }
 
-const analysis_low = 0.167;
-
-export const analysis_colorscale = colorscale({
-	"stops":  uniform_split(5).map(x => d3.interpolateMagma(analysis_low + (x * (1 - analysis_low)))),
-	"domain": { "min": 0, "max": 1 },
-});
+// The analysis ramp belongs to the shared score->bucket scale (area-scores.ts,
+// whose stops are the five bucket colours); re-exported for the plot and
+// legend consumers.
+export { analysis_colorscale };
 
 export const analysis_colorscale_svg = colorscale_svg(analysis_colorscale.stops);
-
-export const lowmedhigh_scale = d3.scaleQuantize()
-	.domain([0,1])
-	.range(["Low", "Low-Medium", "Medium", "Medium-High", "High"]);
 
 /*
  * run
@@ -120,9 +115,8 @@ export default async function run(type: string) {
 	//
 	if (list.every(d => filter_types.includes(d.analysis_scale(type)))) return { "raster": it };
 
-	// Per-dataset weights and per-index totals. The computation lives in
-	// weights_for() (area-scores.ts) so run() and the future
-	// area_score_strategy share one weights source.
+	// Per-dataset weights and per-index totals, from weights_for()
+	// (area-scores.ts) so run() and the scoring strategy share one weights source.
 	//
 	const { weights, "totals": tots } = weights_for(type, list);
 
@@ -320,8 +314,8 @@ function datasets(type: string): AnalysisDataset[] {
  */
 
 export async function plot_active(type: string) {
-	// The run() is shared with the analysis_result pipeline through the
-	// service's stage cache (EAE-521): one reload() computes the cells once.
+	// run() is shared with the analysis_result pipeline via the service's
+	// stage cache: one reload() computes the cells once.
 	const a = await analysis_cells(type);
 	plot_outputcanvas(a.raster);
 
@@ -349,18 +343,17 @@ export async function plot_active(type: string) {
 	return a;
 };
 
-// Which pixels satisfy every active dataset's own criteria, inside the
-// sub-geography selected with "Change geographies" (when there is one).
+// The timeline-filters display mask (a.js apply_criteria_mask) — deliberately
+// NOT the one "analysed cells" rule (area-scores.ts analysed_mask).
 //
-// EAE-496: the filtered data view has to be masked to the sub-geography the
-// user changed to, exactly like run() masks the analysis raster. Without this
-// term the mask still covers the whole parent geography, so the active layers
-// are painted over the parent instead of over the subnational boundary the
-// user selected.
+// EAE-496: it is masked to the sub-geography selected with "Change
+// geographies" (when there is one) — the same term run() applies to the
+// analysis raster — so the active layers are painted over the boundary the
+// user selected rather than over the whole parent geography.
 export function criteria_mask(type: string) {
 	const list = datasets(type);
 
-	const it = analysed_mask(OUTLINE!.raster.data.length, list.map(d => ({
+	const it = criteria_pass_mask(OUTLINE!.raster.data.length, list.map(d => ({
 		"data":   d.raster!.data!,
 		"nodata": d.raster!.nodata!,
 		"score":  d._afn!(type),
@@ -414,15 +407,10 @@ export async function analysis(type: string) {
 /*
  * priority
  *
- * Paint the priority fills FROM the analysis result (EAE-521): the
- * computing lives in analysis_result() (area-scores.ts underneath), this
- * only turns result.areas[].score/bucket into mapbox fill colours. The
- * bucket is the one area scale's Low..High label; its index in
- * lowmedhigh_scale.range() is the same quantile slot the legacy fill scale
- * (an area scale over analysis_colorscale.stops) would return — both scales
- * share the domain and a 5-element range — so the colours are unchanged.
+ * Paint fills from result.areas[].bucket; the colour is the shared score
+ * scale's, the same band the percentage and the Low..High label read off.
  */
-export function priority(result: { areas: Record<string, { bucket: string | null }> }, tier: number | string) {
+export function priority(result: { areas: Record<string, { bucket: ScoreBucket | null }> }, tier: number | string) {
 	const source = MAPBOX.getSource(`priority-source-${tier}`);
 
 	if (source) {
@@ -434,9 +422,7 @@ export function priority(result: { areas: Record<string, { bucket: string | null
 			const feature = source._data!.features!.find(f => f.id === +area_id);
 			const area = areas[area_id]!;
 
-			feature!.properties['__fill'] = (area.bucket === null)
-				? "transparent"
-				: analysis_colorscale.stops[lowmedhigh_scale.range().indexOf(area.bucket)];
+			feature!.properties['__fill'] = area.bucket ? area.bucket.colour : "transparent";
 		}
 
 		source.setData(json_clone(source._data));
@@ -506,22 +492,19 @@ function aggregate_scalar_values(division_raster: RasterData, dataset: AnalysisD
 }
 
 // ---------------------------------------------------------------------------
-// EAE-521: analysis_result — the single memoised entry point for derived
-// analysis state (notes/area-score-refactor.md §4-6). The pure cell, the
-// in-flight memo and the revision staleness guard live in analysis-state.ts;
-// everything below is the impure producer: the computation against
-// STATE/GEOGRAPHY/OUTLINE, the inputs fingerprint and the memoised service.
-// Every consumer and every QA readiness check reads the analysis cell now.
+// analysis_result: the single memoised entry point for derived analysis state.
+// The pure cell and staleness guard live in analysis-state.ts; below is the
+// impure producer — computation, inputs fingerprint and the memoised service.
 // ---------------------------------------------------------------------------
 
-// The run() stage is shared between canvas painting (plot_active) and the
-// result pipeline, keyed (revision, index, subdiv) like everything else.
+// run()'s stage is shared by canvas painting (plot_active) and the result
+// pipeline, keyed (revision, index, subdiv).
 export function analysis_cells(type: string): Promise<{ raster: Float32Array }> {
 	return result_service.stage(type, () => run(type));
 }
 
-// Weak identity tokens so the inputs fingerprint notices data re-parses
-// (fresh arrays even at equal lengths) and data arrival.
+// Weak identity tokens so the fingerprint notices data re-parses (fresh arrays
+// even at equal lengths) and data arrival.
 const input_tokens = new WeakMap<object, number>();
 let input_token_count = 0;
 
@@ -540,14 +523,8 @@ function input_token(obj: unknown): number {
 /*
  * result_inputs
  *
- * The fingerprint of everything an analysis result for (index, subdiv)
- * derives from: the geography, the subdivision filter (both the scope's and
- * the live one, so other-scope entries are dropped when it changes), the
- * subdivision tier run() filters with, the selected timeline date, and per
- * dataset its weight, its _domain/_domain_select (range sliders rewrite
- * _afn from these) and the identity of its loaded data. Any change to these
- * shows up as a different string and invalidates exactly the results whose
- * computation consumed them.
+ * Fingerprint of everything a result for (index, subdiv) derives from: a
+ * change invalidates exactly the results that consumed the changed input.
  */
 function result_inputs(index: string, subdiv: unknown) {
 	const parts = [
@@ -586,66 +563,80 @@ function result_inputs(index: string, subdiv: unknown) {
 	return JSON.stringify(parts);
 }
 
+// The analysis datasets as layer_totals weighs and orients them: run()'s
+// weights and the per-index `invert` direction (ds.js analysis_fn's flip).
+function score_layers(index: string): ScoreLayer[] {
+	const list = datasets(index);
+	const { weights } = weights_for(index, list);
+
+	return list.map(d => ({
+		"id":     d.id,
+		"weight": weights[d.id] || 0,
+		"invert": !!d.analysis?.indexes?.find(i => i.index === index)?.invert,
+	}));
+}
+
+// The aggregates the scores were derived from, stashed against the phase-1
+// payload so the values phase folds them instead of recomputing.
+const values_stash = new WeakMap<ScoresPayload, ValuesPayload & { layer_aggregates: Record<string, unknown> }>();
+
 async function compute_result_scores(key: ResultKey): Promise<ScoresPayload> {
 	const cells = (await analysis_cells(key.index)).raster;
 
-	// Per-area scores need the tier's division raster. Geography init builds
-	// it asynchronously — the outline pseudo-division lands late on large
-	// geographies — and an early analysis (no/few layers) outruns it, so wait
-	// for it the way run() has always waited for data. (Rejection here used
-	// to strand the Analysis Results loader.)
+	// Geography init builds the tier's division raster asynchronously and an
+	// early analysis (no/few layers) outruns it, so wait the way run() waits
+	// for data.
 	await until(() => GEOGRAPHY.divisions?.[key.tier]?.raster, Infinity);
 	const division = GEOGRAPHY.divisions![key.tier]!;
 
-	// The per-area {score, bucket} table (area-scores.ts area_score_table):
-	// the same per-area averages the legacy record carried, bucketed by the
-	// one area scale over the areas in view.
-	const area_scores = area_score_table(cells, division.raster.data, lowmedhigh_scale.range());
+	// The one "analysed cells" mask (area-scores.ts analysed_mask); every
+	// aggregate below counts exactly these cells.
+	const mask = analysed_mask(cells);
 
-	const mask = new Uint8Array(cells.length);
-	for (let i = 0; i < cells.length; i += 1)
-		mask[i] = has_priority_score(cells[i] as number) ? 1 : 0;
-
-	return { cells, mask, "areas": area_scores };
-}
-
-async function compute_result_values(key: ResultKey, scores: ScoresPayload) {
-	const division = GEOGRAPHY.divisions![key.tier]!;
-	const analysis_raster = scores.cells;
-
-	// The cards for a selected area aggregate the same cells as the
-	// country-level cards: cells that have a priority score, restricted to this
-	// area (the mask priority() used to build inline).
+	// The scores are derived from these exact aggregates, so the values phase
+	// publishes this fold rather than recomputing it.
 	const analysis_mask = {
-		"raster": { "data": division.raster.data.map((v, i) => (v === -1 || !has_priority_score(analysis_raster[i] as number)) ? -1 : v) },
+		"raster": { "data": division.raster.data.map((v, i) => (v === -1 || !mask[i]) ? -1 : v) },
 	};
 	const layer_aggregates = await aggregate_layer_values(analysis_mask);
 
-	// The first-class whole-geography entry (notes §6.3): the same layers over
-	// the full outline, no analysis mask — what right-panel.js,
-	// right-panel-data-tab.ts and summary.js faked as "area 0".
+	// The whole-geography aggregate: the same layers over the full outline,
+	// with no analysis mask.
 	const national_mask = {
 		"raster": { "data": OUTLINE!.raster.data.map(v => (v !== OUTLINE!.raster.nodata) ? 0 : -1) },
 	};
 	const national_aggregates = await aggregate_layer_values(national_mask);
 
-	// The cards' analysed-area universe (EAE-514): the analysed cells inside
-	// the outline — the exact mask the pre-refactor graphs() fabricated as
-	// "area 0", computed from the outline alone so it needs no admin
-	// division (large geographies build theirs late; the cards must not
-	// depend on it).
+	// The cards' analysed-area universe: analysed cells inside the outline,
+	// computed from the outline alone so it needs no admin division (large
+	// geographies build theirs late).
 	const analysed_mask_raster = {
 		"raster": { "data": OUTLINE!.raster.data.map((v, i) =>
-			(v === OUTLINE!.raster.nodata || !scores.mask[i]) ? -1 : 0) },
+			(v === OUTLINE!.raster.nodata || !mask[i]) ? -1 : 0) },
 	};
 	const analysed_aggregates = await aggregate_layer_values(analysed_mask_raster);
 
-	return {
-		"areas":            foldValues(layer_aggregates),
+	const values = foldValues(layer_aggregates);
+
+	// The per-area {score, bucket} table; area_score_table is the scoring
+	// strategy knob, currently 'layer_totals' — each layer's per-area
+	// aggregate normalised across the areas, weighted, stretched to 1..100%.
+	const areas = area_score_table(aggregate_by_area(cells, division.raster.data), values, score_layers(key.index));
+
+	const scores = { cells, mask, areas };
+	values_stash.set(scores, {
+		"areas":            values,
 		"national":         foldNational(national_aggregates),
 		"analysed":         foldNational(analysed_aggregates),
 		"layer_aggregates": layer_aggregates,
-	};
+	});
+
+	return scores;
+}
+
+async function compute_result_values(_key: ResultKey, scores: ScoresPayload) {
+	// The fold compute_result_scores stashed — no recomputation.
+	return values_stash.get(scores)!;
 }
 
 const result_service = createAnalysisService({
@@ -656,19 +647,18 @@ const result_service = createAnalysisService({
 	"computeValues": compute_result_values,
 });
 
-/** Phase 1 of analysis_result: per-area scores/buckets land first (§6.7). */
+/** analysis_result phase 1: per-area scores/buckets, published before values. */
 export function analysis_scores(index: string, tier: number | string) {
 	return result_service.scores(index, tier);
 }
 
-/** The memoised analysis_result: cells, mask, areas, national. */
+/** The completed analysis_result: cells, mask, areas, national. */
 export function analysis_result(index: string, tier: number | string) {
 	return result_service.result(index, tier);
 }
 
-// The COMMIT hook (a.js, next to timeline_sync_datasets): revision bump +
-// selective invalidation. Deliberately NOT state_set — COMMIT's 300ms
-// debounce coalesces range-slider drags into one revalidation.
+// COMMIT hook (a.js): revision bump + selective invalidation. Deliberately
+// NOT state_set — COMMIT's 300ms debounce coalesces slider drags into one revalidation.
 export function analysis_state_sync() {
 	result_service.sync();
 }

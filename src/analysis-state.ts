@@ -1,39 +1,22 @@
-// EAE-521: the single atom for derived analysis state
-// (notes/area-score-refactor.md §4-6, esp. §6.7-8). One meiosis cell holds
-// the memoised `analysis_result` payloads — cells, mask, per-area scores /
-// buckets / values and the first-class whole-geography entry — keyed by
-// key(index, tier, subdiv), plus the pure producer service that memoises
-// in-flight promises and publishes through a revision staleness guard.
+// The pure atom for derived analysis state: a meiosis cell of memoised
+// analysis_result payloads — cells, mask, per-area scores/buckets/values and
+// the whole-geography entry — keyed by (index, tier, subdiv), plus the service
+// that memoises in-flight promises and publishes through a revision guard.
 //
-// Same conventions as right-panel-data-state.ts / timeline-state.ts:
-// pure module (no DOM, no app globals), meiosis-stream function patches,
-// cell/actions/subscribe, staleness-guarded actions. The IMPURE producer
-// (run() + area-scores + layer aggregates against STATE/GEOGRAPHY/OUTLINE)
-// is injected as computeScores/computeValues and lives in analysis.js.
-//
-// Invalidation is driven from a.js's COMMIT (via service.sync(), next to
-// timeline_sync_datasets) — NOT from state_set — so the 300ms debounce
-// coalesces slider drags into one revalidation. Every commit bumps
-// `revision`; entries whose inputs are unchanged are re-stamped to the new
-// revision (unrelated commits do NOT invalidate), entries whose inputs
-// moved are dropped (so a change evicts exactly what it affects).
-//
-// Two-phase publish (§6.7): computeScores' payload — per-area scores and
-// buckets — is published synchronously before computeValues is even
-// called, because mapbox popup handlers read scores synchronously while
-// the layer aggregates are still being computed.
-//
-// Erasable-syntax only (no namespace/enum): node strip-types runs the tests.
+// Erasable syntax only (no namespace/enum): node strip-types runs the tests.
 
 import stream from './meiosis-stream.ts';
+
+import type {
+	ScoreBucket,
+} from './area-scores.ts';
 
 /** A subdivision selection (STATE.subdiv); null is "no subdivision filter". */
 export type Subdiv = number | string | null;
 
-/** A division tier (STATE.variant: a tier number or 'raster'). */
+/** A division tier (STATE.divtier): a tier number or 'raster'. */
 export type Tier = number | string;
 
-/** The identity of one derived analysis result. */
 export interface ResultKey {
 	readonly index: string;
 	readonly tier: Tier;
@@ -54,42 +37,29 @@ export interface AggregateResult {
 /** Per-area values per dataset id. */
 export type AreaValues = Readonly<Record<string, AggregateResult | null>>;
 
-/** The score/bucket half of an area entry (phase 1). */
+/** The score/bucket half of an area entry. */
 export interface AreaScores {
-	/** The area's average analysis score. */
 	readonly score: number;
-	/** Low..High label from the one area scale; null is "no score". */
-	readonly bucket: string | null;
+	/** The shared score scale's bucket (area-scores.ts); null is "no score". */
+	readonly bucket: ScoreBucket | null;
 }
 
-/** One area's full entry: score, bucket and its per-dataset aggregates. */
 export interface AreaResult extends AreaScores {
-	/** Per-area values per dataset; null until the second publish phase. */
+	/** Per-area values per dataset; null until the values publish. */
 	readonly values: AreaValues | null;
 }
 
-/**
- * The whole-geography entry, FIRST-CLASS (§6.3): the per-dataset aggregates
- * over the full outline with no analysis mask. This is what right-panel.js,
- * right-panel-data-tab.ts and summary.js faked as "area 0" until now. Null
- * until the second publish phase.
- */
+/** The whole-geography aggregate over the full outline, no analysis mask;
+ * values is null until the values publish. */
 export interface NationalResult {
 	readonly values: AreaValues | null;
 }
 
-/**
- * One derived analysis result (notes §4).
+/** One derived analysis result.
  *
- * - cells:   the analysis raster (run()'s rescaled scores, -1 clipped).
- * - mask:    the "analysed cells" rule (today's has_priority_score; the
- *            mask unification lands separately, TODO(#13)).
- * - areas:   per division area: values per dataset, score, bucket.
- * - national: the whole-geography entry (§6.3).
- * - analysed: the analysed cells inside the outline — the cards'
- *             analysed-area universe (EAE-514), outline-gated so it needs
- *             no admin division.
- */
+ * mask is the one "analysed cells" rule (area-scores.ts analysed_mask); the
+ * criteria display mask is deliberately a different concept (criteria_pass_mask).
+ * analysed comes from the outline alone, so the cards need no admin division. */
 export interface AnalysisResult {
 	readonly cells: Float32Array;
 	readonly mask: Uint8Array;
@@ -102,7 +72,7 @@ export interface AnalysisResult {
 export interface ResultEntry {
 	readonly revision: number;
 	readonly key: ResultKey;
-	/** The inputs fingerprint captured at compute time (see ServiceSpec.inputs). */
+	/** The inputs fingerprint captured at compute time. */
 	readonly inputs: string;
 	readonly result: AnalysisResult;
 }
@@ -117,8 +87,8 @@ export interface AnalysisState {
 export type Patch = (state: AnalysisState) => AnalysisState;
 
 export interface AnalysisCell {
-	/** Snapshot taken at cell() call time (timeline-state convention) —
-	 * re-call cell() or use subscribe() for a fresh read. */
+	/** Snapshot at cell() call time; re-call cell() or subscribe() for a
+	 * fresh read. */
 	readonly state: AnalysisState;
 	update(patch: Patch): void;
 }
@@ -149,14 +119,9 @@ export interface ComputedPayload {
 }
 
 export const actions = {
-	/**
-	 * A result computation resolved and is being published. Applied only
-	 * while the state still carries the revision it was computed for — a
-	 * stale payload (a commit landed meanwhile) is discarded instead of
-	 * clobbering fresher state (the right-panel-data-state nationalComputed
-	 * pattern). Two-phase: called once with the scores-only result and again
-	 * with the completed one. Returns whether it was applied.
-	 */
+	/** Applied only while the state still carries the revision the payload was
+	 * computed for — a stale payload is discarded, not written over fresher
+	 * state. Called with the scores-only result and again with the completed one. */
 	computed(c: AnalysisCell, payload: ComputedPayload): boolean {
 		if (c.state.revision !== payload.revision) return false;
 
@@ -178,17 +143,9 @@ export const actions = {
 		return true;
 	},
 
-	/**
-	 * A COMMIT landed: bump the revision and keep exactly the entries whose
-	 * inputs are unchanged (re-stamped to the new revision, so unrelated
-	 * commits — map moves, tab switches — do not invalidate anything);
-	 * entries whose fingerprint moved — dataset on/weight/domain (`_afn`
-	 * range sliders), subdiv, tier, data arrival — are dropped.
-	 *
-	 * `current` maps every stored entry's resultKey to its fingerprint NOW
-	 * (ServiceSpec.inputs). Entries missing from the map are unverifiable
-	 * and are dropped too.
-	 */
+	/** Bumps the revision and keeps exactly the entries whose inputs still
+	 * match `current`, re-stamping them to the new revision; entries whose
+	 * fingerprint moved, or that are missing from `current`, are dropped. */
 	commit(c: AnalysisCell, current: Readonly<Record<string, string>>): void {
 		c.update(s => {
 			const results: Record<string, ResultEntry> = {};
@@ -216,21 +173,21 @@ export const actions = {
 // Pure result assembly (exported for the producer and for unit tests).
 // ---------------------------------------------------------------------------
 
-/** Phase-1 payload: everything but the per-dataset aggregates. */
+/** Everything but the per-dataset aggregates. */
 export interface ScoresPayload {
 	readonly cells: Float32Array;
 	readonly mask: Uint8Array;
 	readonly areas: Readonly<Record<string, AreaScores>>;
 }
 
-/** Phase-2 payload: the per-dataset aggregates, areas first. */
+/** The per-dataset aggregates, areas first. */
 export interface ValuesPayload {
 	readonly areas: Readonly<Record<string, AreaValues>>;
 	readonly national: AreaValues;
 	readonly analysed: AreaValues;
 }
 
-/** Builds the phase-1 result (values pending) from a scores payload. */
+/** A result whose values are still pending. */
 export function withScores(scores: ScoresPayload): AnalysisResult {
 	return {
 		"cells":   scores.cells,
@@ -244,7 +201,6 @@ export function withScores(scores: ScoresPayload): AnalysisResult {
 	};
 }
 
-/** Folds the phase-2 aggregates into a phase-1 result. */
 export function withValues(partial: AnalysisResult, values: ValuesPayload): AnalysisResult {
 	return {
 		...partial,
@@ -257,17 +213,14 @@ export function withValues(partial: AnalysisResult, values: ValuesPayload): Anal
 	};
 }
 
-/**
- * Structural view of analysis.js's aggregate_layer_values output
- * ({ [datasetId]: { ..., areas: { [areaId]: { result } } } }).
- */
+/** Structural view of aggregate_layer_values' output
+ * ({ [datasetId]: { areas: { [areaId]: { result } } } }). */
 export interface LayerDataLike {
 	readonly [datasetId: string]: {
 		readonly areas?: Readonly<Record<string, { readonly result?: AggregateResult | null } | undefined>> | undefined;
 	} | undefined;
 }
 
-/** Folds layer data into per-area values per dataset (area-first). */
 export function foldValues(aggregates: LayerDataLike): Record<string, AreaValues> {
 	const out: Record<string, Record<string, AggregateResult | null>> = {};
 
@@ -284,7 +237,7 @@ export function foldValues(aggregates: LayerDataLike): Record<string, AreaValues
 	return out;
 }
 
-/** The whole-geography entry of a whole-outline aggregate (fake "area 0"). */
+/** The whole-geography entry of a whole-outline aggregate (area '0'). */
 export function foldNational(aggregates: LayerDataLike): AreaValues {
 	const out: Record<string, AggregateResult | null> = {};
 
@@ -303,27 +256,20 @@ export type MaybePromise<T> = T | Promise<T>;
 export type PublishPhase = 'scores' | 'complete';
 
 export interface ServiceSpec<V extends ValuesPayload> {
-	/**
-	 * The fingerprint of EVERYTHING a result for (index, subdiv) derives
-	 * from: live mutable state included (subdiv, divtier, timeline date,
-	 * dataset on/weight/domain/_domain_select, data arrival). Compared
-	 * across commits to decide invalidation — every input change must show
-	 * up as a different string. `subdiv` is the scope's key part; fold in the
-	 * live subdiv too so entries of other subdivisions are dropped when it
-	 * changes.
-	 */
+	/** Fingerprint of everything a result for (index, subdiv) derives from,
+	 * live state included (subdiv, divtier, timeline date, per-dataset
+	 * on/weight/domain/data). Every input change must produce a different
+	 * string; the live subdiv is folded in so other-scope entries drop too. */
 	readonly inputs: (index: string, subdiv: Subdiv) => string;
 
-	/** The current subdivision (STATE.subdiv), used to build request keys. */
+	/** The current subdivision (STATE.subdiv), for building request keys. */
 	readonly subdiv: () => Subdiv;
 
 	/** Geography identity; a change clears the whole cache. */
 	readonly geography: () => string;
 
-	/**
-	 * Phase 1: cells, mask and per-area scores/buckets. Runs first and its
-	 * result is published before computeValues is called (§6.7).
-	 */
+	/** Phase 1: cells, mask and per-area scores/buckets. Published before
+	 * computeValues runs — popup handlers read scores synchronously. */
 	readonly computeScores: (key: ResultKey) => MaybePromise<ScoresPayload>;
 
 	/** Phase 2: the per-area / national aggregates. */
@@ -341,17 +287,11 @@ export interface ServiceSpec<V extends ValuesPayload> {
 export interface AnalysisService {
 	/** Phase 1 as soon as it lands (scores readable while values are pending). */
 	scores(index: string, tier: Tier): Promise<AnalysisResult>;
-	/**
-	 * The completed result (values + national). Never resolves with a
-	 * result whose publish was discarded as stale — that case retries the
-	 * computation against the current inputs (see start()).
-	 */
+	/** The completed result. Never resolves with a result whose publish was
+	 * discarded as stale — that case retries against the current inputs. */
 	result(index: string, tier: Tier): Promise<AnalysisResult>;
-	/**
-	 * Memoised first stage (the run() shared by canvas painting and the
-	 * result pipeline), keyed (revision, index, subdiv). Concurrent callers
-	 * share one promise.
-	 */
+	/** Memoised run() stage shared by canvas painting and the result pipeline,
+	 * keyed (revision, index, subdiv); concurrent callers share one promise. */
 	stage<T>(index: string, fn: () => MaybePromise<T>): Promise<T>;
 	/** The COMMIT hook (a.js): revision bump + selective invalidation. */
 	sync(): void;
@@ -369,7 +309,7 @@ interface MemoEntry {
 	readonly done: Promise<AnalysisResult>;
 }
 
-/** The (index, subdiv) scope a cache entry's fingerprint is computed for. */
+/** The (index, subdiv) scope an entry's fingerprint is computed for. */
 interface Scoped {
 	readonly index: string;
 	readonly subdiv: Subdiv;
@@ -386,10 +326,8 @@ interface StageEntry {
 export function createAnalysisService<V extends ValuesPayload>(spec: ServiceSpec<V>): AnalysisService {
 	let memo = new Map<string, MemoEntry>();
 	let stages = new Map<string, StageEntry>();
-	// Lazy: spec.geography() may read app globals that do not exist yet at
-	// construction time (the module loads before the geography does). The
-	// baseline is seeded on first use, so a change before the first sync is
-	// still caught.
+	// Lazy: spec.geography() may read app globals absent at construction time.
+	// Seeding the baseline on first use still catches a change before first sync.
 	let geography: string | null = null;
 
 	function observeGeography(): string {
@@ -410,10 +348,8 @@ export function createAnalysisService<V extends ValuesPayload>(spec: ServiceSpec
 	): boolean {
 		const c = cell();
 
-		// Inputs moved while the computation was in flight: the result is
-		// stale in substance — do not publish it. The caller retries against
-		// the current inputs (see start()), so an un-published result is never
-		// resolved to a consumer either.
+		// Inputs moved while the computation was in flight: do not publish. The
+		// caller retries against the current inputs (see start()).
 		if (spec.inputs(key.index, key.subdiv) !== inputs) return false;
 
 		const applied = actions.computed(c, {
@@ -434,26 +370,24 @@ export function createAnalysisService<V extends ValuesPayload>(spec: ServiceSpec
 		const k = memoKey(revision, key);
 		const inputs = spec.inputs(key.index, key.subdiv);
 
-		// A hit is served only while its captured fingerprint still matches:
-		// a change can land INSIDE the 300ms COMMIT debounce — the revision,
-		// and with it the memo key, is not bumped yet — and a pre-change entry
-		// served here publishes a stale analysis. Mismatch = miss.
+		// A change can land inside COMMIT's 300ms debounce, before the revision
+		// (and memo key) is bumped; serving a pre-change entry would publish a
+		// stale analysis. Mismatch = miss.
 		const hit = memo.get(k);
 		if (hit && hit.inputs === inputs) return hit;
 
-		// In-flight promises are memoised, so concurrent callers (map paint
-		// + popup + summary firing from one reload()) share one computation.
+		// In-flight promises are memoised so concurrent callers share one computation.
 		const scoresPayload = (async () => spec.computeScores(key))();
 
-		// Phase 1, shared by both entry points — or null when its publish was
-		// discarded as stale (inputs moved while the computation was in
-		// flight).
+		// Phase 1, shared by both entry points; null when its publish was
+		// discarded as stale.
 		const phase1 = (async () => {
 			const payload = await scoresPayload;
 			const partial = withScores(payload);
 
-			// Phase 1 lands BEFORE computeValues is even called: per-area
-			// scores are synchronously readable at publish time (§6.7).
+			// Phase 1 lands before computeValues is called: popup handlers read
+			// per-area scores synchronously at publish time, while the aggregates
+			// are still pending.
 			return publish(inputs, key, 'scores', payload, partial)
 				? { payload, partial }
 				: null;
@@ -462,11 +396,8 @@ export function createAnalysisService<V extends ValuesPayload>(spec: ServiceSpec
 		const scores = (async () => {
 			const p1 = await phase1;
 
-			// The publish was discarded as stale: the caller asked for the
-			// result for the CURRENT inputs — retry the computation against
-			// them rather than resolving a result the atom never held (the
-			// fresh start re-verifies and replaces this entry, so every
-			// waiting caller shares one retry).
+			// Publish was discarded as stale: retry against the current inputs
+			// rather than resolve a result the atom never held.
 			return p1 ? p1.partial : start(key).scores;
 		})();
 
@@ -477,9 +408,8 @@ export function createAnalysisService<V extends ValuesPayload>(spec: ServiceSpec
 			const values = await spec.computeValues(key, p1.payload);
 			const complete = withValues(p1.partial, values);
 
-			// Phase 2 went stale (inputs moved while the aggregates were in
-			// flight): the completed result is stale in substance too —
-			// recompute the whole pipeline against the current inputs.
+			// Phase 2 went stale too: recompute the whole pipeline against the
+			// current inputs.
 			return publish(inputs, key, 'complete', values, complete)
 				? complete
 				: start(key).done;
@@ -516,10 +446,8 @@ export function createAnalysisService<V extends ValuesPayload>(spec: ServiceSpec
 			const k = `${revision}|stage|${index}|${String(subdiv)}`;
 			const inputs = spec.inputs(index, subdiv);
 
-			// Same hit re-verification as start(): the pre-change run() cells a
-			// stale stage hit returns would be folded into a post-change result
-			// whose publish guard sees matching (post-change) captures and
-			// applies it — the stale-publish half of the debounce race.
+			// Same re-verification as start(): a stale stage's cells would be
+			// folded into a post-change result whose guard then applies it.
 			// Mismatch = miss.
 			const hit = stages.get(k);
 			if (hit && hit.inputs === inputs) return hit.promise as Promise<T2>;
@@ -557,8 +485,8 @@ export function createAnalysisService<V extends ValuesPayload>(spec: ServiceSpec
 
 			actions.commit(c, current);
 
-			// Re-read: cell() snapshots state at call time (timeline-state
-			// convention), so c.state still carries the pre-commit revision.
+			// Re-read: cell() snapshots at call time, so c.state still carries
+			// the pre-commit revision.
 			const revision = cell().state.revision;
 
 			const keptMemo = new Map<string, MemoEntry>();

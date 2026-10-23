@@ -336,7 +336,7 @@ async function get_division_results(variant, { all = false } = {}) {
 		.filter(id => all || has_priority_score(areas[id].score))
 		.map(id => get_admin_area_item(variant, id))
 		.filter(item => item !== null)
-		.sort((a, b) => a.priority > b.priority ? -1 : 1);
+		.sort((a, b) => b.priority - a.priority);
 };
 
 export async function update() {
@@ -348,7 +348,7 @@ export async function update() {
 
 	const isRaster = STATE.variant === 'raster';
 	const results = isRaster ? await all_points() : await get_division_results(STATE.variant);
-	const sorted = results.sort((a, b) => a.priority > b.priority ? -1 : 1);
+	const sorted = results.sort((a, b) => b.priority - a.priority);
 
 	locations_list.setResults(sorted);
 
@@ -404,7 +404,7 @@ async function all_points() {
 	}, []);
 
 	return points
-		.sort((a,b) => a.v > b.v ? -1 : 1)
+		.sort((a, b) => b.v - a.v)
 		.map(t => ({ "priority": t.v, "i": t.i, "c": raster_pixel_to_coordinates(t.i) }));
 };
 

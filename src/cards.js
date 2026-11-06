@@ -1,5 +1,7 @@
 import DS from './ds.js';
 
+import { layer_legend } from './right-panel-shared.ts';
+
 import { t, translateDatasetName, translateDatasetAttribute, translateNode, translateUnit, translateIndexName, getScaleLabels, registerUIUpdater } from './translate.js';
 
 import bind from '../lib/bind.js';
@@ -469,7 +471,9 @@ function symbol() {
 };
 
 function colorscale() {
-	if (!this.ds.colorscale) return null;
+	const stops = layer_legend(this.ds)?.stops;
+
+	if (!stops) return null;
 
 	let bubble;
 
@@ -498,7 +502,7 @@ function colorscale() {
 		}
 
 		return colorscale_svg(
-			this.ds.colorscale.stops,
+			stops,
 			16,
 			(t,i) => mouseenter(t, i, x(i)),
 			mouseleave,
@@ -509,7 +513,7 @@ function colorscale() {
 	case 'raster-valued-mutant': {
 		const ds = this.ds.hosts ? this.ds.host : this.ds;
 		return colorscale_svg(
-			ds.colorscale.stops,
+			stops,
 			16,
 			(t,i) => mouseenter(t, i, maybe(ds.csv.table, i)),
 			mouseleave,
@@ -522,29 +526,14 @@ function colorscale() {
 };
 
 function ramp() {
-	const ds = this.ds.hosts ? this.ds.host : this.ds;
-	const cat = this.ds.category;
+	const labels = layer_legend(this.ds)?.labels;
 
-	if (!ds.domain) return "";
-
-	if (ds._domain_select) return bind(tmpl('#ramp'), {
-		"middle": coalesce(cat.controls.range_label, translateUnit(window.LOCALE, cat.unit)),
-	});
-
-	const {min,max} = ds.domain;
-
-	const diff = Math.abs(max - min);
-	let i = 3 - Math.ceil(Math.log10(diff || 1));
-	if (i < 0) i = 0;
-
-	if (and(cat.unit === "%",
-	        or(and(min === 0, max === 100),
-	           and(min === 100, max === 0)))) i = 0;
+	if (!labels) return "";
 
 	return bind(tmpl('#ramp'), {
-		"left":   min.toFixed(i),
-		"middle": coalesce(cat.controls.range_label, translateUnit(window.LOCALE, cat.unit), t(window.LOCALE, 'left_panel.cards.card.range')),
-		"right":  max.toFixed(i),
+		"left":   labels.min,
+		"middle": labels.mid,
+		"right":  labels.max,
 	});
 };
 

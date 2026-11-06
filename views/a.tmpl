@@ -736,6 +736,18 @@
 
       <div class="card-section export-option-card">
         <div class="export-option-icon">
+          <i class="bi bi-map"></i>
+        </div>
+        <h3 class="card-title" data-t="modal.export.static_map.title">Static map</h3>
+        <p class="card-description" data-t="modal.export.static_map.desc">A printable PDF of the map as you see it, with its legend, scale bar, north arrow, data sources and attributions.</p>
+        <button type="button" class="button-small" bind-listen="click" bind-func="export_static_map">
+          <i class="bi bi-download"></i>
+          <span data-t="modal.export.static_map.button">Download .pdf</span>
+        </button>
+      </div>
+
+      <div class="card-section export-option-card">
+        <div class="export-option-icon">
           <i class="bi bi-table"></i>
         </div>
         <h3 class="card-title" data-t="modal.export.high_priority.title">Priority areas</h3>

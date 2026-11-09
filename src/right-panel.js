@@ -124,11 +124,23 @@ export function update_analysis(data) {
 	render();
 }
 
+let summary_generation = 0;
+
+// The share graphs come from the summary, which waits on the population
+// raster: they show as pending until it lands.
+function summary_pending(pending) {
+	for (const id of ['#area-number', '#population-number'])
+		qs(id)?.closest('.index-graphs-section')?.classList.toggle('pending', pending);
+}
+
 export async function graphs(raster) {
+	summary_generation += 1;
+
 	// The outline alone gives the panel nothing but its blank state, and the
 	// summary would download the population raster to fill hidden cards.
 	if (STATE.datasets.every(d => d === OUTLINE)) {
 		data_tab_actions.analysisCompleted(data_tab_cell(), {}, {});
+		summary_pending(false);
 		update_analysis(false);
 		return;
 	}
@@ -136,17 +148,14 @@ export async function graphs(raster) {
 	// Card aggregates come from the analysis cell: OUTLINE_TIER's area 0 is the
 	// has_priority_score() analysed-area bucket, result.national.values the same
 	// layers over the whole geography with no analysis mask.
-	let summary;
+	let national_layer_data;
 	try {
 		const result = await analysis_result(STATE.index, OUTLINE_TIER);
 
 		const layer_data = layer_data_from_values(result.analysed.values);
-		const national_layer_data = layer_data_from_values(result.national.values);
+		national_layer_data = layer_data_from_values(result.national.values);
 
 		data_tab_actions.analysisCompleted(data_tab_cell(), layer_data, national_layer_data);
-
-		// The summary keeps the analysis-window mask.
-		summary = await summary_analyse(raster, national_layer_data);
 	} catch (e) {
 		update_analysis(false);
 		throw e;
@@ -160,9 +169,18 @@ export async function graphs(raster) {
 	// wherever no layer feeds the index (and returns an all -1 raster for a
 	// filters-only analysis, deliberately).
 	update_analysis(raster.some(v => v !== -1));
-
-	render_graphs(summary);
 	analysis_locations_panel_update();
+
+	// Not awaited: the results above show without the population download.
+	// A newer analysis supersedes this summary, which keeps the
+	// analysis-window mask.
+	const generation = summary_generation;
+	summary_pending(true);
+
+	summary_analyse(raster, national_layer_data)
+		.then(summary => { if (generation === summary_generation) render_graphs(summary); })
+		.catch(err => console.error(err))
+		.finally(() => { if (generation === summary_generation) summary_pending(false); });
 };
 
 export function init() {

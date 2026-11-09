@@ -780,11 +780,11 @@ export default class DS {
 		else if (this.card) this.card.remove();
 	};
 
-	loadall() {
+	loadall(role = 'layer') {
 		return dataset_load(this.id, () => Whatever
 			.then(_ => this.load('csv'))
 			.then(_ => this.load('vectors'))
-			.then(_ => this.load('raster')));
+			.then(_ => this.load('raster')), role);
 	};
 
 	async load(arg) {

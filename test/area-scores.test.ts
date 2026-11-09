@@ -47,6 +47,7 @@ const has_priority_score: any  = scores.has_priority_score;
 const analysed_mask: any       = scores.analysed_mask;
 const criteria_pass_mask: any  = scores.criteria_pass_mask;
 const aggregation_band: any    = scores.aggregation_band;
+const aggregation_band_key: any = scores.aggregation_band_key;
 const jenks_breaks: any        = scores.jenks_breaks;
 const bucket_in_edges: any     = scores.bucket_in_edges;
 const aggregate_layer_values: any = analysis.aggregate_layer_values;
@@ -457,6 +458,23 @@ describe('aggregation_band', () => {
 			aggregation_band(layer({ "name": 'c', "analysis": { "aggregation": 'AVG' } }, csv)),
 			'DATA_BAND',
 		);
+	});
+
+	// The parser decodes only near plus this band for a raster no other
+	// dataset reads: the key must name the band aggregation_band() returns.
+	it('aggregation_band_key names the band aggregation_band reads', () => {
+		const csv = { "key": 1, "table": {} };
+		const cases = [
+			layer({ "name": 'c', "analysis": { "aggregation": 'SUM' } }),
+			layer({ "name": 'c', "analysis": { "aggregation": 'AVG' } }),
+			layer({ "name": 'c' }),
+			layer({ "name": 'c', "analysis": { "aggregation": 'SUM' } }, csv),
+		];
+
+		assert.deepEqual(cases.map(aggregation_band_key), ['sum', 'average', 'average', 'data']);
+
+		for (const c of cases)
+			assert.equal(aggregation_band(c), bands[aggregation_band_key(c) as keyof typeof bands]);
 	});
 });
 

@@ -14,7 +14,9 @@ import modal from '../lib/modal.js';
 
 import bind from '../lib/bind.js';
 
-import dscard from './cards.js';
+import dscard, {
+	update as cards_update,
+} from './cards.js';
 
 import dscontrols from './controls.js';
 
@@ -773,7 +775,9 @@ export default class DS {
 
 		this.visibility(visible && draw);
 
-		if (!visible && this.card) this.card.remove();
+		// The card shows with the layer, not once the analysis is done.
+		if (visible) cards_update();
+		else if (this.card) this.card.remove();
 	};
 
 	loadall() {

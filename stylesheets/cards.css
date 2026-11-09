@@ -21,3 +21,25 @@
   border: 1px solid lightgray;
   margin: 0.25em 0.25em;
 }
+
+#cards-pending .card-pending {
+  display: flex;
+  align-items: center;
+  gap: 0.75em;
+  margin: 1em;
+  padding: 1em;
+  background-color: white;
+  border-radius: 5px;
+  color: var(--the-gray);
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.3));
+}
+
+#cards-pending .spinner {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #E7E6E6;
+  border-top-color: #A0D4C1;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}

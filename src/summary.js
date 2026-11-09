@@ -111,7 +111,7 @@ function national_value(national, dataset_id) {
 
 export async function generate_summary_data() {
 	const pop = DST.get('population-density');
-	await pop.load('raster');
+	await pop.loadall('support');
 
 	SUMMARY = {};
 
@@ -179,7 +179,7 @@ export default async function analyse(raster, national = null) {
 		ds = OUTLINE;
 	}
 
-	await ds.loadall();
+	await ds.loadall('support');
 	const p = ds.raster.data;
 	const nodata = ds.raster.nodata;
 

@@ -127,6 +127,7 @@ import {
 	actions as loading_actions,
 	recompute,
 	subscribe as loading_subscribe,
+	layer_loading,
 } from './loading-state.js';
 
 export const STANDARD_TABS = new Set(['census', 'demand', 'supply', 'other']);
@@ -539,7 +540,7 @@ function warm_population() {
 
 	const unsubscribe = loading_subscribe(s => {
 		const layer = Object.entries(s.datasets)
-			.some(([id, status]) => status === 'loading' && id !== ds.id && id !== OUTLINE.id);
+			.some(([id, e]) => layer_loading(e) && id !== ds.id && id !== OUTLINE.id);
 
 		if (layer) controller.abort();
 	});

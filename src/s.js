@@ -51,16 +51,34 @@ function find_geography_by_name(geographies, name) {
 		|| geographies.find(g => g.name.toLowerCase().startsWith(lower + ' '));
 };
 
-function preload_boundaries(id) {
-	return API.get('datasets', {
-		"select":        ['processed_files'],
-		"geography_id":  `eq.${id}`,
-		"category_name": "in.(outline,boundaries)",
-	}).then(r => {
-		r.map(d => d['processed_files'].find(f => f['func'] === 'vectors'))
-			.filter(Boolean)
-			.forEach(f => fetch(f['endpoint']).catch(() => {}));
+const preloaded = new Set();
+
+// Warms the HTTP cache with the files /tool/a downloads before its overlay
+// lifts: the outline and the configured divisions. S3 sends Last-Modified
+// and no Cache-Control, so the browser reuses them on the next page. The
+// request must match parse.js's fetch() for the cache to hit.
+async function preload_boundaries(id) {
+	if (preloaded.has(id) || navigator.connection?.saveData) return;
+	preloaded.add(id);
+
+	const g = await API.get('geographies', { "id": `eq.${id}`, "select": ['configuration'] }, { "one": true });
+	const ids = (maybe(g, 'configuration', 'divisions') || []).map(d => d.dataset_id).filter(Boolean);
+	if (!ids.length) return;
+
+	const datasets = await API.get('datasets', {
+		"select": ['processed_files', 'source_files'],
+		"id":     `in.(${ids.join(',')})`,
 	});
+
+	const endpoints = datasets.flatMap(d => [
+		...(d['processed_files'] || []).filter(f => ['vectors', 'raster'].includes(f['func'])),
+		...(d['source_files'] || []).filter(f => f['func'] === 'csv'),
+	].map(f => f['endpoint']));
+
+	for (const e of endpoints.filter(Boolean)) {
+		const url = e.match(/^(blob:)?http/) ? e : EAE['settings'].storage + e;
+		fetch(url).catch(() => {});
+	}
 };
 
 async function geography(c) {
@@ -165,6 +183,8 @@ const presets = [
 ];
 
 function usertype(gid) {
+	preload_boundaries(gid).catch(() => {});
+
 	const content = ce('div', ce('p', t(window.LOCALE, 'geography_picker.interest_prompt')), { "id": "presets" });
 
 	const ul = ce('ul');
@@ -262,7 +282,7 @@ export async function init() {
 		for (const co of geographies) {
 			const d = ce('div', ce('h2', co.name, { "class": 'country-name' }), { "class": 'country-item', "ripple": "" });
 			d.onclick = async _ => {
-				preload_boundaries(co.id);
+				preload_boundaries(co.id).catch(() => {});
 				setTimeout(_ => geography(co), 350);
 			};
 

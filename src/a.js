@@ -135,6 +135,10 @@ export const STANDARD_TABS = new Set(['census', 'demand', 'supply', 'other']);
 // Must match the keys reload() returns early for.
 const VIEW_ONLY_COMMITS = ['center', 'zoom', 'tab'];
 
+const DATASETS_SELECT = ["*", "type", "category:categories(*)"];
+
+let datasets_request;
+
 const commit = debounce(function() {
 	if (DEBUG || ENV.includes("test")) console.trace("commit!", ...arguments);
 
@@ -294,6 +298,16 @@ async function init_1() {
 		throw new Error("No geography id in URL");
 	}
 
+	// The query needs only the id in the URL, so it runs alongside the
+	// geography's own request; init_2 awaits it.
+	datasets_request = API.get("datasets", {
+		"geography_id": `eq.${id}`,
+		"select":       DATASETS_SELECT,
+		"deployment":   `ov.{${ENV}}`,
+		"flagged":      "is.false",
+	});
+	datasets_request.catch(() => {});
+
 	let conf = sessionStorage.getItem('config');
 	if (conf) conf = JSON.parse(conf);
 
@@ -368,20 +382,13 @@ async function init_1() {
 };
 
 async function init_2(conf) {
-	const select = ["*", "type", "category:categories(*)"];
-
 	const divisions = maybe(GEOGRAPHY.configuration, 'divisions').filter(d => d.dataset_id !== null);
 
 	GEOGRAPHY.divisions = [];
 
 	loading(t(LOCALE, 'overlay.fetching_datasets'));
 
-	const ALL = await API.get("datasets", {
-		"geography_id": `eq.${GEOGRAPHY.id}`,
-		"select":       select,
-		"deployment":   `ov.{${ENV}}`,
-		"flagged":      "is.false",
-	});
+	const ALL = await datasets_request;
 
 	await (async function outline() {
 		const json = ALL.find(d => d.id === divisions[0].dataset_id);
@@ -400,8 +407,7 @@ This is fatal. Thanks for all the fish.`;
 		OUTLINE.vectors.fill = 'transparent';
 		OUTLINE.vectors.opacity = 1;
 
-		await OUTLINE.load('vectors');
-		await OUTLINE.load('raster');
+		await Promise.all([OUTLINE.load('vectors'), OUTLINE.load('raster')]);
 
 		OUTLINE.vectors.data.features[0].id = 0;
 	})();
@@ -417,10 +423,11 @@ This is fatal. Thanks for all the fish.`;
 				.map(async e => {
 					const ds = new DS(e);
 
-					return ds.load('csv')
-						.then(_ => ds.load('vectors'))
-						.then(_ => ds.load('raster'))
-						.catch(err => console.error(err));
+					// The vectors join the csv on parse; the raster needs neither.
+					return Promise.all([
+						ds.load('csv').then(_ => ds.load('vectors')),
+						ds.load('raster'),
+					]).catch(err => console.error(err));
 				}),
 		);
 	})();
@@ -441,7 +448,7 @@ This is fatal. Thanks for all the fish.`;
 
 			o = await API.get("datasets", {
 				"geography_id":  `eq.${pid}`,
-				"select":        select,
+				"select":        DATASETS_SELECT,
 				"category_name": "eq.admin-tiers",
 			}, { "one": true });
 		}

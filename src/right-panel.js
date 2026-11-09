@@ -90,17 +90,23 @@ function render() {
 
 	const idle_with_data = !busy && has_data;
 
+	// While a recompute runs, results already on screen stay, dimmed and
+	// inert, instead of giving way to the spinner.
+	const stale = busy && has_data;
+
 	for (const id of ['#save-snapshot-button', '#share-snapshot-button', '#export-button']) {
 		const button = qs(id);
 		if (button) button.disabled = !idle_with_data;
 	}
 
-	qs('#analysis-loading-state').style.display = busy ? 'flex' : 'none';
+	qs('#right-panel-content').classList.toggle('stale', stale);
+
+	qs('#analysis-loading-state').style.display = (busy && !has_data) ? 'flex' : 'none';
 	qs('#analysis-blank-state').style.display = (!busy && !has_data) ? 'flex' : 'none';
-	qs('#analysis-sections-wrapper').style.display = idle_with_data ? 'flex' : 'none';
+	qs('#analysis-sections-wrapper').style.display = has_data ? 'flex' : 'none';
 
 	const active_tab = qs('#right-panel-tabs .right-panel-tab.active');
-	const shown = (!busy && active_tab) ? `right-panel-tab-${active_tab.dataset.tab}` : null;
+	const shown = ((!busy || has_data) && active_tab) ? `right-panel-tab-${active_tab.dataset.tab}` : null;
 
 	document.querySelectorAll('.right-panel-tab-panel').forEach(p => { p.hidden = p.id !== shown; });
 }

@@ -94,7 +94,6 @@ import {
 import {
 	init as right_panel_init,
 	graphs as right_panel_graphs,
-	update_analysis as right_panel_update_analysis,
 } from './right-panel.js';
 
 import {
@@ -556,7 +555,6 @@ async function reload(k,v) {
 
 async function reload_analysis(k) {
 	drop_map_info();
-	right_panel_update_analysis(false);
 
 	if (k === "datasets") {
 		controls_recount();

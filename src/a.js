@@ -509,6 +509,23 @@ async function init_4() {
 	delay(0.3).then(_ => mapbox_fit(GEOGRAPHY.envelope));
 
 	loading(false);
+
+	warm_population();
+};
+
+// The summary reads the population raster at the first analysis. Fetching it
+// into the HTTP cache while the user picks a layer keeps it off that
+// analysis's critical path, with no loading state and no decode. The URL
+// must match parse.js's fetch() for the cache to hit.
+function warm_population() {
+	const r = DST.get('population-density')?.raster;
+
+	if (!r?.endpoint || r.data || navigator.connection?.saveData) return;
+	if (STATE.datasets.some(d => d !== OUTLINE)) return;
+
+	const url = r.endpoint.match(/^(blob:)?http/) ? r.endpoint : EAE['settings'].storage + r.endpoint;
+
+	(window.requestIdleCallback || setTimeout)(() => fetch(url).catch(() => {}));
 };
 
 async function reload(k,v) {

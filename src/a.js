@@ -127,6 +127,7 @@ import {
 	cell as loading_cell,
 	actions as loading_actions,
 	recompute,
+	subscribe as loading_subscribe,
 } from './loading-state.js';
 
 export const STANDARD_TABS = new Set(['census', 'demand', 'supply', 'other']);
@@ -509,6 +510,42 @@ async function init_4() {
 	delay(0.3).then(_ => mapbox_fit(GEOGRAPHY.envelope));
 
 	loading(false);
+
+	warm_population();
+};
+
+// The summary reads the population raster at the first analysis. Fetching it
+// into the HTTP cache while the user picks a layer keeps it off that
+// analysis's critical path, with no loading state and no decode. The URL
+// must match parse.js's fetch() for the cache to hit.
+//
+// It gives way to the layer the user turns on: both would share the
+// connection, delaying the one the user asked for.
+function warm_population() {
+	const ds = DST.get('population-density');
+	const r = ds?.raster;
+
+	if (!r?.endpoint || r.data || navigator.connection?.saveData) return;
+	if (STATE.datasets.some(d => d !== OUTLINE)) return;
+
+	const url = r.endpoint.match(/^(blob:)?http/) ? r.endpoint : EAE['settings'].storage + r.endpoint;
+	const controller = new AbortController();
+
+	const unsubscribe = loading_subscribe(s => {
+		const layer = Object.entries(s.datasets)
+			.some(([id, status]) => status === 'loading' && id !== ds.id && id !== OUTLINE.id);
+
+		if (layer) controller.abort();
+	});
+
+	(window.requestIdleCallback || setTimeout)(() => {
+		if (controller.signal.aborted) return unsubscribe();
+
+		fetch(url, { "signal": controller.signal })
+			.then(res => res.arrayBuffer())
+			.catch(() => {})
+			.finally(unsubscribe);
+	});
 };
 
 async function reload(k,v) {

@@ -77,14 +77,15 @@ let has_data = false;
 let was_busy = false;
 
 // The panel's whole visible state is a function of (busy, has_data, active
-// tab); nothing else may toggle these elements.
+// tab, active layers); nothing else may toggle these elements.
 function render() {
 	const busy = loading_busy(loading_cell().state);
 
 	if (busy && !was_busy) reset_selection();
 	was_busy = busy;
 
-	if (busy) pulse_start();
+	// The outline alone leaves the analysis nothing to sweep over.
+	if (busy && STATE.datasets.some(d => d !== OUTLINE)) pulse_start();
 	else pulse_stop();
 
 	const idle_with_data = !busy && has_data;

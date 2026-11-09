@@ -504,13 +504,18 @@ export interface PointResult {
 // The band used for a dataset's scalar aggregation. SUM reads the area-weighted
 // sum band, AVG reads the area-weighted average band, and categorical datasets
 // (csv lookup) keep the near band since their values are category codes.
-// The parser has already folded legacy single-band rasters into every band.
-export function aggregation_band(dataset: AggregationDataset): ArrayLike<number> {
-	const agg_fn = dataset.category.analysis?.aggregation ?? 'AVG';
+// The parser has already folded legacy single-band rasters into every band,
+// and decodes this band (with the near one) for a raster no other dataset reads.
+export type AggregationBand = 'data' | 'sum' | 'average';
 
-	if (dataset.csv?.key != null) return dataset.raster.data;
-	if (agg_fn === 'SUM') return dataset.raster.sum!;
-	return dataset.raster.average!;
+export function aggregation_band_key(dataset: Pick<AggregationDataset, 'category' | 'csv'>): AggregationBand {
+	if (dataset.csv?.key != null) return 'data';
+
+	return (dataset.category.analysis?.aggregation ?? 'AVG') === 'SUM' ? 'sum' : 'average';
+}
+
+export function aggregation_band(dataset: AggregationDataset): ArrayLike<number> {
+	return dataset.raster[aggregation_band_key(dataset)]!;
 }
 
 // Collect the values of a dataset's aggregation band for each division area,

@@ -14,7 +14,9 @@ import modal from '../lib/modal.js';
 
 import bind from '../lib/bind.js';
 
-import dscard from './cards.js';
+import dscard, {
+	update as cards_update,
+} from './cards.js';
 
 import dscontrols from './controls.js';
 
@@ -41,8 +43,8 @@ import {
 } from './rasters.js';
 
 import {
-	loading_analysis,
-} from './right-panel.js';
+	load as dataset_load,
+} from './loading-state.js';
 
 import {
 	and,
@@ -731,9 +733,16 @@ export default class DS {
 
 		if (visible) {
 			if (this.controls) this.controls.loading(true);
-			loading_analysis(true);
 
-			await this.loadall();
+			try {
+				await this.loadall();
+			} catch (err) {
+				console.error(err);
+				if (!this.disabled) parse_fail.call(this, err?.message);
+				return;
+			} finally {
+				if (this.controls) this.controls.loading(false);
+			}
 
 			// EAE-297: the CSV data just became available asynchronously, after
 			// the COMMIT that `turn()` fired. Bump the timeline cell so its trend
@@ -755,8 +764,6 @@ export default class DS {
 
 			this.set_scales();
 
-			if (this.controls) this.controls.loading(false);
-
 			if (this.disabled) return;
 		}
 
@@ -768,20 +775,20 @@ export default class DS {
 
 		this.visibility(visible && draw);
 
-		if (!visible && this.card) this.card.remove();
+		// The card shows with the layer, not once the analysis is done.
+		if (visible) cards_update();
+		else if (this.card) this.card.remove();
 	};
 
-	loadall() {
-		return Whatever
+	loadall(role = 'layer') {
+		return dataset_load(this.id, () => Whatever
 			.then(_ => this.load('csv'))
 			.then(_ => this.load('vectors'))
-			.then(_ => this.load('raster'));
+			.then(_ => this.load('raster')), role);
 	};
 
 	async load(arg) {
 		if (!this[arg]) return;
-
-		this.loading = true;
 
 		if (this.hosts) {
 			await until(_ => this.hosts.every(d => d instanceof DS));
@@ -792,8 +799,6 @@ export default class DS {
 			await this[arg].parse();
 		else
 			throw new Error(`Loading Error: '${this.id}' tried to load '${arg}', but failed`);
-
-		this.loading = false;
 	};
 
 	opacity(v) {

@@ -16,6 +16,10 @@ import {
 } from './mapbox.js';
 
 import {
+	aggregation_band_key,
+} from './area-scores.ts';
+
+import {
 	and,
 	ce,
 	has,
@@ -36,7 +40,7 @@ async function fetchcheck(endpoint, format) {
 	if (endpoint.match(/^(blob:)?http/)) ;
 	else endpoint = EAE['settings'].storage + endpoint;
 
-	return fetch(endpoint)
+	return fetch_unstalled(endpoint)
 		.catch(_ => {
 			fail.call(this);
 			throw new Error(`Network error: Could not fetch ${format} from ${endpoint}`);
@@ -48,6 +52,51 @@ async function fetchcheck(endpoint, format) {
 				throw new Error(`${format} Endpoint gave ${r.status} response.`);
 			}
 		});
+};
+
+const STALL_TIMEOUT = 30000;
+
+// A hung fetch would keep its dataset loading forever. The bound is idle time,
+// not total time, so large downloads on slow links still complete.
+async function fetch_unstalled(endpoint) {
+	const controller = new AbortController();
+
+	let timer;
+	const arm = () => {
+		clearTimeout(timer);
+		timer = setTimeout(() => controller.abort(), STALL_TIMEOUT);
+	};
+
+	arm();
+
+	let r;
+	try {
+		r = await fetch(endpoint, { "signal": controller.signal });
+	} catch (err) {
+		clearTimeout(timer);
+		throw err;
+	}
+
+	if (!r.body) {
+		clearTimeout(timer);
+		return r;
+	}
+
+	const body = r.body.pipeThrough(new TransformStream({
+		transform(chunk, out) {
+			arm();
+			out.enqueue(chunk);
+		},
+		flush() {
+			clearTimeout(timer);
+		},
+	}));
+
+	return new Response(body, {
+		"status":     r.status,
+		"statusText": r.statusText,
+		"headers":    r.headers,
+	});
 };
 
 export function fail(msg = "") {
@@ -137,6 +186,18 @@ function table_refresh() {
 	return table;
 };
 
+const BAND_SAMPLE = { "data": 0, "sum": 1, "average": 2 };
+
+// Other datasets read these rasters under their own settings, so every band
+// stays decoded: the outline, divisions (their indicators), mutant hosts and
+// timelines, whose bands are dates.
+function raster_shared() {
+	return this === OUTLINE
+		|| !!this.timeline
+		|| !!maybe(GEOGRAPHY, 'configuration', 'divisions')?.some(d => d.dataset_id === this.dataset_id)
+		|| Array.from(DST.values()).some(d => d.config?.hosts?.includes(this.id));
+};
+
 export function raster() {
 	async function run_it(blob) {
 		function draw(overrideid) {
@@ -175,19 +236,31 @@ export function raster() {
 		if (!maybe(this.raster, 'data')) {
 			const tiff = await GeoTIFF.fromBlob(blob);
 			const image = await tiff.getImage();
-			const rasters = await image.readRasters();
 
 			// Multi-band contract: band 1 = near (display), band 2 = area-weighted
 			// sum, band 3 = area-weighted average. Only a file with three bands HAS
 			// aggregation bands: a two-band data+Alpha raster would otherwise hand
 			// its alpha channel to `sum`, and a SUM-aggregated dataset would then
 			// aggregate transparency as if it were the data. Everything else --
-			// legacy single-band included -- falls back to band 1, so downstream
-			// code can still read any aggregation band unconditionally.
-			const has_bands = rasters.length >= 3;
+			// legacy single-band included -- falls back to band 1.
+			//
+			// Each band costs a full decode, so a raster only this dataset reads
+			// decodes just near plus the band aggregation_band() will read.
+			const has_bands = image.getSamplesPerPixel() >= 3;
+			const own_band = (has_bands && !raster_shared.call(this)) ? aggregation_band_key(this) : null;
+
+			const rasters = own_band
+				? await image.readRasters({ "samples": [...new Set([0, BAND_SAMPLE[own_band]])] })
+				: await image.readRasters();
+
 			this.raster.data = rasters[0];
-			this.raster.sum = has_bands ? rasters[1] : rasters[0];
-			this.raster.average = has_bands ? rasters[2] : rasters[0];
+
+			if (own_band) {
+				if (own_band !== 'data') this.raster[own_band] = rasters[1];
+			} else {
+				this.raster.sum = has_bands ? rasters[1] : rasters[0];
+				this.raster.average = has_bands ? rasters[2] : rasters[0];
+			}
 			this.raster.width = image.getWidth();
 			this.raster.height = image.getHeight();
 			this.raster.nodata = parseFloat(image.fileDirectory.GDAL_NODATA);

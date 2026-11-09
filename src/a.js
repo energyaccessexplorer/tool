@@ -94,7 +94,6 @@ import {
 import {
 	init as right_panel_init,
 	graphs as right_panel_graphs,
-	update_analysis as right_panel_update_analysis,
 } from './right-panel.js';
 
 import {
@@ -123,9 +122,24 @@ import { syncDatasets as timeline_sync_datasets, cell as timeline_cell } from '.
 
 import { init as timeline_view_init, commitSync as timeline_commit_sync } from './timeline-view.js';
 
+import {
+	cell as loading_cell,
+	actions as loading_actions,
+	recompute,
+	subscribe as loading_subscribe,
+	layer_loading,
+} from './loading-state.js';
+
 export const STANDARD_TABS = new Set(['census', 'demand', 'supply', 'other']);
 
-COMMIT = debounce(function() {
+// Must match the keys reload() returns early for.
+const VIEW_ONLY_COMMITS = ['center', 'zoom', 'tab'];
+
+const DATASETS_SELECT = ["*", "type", "category:categories(*)"];
+
+let datasets_request;
+
+const commit = debounce(function() {
 	if (DEBUG || ENV.includes("test")) console.trace("commit!", ...arguments);
 
 	if (!OUTLINE?.raster?.data) {
@@ -135,7 +149,10 @@ COMMIT = debounce(function() {
 		return;
 	}
 
+	// Unqueued only once reload() has registered its recompute: busy() must
+	// not blink false in between.
 	reload(...arguments);
+	loading_actions.queued(loading_cell(), false);
 
 	timeline_sync_datasets(STATE.datasets, GEOGRAPHY.timeline_dates);
 	// COMMIT, not state_set: the 300ms debounce must coalesce range-slider
@@ -145,6 +162,12 @@ COMMIT = debounce(function() {
 
 	window.dispatchEvent(new Event('resize'));
 }, 300);
+
+COMMIT = function(k) {
+	if (!VIEW_ONLY_COMMITS.includes(k)) loading_actions.queued(loading_cell(), true);
+
+	commit(...arguments);
+};
 
 function state_get(conf, p) {
 	switch (p) {
@@ -275,6 +298,16 @@ async function init_1() {
 		throw new Error("No geography id in URL");
 	}
 
+	// The query needs only the id in the URL, so it runs alongside the
+	// geography's own request; init_2 awaits it.
+	datasets_request = API.get("datasets", {
+		"geography_id": `eq.${id}`,
+		"select":       DATASETS_SELECT,
+		"deployment":   `ov.{${ENV}}`,
+		"flagged":      "is.false",
+	});
+	datasets_request.catch(() => {});
+
 	let conf = sessionStorage.getItem('config');
 	if (conf) conf = JSON.parse(conf);
 
@@ -349,20 +382,13 @@ async function init_1() {
 };
 
 async function init_2(conf) {
-	const select = ["*", "type", "category:categories(*)"];
-
 	const divisions = maybe(GEOGRAPHY.configuration, 'divisions').filter(d => d.dataset_id !== null);
 
 	GEOGRAPHY.divisions = [];
 
 	loading(t(LOCALE, 'overlay.fetching_datasets'));
 
-	const ALL = await API.get("datasets", {
-		"geography_id": `eq.${GEOGRAPHY.id}`,
-		"select":       select,
-		"deployment":   `ov.{${ENV}}`,
-		"flagged":      "is.false",
-	});
+	const ALL = await datasets_request;
 
 	await (async function outline() {
 		const json = ALL.find(d => d.id === divisions[0].dataset_id);
@@ -381,8 +407,7 @@ This is fatal. Thanks for all the fish.`;
 		OUTLINE.vectors.fill = 'transparent';
 		OUTLINE.vectors.opacity = 1;
 
-		await OUTLINE.load('vectors');
-		await OUTLINE.load('raster');
+		await Promise.all([OUTLINE.load('vectors'), OUTLINE.load('raster')]);
 
 		OUTLINE.vectors.data.features[0].id = 0;
 	})();
@@ -398,10 +423,11 @@ This is fatal. Thanks for all the fish.`;
 				.map(async e => {
 					const ds = new DS(e);
 
-					return ds.load('csv')
-						.then(_ => ds.load('vectors'))
-						.then(_ => ds.load('raster'))
-						.catch(err => console.error(err));
+					// The vectors join the csv on parse; the raster needs neither.
+					return Promise.all([
+						ds.load('csv').then(_ => ds.load('vectors')),
+						ds.load('raster'),
+					]).catch(err => console.error(err));
 				}),
 		);
 	})();
@@ -422,7 +448,7 @@ This is fatal. Thanks for all the fish.`;
 
 			o = await API.get("datasets", {
 				"geography_id":  `eq.${pid}`,
-				"select":        select,
+				"select":        DATASETS_SELECT,
 				"category_name": "eq.admin-tiers",
 			}, { "one": true });
 		}
@@ -491,6 +517,42 @@ async function init_4() {
 	delay(0.3).then(_ => mapbox_fit(GEOGRAPHY.envelope));
 
 	loading(false);
+
+	warm_population();
+};
+
+// The summary reads the population raster at the first analysis. Fetching it
+// into the HTTP cache while the user picks a layer keeps it off that
+// analysis's critical path, with no loading state and no decode. The URL
+// must match parse.js's fetch() for the cache to hit.
+//
+// It gives way to the layer the user turns on: both would share the
+// connection, delaying the one the user asked for.
+function warm_population() {
+	const ds = DST.get('population-density');
+	const r = ds?.raster;
+
+	if (!r?.endpoint || r.data || navigator.connection?.saveData) return;
+	if (STATE.datasets.some(d => d !== OUTLINE)) return;
+
+	const url = r.endpoint.match(/^(blob:)?http/) ? r.endpoint : EAE['settings'].storage + r.endpoint;
+	const controller = new AbortController();
+
+	const unsubscribe = loading_subscribe(s => {
+		const layer = Object.entries(s.datasets)
+			.some(([id, e]) => layer_loading(e) && id !== ds.id && id !== OUTLINE.id);
+
+		if (layer) controller.abort();
+	});
+
+	(window.requestIdleCallback || setTimeout)(() => {
+		if (controller.signal.aborted) return unsubscribe();
+
+		fetch(url, { "signal": controller.signal })
+			.then(res => res.arrayBuffer())
+			.catch(() => {})
+			.finally(unsubscribe);
+	});
 };
 
 async function reload(k,v) {
@@ -509,8 +571,11 @@ async function reload(k,v) {
 		return;
 	}
 
+	return recompute(() => reload_analysis(k));
+};
+
+async function reload_analysis(k) {
 	drop_map_info();
-	right_panel_update_analysis(false, true);
 
 	if (k === "datasets") {
 		controls_recount();
@@ -606,8 +671,12 @@ async function reload(k,v) {
 		});
 	};
 
-	await (function datasets_visibility() {
-		return Promise.all(STATE.datasets.map(x => x.active(true, x.visible)));
+	await (async function datasets_visibility() {
+		// One dataset failing must not take the analysis of the others down.
+		const settled = await Promise.allSettled(STATE.datasets.map(x => x.active(true, x.visible)));
+
+		for (const r of settled)
+			if (r.status === 'rejected') console.error(r.reason);
 	})();
 
 	const a = await analysis_plot_active(index);
@@ -620,7 +689,8 @@ async function reload(k,v) {
 		await analysis_result(index, variant);
 	}
 
-	right_panel_graphs(a.raster);
+	// The recompute is not over until the panel has its results.
+	const graphs = right_panel_graphs(a.raster).catch(err => console.error(err));
 
 	indexes_list();
 
@@ -648,6 +718,8 @@ async function reload(k,v) {
 	priority_visibility_pick();
 
 	output_visibility();
+
+	await graphs;
 };
 
 export function clean() {

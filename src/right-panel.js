@@ -56,6 +56,12 @@ import {
 	stop as pulse_stop,
 } from './map-pulse.js';
 
+import {
+	busy as loading_busy,
+	cell as loading_cell,
+	subscribe as loading_subscribe,
+} from './loading-state.js';
+
 import bind from '../lib/bind.js';
 
 import modal from '../lib/modal.js';
@@ -67,70 +73,90 @@ import {
 
 const user_id = user_extract('id');
 
-export function loading_analysis(loading) {
-	qs('#analysis-loading-state').style.display = loading ? 'flex' : 'none';
-	qs('#analysis-sections-wrapper').style.display = 'none';
-	qs('#analysis-blank-state').style.display = 'none';
-	if (loading) {
-		pulse_start();
-		data_tab_actions.backToNational(data_tab_cell());
-		prioritization_actions.backToNational(prioritization_cell());
-		poi_clear();
-		document.querySelectorAll('.right-panel-tab-panel').forEach(p => { p.hidden = true; });
+let has_data = false;
+let was_busy = false;
+
+// The panel's whole visible state is a function of (busy, has_data, active
+// tab, active layers); nothing else may toggle these elements.
+function render() {
+	const busy = loading_busy(loading_cell().state);
+
+	if (busy && !was_busy) reset_selection();
+	was_busy = busy;
+
+	// The outline alone leaves the analysis nothing to sweep over.
+	if (busy && STATE.datasets.some(d => d !== OUTLINE)) pulse_start();
+	else pulse_stop();
+
+	const idle_with_data = !busy && has_data;
+
+	// While a recompute runs, results already on screen stay, dimmed and
+	// inert, instead of giving way to the spinner.
+	const stale = busy && has_data;
+
+	for (const id of ['#save-snapshot-button', '#share-snapshot-button', '#export-button']) {
+		const button = qs(id);
+		if (button) button.disabled = !idle_with_data;
 	}
+
+	qs('#right-panel-content').classList.toggle('stale', stale);
+
+	qs('#analysis-loading-state').style.display = (busy && !has_data) ? 'flex' : 'none';
+	qs('#analysis-blank-state').style.display = (!busy && !has_data) ? 'flex' : 'none';
+	qs('#analysis-sections-wrapper').style.display = has_data ? 'flex' : 'none';
+
+	const active_tab = qs('#right-panel-tabs .right-panel-tab.active');
+	const shown = ((!busy || has_data) && active_tab) ? `right-panel-tab-${active_tab.dataset.tab}` : null;
+
+	document.querySelectorAll('.right-panel-tab-panel').forEach(p => { p.hidden = p.id !== shown; });
 }
 
-// `busy`: the results are stale but the recompute is still running, so the
-// map pulse (unlike the spinner) must outlive this reset.
-export function update_analysis(has_data, busy = false) {
-	const save_button = qs('#save-snapshot-button');
-	const share_button = qs('#share-snapshot-button');
-	const download_button = qs('#export-button');
-
-	if (save_button) save_button.disabled = !has_data;
-	if (share_button) share_button.disabled = !has_data;
-	if (download_button) download_button.disabled = !has_data;
-
-	qs('#analysis-loading-state').style.display = 'none';
-
-	if (!busy) pulse_stop();
-
-	const blank_state = qs('#analysis-blank-state');
-	const sections_wrapper = qs('#analysis-sections-wrapper');
-
+function reset_selection() {
 	data_tab_actions.backToNational(data_tab_cell());
 	prioritization_actions.backToNational(prioritization_cell());
 	poi_clear();
-	blank_state.style.display = has_data ? 'none' : 'flex';
-	sections_wrapper.style.display = has_data ? 'flex' : 'none';
+}
 
-	document.querySelectorAll('.right-panel-tab-panel').forEach(p => { p.hidden = true; });
+export function update_analysis(data) {
+	has_data = data;
 
-	const active_tab = qs('#right-panel-tabs .right-panel-tab.active');
-	if (active_tab) {
-		const target = qs(`#right-panel-tab-${active_tab.dataset.tab}`);
-		if (target) target.hidden = false;
-	}
+	reset_selection();
+	render();
+}
+
+let summary_generation = 0;
+
+// The share graphs come from the summary, which waits on the population
+// raster: they show as pending until it lands.
+function summary_pending(pending) {
+	for (const id of ['#area-number', '#population-number'])
+		qs(id)?.closest('.index-graphs-section')?.classList.toggle('pending', pending);
 }
 
 export async function graphs(raster) {
+	summary_generation += 1;
+
+	// The outline alone gives the panel nothing but its blank state, and the
+	// summary would download the population raster to fill hidden cards.
+	if (STATE.datasets.every(d => d === OUTLINE)) {
+		data_tab_actions.analysisCompleted(data_tab_cell(), {}, {});
+		summary_pending(false);
+		update_analysis(false);
+		return;
+	}
+
 	// Card aggregates come from the analysis cell: OUTLINE_TIER's area 0 is the
 	// has_priority_score() analysed-area bucket, result.national.values the same
 	// layers over the whole geography with no analysis mask.
-	let summary;
+	let national_layer_data;
 	try {
 		const result = await analysis_result(STATE.index, OUTLINE_TIER);
 
 		const layer_data = layer_data_from_values(result.analysed.values);
-		const national_layer_data = layer_data_from_values(result.national.values);
+		national_layer_data = layer_data_from_values(result.national.values);
 
 		data_tab_actions.analysisCompleted(data_tab_cell(), layer_data, national_layer_data);
-
-		// The summary keeps the analysis-window mask.
-		summary = await summary_analyse(raster, national_layer_data);
 	} catch (e) {
-		// loading_analysis(true) in ds.js active() must always balance: never
-		// strand the "Loading data layers" spinner.
 		update_analysis(false);
 		throw e;
 	}
@@ -143,9 +169,18 @@ export async function graphs(raster) {
 	// wherever no layer feeds the index (and returns an all -1 raster for a
 	// filters-only analysis, deliberately).
 	update_analysis(raster.some(v => v !== -1));
-
-	render_graphs(summary);
 	analysis_locations_panel_update();
+
+	// Not awaited: the results above show without the population download.
+	// A newer analysis supersedes this summary, which keeps the
+	// analysis-window mask.
+	const generation = summary_generation;
+	summary_pending(true);
+
+	summary_analyse(raster, national_layer_data)
+		.then(summary => { if (generation === summary_generation) render_graphs(summary); })
+		.catch(err => console.error(err))
+		.finally(() => { if (generation === summary_generation) summary_pending(false); });
 };
 
 export function init() {
@@ -186,11 +221,7 @@ export function init() {
 			tab.classList.add('active');
 			tab.setAttribute('aria-selected', 'true');
 
-			document.querySelectorAll('.right-panel-tab-panel').forEach(panel => {
-				panel.hidden = true;
-			});
-			const target = qs(`#right-panel-tab-${tab.dataset.tab}`);
-			if (target) target.hidden = false;
+			render();
 		};
 	});
 
@@ -214,6 +245,9 @@ export function init() {
 	analysis_locations_panel_init();
 	data_tab_init();
 	prioritization_tab_init();
+
+	loading_subscribe(render);
+	render();
 };
 
 function share_url() {

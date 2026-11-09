@@ -179,7 +179,7 @@ export default async function analyse(raster, national = null) {
 		ds = OUTLINE;
 	}
 
-	await ds.load('raster');
+	await ds.loadall();
 	const p = ds.raster.data;
 	const nodata = ds.raster.nodata;
 

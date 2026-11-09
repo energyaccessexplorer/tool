@@ -51,16 +51,36 @@ function find_geography_by_name(geographies, name) {
 		|| geographies.find(g => g.name.toLowerCase().startsWith(lower + ' '));
 };
 
-function preload_boundaries(id) {
-	return API.get('datasets', {
-		"select":        ['processed_files'],
-		"geography_id":  `eq.${id}`,
-		"category_name": "in.(outline,boundaries)",
-	}).then(r => {
-		r.map(d => d['processed_files'].find(f => f['func'] === 'vectors'))
-			.filter(Boolean)
-			.forEach(f => fetch(f['endpoint']).catch(() => {}));
+const preloaded = new Set();
+
+// Warms the HTTP cache with the files /tool/a downloads before its overlay
+// lifts: the outline and the configured divisions (vectors, raster, csv).
+// S3 sends Last-Modified and no Cache-Control, so the next page reuses them.
+// Navigating away cancels whatever has not arrived, hence one request for
+// the endpoints, then every file at once. The URLs must match parse.js's
+// fetch() for the cache to hit.
+async function preload_boundaries(g) {
+	if (!g || preloaded.has(g.id) || navigator.connection?.saveData) return;
+	preloaded.add(g.id);
+
+	const ids = (maybe(g, 'configuration', 'divisions') || []).map(d => d.dataset_id).filter(Boolean);
+	if (!ids.length) return;
+
+	const datasets = await API.get('datasets', {
+		"select": ['id', 'processed_files', 'source_files'],
+		"id":     `in.(${ids.join(',')})`,
 	});
+
+	const endpoints = d => [
+		...(d['processed_files'] || []).filter(f => ['vectors', 'raster'].includes(f['func'])),
+		...(d['source_files'] || []).filter(f => f['func'] === 'csv'),
+	].map(f => f['endpoint']).filter(Boolean);
+
+	const get = e => fetch(e.match(/^(blob:)?http/) ? e : EAE['settings'].storage + e)
+		.then(r => r.arrayBuffer())
+		.catch(() => {});
+
+	await Promise.all(datasets.flatMap(endpoints).map(get));
 };
 
 async function geography(c) {
@@ -89,7 +109,10 @@ async function geography(c) {
 				return;
 			}
 
-			if (x) usertype(x.id);
+			if (x) {
+				preload_boundaries(x).catch(() => {});
+				usertype(x.id);
+			}
 		},
 	});
 
@@ -262,7 +285,7 @@ export async function init() {
 		for (const co of geographies) {
 			const d = ce('div', ce('h2', co.name, { "class": 'country-name' }), { "class": 'country-item', "ripple": "" });
 			d.onclick = async _ => {
-				preload_boundaries(co.id);
+				preload_boundaries(co).catch(() => {});
 				setTimeout(_ => geography(co), 350);
 			};
 

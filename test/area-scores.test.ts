@@ -133,6 +133,44 @@ describe('by_area', () => {
 
 		assert.equal(has_priority_score(TINY_NEG), false);
 	});
+
+	// Characterise key order and IEEE-754 edge cases as well as numeric totals.
+	type Aggregate = { sum: number; average: number };
+	const reference = (raster: ArrayLike<number>, division: ArrayLike<number>): Record<string, Aggregate> => Object.fromEntries(
+		Object.entries(
+			Array.from(raster).reduce((acc: Record<string, { sum: number; count: number }>, value: number, i: number) => {
+				const id = division[i] as number;
+				if (id === -1 || value === -1) return acc;
+				return Object.assign(acc, {
+					[id]: { "sum": (acc[id]?.sum || 0) + value, "count": (acc[id]?.count || 0) + 1 },
+				});
+			}, {}),
+		).map(([id, { sum, count }]): [string, Aggregate] => [id, { sum, "average": sum / count }]),
+	);
+
+	const identical = (a: Record<string, Aggregate>, b: Record<string, Aggregate>) => {
+		assert.deepEqual(Object.keys(a), Object.keys(b));
+		for (const k of Object.keys(a)) {
+			const x = a[k]!, y = b[k]!;
+			assert.ok(Object.is(x.sum, y.sum), `sum of ${k}: ${x.sum} vs ${y.sum}`);
+			assert.ok(Object.is(x.average, y.average), `average of ${k}: ${x.average} vs ${y.average}`);
+		}
+	};
+
+	it('preserves key order, NaN, -0 and float32 inputs', () => {
+		let seed = 7;
+		const rand = () => (seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648;
+		const pick = <T>(xs: T[]): T => xs[Math.floor(rand() * xs.length)]!;
+
+		for (let run = 0; run < 200; run += 1) {
+			const n = 1 + Math.floor(rand() * 300);
+			const raster = Array.from({ "length": n }, () => pick([-1, 0, -0, NaN, TINY_NEG, 1, rand(), rand(), rand()]));
+			const division = Array.from({ "length": n }, () => pick([-1, 0, 1, 2, 3, 10, 2.5, -3, 100]));
+
+			identical(by_area(raster, division), reference(raster, division));
+			identical(by_area(new Float32Array(raster), new Float32Array(division)), reference(new Float32Array(raster), new Float32Array(division)));
+		}
+	});
 });
 
 // ------------------------------------------------------------------ jenks

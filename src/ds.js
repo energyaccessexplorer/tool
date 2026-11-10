@@ -136,8 +136,10 @@ export default class DS {
 			Object.assign(this.vectors, this.category.vectors);
 
 			this.vectors.id = b.config.vectors_id;
-			this.vectors.parse = x => {
-				parse_polygons.call(x || this);
+			// The polygon parse resets each feature's style to the layer default;
+			// the csv colours must land after it.
+			this.vectors.parse = async x => {
+				await parse_polygons.call(x || this);
 				parse_vectors_csv.call(x || this);
 			};
 
@@ -762,7 +764,14 @@ export default class DS {
 				}
 			}
 
+			const unscaled = !this.colorscale;
+
 			this.set_scales();
+
+			// A parse that ran before the colour scale existed coloured every
+			// feature with the layer default.
+			if (unscaled && this.colorscale && this.csv?.data && this.vectors?.data)
+				parse_vectors_csv.call(this);
 
 			if (this.disabled) return;
 		}

@@ -193,6 +193,7 @@ build-a:
 		${JS}/summary.js \
 		${JS}/timeline.js \
 		${JS}/meiosis-stream.js \
+		${JS}/loading-state.js \
 		${JS}/timeline-state.js \
 		${JS}/timeline-view.js \
 		${JS}/user.js \

@@ -34,6 +34,10 @@ import {
 } from './plot.js';
 
 import {
+	loadsSettled,
+} from './loading-state.ts';
+
+import {
 	and,
 	json_clone,
 	maybe,
@@ -99,6 +103,9 @@ export const analysis_colorscale_svg = colorscale_svg(analysis_colorscale.stops)
  */
 
 export default async function run(type: string) {
+	// A dataset still loading has no raster yet: analyse what the loads settle to.
+	await loadsSettled();
+
 	const t0 = performance.now();
 
 	const list = datasets(type);
@@ -145,9 +152,6 @@ export default async function run(type: string) {
 	//
 	const full_weight = list
 		.reduce((a,c) => ((c.analysis_scale(type) === "key-delta") ? a : c.weight + a), 0);
-
-	if (list.find(l => !maybe(l, 'raster', 'data')))
-		await until((_: unknown) => list.filter(d => d.on && d.raster && d.analysis && !d.raster.data).length === 0, Infinity);
 
 	if (list.length === 1 && full_weight === 0) return { "raster": it };
 
@@ -269,7 +273,7 @@ export function active_area_mask(): { data: RasterData; nodata: number; id: numb
 
 function datasets(type: string): AnalysisDataset[] {
 	return (STATE.datasets as AnalysisDataset[])
-		.filter(d => and(d.raster, d.analysis))
+		.filter(d => and(d.raster?.data, d.analysis))
 		.filter(d => {
 			if (d.type === 'polygons-boundaries') return false;
 

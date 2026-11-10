@@ -354,7 +354,7 @@ async function worldview() {
 // work, so this resolves while the tab is hidden.
 export function style_ready(timeout = 30000) {
 	if (!MAPBOX) return Promise.reject(new Error('style_ready: mapbox is not initialised'));
-	if (MAPBOX.isStyleLoaded()) return Promise.resolve();
+	if (style_applied()) return Promise.resolve();
 
 	return new Promise(resolve => {
 		const done = () => {
@@ -382,6 +382,12 @@ export function style_ready(timeout = 30000) {
 			done();
 		}, timeout);
 	});
+};
+
+// Not isStyleLoaded(): it also counts tile loads, which no style event ends.
+// addSource/addLayer only check Style._loaded (private in mapbox-gl 2.11).
+function style_applied() {
+	return !!MAPBOX.style?._loaded;
 };
 
 export function change_theme(theme) {

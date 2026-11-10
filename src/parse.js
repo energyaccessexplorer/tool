@@ -36,7 +36,7 @@ async function fetchcheck(endpoint, format) {
 	if (endpoint.match(/^(blob:)?http/)) ;
 	else endpoint = EAE['settings'].storage + endpoint;
 
-	return fetch(endpoint)
+	return fetch_unstalled(endpoint)
 		.catch(_ => {
 			fail.call(this);
 			throw new Error(`Network error: Could not fetch ${format} from ${endpoint}`);
@@ -48,6 +48,51 @@ async function fetchcheck(endpoint, format) {
 				throw new Error(`${format} Endpoint gave ${r.status} response.`);
 			}
 		});
+};
+
+const STALL_TIMEOUT = 30000;
+
+// A hung fetch would keep its dataset loading forever. The bound is idle time,
+// not total time, so large downloads on slow links still complete.
+async function fetch_unstalled(endpoint) {
+	const controller = new AbortController();
+
+	let timer;
+	const arm = () => {
+		clearTimeout(timer);
+		timer = setTimeout(() => controller.abort(), STALL_TIMEOUT);
+	};
+
+	arm();
+
+	let r;
+	try {
+		r = await fetch(endpoint, { "signal": controller.signal });
+	} catch (err) {
+		clearTimeout(timer);
+		throw err;
+	}
+
+	if (!r.body) {
+		clearTimeout(timer);
+		return r;
+	}
+
+	const body = r.body.pipeThrough(new TransformStream({
+		transform(chunk, out) {
+			arm();
+			out.enqueue(chunk);
+		},
+		flush() {
+			clearTimeout(timer);
+		},
+	}));
+
+	return new Response(body, {
+		"status":     r.status,
+		"statusText": r.statusText,
+		"headers":    r.headers,
+	});
 };
 
 export function fail(msg = "") {

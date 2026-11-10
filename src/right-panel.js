@@ -56,6 +56,12 @@ import {
 	stop as pulse_stop,
 } from './map-pulse.js';
 
+import {
+	busy as loading_busy,
+	cell as loading_cell,
+	subscribe as loading_subscribe,
+} from './loading-state.js';
+
 import bind from '../lib/bind.js';
 
 import modal from '../lib/modal.js';
@@ -67,50 +73,49 @@ import {
 
 const user_id = user_extract('id');
 
-export function loading_analysis(loading) {
-	qs('#analysis-loading-state').style.display = loading ? 'flex' : 'none';
-	qs('#analysis-sections-wrapper').style.display = 'none';
-	qs('#analysis-blank-state').style.display = 'none';
-	if (loading) {
-		pulse_start();
-		data_tab_actions.backToNational(data_tab_cell());
-		prioritization_actions.backToNational(prioritization_cell());
-		poi_clear();
-		document.querySelectorAll('.right-panel-tab-panel').forEach(p => { p.hidden = true; });
+let has_data = false;
+let was_busy = false;
+
+// The panel's whole visible state is a function of (busy, has_data, active
+// tab, active layers); nothing else may toggle these elements.
+function render() {
+	const busy = loading_busy(loading_cell().state);
+
+	if (busy && !was_busy) reset_selection();
+	was_busy = busy;
+
+	// The outline alone leaves the analysis nothing to sweep over.
+	if (busy && STATE.datasets.some(d => d !== OUTLINE)) pulse_start();
+	else pulse_stop();
+
+	const idle_with_data = !busy && has_data;
+
+	for (const id of ['#save-snapshot-button', '#share-snapshot-button', '#export-button']) {
+		const button = qs(id);
+		if (button) button.disabled = !idle_with_data;
 	}
+
+	qs('#analysis-loading-state').style.display = busy ? 'flex' : 'none';
+	qs('#analysis-blank-state').style.display = (!busy && !has_data) ? 'flex' : 'none';
+	qs('#analysis-sections-wrapper').style.display = idle_with_data ? 'flex' : 'none';
+
+	const active_tab = qs('#right-panel-tabs .right-panel-tab.active');
+	const shown = (!busy && active_tab) ? `right-panel-tab-${active_tab.dataset.tab}` : null;
+
+	document.querySelectorAll('.right-panel-tab-panel').forEach(p => { p.hidden = p.id !== shown; });
 }
 
-// `busy`: the results are stale but the recompute is still running, so the
-// map pulse (unlike the spinner) must outlive this reset.
-export function update_analysis(has_data, busy = false) {
-	const save_button = qs('#save-snapshot-button');
-	const share_button = qs('#share-snapshot-button');
-	const download_button = qs('#export-button');
-
-	if (save_button) save_button.disabled = !has_data;
-	if (share_button) share_button.disabled = !has_data;
-	if (download_button) download_button.disabled = !has_data;
-
-	qs('#analysis-loading-state').style.display = 'none';
-
-	if (!busy) pulse_stop();
-
-	const blank_state = qs('#analysis-blank-state');
-	const sections_wrapper = qs('#analysis-sections-wrapper');
-
+function reset_selection() {
 	data_tab_actions.backToNational(data_tab_cell());
 	prioritization_actions.backToNational(prioritization_cell());
 	poi_clear();
-	blank_state.style.display = has_data ? 'none' : 'flex';
-	sections_wrapper.style.display = has_data ? 'flex' : 'none';
+}
 
-	document.querySelectorAll('.right-panel-tab-panel').forEach(p => { p.hidden = true; });
+export function update_analysis(data) {
+	has_data = data;
 
-	const active_tab = qs('#right-panel-tabs .right-panel-tab.active');
-	if (active_tab) {
-		const target = qs(`#right-panel-tab-${active_tab.dataset.tab}`);
-		if (target) target.hidden = false;
-	}
+	reset_selection();
+	render();
 }
 
 export async function graphs(raster) {
@@ -129,8 +134,6 @@ export async function graphs(raster) {
 		// The summary keeps the analysis-window mask.
 		summary = await summary_analyse(raster, national_layer_data);
 	} catch (e) {
-		// loading_analysis(true) in ds.js active() must always balance: never
-		// strand the "Loading data layers" spinner.
 		update_analysis(false);
 		throw e;
 	}
@@ -186,11 +189,7 @@ export function init() {
 			tab.classList.add('active');
 			tab.setAttribute('aria-selected', 'true');
 
-			document.querySelectorAll('.right-panel-tab-panel').forEach(panel => {
-				panel.hidden = true;
-			});
-			const target = qs(`#right-panel-tab-${tab.dataset.tab}`);
-			if (target) target.hidden = false;
+			render();
 		};
 	});
 
@@ -214,6 +213,9 @@ export function init() {
 	analysis_locations_panel_init();
 	data_tab_init();
 	prioritization_tab_init();
+
+	loading_subscribe(render);
+	render();
 };
 
 function share_url() {

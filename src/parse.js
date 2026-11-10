@@ -56,6 +56,46 @@ async function fetchcheck(endpoint, format) {
 
 const STALL_TIMEOUT = 30000;
 
+// geotiff 1.0.4 names its decoder worker relative to the page, so the pool
+// gets one with the URL the deps step ships it at. A worker that never starts
+// hangs every decode handed to it: the pool is used only once a decode through
+// it has come back, and rasters decode on the main thread otherwise.
+const DECODER_WORKER = '../lib/decoder.worker.1936c0d9.js';
+const DECODER_PROBE_TIMEOUT = 5000;
+
+let decoder;
+
+function decoder_pool() {
+	if (!decoder) decoder = decoder_start();
+
+	return decoder;
+};
+
+async function decoder_start() {
+	let worker, pool;
+
+	try {
+		worker = new Worker(new URL(DECODER_WORKER, import.meta.url));
+		pool = new GeoTIFF.Pool(4, worker);
+
+		const started = await Promise.race([
+			pool.decode({ "Compression": 1 }, new ArrayBuffer(4)).then(() => true, () => false),
+			new Promise(resolve => setTimeout(resolve, DECODER_PROBE_TIMEOUT, false)),
+		]);
+
+		if (started) return pool;
+	} catch (err) {
+		console.warn(err);
+	}
+
+	console.warn("geotiff: the decoder worker did not start, decoding on the main thread");
+
+	// Pool.destroy() also awaits the failed init and rejects outside the decode.
+	worker?.terminate();
+
+	return null;
+};
+
 // A hung fetch would keep its dataset loading forever. The bound is idle time,
 // not total time, so large downloads on slow links still complete.
 async function fetch_unstalled(endpoint) {
@@ -249,9 +289,12 @@ export function raster() {
 			const has_bands = image.getSamplesPerPixel() >= 3;
 			const own_band = (has_bands && !raster_shared.call(this)) ? aggregation_band_key(this) : null;
 
-			const rasters = own_band
-				? await image.readRasters({ "samples": [...new Set([0, BAND_SAMPLE[own_band]])] })
-				: await image.readRasters();
+			const options = own_band ? { "samples": [...new Set([0, BAND_SAMPLE[own_band]])] } : {};
+
+			const pool = await decoder_pool();
+			if (pool) options.pool = pool;
+
+			const rasters = await image.readRasters(options);
 
 			this.raster.data = rasters[0];
 
@@ -520,7 +563,7 @@ export function points() {
 					"visibility":  'none',
 					"text-field":  ['to-string', ['get', '__visible_count']],
 					"text-font":   ["DIN Offc Pro Medium", "Arial Unicode MS Regular"],
-					"text-size": ['step', ['get', '__visible_count'],
+					"text-size":  ['step', ['get', '__visible_count'],
 						11, 5,
 						13, 10,
 						15, 25,

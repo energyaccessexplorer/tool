@@ -545,12 +545,18 @@ export async function sort() {
 		...layers.filter(id => !/-clusters-count$/.test(id)),
 	];
 
-	await Promise.all(ordered.map(i => until(_ => MAPBOX.getLayer(i), Infinity)));
+	// A dataset disabled mid-commit keeps the ids of layers it no longer has;
+	// waiting for one would hold the recompute open, and the loading state
+	// derived from it never clears.
+	const present = ordered.filter(i => MAPBOX.getLayer(i));
 
-	for (let i = 0; i < ordered.length; i++) {
+	if (present.length !== ordered.length)
+		console.warn('mapbox: sorting the layers that exist, missing:', ordered.filter(i => !MAPBOX.getLayer(i)));
+
+	for (let i = 0; i < present.length; i++) {
 		MAPBOX.moveLayer(
-			ordered[i],
-			(i === 0) ? MAPBOX.first_symbol : ordered[i-1],
+			present[i],
+			(i === 0) ? MAPBOX.first_symbol : present[i-1],
 		);
 	}
 };

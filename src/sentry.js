@@ -47,6 +47,13 @@ export function sentry_set_snapshot(snap) {
 	});
 }
 
+export function sentry_report_stall(extra) {
+	window.Sentry?.captureMessage?.('Analysis recompute stalled', {
+		"level": 'error',
+		extra,
+	});
+}
+
 export function sentry_update_datasets(dst) {
 	if (!dst) return;
 	const active = [];

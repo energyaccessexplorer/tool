@@ -13,6 +13,7 @@ import {
 
 import {
 	sentry_set_geography,
+	sentry_report_stall,
 	sentry_set_snapshot,
 	sentry_setup_global_handlers,
 	sentry_update_datasets,
@@ -128,6 +129,8 @@ import {
 	recompute,
 	subscribe as loading_subscribe,
 	layer_loading,
+	waitingOn,
+	watchdog,
 } from './loading-state.js';
 
 export const STANDARD_TABS = new Set(['census', 'demand', 'supply', 'other']);
@@ -136,6 +139,9 @@ export const STANDARD_TABS = new Set(['census', 'demand', 'supply', 'other']);
 const VIEW_ONLY_COMMITS = ['center', 'zoom', 'tab'];
 
 const DATASETS_SELECT = ["*", "type", "category:categories(*)"];
+
+// Far beyond any analysis step on the largest geography.
+const RECOMPUTE_STALL = 30000;
 
 let datasets_request;
 
@@ -167,6 +173,17 @@ COMMIT = function(k) {
 	if (!VIEW_ONLY_COMMITS.includes(k)) loading_actions.queued(loading_cell(), true);
 
 	commit(...arguments);
+};
+
+function report_stall(s) {
+	const missing_layers = STATE.datasets
+		.map(d => d.hosts ? d.host : d)
+		.flatMap(d => (d?._layers ?? []).filter(id => !MAPBOX.getLayer(id)));
+
+	const extra = { "waits": s.waits, "recomputes": s.recomputes, missing_layers };
+
+	console.error("analysis recompute stalled, giving it up:", extra);
+	sentry_report_stall(extra);
 };
 
 function state_get(conf, p) {
@@ -277,6 +294,8 @@ export function init() {
 	if (window.innerWidth <= 768) return;
 
 	sentry_setup_global_handlers(ENV[0]);
+
+	watchdog(RECOMPUTE_STALL, report_stall);
 
 	initLocalePicker(LOCALE);
 
@@ -671,22 +690,22 @@ async function reload_analysis(k) {
 		});
 	};
 
-	await (async function datasets_visibility() {
+	await waitingOn('datasets', (async function datasets_visibility() {
 		// One dataset failing must not take the analysis of the others down.
 		const settled = await Promise.allSettled(STATE.datasets.map(x => x.active(true, x.visible)));
 
 		for (const r of settled)
 			if (r.status === 'rejected') console.error(r.reason);
-	})();
+	})());
 
-	const a = await analysis_plot_active(index);
+	const a = await waitingOn('analysis', analysis_plot_active(index));
 
 	if (GEOGRAPHY.divisions[variant]) {
 		// Scores publish synchronously and paint the fills; the layer aggregates
 		// land in a second phase, so graphs() must read them after this await.
-		const scores = await analysis_scores(index, variant);
+		const scores = await waitingOn('scores', analysis_scores(index, variant));
 		priority(scores, variant);
-		await analysis_result(index, variant);
+		await waitingOn('result', analysis_result(index, variant));
 	}
 
 	// The recompute is not over until the panel has its results.
@@ -699,12 +718,12 @@ async function reload_analysis(k) {
 	apply_criteria_mask();
 
 	if (k === "layers") {
-		await mapbox_sort();
+		await waitingOn('sort', mapbox_sort());
 	}
 
 	if (k === "datasets") {
 		cards_update();
-		await mapbox_sort();
+		await waitingOn('sort', mapbox_sort());
 
 		STATE.datasets.forEach(async d => {
 			if (d.type.match(/raster-timeline/))
@@ -719,7 +738,7 @@ async function reload_analysis(k) {
 
 	output_visibility();
 
-	await graphs;
+	await waitingOn('graphs', graphs);
 };
 
 export function clean() {

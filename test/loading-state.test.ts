@@ -9,6 +9,8 @@ import {
 	loadsSettled,
 	recompute,
 	subscribe,
+	waitingOn,
+	watchdog,
 } from '../src/loading-state.ts';
 
 import type {
@@ -36,6 +38,8 @@ describe('loading-state: busy', () => {
 			"datasets":   { "a": { "status": 'loaded', "role": 'layer' }, "b": { "status": 'failed', "role": 'layer' } },
 			"queued":     false,
 			"recomputes": 0,
+			"waits":      {},
+			"epoch":      0,
 		};
 
 		assert.equal(busy(base), false);
@@ -223,5 +227,123 @@ describe('loading-state: recompute', () => {
 
 		assert.equal(state().recomputes, 0);
 		assert.equal(busy(state()), false);
+	});
+});
+
+const tick = (ms: number) => new Promise(r => setTimeout(r, ms));
+
+describe('loading-state: waitingOn', () => {
+	it('names the step while it is pending, failed or not', async () => {
+		const ok = deferred();
+		const ko = deferred();
+
+		const a = waitingOn('step-a', ok.promise);
+		const b = waitingOn('step-b', ko.promise);
+		b.catch(() => {});
+
+		assert.deepEqual(Object.keys(state().waits).sort(), ['step-a', 'step-b']);
+
+		ok.resolve();
+		await a;
+		ko.reject(new Error('ko'));
+		await assert.rejects(b);
+
+		assert.deepEqual(state().waits, {});
+	});
+
+	it('counts overlapping waits on the same step', async () => {
+		const x = deferred();
+		const y = deferred();
+
+		const a = waitingOn('same', x.promise);
+		const b = waitingOn('same', y.promise);
+		assert.equal(state().waits['same'], 2);
+
+		x.resolve();
+		await a;
+		assert.equal(state().waits['same'], 1);
+
+		y.resolve();
+		await b;
+		assert.equal(state().waits['same'], undefined);
+	});
+});
+
+describe('loading-state: watchdog', () => {
+	it('reports a recompute that makes no progress, then gives it up', async () => {
+		const stuck = deferred();
+		const stalls: LoadingState[] = [];
+		const off = watchdog(20, s => stalls.push(s));
+
+		const a = recompute(() => waitingOn('never', stuck.promise));
+		await tick(60);
+
+		assert.equal(stalls.length, 1);
+		assert.equal(stalls[0]!.recomputes, 1);
+		assert.equal(stalls[0]!.waits['never'], 1);
+		assert.equal(state().recomputes, 0);
+		assert.deepEqual(state().waits, {});
+		assert.equal(busy(state()), false);
+
+		// The abandoned recompute settling late must not count against the next.
+		const next = deferred();
+		const b = recompute(() => next.promise);
+		stuck.resolve();
+		await a;
+		assert.equal(state().recomputes, 1);
+
+		off();
+		next.resolve();
+		await b;
+		assert.equal(state().recomputes, 0);
+	});
+
+	it('waits while a load is in flight', async () => {
+		const loading = deferred();
+		const work = deferred();
+		const stalls: LoadingState[] = [];
+		const off = watchdog(20, s => stalls.push(s));
+
+		const l = load('watchdog-load', () => loading.promise);
+		const r = recompute(() => work.promise);
+		await tick(60);
+		assert.equal(stalls.length, 0);
+
+		loading.resolve();
+		await l;
+		await tick(60);
+		assert.equal(stalls.length, 1);
+
+		off();
+		work.resolve();
+		await r;
+		assert.equal(state().recomputes, 0);
+	});
+
+	it('restarts its clock on progress', async () => {
+		const stalls: LoadingState[] = [];
+		const off = watchdog(40, s => stalls.push(s));
+
+		const r = recompute(async () => {
+			for (let i = 0; i < 4; i++) await waitingOn(`step-${i}`, tick(25));
+		});
+		await r;
+
+		assert.equal(stalls.length, 0);
+		off();
+	});
+
+	it('stops when uninstalled', async () => {
+		const work = deferred();
+		const stalls: LoadingState[] = [];
+		const off = watchdog(20, s => stalls.push(s));
+
+		const r = recompute(() => work.promise);
+		off();
+		await tick(60);
+		assert.equal(stalls.length, 0);
+
+		work.resolve();
+		await r;
 	});
 });

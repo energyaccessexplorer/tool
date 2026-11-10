@@ -331,6 +331,9 @@ export default class DS {
 
 		this._layers.map(i => MAPBOX.removeLayer(i));
 
+		// The ids go with the layers: a later sort() must not wait for them.
+		this._layers = [];
+
 		DST.delete(this.id);
 	};
 

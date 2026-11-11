@@ -537,20 +537,18 @@ export function coords_search_pois({
 export async function sort() {
 	const datasets = STATE.datasets.map(d => d.hosts ? d.host : d);
 
-	const layers = [].concat(...datasets.map(d => d._layers));
+	// Counts lead each dataset's list so they paint above its circles only.
+	const layers = [].concat(...datasets.map(d => [
+		...d._layers.filter(id => /-clusters-count$/.test(id)),
+		...d._layers.filter(id => !/-clusters-count$/.test(id)),
+	]));
 
-	// Counts on top so nothing paints over a number.
-	const ordered = [
-		...layers.filter(id => /-clusters-count$/.test(id)),
-		...layers.filter(id => !/-clusters-count$/.test(id)),
-	];
+	await Promise.all(layers.map(i => until(_ => MAPBOX.getLayer(i), Infinity)));
 
-	await Promise.all(ordered.map(i => until(_ => MAPBOX.getLayer(i), Infinity)));
-
-	for (let i = 0; i < ordered.length; i++) {
+	for (let i = 0; i < layers.length; i++) {
 		MAPBOX.moveLayer(
-			ordered[i],
-			(i === 0) ? MAPBOX.first_symbol : ordered[i-1],
+			layers[i],
+			(i === 0) ? MAPBOX.first_symbol : layers[i-1],
 		);
 	}
 };

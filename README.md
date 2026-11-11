@@ -41,6 +41,11 @@ Now you can run in development mode with (`bmake` in Linux):
 
     $ make build start
 
+## Embed Mode
+
+This fork supports responsive iframe embedding, URL view parameters, and bidirectional `postMessage` control.
+See [docs/embed-mode.md](./docs/embed-mode.md) for protocol specifications, configuration, and build instructions.
+
 ## License
 
 This project is licensed under MIT. Additionally, you must read the

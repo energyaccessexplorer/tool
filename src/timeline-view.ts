@@ -425,10 +425,17 @@ function renderFiltersToggle(state: TimelineState): void {
 
 	checkbox.checked = state.filters.enabled;
 	checkbox.onchange = () => {
-		actions.setFilterEnabled(cell(), checkbox.checked);
-		renderFiltered(cell().state);
-		COMMIT();
+		setCriteriaMask(checkbox.checked);
 	};
+};
+
+export function setCriteriaMask(enabled: boolean): void {
+	actions.setFilterEnabled(cell(), enabled);
+	renderFiltered(cell().state);
+	COMMIT();
+
+	const checkbox = qs('#timeline-filters-toggle') as HTMLInputElement | null;
+	if (checkbox) checkbox.checked = enabled;
 };
 
 // STATE.timeline <-> cell.year bridge: the legacy per-geography selected

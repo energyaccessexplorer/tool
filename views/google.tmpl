@@ -1,6 +1,7 @@
 {{define "google"}}
 <script>
   (function(w,d,s,l,i){
+	if (new URLSearchParams(location.search).get('embed') === '1') return;
 	if (location.hostname.match(/(localhost|linux|^test\.)/)) return;
 
 	w[l] = w[l]||[];

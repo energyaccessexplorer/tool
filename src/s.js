@@ -237,8 +237,6 @@ export async function init() {
 
 	translateNode(window.LOCALE, document);
 
-	if (window.innerWidth <= 768) return;
-
 	initLocalePicker(window.LOCALE);
 
 	sentry_setup_global_handlers(ENV[0]);

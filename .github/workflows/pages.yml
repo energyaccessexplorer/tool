@@ -1,0 +1,61 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bmake jq curl golang-go
+          sudo npm install -g typescript
+
+      - name: Configure .env
+        run: |
+          cat <<- EOF > .env
+          TITLE = "${{ vars.TITLE || 'Energy Access Explorer' }}"
+          WORLD = "${{ vars.WORLD }}"
+          DOMAIN = "${{ vars.DOMAIN }}"
+          API_URL = "${{ vars.API_URL }}"
+          STORAGE_URL = "${{ vars.STORAGE_URL }}"
+          MAPBOX_THEME = "${{ vars.MAPBOX_THEME || 'mapbox/light-v10' }}"
+          MAPBOX_TOKEN = "${{ secrets.MAPBOX_TOKEN || vars.MAPBOX_TOKEN }}"
+          EMBED_ORIGINS = "${{ vars.EMBED_ORIGINS }}"
+          EOF
+
+      - name: Build
+        run: |
+          bmake deps reconfig build
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

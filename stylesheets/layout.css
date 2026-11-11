@@ -57,6 +57,21 @@ body {
   transition: transform 0.3s ease;
 }
 
+body.embed nav,
+body.embed #mobile-warning,
+body.embed #cookieNotice,
+body.embed .cookie-notice-container,
+body.embed #feedback-widget,
+body.embed [data-widget="feedback"],
+body.embed #_hj_feedback_container,
+body.embed [id*="_hj"] {
+  display: none !important;
+}
+
+body.embed #right-panel {
+  height: 100%;
+}
+
 #right-panel-header,
 #right-panel-footer {
   flex-shrink: 0;

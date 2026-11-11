@@ -1,6 +1,7 @@
 {{define "sentry"}}
 <script>
   (function() {
+    if (new URLSearchParams(location.search).get('embed') === '1') return;
     if (location.hostname.match(/(localhost|linux)/)) return;
 
     window.sentryOnLoad = function() {

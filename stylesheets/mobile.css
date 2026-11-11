@@ -22,19 +22,7 @@
   }
 
   #mobile-warning {
-    display: flex;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 9999;
-    background-color: #fff;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 2em;
-    box-sizing: border-box;
+    display: none !important;
   }
 
   #mobile-warning-content {

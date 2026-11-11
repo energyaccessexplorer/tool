@@ -206,6 +206,8 @@ build-a:
 		${JS}/map-info.js \
 		${JS}/panel-section.js \
 		${JS}/export.js \
+		${JS}/static-map.js \
+		${JS}/pdf.js \
 		${JS}/sentry.js \
 		${JS}/translate.js \
 		${JS}/toast.js \

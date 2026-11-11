@@ -42,6 +42,10 @@ import {
 	generate_rows,
 } from './area-analysis.js';
 
+import {
+	download_static_map,
+} from './static-map.js';
+
 const slugify = (s) => s.toLowerCase().replace(/\s+/g, '-');
 
 function escape_csv(val) {
@@ -245,6 +249,15 @@ export function show_export_modal() {
 			const index_slug = slugify(EAE['indexes'][type]['name']);
 			fake_blob_download((await analysis(type)).tiff, export_filename(`${index_slug}-map`, 'tif'));
 			loading(false);
+		},
+		"export_static_map": async () => {
+			document.querySelector('#export-options-modal')?.remove();
+			loading(t(window.LOCALE, 'modal.export.generating'));
+			try {
+				await download_static_map();
+			} finally {
+				loading(false);
+			}
 		},
 		"export_csv":       () => {
 			const area_type_str = area_type(STATE.variant);

@@ -196,6 +196,10 @@ modal.save_analysis.saved_toast,Analysis saved successfully,Analyse sauvegardée
 modal.save_analysis.saved_toast_caption,Your analysis was saved to your My EAE account.,Votre analyse a été sauvegardée dans votre compte Mon EAE.,"您的分析已保存到您的""我的 EAE""账户。"
 modal.save_analysis.save_failed,Save failed,Échec de l'enregistrement,保存失败
 modal.export.header,Export options,Options d'exportation,导出选项
+modal.export.static_map.title,Static map,Carte statique,静态地图
+modal.export.static_map.desc,"A printable PDF of the map as you see it, with its legend, scale bar, north arrow, data sources and attributions.","Un PDF imprimable de la carte telle que vous la voyez, avec sa légende, son échelle, sa flèche du nord, ses sources de données et ses attributions.",您所见地图的可打印 PDF，包含图例、比例尺、指北针、数据来源和署名信息。
+modal.export.static_map.button,Download .pdf,Télécharger .pdf,下载 .pdf
+modal.export.static_map.image_title,Energy Access Explorer,Energy Access Explorer,Energy Access Explorer
 modal.export.generating,Generating...,Génération en cours...,生成中...
 modal.export.download_all,Download all,Tout télécharger,全部下载
 modal.export.summary_presentation.title,Summary presentation,Présentation résumée,汇总演示文稿
@@ -525,5 +529,10 @@ timeline.trend.title,Trend lines,Lignes de tendance,趋势线
 timeline.trend.subtitle,Showing trendlines for timeline data between {{from}} and {{to}}.,Affiche les lignes de tendance pour les données temporelles entre {{from}} et {{to}}.,显示 {{from}} 至 {{to}} 年间时间轴数据的趋势线。
 timeline.trend.subtitle_location,Showing trend for {{location}} between {{from}} and {{to}}.,Affiche la tendance pour {{location}} entre {{from}} et {{to}}.,显示 {{location}} 在 {{from}} 至 {{to}} 年间的趋势。
 timeline.trend.clear_location,Show all,Tout afficher,显示全部
-timeline.trend.about,"Trend lines show how each active timeline dataset's value has changed across the years available for this geography, averaged across the whole selected area.","Les lignes de tendance montrent l'évolution de la valeur de chaque couche temporelle active au fil des années disponibles pour cette zone géographique, moyennée sur l'ensemble de la zone sélectionnée.","趋势线显示每个活跃时间轴数据集在该地理区域可用年份间的变化情况，数值为所选整个区域的平均值。"
+timeline.trend.about,"Trend lines show how each active timeline dataset's value has changed across the years available for this geography, averaged across the whole selected area.","Les lignes de tendance montrent l'évolution de la valeur de chaque couche temporelle active au fil des années disponibles pour cette zone géographique, moyennée sur l'ensemble de la zone sélectionnée.",趋势线显示每个活跃时间轴数据集在该地理区域可用年份间的变化情况，数值为所选整个区域的平均值。
 timeline.filtered_geographies.about,"This list shows every area that has data in at least one active timeline dataset, for the year currently selected.","Cette liste montre chaque zone disposant de données dans au moins une couche temporelle active, pour l'année actuellement sélectionnée.",此列表显示在当前所选年份至少有一个活跃时间轴数据集含有数据的每个区域。
+static_map.geography,Geography,Géographie,地理区域
+static_map.data_source,Data source,Source des données,数据来源
+static_map.map_layers,Map layers,Couches cartographiques,地图图层
+static_map.attributions,Attributions,Attributions,署名
+static_map.mapbox_attribution,© Mapbox © OpenStreetMap contributors,© Mapbox © OpenStreetMap contributors,© Mapbox © OpenStreetMap contributors

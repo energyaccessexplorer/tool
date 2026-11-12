@@ -762,7 +762,14 @@ export default class DS {
 				}
 			}
 
+			const unscaled = !this.colorscale;
+
 			this.set_scales();
+
+			// A parse that ran before the colour scale existed coloured every
+			// feature with the layer default.
+			if (unscaled && this.colorscale && this.csv?.data && this.vectors?.data)
+				parse_vectors_csv.call(this);
 
 			if (this.disabled) return;
 		}

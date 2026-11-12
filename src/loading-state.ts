@@ -1,7 +1,7 @@
 // Meiosis cell for what the tool is waiting on: dataset loads and analysis
 // recomputes. The analysis spinner and map pulse derive from busy(); nothing
 // may toggle them by hand. Every load() and recompute() must settle the atom,
-// however it ends.
+// however it ends; watchdog() gives up a recompute that never does.
 //
 // Pure and erasable-syntax only: node strip-types runs the tests.
 
@@ -24,6 +24,12 @@ export interface LoadingState {
 	readonly queued: boolean;
 	/** A count: a slow reload() can overlap the next. */
 	readonly recomputes: number;
+	/** The steps the running recomputes wait on, by name; counts, since
+	 * overlapping recomputes wait on the same steps. */
+	readonly waits: Readonly<Record<string, number>>;
+	/** Bumped when stalled recomputes are given up: their late settles must
+	 * not count against the recomputes running by then. */
+	readonly epoch: number;
 }
 
 export type Patch = (state: LoadingState) => LoadingState;
@@ -39,6 +45,8 @@ const initial: LoadingState = {
 	"datasets":   {},
 	"queued":     false,
 	"recomputes": 0,
+	"waits":      {},
+	"epoch":      0,
 };
 
 const update = stream<Patch>();
@@ -92,8 +100,26 @@ export const actions = {
 		c.update(s => ({ ...s, "recomputes": s.recomputes + 1 }));
 	},
 
-	recomputeSettled(c: LoadingCell): void {
-		c.update(s => ({ ...s, "recomputes": Math.max(0, s.recomputes - 1) }));
+	recomputeSettled(c: LoadingCell, epoch: number): void {
+		c.update(s => (s.epoch !== epoch ? s : { ...s, "recomputes": Math.max(0, s.recomputes - 1) }));
+	},
+
+	waitStarted(c: LoadingCell, label: string): void {
+		c.update(s => ({ ...s, "waits": { ...s.waits, [label]: (s.waits[label] ?? 0) + 1 } }));
+	},
+
+	waitSettled(c: LoadingCell, label: string, epoch: number): void {
+		c.update(s => {
+			if (s.epoch !== epoch) return s;
+
+			const { [label]: n = 0, ...rest } = s.waits;
+
+			return { ...s, "waits": n > 1 ? { ...rest, [label]: n - 1 } : rest };
+		});
+	},
+
+	recomputesAbandoned(c: LoadingCell): void {
+		c.update(s => ({ ...s, "recomputes": 0, "waits": {}, "epoch": s.epoch + 1 }));
 	},
 } as const;
 
@@ -137,11 +163,56 @@ export async function loadsSettled(): Promise<void> {
 };
 
 export async function recompute<T>(fn: () => Promise<T>): Promise<T> {
+	const epoch = cell().state.epoch;
+
 	actions.recomputeStarted(cell());
 
 	try {
 		return await fn();
 	} finally {
-		actions.recomputeSettled(cell());
+		actions.recomputeSettled(cell(), epoch);
 	}
+};
+
+/** Names a step of the running recompute in the atom while it is pending. */
+export async function waitingOn<T>(label: string, p: Promise<T>): Promise<T> {
+	const epoch = cell().state.epoch;
+
+	actions.waitStarted(cell(), label);
+
+	try {
+		return await p;
+	} finally {
+		actions.waitSettled(cell(), label, epoch);
+	}
+};
+
+/** A recompute is stalled once the atom has not changed for `limit` ms while
+ * no load is in flight: loads bound their own waits (parse.js
+ * fetch_unstalled), a recompute need not. onStall gets the stalled state, then
+ * the recomputes are given up so busy() cannot hold forever. Returns the
+ * uninstaller. */
+export function watchdog(limit: number, onStall: (s: LoadingState) => void): () => void {
+	let timer: ReturnType<typeof setTimeout> | undefined;
+
+	const arm = (s: LoadingState) => {
+		clearTimeout(timer);
+		timer = undefined;
+
+		if (s.recomputes === 0) return;
+		if (Object.values(s.datasets).some(e => e.status === 'loading')) return;
+
+		timer = setTimeout(() => {
+			onStall(cell().state);
+			actions.recomputesAbandoned(cell());
+		}, limit);
+	};
+
+	const unsubscribe = subscribe(arm);
+	arm(cell().state);
+
+	return () => {
+		clearTimeout(timer);
+		unsubscribe();
+	};
 };

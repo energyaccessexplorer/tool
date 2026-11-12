@@ -134,8 +134,8 @@ export default class DS {
 			Object.assign(this.vectors, this.category.vectors);
 
 			this.vectors.id = b.config.vectors_id;
-			this.vectors.parse = x => {
-				parse_polygons.call(x || this);
+			this.vectors.parse = async x => {
+				await parse_polygons.call(x || this);
 				parse_vectors_csv.call(x || this);
 			};
 
@@ -540,7 +540,7 @@ export default class DS {
 
 		switch (this.type) {
 		case 'polygons-valued': {
-			if (this.csv.key) {
+			if (this.csv) {
 				colorstops_check.call(this);
 
 				color_opts = {

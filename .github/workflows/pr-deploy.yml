@@ -5,35 +5,43 @@ on:
     branches: [ '**', '!trunk', '!production' ]
 
 jobs:
-  build-deploy:
+  tickets:
     runs-on: ubuntu-latest
+    outputs:
+      ids: ${{ steps.parse.outputs.ids }}
 
     steps:
-      - name: Parse ticket tag from commit message
-        id: ticket
+      - name: Parse ticket tags from commit message
+        id: parse
         env:
           MSG: ${{ github.event.head_commit.message }}
         run: |
-          if [[ "$MSG" =~ \[Tests\ ([A-Z]+-[0-9]+)\] ]]; then
-            echo "id=${BASH_REMATCH[1]}" >> "$GITHUB_OUTPUT"
-            echo "matched=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "matched=false" >> "$GITHUB_OUTPUT"
-          fi
+          ids=$( { grep -oE '\[Tests [A-Z]+-[0-9]+\]' <<< "$MSG" || true; } \
+            | sed -E 's/^\[Tests (.*)\]$/\1/' | sort -u | jq -R . | jq -cs .)
+          echo "ids=$ids" >> "$GITHUB_OUTPUT"
 
+  build-deploy:
+    needs: tickets
+    if: needs.tickets.outputs.ids != '[]'
+    runs-on: ubuntu-latest
+
+    # The ticket is baked into the build's base path: one build per ticket.
+    strategy:
+      fail-fast: false
+      matrix:
+        id: ${{ fromJSON(needs.tickets.outputs.ids) }}
+
+    steps:
       - uses: actions/checkout@v5
-        if: steps.ticket.outputs.matched == 'true'
         with:
           fetch-depth: 0
 
       - name: Install build dependencies
-        if: steps.ticket.outputs.matched == 'true'
         run: |
           sudo apt-get install -y bmake curl jq
           sudo npm install -g typescript@5.9.3
 
       - name: Merge ${{ github.event.repository.default_branch }} before building
-        if: steps.ticket.outputs.matched == 'true'
         env:
           BASE: ${{ github.event.repository.default_branch }}
         run: |
@@ -45,9 +53,8 @@ jobs:
           test "$(git rev-list --count HEAD..origin/$BASE)" = "0"
 
       - name: Build .env
-        if: steps.ticket.outputs.matched == 'true'
         run: |
-          printf "{{define \"base\"}}/${{ steps.ticket.outputs.id }}{{end}}" > views/base.tmpl
+          printf "{{define \"base\"}}/${{ matrix.id }}{{end}}" > views/base.tmpl
 
           cat <<- EOF >.env
           	DOMAIN = "${{ vars.DOMAIN }}"
@@ -60,12 +67,10 @@ jobs:
           EOF
 
       - name: Run make
-        if: steps.ticket.outputs.matched == 'true'
         run: |
           bmake deps reconfig build env=test
 
       - name: Make destination directory
-        if: steps.ticket.outputs.matched == 'true'
         uses: appleboy/ssh-action@v1.2.2
         with:
           host:     ${{ secrets.PR_DEPLOY_HOST }}
@@ -73,15 +78,14 @@ jobs:
           port:     ${{ secrets.PR_DEPLOY_PORT }}
           key:      ${{ secrets.PR_DEPLOY_KEY }}
           script:   |
-            mkdir -p ${{ secrets.PR_DEPLOY_PATH }}/${{ steps.ticket.outputs.id }}
+            mkdir -p ${{ secrets.PR_DEPLOY_PATH }}/${{ matrix.id }}
 
       - name: Deploy the thing
-        if: steps.ticket.outputs.matched == 'true'
         uses: burnett01/rsync-deployments@7.1.0
         with:
           switches: --recursive --verbose
           path: dist/
-          remote_path: ${{ secrets.PR_DEPLOY_PATH }}/${{ steps.ticket.outputs.id }}/tool/
+          remote_path: ${{ secrets.PR_DEPLOY_PATH }}/${{ matrix.id }}/tool/
           remote_host: ${{ secrets.PR_DEPLOY_HOST }}
           remote_port: ${{ secrets.PR_DEPLOY_PORT }}
           remote_user: ${{ secrets.PR_DEPLOY_USER }}

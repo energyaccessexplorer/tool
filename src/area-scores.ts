@@ -232,23 +232,27 @@ export function aggregate_by_area(
 	analysis_raster: ArrayLike<number>,
 	division_data: ArrayLike<number>,
 ): Record<string, AreaCellScore> {
+	// One accumulator per area, not per cell: this runs over every raster cell.
+	const acc: Record<string, { sum: number; count: number }> = {};
+
+	for (let i = 0; i < analysis_raster.length; i += 1) {
+		const id = division_data[i] as number;
+		const value = analysis_raster[i] as number;
+
+		// skip nodata pixels
+		if (id === -1 || value === -1) continue;
+
+		const a = acc[id];
+		if (a) {
+			a.sum = (a.sum || 0) + value;
+			a.count += 1;
+		} else {
+			acc[id] = { "sum": 0 + value, "count": 1 };
+		}
+	}
+
 	return Object.fromEntries(
-		Object.entries(
-			Array.from(analysis_raster).reduce((acc, value, i) => {
-				const id = division_data[i] as number;
-				// skip nodata pixels
-				if (id === -1 || value === -1) {
-					return acc;
-				} else {
-					return Object.assign(acc, {
-						[id]: {
-							"sum":   (acc[id]?.sum || 0) + value,
-							"count": (acc[id]?.count || 0) + 1,
-						},
-					});
-				}
-			}, {} as Record<string, { "sum": number; "count": number }>),
-		).map(([id, { sum, count }]): [string, AreaCellScore] => [id, { sum, "average": sum / count }]),
+		Object.entries(acc).map(([id, { sum, count }]): [string, AreaCellScore] => [id, { sum, "average": sum / count }]),
 	);
 }
 

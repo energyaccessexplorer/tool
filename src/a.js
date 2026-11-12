@@ -94,7 +94,6 @@ import {
 import {
 	init as right_panel_init,
 	graphs as right_panel_graphs,
-	update_analysis as right_panel_update_analysis,
 } from './right-panel.js';
 
 import {
@@ -128,6 +127,7 @@ import {
 	actions as loading_actions,
 	recompute,
 	subscribe as loading_subscribe,
+	layer_loading,
 } from './loading-state.js';
 
 export const STANDARD_TABS = new Set(['census', 'demand', 'supply', 'other']);
@@ -540,7 +540,7 @@ function warm_population() {
 
 	const unsubscribe = loading_subscribe(s => {
 		const layer = Object.entries(s.datasets)
-			.some(([id, status]) => status === 'loading' && id !== ds.id && id !== OUTLINE.id);
+			.some(([id, e]) => layer_loading(e) && id !== ds.id && id !== OUTLINE.id);
 
 		if (layer) controller.abort();
 	});
@@ -576,7 +576,6 @@ async function reload(k,v) {
 
 async function reload_analysis(k) {
 	drop_map_info();
-	right_panel_update_analysis(false);
 
 	if (k === "datasets") {
 		controls_recount();

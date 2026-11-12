@@ -119,6 +119,14 @@ export function update_analysis(data) {
 }
 
 export async function graphs(raster) {
+	// The outline alone gives the panel nothing but its blank state, and the
+	// summary would download the population raster to fill hidden cards.
+	if (STATE.datasets.every(d => d === OUTLINE)) {
+		data_tab_actions.analysisCompleted(data_tab_cell(), {}, {});
+		update_analysis(false);
+		return;
+	}
+
 	// Card aggregates come from the analysis cell: OUTLINE_TIER's area 0 is the
 	// has_priority_score() analysed-area bucket, result.national.values the same
 	// layers over the whole geography with no analysis mask.

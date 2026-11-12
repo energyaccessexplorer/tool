@@ -16,6 +16,10 @@ import {
 } from './mapbox.js';
 
 import {
+	aggregation_band_key,
+} from './area-scores.ts';
+
+import {
 	and,
 	ce,
 	has,
@@ -182,6 +186,18 @@ function table_refresh() {
 	return table;
 };
 
+const BAND_SAMPLE = { "data": 0, "sum": 1, "average": 2 };
+
+// Other datasets read these rasters under their own settings, so every band
+// stays decoded: the outline, divisions (their indicators), mutant hosts and
+// timelines, whose bands are dates.
+function raster_shared() {
+	return this === OUTLINE
+		|| !!this.timeline
+		|| !!maybe(GEOGRAPHY, 'configuration', 'divisions')?.some(d => d.dataset_id === this.dataset_id)
+		|| Array.from(DST.values()).some(d => d.config?.hosts?.includes(this.id));
+};
+
 export function raster() {
 	async function run_it(blob) {
 		function draw(overrideid) {
@@ -220,19 +236,31 @@ export function raster() {
 		if (!maybe(this.raster, 'data')) {
 			const tiff = await GeoTIFF.fromBlob(blob);
 			const image = await tiff.getImage();
-			const rasters = await image.readRasters();
 
 			// Multi-band contract: band 1 = near (display), band 2 = area-weighted
 			// sum, band 3 = area-weighted average. Only a file with three bands HAS
 			// aggregation bands: a two-band data+Alpha raster would otherwise hand
 			// its alpha channel to `sum`, and a SUM-aggregated dataset would then
 			// aggregate transparency as if it were the data. Everything else --
-			// legacy single-band included -- falls back to band 1, so downstream
-			// code can still read any aggregation band unconditionally.
-			const has_bands = rasters.length >= 3;
+			// legacy single-band included -- falls back to band 1.
+			//
+			// Each band costs a full decode, so a raster only this dataset reads
+			// decodes just near plus the band aggregation_band() will read.
+			const has_bands = image.getSamplesPerPixel() >= 3;
+			const own_band = (has_bands && !raster_shared.call(this)) ? aggregation_band_key(this) : null;
+
+			const rasters = own_band
+				? await image.readRasters({ "samples": [...new Set([0, BAND_SAMPLE[own_band]])] })
+				: await image.readRasters();
+
 			this.raster.data = rasters[0];
-			this.raster.sum = has_bands ? rasters[1] : rasters[0];
-			this.raster.average = has_bands ? rasters[2] : rasters[0];
+
+			if (own_band) {
+				if (own_band !== 'data') this.raster[own_band] = rasters[1];
+			} else {
+				this.raster.sum = has_bands ? rasters[1] : rasters[0];
+				this.raster.average = has_bands ? rasters[2] : rasters[0];
+			}
 			this.raster.width = image.getWidth();
 			this.raster.height = image.getHeight();
 			this.raster.nodata = parseFloat(image.fileDirectory.GDAL_NODATA);

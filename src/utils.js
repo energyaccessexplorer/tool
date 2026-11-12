@@ -106,9 +106,24 @@ export function colorscale({intervals, stops, domain}) {
 			throw new Error(`rgba: argument ${str} doesn't match`);
 	};
 
+	// fn runs per pixel when a raster is drawn, but a scale yields few distinct
+	// colours. Callers only read the returned array.
+	const parsed = new Map();
+
+	function rgba_cached(str) {
+		let c = parsed.get(str);
+
+		if (!c) {
+			c = rgba(str);
+			if (parsed.size < 4096) parsed.set(str, c);
+		}
+
+		return c;
+	};
+
 	return {
 		"domain":    domain,
-		"fn":        x => rgba(s(x)),
+		"fn":        x => rgba_cached(s(x)),
 		"stops":     stops,
 		"intervals": intervals || s.domain(),
 	};

@@ -17,6 +17,7 @@ import {
 
 import {
 	aggregation_band_key,
+	band_samples,
 } from './area-scores.ts';
 
 import {
@@ -226,8 +227,6 @@ function table_refresh() {
 	return table;
 };
 
-const BAND_SAMPLE = { "data": 0, "sum": 1, "average": 2 };
-
 // Other datasets read these rasters under their own settings, so every band
 // stays decoded: the outline, divisions (their indicators), mutant hosts and
 // timelines, whose bands are dates.
@@ -289,7 +288,7 @@ export function raster() {
 			const has_bands = image.getSamplesPerPixel() >= 3;
 			const own_band = (has_bands && !raster_shared.call(this)) ? aggregation_band_key(this) : null;
 
-			const options = own_band ? { "samples": [...new Set([0, BAND_SAMPLE[own_band]])] } : {};
+			const options = own_band ? { "samples": [...new Set([0, band_samples[own_band]])] } : {};
 
 			const pool = await decoder_pool();
 			if (pool) options.pool = pool;

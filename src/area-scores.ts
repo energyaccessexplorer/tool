@@ -518,6 +518,13 @@ export function aggregation_band_key(dataset: Pick<AggregationDataset, 'category
 	return (dataset.category.analysis?.aggregation ?? 'AVG') === 'SUM' ? 'sum' : 'average';
 }
 
+// Where each band lives in a published GeoTIFF: 1 display, 2 area-weighted sum,
+// 3 area-weighted average. A file with fewer than three bands has no
+// aggregation bands and reads band 1 for all three.
+export const band_samples: Readonly<Record<AggregationBand, number>> = {
+	"data": 0, "sum": 1, "average": 2,
+};
+
 export function aggregation_band(dataset: AggregationDataset): ArrayLike<number> {
 	return dataset.raster[aggregation_band_key(dataset)]!;
 }

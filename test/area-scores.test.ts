@@ -48,6 +48,7 @@ const analysed_mask: any       = scores.analysed_mask;
 const criteria_pass_mask: any  = scores.criteria_pass_mask;
 const aggregation_band: any    = scores.aggregation_band;
 const aggregation_band_key: any = scores.aggregation_band_key;
+const band_samples: any = scores.band_samples;
 const jenks_breaks: any        = scores.jenks_breaks;
 const bucket_in_edges: any     = scores.bucket_in_edges;
 const aggregate_layer_values: any = analysis.aggregate_layer_values;
@@ -513,6 +514,25 @@ describe('aggregation_band', () => {
 
 		for (const c of cases)
 			assert.equal(aggregation_band(c), bands[aggregation_band_key(c) as keyof typeof bands]);
+	});
+
+	// The published GeoTIFF order is band 1 display, band 2 sum, band 3 average;
+	// a reorder there would feed SUM datasets the average and stay invisible
+	// until the numbers were wrong, so the pair is pinned here.
+	it('the aggregation band reads the published sample index', () => {
+		const csv = { "key": 1, "table": {} };
+		const sample = (category: any, extra?: any) =>
+			band_samples[aggregation_band_key(layer(category, extra))];
+
+		assert.deepEqual(
+			[sample({ "name": 'c', "analysis": { "aggregation": 'SUM' } }),
+			 sample({ "name": 'c', "analysis": { "aggregation": 'AVG' } }),
+			 sample({ "name": 'c' }),
+			 sample({ "name": 'c', "analysis": { "aggregation": 'SUM' } }, csv)],
+			[1, 2, 2, 0],
+		);
+
+		assert.deepEqual(band_samples, { "data": 0, "sum": 1, "average": 2 });
 	});
 });
 

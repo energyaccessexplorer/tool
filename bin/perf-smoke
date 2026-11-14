@@ -1,0 +1,168 @@
+#!/bin/sh
+# Time what a geography page costs to become usable, so a startup claim can be
+# re-measured instead of remembered: ready (spinner gone), loaded (every dataset
+# that has a raster has one), raster bytes on the wire and console errors.
+#
+#   bin/perf-smoke [url-or-geography-id]...
+#
+# Needs a browser this shell may drive: chrome-ctl + agent-browser on PATH, and
+# a dev server serving the tool. Without arguments it times the ids in
+# $EAE_PERF_IDS (comma separated).  A bare geography page loads the outline and
+# its divisions only, so measure a snapshot URL (tool/p?<time>) to time a first
+# load with layers on: that is the case EAE-532 was about.
+#
+# The numbers are: ready (spinner gone), drawn (every raster and its analysis
+# present and no longer growing), analysis (the right panel stopped marking its
+# results stale), layers drawn, megabytes of raster and of everything.
+
+set -e
+
+BASE=${EAE_BASE:-http://eae.localhost}
+IDS=${EAE_PERF_IDS:-}
+BUDGET_READY=${EAE_PERF_BUDGET_READY:-90}
+BUDGET_SETTLED=${EAE_PERF_BUDGET_SETTLED:-180}
+INSTANCE=${EAE_PERF_INSTANCE:-perf-smoke}
+
+for tool in chrome-ctl agent-browser; do
+	command -v "$tool" >/dev/null 2>&1 || {
+		>&2 echo "perf-smoke needs '$tool' on PATH (see the chrome-headless skill)"
+		exit 1
+	}
+done
+
+targets=$*
+if [ -z "$targets" ]; then
+	[ -n "$IDS" ] || {
+		>&2 echo "usage: perf-smoke [url-or-geography-id]...   (or set EAE_PERF_IDS)"
+		exit 1
+	}
+	targets=$(echo "$IDS" | tr ',' ' ')
+fi
+
+cleanup() { [ -n "$PID" ] && kill "$PID" 2>/dev/null; chrome-ctl stop instance="$INSTANCE" >/dev/null 2>&1; }
+trap cleanup EXIT INT TERM
+
+started=$(chrome-ctl start "instance=$INSTANCE" 2>/dev/null) || {
+	>&2 echo "chrome-ctl could not start instance '$INSTANCE'"
+	exit 1
+}
+
+PID=$(echo "$started" | sed -n 's/.*"pid": *\([0-9]*\).*/\1/p')
+
+[ -n "$PID" ] || {
+	>&2 echo "chrome-ctl did not report a pid: $started"
+	exit 1
+}
+
+# The sandbox shell has no lsof on PATH; the store copy does the same job.
+LSOF=$(command -v lsof 2>/dev/null || ls -1d /nix/store/*-lsof-*/bin/lsof 2>/dev/null | head -1)
+
+[ -n "$LSOF" ] || {
+	>&2 echo "perf-smoke needs lsof to find the browser's CDP port"
+	exit 1
+}
+
+# The browser listens on a port Chrome picks; find it for this pid only.
+for _i in $(seq 1 40); do
+	PORT=$("$LSOF" -nP -a -p "$PID" -iTCP -sTCP:LISTEN 2>/dev/null | awk 'NR>1{split($9,a,":"); print a[2]; exit}')
+	[ -n "$PORT" ] && break
+	sleep 0.5
+done
+
+[ -n "$PORT" ] || {
+	>&2 echo "no CDP port for pid $PID"
+	exit 1
+}
+
+AGENT_BROWSER_CDP_PORT=$PORT agent-browser set viewport 1600 1000 >/dev/null 2>&1
+
+ev() { AGENT_BROWSER_CDP_PORT=$PORT agent-browser eval "$1" </dev/null 2>&1 | tail -1; }
+
+failures=0
+
+for target in $targets; do
+	case "$target" in
+	http*) url=$target ;;
+	*)     url="$BASE/tool/a?id=$target" ;;
+	esac
+
+	start=$(date +%s)
+	AGENT_BROWSER_CDP_PORT=$PORT agent-browser open "$url" >/dev/null 2>&1 </dev/null
+
+	# The page owns the definition of "usable": the spinner is gone, the outline
+	# and its divisions are drawn, and no dataset is still loading.
+	ready=''
+	while [ -z "$ready" ]; do
+		ready=$(ev "(()=>{
+			const busy = document.querySelector('#app-loading')?.style.display !== 'none';
+			const state = (() => { try { return getComputedStyle(document.querySelector('#app-loading')).display } catch (e) { return 'init' } })();
+			const outline = !!(window.OUTLINE && OUTLINE.raster && OUTLINE.raster.data);
+			if (state === 'none' && outline) return 'ready';
+			return '';
+		})()" | tr -d '"')
+
+		[ -n "$ready" ] || sleep 1
+		[ $(( $(date +%s) - start )) -gt "$BUDGET_READY" ] && break
+	done
+
+	seconds=$(( $(date +%s) - start ))
+
+	# Datasets stream in after the spinner goes: the page has settled when the
+	# number of drawn rasters stops growing.
+	last=-1
+	still=0
+	while [ "$still" -lt 3 ] && [ $(( $(date +%s) - start )) -lt "$BUDGET_SETTLED" ]; do
+		drawn=$(ev "(STATE.datasets||[]).filter(d => d.raster && d.raster.data).length" | tr -d '"')
+		if [ "$drawn" = "$last" ]; then
+			still=$((still + 1))
+		else
+			last=$drawn
+			still=0
+		fi
+		[ "$still" -lt 3 ] && sleep 1
+	done
+
+	settled=$(( $(date +%s) - start ))
+
+	# The panel's results are dimmed while the analysis recomputes; the page is
+	# done when that clears, which is the state EAE-532 left it stuck in.
+	panel=''
+	while [ -z "$panel" ] && [ $(( $(date +%s) - start )) -lt "$BUDGET_SETTLED" ]; do
+		panel=$(ev "(()=>{const c=document.querySelector('#right-panel-content'); return c && !c.classList.contains('stale') ? 'done' : ''})()" | tr -d '"')
+		[ -n "$panel" ] || sleep 1
+	done
+
+	analysis=$(( $(date +%s) - start ))
+
+	measure=$(ev "(()=>{
+		const rasters = STATE.datasets.filter(d => d.raster && d.raster.endpoint);
+		const bytes = performance.getEntriesByType('resource')
+			.filter(e => /tiff/.test(e.name) || /tiff/.test(e.initiatorType))
+			.reduce((a, e) => a + (e.transferSize || 0), 0);
+		const total = performance.getEntriesByType('resource')
+			.reduce((a, e) => a + (e.transferSize || 0), 0);
+		const drawn = rasters.filter(d => d.raster.data).length;
+		return [drawn, rasters.length, Math.round(bytes / 104857.6) / 10, Math.round(total / 104857.6) / 10, (window.__errors || []).length].join(' ');
+	})()" | tr -d '"')
+
+	set -- $measure
+	printf '%-40s ready %3ds  drawn %3ds  analysis %3ds  layers %s  tiff %5s MB  total %6s MB  errors %s\n' \
+		"$target" "$seconds" "$settled" "$analysis" "$1" "$3" "$4" "$5"
+
+	if [ "$seconds" -gt "$BUDGET_READY" ]; then
+		echo "  over the ${BUDGET_READY}s ready budget"
+		failures=$((failures + 1))
+	fi
+
+	if [ "$settled" -gt "$BUDGET_SETTLED" ]; then
+		echo "  over the ${BUDGET_SETTLED}s settle budget"
+		failures=$((failures + 1))
+	fi
+
+	if [ -z "$panel" ]; then
+		echo "  the analysis never cleared its stale marker"
+		failures=$((failures + 1))
+	fi
+done
+
+exit $([ "$failures" -eq 0 ] && echo 0 || echo 1)

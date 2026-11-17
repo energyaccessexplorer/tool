@@ -71,7 +71,7 @@ import {
 	tmpl,
 } from '../lib/helpers.js';
 
-const user_id = user_extract('id');
+const user_id = user_extract('sub');
 
 let has_data = false;
 let was_busy = false;

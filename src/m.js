@@ -21,7 +21,7 @@ import {
 
 import { t, unesc, translateNode, initLocalePicker, resolveLocale } from './translate.js';
 
-const user_id = user_extract('id');
+const user_id = user_extract('sub');
 
 function loading(bool) {
 	qs('#app-loading').style['display'] = bool ? 'block' : 'none';

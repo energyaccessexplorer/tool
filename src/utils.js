@@ -23,7 +23,7 @@ export async function self() {
 	if (!token) return;
 
 	try {
-		const id = jwt_decode(token).id;
+		const id = jwt_decode(token).sub;
 		SELF = (await API.get('users', { "id": `eq.${id}` }, { "one": true }));
 	} catch (err) {
 		console.warn("token:", token, err);

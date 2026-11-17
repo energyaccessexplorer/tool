@@ -18,7 +18,14 @@ include .env
 # MAPBOX_TOKEN = ""
 #
 # STORAGE_URL = "https://bucket.s3.storage.com/path/"
+# SUPABASE_URL = "https://ref.supabase.co"
+# SUPABASE_ANON_KEY = "sb_publishable_..."
 #
+# Supabase Auth, read by src/auth.js. The key is public by design; the
+# dev-server rewrites both values to the local gateway in local builds.
+SUPABASE_URL ?= "https://fjuzeptiewrqfxunivnu.supabase.co"
+SUPABASE_ANON_KEY ?= "sb_publishable_fyBFmd4Q_XsbecX6_9-h_w_1_EQz0lF"
+
 DIST = ./dist
 SRC = ./src
 BIN = ./bin
@@ -63,6 +70,10 @@ lint:
 deps:
 	@ mkdir -p ${LIB}/fonts
 	DEST=${LIB} ${BIN}/deps
+
+	@ # Checked in rather than fetched: the API client carries the token
+	@ # refresh the app depends on.
+	@ cp ${SRC}/auth.js ${SRC}/pgrest.js ${LIB}/
 
 	@ sed 's/var PptxGenJS=/window.PptxGenJS=/' ${LIB}/pptxgen.js > ${LIB}/pptxgen.js.$$$$ && mv ${LIB}/pptxgen.js.$$$$ ${LIB}/pptxgen.js
 
@@ -359,6 +370,8 @@ reconfig:
 		| jq '.storage = ${STORAGE_URL}' \
 		| jq '.mapbox_token = ${MAPBOX_TOKEN}' \
 		| jq '.mapbox_theme = ${MAPBOX_THEME}' \
+		| jq '.supabase_url = ${SUPABASE_URL}' \
+		| jq '.supabase_anon_key = ${SUPABASE_ANON_KEY}' \
 		>> "$$tmp" && \
 	printf ';\n' >> "$$tmp" && \
 	mv "$$tmp" settings.tmp.json

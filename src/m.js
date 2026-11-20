@@ -264,7 +264,7 @@ export async function init() {
 	};
 
 	document.querySelector('#change-password').onclick = function() {
-		window.location = `/password-reset?email=${user_extract('email')}`;
+		window.location = `${window.BASE}/password-reset?email=${user_extract('email')}`;
 	};
 
 	draw_snapshots(snapshots, geographies, container, trees);

@@ -24,6 +24,8 @@ jobs:
     needs: tickets
     if: needs.tickets.outputs.ids != '[]'
     runs-on: ubuntu-latest
+    # The Supabase project this branch builds against.
+    environment: staging
 
     # The ticket is baked into the build's base path: one build per ticket.
     strategy:
@@ -52,6 +54,13 @@ jobs:
           git merge --no-edit "origin/$BASE"
           test "$(git rev-list --count HEAD..origin/$BASE)" = "0"
 
+      - name: Check the staging environment
+        run: |
+          test -n "${{ vars.SUPABASE_URL }}" && test -n "${{ vars.SUPABASE_ANON_KEY }}" || {
+            echo "::error::the staging environment needs the variables SUPABASE_URL and SUPABASE_ANON_KEY"
+            exit 1
+          }
+
       - name: Build .env
         run: |
           printf "{{define \"base\"}}/${{ matrix.id }}{{end}}" > views/base.tmpl
@@ -60,8 +69,8 @@ jobs:
           	DOMAIN = "${{ vars.DOMAIN }}"
           	WORLD = "${{ vars.WORLD_URL }}"
           	TITLE = "${{ vars.TITLE }}"
-          	API_URL = "${{ vars.API_URL }}"
-          	STORAGE_URL = "${{ vars.STORAGE_URL }}"
+          SUPABASE_URL = "${{ vars.SUPABASE_URL }}"
+          SUPABASE_ANON_KEY = "${{ vars.SUPABASE_ANON_KEY }}"
           	MAPBOX_TOKEN = "${{ vars.MAPBOX_TOKEN }}"
           	MAPBOX_THEME = "${{ vars.MAPBOX_THEME }}"
           EOF

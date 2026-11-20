@@ -71,7 +71,7 @@ function share(snapshots) {
 	translateNode(window.LOCALE, c);
 
 	const u = new URL(location);
-	const url = `${u.protocol}//${u.hostname}${window.BASE}/tool/p?${s.time}`;
+	const url = `${u.protocol}//${u.host}${window.BASE}/tool/p?${s.time}`;
 
 	function copy() {
 		if (!navigator.clipboard) {

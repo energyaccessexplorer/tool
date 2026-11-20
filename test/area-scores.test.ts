@@ -47,6 +47,8 @@ const has_priority_score: any  = scores.has_priority_score;
 const analysed_mask: any       = scores.analysed_mask;
 const criteria_pass_mask: any  = scores.criteria_pass_mask;
 const aggregation_band: any    = scores.aggregation_band;
+const aggregation_band_key: any = scores.aggregation_band_key;
+const band_samples: any = scores.band_samples;
 const jenks_breaks: any        = scores.jenks_breaks;
 const bucket_in_edges: any     = scores.bucket_in_edges;
 const aggregate_layer_values: any = analysis.aggregate_layer_values;
@@ -131,6 +133,44 @@ describe('by_area', () => {
 		near(mixed['4'].average, 0.249999992);  // (0.5 - 1.6e-8) / 2
 
 		assert.equal(has_priority_score(TINY_NEG), false);
+	});
+
+	// Characterise key order and IEEE-754 edge cases as well as numeric totals.
+	type Aggregate = { sum: number; average: number };
+	const reference = (raster: ArrayLike<number>, division: ArrayLike<number>): Record<string, Aggregate> => Object.fromEntries(
+		Object.entries(
+			Array.from(raster).reduce((acc: Record<string, { sum: number; count: number }>, value: number, i: number) => {
+				const id = division[i] as number;
+				if (id === -1 || value === -1) return acc;
+				return Object.assign(acc, {
+					[id]: { "sum": (acc[id]?.sum || 0) + value, "count": (acc[id]?.count || 0) + 1 },
+				});
+			}, {}),
+		).map(([id, { sum, count }]): [string, Aggregate] => [id, { sum, "average": sum / count }]),
+	);
+
+	const identical = (a: Record<string, Aggregate>, b: Record<string, Aggregate>) => {
+		assert.deepEqual(Object.keys(a), Object.keys(b));
+		for (const k of Object.keys(a)) {
+			const x = a[k]!, y = b[k]!;
+			assert.ok(Object.is(x.sum, y.sum), `sum of ${k}: ${x.sum} vs ${y.sum}`);
+			assert.ok(Object.is(x.average, y.average), `average of ${k}: ${x.average} vs ${y.average}`);
+		}
+	};
+
+	it('preserves key order, NaN, -0 and float32 inputs', () => {
+		let seed = 7;
+		const rand = () => (seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648;
+		const pick = <T>(xs: T[]): T => xs[Math.floor(rand() * xs.length)]!;
+
+		for (let run = 0; run < 200; run += 1) {
+			const n = 1 + Math.floor(rand() * 300);
+			const raster = Array.from({ "length": n }, () => pick([-1, 0, -0, NaN, TINY_NEG, 1, rand(), rand(), rand()]));
+			const division = Array.from({ "length": n }, () => pick([-1, 0, 1, 2, 3, 10, 2.5, -3, 100]));
+
+			identical(by_area(raster, division), reference(raster, division));
+			identical(by_area(new Float32Array(raster), new Float32Array(division)), reference(new Float32Array(raster), new Float32Array(division)));
+		}
 	});
 });
 
@@ -457,6 +497,42 @@ describe('aggregation_band', () => {
 			aggregation_band(layer({ "name": 'c', "analysis": { "aggregation": 'AVG' } }, csv)),
 			'DATA_BAND',
 		);
+	});
+
+	// The parser decodes only near plus this band for a raster no other
+	// dataset reads: the key must name the band aggregation_band() returns.
+	it('aggregation_band_key names the band aggregation_band reads', () => {
+		const csv = { "key": 1, "table": {} };
+		const cases = [
+			layer({ "name": 'c', "analysis": { "aggregation": 'SUM' } }),
+			layer({ "name": 'c', "analysis": { "aggregation": 'AVG' } }),
+			layer({ "name": 'c' }),
+			layer({ "name": 'c', "analysis": { "aggregation": 'SUM' } }, csv),
+		];
+
+		assert.deepEqual(cases.map(aggregation_band_key), ['sum', 'average', 'average', 'data']);
+
+		for (const c of cases)
+			assert.equal(aggregation_band(c), bands[aggregation_band_key(c) as keyof typeof bands]);
+	});
+
+	// The published GeoTIFF order is band 1 display, band 2 sum, band 3 average;
+	// a reorder there would feed SUM datasets the average and stay invisible
+	// until the numbers were wrong, so the pair is pinned here.
+	it('the aggregation band reads the published sample index', () => {
+		const csv = { "key": 1, "table": {} };
+		const sample = (category: any, extra?: any) =>
+			band_samples[aggregation_band_key(layer(category, extra))];
+
+		assert.deepEqual(
+			[sample({ "name": 'c', "analysis": { "aggregation": 'SUM' } }),
+			 sample({ "name": 'c', "analysis": { "aggregation": 'AVG' } }),
+			 sample({ "name": 'c' }),
+			 sample({ "name": 'c', "analysis": { "aggregation": 'SUM' } }, csv)],
+			[1, 2, 2, 0],
+		);
+
+		assert.deepEqual(band_samples, { "data": 0, "sum": 1, "average": 2 });
 	});
 });
 

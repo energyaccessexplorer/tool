@@ -323,6 +323,21 @@
   flex-shrink: 0;
 }
 
+#right-panel-content.stale .right-panel-tab-panel {
+  opacity: 0.45;
+  pointer-events: none;
+  transition: opacity 200ms ease-out;
+}
+
+#right-panel-content .right-panel-tab-panel {
+  transition: opacity 150ms ease-in;
+}
+
+.index-graphs-section.pending {
+  opacity: 0.45;
+  transition: opacity 200ms ease-out;
+}
+
 #analysis-loading-state {
   display: none;
   align-items: center;

@@ -29,6 +29,11 @@ import {
 } from './timeline-state.js';
 
 import {
+	layer_loading,
+	subscribe as loading_subscribe,
+} from './loading-state.js';
+
+import {
 	and,
 	ce,
 	coalesce,
@@ -642,6 +647,23 @@ export function update() {
 
 	if (list.length) sortable(cards_list, 'enable');
 };
+
+// A layer being turned on holds a placeholder until its card can be built
+// from its data.
+loading_subscribe(s => {
+	const pending = qs('#cards-pending');
+	if (!pending) return;
+
+	const datasets = Object.entries(s.datasets)
+		.filter(([, e]) => layer_loading(e))
+		.map(([id]) => DST.get(id))
+		.filter(d => d && d.on && d !== OUTLINE && !d.card?.isConnected);
+
+	pending.replaceChildren(...datasets.map(d => ce('div', [
+		ce('div', null, { "class": 'spinner' }),
+		ce('span', translateDatasetName(window.LOCALE, d)),
+	], { "class": 'card-pending' })));
+});
 
 timeline_subscribe(() => {
 	STATE.datasets.map(d => d.card).filter(Boolean).forEach(c => c.bind());

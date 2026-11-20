@@ -127,7 +127,7 @@ function edit_title(s, callback) {
 };
 
 export function snapshot(callback) {
-	const user_id = user_extract('id');
+	const user_id = user_extract('sub');
 
 	if (!user_id) {
 		request_authentication();

@@ -1,0 +1,60 @@
+# PR previews on Supabase.
+name: SUPABASE PR DEPLOY
+
+on:
+  pull_request:
+    branches: [ trunk ]
+
+env:
+  DESTINATION: ${{ github.head_ref || github.ref_name }}
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get install -y bmake curl jq awscli
+
+      - name: Build .env
+        run: |
+          printf "{{define \"base\"}}/preview/${{ env.DESTINATION }}{{end}}" > views/base.tmpl
+
+          cat <<- EOF >.env
+          	DOMAIN = "${{ vars.DOMAIN }}"
+          	WORLD = "${{ vars.WORLD_URL }}"
+          	TITLE = "${{ vars.TITLE }}"
+          	API_URL = "${{ vars.API_URL }}"
+          	STORAGE_URL = "${{ vars.STORAGE_URL }}"
+          	MAPBOX_TOKEN = "${{ vars.MAPBOX_TOKEN }}"
+          	MAPBOX_THEME = "${{ vars.MAPBOX_THEME }}"
+          EOF
+
+      - name: Run make
+        run: |
+          bmake deps reconfig build env=test
+
+      - name: Deploy to Supabase Storage
+        run: |
+          aws s3 sync dist/ "s3://${{ vars.SUPABASE_BUCKET }}/preview/${{ env.DESTINATION }}/tool/" \
+            --endpoint-url "https://${{ vars.SUPABASE_PROJECT_REF }}.supabase.co/storage/v1/s3" \
+            --delete
+        env:
+          AWS_ACCESS_KEY_ID:     ${{ secrets.SUPABASE_STORAGE_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.SUPABASE_STORAGE_SECRET }}
+          AWS_DEFAULT_REGION:    us-east-1
+
+      - name: Comment preview URL
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const url = `${{ vars.SUPABASE_SITE_ROUTER_URL }}/preview/${{ env.DESTINATION }}/tool/`;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `[Supabase track] Tool preview deployed: ${url}`,
+            });

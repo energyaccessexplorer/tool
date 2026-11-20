@@ -21,7 +21,7 @@ import {
 
 import { t, unesc, translateNode, initLocalePicker, resolveLocale } from './translate.js';
 
-const user_id = user_extract('id');
+const user_id = user_extract('sub');
 
 function loading(bool) {
 	qs('#app-loading').style['display'] = bool ? 'block' : 'none';
@@ -71,7 +71,7 @@ function share(snapshots) {
 	translateNode(window.LOCALE, c);
 
 	const u = new URL(location);
-	const url = `${u.protocol}//${u.hostname}${window.BASE}/tool/p?${s.time}`;
+	const url = `${u.protocol}//${u.host}${window.BASE}/tool/p?${s.time}`;
 
 	function copy() {
 		if (!navigator.clipboard) {
@@ -264,7 +264,7 @@ export async function init() {
 	};
 
 	document.querySelector('#change-password').onclick = function() {
-		window.location = `/password-reset?email=${user_extract('email')}`;
+		window.location = `${window.BASE}/password-reset?email=${user_extract('email')}`;
 	};
 
 	draw_snapshots(snapshots, geographies, container, trees);

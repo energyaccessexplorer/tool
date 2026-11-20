@@ -589,9 +589,14 @@ async function compute_result_scores(key: ResultKey): Promise<ScoresPayload> {
 
 	// Geography init builds the tier's division raster asynchronously and an
 	// early analysis (no/few layers) outruns it, so wait the way run() waits
-	// for data.
-	await until(() => GEOGRAPHY.divisions?.[key.tier]?.raster, Infinity);
-	const division = GEOGRAPHY.divisions![key.tier]!;
+	// for data — but a tier that never arrives must not hold busy() open, and
+	// with it the map pulse, forever.
+	await until(() => GEOGRAPHY.divisions?.[key.tier]?.raster).catch(() => {});
+
+	const division = GEOGRAPHY.divisions?.[key.tier] ?? OUTLINE!;
+
+	if (!GEOGRAPHY.divisions?.[key.tier]?.raster)
+		console.warn(`analysis: no division raster for tier ${String(key.tier)}, scoring the whole geography`);
 
 	// The one "analysed cells" mask (area-scores.ts analysed_mask); every
 	// aggregate below counts exactly these cells.

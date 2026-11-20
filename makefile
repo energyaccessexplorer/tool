@@ -18,7 +18,23 @@ include .env
 # MAPBOX_TOKEN = ""
 #
 # STORAGE_URL = "https://bucket.s3.storage.com/path/"
+# SUPABASE_URL = "https://ref.supabase.co"
+# SUPABASE_ANON_KEY = "sb_publishable_..."
 #
+# Supabase Auth, read by src/auth.js. The key is public by design; the
+# dev-server rewrites both values to the local gateway in local builds.
+SUPABASE_URL ?= "https://fjuzeptiewrqfxunivnu.supabase.co"
+SUPABASE_ANON_KEY ?= "sb_publishable_fyBFmd4Q_XsbecX6_9-h_w_1_EQz0lF"
+
+# The project's API, and its Storage for what the tool loads by path
+# (presets.csv), which migrate-infra's originals step copies there.
+API_URL ?= "${SUPABASE_URL:S/"//g}/rest/v1"
+STORAGE_URL ?= "${SUPABASE_URL:S/"//g}/storage/v1/object/public/paver-outputs/EnergyAccess/"
+
+# The deployment whose data the tool shows (public, test, ...); empty reads it
+# from the hostname.
+DEPLOYMENT ?= ""
+
 DIST = ./dist
 SRC = ./src
 BIN = ./bin
@@ -63,6 +79,10 @@ lint:
 deps:
 	@ mkdir -p ${LIB}/fonts
 	DEST=${LIB} ${BIN}/deps
+
+	@ # Checked in rather than fetched: the API client carries the token
+	@ # refresh the app depends on.
+	@ cp ${SRC}/auth.js ${SRC}/pgrest.js ${LIB}/
 
 	@ sed 's/var PptxGenJS=/window.PptxGenJS=/' ${LIB}/pptxgen.js > ${LIB}/pptxgen.js.$$$$ && mv ${LIB}/pptxgen.js.$$$$ ${LIB}/pptxgen.js
 
@@ -359,6 +379,9 @@ reconfig:
 		| jq '.storage = ${STORAGE_URL}' \
 		| jq '.mapbox_token = ${MAPBOX_TOKEN}' \
 		| jq '.mapbox_theme = ${MAPBOX_THEME}' \
+		| jq '.supabase_url = ${SUPABASE_URL}' \
+		| jq '.supabase_anon_key = ${SUPABASE_ANON_KEY}' \
+		| jq 'if ${DEPLOYMENT} == "" then . else .deployment = ${DEPLOYMENT} end' \
 		>> "$$tmp" && \
 	printf ';\n' >> "$$tmp" && \
 	mv "$$tmp" settings.tmp.json

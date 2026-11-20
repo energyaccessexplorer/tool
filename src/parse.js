@@ -16,6 +16,11 @@ import {
 } from './mapbox.js';
 
 import {
+	aggregation_band_key,
+	band_samples,
+} from './area-scores.ts';
+
+import {
 	and,
 	ce,
 	has,
@@ -51,6 +56,46 @@ async function fetchcheck(endpoint, format) {
 };
 
 const STALL_TIMEOUT = 30000;
+
+// geotiff 1.0.4 names its decoder worker relative to the page, so the pool
+// gets one with the URL the deps step ships it at. A worker that never starts
+// hangs every decode handed to it: the pool is used only once a decode through
+// it has come back, and rasters decode on the main thread otherwise.
+const DECODER_WORKER = '../lib/decoder.worker.1936c0d9.js';
+const DECODER_PROBE_TIMEOUT = 5000;
+
+let decoder;
+
+function decoder_pool() {
+	if (!decoder) decoder = decoder_start();
+
+	return decoder;
+};
+
+async function decoder_start() {
+	let worker, pool;
+
+	try {
+		worker = new Worker(new URL(DECODER_WORKER, import.meta.url));
+		pool = new GeoTIFF.Pool(4, worker);
+
+		const started = await Promise.race([
+			pool.decode({ "Compression": 1 }, new ArrayBuffer(4)).then(() => true, () => false),
+			new Promise(resolve => setTimeout(resolve, DECODER_PROBE_TIMEOUT, false)),
+		]);
+
+		if (started) return pool;
+	} catch (err) {
+		console.warn(err);
+	}
+
+	console.warn("geotiff: the decoder worker did not start, decoding on the main thread");
+
+	// Pool.destroy() also awaits the failed init and rejects outside the decode.
+	worker?.terminate();
+
+	return null;
+};
 
 // A hung fetch would keep its dataset loading forever. The bound is idle time,
 // not total time, so large downloads on slow links still complete.
@@ -182,6 +227,16 @@ function table_refresh() {
 	return table;
 };
 
+// Other datasets read these rasters under their own settings, so every band
+// stays decoded: the outline, divisions (their indicators), mutant hosts and
+// timelines, whose bands are dates.
+function raster_shared() {
+	return this === OUTLINE
+		|| !!this.timeline
+		|| !!maybe(GEOGRAPHY, 'configuration', 'divisions')?.some(d => d.dataset_id === this.dataset_id)
+		|| Array.from(DST.values()).some(d => d.config?.hosts?.includes(this.id));
+};
+
 export function raster() {
 	async function run_it(blob) {
 		function draw(overrideid) {
@@ -220,19 +275,34 @@ export function raster() {
 		if (!maybe(this.raster, 'data')) {
 			const tiff = await GeoTIFF.fromBlob(blob);
 			const image = await tiff.getImage();
-			const rasters = await image.readRasters();
 
 			// Multi-band contract: band 1 = near (display), band 2 = area-weighted
 			// sum, band 3 = area-weighted average. Only a file with three bands HAS
 			// aggregation bands: a two-band data+Alpha raster would otherwise hand
 			// its alpha channel to `sum`, and a SUM-aggregated dataset would then
 			// aggregate transparency as if it were the data. Everything else --
-			// legacy single-band included -- falls back to band 1, so downstream
-			// code can still read any aggregation band unconditionally.
-			const has_bands = rasters.length >= 3;
+			// legacy single-band included -- falls back to band 1.
+			//
+			// Each band costs a full decode, so a raster only this dataset reads
+			// decodes just near plus the band aggregation_band() will read.
+			const has_bands = image.getSamplesPerPixel() >= 3;
+			const own_band = (has_bands && !raster_shared.call(this)) ? aggregation_band_key(this) : null;
+
+			const options = own_band ? { "samples": [...new Set([0, band_samples[own_band]])] } : {};
+
+			const pool = await decoder_pool();
+			if (pool) options.pool = pool;
+
+			const rasters = await image.readRasters(options);
+
 			this.raster.data = rasters[0];
-			this.raster.sum = has_bands ? rasters[1] : rasters[0];
-			this.raster.average = has_bands ? rasters[2] : rasters[0];
+
+			if (own_band) {
+				if (own_band !== 'data') this.raster[own_band] = rasters[1];
+			} else {
+				this.raster.sum = has_bands ? rasters[1] : rasters[0];
+				this.raster.average = has_bands ? rasters[2] : rasters[0];
+			}
 			this.raster.width = image.getWidth();
 			this.raster.height = image.getHeight();
 			this.raster.nodata = parseFloat(image.fileDirectory.GDAL_NODATA);
@@ -492,7 +562,7 @@ export function points() {
 					"visibility":  'none',
 					"text-field":  ['to-string', ['get', '__visible_count']],
 					"text-font":   ["DIN Offc Pro Medium", "Arial Unicode MS Regular"],
-					"text-size": ['step', ['get', '__visible_count'],
+					"text-size":  ['step', ['get', '__visible_count'],
 						11, 5,
 						13, 10,
 						15, 25,

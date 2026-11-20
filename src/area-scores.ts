@@ -232,23 +232,27 @@ export function aggregate_by_area(
 	analysis_raster: ArrayLike<number>,
 	division_data: ArrayLike<number>,
 ): Record<string, AreaCellScore> {
+	// One accumulator per area, not per cell: this runs over every raster cell.
+	const acc: Record<string, { sum: number; count: number }> = {};
+
+	for (let i = 0; i < analysis_raster.length; i += 1) {
+		const id = division_data[i] as number;
+		const value = analysis_raster[i] as number;
+
+		// skip nodata pixels
+		if (id === -1 || value === -1) continue;
+
+		const a = acc[id];
+		if (a) {
+			a.sum = (a.sum || 0) + value;
+			a.count += 1;
+		} else {
+			acc[id] = { "sum": 0 + value, "count": 1 };
+		}
+	}
+
 	return Object.fromEntries(
-		Object.entries(
-			Array.from(analysis_raster).reduce((acc, value, i) => {
-				const id = division_data[i] as number;
-				// skip nodata pixels
-				if (id === -1 || value === -1) {
-					return acc;
-				} else {
-					return Object.assign(acc, {
-						[id]: {
-							"sum":   (acc[id]?.sum || 0) + value,
-							"count": (acc[id]?.count || 0) + 1,
-						},
-					});
-				}
-			}, {} as Record<string, { "sum": number; "count": number }>),
-		).map(([id, { sum, count }]): [string, AreaCellScore] => [id, { sum, "average": sum / count }]),
+		Object.entries(acc).map(([id, { sum, count }]): [string, AreaCellScore] => [id, { sum, "average": sum / count }]),
 	);
 }
 
@@ -504,13 +508,25 @@ export interface PointResult {
 // The band used for a dataset's scalar aggregation. SUM reads the area-weighted
 // sum band, AVG reads the area-weighted average band, and categorical datasets
 // (csv lookup) keep the near band since their values are category codes.
-// The parser has already folded legacy single-band rasters into every band.
-export function aggregation_band(dataset: AggregationDataset): ArrayLike<number> {
-	const agg_fn = dataset.category.analysis?.aggregation ?? 'AVG';
+// The parser has already folded legacy single-band rasters into every band,
+// and decodes this band (with the near one) for a raster no other dataset reads.
+export type AggregationBand = 'data' | 'sum' | 'average';
 
-	if (dataset.csv?.key != null) return dataset.raster.data;
-	if (agg_fn === 'SUM') return dataset.raster.sum!;
-	return dataset.raster.average!;
+export function aggregation_band_key(dataset: Pick<AggregationDataset, 'category' | 'csv'>): AggregationBand {
+	if (dataset.csv?.key != null) return 'data';
+
+	return (dataset.category.analysis?.aggregation ?? 'AVG') === 'SUM' ? 'sum' : 'average';
+}
+
+// Where each band lives in a published GeoTIFF: 1 display, 2 area-weighted sum,
+// 3 area-weighted average. A file with fewer than three bands has no
+// aggregation bands and reads band 1 for all three.
+export const band_samples: Readonly<Record<AggregationBand, number>> = {
+	"data": 0, "sum": 1, "average": 2,
+};
+
+export function aggregation_band(dataset: AggregationDataset): ArrayLike<number> {
+	return dataset.raster[aggregation_band_key(dataset)]!;
 }
 
 // Collect the values of a dataset's aggregation band for each division area,
